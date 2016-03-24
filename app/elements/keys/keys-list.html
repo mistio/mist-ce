@@ -88,7 +88,7 @@
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="keys" drawer></app-sidebar>
             <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
-                <paper-toolbar class="tall" style$="[[_getHeaderStyle()]]">
+                <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
@@ -182,6 +182,13 @@
                 sections: {
                     type: Object
                 },
+                section: {
+                    type: Object
+                },
+                color: {                    
+                    type: String,
+                    computed: '_getHeaderStyle(section)'
+                },
                 keys: {
                     type: Array
                 },
@@ -254,8 +261,8 @@
             ready: function (){
                 this.presentedKeys = this.keys;
             },
-            _getHeaderStyle: function(color) {
-                return 'background-color: ' + this.get('section.color') + '; color: #fff;';
+            _getHeaderStyle: function(section) {
+                return 'background-color: ' + section.color + '; color: #fff;';
             },
             _giveFocusWhenSearchOn: function(){
                 if (this.showSearchOption) {

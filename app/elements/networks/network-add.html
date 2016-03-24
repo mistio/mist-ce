@@ -32,7 +32,7 @@
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
             <paper-header-panel id="container" view$="[[_actualView(view)]]" main>
-                <paper-toolbar style$="[[_getHeaderStyle(section.color)]]">
+                <paper-toolbar style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
@@ -95,6 +95,10 @@
                 },
                 section: {
                     type: Object
+                },
+                color: {                    
+                    type: String,
+                    computed: '_getHeaderStyle(section)'
                 },
                 model: {
                     type: Object
@@ -344,8 +348,8 @@
                     this.typedName = '"'+t.value+'"';
                 }
             },
-            _getHeaderStyle: function() {
-                return 'background-color: ' + this.section.color + '; color: #fff;';
+            _getHeaderStyle: function(section) {
+                return 'background-color: ' + section.color + '; color: #fff;';
             },
             _computeHasClouds: function(clouds) {
                 return clouds.length > 0;
