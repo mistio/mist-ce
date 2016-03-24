@@ -56,28 +56,12 @@
         app-bar .menu-icon {
             margin-right: 15px;
         }
-
-        .elements-title h2 {
-            @apply(--paper-font-title);
-            color: #424242;
-        }
-
-        .elements-title iron-icon {
-            cursor: pointer;
-            margin-left: 16px;
-        }
-
-        .elements-title > [paper-drawer-toggle] {
-            margin: 0 16px 0 0;
-        }
         app-check {
             margin-right: 16px;
             display: inline-block;
             vertical-align: middle;
         }
-        #element-cards,
-        element-table,
-        .elements-title {
+        #element-cards {
             max-width: 1500px;
             margin: 20px auto;
         }
@@ -258,7 +242,6 @@
                 'confirmation': '_deleteSelectedResponse',
                 keyup: 'hotkeys'
             },
-
             _getHeaderStyle: function(color) {
                 return 'background-color: ' + color + '; color: #fff;';
             },

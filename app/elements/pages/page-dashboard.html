@@ -276,7 +276,7 @@
                             </google-chart>
                         </paper-material>
                     </div>
-                    <log-list></log-list>
+                    <!-- <log-list></log-list> -->
                 </div>
         </paper-header-panel>
     </template>
@@ -307,6 +307,9 @@ Polymer({
         model: {
             type: Object,
             notify: true
+        },
+        onbstate : {
+            type: Number
         },
         q: {
             type: String,

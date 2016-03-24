@@ -1,9 +1,9 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<dom-module id="key-item-element">
+<dom-module id="network-item-element">
     <template>
         <style include="shared-styles">
-            :host {
+                        :host {
                 display: block;
             }
             :host[selected] {
@@ -34,23 +34,20 @@
             paper-checkbox[checked] {
                 display: inline-block;
             }
-
-        </style>
+        </style>        
         <paper-item class$="info-item flex-horizontal-with-ratios [[indexClass]]">
             <div class="flexchild">
                 <span class="check">
-                    <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectKey"></app-check>
-                    <paper-tooltip for="check" position="right">Select item</paper-tooltip>
+                    <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectNetwork" disabled$="[[!isOpenstack]]"></app-check>
+                    <paper-tooltip hidden="[[!isOpenstack]]" for="check" position="right">Select item</paper-tooltip>
                 </span>
                 <span class="name">
-                    <a class="regular" href="keys/[[key.id]]">[[key.id]]</a>
+                    <a class="regular" href="networks/[[network.id]]">[[network.name]]</a>
                 </span>
             </div>
-            <div class="flexchild">{{isDefaultText}}</div>
-            <div class="flexchild">[[key.machines.length]] <span hidden="[[!key.machines.length]]">machine<span hidden="[[key.machines.length = 1]]">s</span><span></div>
-            <div>
-                <content></content>
-            </div>
+            <div class="flexchild">[[typeText]]</div>
+            <div class="flexchild">[[network.cloud.title]]</div>
+            <content></content>
         </paper-item>
     </template>
     <script>
@@ -58,21 +55,19 @@
             'use strict';
 
             Polymer({
-                is: 'key-item-element',
+                is: 'network-item-element',
 
                 properties: {
-                    key: {
+                    network: {
                         type: Object
                     },
                     selected: {
                         type: Boolean,
                         value: false,
-                        notify: true,
-                        reflectToAttribute: true
+                        notify: true
                     },
                     index: {
-                        type: Number,
-                        reflectToAttribute: true
+                        type: Number
                     },
                     count: {
                         type: Number
@@ -81,17 +76,25 @@
                         type: String,
                         computed: '_computeIsIndexClass(index, count)'
                     },
-                    isDefaultText: {
+                    isOpenstack: {
+                        type: Boolean,
+                        computed: '_computeIsOpenstack(network.cloud.provider)'
+                    },
+                    isPublic: {
+                        type: Boolean,
+                        computed: '_computeIsPublic(network.router_external)'
+                    },
+                    isPrivate: {
+                        type: Boolean,
+                        computed: '_computeIsPrivate(network.router_external)'
+                    },
+                    typeText: {
                         type: String,
-                        computed: '_computeIsDefaultText(key.isDefault)',
-                        notify: true
+                        computed: '_computeTypeText(isPublic, isPrivate)'
                     }
                 },
                 listeners: {
-                    'selected-changed': '_selectKeyChanged'
-                },
-                _computeIsDefaultText: function(isDefault) {
-                    return isDefault ? 'Default' : null;
+                    'selected-changed': '_selectNetworkChanged'
                 },
                 _computeIsIndexClass: function(index, count) {
                     var classes = [];
@@ -101,17 +104,41 @@
                     );
                     return classes.join(' ');
                 },
-                _selectKeyChanged: function(e) {
-                    var selected = e.detail.value;
-                    this.fire('toggleSelectedKey', {
-                        key: this.key,
-                        selected: selected
-                    });
+                _computeIsOpenstack: function(provider) {
+                    return provider == 'openstack';
                 },
-                _viewKey: function(e) {
-                    page.show('/keys/' + this.key.id);
+                _computeIsPublic: function(router_external) {
+                    return router_external == true;
                 },
-                _selectKey: function(e) {
+                _computeIsPrivate: function(router_external) {
+                    return router_external == false;
+                },
+                _computeTypeText: function(isPublic, isPrivate) {
+                    if (isPublic) {
+                        return 'Public';
+                    }
+
+                    if (isPrivate) {
+                        return 'Private';
+                    }
+
+                    return '';
+                },
+                _selectNetworkChanged: function(e) {
+                    if (this.isOpenstack) {
+                        var selected = e.detail.value;
+                        this.fire('toggleSelectedNetwork', {
+                            network: this.network,
+                            selected: selected
+                        });
+                    } else {
+                        this.set('selected', false);
+                    }
+                },
+                _viewNetwork: function(e) {
+                    page.show('/networks/' + this.network.id);
+                },
+                _selectNetwork: function(e) {
                     // This is used to prevent event bubbling
                     e.stopPropagation();
                     if (Polymer.dom(e).localTarget === this.$.check) {

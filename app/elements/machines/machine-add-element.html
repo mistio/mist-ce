@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="machine-add-element">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+            }
+        </style>
+
+        <paper-card heading="Add Machine">
+            <div class="card-content">
+                <p>Add full page machines dynamic form here</p>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'machine-add-element',
+
+                properties: {
+                    machine: {
+                        type: Object
+                    }
+                }
+            });
+        })();
+    </script>
+</dom-module>

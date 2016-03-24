@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="machine-page-element">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+            }
+        </style>
+
+        <paper-card heading="Single Machine">
+            <div class="card-content">
+                <h2>[[machine.id]]</h2>
+            </div>
+        </paper-card>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'machine-page-element',
+
+                properties: {
+                    machine: {
+                        type: Object
+                    }
+                }
+            });
+        })();
+    </script>
+</dom-module>

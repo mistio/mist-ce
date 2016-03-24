@@ -124,7 +124,7 @@
                                 <paper-tooltip for="sortByDefault" position="top">Sort by default</paper-tooltip>
                                 <paper-icon-button id="sortByDefault" class$="[[_computeIsActiveSort(sortByTerm, 'default')]]" icon="icons:arrow-upward" on-tap="_sortKeys" sort-option="default"></paper-icon-button>
                             </div>
-                            <div class="flexchild">Associated machines
+                            <div class="flexchild">Used In
                                 <paper-tooltip for="sortByMachines" position="top">Sort by amount of machines</paper-tooltip>
                                 <paper-icon-button id="sortByMachines" class$="[[_computeIsActiveSort(sortByTerm, 'machines')]]" icon="icons:arrow-upward" on-tap="_sortKeys" sort-option="machines"></paper-icon-button>
                             </div>
@@ -229,7 +229,7 @@
             },
             ready: function() {
                 var wh = window.innerHeight;
-                this.vpHeight = 'height:'+ wh +'px; overflow: auto;';                
+                this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
             },
             observers: [
                 '_keysChanged(keys.*, selectedKeys.*)',

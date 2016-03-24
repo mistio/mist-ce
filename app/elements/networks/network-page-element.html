@@ -1,12 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<dom-module id="script-page-element">
+<dom-module id="network-page-element">
     <template>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
         :host {
             display: block;
-            background: #fafafa;
         }
         
         paper-material {
@@ -102,25 +101,32 @@
             margin-right: 15px;
         }
 
+        h4.key  {
+            @apply(--layout-flex);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+        
         [size=xs] > * {
             display: none;
         }
-
+        
         responsive-element[size=xs].layout {
             -ms-flex-direction: column;
             -webkit-flex-direction: column;
             flex-direction: column;
         }
-
+        
         [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
             padding: 0 16px;
         }
-
+        
         [size=xs] app-sidebar {
             min-width: 100%;
             height: auto;
         }
-
+        
         paper-icon-bottom.bottom {
             padding-right: 8px;
         }
@@ -132,57 +138,44 @@
                     <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
-                    <span class="bottom title">Script "[[script.name]]"</span>
-                    <paper-tooltip for="scheduleScript" position="top">Schedule Script</paper-tooltip>
-                    <paper-icon-button id="scheduleScript" class="bottom" icon="icons:schedule" on-tap="_scheduleScript"></paper-icon-button>
-                    <paper-tooltip for="editScript" position="top">Edit Script</paper-tooltip>
-                    <paper-icon-button id="editScript" class="bottom" icon="icons:create" on-tap="_editScript"></paper-icon-button>
-                    <paper-tooltip for="deleteScript" position="top">Delete Script</paper-tooltip>
-                    <paper-icon-button id="deleteScript" class="bottom" icon="icons:delete" on-tap="_deleteScript"></paper-icon-button>
+                    <span class="bottom title">Network "[[network.name]]"</span>
+                    <paper-tooltip for="editNetwork" position="top">Edit Network</paper-tooltip>
+                    <paper-icon-button id="editNetwork" class="bottom" icon="icons:create" on-tap="_editNetwork"></paper-icon-button>
+                    <paper-tooltip for="deleteNetwork" position="top">Delete Network</paper-tooltip>
+                    <paper-icon-button id="deleteNetwork" class="bottom" icon="icons:delete" on-tap="_deleteNetwork" disabled$="[[!isOpenstack]]"></paper-icon-button>
                 </paper-toolbar>
                 <div class="content">
                     <paper-material>
                         <div class="info-table">
                             <div class="info-body info-group">
-                                <template is="dom-if" if="[[script.description]]">
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div hidden$="[[!script.description]]" class="flexchild">Description</div>
-                                        <div class="flexchild">[[script.description]]</div>
-                                    </div>
-                                </template>
                                 <div class="info-item flex-horizontal-with-ratios">
-                                    <div class="flexchild">Type</div>
-                                    <div class="flexchild">[[script.type]]</div>
+                                    <div class="flexchild">Name</div>
+                                    <div class="flexchild">[[network.name]]</div>
                                 </div>
-                                <template is="dom-if" if="[[script.entrypoint]]">
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Status</div>
-                                        <div class="flexchild">[[script.entrypoint]]</div>
-                                    </div>
-                                </template>
-                                <template is="dom-if" if="[[isInline]]">
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Script</div>
-                                        <div class="flexchild command-container">[[script.script]]</div>
-                                    </div>
-                                </template>
-                                <template is="dom-if" if="[[isInline]]">
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Url</div>
-                                        <div class="flexchild">[[script.script]]</div>
-                                    </div>
+                                <div class="info-item flex-horizontal-with-ratios">
+                                    <div class="flexchild">ID</div>
+                                    <div class="flexchild">[[network.id]]</div>
+                                </div>
+                                <div hidden$=[[!network.status]] class="info-item flex-horizontal-with-ratios">
+                                    <div class="flexchild">Status</div>
+                                    <div class="flexchild">[[network.status]]</div>
+                                </div>
+                            </div>
+                        </div>
+                    </paper-material>
+                    <paper-material hidden$="[[network.subnets.length < 1]]">
+                        <h4>[[network.subnets.length]] Subnet<span hidden$="[[network.subnets.length >= 2]]">s</span></h4>
+                        <div class="info-table">
+                            <div class="info-body">
+                                <template is="dom-repeat" items="[[network.subnets]]" as="subnet">
+                                    <subnet-item-element subnet="[[subnet]]" itemindex="{{index}}"></subnet-item-element>
                                 </template>
                             </div>
                         </div>
-                    </paper-material>                        
-                    <div class="absolute-bottom-right">
-                        <paper-fab icon="av:play-arrow" on-tap="_runScript" id="runScriptFab"></paper-fab>
-                        <paper-tooltip for="runScriptFab" position="top">Run Script</paper-tooltip>
-                    </div>
+                    </paper-material>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <script-edit-element script="[[script]]"></script-edit-element>
         <dialog-element></dialog-element>
     </template>
     <script>
@@ -190,79 +183,75 @@
         'use strict';
 
         Polymer({
-            is: 'script-page-element',
+            is: 'network-page-element',
 
             properties: {
-                params: {
-                    type: Object
-                },
                 model: {
-                    type: Object
-                },
-                sections: {
-                    type: Object
-                },
-                script: {
                     type: Object,
-                    computed: '_computeScript(params)'
+                    notify: true
                 },
-                scriptid: {
+                params: {
+                    type: Object,
+                    notify: true
+                },
+                network: {
+                    type: Object,
+                    computed: '_computeNetwork(params)'
+                },
+                netid: {
                     type: String,
-                    computed: '_computeScriptId(params)'
+                    computed: '_computeNetworkId(params)'
                 },
-                isInline: {
+                isOpenstack: {
                     type: Boolean,
-                    computed: '_computeIsInline(script.source)'
-                }
+                    computed: '_computeIsOpenstack(network.cloud.provider)'
+                },
+                hasSubnets: {
+                    type: Boolean,
+                    computed: '_computeHasSubnets(network.subnets)'
+                },
             },
+            observers: [
+                '_computeNetwork(params)',
+                '_computeNetworkId(params)'
+            ],
             listeners: {
-                'confirmation': '_deleteScriptResponse',
-                'updateSelectedScript': '_updateScript'
+                'confirmation': '_deleteNetworkResponse'
             },
             _getHeaderStyle: function(color) {
                 return 'background-color: ' + color + '; color: #fff;';
             },
-            _computeId: function(params) {
-                return params.id;
-            },
-            _computeScript: function(params) {
-                return this.model.scriptsArray.find(function(script) {
-                    return script.id == params.id;
+            _computeNetwork: function(params) {
+                var netid = params.id;
+                var net = this.model.networksArray.find(function(network) {
+                    return network.id == netid;
                 }, this);
+                return net;
             },
-            _computeScriptId: function(params) {
+            _computeNetworkId: function(params) {
                 return params.id;
             },
-            _computeIsInline: function(source) {
-                return source == 'inline';
+            _computeHasSubnets: function(subnets) {
+                return subnets && subnets.length;
             },
-            _runScript: function(e) {
-                page.show('/run-script/' + this.script.id);
+            _computeIsOpenstack: function(provider) {
+                return provider == 'openstack';
             },
-            _editScript: function(e) {
-                var el = this.querySelector('script-edit-element');
-                el._openEditScriptModal();
-            },
-            _updateScript: function(e) {
-                var script = e.detail.script;
-                this.set('script.name', script.name);
-                this.set('script.description', script.description);
-            },
-            _deleteScript: function(e) {
+            _deleteNetwork: function(e) {
                 this._showDialog({
-                    title: 'Delete Script?',
-                    body: "Deleting scripts cannot be undone. You are about to delete script: " + this.script.name ,
+                    title: 'Delete Network?',
+                    body: "Deleting scripts cannot be undone. You are about to delete network: " + this.network.name,
                     danger: true,
-                    reason: "delete_script"
+                    reason: "delete_network"
                 });
             },
-            _deleteScriptResponse: function(e) {
+            _deleteNetworkResponse: function(e) {
                 var reason = e.detail.reason,
                     response = e.detail.response;
 
-                if (response.confirmed && reason == "delete_script") {
-                    console.log('i ll delete the script');
-                    page.show('/scripts');
+                if (response.confirmed && reason == "delete_network") {
+                    console.log('i ll delete the network');
+                    page.show('/networks');
                 }
             },
             _showDialog: function(info) {
