@@ -4,19 +4,6 @@
     <template>
         <style is="custom-style" include="forms"></style>
         <style include="shared-styles">
-        /*:host {
-            display: block;
-        }
-        
-        paper-card,
-        paper-checkbox {
-            display: block;
-        }
-        
-        paper-toggle-button,
-        paper-checkbox {
-            margin-top: 20px;
-        }*/
         :host {
             display: block;
         }
@@ -103,6 +90,12 @@
             is: 'network-add',
 
             properties: {
+                sections: {
+                    type: Object
+                },
+                section: {
+                    type: Object
+                },
                 model: {
                     type: Object
                 },
@@ -351,8 +344,8 @@
                     this.typedName = '"'+t.value+'"';
                 }
             },
-            _getHeaderStyle: function(color) {
-                return 'background-color: ' + color + '; color: #fff;';
+            _getHeaderStyle: function() {
+                return 'background-color: ' + this.section.color + '; color: #fff;';
             },
             _computeHasClouds: function(clouds) {
                 return clouds.length > 0;

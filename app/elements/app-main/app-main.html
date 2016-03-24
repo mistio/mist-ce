@@ -60,6 +60,7 @@
             <iron-route path="/keys/:id" title="keys" href="../keys/key-page.html"></iron-route>
             <iron-route path="/networks" title="networks" href="../networks/networks-list.html"></iron-route>
             <iron-route path="/networks/:id" title="network" href="../networks/network-page.html"></iron-route>
+            <iron-route path="/add-network" title="network" href="../networks/network-add.html"></iron-route>
             <iron-route path="/scripts" title="scripts" href="../scripts/scripts-list.html"></iron-route>
             <iron-route path="/scripts/:id" title="script" href="../scripts/script-page.html"></iron-route>
             <iron-route path="/add-script" title="add scripts" href="../scripts/script-add.html"></iron-route>
@@ -78,20 +79,34 @@
             <!-- images -->
             <page-list model="[[model]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-list>
             <page-image params="[[params]]" model="[[model]]" image="[[getImage(params)]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-image>
+            
+
+
             <!-- keys -->
             <keys-list model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" keys="[[model.keysArray]]"></keys-list>
             <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
+            
+
+
+
             <!-- networks -->
             <!-- <page-list model="[[model]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-list> -->
             <networks-list model="[[model]]" networks="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></networks-list>
             <!-- <page-network model="[[model]]" params="[[params]]" network="[[getNetwork(params)]]" elements="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></page-network> -->
             <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
             <network-add model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
+
+
+
             <!-- scripts -->
             <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
             <scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list>
             <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
-            <script-add model="{{model}}" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
+            <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
+            
+
+
+
             <page-elements></page-elements>
             <page-account></page-account>
             <page-not-found></page-not-found>

@@ -194,6 +194,9 @@
                     type: Object,
                     notify: true
                 },
+                sections: {
+                    type: Object
+                },
                 params: {
                     type: Object,
                     notify: true
@@ -222,7 +225,7 @@
             listeners: {
                 'confirmation': '_deleteNetworkResponse'
             },
-            _getHeaderStyle: function(color) {
+            _getHeaderStyle: function() {
                 return 'background-color: ' + this.section.color + '; color: #fff;';
             },
             _computeNetwork: function(params) {

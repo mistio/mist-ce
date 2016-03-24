@@ -203,7 +203,7 @@
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
             <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
-                <paper-toolbar class="tall" style$="[[_getHeaderStyle(section.color)]]">
+                <paper-toolbar class="tall" style$="[[_getHeaderStyle()]]">
                     <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
@@ -258,7 +258,6 @@
                                 <li>
                                     <iron-icon icon='hardware:laptop'></iron-icon> <a href="[[getMachineUrl(machine)]]" class="machine">[[getMachineName(machine)]]</a>
                                     <span class="machine-info">: id: [[machine.1]], image: [[machine.3]]</span>
-                                    <!--  [[machine.0]] ,  [[machine.2]],  [[machine.4]], ,  [[machine.5]] -->
                                 </li>
                             </template>
                         </ul>
@@ -288,6 +287,9 @@
             is: 'key-page',
 
             properties: {
+                sections: {
+                    type: Object
+                },
                 params: {
                     type: Object,
                     notify: true
@@ -354,8 +356,8 @@
             _baseUrl: function (params){
                 return '/keys/'+ this.params.id;
             },
-            _getHeaderStyle: function(color) {
-                return 'background-color: ' + color + '; color: #fff;';
+            _getHeaderStyle: function() {
+                return 'background-color: ' + this.section.color + '; color: #fff;';
             },
             _computeKey: function(params) {
                 return this.model.keysArray.find(function(key) {
