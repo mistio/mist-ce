@@ -17,6 +17,10 @@ Polymer({
         initialized: {
             type: Boolean,
             value: false
+        },
+        onboarding: {
+            type: Object,
+            value: {}
         }
     },
 
@@ -147,6 +151,21 @@ Polymer({
             that.send('msg', 'logs', 'ready');
             that.set('initialized', true);
         };
+
+        this.getScripts();
+    },
+
+    getScripts: function () {
+        var xhr = new XMLHttpRequest(), that = this;
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status == 200) {
+                    that._updateModel('scripts', JSON.parse(xhr.responseText));
+                }
+            }
+        }
+        xhr.open("GET", '/api/v1/scripts', true);
+        xhr.send();
     },
 
     connectionClosed: function () {
@@ -191,13 +210,9 @@ Polymer({
             endpoint(body[Object.keys(body)[0]]);
     },
 
-    _updateClouds: function (data) {
-        return this._updateModel('clouds', data);
-    },
-
     _updateModel: function (section, data) {
         var changed = false, // we wont update the model if it hasn't changed
-            pending = this.get('model.' + section + '.pending');
+            pending = this.get('model.pending.' + section);
 
         // if the received data array has different length than the respective
         // model array, then things must have changed since last update
@@ -259,9 +274,23 @@ Polymer({
         return changed;
     },
 
+    _updateClouds: function (data) {
+        if (data.length && (this.get('onboarding.hasCloud') != true))
+            this.set('onboarding.hasCloud', true);
+        if (!data.length)
+            this.set('onboarding.hasCloud', false);
+        console.warn(data);
+        return this._updateModel('clouds', data);
+    },
+
     _updateMonitoring: function (data) {
-        //console.warn('got monitoring', data);
+        console.warn('got monitoring', data);
+        if (data.length && this.get('onboarding.hasMonitoring') != true)
+            this.set('onboarding.hasMonitoring', true);
+        if (!data.length)
+            this.set('onboarding.hasMonitoring', false);
         this.set('model.pending.monitoring', false);
+        return this.set('model.monitoring', data);
     },
 
     _updateKeys: function (data) {
@@ -305,7 +334,7 @@ Polymer({
             return false;
 
         var allMachines = [];
-        if (this.model  != undefined ) {
+        if (this.model != undefined ) {
             this.model.cloudsArray.forEach(
                 function(cloud){
                     if (cloud.machinesArray != undefined ) {
@@ -317,6 +346,9 @@ Polymer({
                 }
             });
         }
+
+        if (data.length && this.get('model.onboarding.hasMachines') != true)
+            this.set('model.onboarding.hasMachines', true);
 
         this.set('model.machinesArray', allMachines);
         this.set('machinesArray', allMachines);
