@@ -18,7 +18,6 @@ define('app/views/team', ['app/views/page'],
             //
 
             model: function () {
-                console.log(this.get('controller').get('model'));
                 return this.get('controller').get('model');
             }.property('controller.model'),
 

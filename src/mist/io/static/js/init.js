@@ -396,7 +396,6 @@ var setupMainChannel = function(socket, callback) {
                 id: organization.id,
                 name: organization.name
             };
-
             var members = organization.members.filter(function(member) {
                 return team.members.indexOf(member.id) > -1;
             });

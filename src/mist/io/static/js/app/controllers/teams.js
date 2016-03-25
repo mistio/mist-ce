@@ -69,6 +69,12 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             // Methods
             //
 
+            belongsToOtherTeam: function(args) {
+                return this.get('model').some(function(team) {
+                    return team.id != args.team.id && team.members.indexOf(args.member) != -1;
+                });
+            },
+
             addTeam: function(args) {
                 var that = this;
                 that.set('addingTeam', true);
