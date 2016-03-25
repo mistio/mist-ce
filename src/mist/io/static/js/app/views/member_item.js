@@ -42,9 +42,9 @@ define('app/views/member_item', ['ember', 'md5'],
                         paragraph = null;
 
                     if (belongsToOtherTeam) {
-                        paragraph = '"' + member.name + '" does not belong to any other teams. Removing them from the "' + team.name + '" team will remove them from the organization. Proceed?';
-                    } else {
                         paragraph = 'Are you sure you want to remove member "' + member.name + '"?';
+                    } else {
+                        paragraph = '"' + member.name + '" does not belong to any other teams. Removing them from the "' + team.name + '" team will remove them from the organization. Proceed?';
                     }
 
                     Mist.dialogController.open({
