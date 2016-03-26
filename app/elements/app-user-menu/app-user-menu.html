@@ -9,31 +9,52 @@
         :host ::content paper-material {
             width: 300px !important;
         }
-        paper-item {
+        :host paper-item {
             --paper-menu-focused-item {
                 background-color: #fff;
-            }
+            }            
         }
-        paper-item:last-child, paper-item.noborder {
+        :host paper-item {
+            border-bottom: 0 none;
+            padding: 8px 16px;
+            min-height: 36px;
+        }
+        :host paper-item:last-child, :host paper-item.noborder {
             border-bottom: 0 none;
         }
-        paper-icon-button.gravatar {
+        :host paper-icon-button.gravatar {
             border-radius: 50%;
             border: 2px solid #212121;
             overflow: hidden;
         }
-        .opaque {
+        :host iron-icon {
+            margin-right: 26px;            
+        }
+        .add-org {
             opacity: 0.54;
-            padding-top: 15px;
+            margin-top: 8px;
+            flex-flow: row-reverse wrap;
+            border-top: 1px solid #ddd;
+        }
+        .add-org a {
+            font-weight: 400;
+        }
+        :host .add-org iron-icon {
+            margin-right: 0;
         }
         .grid-row {
             padding: 0;
             margin: 0;
         }
+        paper-item:not(.context) {
+            padding: 8px 16px 8px 24px;
+        }
         .context iron-icon {
             background-color: #f2f2f2;
             border-radius: 50%;
-            margin-right: 8px;            
+            margin-right: 22px;
+            width: 36px;
+            height: 36px;
         }
         .current.context {
             border-bottom: 1px solid #ddd;
@@ -52,9 +73,8 @@
             display: block;
             color: rgba(0,0,0,0.54);
             font-weight: 400;
-            padding-left: 35px;
         }
-        paper-icon-button {
+        :host paper-icon-button {
             padding: 0;
         }
         h4 {
@@ -72,36 +92,43 @@
             <paper-icon-button src="[[gravatar]]" class="gravatar dropdown-trigger"></paper-icon-button>
             <div class="dropdown-content">
                 <div class="grid-row current context">
-                    <div class="logo xs3">
+                    <div class="logo xs4">
                         <iron-icon class="user-menu-icon" icon="circle"></iron-icon> 
                     </div>
-                    <div class="org xs9">
+                    <div class="org xs8">
                         <h4>Organisation X</h4>
                         <span>Dev, QA</span>
                     </div>
                 </div>
                 <paper-menu>                
                     <paper-item class="context">
-                        <a href="/" class="flex">
-                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon> Mist.io
-                            <span class="teams">Dev</span>
+                        <a href="/" class="grid-row">
+                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon> 
+                            <div>Mist.io
+                                <span class="teams">Dev</span>
+                            </div>
                         </a>
                     </paper-item>
                     <paper-item class="context">
-                        <a href="/" class="flex">
-                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon> Organisation 
+                        <a href="/" class="grid-row">
+                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon> 
+                            <div>Organisation 
                             <span class="teams">QA, Dev</span>
+                            </div>
                         </a>
                     </paper-item>
                     <paper-item class="context">
-                        <a href="/" class="flex">
-                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon> [[email]] 
+                        <a href="/" class="grid-row">
+                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon> 
+                            <div>[[email]] 
                             <span class="teams">Personal account</span>
+                            </div>
                         </a>
                     </paper-item>
-                    <paper-item class="noborder opaque">
-                        <a href="/" class="flex">
-                            <iron-icon icon="icons:add-circle-outline"></iron-icon> Add Organisation
+                    <paper-item class="noborder add-org">
+                        <a href="/" class="grid-row">
+                            Add Organisation
+                            <iron-icon icon="icons:add-circle-outline"></iron-icon>
                         </a>
                     </paper-item>
                     <hr/>
@@ -120,6 +147,7 @@
                             <iron-icon class="user-menu-icon" icon="account-circle"></iron-icon> Account
                         </a>
                     </paper-item>
+                    <hr/>
                     <paper-item>
                         <a href="/" class="flex">
                             <iron-icon class="user-menu-icon" icon="power-settings-new"></iron-icon> Logout                            
