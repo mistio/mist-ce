@@ -39,7 +39,7 @@
                     <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectScript"></app-check>
                     <paper-tooltip for="check" position="right">Select item</paper-tooltip>
                 </span>
-                <span class="name"><a class="regular" href="scripts/[[script.id]]">[[script.name]]</a></span>
+                <span class="name"><a is="pushstate-anchor" class="regular" href="scripts/[[script.id]]">[[script.name]]</a></span>
             </div>
             <div class="flexchild">[[script.type]]</div>
             <content></content>

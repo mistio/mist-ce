@@ -91,7 +91,7 @@
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
             <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
                 <paper-toolbar class="tall" style$="[[color]]">
-                    <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
+                    <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
                     <span class="bottom title">[[presentedNetworks.length]] Networks</span>
@@ -405,6 +405,9 @@
                     var notification = document.querySelector('notification-element');
                     notification.title = title;
                     notification._openToast();
+                },
+                _goBack: function(){
+                    history.back();
                 }
             });
         })();
