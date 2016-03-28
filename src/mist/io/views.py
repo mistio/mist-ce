@@ -1363,7 +1363,7 @@ def star_image(request):
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner,
                                                   cloud_id)
     if not auth_context.has_perm("cloud", "edit", cloud_id, cloud_tags):
-        raise PolicyUnauthorizedError("To edit cloud")
+        raise PolicyUnauthorizedError("To edit cloud's images")
     return methods.star_image(auth_context.owner, cloud_id, image_id)
 
 
