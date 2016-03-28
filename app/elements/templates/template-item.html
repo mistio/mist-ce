@@ -36,10 +36,10 @@
         <paper-item class$="info-item flex-horizontal-with-ratios [[indexClass]]">
             <div class="flexchild">
                 <span class="check">
-                    <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectScript"></app-check>
+                    <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectTemplate"></app-check>
                     <paper-tooltip for="check" position="right">Select item</paper-tooltip>
                 </span>
-                <span class="name"><a is="pushstate-anchor" class="regular" href="scripts/[[script.id]]">[[template.name]]</a></span>
+                <span class="name"><a is="pushstate-anchor" class="regular" href="templates/[[template._id]]">[[template.name]]</a></span>
             </div>
             <div class="flexchild">[[template.type]]</div>
             <content></content>
@@ -53,7 +53,7 @@
                 is: 'template-item',
 
                 properties: {
-                    script: {
+                    template: {
                         type: Object
                     },
                     selected: {
@@ -73,7 +73,7 @@
                     },
                     isDefaultText: {
                         type: String,
-                        computed: '_computeIsDefaultText(script.isDefault)'
+                        computed: '_computeIsDefaultText(template.isDefault)'
                     }
                 },
                 listeners: {
@@ -90,15 +90,15 @@
                 _selectScriptChanged: function(e) {
                     var selected = e.detail.value;
                     this.fire('toggleSelectedScript', {
-                        script: this.script,
+                        template: this.template,
                         selected: selected
                     });
                 },
-                _scriptUrl: function(script){
-                    return "/scripts/"+script.id;
+                _templateUrl: function(template){
+                    return "/templates/"+template.id;
                 },
                 _viewScript: function(e) {
-                    page.show('/scripts/' + this.script.id);
+                    page.show('/templates/' + this.template.id);
                 },
                 _selectScript: function(e) {
                     // This is used to prevent event bubbling

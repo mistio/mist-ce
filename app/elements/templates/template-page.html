@@ -136,57 +136,69 @@
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
-                    <span class="bottom title">Script "[[script.name]]"</span>
-                    <paper-tooltip for="scheduleScript" position="top">Schedule Script</paper-tooltip>
-                    <paper-icon-button id="scheduleScript" class="bottom" icon="icons:schedule" on-tap="_scheduleScript"></paper-icon-button>
-                    <paper-tooltip for="editScript" position="top">Edit Script</paper-tooltip>
-                    <paper-icon-button id="editScript" class="bottom" icon="icons:create" on-tap="_editScript"></paper-icon-button>
-                    <paper-tooltip for="deleteScript" position="top">Delete Script</paper-tooltip>
-                    <paper-icon-button id="deleteScript" class="bottom" icon="icons:delete" on-tap="_deleteScript"></paper-icon-button>
+                    <span class="bottom title">Template "[[template.name]]"</span>
+                    <paper-tooltip for="scheduleTemplate" position="top">Schedule Template</paper-tooltip>
+                    <paper-icon-button id="scheduleTemplate" class="bottom" icon="icons:schedule" on-tap="_scheduleTemplate"></paper-icon-button>
+                    <paper-tooltip for="editTemplate" position="top">Edit Template</paper-tooltip>
+                    <paper-icon-button id="editTemplate" class="bottom" icon="icons:create" on-tap="_editTemplate"></paper-icon-button>
+                    <paper-tooltip for="deleteTemplate" position="top">Delete Template</paper-tooltip>
+                    <paper-icon-button id="deleteTemplate" class="bottom" icon="icons:delete" on-tap="_deleteTemplate"></paper-icon-button>
                 </paper-toolbar>
                 <div class="content">
                     <paper-material>
                         <div class="info-table">
                             <div class="info-body info-group">
-                                <template is="dom-if" if="[[script.description]]">
+                                <template is="dom-if" if="[[template.description]]">
                                     <div class="info-item flex-horizontal-with-ratios">
-                                        <div hidden$="[[!script.description]]" class="flexchild">Description</div>
-                                        <div class="flexchild">[[script.description]]</div>
+                                        <div hidden$="[[!template.description]]" class="flexchild">Description</div>
+                                        <div class="flexchild">[[template.description]]</div>
+                                    </div>
+                                </template>
+                                <template is="dom-if" if="[[template.created_at]]">
+                                    <div class="info-item flex-horizontal-with-ratios">
+                                        <div class="flexchild">Created at</div>
+                                        <div class="flexchild">[[template.created_at]]</div>
+                                    </div>
+                                </template>
+                                <template is="dom-if" if="[[template.entrypoint]]">
+                                    <div class="info-item flex-horizontal-with-ratios">
+                                        <div class="flexchild">Location</div>
+                                        <div class="flexchild">[[template.entrypoint]]</div>
                                     </div>
                                 </template>
                                 <div class="info-item flex-horizontal-with-ratios">
                                     <div class="flexchild">Type</div>
-                                    <div class="flexchild">[[script.type]]</div>
+                                    <div class="flexchild">[[template.exec_type]]</div>
                                 </div>
-                                <template is="dom-if" if="[[script.entrypoint]]">
+                                <template is="dom-if" if="[[template.location_type]]">
                                     <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Status</div>
-                                        <div class="flexchild">[[script.entrypoint]]</div>
+                                        <div class="flexchild">Location</div>
+                                        <div class="flexchild">[[template.location_type]]</div>
                                     </div>
                                 </template>
-                                <template is="dom-if" if="[[isInline]]">
+                                <template is="dom-if" if="[[template.stacks.length > 0]]">
                                     <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Script</div>
-                                        <div class="flexchild command-container">[[script.script]]</div>
+                                        <div class="flexchild">Created at</div>
+                                        <div class="flexchild">[[template.stacks]]</div>
                                     </div>
                                 </template>
-                                <template is="dom-if" if="[[isInline]]">
+                                <template is="dom-if" if="[[template.template]]">
                                     <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Url</div>
-                                        <div class="flexchild">[[script.script]]</div>
+                                        <div class="flexchild">Template</div>
+                                        <div class="flexchild command-container">[[template.template]]</div>
                                     </div>
-                                </template>
+                                </template>                                
                             </div>
                         </div>
                     </paper-material>
                     <div class="absolute-bottom-right">
-                        <paper-fab icon="av:play-arrow" on-tap="_runScript" id="runScriptFab"></paper-fab>
-                        <paper-tooltip for="runScriptFab" position="top">Run Script</paper-tooltip>
+                        <paper-fab icon="av:play-arrow" on-tap="_runTemplate" id="runTemplateFab"></paper-fab>
+                        <paper-tooltip for="runTemplateFab" position="top">Run Template</paper-tooltip>
                     </div>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <script-edit script="[[script]]"></script-edit>
+        <template-edit template="[[template]]"></template-edit>
         <dialog-element></dialog-element>
     </template>
     <script>
@@ -213,22 +225,22 @@
                 model: {
                     type: Object
                 },
-                script: {
+                template: {
                     type: Object,
-                    computed: '_computeScript(params)'
+                    computed: '_computeTemplate(params)'
                 },
-                scriptid: {
+                templateid: {
                     type: String,
-                    computed: '_computeScriptId(params)'
+                    computed: '_computeTemplateId(params)'
                 },
                 isInline: {
                     type: Boolean,
-                    computed: '_computeIsInline(script.source)'
+                    computed: '_computeIsInline(template.source)'
                 }
             },
             listeners: {
-                'confirmation': '_deleteScriptResponse',
-                'updateSelectedScript': '_updateScript'
+                'confirmation': '_deleteTemplateResponse',
+                'updateSelectedTemplate': '_updateTemplate'
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
@@ -236,44 +248,44 @@
             _computeId: function(params) {
                 return params.id;
             },
-            _computeScript: function(params) {
-                return this.model.scriptsArray.find(function(script) {
-                    return script.id == params.id;
+            _computeTemplate: function(params) {
+                return this.model.templatesArray.find(function(template) {
+                    return template._id == params.id;
                 }, this);
             },
-            _computeScriptId: function(params) {
+            _computeTemplateId: function(params) {
                 return params.id;
             },
             _computeIsInline: function(source) {
                 return source == 'inline';
             },
-            _runScript: function(e) {
-                page.show('/run-script/' + this.script.id);
+            _runTemplate: function(e) {
+                page.show('/run-template/' + this.template.id);
             },
-            _editScript: function(e) {
-                var el = this.querySelector('script-edit');
-                el._openEditScriptModal();
+            _editTemplate: function(e) {
+                var el = this.querySelector('template-edit');
+                el._openEditTemplateModal();
             },
-            _updateScript: function(e) {
-                var script = e.detail.script;
-                this.set('script.name', script.name);
-                this.set('script.description', script.description);
+            _updateTemplate: function(e) {
+                var template = e.detail.template;
+                this.set('template.name', template.name);
+                this.set('template.description', template.description);
             },
-            _deleteScript: function(e) {
+            _deleteTemplate: function(e) {
                 this._showDialog({
-                    title: 'Delete Script?',
-                    body: "Deleting scripts cannot be undone. You are about to delete script: " + this.script.name ,
+                    title: 'Delete Template?',
+                    body: "Deleting templates cannot be undone. You are about to delete template: " + this.template.name ,
                     danger: true,
-                    reason: "delete_script"
+                    reason: "delete_template"
                 });
             },
-            _deleteScriptResponse: function(e) {
+            _deleteTemplateResponse: function(e) {
                 var reason = e.detail.reason,
                     response = e.detail.response;
 
-                if (response.confirmed && reason == "delete_script") {
-                    console.log('i ll delete the script');
-                    page.show('/scripts');
+                if (response.confirmed && reason == "delete_template") {
+                    console.log('i ll delete the template');
+                    page.show('/templates');
                 }
             },
             _showDialog: function(info) {

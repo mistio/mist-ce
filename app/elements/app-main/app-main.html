@@ -108,7 +108,7 @@
             <template-add model="[[model]]" sections="[[sections]]" section="[[sections.templates]]"></template-add>
             
 
-            <!-- scripts - leave scipts last due to editor  highlighting problem-->
+            <!-- scripts - leave scipts last due to editors highlighting problem -->
             <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
             <scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list>
             <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
@@ -172,18 +172,7 @@ var app = Polymer({
                     user: "56b8beaae90e5b043ae75c98"
                 }
             ],
-            teamsArray:[
-                {
-                    description: "",
-                    entrypoint: "",
-                    id: "448082e761c94660acfe54427c5ca461",
-                    name: "test",
-                    script: "#!/bin/bash\necho 'hello world '",
-                    source: "inline",
-                    type: "executable",
-                    user: "marios@mist.io",
-                }
-            ],
+            teamsArray:[],
             pending: {
                 clouds: true,
                 monitoring: true

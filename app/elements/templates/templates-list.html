@@ -244,9 +244,15 @@
                 this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
             },
             observers: [
-                
+                '_templatesChanged(templates.*, selectedTemplates.*)',
+                '_presentedTemplatesChanged(templates.*, searchTerm, sortByTerm)',
+                '_giveFocusWhenSearchOn(showSearchOption)'
             ],
             listeners: {
+                '_toggleSelectedTemplate': '_toggleSelectedTemplate',
+                'addTemplate': '_addTemplate',
+                '_updateSelectedTemplate': '_updateSelectedTemplate',
+                'confirmation': '_deleteSelectedResponse',
                 keyup: 'hotkeys'
             },
             _getHeaderStyle: function(section) {
