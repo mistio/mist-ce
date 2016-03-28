@@ -1849,7 +1849,7 @@ def assoc_metric(request):
     auth_context = auth_context_from_request(request)
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
-        raise UnauthorizedError()
+        raise PolicyUnauthorizedError("To read cloud")
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
     try:
