@@ -54,8 +54,10 @@
             <iron-route path="/machines/:uuid" title="machine"></iron-route>
             
             <!-- images -->
-            <iron-route path="/images" title="images" href="../pages/page-list.html"></iron-route>
-            <iron-route path="/images/:id" title="image"></iron-route>
+            <!-- <iron-route path="/images" title="images" href="../pages/page-list.html"></iron-route> -->
+            <!-- <iron-route path="/images/:id" title="image"></iron-route> -->
+            <iron-route path="/images" title="images" href="../images/images-list.html"></iron-route>
+            <iron-route path="/images/:id" title="image" href="../images/images-page.html"></iron-route>
             
             <!-- keys -->
             <iron-route path="/keys" title="keys" href="../keys/keys-list.html"></iron-route>
@@ -90,7 +92,8 @@
             <page-machine params="[[params]]" model="[[model]]" machine="[[getMachine(params)]]" sections="[[sections]]"></page-machine>
             
             <!-- images -->
-            <page-list model="[[model]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-list>
+            <!-- <page-list model="[[model]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-list> -->
+            <images-list model="[[model]]" images="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></images-list>
             <page-image params="[[params]]" model="[[model]]" image="[[getImage(params)]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-image>
             
             <!-- keys -->
@@ -172,7 +175,18 @@ var app = Polymer({
                     user: "56b8beaae90e5b043ae75c98"
                 }
             ],
-            teamsArray:[],
+            teamsArray:[
+                {
+                    description: "",
+                    entrypoint: "",
+                    id: "448082e761c94660acfe54427c5ca461",
+                    name: "test",
+                    script: "#!/bin/bash\necho 'hello world '",
+                    source: "inline",
+                    type: "executable",
+                    user: "marios@mist.io",
+                }
+            ],
             pending: {
                 clouds: true,
                 monitoring: true

@@ -237,8 +237,9 @@
                 return params.id;
             },
             _computeScript: function(params) {
+                var scriptid = params.id;
                 return this.model.scriptsArray.find(function(script) {
-                    return script.id == params.id;
+                    return script.id == scriptid;
                 }, this);
             },
             _computeScriptId: function(params) {
