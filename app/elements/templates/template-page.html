@@ -1,0 +1,293 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="template-edit.html">
+<link rel="import" href="template-item.html">
+<link rel="import" href="template-run.html">
+
+<dom-module id="template-page">
+    <template>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            background: #fafafa;
+        }
+
+        paper-material {
+            display: block;
+            padding: 20px;
+            margin: 36px;
+        }
+
+        paper-menu-button paper-button {
+            display: block;
+        }
+
+        .flex-horizontal-with-ratios {
+            @apply(--layout-horizontal);
+        }
+
+        .flexchild {
+            @apply(--layout-flex);
+        }
+
+        .command-container {
+            background-color: #444;
+            color: #fff;
+            font-family: monospace;
+            padding: 10px;
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+        }
+
+        #container {
+            background: #fafafa;
+        }
+
+        .paper-header [paper-drawer-toggle] {
+            margin-left: 10px;
+        }
+
+        .paper-header {
+            @apply(--layout-horizontal);
+        }
+
+        .paper-header {
+            height: 60px;
+            font-size: 24px;
+            line-height: 60px;
+            padding: 0 10px;
+            color: white;
+            transition: height 0.2s;
+            transition: font-size 0.2s;
+        }
+
+        .paper-header.tall {
+            height: 320px;
+            font-size: 16px;
+        }
+
+        .paper-header h2 {
+            margin-left: 20px;
+            @apply(--layout-flex);
+            text-transform: capitalize;
+        }
+
+        .paper-header .toggleViewButton {
+            --paper-icon-button-ink-color: transparent;
+        }
+
+        .paper-header .cartButton {
+            margin-right: 10px;
+        }
+
+        #content {
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 10px;
+        }
+
+        paper-icon-button {
+            transition: all 200ms;
+        }
+
+        paper-icon-button.active-sort {
+            transform: rotate(180deg);
+        }
+
+        paper-icon-button.active-sort::content iron-icon {
+            color: #D48900 !important;
+        }
+
+        app-bar .menu-icon {
+            margin-right: 15px;
+        }
+
+        [size=xs] > * {
+            display: none;
+        }
+
+        responsive-element[size=xs].layout {
+            -ms-flex-direction: column;
+            -webkit-flex-direction: column;
+            flex-direction: column;
+        }
+
+        [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
+            padding: 0 16px;
+        }
+
+        [size=xs] app-sidebar {
+            min-width: 100%;
+            height: auto;
+        }
+
+        paper-icon-bottom.bottom {
+            padding-right: 8px;
+        }
+        </style>
+        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
+            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
+            <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
+                <paper-toolbar class="tall" style$="[[color]]">
+                    <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
+                    <span class="title"></span>
+                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <span class="bottom title">Script "[[script.name]]"</span>
+                    <paper-tooltip for="scheduleScript" position="top">Schedule Script</paper-tooltip>
+                    <paper-icon-button id="scheduleScript" class="bottom" icon="icons:schedule" on-tap="_scheduleScript"></paper-icon-button>
+                    <paper-tooltip for="editScript" position="top">Edit Script</paper-tooltip>
+                    <paper-icon-button id="editScript" class="bottom" icon="icons:create" on-tap="_editScript"></paper-icon-button>
+                    <paper-tooltip for="deleteScript" position="top">Delete Script</paper-tooltip>
+                    <paper-icon-button id="deleteScript" class="bottom" icon="icons:delete" on-tap="_deleteScript"></paper-icon-button>
+                </paper-toolbar>
+                <div class="content">
+                    <paper-material>
+                        <div class="info-table">
+                            <div class="info-body info-group">
+                                <template is="dom-if" if="[[script.description]]">
+                                    <div class="info-item flex-horizontal-with-ratios">
+                                        <div hidden$="[[!script.description]]" class="flexchild">Description</div>
+                                        <div class="flexchild">[[script.description]]</div>
+                                    </div>
+                                </template>
+                                <div class="info-item flex-horizontal-with-ratios">
+                                    <div class="flexchild">Type</div>
+                                    <div class="flexchild">[[script.type]]</div>
+                                </div>
+                                <template is="dom-if" if="[[script.entrypoint]]">
+                                    <div class="info-item flex-horizontal-with-ratios">
+                                        <div class="flexchild">Status</div>
+                                        <div class="flexchild">[[script.entrypoint]]</div>
+                                    </div>
+                                </template>
+                                <template is="dom-if" if="[[isInline]]">
+                                    <div class="info-item flex-horizontal-with-ratios">
+                                        <div class="flexchild">Script</div>
+                                        <div class="flexchild command-container">[[script.script]]</div>
+                                    </div>
+                                </template>
+                                <template is="dom-if" if="[[isInline]]">
+                                    <div class="info-item flex-horizontal-with-ratios">
+                                        <div class="flexchild">Url</div>
+                                        <div class="flexchild">[[script.script]]</div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </paper-material>
+                    <div class="absolute-bottom-right">
+                        <paper-fab icon="av:play-arrow" on-tap="_runScript" id="runScriptFab"></paper-fab>
+                        <paper-tooltip for="runScriptFab" position="top">Run Script</paper-tooltip>
+                    </div>
+                </div>
+            </paper-header-panel>
+        </paper-drawer-panel>
+        <script-edit script="[[script]]"></script-edit>
+        <dialog-element></dialog-element>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'template-page',
+
+            properties: {
+                sections: {
+                    type: Object
+                },
+                section: {
+                    type: Object
+                },
+                color: {
+                    type: String,
+                    computed: '_getHeaderStyle(section)'
+                },
+                params: {
+                    type: Object
+                },
+                model: {
+                    type: Object
+                },
+                script: {
+                    type: Object,
+                    computed: '_computeScript(params)'
+                },
+                scriptid: {
+                    type: String,
+                    computed: '_computeScriptId(params)'
+                },
+                isInline: {
+                    type: Boolean,
+                    computed: '_computeIsInline(script.source)'
+                }
+            },
+            listeners: {
+                'confirmation': '_deleteScriptResponse',
+                'updateSelectedScript': '_updateScript'
+            },
+            _getHeaderStyle: function(section) {
+                return 'background-color: ' + section.color + '; color: #fff;';
+            },
+            _computeId: function(params) {
+                return params.id;
+            },
+            _computeScript: function(params) {
+                return this.model.scriptsArray.find(function(script) {
+                    return script.id == params.id;
+                }, this);
+            },
+            _computeScriptId: function(params) {
+                return params.id;
+            },
+            _computeIsInline: function(source) {
+                return source == 'inline';
+            },
+            _runScript: function(e) {
+                page.show('/run-script/' + this.script.id);
+            },
+            _editScript: function(e) {
+                var el = this.querySelector('script-edit');
+                el._openEditScriptModal();
+            },
+            _updateScript: function(e) {
+                var script = e.detail.script;
+                this.set('script.name', script.name);
+                this.set('script.description', script.description);
+            },
+            _deleteScript: function(e) {
+                this._showDialog({
+                    title: 'Delete Script?',
+                    body: "Deleting scripts cannot be undone. You are about to delete script: " + this.script.name ,
+                    danger: true,
+                    reason: "delete_script"
+                });
+            },
+            _deleteScriptResponse: function(e) {
+                var reason = e.detail.reason,
+                    response = e.detail.response;
+
+                if (response.confirmed && reason == "delete_script") {
+                    console.log('i ll delete the script');
+                    page.show('/scripts');
+                }
+            },
+            _showDialog: function(info) {
+                var dialog = this.querySelector('dialog-element'),
+                    i;
+                for (i in info) {
+                    dialog[i] = info[i];
+                }
+                dialog._openDialog();
+            },
+            _goBack: function(){
+                history.back();
+            }
+        });
+    })();
+    </script>
+</dom-module>
