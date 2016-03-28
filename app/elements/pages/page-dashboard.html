@@ -148,8 +148,11 @@
         }
         /* graphs */
         
-        .graphs, log-list {
+        .graphs, .logs {
             margin: var(--layout-margin);
+        }
+        .graphs {
+            margin-bottom: 1em;
         }
         
         google-chart {
@@ -287,7 +290,9 @@
                             </google-chart>
                         </paper-material>
                     </div>
-                    <log-list></log-list>
+                    <div class="logs">
+                        <log-list></log-list>
+                    </div>
                 </div>
                 <div class="absolute-bottom-right">
                     <app-fab></app-fab>
