@@ -21,7 +21,7 @@
         paper-header-panel {
             background: rgb(245, 245, 245);
         }
-
+        
         paper-header-panel {
             --paper-header-panel-shadow: {
                 height: 6px;
@@ -30,67 +30,53 @@
             }
         }
         /* layout helper classes */
-
-        .content {
-            display: block;
-            padding: 50px 16px;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
+        
         .flex-horizontal-with-ratios {
             @apply(--layout-horizontal);
             justify-content: stretch;
         }
-
+        
         .flexchild {
             @apply(--layout-flex);
         }
-
+        
         .flex2child {
             @apply(--layout-flex-2);
             order: 2;
         }
-
+        
         .flex3child {
             @apply(--layout-flex-2);
             order: 1;
         }
-
+        
         .pad {
             padding: 8px;
         }
-
+        
         .spacer {
             padding: 4px 0;
         }
         /* header */
-
+        
         paper-toolbar {
-            /*background-color: #fff;*/
             background-color: var(--mist-dark-color);
             color: rgba(255, 255, 255, 0.84);
         }
-
+        
         paper-toolbar a {
             color: rgba(255, 255, 255, 0.84);
         }
-
-        paper-toolbar::content #topbar {
-            /*padding: 4px 0;
-            height: 72px;*/
-        }
-
+        
         paper-toolbar::content #topBar.paper-toolbar {
-            max-width: 1100px;
             margin: 0 auto;
         }
-
+        
         .search.active {
             left: 15px;
         }
         /* clouds */
-
+        
         .clouds {
             display: flex;
             overflow: hidden;
@@ -103,12 +89,12 @@
             transition: all 100ms ease;
             font-size: 14px;
         }
-
+        
         .clouds span.cloud-title {
             bottom: -2px;
             position: relative;
         }
-
+        
         .clouds paper-button:not(#addcoud) {
             background-color: #fff;
             color: inherit;
@@ -116,77 +102,73 @@
             margin-bottom: 8px;
             padding: 0.7em 0.57em;
         }
-
+        
         paper-button:not(#addcoud)::content iron-icon {
             border-radius: 2em;
             background-color: #eee;
             padding: 3px;
         }
-
+        
         paper-button:not(#addcoud)::content iron-icon[icon='check'] {
             color: green;
         }
-
+        
         paper-button:not(#addcoud)::content iron-icon[icon='clear'] {
             color: #fff;
             background-color: #D96557;
         }
-
+        
         paper-button.blue {
             line-height: 30px;
         }
-
+        
         paper-menu-button {
             padding: 0;
         }
-
+        
         paper-item {
             font-size: 14px;
         }
         /* sections */
-
+        
         .sections {
             align-items: stretch;
         }
-
+        
         a.main-section {
             min-width: 200px;
             margin: var(--layout-margin);
         }
         /* incidents */
-
+        
         .incidents {
             margin: var(--layout-margin);
             @apply(--layout-horizontal);
             align-items: stretch;
         }
         /* graphs */
-
-        .graphs {
+        
+        .graphs, log-list {
             margin: var(--layout-margin);
         }
-
+        
         google-chart {
             height: 300px;
             width: 100%;
         }
-
+        
         @media (max-width: 489px) {
             a.main-section {
                 width: calc(100% - 1em);
             }
         }
-
+        
         @media (max-width: 639px) {
-            paper-toolbar /deep/ #topBar {
-                /*margin-top: 4px;*/
-                /*padding: 0 16px;*/
-            }
             a.main-section:first-child {
                 min-width: calc(100% - 1em);
             }
         }
-
+        
         @media (max-width: 639px) {
             .flex-horizontal-with-ratios {
                 @apply(--layout-vertical);
@@ -198,6 +180,38 @@
                 order: 2;
             }
         }
+        .content {            
+            padding: 50px 16px;
+            margin: 0 auto;
+        }
+        @media (max-width: 1899px) {
+            .content {
+                display: block;
+                max-width: 1100px;
+            }
+            paper-toolbar::content #topBar {
+                max-width: 1100px;
+            }
+        }
+        @media (min-width: 1900px) {
+            paper-toolbar::content #topBar {
+                max-width: auto;
+            }
+            .content {
+                max-width: auto !important;
+            }
+            .flex-horizontal-wide {
+                @apply(--layout-horizontal);
+                flex-wrap: wrap;
+            }
+            .flexchild-wide {
+                @apply(--layout-flex);
+            }
+            .flexchild-wide-top {
+                flex: 1 100%;
+            }
+        }
+        
         .onb-area {
             padding: 8px;
         }
@@ -210,8 +224,8 @@
                 </app-bar>
                 <app-user-menu email="marios@mist.io"></app-user-menu>
             </paper-toolbar>
-            <div class="content">
-                <div class="clouds">
+            <div class="content flex-horizontal-wide">
+                <div class="clouds flexchild-wide-top">
                     <div class="flex">
                         <template is="dom-repeat" items="{{model.cloudsArray}}">
                             <paper-button raised class="link">
@@ -226,10 +240,7 @@
                         </template>
                     </div>
                 </div>
-                <div class="absolute-bottom-right">
-                    <app-fab></app-fab>
-                </div>
-                <div class="container flex-horizontal-with-ratios">
+                <div class="container flex-horizontal-with-ratios flexchild-wide">
                     <!-- FIXME: dom-if needs to be here but gives error -->
                     <template is="dom-if" if="[[onbstate]]">
                         <onb-element class="onb-area flex2child top right" onbstate="[[onbstate]]" model="[[model]]"></onb-element>
@@ -263,7 +274,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="bottom full">
+                <div class="bottom full flexchild-wide">
                     <div class="graphs">
                         <paper-material>
                             <h2 class="app-title">Load on all monitored machines</h2>
@@ -278,6 +289,10 @@
                     </div>
                     <log-list></log-list>
                 </div>
+                <div class="absolute-bottom-right">
+                    <app-fab></app-fab>
+                </div>
+            </div>
         </paper-header-panel>
     </template>
 </dom-module>
@@ -308,7 +323,7 @@ Polymer({
             type: Object,
             notify: true
         },
-        onbstate : {
+        onbstate: {
             type: Number
         },
         q: {
