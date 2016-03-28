@@ -793,13 +793,25 @@ def create_machine(request):
     script_params:
       type: string
     size_id:
-      description: ' If of the size of the machine'
+      description: ' Id of the size of the machine'
       required: true
       type: string
     size_name:
       type: string
     ssh_port:
       type: integer
+    softlayer_backend_vlan_id:
+      description: 'Specify id of a backend(private) vlan'
+      type: integer
+    project_id:
+      description: ' Needed only by Packet.net cloud'
+      type: string
+    billing:
+      description: ' Needed only by SoftLayer cloud'
+      type: string
+    bare_metal:
+      description: ' Needed only by SoftLayer cloud'
+      type: string
     """
     params = params_from_request(request)
     cloud_id = request.matchdict['cloud']
@@ -853,6 +865,13 @@ def create_machine(request):
     associate_floating_ip = params.get('associate_floating_ip', False)
     associate_floating_ip_subnet = params.get('attach_floating_ip_subnet', None)
     project_id = params.get('project', None)
+    bare_metal = params.get('bare_metal', False)
+    # bare_metal True creates a hardware server in SoftLayer,
+    # whule bare_metal False creates a virtual cloud server
+    # hourly True is the default setting for SoftLayer hardware
+    # servers, while False means the server has montly pricing
+    softlayer_backend_vlan_id = params.get('softlayer_backend_vlan_id', None)
+    hourly = params.get('billing', True)
 
     # only for mist.core, parameters for cronjob
     if not params.get('cronjob_type'):
@@ -879,26 +898,27 @@ def create_machine(request):
     job_id = uuid.uuid4().hex
     from mist.io import tasks
     args = (cloud_id, key_id, machine_name,
-            location_id, image_id, size_id, script,
+            location_id, image_id, size_id,
             image_extra, disk, image_name, size_name,
             location_name, ips, monitoring, networks,
             docker_env, docker_command)
-    kwargs = {'script_id': script_id, 'script_params': script_params,
+    kwargs = {'script_id': script_id, 'script_params': script_params, 'script': script,
               'job_id': job_id, 'docker_port_bindings': docker_port_bindings,
               'docker_exposed_ports': docker_exposed_ports,
               'azure_port_bindings': azure_port_bindings,
               'hostname': hostname, 'plugins': plugins,
               'post_script_id': post_script_id,
-              'post_script_params': post_script_params, 'disk_size': disk_size,
+              'post_script_params': post_script_params,
+              'disk_size': disk_size,
               'disk_path': disk_path,
               'cloud_init': cloud_init,
               'associate_floating_ip': associate_floating_ip,
               'associate_floating_ip_subnet': associate_floating_ip_subnet,
-              'project_id': project_id, 'cronjob': cronjob}
+              'project_id': project_id, 'bare_metal': bare_metal, 'hourly': hourly, 'cronjob': cronjob,
+              'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
     if not async:
         ret = methods.create_machine(user, *args, **kwargs)
     else:
-
         args = (user.email, ) + args
         kwargs.update({'quantity': quantity, 'persist': persist})
         tasks.create_machine_async.apply_async(args, kwargs, countdown=2)

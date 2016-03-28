@@ -18,19 +18,21 @@ browser.find_by_css('#ap_password').fill(EC2_PASS)
 browser.find_by_css('#signInSubmit-input').click()
 
 then = datetime.datetime.now()
-for provider in ['eu-central-1', 'us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1', 'ap-southeast-1', 'ap-northeast-1', 'ap-southeast-2','sa-east-1']:
+for provider in ['eu-central-1', 'us-east-1', 'us-west-2', 'us-west-1', 'eu-west-1', 'ap-southeast-1', 'ap-northeast-1', 'ap-southeast-2','sa-east-1', 'ap-northeast-2']:
     provider_images = []
     browser.visit('https://console.aws.amazon.com/ec2/v2/home?region=%s' % provider)
-    time.sleep(6)
+    time.sleep(10)
     #wait to load otherwise it fails
     browser.find_by_css('.gwt-Button').click()
-    time.sleep(6)
+
+    time.sleep(1)
 
     divs = browser.find_by_css('.NB')
     divs.extend(browser.find_by_css('.PB'))
+    divs.extend(browser.find_by_css('.BC'))
 
 
-    print '    \'%s\': {' % provider      
+    print '    \'%s\': {' % provider
     for div in divs:
         if 'Microsoft Windows' in div.value:
             continue
@@ -42,21 +44,21 @@ for provider in ['eu-central-1', 'us-east-1', 'us-west-2', 'us-west-1', 'eu-west
         name = ami_in.split(' - ')[0]
 
         a = re.findall(r'ami-\w+\s+\(64-bit\)', ami_in)
-        if a: 
+        if a:
             ami = a[0].split(' (64-bit)')[0]
-            print '        \'%s\': \'%s (64-bit)\',' % (ami, name)        
+            print '        \'%s\': \'%s (64-bit)\',' % (ami, name)
         b = re.findall(r'ami-\w+\s+\(32-bit\)', ami_in)
         if b:
              ami = b[0].split(' (32-bit)')[0]
-             print '        \'%s\': \'%s (32-bit)\',' % (ami, name)        
+             print '        \'%s\': \'%s (32-bit)\',' % (ami, name)
 
         c = re.findall(r'ami-\w+$', ami_in)
         if c:
-            print '        \'%s\': \'%s\',' % (c[0], name)        
+            print '        \'%s\': \'%s\',' % (c[0], name)
 
-    print '    },' 
+    print '    },'
     #lame formating for easy copy paste to ec2_images.EC2_IMAGES dict
-    
+
 now = datetime.datetime.now()
 total = (now-then).seconds
 print 'took %s seconds\n' % total
