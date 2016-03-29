@@ -60,9 +60,20 @@ def owner_password():
 
 
 @pytest.fixture
-def member_email():
+def member1_email():
     return config.MEMBER1_EMAIL
 
+
 @pytest.fixture
-def member_password():
+def member1_password():
     return config.MEMBER1_PASSWORD
+
+
+@pytest.fixture
+def member2_email():
+    return config.MEMBER2_EMAIL
+
+
+@pytest.fixture
+def member2_password():
+    return config.MEMBER2_PASSWORD
