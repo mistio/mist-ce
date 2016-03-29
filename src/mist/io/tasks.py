@@ -5,6 +5,7 @@ import tempfile
 import functools
 
 import libcloud.security
+from libcloud.compute.types import NodeState
 
 from time import time, sleep
 from uuid import uuid4
@@ -107,10 +108,10 @@ def ssh_command(owner, cloud_id, machine_id, host, command,
 
 
 @app.task(bind=True, default_retry_delay=3*60)
-def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring, command='',
+def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                       key_id=None, username=None, password=None, port=22,
                       script_id='', script_params='', job_id=None,
-                      hostname='', plugins=None, script=None,
+                      hostname='', plugins=None, script='',
                       post_script_id='', post_script_params='', cronjob={}):
 
 
@@ -156,6 +157,10 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring, command='',
             tmp_log('ip not found, retrying')
             raise self.retry(exc=Exception(), countdown=60, max_retries=20)
 
+        if node.state != NodeState.RUNNING:
+            tmp_log('not running state')
+            raise self.retry(exc=Exception(), countdown=120, max_retries=30)
+
         try:
             from mist.io.shell import Shell
             shell = Shell(host)
@@ -179,7 +184,6 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring, command='',
                     'key_id': key_id,
                     'ssh_user': ssh_user,
                 }
-
             log_event(action='probe', result=result, **log_dict)
             cloud = Cloud.objects.get(owner=owner, id=cloud_id)
             msg = "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title, cloud_id)
@@ -204,13 +208,13 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring, command='',
                 )
                 error = ret['error']
                 tmp_log('executed script_id %s', script_id)
-            elif command:
-                tmp_log('will run command %s', command)
-                log_event(action='deployment_script_started', command=command,
+            elif script:
+                tmp_log('will run script')
+                log_event(action='deployment_script_started', command=script,
                           **log_dict)
                 start_time = time()
-                retval, output = shell.command(command)
-                tmp_log('executed command %s', command)
+                retval, output = shell.command(script)
+                tmp_log('executed script %s', script)
                 execution_time = time() - start_time
                 output = output.decode('utf-8','ignore')
                 title = "Deployment script %s" % ('failed' if retval
@@ -220,7 +224,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring, command='',
                             cloud_id=cloud_id,
                             machine_id=machine_id,
                             machine_name=node.name,
-                            command=command,
+                            command=script,
                             output=output,
                             duration=execution_time,
                             retval=retval,
@@ -228,7 +232,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring, command='',
                 log_event(action='deployment_script_finished',
                           error=retval > 0,
                           return_value=retval,
-                          command=command,
+                          command=script,
                           stdout=output,
                           **log_dict)
 
@@ -260,7 +264,8 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring, command='',
                     action_prefix='post_',
                 )
                 error = ret['error']
-                tmp_log('executed post_script_id %s', script_id)
+                tmp_log('executed post_script_id %s', post_script_id)
+
 
             # only for mist.core, set cronjob entry as a post deploy step
             if cronjob:
@@ -300,85 +305,17 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring, command='',
             cloud_id=cloud_id,
             machine_id=machine_id,
             enable_monitoring=bool(monitoring),
-            command=command,
+            command=script,
             error="Couldn't connect to run post deploy steps.",
             job_id=job_id
         )
 
 
 @app.task(bind=True, default_retry_delay=2*60)
-def hpcloud_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
-                              command, key_id, username, password, public_key,
-                              script_id='', script_params='', job_id=None,
-                              hostname='', plugins=None,
-                              post_script_id='', post_script_params='',
-                              cronjob={}):
-    from mist.io.methods import connect_provider
-    if owner.find("@")!=-1:
-        owner = User.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
-
-    try:
-        cloud = Cloud.objects.get(owner=owner, id=cloud_id)
-        conn = connect_provider(cloud)
-        nodes = conn.list_nodes()
-        node = None
-
-        for n in nodes:
-            if n.id == machine_id:
-                node = n
-                break
-
-        if node and node.state == 0 and len(node.public_ips):
-            # filter out IPv6 addresses
-            ips = filter(lambda ip: ':' not in ip, node.public_ips)
-            host = ips[0]
-
-            post_deploy_steps.delay(
-                owner.id, cloud_id, machine_id, monitoring, command, key_id,
-                script_id=script_id, script_params=script_params,
-                job_id=job_id, hostname=hostname, plugins=plugins,
-                post_script_id=post_script_id,
-                post_script_params=post_script_params,
-            )
-
-        else:
-            try:
-                available_networks = conn.ex_list_networks()
-                external_networks = [net for net in available_networks
-                                     if net.router_external]
-                if external_networks:
-                    ext_net_id = external_networks[0].id
-                else:
-                    ext_net_id = ""
-
-                ports = conn.ex_list_ports()
-
-                port = [port for port in ports
-                        if port.get("device_id", "") == node.id][0]
-
-                ip = conn.ex_create_floating_ip(ext_net_id, port['id'])
-                post_deploy_steps.delay(
-                    owner.id, cloud_id, machine_id, monitoring, command, key_id,
-                    script_id=script_id, script_params=script_params,
-                    job_id=job_id, hostname=hostname, plugins=plugins,
-                    post_script_id=post_script_id,
-                    post_script_params=post_script_params, cronjob=cronjob
-                )
-
-            except:
-                raise self.retry(exc=Exception(), max_retries=20)
-    except Exception as exc:
-        if str(exc).startswith('Retry'):
-            raise
-
-
-@app.task(bind=True, default_retry_delay=2*60)
 def openstack_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
-                                command, key_id, username, password,
-                                public_key, script_id='', script_params='',
-                                job_id=None, hostname='', plugins=None,
+                                key_id, username, password, public_key, script='',
+                                script_id='', script_params='', job_id=None,
+                                hostname='', plugins=None,
                                 post_script_id='', post_script_params='',
                                 networks=[], cronjob={}):
 
@@ -405,8 +342,8 @@ def openstack_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
             host = ips[0]
 
             post_deploy_steps.delay(
-                owner.id, cloud_id, machine_id, monitoring, command, key_id,
-                script_id=script_id, script_params=script_params,
+                owner.id, cloud_id, machine_id, monitoring, key_id,
+                script=script, script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
                 post_script_params=post_script_params, cronjob=cronjob
@@ -450,7 +387,8 @@ def openstack_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
                     ip = conn.ex_create_floating_ip(ext_net_id, machine_port_id)
 
                 post_deploy_steps.delay(
-                    owner.id, cloud_id, machine_id, monitoring, command, key_id,
+                    owner.id, cloud_id, machine_id, monitoring, key_id,
+                    script=script,
                     script_id=script_id, script_params=script_params,
                     job_id=job_id, hostname=hostname, plugins=plugins,
                     post_script_id=post_script_id,
@@ -466,7 +404,7 @@ def openstack_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
 
 @app.task(bind=True, default_retry_delay=2*60)
 def azure_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
-                            command, key_id, username, password, public_key,
+                            key_id, username, password, public_key, script='',
                             script_id='', script_params='', job_id=None,
                             hostname='', plugins=None,
                             post_script_id='', post_script_params='',cronjob={}):
@@ -528,7 +466,8 @@ def azure_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
             ssh.close()
 
             post_deploy_steps.delay(
-                owner.id, cloud_id, machine_id, monitoring, command, key_id,
+                owner.id, cloud_id, machine_id, monitoring, key_id,
+                script=script,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
@@ -544,8 +483,8 @@ def azure_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
 
 @app.task(bind=True, default_retry_delay=2*60)
 def rackspace_first_gen_post_create_steps(
-    self, owner, cloud_id, machine_id, monitoring, command, key_id,
-    password, public_key, username='root', script_id='', script_params='',
+    self, owner, cloud_id, machine_id, monitoring, key_id, password,
+    public_key, username='root', script='', script_id='', script_params='',
     job_id=None, hostname='', plugins=None, post_script_id='',
     post_script_params='', cronjob={}
 ):
@@ -591,7 +530,8 @@ def rackspace_first_gen_post_create_steps(
             ssh.close()
 
             post_deploy_steps.delay(
-                owner.id, cloud_id, machine_id, monitoring, command, key_id,
+                owner.id, cloud_id, machine_id, monitoring, key_id,
+                script=script,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
@@ -973,9 +913,9 @@ def undeploy_collectd(owner, cloud_id, machine_id):
 
 @app.task
 def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
-                         image_id, size_id, script, image_extra, disk,
+                         image_id, size_id, image_extra, disk,
                          image_name, size_name, location_name, ips, monitoring,
-                         networks, docker_env, docker_command,
+                         networks, docker_env, docker_command, script='',
                          script_id='', script_params='',
                          post_script_id='', post_script_params='',
                          quantity=1, persist=False, job_id=None,
@@ -984,8 +924,8 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
                          disk_size=None, disk_path=None,
                          cloud_init='', associate_floating_ip=False,
                          associate_floating_ip_subnet=None, project_id=None,
-                         tags=None, cronjob={}):
-
+                         tags=None, cronjob={}, bare_metal=False, hourly=True,
+                         softlayer_backend_vlan_id=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
@@ -1038,7 +978,8 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
              'disk_path': disk_path,
              'project_id': project_id,
              'tags': tags,
-             'cronjob': cronjob}
+             'cronjob': cronjob,
+             'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
         ))
 
     def create_machine_wrapper(args_kwargs):
