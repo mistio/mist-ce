@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/google-chart/google-chart.html">
+<link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
 <link rel="import" href="../section-tile/section-tile.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
 <link rel="import" href="../app-forms/app-forms.html">
@@ -21,7 +21,7 @@
         paper-header-panel {
             background: rgb(245, 245, 245);
         }
-        
+
         paper-header-panel {
             --paper-header-panel-shadow: {
                 height: 6px;
@@ -30,53 +30,53 @@
             }
         }
         /* layout helper classes */
-        
+
         .flex-horizontal-with-ratios {
             @apply(--layout-horizontal);
             justify-content: stretch;
         }
-        
+
         .flexchild {
             @apply(--layout-flex);
         }
-        
+
         .flex2child {
             @apply(--layout-flex-2);
             order: 2;
         }
-        
+
         .flex3child {
             @apply(--layout-flex-2);
             order: 1;
         }
-        
+
         .pad {
             padding: 8px;
         }
-        
+
         .spacer {
             padding: 4px 0;
         }
         /* header */
-        
+
         paper-toolbar {
             background-color: var(--mist-dark-color);
             color: rgba(255, 255, 255, 0.84);
         }
-        
+
         paper-toolbar a {
             color: rgba(255, 255, 255, 0.84);
         }
-        
+
         paper-toolbar::content #topBar.paper-toolbar {
             margin: 0 auto;
         }
-        
+
         .search.active {
             left: 15px;
         }
         /* clouds */
-        
+
         .clouds {
             display: flex;
             overflow: hidden;
@@ -89,12 +89,12 @@
             transition: all 100ms ease;
             font-size: 14px;
         }
-        
+
         .clouds span.cloud-title {
             bottom: -2px;
             position: relative;
         }
-        
+
         .clouds paper-button:not(#addcoud) {
             background-color: #fff;
             color: inherit;
@@ -102,76 +102,71 @@
             margin-bottom: 8px;
             padding: 0.7em 0.57em;
         }
-        
+
         paper-button:not(#addcoud)::content iron-icon {
             border-radius: 2em;
             background-color: #eee;
             padding: 3px;
         }
-        
+
         paper-button:not(#addcoud)::content iron-icon[icon='check'] {
             color: green;
         }
-        
+
         paper-button:not(#addcoud)::content iron-icon[icon='clear'] {
             color: #fff;
             background-color: #D96557;
         }
-        
+
         paper-button.blue {
             line-height: 30px;
         }
-        
+
         paper-menu-button {
             padding: 0;
         }
-        
+
         paper-item {
             font-size: 14px;
         }
         /* sections */
-        
+
         .sections {
             align-items: stretch;
         }
-        
+
         a.main-section {
             min-width: 200px;
             margin: var(--layout-margin);
         }
         /* incidents */
-        
+
         .incidents {
             margin: var(--layout-margin);
             @apply(--layout-horizontal);
             align-items: stretch;
         }
         /* graphs */
-        
+
         .graphs, .logs {
             margin: var(--layout-margin);
         }
         .graphs {
             margin-bottom: 1em;
         }
-        
-        google-chart {
-            height: 300px;
-            width: 100%;
-        }
-        
+
         @media (max-width: 489px) {
             a.main-section {
                 width: calc(100% - 1em);
             }
         }
-        
+
         @media (max-width: 639px) {
             a.main-section:first-child {
                 min-width: calc(100% - 1em);
             }
         }
-        
+
         @media (max-width: 639px) {
             .flex-horizontal-with-ratios {
                 @apply(--layout-vertical);
@@ -183,7 +178,7 @@
                 order: 2;
             }
         }
-        .content {            
+        .content {
             padding: 50px 16px;
             margin: 0 auto;
         }
@@ -214,7 +209,7 @@
                 flex: 1 100%;
             }
         }
-        
+
         .onb-area {
             padding: 8px;
         }
@@ -280,16 +275,7 @@
                 </div>
                 <div class="bottom full flexchild-wide">
                     <div class="graphs">
-                        <paper-material>
-                            <h2 class="app-title">Load on all monitored machines</h2>
-                            <google-chart id="mutating_gauge" type="line" data='[["Label", "Value"],["Memory", 80],["CPU", 55],["Network", 68]]' options='{
-                            "redFrom": 90,
-                            "redTo": 100,
-                            "yellowFrom": 75,
-                            "yellowTo": 90,
-                            "minorTicks": 5}'>
-                            </google-chart>
-                        </paper-material>
+                        <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
                     </div>
                     <div class="logs">
                         <log-list></log-list>
@@ -335,7 +321,11 @@ Polymer({
         q: {
             type: String,
             notify: true
+        },
+        dashboard: {
+            type: Object
         }
+
     },
     ready: function() {},
     attached: function() {
@@ -343,6 +333,70 @@ Polymer({
         this.fire('page-meta', {
             title: null
         });
+        this.datasources = [
+          {
+          "id": 1,
+          "orgId": 1,
+          "name": "mistphite",
+          "type": "graphite",
+          "access": "proxy",
+          "uri": "/graphite/",
+          "password": "",
+          "user": "",
+          "database": "",
+          "basicAuth": false,
+          "basicAuthUser": "",
+          "basicAuthPassword": "",
+          "withCredentials": false,
+          "isDefault": false,
+          "jsonData": null
+          }
+        ];
+        this.dashboard = {
+          "id": 1,
+          "refresh": "10s",
+          "rows": [{
+            "panels": [{
+              "aliasColors": {},
+              "datasource": "mistphite",
+              "id": 2,
+              "span": 12,
+              "stack": false,
+              "targets": [
+                {
+                "refId": "A",
+                "target": "bucky.*.load.shortterm"
+                },
+              ],
+              "timeFrom": null,
+              "timeShift": null,
+              "title": "Load on all monitored machines",
+              "type": "graph",
+              "x-axis": true,
+              "y-axis": true
+            }],
+          }],
+          "time": {
+            "from": "now-10m",
+            "to": "now"
+          },
+          "timepicker": {
+            "now": true,
+            "refresh_intervals": [],
+            "time_options": [
+              "5m",
+              "15m",
+              "1h",
+              "6h",
+              "12h",
+              "24h",
+              "2d",
+              "7d",
+              "30d"
+            ]
+          },
+          "timezone": "browser"
+        };
     },
     isOnline: function(cloud) {
         return cloud.state == 'online';
