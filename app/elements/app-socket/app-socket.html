@@ -1,7 +1,6 @@
-<script src="../../bower_components/sockjs/sockjs.min.js"></script>
+<script src="../../bower_components/sockjs-client/dist/sockjs.min.js"></script>
 <script>
 DEBUG_SOCKET = false;
-SockJS.websocket.roundTrips = 5;
 Polymer({
     is: 'app-socket',
     url: '/socket',
@@ -279,7 +278,6 @@ Polymer({
             this.set('onboarding.hasCloud', true);
         if (!data.length)
             this.set('onboarding.hasCloud', false);
-        console.warn(data);
         return this._updateModel('clouds', data);
     },
 
