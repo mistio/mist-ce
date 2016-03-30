@@ -266,7 +266,6 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                 error = ret['error']
                 tmp_log('executed post_script_id %s', post_script_id)
 
-
             # only for mist.core, set cronjob entry as a post deploy step
             if cronjob:
                 try:
@@ -945,7 +944,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
             names.append('%s-%d' % (machine_name, i))
 
     if owner.find("@") != -1:
-        owner = Owner.objects.get(email=email)
+        owner = Owner.objects.get(email=owner)
     else:
         owner = Owner.objects.get(id=owner)
 
