@@ -48,6 +48,7 @@
         <iron-routes for="app-main" selected="[[section]]">
             <!-- dashboard -->
             <iron-route path="/" title=""></iron-route>
+            <iron-route path="/add-cloud" title="add cloud" href="../clouds/cloud-add.html"></iron-route>
 
             <!-- machines -->
             <iron-route path="/machines" title="machines" href="../pages/page-list.html"></iron-route>
@@ -86,6 +87,7 @@
         <iron-pages id="app-main">
             <!-- dashboard -->
             <page-dashboard model="[[model]]" sections="[[sections]]"><title>Dashboard</title></page-dashboard>
+            <cloud-add model="[[model]]" keys="[[model.keysArray]]"></cloud-add>
 
             <!-- machines -->
             <page-list model="[[model]]" elements="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-list>
