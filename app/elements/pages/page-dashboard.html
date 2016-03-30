@@ -241,6 +241,7 @@
                                 <span class="cloud-title">{{item.title}}</span>
                             </paper-button>
                         </template>
+                        <a href="/add-cloud"> add cloud </a>
                     </div>
                 </div>
                 <div class="container flex-horizontal-with-ratios flexchild-wide">
@@ -251,8 +252,7 @@
                     <app-incidents hidden$="[[onbstate]]" id="right" class="flex2child incidents top right">
                     </app-incidents>
                     <div id="left" class="flex3child top left">
-                        <div class="sections layout horizontal wrap">
-                            <a href="/add-cloud"> add cloud </a>
+                        <div class="sections layout horizontal wrap">                            
                             <a href="/machines" class="main-section flex" is="pushstate-anchor">
                                 <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
                                 </section-tile>
