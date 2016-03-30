@@ -80,7 +80,9 @@ define('app/views/team_add', ['app/views/controlled'],
                 },
 
                 addClicked: function () {
-                    Mist.teamAddController.add();
+                    if (this.get('isReady')) {
+                        Mist.teamAddController.add();
+                    }
                 }
             },
         });
