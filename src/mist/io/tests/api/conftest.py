@@ -77,3 +77,28 @@ def member2_email():
 @pytest.fixture
 def member2_password():
     return config.MEMBER2_PASSWORD
+
+
+@pytest.fixture
+def private_key():
+    return config.API_TESTS_PRIVATE_KEY
+
+
+@pytest.fixture
+def public_key():
+    return config.API_TESTS_PUBLIC_KEY
+
+
+@pytest.fixture
+def api_test_machine_name():
+    return config.API_TESTING_MACHINE_NAME
+
+
+@pytest.fixture
+def private_key():
+    return config.API_TESTING_MACHINE_PRIVATE_KEY
+
+
+@pytest.fixture
+def public_key():
+    return config.API_TESTING_MACHINE_PUBLIC_KEY
