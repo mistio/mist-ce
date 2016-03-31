@@ -162,6 +162,25 @@ def modal_waiting_with_timeout(context, modal_id, action, seconds):
         raise TimeoutException("Modal %s did not %s after %s seconds"
                                % (modal_id, action, seconds))
 
+@then(u'I expect for "{collapsible_id}" collapsible to {action} within max {seconds} '
+      u'seconds')
+def panel_waiting_with_timeout(context, collapsible_id, action, seconds):
+    """
+    Function that waits for collapsible to appear but for a maximum amount of time
+    """
+    if action == 'appear':
+        css_selector = '#%s:not([class*="ui-collapsible-collapsed"])' % collapsible_id
+    elif action == 'disappear':
+        css_selector = '#%s[class*="ui-collapsible-collapsed"]' % collapsible_id
+    else:
+        raise ValueError("Action can be either appear or disappear. Duh!")
+    try:
+        WebDriverWait(context.browser, int(seconds)).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, css_selector)))
+    except TimeoutException:
+        raise TimeoutException("Panel %s did not %s after %s seconds"
+                               % (panel_id, action, seconds))
+
 
 @then(u'I expect for "{side_panel_id}" side panel to {action} within max '
       u'{seconds} seconds')
@@ -515,7 +534,7 @@ def some_counter_loaded(context, counter_title, counter_number, seconds):
 @when(u'I visit the {title} page after the counter has loaded')
 def go_to_some_page_after_loading(context, title):
     """
-    WIll visit one of the basic pages(Machines, Images, Keys, Scripts) and has
+    WIll visit one of the basic pages(Machines, Images, Keys, Scripts ,Teams) and has
     the choice of waiting for the counter to load.
     For now the code will not be very accurate for keys page
     """
@@ -530,9 +549,9 @@ def go_to_some_page_after_counter_loading(context, title, counter_title):
     the choice of waiting for some of the counters to load
     For now the code will not be very accurate for keys page
     """
-    if title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts']:
+    if title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts', 'Teams']:
         raise ValueError('The page given is unknown')
-    if counter_title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts']:
+    if counter_title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts', 'Teams']:
         raise ValueError('The page given is unknown')
     context.execute_steps(u'''
         Then I wait for the links in homepage to appear
@@ -568,7 +587,7 @@ def go_to_some_page_without_waiting(context, title):
 @step(u'I wait for "{title}" list page to load')
 def wait_for_some_list_page_to_load(context, title):
     if title not in ['Machines', 'Images', 'Keys', 'Networks', 'Scripts',
-                     'Account']:
+                     'Account', 'Teams']:
         raise ValueError('The page given is unknown')
     # Wait for the list page to appear
     end_time = time() + 5
@@ -598,7 +617,7 @@ def wait_for_some_list_page_to_load(context, title):
 @when(u'I search for the "{text}" {type_of_search}')
 def search_for_something(context, text, type_of_search):
     type_of_search = type_of_search.lower()
-    if type_of_search not in ['machine', 'key', 'image', 'script', 'network']:
+    if type_of_search not in ['machine', 'key', 'image', 'script', 'network', 'team']:
         raise ValueError("This is type of object does not exist(%s)" % type_of_search)
     search_bar = context.browser.find_elements_by_class_name("%s-search" % type_of_search)
     assert len(search_bar) > 0, "Could not find the %s-search search input" % type_of_search
