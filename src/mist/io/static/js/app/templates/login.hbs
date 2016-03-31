@@ -8,29 +8,22 @@
 
     <div data-role="content">
         <div class="form-field">
-          <label for="login-email">Email</label>
-          {{view Mist.TextField
-			id="login-email"
-			value=Mist.loginController.email}}
+            <label for="login-email">Email</label>
+            {{view Mist.TextField id="login-email" value=Mist.loginController.email}}
         </div>
 
         <div class="form-field">
-          <label for="login-password">Password</label>
-          {{view Mist.TextField
-			id="login-password"
-			type="password"
-			value=Mist.loginController.password}}
+            <label for="login-password">Password</label>
+            {{view Mist.TextField id="login-password" type="password" value=Mist.loginController.password}}
         </div>
 
         {{#if Mist.loginController.loggingIn}}
-        <div class="ajax-loader"></div>
+            <div class="ajax-loader"></div>
         {{/if}}
 
         <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
-            <a id="login-ok" class="ui-btn ui-btn-d ui-caps"
-                {{action "loginClicked" target=view}}>Log in</a>
+            <a id="login-ok" class="ui-btn ui-btn-d ui-caps" {{action "loginClicked" target=view}}>Log in</a>
         </div>
-
     </div>
 
 </div>

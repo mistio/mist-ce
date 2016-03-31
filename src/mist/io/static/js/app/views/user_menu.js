@@ -41,6 +41,13 @@ define('app/views/user_menu', ['ember', 'md5'],
                     $('#user-menu-popup').popup('open');
                 },
 
+                addOrganizationClicked: function() {
+                    $('#user-menu-popup').popup('close');
+                    Ember.run.later(function() {
+                        Mist.organizationAddController.open();
+                    }, 300);
+                },
+
                 loginClicked: function() {
                     $('#user-menu-popup').popup('close');
                     Ember.run.later(function() {
