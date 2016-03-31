@@ -68,7 +68,8 @@ class BareMetalDriver(object):
         extra = {}
         if hasattr(machine, 'os_type') and machine.os_type:
             extra['os_type'] = machine.os_type
-            if machine.os_type == 'windows' and hasattr(machine, 'remote_desktop_port'):
+            if machine.os_type == 'windows' and hasattr(machine,
+                                                        'remote_desktop_port'):
                 extra['remote_desktop_port'] = machine.remote_desktop_port
 
         node = Node(id=machine_id, name=machine.name, state=state,

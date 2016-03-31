@@ -43,5 +43,10 @@ class MistRequests(object):
                                    timeout=self.timeout)
         return response
 
+    # def patch(self):
+    #     response = requests.patch(self.uri, data=self.data, json=self.json,
+    #                              headers=self.headers, timeout=self.timeout)
+    #     return response
+
     def unavailable_api_call(self, *args, **kwargs):
         raise NotImplementedError("This method call is not available")

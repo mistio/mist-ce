@@ -4,7 +4,7 @@ define('app/views/user_menu', ['ember', 'md5'],
      *
      *  @returns Class
      */
-    function () {
+    function() {
 
         'use strict';
 
@@ -13,26 +13,31 @@ define('app/views/user_menu', ['ember', 'md5'],
             //
             //  Properties
             //
+
             layoutName: 'user_menu',
             isNotCore: !IS_CORE,
             accountUrl: URL_PREFIX + '/account',
             gravatarURL: EMAIL && ('https://www.gravatar.com/avatar/' + md5(EMAIL) + '?d=' +
-                  encodeURIComponent('https://mist.io/resources/images/sprite-images/user.png') +'&s='+(window.devicePixelRatio > 1.5 ? 100 : 50)),
+                encodeURIComponent('https://mist.io/resources/images/sprite-images/user.png') + '&s=' + (window.devicePixelRatio > 1.5 ? 100 : 50)),
             hasName: Ember.computed(function() {
                 return FIRST_NAME && LAST_NAME;
             }),
             gravatarName: Ember.computed('hasName', function() {
                 return this.get('hasName') ? FIRST_NAME + ' ' + LAST_NAME : EMAIL;
             }),
-
+            hasOrganization: Ember.computed('Mist.organizationsController.model', function() {
+                return !!Mist.organizationsController.model;
+            }),
+            memberTeam: Ember.computed('hasOrganization', function() {
+                return this.get('hasOrganization') ? Mist.teamsController.model.slice().shift().name : null;
+            }),
 
             //
             //  Actions
             //
 
             actions: {
-
-                meClicked: function(){
+                meClicked: function() {
                     $('#user-menu-popup').popup('open');
                 },
 

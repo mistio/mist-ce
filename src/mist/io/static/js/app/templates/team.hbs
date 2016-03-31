@@ -1,0 +1,119 @@
+<div id="single-team-page" data-role="page" class="ui-page-active">
+
+    <div data-role="header" data-theme="a">
+        <!-- Page header -->
+        <div class="ui-header ui-bar-a">
+            <div class="header-grid">
+                <div class="ui-grid-b">
+                    <div class="ui-block-a">
+                        {{#link-to 'teams' class="responsive-button ui-btn icon-prev ui-alt-icon ui-caps
+                        ui-btn-icon-left ui-corner-all nav-back" }}<span>Teams</span>{{/link-to}}
+                    </div>
+
+                    <div class="ui-block-b">
+                        <h1 class="ui-title">{{view.team.name}}</h1>
+                    </div>
+
+                    <div class="ui-block-c">
+                        <div class="user-menu">
+                            {{component "user-menu"}}
+                        </div>
+                    </div>
+                </div>
+                <!-- /grid-b -->
+            </div>
+        </div>
+    </div>
+
+    <div role="main" class="ui-content" data-theme="c">
+        <div id="team-basic-info" class="ui-shadow" data-role="collapsible" data-collapsed="false">
+            <h4>Basic Info</h4>
+            <table class="info-table">
+                <tbody>
+                    {{#if view.team.description}}
+                    <tr>
+                        <td>Description</td>
+                        <td>{{view.team.description}}</td>
+                    </tr>
+                    {{/if}}
+                    <tr>
+                        <td>Organization</td>
+                        <td>{{view.team.organization.name}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="team-members-list" class="ui-shadow" data-role="collapsible" data-collapsed="false">
+            <h4>Members</h4>
+
+            {{#if view.team.members.length}}
+            <table class="info-table">
+                <tbody>
+                    <tr class="member-header">
+                        <td>Name</td>
+                        <td>Email</td>
+                        <td class="member-actions"></td>
+                    </tr>
+                    {{#each view.team.members as |member|}}
+                        {{component "member-item" member=member team=view.team}}
+                    {{/each}}
+                </tbody>
+            </table>
+            {{/if}}
+
+            <div class="text-center">
+                <a id="member-invite" class="ui-btn ui-shadow ui-caps ui-btn-d" {{action "inviteMemberClicked" target=view}}>Invite Member</a>
+            </div>
+        </div>
+
+        <div id="team-policy-list" class="ui-shadow" data-role="collapsible" data-collapsed="false">
+            <h4>Policy</h4>
+
+            <table class="info-table">
+                <tbody>
+                    {{#unless view.team.isOwners}}
+                        {{#each view.team.policy.rules as |rule index|}}
+                            {{component "policy-rule-item" index=index rule=rule team=view.team}}
+                        {{/each}}
+                    {{/unless}}
+
+                    {{component "policy-operator-item" team=view.team policy=view.team.policy}}
+                </tbody>
+            </table>
+
+            {{#unless view.team.isOwners}}
+            <div class="text-center">
+                <a id="rule-add" class="ui-btn ui-shadow ui-caps back" {{action "addRulesClicked" target=view}}>Add Rule</a>
+                <a id="rule-save" class="ui-btn ui-caps ui-shadow ui-btn-d" {{action "saveRulesClicked" target=view}}>Save Rules</a>
+            </div>
+            {{/unless}}
+        </div>
+
+        <div class="mid-padding"></div>
+    </div>
+
+    {{component "dialog-popup"}}
+
+    {{component "team-edit"}}
+
+    {{component "policy-rule-edit"}}
+
+    {{component "policy-operator-edit" team=view.team}}
+
+    {{component "member-add" team=view.team}}
+
+    {{#unless view.team.isOwners}}
+    <div class="dual-action-footer" data-role="footer" data-theme="b">
+        <div class="ui-grid-a">
+            <div class="ui-block-a">
+                <a class="ui-btn ui-btn-icon-right ui-caps icon-edit" {{action "renameClicked" target=view}}>Edit</a>
+            </div>
+            <div class="ui-block-b">
+                <a class="ui-btn ui-btn-icon-right ui-caps icon-xx" {{action "deleteClicked" target=view}}>Delete</a>
+            </div>
+        </div>
+    </div>
+    {{/unless}}
+
+</div>
