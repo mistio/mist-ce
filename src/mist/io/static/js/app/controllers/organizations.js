@@ -36,30 +36,23 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
             },
 
             addOrganization: function(args) {
-                var organization = Ember.Object.create({
-                    id: -1,
-                    name: args.organization.name,
-                    description: args.organization.description
-                });
-                this._addOrganization(organization);
-                // var that = this;
-                // that.set('addingOrganization', true);
-                // Mist.ajax
-                //     .POST('/org', {
-                //         'name': args.organization.name,
-                //         'description': args.organization.description
-                //     })
-                //     .success(function(organization) {
-                //         that._addOrganization(organization);
-                //     })
-                //     .error(function(message) {
-                //         Mist.notificationController.notify(message);
-                //     })
-                //     .complete(function(success) {
-                //         that.set('addingOrganization', false);
-                //         if (args.callback)
-                //             args.callback(success);
-                //     });
+                var that = this;
+                that.set('addingOrganization', true);
+                Mist.ajax
+                    .POST('/org', {
+                        'name': args.organization.name
+                    })
+                    .success(function(organization) {
+                        console.log(organization);
+                    })
+                    .error(function(message) {
+                        Mist.notificationController.notify(message);
+                    })
+                    .complete(function(success) {
+                        that.set('addingOrganization', false);
+                        if (args.callback)
+                            args.callback(success);
+                    });
             },
 
             _addOrganization: function(organization) {

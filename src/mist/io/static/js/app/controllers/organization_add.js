@@ -11,8 +11,7 @@ define('app/controllers/organization_add', ['ember'],
         return Ember.Object.extend({
 
             newOrganization: Ember.Object.create({
-                name: '',
-                description: ''
+                name: ''
             }),
             formReady: false,
 
@@ -45,8 +44,7 @@ define('app/controllers/organization_add', ['ember'],
 
             clear: function() {
                 this.get('newOrganization').setProperties({
-                    name: '',
-                    description: ''
+                    name: ''
                 });
                 this.set('formReady', false);
             },

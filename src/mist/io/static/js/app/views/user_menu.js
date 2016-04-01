@@ -29,7 +29,8 @@ define('app/views/user_menu', ['ember', 'md5'],
                 return !!Mist.organizationsController.model;
             }),
             memberTeam: Ember.computed('hasOrganization', function() {
-                return this.get('hasOrganization') ? Mist.teamsController.model.slice().shift().name : null;
+                return 'needs work';
+                // return this.get('hasOrganization') ? Mist.teamsController.model.slice().shift().name : null;
             }),
 
             //
@@ -39,6 +40,13 @@ define('app/views/user_menu', ['ember', 'md5'],
             actions: {
                 meClicked: function() {
                     $('#user-menu-popup').popup('open');
+                },
+
+                addOrganizationClicked: function() {
+                    $('#user-menu-popup').popup('close');
+                    Ember.run.later(function() {
+                        Mist.organizationAddController.open();
+                    }, 300);
                 },
 
                 loginClicked: function() {

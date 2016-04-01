@@ -104,6 +104,13 @@ EMAIL = test_settings.get("EMAIL", "")
 PASSWORD1 = test_settings.get("PASSWORD1", "")
 PASSWORD2 = test_settings.get("PASSWORD2", "")
 
+# CREDENTIALS FOR TESTING RBAC
+RBAC_OWNER_EMAIL = test_settings.get("RBAC_OWNER_EMAIL", "owner@dr.dr")
+RBAC_OWNER_PASSWORD  = test_settings.get("RBAC_OWNER_PASSWORD ", "dr")
+
+RBAC_MEMBER_EMAIL = test_settings.get("RBAC_MEMBER_EMAIL", "user@dr.dr")
+RBAC_MEMBER_PASSWORD = test_settings.get("RBAC_MEMBER_PASSWORD", "dr")
+
 # CREDENTIALS FOR GOOGLE SSO
 GOOGLE_TEST_EMAIL = test_settings.get("GOOGLE_TEST_EMAIL", "")
 GOOGLE_TEST_PASSWORD = test_settings.get("GOOGLE_TEST_PASSWORD", "")

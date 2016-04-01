@@ -1,48 +1,52 @@
 <a id="me-btn" {{action "meClicked" target=view}}>
-	{{#if Mist.authenticated}}
-		<span class="owner {{if view.hasName 'name'}} {{if view.hasOrganization 'org'}}">{{view.gravatarName}}
-		{{#if view.hasOrganization}}
-			<br/><span class="org-name">{{Mist.organizationsController.model.name}}</span> &middot; <span class="org-team-name">{{view.memberTeam}}</span>
-		{{/if}}
-		</span>
-	{{/if}}
+    {{#if Mist.authenticated}}
+        <span class="owner {{if view.hasName 'name'}} {{if view.hasOrganization 'org'}}">{{view.gravatarName}}
+        {{#if view.hasOrganization}}
+            <br/><span class="org-name">{{Mist.organizationsController.model.name}}</span> &middot; <span class="org-team-name">{{view.memberTeam}}</span>
+        {{/if}}
+        </span>
+    {{/if}}
 
-	{{#if view.gravatarURL}}
-		<img class="gravatar-image" src="{{view.gravatarURL}}" />
-	{{else}}
-		<span class="gravatar-image user"></span>
-	{{/if}}
+    {{#if view.gravatarURL}}
+        <img class="gravatar-image" src="{{view.gravatarURL}}" />
+    {{else}}
+        <span class="gravatar-image user"></span>
+    {{/if}}
 &nbsp;</a>
 
 <div id="user-menu-popup" class="ui-mini" data-role="popup" data-position-to="#me-btn .gravatar-image" data-theme="a" data-overlay-theme="b" data-transition="flip">
 
-	{{#if Mist.authenticated}}
-		<div class="ui-header user-email">{{view.gravatarName}}</div>
-	{{/if}}
+    {{#if Mist.authenticated}}
+        <div class="ui-header user-email">{{view.gravatarName}}</div>
+    {{/if}}
 
-	<ul class="ui-listview">
+    <ul class="ui-listview">
+        <li><a href="/switch_context" class="ui-btn ui-btn-icon-left ui-mini icon-user">{{view.gravatarName}}</a></li>
+        {{#each org in Mist.orgs}}
+            <li><a href="/switch_context/{{org.id}}" class="ui-btn ui-btn-icon-left ui-mini icon-user">{{org.name}}</a></li>
+        {{/each}}
+        <li class="text-center" id="add-org"><a {{action "addOrganizationClicked" target=view}} class="ui-btn ui-btn-d ui-caps ui-shadow">Add Organization</a></li>
+    </ul>
 
-		<li><a href="http://docs.mist.io/contact" target="_blank" class="ui-btn ui-btn-icon-left ui-mini icon-support">
-		   Support</a></li>
+    <ul class="ui-listview">
+        <li><a href="http://docs.mist.io/contact" target="_blank" class="ui-btn ui-btn-icon-left ui-mini icon-support">Support</a></li>
+        <li><a href="http://docs.mist.io/" target="_blank" class="ui-btn ui-btn-icon-left ui-mini icon-docs">Docs</a></li>
 
-		<li><a href="http://docs.mist.io/" target="_blank" class="ui-btn ui-btn-icon-left ui-mini icon-docs">
-		   Docs</a></li>
-
-		{{#if Mist.authenticated}}
-
-			<li><a class="ui-btn ui-btn-icon-left ui-mini icon-user" href= {{view.accountUrl}} target= {{view.isNotCore}}>Account</a></li>
-
-
-			{{#if Mist.isCore}}
-				<li><a class="ui-btn ui-btn-icon-left ui-mini icon-x" {{action "logoutClicked" target=view}}>Logout</a></li>
-			{{/if}}
-		{{else}}
-			{{#unless Mist.isCore}}
-				<li><a class="ui-btn ui-mini ui-btn-icon-left icon-lock" {{action "loginClicked" target=view}}>Login</a></li>
-			{{/unless}}
-		{{/if}}
-
-	</ul>
+        {{#if Mist.authenticated}}
+            <li><a class="ui-btn ui-btn-icon-left ui-mini icon-user" href={{view.accountUrl}} target={{view.isNotCore}}>Account</a></li>
+            {{#if Mist.isCore}}
+                <li><a class="ui-btn ui-btn-icon-left ui-mini icon-x" {{action "logoutClicked" target=view}}>Logout</a></li>
+            {{/if}}
+        {{else}}
+            {{#unless Mist.isCore}}
+                <li><a class="ui-btn ui-mini ui-btn-icon-left icon-lock" {{action "loginClicked" target=view}}>Login</a></li>
+            {{/unless}}
+        {{/if}}
+    </ul>
 </div>
 
-{{component "login-popup"}} {{component "message-box"}}
+{{component "organization-add"}}
+
+{{component "login-popup"}}
+
+{{component "message-box"}}
