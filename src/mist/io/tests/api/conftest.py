@@ -102,3 +102,8 @@ def private_key():
 @pytest.fixture
 def public_key():
     return config.API_TESTING_MACHINE_PUBLIC_KEY
+
+
+@pytest.fixture
+def cloud_name():
+    return config.API_TESTING_CLOUD
