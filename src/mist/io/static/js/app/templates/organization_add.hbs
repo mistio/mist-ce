@@ -1,5 +1,4 @@
-<div id="organization-add" class="large-popup" data-role="popup" data-position="right" data-display="overlay" data-overlay-theme="b" data-transition="slideup">
-
+<div id="organization-add" class="large-popup" data-role="popup" data-position="right" data-display="overlay" data-overlay-theme="b" data-transition="pop">
     <div id="add-organization" class="large-popup
             ui-popup
             ui-body-a
@@ -7,7 +6,7 @@
             ui-corner-all" data-role="popup" data-enhanced="true">
 
         <div class="ui-header ui-caps">
-            <h1 class="ui-title">Create Organization</h1>
+            <h1 class="ui-title">Add Organization</h1>
 
             <a class="close" {{action "backClicked" target=view}} data-rel="back">&#10005;</a>
         </div>
@@ -18,12 +17,7 @@
                     {{input value=Mist.organizationAddController.newOrganization.name id="organization-name"}}
                 </div>
 
-                <div class="form-field">
-                    <label for="organization-description">Description</label>
-                    {{textarea value=Mist.organizationAddController.newOrganization.description id="organization-description"}}
-                </div>
-
-                <button type="submit" class="ui-btn ui-btn-d ui-shadow ui-caps {{if Mist.organizationAddController.formReady '' 'ui-state-disabled'}}">Create</button>
+                <button type="submit" class="ui-btn ui-btn-d ui-shadow ui-caps {{if Mist.organizationAddController.formReady '' 'ui-state-disabled'}}">Add</button>
             </form>
         </div>
     </div>
