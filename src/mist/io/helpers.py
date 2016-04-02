@@ -227,11 +227,12 @@ def amqp_owner_listening(owner):
         connection.close()
 
 
-def trigger_session_update(email, sections=['clouds', 'keys', 'monitoring']):
-    amqp_publish_user(email, routing_key='update', data=sections)
+def trigger_session_update(owner, sections=['clouds', 'keys', 'monitoring']):
+    amqp_publish_user(owner, routing_key='update', data=sections)
 
 
 def amqp_log(msg):
+    return
     msg = "[%s] %s" % (time.strftime("%Y-%m-%d %H:%M:%S %Z"), msg)
     try:
         amqp_publish('mist_debug', '', msg)
