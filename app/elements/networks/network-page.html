@@ -11,49 +11,49 @@
         :host {
             display: block;
         }
-        
+
         paper-material {
             display: block;
             padding: 20px;
             margin: 36px;
         }
-        
+
         paper-menu-button paper-button {
             display: block;
         }
-        
+
         .flex-horizontal-with-ratios {
             @apply(--layout-horizontal);
         }
-        
+
         .flexchild {
             @apply(--layout-flex);
         }
-        
+
         .command-container {
             background-color: #444;
             color: #fff;
             font-family: monospace;
             padding: 10px;
         }
-        
+
         a {
             color: black;
             text-decoration: none;
         }
-        
+
         #container {
             background: #fafafa;
         }
-        
+
         .paper-header [paper-drawer-toggle] {
             margin-left: 10px;
         }
-        
+
         .paper-header {
             @apply(--layout-horizontal);
         }
-        
+
         .paper-header {
             height: 60px;
             font-size: 24px;
@@ -63,44 +63,44 @@
             transition: height 0.2s;
             transition: font-size 0.2s;
         }
-        
+
         .paper-header.tall {
             height: 320px;
             font-size: 16px;
         }
-        
+
         .paper-header h2 {
             margin-left: 20px;
             @apply(--layout-flex);
             text-transform: capitalize;
         }
-        
+
         .paper-header .toggleViewButton {
             --paper-icon-button-ink-color: transparent;
         }
-        
+
         .paper-header .cartButton {
             margin-right: 10px;
         }
-        
+
         #content {
             overflow: auto;
             -webkit-overflow-scrolling: touch;
             padding: 0 10px;
         }
-        
+
         paper-icon-button {
             transition: all 200ms;
         }
-        
+
         paper-icon-button.active-sort {
             transform: rotate(180deg);
         }
-        
+
         paper-icon-button.active-sort::content iron-icon {
             color: #D48900 !important;
         }
-        
+
         app-bar .menu-icon {
             margin-right: 15px;
         }
@@ -111,26 +111,20 @@
             font-size: 0.9rem;
             font-weight: 700;
         }
-        
+
         [size=xs] > * {
             display: none;
         }
-        
-        responsive-element[size=xs].layout {
-            -ms-flex-direction: column;
-            -webkit-flex-direction: column;
-            flex-direction: column;
-        }
-        
+
         [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
             padding: 0 16px;
         }
-        
+
         [size=xs] app-sidebar {
             min-width: 100%;
             height: auto;
         }
-        
+
         paper-icon-bottom.bottom {
             padding-right: 8px;
         }

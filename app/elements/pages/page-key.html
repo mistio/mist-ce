@@ -9,7 +9,6 @@
 <link rel="import" href="../element-action-menu/element-action-menu.html">
 <link rel="import" href="../element-table/element-table.html">
 <link rel="import" href="../element-table-cards/element-table-cards.html">
-<link rel="import" href="../responsive-element/responsive-element.html">
 <link rel="import" href="../element-dialog/element-dialog.html">
 <dom-module id="page-key">
     <link rel="import" type="css" href="../../styles/main.css">
@@ -19,47 +18,47 @@
         :host {
             background: #fafafa;
         }
-        
+
         #content {
             overflow: auto;
             -webkit-overflow-scrolling: touch;
             padding: 20px;
         }
-        
+
         #container {
             background: #fafafa;
         }
-        
+
         paper-material {
             padding: 0 20px;
             overflow: hidden;
             margin-bottom: 20px;
         }
-        
+
         .key-is-default {
             padding-left: 10px;
         }
-        
+
         .key-is-default span {
             display: inline;
             vertical-align: middle;
             opacity: 0.54;
             font-size: 12px;
         }
-        
+
         .key-is-default iron-icon {
             padding-left: 8px;
         }
-        
+
         .key-is-default paper-icon-button {
             background-color: #eee;
             border-radius: 32px;
         }
-        
+
         .info-card {
             position: relative;
         }
-        
+
         .info-card .copy-key {
             position: absolute;
             right: 16px;
@@ -68,11 +67,11 @@
             background-color: #fff;
             color: #474747;
         }
-        
+
         .info-card .card-content {
             padding: 16px;
         }
-        
+
         #keyPublicContainer textarea,
         #keyPrivateContainer textarea {
             height: 120px;
@@ -86,19 +85,19 @@
             background-color: #f8f8f8;
             border-color: #eeedeb;
         }
-        
+
         #keyPublicContainer textarea {
             height: 120px;
         }
-        
+
         #keyPrivateContainer {
             text-align: center;
         }
-        
+
         #keyPrivateContainer textarea {
             height: 440px;
         }
-        
+
         #keyPrivateContainer #showPrivateKey {
             margin: 20px 0;
         }

@@ -18,7 +18,7 @@
 
   vaadin-grid ::content input[type="checkbox"] + label {
     position: relative;
-    left: 0;    
+    left: 0;
     box-sizing: border-box;
     display: block;
     width: 18px;
@@ -113,12 +113,12 @@
     background-color: var(--default-primary-color, #03A9F4);
   }
 
-        
+
         :host {
             display: block;
             background: #fafafa;
         }
-        
+
         paper-card {
             display: block;
         }
@@ -126,15 +126,15 @@
         #container {
             background: #fafafa;
         }
-        
+
         .paper-header [paper-drawer-toggle] {
             margin-left: 10px;
         }
-        
+
         .paper-header {
             @apply(--layout-horizontal);
         }
-        
+
         .paper-header {
             height: 60px;
             font-size: 24px;
@@ -144,65 +144,59 @@
             transition: height 0.2s;
             transition: font-size 0.2s;
         }
-        
+
         .paper-header.tall {
             height: 320px;
             font-size: 16px;
         }
-        
+
         .paper-header h2 {
             margin-left: 20px;
             @apply(--layout-flex);
             text-transform: capitalize;
         }
-        
+
         #content {
             overflow: auto;
             -webkit-overflow-scrolling: touch;
             padding: 0 10px;
         }
-        
+
         paper-icon-button {
             transition: all 200ms;
         }
-        
+
         paper-icon-button.active-sort {
             transform: rotate(180deg);
         }
-        
+
         paper-icon-button.active-sort::content iron-icon {
             color: #D48900 !important;
         }
-        
+
         app-bar .menu-icon {
             margin-right: 15px;
         }
-        
+
         app-check {
             margin-right: 16px;
             display: inline-block;
             vertical-align: middle;
         }
-        
+
         [size=xs] > * {
             display: none;
         }
-        
-        responsive-element[size=xs].layout {
-            -ms-flex-direction: column;
-            -webkit-flex-direction: column;
-            flex-direction: column;
-        }
-        
+
         [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
             padding: 0 16px;
         }
-        
+
         [size=xs] app-sidebar {
             min-width: 100%;
             height: auto;
         }
-        
+
         .absolute-top-right {
             position: fixed;
             right: 18px;

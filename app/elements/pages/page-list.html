@@ -7,7 +7,6 @@
 <link rel="import" href="../element-action-menu/element-action-menu.html">
 <link rel="import" href="../element-table/element-table.html">
 <link rel="import" href="../element-table-cards/element-table-cards.html">
-<link rel="import" href="../responsive-element/responsive-element.html">
 <dom-module id="page-list">
     <template>
         <style>
@@ -90,12 +89,6 @@
 
         [size=xs] > * {
             display: none;
-        }
-
-        responsive-element[size=xs].layout {
-            -ms-flex-direction: column;
-            -webkit-flex-direction: column;
-            flex-direction: column;
         }
 
         [size=xs] app-sidebar paper-toolbar /deep/ #topBar {

@@ -112,12 +112,6 @@
             display: none;
         }
 
-        responsive-element[size=xs].layout {
-            -ms-flex-direction: column;
-            -webkit-flex-direction: column;
-            flex-direction: column;
-        }
-
         [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
             padding: 0 16px;
         }
@@ -141,11 +135,11 @@
                     <div class="absolute-bottom-right">
                          <app-fab>
                             <div class="item">
-                                <paper-icon-button id="addclooud" icon="image:wb-cloudy" on-tap="addclooud"></paper-icon-button> 
+                                <paper-icon-button id="addclooud" icon="image:wb-cloudy" on-tap="addclooud"></paper-icon-button>
                                 <paper-tooltip position="left" animation-delay="0">Add Cloud</paper-tooltip>
                             </div>
                             <div class="item">
-                                <paper-icon-button id="addmachine" icon="hardware:computer" on-tap="addmachine"></paper-icon-button> 
+                                <paper-icon-button id="addmachine" icon="hardware:computer" on-tap="addmachine"></paper-icon-button>
                                 <paper-tooltip position="left" animation-delay="0">Add Machine</paper-tooltip>
                             </div>
                             <div class="item">

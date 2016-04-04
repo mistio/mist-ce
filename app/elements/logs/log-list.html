@@ -102,8 +102,13 @@ Polymer({
           {name: 'type'},
           {name: 'time', renderer:
               function(cell) {
+                  //var item = that.items.find(function(p){ return p.time==cell.data});
+                  //var ind = that.items.indexOf(item);
                   var dt = new Date(cell.data * 1000);
-                  cell.element.innerHTML = dt.getTimeFromNow();
+                  cell.element.innerHTML = /*ind + ' : ' + cell.data + ' : ' + */ dt.getTimeFromNow();
+                  console.info(dt, dt.getTimeFromNow());
+
+
               }
           }
         ];
