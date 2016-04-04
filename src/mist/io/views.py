@@ -1183,7 +1183,6 @@ def machine_actions(request):
 
 
 @view_config(route_name='api_v1_machine_rdp', request_method='GET', renderer='json')
-@view_config(route_name='machine_rdp', request_method='GET', renderer='json')
 def machine_rdp(request):
     """
     Rdp file for windows machines
@@ -1401,7 +1400,6 @@ def star_image(request):
 
 
 @view_config(route_name='api_v1_sizes', request_method='GET', renderer='json')
-@view_config(route_name='sizes', request_method='GET', renderer='json')
 def list_sizes(request):
     """
     List sizes of a cloud
@@ -1422,7 +1420,6 @@ def list_sizes(request):
 
 
 @view_config(route_name='api_v1_locations', request_method='GET', renderer='json')
-@view_config(route_name='locations', request_method='GET', renderer='json')
 def list_locations(request):
     """
     List locations of cloud
@@ -1592,7 +1589,6 @@ def associate_ip(request):
 
 
 @view_config(route_name='api_v1_probe', request_method='POST', renderer='json')
-@view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
     """
     Probe a machine
@@ -2175,7 +2171,7 @@ def update_rule(request):
     if ret.status_code != 200:
         log.error("Error updating rule %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
-    trigger_session_update(user.email, ['monitoring'])
+    trigger_session_update(user, ['monitoring'])
     return ret.json()
 
 
@@ -2205,7 +2201,7 @@ def delete_rule(request):
     if ret.status_code != 200:
         log.error("Error deleting rule %d:%s", ret.status_code, ret.text)
         raise ServiceUnavailableError()
-    trigger_session_update(user.email, ['monitoring'])
+    trigger_session_update(user, ['monitoring'])
     return OK
 
 

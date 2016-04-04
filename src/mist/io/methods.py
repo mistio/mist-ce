@@ -198,7 +198,7 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 raise CloudUnavailableError(exc=exc)
         cloud.save()
     log.info("Cloud with id '%s' added succesfully.", cloud.id)
-    trigger_session_update(user.email, ['clouds'])
+    trigger_session_update(user, ['clouds'])
     return cloud.id
 
 
@@ -236,12 +236,12 @@ def add_cloud_v_2(user, title, provider, params):
     if provider == 'bare_metal':
         cloud_id, mon_dict = _add_cloud_bare_metal(user, title, provider, params)
         log.info("Cloud with id '%s' added successfully.", cloud_id)
-        trigger_session_update(user.email, ['clouds'])
+        trigger_session_update(user, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'coreos':
         cloud_id, mon_dict = _add_cloud_coreos(user, title, provider, params)
         log.info("Cloud with id '%s' added successfully.", cloud_id)
-        trigger_session_update(user.email, ['clouds'])
+        trigger_session_update(user, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'ec2':
         cloud_id, cloud = _add_cloud_ec2(user, title, params)
@@ -303,7 +303,7 @@ def add_cloud_v_2(user, title, provider, params):
     cloud.owner = user
     cloud.save()
     log.info("Cloud with id '%s' added succesfully with Api-Version: 2.", cloud_id)
-    trigger_session_update(user.email, ['clouds'])
+    trigger_session_update(user, ['clouds'])
 
     if provider == 'libvirt' and cloud.apisecret:
     # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
@@ -949,7 +949,7 @@ def add_key(user, key_id, private_key):
     keypair.save()
 
     log.info("Added key with id '%s'", key_id)
-    trigger_session_update(user.email, ['keys'])
+    trigger_session_update(user, ['keys'])
     return key_id
 
 
@@ -976,7 +976,7 @@ def delete_key(user, key_id):
         other_key.default = True
         other_key.save()
     log.info("Deleted key with id '%s'.", key_id)
-    trigger_session_update(user.email, ['keys'])
+    trigger_session_update(user, ['keys'])
 
 
 def set_default_key(user, key_id):
@@ -1000,7 +1000,7 @@ def set_default_key(user, key_id):
     key.save()
 
     log.info("Succesfully set key with id '%s' as default.", key_id)
-    trigger_session_update(user.email, ['keys'])
+    trigger_session_update(user, ['keys'])
 
 
 def edit_key(user, new_key, old_key):
@@ -1025,7 +1025,7 @@ def edit_key(user, new_key, old_key):
     key.name = new_key
     key.save()
     log.info("Renamed key '%s' to '%s'.", old_key, new_key)
-    trigger_session_update(user.email, ['keys'])
+    trigger_session_update(user, ['keys'])
 
 
 def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, port=22):
@@ -1068,7 +1068,7 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
                                        port=port)
             machine.key_associations.append(key_assoc)
             machine.save()
-            trigger_session_update(user.email, ['keys'])
+            trigger_session_update(user, ['keys'])
         return
 
     # if host is specified, try to actually deploy
@@ -1145,7 +1145,7 @@ def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
             break
     machine.key_associations.remove(assoc)
     machine.save()
-    trigger_session_update(user.email, ['keys'])
+    trigger_session_update(user, ['keys'])
 
 
 def connect_provider(cloud):
@@ -3102,7 +3102,7 @@ def create_network(user, cloud_id, network, subnet, router):
 
     task = mist.io.tasks.ListNetworks()
     task.clear_cache(user.email, cloud_id)
-    trigger_session_update(user.email, ['clouds'])
+    trigger_session_update(user, ['clouds'])
     return ret
 
 
@@ -3254,7 +3254,7 @@ def delete_network(user, cloud_id, network_id):
     try:
         task = mist.io.tasks.ListNetworks()
         task.clear_cache(user.email, cloud_id)
-        trigger_session_update(user.email, ['clouds'])
+        trigger_session_update(user, ['clouds'])
     except Exception as e:
         pass
 
@@ -3504,7 +3504,7 @@ def enable_monitoring(user, cloud_id, machine_id,
             deploy = deploy.delay
         deploy(user.email, cloud_id, machine_id, ret_dict['extra_vars'])
 
-    trigger_session_update(user.email, ['monitoring'])
+    trigger_session_update(user, ['monitoring'])
 
     return ret_dict
 
@@ -3535,7 +3535,7 @@ def disable_monitoring(user, cloud_id, machine_id, no_ssh=False):
     if not no_ssh:
         mist.io.tasks.undeploy_collectd.delay(user.email,
                                               cloud_id, machine_id)
-    trigger_session_update(user.email, ['monitoring'])
+    trigger_session_update(user, ['monitoring'])
 
 
 def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
@@ -3753,7 +3753,7 @@ def assoc_metric(user, cloud_id, machine_id, metric_id):
     if not resp.ok:
         log.error("Error in assoc_metric %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
-    trigger_session_update(user.email, [])
+    trigger_session_update(user, [])
 
 
 def disassoc_metric(user, cloud_id, machine_id, metric_id):
@@ -3772,7 +3772,7 @@ def disassoc_metric(user, cloud_id, machine_id, metric_id):
     if not resp.ok:
         log.error("Error in disassoc_metric %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
-    trigger_session_update(user.email, [])
+    trigger_session_update(user, [])
 
 
 def update_metric(user, metric_id, name=None, unit=None,
@@ -3796,7 +3796,7 @@ def update_metric(user, metric_id, name=None, unit=None,
     if not resp.ok:
         log.error("Error updating metric %d:%s", resp.status_code, resp.text)
         raise BadRequestError(resp.text)
-    trigger_session_update(user.email, [])
+    trigger_session_update(user, [])
 
 
 def deploy_python_plugin(user, cloud_id, machine_id, plugin_id,
