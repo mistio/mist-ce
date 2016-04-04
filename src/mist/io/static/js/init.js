@@ -360,31 +360,6 @@ var setupMainChannel = function(socket, callback) {
         //  TODO: This is a temporary ajax-request to get the scripts.
         //  It should be converted into a "list_scripts" socket handler
         //  as soon as the cloud supports it
-        // Mist.ajax.GET('/org').success(function(organization) {
-        //     if (organization.hasOwnProperty("id")) {
-        //         teams = [];
-        //         Mist.set('organization', organization);
-        //         organization.teams.forEach(function(team) {
-        //             team.organization = {
-        //                 id: organization.id,
-        //                 name: organization.name
-        //             };
-        //
-        //             var members = organization.members.filter(function(member) {
-        //                 return team.members.indexOf(member.id) > -1;
-        //             });
-        //             team.members = members;
-        //             teams.pushObject(team);
-        //         });
-        //
-        //         Mist.organizationsController.load({
-        //             id: organization.id,
-        //             name: organization.name
-        //         });
-        //     }
-        //
-        //     Mist.teamsController.setModel(teams);
-        // });
         Mist.ajax.GET('/scripts').success(function(scripts) {
             Mist.scriptsController.setModel(scripts, true);
         });

@@ -20,7 +20,7 @@
         <div class="ui-header user-email">{{view.gravatarName}}</div>
     {{/if}}
 
-    <ul class="ui-listview">
+    <ul class="ui-listview orgs-list">
         <li><a href="/switch_context" class="ui-btn ui-btn-icon-left ui-mini icon-teams">{{view.gravatarName}}</a></li>
         {{#each org in Mist.orgs}}
             <li><a href="/switch_context/{{org.id}}" class="ui-btn ui-btn-icon-left ui-mini icon-teams">{{org.name}}</a></li>

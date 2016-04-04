@@ -1283,9 +1283,11 @@ ul.checkbox-list .ui-grid-b {
 #user-menu-popup .ui-btn-icon-left {
     padding-left: 3.4em !important;
 }
+.orgs-list {
+    border-bottom: 1px solid #d4d4d4;
+}
 #add-org {
     border-top: 1px solid #d4d4d4;
-    border-bottom: 1px solid #d4d4d4;
     padding: 10px 10px 8px;
 }
 #add-org .ui-btn {

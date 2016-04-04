@@ -43,7 +43,10 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                         'name': args.organization.name
                     })
                     .success(function(organization) {
-                        console.log(organization);
+                        Mist.orgs.pushObject({
+                            id: organization.id,
+                            name: organization.name
+                        });
                     })
                     .error(function(message) {
                         Mist.notificationController.notify(message);
