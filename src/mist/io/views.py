@@ -177,6 +177,8 @@ def list_clouds(request):
     ---
     """
     auth_context = auth_context_from_request(request)
+    if not auth_context.has_perm("cloud", "read"):
+        raise PolicyUnauthorizedError("To list clouds")
     return mist.core.methods.filter_list_clouds(auth_context)
 
 
