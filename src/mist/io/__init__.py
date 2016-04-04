@@ -19,47 +19,6 @@ log = logging.getLogger(__name__)
 def main(global_config, **settings):
     """This function returns a Pyramid WSGI application."""
     settings = {}
-    from mist.io.model import User
-
-    # migrate settings.yaml to db.yaml
-    try:
-        with open('settings.yaml', 'r') as config_file:
-            log.info("Found settings.yaml, migrating...")
-            data = config_file.read()
-            with open('db.yaml', 'w') as db_file:
-                db_file.write(data)
-        os.rename('settings.yaml', 'settings.yaml.backup')
-        user = User()
-        with user.lock_n_load():
-            for key in ['core_uri', 'js_build', 'js_log_level']:
-                if key in user._dict:
-                    del user._dict[key]
-            user.save()
-
-        from mist.io.model import Machine
-        with user.lock_n_load():
-            for cloud in user.clouds.values():
-                if 'list_of_machines' in cloud._dict:
-                    list_of_machines = cloud._dict['list_of_machines']
-                    for old_machine in list_of_machines:
-                        machine_id = old_machine.get('id')
-                        machine_hostname = old_machine.get('hostname')
-                        print ("Migrating %s(%s) for user %s" %
-                               (machine_id, machine_hostname, user.email))
-                        if not machine_id or not machine_hostname:
-                            print " *** ERROR MIGRATING, SKIPPING *** "
-                            continue
-                        if machine_id not in cloud.machines:
-                            cloud.machines[machine_id] = Machine()
-                        machine = cloud.machines[machine_id]
-                        machine.dns_name = machine_hostname
-                        machine.public_ips.append(machine_hostname)
-                        machine.name = machine_hostname
-                    del cloud._dict['list_of_machines']
-            user.save()
-    except IOError as exc:
-        # settings.yaml doesn't exist, continue
-        pass
 
     configurator = Configurator(root_factory=Root, settings=settings)
 

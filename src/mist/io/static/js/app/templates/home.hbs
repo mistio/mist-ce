@@ -105,15 +105,11 @@
                         {{#if view.isOrgOwner}}
                         <!-- Teams link -->
                         <li class="ui-li-has-count">
-                            {{#link-to 'teams' class="ui-btn ui-btn-icon-left icon-team ui-alt-icon"}}
-                                {{#if Mist.teamsController.model.length}}
-                                    <span class="ui-li-count ui-body-inherit">
-                                        {{Mist.teamsController.model.length}}
-                                    </span>
-                                    Teams
-                                {{else}}
-                                    Organization
-                                {{/if}}
+                            {{#link-to 'teams' class="ui-btn ui-btn-icon-left icon-teams ui-alt-icon"}}
+                                <span class="ui-li-count ui-body-inherit">
+                                    {{Mist.teamsController.model.length}}
+                                </span>
+                                Teams
                             {{/link-to}}
                         </li>
                         {{/if}}
