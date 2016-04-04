@@ -32,15 +32,15 @@ import logging
 from Crypto.PublicKey import RSA
 from hashlib import sha1
 
-from mist.io.dal import StrField, HtmlSafeStrField
-from mist.io.dal import IntField, FloatField, BoolField
-from mist.io.dal import ListField, DictField
-from mist.io.dal import OODict, FieldsDict, FieldsList, make_field
+from mist.io.deprecated_dal import StrField, HtmlSafeStrField
+from mist.io.deprecated_dal import IntField, FloatField, BoolField
+from mist.io.deprecated_dal import ListField, DictField
+from mist.io.deprecated_dal import OODict, FieldsDict, FieldsList, make_field
 try:
-    from mist.core.dal import User as DalUser
-    from mist.core.dal import FieldsDict  # escapes dots in keys (for mongo)
+    from mist.core.deprecated_dal import User as deprecated_dalUser
+    from mist.core.deprecated_dal import FieldsDict  # escapes dots in keys (for mongo)
 except ImportError:
-    from mist.io.dal import User as DalUser
+    from mist.io.deprecated_dal import User as deprecated_dalUser
 from mist.io import exceptions
 
 try:
