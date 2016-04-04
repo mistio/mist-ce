@@ -37,10 +37,10 @@ from mist.io.deprecated_dal import IntField, FloatField, BoolField
 from mist.io.deprecated_dal import ListField, DictField
 from mist.io.deprecated_dal import OODict, FieldsDict, FieldsList, make_field
 try:
-    from mist.core.deprecated_dal import User as deprecated_dalUser
+    from mist.core.deprecated_dal import User as DalUser
     from mist.core.deprecated_dal import FieldsDict  # escapes dots in keys (for mongo)
 except ImportError:
-    from mist.io.deprecated_dal import User as deprecated_dalUser
+    from mist.io.deprecated_dal import User as DalUser
 from mist.io import exceptions
 
 try:
