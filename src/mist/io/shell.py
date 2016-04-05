@@ -235,81 +235,82 @@ class ParamikoShell(object):
         except me.DoesNotExist:
             machine = Machine(cloud=cloud, machine_id=machine_id)
 
-        users = []
         if key_id:
             keys = [Keypair.objects.get(owner=user, name=key_id)]
         else:
             keys = [key_assoc.keypair
                     for key_assoc in machine.key_associations
                     if isinstance(key_assoc.keypair, Keypair)]
-            users = [key_assoc.ssh_user
-                     for key_assoc in machine.key_associations
-                     if key_assoc.ssh_user]
         if username:
             users = [username]
+        else:
+            users = list(set([key_assoc.ssh_user
+                              for key_assoc in machine.key_associations
+                              if key_assoc.ssh_user]))
         if not users:
-            users = [key_assoc.ssh_user
-                     for key_assoc in machine.key_associations
-                     if key_assoc.ssh_user]
-            for key_assoc in machine.key_associations:
-                if key_assoc.port:
-                    port = key_assoc.port
             for name in ['root', 'ubuntu', 'ec2-user', 'user', 'azureuser',
                          'core', 'centos', 'cloud-user', 'fedora']:
-                    if not name in users:
-                        users.append(name)
-        if not port:
-            port = 22
+                if not name in users:
+                    users.append(name)
+        if port != 22:
+            ports = [port]
+        else:
+            ports = list(set([key_assoc.port
+                              for key_assoc in machine.key_associations]))
+        if 22 not in ports:
+            ports.append(22)
         for key in keys:
             for ssh_user in users:
-                try:
-                    log.info("ssh -i %s %s@%s:%s",
-                             key.name, ssh_user, self.host, port)
-                    self.connect(username=ssh_user,
-                                 key=key.private,
-                                 password=password,
-                                 port=port)
-                except MachineUnauthorizedError:
-                    continue
-
-                retval, resp = self.command('uptime')
-                new_ssh_user = None
-                if 'Please login as the user ' in resp:
-                    new_ssh_user = resp.split()[5].strip('"')
-                elif 'Please login as the' in resp:
-                    # for EC2 Amazon Linux machines, usually with ec2-user
-                    new_ssh_user = resp.split()[4].strip('"')
-                if new_ssh_user:
-                    log.info("retrying as %s", new_ssh_user)
+                for port in ports:
                     try:
-                        self.disconnect()
-                        self.connect(username=new_ssh_user,
+                        log.info("ssh -i %s %s@%s:%s",
+                                 key.name, ssh_user, self.host, port)
+                        self.connect(username=ssh_user,
                                      key=key.private,
                                      password=password,
                                      port=port)
-                        ssh_user = new_ssh_user
                     except MachineUnauthorizedError:
                         continue
-                # we managed to connect succesfully, return
-                # but first update key
-                updated = False
-                for key_assoc in machine.key_associations:
-                    if key_assoc.keypair == key:
-                        key_assoc.ssh_user = ssh_user
-                        updated = True
-                        trigger_session_update_flag = True
-                        break
-                if not updated:
-                    trigger_session_update_flag = True
-                    key_assoc = KeyAssociation(keypair=key, ssh_user=ssh_user,
-                                               port=port,
-                                               sudo=self.check_sudo())
-                    machine.key_associations.append(key_assoc)
-                machine.save()
 
-                if trigger_session_update_flag:
-                    trigger_session_update(user.id, ['keys'])
-                return key.name, ssh_user
+                    retval, resp = self.command('uptime')
+                    new_ssh_user = None
+                    if 'Please login as the user ' in resp:
+                        new_ssh_user = resp.split()[5].strip('"')
+                    elif 'Please login as the' in resp:
+                        # for EC2 Amazon Linux machines, usually with ec2-user
+                        new_ssh_user = resp.split()[4].strip('"')
+                    if new_ssh_user:
+                        log.info("retrying as %s", new_ssh_user)
+                        try:
+                            self.disconnect()
+                            self.connect(username=new_ssh_user,
+                                         key=key.private,
+                                         password=password,
+                                         port=port)
+                            ssh_user = new_ssh_user
+                        except MachineUnauthorizedError:
+                            continue
+                    # we managed to connect succesfully, return
+                    # but first update key
+                    updated = False
+                    for key_assoc in machine.key_associations:
+                        if key_assoc.keypair == key:
+                            key_assoc.ssh_user = ssh_user
+                            updated = True
+                            trigger_session_update_flag = True
+                            break
+                    if not updated:
+                        trigger_session_update_flag = True
+                        key_assoc = KeyAssociation(keypair=key,
+                                                   ssh_user=ssh_user,
+                                                   port=port,
+                                                   sudo=self.check_sudo())
+                        machine.key_associations.append(key_assoc)
+                    machine.save()
+
+                    if trigger_session_update_flag:
+                        trigger_session_update(user.id, ['keys'])
+                    return key.name, ssh_user
 
         raise MachineUnauthorizedError("%s:%s" % (cloud_id, machine_id))
 

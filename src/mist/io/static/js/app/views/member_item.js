@@ -37,14 +37,21 @@ define('app/views/member_item', ['ember', 'md5'],
             actions: {
                 removeMemberClicked: function() {
                     var team = this.get('team'),
-                        member = this.get('member');
+                        member = this.get('member'),
+                        belongsToOtherTeam = Mist.teamsController.belongsToOtherTeam({member: member, team: team}),
+                        paragraph = null;
+
+                    if (belongsToOtherTeam) {
+                        paragraph = 'Are you sure you want to remove member "' + member.name + '"?';
+                    } else {
+                        paragraph = '"' + member.name + '" does not belong to any other teams. Removing them from the "' + team.name + '" team will remove them from the organization. Proceed?';
+                    }
 
                     Mist.dialogController.open({
                         type: DIALOG_TYPES.YES_NO,
                         head: 'Delete member',
                         body: [{
-                            paragraph: 'Are you sure you want to remove member "' +
-                                member.name + '" ?'
+                            paragraph: paragraph
                         }],
                         callback: function(didConfirm) {
                             if (didConfirm) {

@@ -78,16 +78,13 @@
                         {{/each}}
                     {{/unless}}
 
-                    {{component "policy-operator-item" policy=view.team.policy team=view.team}}
+                    {{component "policy-operator-item" team=view.team policy=view.team.policy}}
                 </tbody>
             </table>
 
             {{#unless view.team.isOwners}}
             <div class="text-center">
                 <a id="rule-add" class="ui-btn ui-shadow ui-caps back" {{action "addRulesClicked" target=view}}>Add Rule</a>
-                {{#if Mist.teamsController.updatingRules}}
-                    <!-- <div class="ajax-loader"></div> -->
-                {{/if}}
                 <a id="rule-save" class="ui-btn ui-caps ui-shadow ui-btn-d" {{action "saveRulesClicked" target=view}}>Save Rules</a>
             </div>
             {{/unless}}

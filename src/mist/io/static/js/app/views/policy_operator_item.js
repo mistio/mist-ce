@@ -24,8 +24,8 @@ define('app/views/policy_operator_item', ['ember'],
             // Computed Properties
             //
 
-            operatorText: Ember.computed('team.policy.rules.[]', function() {
-                return this.get('team') && this.get('team.policy.rules').length ? 'every other action ON any other resource' : 'every action ON any resource';
+            operatorText: Ember.computed('policy', 'policy.rules.[]', function() {
+                return this.get('policy') && this.get('policy.rules').length ? 'every other action ON any other resource' : 'every action ON any resource';
             }),
 
             //
@@ -34,7 +34,7 @@ define('app/views/policy_operator_item', ['ember'],
 
             actions: {
                 openPolicyOperatorPopup: function() {
-                    Mist.policyOperatorEditController.open(this.get('policy'), this.get('team'), 'operator', null, this.elementId);
+                    Mist.policyOperatorEditController.open(this.get('team.policy'), this.get('team'), 'operator', null, this.elementId);
                 }
             }
         });

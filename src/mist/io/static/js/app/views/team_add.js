@@ -21,8 +21,13 @@ define('app/views/team_add', ['app/views/controlled'],
             //  Computed Properties
             //
 
-            isReady: Ember.computed('Mist.teamAddController.newTeam.name', function () {
-                return !!Mist.teamAddController.newTeam.name;
+            isReady: Ember.computed('Mist.teamAddController.newTeam.name', 'Mist.teamsController.model', function () {
+                var newName = Mist.teamAddController.newTeam.name,
+                isUnique = Mist.teamsController.model.every(function(team) {
+                    return team.name != newName;
+                })
+
+                return newName && isUnique;
             }),
 
             load: function () {
@@ -80,7 +85,9 @@ define('app/views/team_add', ['app/views/controlled'],
                 },
 
                 addClicked: function () {
-                    Mist.teamAddController.add();
+                    if (this.get('isReady')) {
+                        Mist.teamAddController.add();
+                    }
                 }
             },
         });

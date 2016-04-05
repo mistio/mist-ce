@@ -69,6 +69,12 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             // Methods
             //
 
+            belongsToOtherTeam: function(args) {
+                return this.get('model').some(function(team) {
+                    return team.id != args.team.id && team.members.indexOf(args.member) != -1;
+                });
+            },
+
             addTeam: function(args) {
                 var that = this;
                 that.set('addingTeam', true);
@@ -177,7 +183,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     'operator': 'DENY',
                     'action': 'all',
                     'rtype': 'all',
-                    'rid': '',
+                    'rid': null,
                     'rtags': {}
                 });
                 team.policy.rules.pushObject(rule);
@@ -185,8 +191,10 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
 
             editRule: function(args) {
                 var index = args.team.policy.rules.indexOf(args.rule),
-                    rule = args.team.policy.rules.objectAt(index);
-                rule.set(args.properties.key, args.properties.value);
+                    rule = args.team.policy.rules.objectAt(index),
+                    key = args.properties.key,
+                    val = args.properties.value;
+                rule.set(key, val);
 
                 // When resource type changes force
                 // action to be All since bad combinations should be avoided
@@ -196,8 +204,23 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
 
                 // When identification changes
                 // reset rid & rtags to prevent both to be set
-                if (args.properties.key == 'identification') {
+                if (key == 'identification') {
                     rule.setProperties({
+                        rid: null,
+                        rtags: {}
+                    });
+
+                    if (['add', 'create'].indexOf(rule.get('action')) != -1) {
+                        rule.set('identification', 'where tags');
+                    }
+                }
+
+                // When action changes
+                // and it is equal to add or create
+                // then only tags can be used
+                if (key == 'action' && ['add', 'create'].indexOf(val) != -1) {
+                    rule.setProperties({
+                        identification: 'where tags',
                         rid: null,
                         rtags: {}
                     });

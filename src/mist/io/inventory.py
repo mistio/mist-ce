@@ -22,34 +22,31 @@ class MistInventory(object):
         self.keys = {}
         if not machines:
             clouds = Cloud.objects(owner=self.user)
-            machines = Machine.objects(cloud__in= clouds).only("machine_id", "cloud").as_pymongo()
-            # machines = [(bid, m['id']) for bid in self.user.clouds for m in self._list_machines(bid)]
-        #  for bid, mid in machines:
-        for machine in machines:
-                bid = machine['cloud']
-                mid = machine['machine_id']
-                try:
-                    name, ip_addr = self.find_machine_details(bid, mid)
-                    key_id, ssh_user, port = self.find_ssh_settings(bid, mid)
-                except Exception as exc:
-                    print exc
-                    continue
-                if key_id not in self.keys:
-                    keypair = Keypair.objects.get(owner=self.user, name=key_id)
-                    self.keys[key_id] = keypair.private
+            machines = [(machine.cloud.id, machine.machine_id)
+                        for machine in Machine.objects(cloud__in=clouds)]
+        for bid, mid in machines:
+            try:
+                name, ip_addr = self.find_machine_details(bid, mid)
+                key_id, ssh_user, port = self.find_ssh_settings(bid, mid)
+            except Exception as exc:
+                print exc
+                continue
+            if key_id not in self.keys:
+                keypair = Keypair.objects.get(owner=self.user, name=key_id)
+                self.keys[key_id] = keypair.private
 
-                if name in self.hosts:
-                    num = 2
-                    while ('%s-%d' % (name, num)) in self.hosts:
-                        num += 1
-                    name = '%s-%d' % (name, num)
+            if name in self.hosts:
+                num = 2
+                while ('%s-%d' % (name, num)) in self.hosts:
+                    num += 1
+                name = '%s-%d' % (name, num)
 
-                self.hosts[name] = {
-                    'ansible_ssh_host': ip_addr,
-                    'ansible_ssh_port': port,
-                    'ansible_ssh_user': ssh_user,
-                    'ansible_ssh_private_key_file': 'id_rsa/%s' % key_id,
-                }
+            self.hosts[name] = {
+                'ansible_ssh_host': ip_addr,
+                'ansible_ssh_port': port,
+                'ansible_ssh_user': ssh_user,
+                'ansible_ssh_private_key_file': 'id_rsa/%s' % key_id,
+            }
 
     def export(self, include_localhost=True):
         ans_inv = ''

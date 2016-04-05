@@ -147,6 +147,11 @@
     position: relative;
     top: 2px;
 }
+#single-team-page .info-table .rule-item .ajax-loader {
+    position: relative;
+    top: 15px;
+    right: 1px;
+}
 #single-team-page .info-table .member-header {
     background-color: #E4E4E4;
     border-bottom: 1px solid #E4E4E4;

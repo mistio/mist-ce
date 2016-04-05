@@ -13,5 +13,10 @@
         {{input value=rule.tagsText placeholder="resource tags"}}
     {{/if}}
 {{/if}}
-<a {{action "deleteRule" target=view}} class="ui-btn icon-xx ui-btn-icon-notext"></a>
+
+{{#if Mist.teamsController.updatingRules}}
+    <div class="ajax-loader"></div>
+{{else}}
+    <a {{action "deleteRule" target=view}} class="ui-btn icon-xx ui-btn-icon-notext"></a>
+{{/if}}
 </td>

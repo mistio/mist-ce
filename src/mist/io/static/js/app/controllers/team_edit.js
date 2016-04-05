@@ -57,8 +57,12 @@ define('app/controllers/team_edit', ['ember'],
             //
 
             _updateFormReady: function() {
-                var formReady = false;
-                if ((this.newName != this.team.name) || (this.newDescription != this.team.description)) {
+                var formReady = false,
+                isUnique = Mist.teamsController.model.every(function(team) {
+                    return team.id != this.team.id ? team.name != this.newName : true;
+                }, this);
+
+                if (this.newName && isUnique && ((this.newName != this.team.name) || (this.newDescription != this.team.description))) {
                     formReady = true;
                 }
                 this.set('formReady', formReady);

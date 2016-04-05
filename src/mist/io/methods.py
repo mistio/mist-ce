@@ -198,7 +198,7 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
                 raise CloudUnavailableError(exc=exc)
         cloud.save()
     log.info("Cloud with id '%s' added succesfully.", cloud.id)
-    trigger_session_update(user.email, ['clouds'])
+    trigger_session_update(user, ['clouds'])
     return cloud.id
 
 
@@ -236,12 +236,12 @@ def add_cloud_v_2(user, title, provider, params):
     if provider == 'bare_metal':
         cloud_id, mon_dict = _add_cloud_bare_metal(user, title, provider, params)
         log.info("Cloud with id '%s' added successfully.", cloud_id)
-        trigger_session_update(user.email, ['clouds'])
+        trigger_session_update(user, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'coreos':
         cloud_id, mon_dict = _add_cloud_coreos(user, title, provider, params)
         log.info("Cloud with id '%s' added successfully.", cloud_id)
-        trigger_session_update(user.email, ['clouds'])
+        trigger_session_update(user, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     elif provider == 'ec2':
         cloud_id, cloud = _add_cloud_ec2(user, title, params)
@@ -303,7 +303,7 @@ def add_cloud_v_2(user, title, provider, params):
     cloud.owner = user
     cloud.save()
     log.info("Cloud with id '%s' added succesfully with Api-Version: 2.", cloud_id)
-    trigger_session_update(user.email, ['clouds'])
+    trigger_session_update(user, ['clouds'])
 
     if provider == 'libvirt' and cloud.apisecret:
     # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
@@ -760,7 +760,7 @@ def _add_cloud_libvirt(user, title, provider, params):
     return cloud.id, cloud
 
 
-def _add_cloud_openstack(title, provider, params):
+def _add_cloud_openstack(user, title, provider, params):
     username = params.get('username', '')
     if not username:
         raise RequiredParameterMissingError('username')
@@ -949,7 +949,7 @@ def add_key(user, key_id, private_key):
     keypair.save()
 
     log.info("Added key with id '%s'", key_id)
-    trigger_session_update(user.email, ['keys'])
+    trigger_session_update(user, ['keys'])
     return key_id
 
 
@@ -976,7 +976,7 @@ def delete_key(user, key_id):
         other_key.default = True
         other_key.save()
     log.info("Deleted key with id '%s'.", key_id)
-    trigger_session_update(user.email, ['keys'])
+    trigger_session_update(user, ['keys'])
 
 
 def set_default_key(user, key_id):
@@ -1000,7 +1000,7 @@ def set_default_key(user, key_id):
     key.save()
 
     log.info("Succesfully set key with id '%s' as default.", key_id)
-    trigger_session_update(user.email, ['keys'])
+    trigger_session_update(user, ['keys'])
 
 
 def edit_key(user, new_key, old_key):
@@ -1025,7 +1025,7 @@ def edit_key(user, new_key, old_key):
     key.name = new_key
     key.save()
     log.info("Renamed key '%s' to '%s'.", old_key, new_key)
-    trigger_session_update(user.email, ['keys'])
+    trigger_session_update(user, ['keys'])
 
 
 def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, port=22):
@@ -1068,7 +1068,7 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
                                        port=port)
             machine.key_associations.append(key_assoc)
             machine.save()
-            trigger_session_update(user.email, ['keys'])
+            trigger_session_update(user, ['keys'])
         return
 
     # if host is specified, try to actually deploy
@@ -1145,7 +1145,7 @@ def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
             break
     machine.key_associations.remove(assoc)
     machine.save()
-    trigger_session_update(user.email, ['keys'])
+    trigger_session_update(user, ['keys'])
 
 
 def connect_provider(cloud):
@@ -1490,11 +1490,11 @@ def list_machines(user, cloud_id):
         conn.disconnect()
     return ret
 
-# command is not an arg into function, but in post deploy steps there is?
+
 def create_machine(user, cloud_id, key_id, machine_name, location_id,
-                   image_id, size_id, script, image_extra, disk, image_name,
+                   image_id, size_id, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
-                   docker_env=[], docker_command=None, ssh_port=22,
+                   docker_env=[], docker_command=None, ssh_port=22, script='',
                    script_id='', script_params='', job_id=None,
                    docker_port_bindings={}, docker_exposed_ports={},
                    azure_port_bindings='', hostname='', plugins=None,
@@ -1502,8 +1502,14 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    post_script_id='', post_script_params='', cloud_init='',
                    associate_floating_ip=False,
                    associate_floating_ip_subnet=None, project_id=None,
+<<<<<<< HEAD
                    bare_metal=False, hourly=True,
                    cronjob={}, command=None, tags=None):
+=======
+                   cronjob={}, command=None, tags=None,
+                   bare_metal=False, hourly=True,
+                   softlayer_backend_vlan_id=None):
+>>>>>>> chaos
 
     """Creates a new virtual machine on the specified cloud.
 
@@ -1525,6 +1531,13 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     through mist.io and those from the Linode interface.
 
     """
+    # script: a command that is given once
+    # script_id: id of a script that exists - for mist.core
+    # script_params: extra params, for script_id
+    # post_script_id: id of a script that exists - for mist.core. If script_id
+    # or monitoring are supplied, this will run after both finish
+    # post_script_params: extra params, for post_script_id
+
     log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     conn = connect_provider(cloud)
@@ -1601,7 +1614,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif conn.type is Provider.SOFTLAYER:
         node = _create_machine_softlayer(conn, key_id, private_key, public_key,
                                          machine_name, image, size,
-                                         location, bare_metal, cloud_init, hourly)
+                                         location, bare_metal, cloud_init, hourly, softlayer_backend_vlan_id)
     elif conn.type is Provider.DIGITAL_OCEAN:
         node = _create_machine_digital_ocean(conn, key_id, private_key,
                                              public_key, machine_name,
@@ -1649,28 +1662,34 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                       username=node.extra.get('username'), port=ssh_port)
     elif key_id:
         associate_key(user, key_id, cloud_id, node.id, port=ssh_port)
-
     # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calls post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
+<<<<<<< HEAD
             user.id, cloud_id, node.id, monitoring, script, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
+=======
+            user.id, cloud_id, node.id, monitoring, key_id,
+            node.extra.get('username'), node.extra.get('password'), public_key,
+            script=script,
+            script_id=script_id, script_params=script_params, job_id = job_id,
+            hostname=hostname, plugins=plugins, post_script_id=post_script_id,
+>>>>>>> chaos
             post_script_params=post_script_params, cronjob=cronjob,
         )
     elif conn.type == Provider.OPENSTACK:
         if associate_floating_ip:
             networks = list_networks(user, cloud_id)
             mist.io.tasks.openstack_post_create_steps.delay(
-                user.id, cloud_id, node.id, monitoring, script, key_id,
+                user.id, cloud_id, node.id, monitoring, key_id,
                 node.extra.get('username'), node.extra.get('password'),
-                public_key, script_id=script_id, script_params=script_params,
+                public_key, script=script, script_id=script_id, script_params=script_params,
                 job_id = job_id, hostname=hostname, plugins=plugins,
-                post_script_id=post_script_id,
                 post_script_params=post_script_params,
                 networks=networks, cronjob=cronjob,
             )
@@ -1679,15 +1698,15 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
-            user.id, cloud_id, node.id, monitoring, script, key_id,
-            node.extra.get('password'), public_key,
+            user.id, cloud_id, node.id, monitoring, key_id,
+            node.extra.get('password'), public_key, script=script,
             script_id=script_id, script_params=script_params,
             job_id = job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
             post_script_params=post_script_params, cronjob=cronjob
         )
 
-    elif key_id:   # there is a problem here with command and script
+    elif key_id:
         mist.io.tasks.post_deploy_steps.delay(
             user.id, cloud_id, node.id, monitoring, script=script,
             key_id=key_id, script_id=script_id, script_params=script_params,
@@ -1928,7 +1947,8 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key,
 
 
 def _create_machine_softlayer(conn, key_name, private_key, public_key,
-                             machine_name, image, size, location, bare_metal, cloud_init, hourly):
+                             machine_name, image, size, location, bare_metal, cloud_init, hourly,
+                             softlayer_backend_vlan_id):
     """Create a machine in Softlayer.
 
     Here there is no checking done, all parameters are expected to be
@@ -1975,7 +1995,8 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
                 sshKeys=server_key,
                 bare_metal=bare_metal,
                 postInstallScriptUri=postInstallScriptUri,
-                ex_hourly=hourly
+                ex_hourly=hourly,
+                ex_backend_vlan=softlayer_backend_vlan_id
             )
         except Exception as e:
             raise MachineCreationError("Softlayer, got exception %s" % e, e)
@@ -3095,7 +3116,7 @@ def create_network(user, cloud_id, network, subnet, router):
 
     task = mist.io.tasks.ListNetworks()
     task.clear_cache(user.email, cloud_id)
-    trigger_session_update(user.email, ['clouds'])
+    trigger_session_update(user, ['clouds'])
     return ret
 
 
@@ -3247,7 +3268,7 @@ def delete_network(user, cloud_id, network_id):
     try:
         task = mist.io.tasks.ListNetworks()
         task.clear_cache(user.email, cloud_id)
-        trigger_session_update(user.email, ['clouds'])
+        trigger_session_update(user, ['clouds'])
     except Exception as e:
         pass
 
@@ -3497,7 +3518,7 @@ def enable_monitoring(user, cloud_id, machine_id,
             deploy = deploy.delay
         deploy(user.email, cloud_id, machine_id, ret_dict['extra_vars'])
 
-    trigger_session_update(user.email, ['monitoring'])
+    trigger_session_update(user, ['monitoring'])
 
     return ret_dict
 
@@ -3528,7 +3549,7 @@ def disable_monitoring(user, cloud_id, machine_id, no_ssh=False):
     if not no_ssh:
         mist.io.tasks.undeploy_collectd.delay(user.email,
                                               cloud_id, machine_id)
-    trigger_session_update(user.email, ['monitoring'])
+    trigger_session_update(user, ['monitoring'])
 
 
 def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
@@ -3546,7 +3567,8 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
     try:
         ret = probe_ssh_only(user, cloud_id, machine_id, host,
                              key_id=key_id, ssh_user=ssh_user)
-    except:
+    except Exception as exc:
+        log.error(exc)
         log.warning("SSH failed when probing, let's see what ping has to say.")
         ret = {}
     ping_out = ping.stdout.read()
@@ -3707,8 +3729,9 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
     try: # Send email in multi-user env
         if email_notify:
             from mist.core.helpers import send_email
+            email = user.email if hasattr(user, 'email') else user.get_email()
             send_email("[mist.io] %s" % title, body.encode('utf-8', 'ignore'),
-                       user.email)
+                       email)
     except ImportError:
         pass
 
@@ -3746,7 +3769,7 @@ def assoc_metric(user, cloud_id, machine_id, metric_id):
     if not resp.ok:
         log.error("Error in assoc_metric %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
-    trigger_session_update(user.email, [])
+    trigger_session_update(user, [])
 
 
 def disassoc_metric(user, cloud_id, machine_id, metric_id):
@@ -3765,7 +3788,7 @@ def disassoc_metric(user, cloud_id, machine_id, metric_id):
     if not resp.ok:
         log.error("Error in disassoc_metric %d:%s", resp.status_code, resp.text)
         raise ServiceUnavailableError(resp.text)
-    trigger_session_update(user.email, [])
+    trigger_session_update(user, [])
 
 
 def update_metric(user, metric_id, name=None, unit=None,
@@ -3789,7 +3812,7 @@ def update_metric(user, metric_id, name=None, unit=None,
     if not resp.ok:
         log.error("Error updating metric %d:%s", resp.status_code, resp.text)
         raise BadRequestError(resp.text)
-    trigger_session_update(user.email, [])
+    trigger_session_update(user, [])
 
 
 def deploy_python_plugin(user, cloud_id, machine_id, plugin_id,

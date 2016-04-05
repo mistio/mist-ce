@@ -36,53 +36,45 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
             },
 
             addOrganization: function(args) {
-                var organization = Ember.Object.create({
-                    id: -1,
-                    name: args.organization.name,
-                    description: args.organization.description
-                });
-                this._addOrganization(organization);
-                // var that = this;
-                // that.set('addingOrganization', true);
-                // Mist.ajax
-                //     .POST('/org', {
-                //         'name': args.organization.name,
-                //         'description': args.organization.description
-                //     })
-                //     .success(function(organization) {
-                //         that._addOrganization(organization);
-                //     })
-                //     .error(function(message) {
-                //         Mist.notificationController.notify(message);
-                //     })
-                //     .complete(function(success) {
-                //         that.set('addingOrganization', false);
-                //         if (args.callback)
-                //             args.callback(success);
-                //     });
+                var that = this;
+                that.set('addingOrganization', true);
+                Mist.ajax
+                    .POST('/org', {
+                        'name': args.organization.name
+                    })
+                    .success(function(organization) {
+                        that._addOrganization(organization);
+                    })
+                    .error(function(message) {
+                        Mist.notificationController.notify(message);
+                    })
+                    .complete(function(success) {
+                        that.set('addingOrganization', false);
+                        if (args.callback)
+                            args.callback(success);
+                    });
             },
 
             _addOrganization: function(organization) {
-                this._updateModel(organization);
-                this.trigger('onOrganizationAdd');
+                Mist.orgs.pushObject({
+                    id: organization.id,
+                    name: organization.name
+                });
 
-                // This is a very bad implementation
-                // try to emit an event and run this
-                // in teams controller
-                var teams = [{
-                    id: -1,
-                    name: 'Owners',
-                    description: '',
-                    members: [{
-                        id: -1,
-                        name: Mist.firstName && Mist.lastName ? Mist.firstName + ' ' + Mist.lastName : Mist.email,
-                        email: Mist.email
-                    }],
-                    policy: {}
-                }];
-
-                Mist.teamsController.setModel(teams);
-                this._renderFields();
+                Ember.run.later(function() {
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.OK_CANCEL,
+                        head: 'New Organization',
+                        body: [{
+                            paragraph: 'Organization "' + organization.name + '" was created successfully. Do you want to switch context?'
+                        }],
+                        callback: function(didConfirm) {
+                            if (didConfirm) {
+                                window.location.href = '/switch_context/' + organization.id;
+                            }
+                        }
+                    });
+                }, 100);
             },
 
             _updateModel: function(organization) {
