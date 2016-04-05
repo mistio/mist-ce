@@ -4,6 +4,10 @@
 	overflow: hidden;
 }
 
+#single-machine-page .ui-content {
+    background-color: transparent;
+}
+
 #single-machine-page {
 	padding-bottom: 50px;
 }

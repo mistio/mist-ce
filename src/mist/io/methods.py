@@ -3553,7 +3553,8 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
     try:
         ret = probe_ssh_only(user, cloud_id, machine_id, host,
                              key_id=key_id, ssh_user=ssh_user)
-    except:
+    except Exception as exc:
+        log.error(exc)
         log.warning("SSH failed when probing, let's see what ping has to say.")
         ret = {}
     ping_out = ping.stdout.read()

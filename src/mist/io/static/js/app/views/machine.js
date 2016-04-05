@@ -61,6 +61,7 @@ define('app/views/machine', ['app/views/page'],
 
             updateMonitoringCollapsible: function() {
                 Ember.run.next(this, function() {
+                    console.log(Mist.cloudsController.checkedMonitoring, this.machine.id);
                     if (Mist.cloudsController.checkedMonitoring && this.machine.id) {
                         $('#monitoring-collapsible').show();
                     } else {

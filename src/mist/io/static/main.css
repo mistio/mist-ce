@@ -1283,13 +1283,24 @@ ul.checkbox-list .ui-grid-b {
 #user-menu-popup .ui-btn-icon-left {
     padding-left: 3.4em !important;
 }
+.orgs-list {
+    border-bottom: 1px solid #d4d4d4;
+}
 #add-org {
     border-top: 1px solid #d4d4d4;
-    border-bottom: 1px solid #d4d4d4;
     padding: 10px 10px 8px;
 }
 #add-org .ui-btn {
     display: inline-block;
+}
+.ui-popup ul.ui-listview li.organization-item.org-active a,
+.ui-popup ul.ui-listview li.organization-item.org-active a:after {
+    color: #009688;
+}
+.ui-popup ul.ui-listview li.organization-item.org-active a:hover,
+.ui-popup ul.ui-listview li.organization-item.org-active a:hover:after {
+    background-color: #009688 !important;
+    color: #fff;
 }
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {

@@ -276,6 +276,7 @@ var loadFiles = function (callback) {
         'app/views/member_item',
         'app/views/member_add',
         'app/views/organization_add',
+        'app/views/organization_item',
         'app/views/policy_rule_item',
         'app/views/policy_rule_edit',
         'app/views/policy_operator_item',
