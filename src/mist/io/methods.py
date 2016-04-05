@@ -3715,8 +3715,9 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
     try: # Send email in multi-user env
         if email_notify:
             from mist.core.helpers import send_email
+            email = user.email if hasattr(user, 'email') else user.get_email()
             send_email("[mist.io] %s" % title, body.encode('utf-8', 'ignore'),
-                       user.email)
+                       email)
     except ImportError:
         pass
 
