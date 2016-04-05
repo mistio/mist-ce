@@ -1,13 +1,12 @@
 <link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
-<link rel="import" href="../element-action-menu/element-action-menu.html">
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../tag-link/tag-link.html">
 <link rel="import" href="machine-list-item.html">
 <link rel="import" href="image-list-item.html">
 <link rel="import" href="key-list-item.html">
 <link rel="import" href="network-list-item.html">
-<dom-module id="element-table">
+<dom-module id="item-list">
     <template>
         <style>
         :host {
@@ -141,9 +140,6 @@
             text-overflow: ellipsis;
         }
 
-        #actions element-action-menu {
-            right: 0;
-        }
         .iron-list {
             /*position: relative;
             height: 100vh;
@@ -182,11 +178,11 @@
                 <div class="description">Description </div>
             </template>
         </div>
-        <div class="row no-data" hidden$="[[elements.length]]">
+        <div class="row no-data" hidden$="[[items.length]]">
             no data yet
         </div>
         <template is="dom-if" if="[[ismachines]]">
-            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="{{selectedMachines}}" style$="[[vpHeight]]">
+            <iron-list items="[[items]]" as="item" selection-enabled multi-selection selected-items="[[selectedItems]]" style$="[[vpHeight]]">
                 <template>
                     <div class="row" data-index$="[[index]]">
                         <machine-list-item section="[[section]]" item="[[item]]"></machine-list-item>
@@ -195,7 +191,7 @@
             </iron-list>
         </template>
         <template is="dom-if" if="[[isimages]]">
-            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedImages]]" style$="[[vpHeight]]">
+            <iron-list items="[[items]]" as="item" selection-enabled multi-selection selected-items="[[selectedItems]]" style$="[[vpHeight]]">
                 <template>
                     <div class="row" data-index$="[[index]]">
                         <image-list-item section="[[section]]" item="[[item]]"></image-list-item>
@@ -204,7 +200,7 @@
             </iron-list>
         </template>
         <template is="dom-if" if="[[iskeys]]">
-            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedKeys]]" style$="[[vpHeight]]">
+            <iron-list items="[[items]]" as="item" selection-enabled multi-selection selected-items="[[selectedItems]]" style$="[[vpHeight]]">
                 <template>
                     <div class="row" data-index$="[[index]]">
                         <key-list-item section="[[section]]" item="[[item]]"></key-list-item>
@@ -213,7 +209,7 @@
             </iron-list>
         </template>
         <template is="dom-if" if="[[isnetworks]]">
-            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedNetworks]]" style$="[[vpHeight]]">
+            <iron-list items="[[items]]" as="item" selection-enabled multi-selection selected-items="[[selectedItems]]" style$="[[vpHeight]]">
                 <template>
                     <div class="row" data-index$="[[index]]">
                         <network-list-item section="[[section]]" item="[[item]]"></network-list-item>
@@ -222,10 +218,10 @@
             </iron-list>
         </template>
         <template is="dom-if" if="[[isscripts]]">
-            <iron-list items="[[elements]]" as="item" selection-enabled multi-selection selected-items="[[selectedScripts]]" style$="[[vpHeight]]">
+            <iron-list items="[[items]]" as="item" selection-enabled multi-selection selected-items="[[selectedItems]]" style$="[[vpHeight]]">
                 <template>
                     <div class="row" data-index$="[[index]]">
-                        <a href$="[[_elementLink(item)]]" is="pushstate-anchor">
+                        <a href$="[[_itemLink(item)]]" is="pushstate-anchor">
                             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
                             <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
                             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
@@ -256,12 +252,12 @@
 </dom-module>
 <script>
 Polymer({
-    is: 'element-table',
+    is: 'item-list',
 
     properties: {
-        elements: {
+        items: {
             type: Array,
-            observer: '_elementsChanged'
+            observer: '_itemsChanged'
         },
         allselected: {
             type: Boolean,
@@ -282,19 +278,7 @@ Polymer({
             type: Boolean,
             reflectToAttribute: true
         },
-        selectedMachines: {
-            type: Array
-        },
-        selectedImages: {
-            type: Array
-        },
-        selectedKeys: {
-            type: Array
-        },
-        selectedNetworks: {
-            type: Array
-        },
-        selectedScripts: {
+        selectedItems: {
             type: Array
         },
         ismachines: {
@@ -342,6 +326,7 @@ Polymer({
             return true;
         return false;
     },
+
     isKeys: function(section) {
         if (section && section.id == "keys")
             return true;
@@ -386,9 +371,10 @@ Polymer({
                 });
             }
         }
-        console.log('selected machines:', this.selectedMachines);
+        console.log('selected machines:', this.selectedItems);
         this.fire('update-params');
     },
+
     _mouseOver: function(e) {
         // _mouseOver & _showActions give error with iron-list
 
@@ -410,6 +396,8 @@ Polymer({
     },
 
     _showActions: function(row, index) {
+        // TODO
+        /*
         // _mouseOver & _showActions give error with iron-list
 
         var sharedActionMenu = this._sharedActionMenu;
@@ -431,10 +419,11 @@ Polymer({
         row.classList.add('hover');
 
         this._currentRowIndex = index;
-        this._currentRow = row;
+        this._currentRow = row;*/
     },
 
     _hideActions: function() {
+        /* TODO
         var row = this._currentRow;
         var sharedActionMenu = this._sharedActionMenu;
 
@@ -445,10 +434,10 @@ Polymer({
             row.classList.remove('hover');
             this._currentRowIndex = -1;
             this._currentRow = null;
-        }
+        }*/
     },
 
-    _elementLink: function(item) {
+    _itemLink: function(item) {
         var p, s = this.section.id;
         if (s == "machines")
             p = item.uuid
@@ -467,9 +456,9 @@ Polymer({
     _getHeaderStyle: function(color) {
         return 'background-color: ' + color + '; color: #fff;';
     },
-    _elementsChanged: function() {
 
-        console.log('selected machines:', this.selectedMachines);
+    _itemsChanged: function() {
+        console.log('selected items:', this.selectedItems);
         // this.classList.add('hidden');
         this.async(function() {
             // this.classList.remove('hidden');
@@ -479,6 +468,7 @@ Polymer({
     _layoutIfNeeded: function(el) {
         return el.offsetTop;
     },
+
     _onSelectAll: function(e) {
         // e.stopPropagation();
 

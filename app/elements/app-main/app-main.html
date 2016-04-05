@@ -51,15 +51,15 @@
             <iron-route path="/add-cloud" title="add cloud" href="../clouds/cloud-add.html"></iron-route>
 
             <!-- machines -->
-            <iron-route path="/machines" title="machines" href="../pages/page-list.html"></iron-route>
+            <iron-route path="/machines" title="machines" href="../pages/page-items.html"></iron-route>
             <iron-route path="/machines/:uuid" title="machine"></iron-route>
-            
+
             <!-- images -->
-            <!-- <iron-route path="/images" title="images" href="../pages/page-list.html"></iron-route> -->
+            <!-- <iron-route path="/images" title="images" href="../pages/page-items.html"></iron-route> -->
             <!-- <iron-route path="/images/:id" title="image"></iron-route> -->
             <iron-route path="/images" title="images" href="../images/images-list.html"></iron-route>
             <iron-route path="/images/:id" title="image" href="../images/images-page.html"></iron-route>
-            
+
             <!-- keys -->
             <iron-route path="/keys" title="keys" href="../keys/keys-list.html"></iron-route>
             <iron-route path="/keys/:id" title="keys" href="../keys/key-page.html"></iron-route>
@@ -68,17 +68,17 @@
             <iron-route path="/networks" title="networks" href="../networks/networks-list.html"></iron-route>
             <iron-route path="/networks/:id" title="network" href="../networks/network-page.html"></iron-route>
             <iron-route path="/add-network" title="network" href="../networks/network-add.html"></iron-route>
-            
+
             <!-- templates -->
             <iron-route path="/templates" title="templates" href="../templates/templates-list.html"></iron-route>
             <iron-route path="/templates/:id" title="template" href="../templates/template-page.html"></iron-route>
             <iron-route path="/add-template" title="add template" href="../templates/template-add.html"></iron-route>
-            
+
             <!-- scripts -->
             <iron-route path="/scripts" title="scripts" href="../scripts/scripts-list.html"></iron-route>
             <iron-route path="/scripts/:id" title="script" href="../scripts/script-page.html"></iron-route>
             <iron-route path="/add-script" title="add script" href="../scripts/script-add.html"></iron-route>
-            
+
             <!-- other -->
             <iron-route path="/elements" title="elements"></iron-route>
             <iron-route path="/account" title="account"></iron-route>
@@ -90,18 +90,18 @@
             <cloud-add model="[[model]]" keys="[[model.keysArray]]"></cloud-add>
 
             <!-- machines -->
-            <page-list model="[[model]]" elements="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-list>
+            <page-items model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
             <page-machine params="[[params]]" model="[[model]]" machine="[[getMachine(params)]]" sections="[[sections]]"></page-machine>
-            
+
             <!-- images -->
             <!-- <page-list model="[[model]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-list> -->
             <images-list model="[[model]]" images="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></images-list>
             <page-image params="[[params]]" model="[[model]]" image="[[getImage(params)]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-image>
-            
+
             <!-- keys -->
             <keys-list model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" keys="[[model.keysArray]]"></keys-list>
             <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
-            
+
             <!-- networks -->
             <networks-list model="[[model]]" networks="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></networks-list>
             <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
@@ -111,13 +111,13 @@
             <templates-list model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" templates="[[model.templatesArray]]"></templates-list>
             <template-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.templates]]"></template-page>
             <template-add model="[[model]]" sections="[[sections]]" section="[[sections.templates]]"></template-add>
-            
+
 
             <!-- scripts - leave scipts last due to editors highlighting problem -->
             <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
             <scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list>
             <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
-            <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>        
+            <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
 
             <page-elements></page-elements>
             <page-account></page-account>

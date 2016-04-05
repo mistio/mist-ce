@@ -2,8 +2,7 @@
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../hero-image/hero-image.html">
 <link rel="import" href="../section-symbol/section-symbol.html">
-<link rel="import" href="../element-action-menu/element-action-menu.html">
-<dom-module id="element-card">
+<dom-module id="item-card">
     <template>
         <style>
         :host {
@@ -20,39 +19,39 @@
             -webkit-transition-properties: opacity, box-shadow;
             -webkit-transition-duration: 0.4s;
         }
-        
+
         @media (max-width: 1070px) {
             :host {
                 max-width: calc(50% - 10px);
             }
         }
-        
+
         @media (max-width: 530px) {
             :host {
                 max-width: calc(100% - 10px);
             }
         }
-        
+
         :host(:hover),
         :host(.hover) {
             @apply(--shadow-elevation-2dp);
         }
-        
+
         h3 {
             font-size: 16px;
             font-weight: 500;
             margin: 0;
             padding: 10px 16px 0;
         }
-        
+
         p {
             margin: 0;
         }
-        
+
         #el {
             cursor: pointer;
         }
-        
+
         #hero {
             width: 100%;
             height: 120px;
@@ -61,27 +60,27 @@
             overflow: hidden;
             border-bottom: 1px solid #e5e5e5;
         }
-        
+
         #hero > img {
             width: 100%;
             height: 100%;
         }
-        
+
         .meta {
             border-top: 1px solid;
             border-bottom: 1px solid;
             border-color: var(--divider-color);
             padding: 10px 16px;
         }
-        
+
         .meta + .meta {
             border-top: 0;
         }
-        
+
         .meta:last-child {
             border-bottom: 0;
         }
-        
+
         #el-desc {
             @apply(--paper-font-body1);
             color: var(--secondary-text-color);
@@ -89,46 +88,46 @@
             padding: 10px 16px;
             height: 75px;
         }
-        
+
         .section {
             font-size: 12px;
             font-weight: 500;
         }
-        
+
         .section section-symbol {
             margin: 0 15px 0 0;
         }
-        
+
         .section > a:hover {
             text-decoration: underline;
         }
-        
+
         .tags iron-icon {
             margin: 0 15px 0 0;
             padding: 5px;
             color: var(--secondary-text-color);
             --iron-icon-size: 18px;
         }
-        
+
         .tag {
             margin-right: 4px;
             font-size: 12px;
         }
-        
+
         .tag:hover {
             text-decoration: underline;
         }
-        
+
         .tag:after {
             margin-left: -3px;
             content: " ,";
         }
-        
+
         .tag:last-of-type:after {
             content: "";
         }
         </style>
-        <a href="[[_getElementLink(item.uuid)]]">
+        <a href="[[_getitemLink(item.uuid)]]">
             <div id="content" class="vertical layout">
                 <div id="el" view="docs">
                     <div id="hero" on-mouseenter="_mouseEnter" on-mouseleave="_mouseLeave" style$="[[_computeStyle(color)]]">
@@ -169,7 +168,7 @@
     }
 
     Polymer({
-        is: 'element-card',
+        is: 'item-card',
         enableCustomStyleProperties: true,
         properties: {
             item: Object,
@@ -178,7 +177,7 @@
         },
 
         observers: [
-            '_updateSection(_element)'
+            '_updateSection(_item)'
         ],
 
         attached: function() {
@@ -208,7 +207,7 @@
         _computeStyle: function(color) {
             return 'background-color:' + color;
         },
-        _getElementLink: function(uuid) {
+        _getItemLink: function(uuid) {
             return './' + uuid;
         },
         _getImageSrc: function(src) {
@@ -229,7 +228,7 @@
             var width = this.$.hero.offsetWidth;
 
             if (!sharedActionMenu) {
-                sharedActionMenu = document.createElement('element-action-menu');
+                sharedActionMenu = document.createElement('item-action-menu');
                 sharedActionMenu.classList.add('cards');
                 sharedActionMenu.classList.add('hidden');
                 sharedActionMenu.addEventListener('mouseenter', mouseEnter);

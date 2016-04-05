@@ -1,13 +1,8 @@
-<link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
-<link rel="import" href="../section-symbol/section-symbol.html">
-<link rel="import" href="../tag-link/tag-link.html">
-<link rel="import" href="../theme-color/theme-color.html">
-<link rel="import" href="../element-action-menu/element-action-menu.html">
-<link rel="import" href="../element-table/element-table.html">
-<link rel="import" href="../element-table-cards/element-table-cards.html">
-<dom-module id="page-list">
+<link rel="import" href="../item-list/item-list.html">
+<link rel="import" href="../item-cards/item-cards.html">
+<dom-module id="page-items">
     <template>
         <style>
         :host {
@@ -42,10 +37,6 @@
             --paper-icon-button-ink-color: transparent;
         }
 
-        .paper-header .cartButton {
-            margin-right: 10px;
-        }
-
         #content {
             overflow: auto;
             -webkit-overflow-scrolling: touch;
@@ -56,17 +47,17 @@
             margin-right: 15px;
         }
 
-        .elements-title h2 {
+        .items-title h2 {
             @apply(--paper-font-title);
             color: #424242;
         }
 
-        .elements-title iron-icon {
+        .items-title iron-icon {
             cursor: pointer;
             margin-left: 16px;
         }
 
-        .elements-title > [paper-drawer-toggle] {
+        .items-title > [paper-drawer-toggle] {
             margin: 0 16px 0 0;
         }
 
@@ -75,9 +66,9 @@
             color: var(--paper-grey-600);
         }
 
-        #element-cards,
-        element-table,
-        .elements-title,
+        #item-cards,
+        item-list,
+        .items-title,
         #section-heading {
             max-width: 1500px;
             margin: 20px auto;
@@ -138,11 +129,11 @@
             right: 15px;
         }
 
-        [view=cards] element-table {
+        [view=cards] item-list {
             display: none;
         }
 
-        [view=table] #element-cards {
+        [view=table] #item-cards {
             display: none;
         }
         </style>
@@ -151,7 +142,7 @@
             <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
                 <div class="paper-header">
                     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-                    <h2 class="flex">[[_filteredElements.length]] [[pageTitle]]</h2>
+                    <h2 class="flex">[[_filteredItems.length]] [[pageTitle]]</h2>
                     <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
                     <paper-icon-button class="toggleViewButton" icon="[[viewIcon]]" on-tap="toggleView" hidden$="[[_forceCards]]"></paper-icon-button>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
@@ -161,10 +152,10 @@
                         <div class="description">[[section.description]]</div>
                     </div>
                     <template is="dom-if" if="[[_stampCards(view)]]">
-                        <element-table-cards id="element-cards" sections="[[sections]]" section="[[section]]" elements="[[_filteredElements]]"></element-table-cards>
+                        <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[_filteredItems]]"></item-cards>
                     </template>
                     <template is="dom-if" if="[[_stampTable(view)]]">
-                        <element-table sections="[[sections]]" section="[[section]]" elements="[[_filteredElements]]" on-tag-selected="updateTag"></element-table>
+                        <item-list sections="[[sections]]" section="[[section]]" items="[[_filteredItems]]" on-tag-selected="updateTag"></item-list>
                     </template>
                 </div>
             </paper-header-panel>
@@ -178,7 +169,7 @@
 (function() {
     var _lastNavigated = null;
     Polymer({
-        is: 'page-list',
+        is: 'page-items',
         enableCustomStyleProperties: true,
         properties: {
             router: Object,
@@ -222,16 +213,16 @@
                 notify: true,
                 value: {}
             },
-            elements: Array,
+            items: Array,
 
-            _filteredElements: Array,
-            _elementCount: Number,
+            _filteredItems: Array,
+            _itemCount: Number,
             _forceCards: {
                 type: Boolean
             },
         },
         observers: [
-            'updateURL(q, section, tag, view, elements)',
+            'updateURL(q, section, tag, view, items)',
             'updateMeta(section)',
             'scrollToTop(section)'
         ],
@@ -241,15 +232,15 @@
         ready: function() {
             this.view = this._forceCards ? 'cards' : 'table';
         },
-        filter: function(element) {
-            if (this.q && this.q.length && element.name.indexOf(this.q) < 0) {
+        filter: function(item) {
+            if (this.q && this.q.length && item.name.indexOf(this.q) < 0) {
                 return false;
             }
 
             if (this.tagList.length) {
                 var match = false;
                 for (var i = 0; i < this.tagList.length; i++) {
-                    if (element.tags.join(' ').indexOf(this.tagList[i]) >= 0) match = true;
+                    if (item.tags.join(' ').indexOf(this.tagList[i]) >= 0) match = true;
                 }
                 if (!match) return false;
             }
@@ -325,7 +316,7 @@
                 });
             }
         },
-        updateURL: function(q, section, tag, view, elements) {
+        updateURL: function(q, section, tag, view, items) {
             var qs = this._buildQueryString();
             if (qs !== _lastNavigated && this.router) {
                 _lastNavigated = qs;
@@ -335,9 +326,9 @@
             }
             this.updateMeta(section);
 
-            if (elements) {
-                this._filteredElements = elements.filter(this.filter.bind(this));
-                this._elementCount = this._filteredElements.length;
+            if (items) {
+                this._filteredItems = items.filter(this.filter.bind(this));
+                this._itemCount = this._filteredItems.length;
             }
             this.scrollToTop();
         },
