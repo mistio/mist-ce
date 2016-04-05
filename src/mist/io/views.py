@@ -1083,18 +1083,12 @@ def create_machine(request):
               'cloud_init': cloud_init,
               'associate_floating_ip': associate_floating_ip,
               'associate_floating_ip_subnet': associate_floating_ip_subnet,
-<<<<<<< HEAD
-              'tags': tags,
-              'project_id': project_id, 'bare_metal': bare_metal,
-              'hourly': hourly, 'cronjob': cronjob}
-=======
               'project_id': project_id,
               'bare_metal': bare_metal,
               'tags': tags,
               'hourly': hourly,
               'cronjob': cronjob,
               'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
->>>>>>> chaos
     if not async:
         ret = methods.create_machine(auth_context.owner, *args, **kwargs)
     else:

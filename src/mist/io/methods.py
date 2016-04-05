@@ -1502,14 +1502,9 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    post_script_id='', post_script_params='', cloud_init='',
                    associate_floating_ip=False,
                    associate_floating_ip_subnet=None, project_id=None,
-<<<<<<< HEAD
-                   bare_metal=False, hourly=True,
-                   cronjob={}, command=None, tags=None):
-=======
                    cronjob={}, command=None, tags=None,
                    bare_metal=False, hourly=True,
                    softlayer_backend_vlan_id=None):
->>>>>>> chaos
 
     """Creates a new virtual machine on the specified cloud.
 
@@ -1667,19 +1662,11 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calls post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
-<<<<<<< HEAD
-            user.id, cloud_id, node.id, monitoring, script, key_id,
-            node.extra.get('username'), node.extra.get('password'), public_key,
-            script_id=script_id, script_params=script_params, job_id = job_id,
-            hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-=======
             user.id, cloud_id, node.id, monitoring, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script=script,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins, post_script_id=post_script_id,
->>>>>>> chaos
             post_script_params=post_script_params, cronjob=cronjob,
         )
     elif conn.type == Provider.OPENSTACK:
