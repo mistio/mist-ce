@@ -13,6 +13,7 @@ import re
 import requests
 import json
 import mongoengine as me
+from mongoengine import ValidationError, NotUniqueError
 
 from pyramid.response import Response
 
@@ -58,15 +59,24 @@ def exception_handler_mist(exc, request):
     isinstance(exc, context) is True.
 
     """
+    # mongoengine ValidationError
+    if isinstance(exc, ValidationError):
+        return Response("Validation Error", 400)
+
+    # mongoengine NotUniqueError
+    if isinstance(exc, NotUniqueError):
+        return Response("NotUniqueError", 409)
 
     # non-mist exceptions. that shouldn't happen! never!
     if not isinstance(exc, exceptions.MistError):
-        trace = traceback.format_exc()
-        log.critical("Uncaught non-mist exception? WTF!\n%s", trace)
-        return Response("Internal Server Error", 500)
+        if not isinstance(exc, (ValidationError, NotUniqueError)):
+            trace = traceback.format_exc()
+            log.critical("Uncaught non-mist exception? WTF!\n%s", trace)
+            return Response("Internal Server Error", 500)
 
     # mist exceptions are ok.
     log.info("MistError: %r", exc)
+
 
     # translate it to HTTP response based on http_code attribute
     return Response(str(exc), exc.http_code)
