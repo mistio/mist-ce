@@ -1293,6 +1293,15 @@ ul.checkbox-list .ui-grid-b {
 #add-org .ui-btn {
     display: inline-block;
 }
+.ui-popup ul.ui-listview li.organization-item.org-active a,
+.ui-popup ul.ui-listview li.organization-item.org-active a:after {
+    color: #009688;
+}
+.ui-popup ul.ui-listview li.organization-item.org-active a:hover,
+.ui-popup ul.ui-listview li.organization-item.org-active a:hover:after {
+    background-color: #009688 !important;
+    color: #fff;
+}
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {
     padding: 15px;
