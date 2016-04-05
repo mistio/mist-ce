@@ -25,9 +25,10 @@ define('app/views/user_menu', ['ember', 'md5'],
             gravatarName: Ember.computed('hasName', function() {
                 return this.get('hasName') ? FIRST_NAME + ' ' + LAST_NAME : EMAIL;
             }),
-            hasOrganization: Ember.computed('Mist.organizationsController.model', function() {
-                return !!Mist.organizationsController.model;
+            hasOrganization: Ember.computed('Mist.organization.id', function() {
+                return !!Mist.organization.id;
             }),
+            // isActive: Ember.computed('Mist.organization', 'Mist.org')
             memberTeam: Ember.computed('hasOrganization', function() {
                 return 'needs work';
                 // return this.get('hasOrganization') ? Mist.teamsController.model.slice().shift().name : null;

@@ -76,14 +76,18 @@
 .icon-script:hover {
     background-color: #D48900 !important;
 }
-.icon-team {
+#dashboard-options .icon-teams,
+#dashboard-options .icon-team {
     color: #009688 !important;
 }
+#dashboard-options .icon-teams,
 .icon-team:after {
     content: '\0078';
 }
-.icon-team:hover {
+#dashboard-options .icon-teams:hover,
+#dashboard-options .icon-team:hover {
     background-color: #009688 !important;
+    color: #fff !important;
 }
 .icon-error:after {
     content: '\0046';
@@ -236,6 +240,9 @@
 .icon-search:after {
     content: '\0074';
 }
+.icon-teams:after {
+    content: '\0077';
+}
 .ui-footer .icon-x:after, .ui-footer .icon-xx:after {
     font-size: 12px;
     margin-top: -6px;
@@ -243,6 +250,10 @@
 #user-menu-popup .icon-x:after {
     font-size: 14px;
     margin: -6px 0 0 7px;
+}
+#user-menu-popup .icon-teams:after {
+    font-size: 17px;
+    margin-left: 3px;
 }
 .ui-collapsible .ui-icon-minus:after, .ui-collapsible .ui-icon-plus:after {
     background-image: none;

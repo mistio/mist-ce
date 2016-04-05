@@ -29,8 +29,8 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                 return Mist.cloudsController.machineCount;
             }),
 
-            isOrgOwner: Ember.computed('Mist.organizationsController.model', 'Mist.teamsController.model', function() {
-                if (!!Mist.organizationsController.model) {
+            isOrgOwner: Ember.computed('Mist.organization.id', 'Mist.teamsController.model', function() {
+                if (!!Mist.organization.id) {
                     return Mist.teamsController.model.some(function(team) {
                         return team.name.toLowerCase() == 'owners';
                     });
