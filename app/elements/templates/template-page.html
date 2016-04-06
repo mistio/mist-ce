@@ -181,7 +181,7 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                             </a>
                         </div>
                         <div class="fab-top-right">
-                            <paper-fab icon="av:play-arrow" on-tap="_runTemplate" id="runTemplateFab"></paper-fab>
+                            <paper-fab icon="av:play-arrow" on-tap="_createStack" id="runTemplateFab"></paper-fab>
                             <paper-tooltip for="runTemplateFab" position="bottom">Create Stacks from Template</paper-tooltip>
                         </div>
                     </div>
@@ -370,8 +370,8 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
             _class: function(isinline){
                 return isinline ? "command-container" : "";
             },
-            _runTemplate: function(e) {
-                page.show('/run-template/' + this.template.id);
+            _createStack: function(e) {
+                page.show('/create-stack/' + this.template._id);
             },
             _editTemplate: function(e) {
                 var el = this.querySelector('template-edit');

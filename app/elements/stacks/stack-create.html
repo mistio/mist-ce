@@ -1,0 +1,367 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<dom-module id="stack-create">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                display: block;
+                padding: 20px;
+                margin: 36px;
+            }
+
+            paper-progress {
+                position: absolute;
+                bottom: 85px;
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
+
+            :host >::content paper-input-container {
+                padding-top: 16px;
+                padding-bottom: 16px;
+                Foinikas1
+            }
+        </style>
+        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
+            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
+            <paper-header-panel id="container" view$="[[_actualView(view)]]" main>
+                <paper-toolbar style$="[[color]]">
+                    <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
+                    <span class="title"></span>
+                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <span class="bottom title">Create Stack {{typedName}} from template [[fromTemplate.name]]</span>
+                </paper-toolbar>
+                <div id="content">
+                    <paper-material>
+                        <div class="grid-row">
+                            <template is="dom-repeat" items="{{fields}}" as="field">
+                                <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
+                                    <paper-input class="xs12" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
+                                    <paper-textarea class="xs12" id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
+                                    <paper-radio-group selected="{{field.value}}">
+                                        <template is="dom-repeat" items="[[field.options]]" as="option">
+                                            <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
+                                        </template>
+                                    </paper-radio-group>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
+                                    <paper-dropdown-menu class="dropdown-block xs12 l6" label="[[field.label]]" horizontal-align="left">
+                                        <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                            <template is="dom-repeat" items="[[field.options]]" as="option">
+                                                <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                            </template>
+                                        </paper-menu>
+                                    </paper-dropdown-menu>
+                                </template>
+                            </template>
+                            <paper-progress indeterminate value="800" min="100" max="1000" hidden$="[[!sendingData]]"></paper-progress>
+                            <hr class="xs12" />
+                            <!-- <div class="notifications xs12">
+                            <div class="red">
+                                <iron-icon icon="icons:error-outline"></iron-icon> Error message from server
+                                <div class="info-code">
+                                    <code>test code</code>
+                                </div>
+                            </div>
+                            <div class="green">
+                                <iron-icon icon="check"></iron-icon> Success message from server
+                            </div>
+                            <div class="blue">
+                                Info message from server
+                            </div>
+                        </div> -->
+                            <div class="clearfix bottom-actions xs12">
+                                <paper-button id="submit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">Create Stack</paper-button>
+                                <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
+                            </div>
+                        </div>
+                    </paper-material>
+                </div>
+            </paper-header-panel>
+        </paper-drawer-panel>
+        <!-- <iron-ajax id="addTemplateAjax" url="/templates" method="POST" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></iron-ajax> -->
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'stack-create',
+
+                properties: {
+                    model: {
+                        type: Object
+                    },
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    stack: {
+                        type: Object,
+                        value: function() {
+                            return {
+                                name: '',
+                                source: '',
+                                url: '',
+                                inline: ''
+                            }
+                        }
+                    },
+                    params: {
+                        type: Object
+                    },
+                    fromTemplate: {
+                        type: Object,
+                        value: {},
+                        computed: '_fromTemplate(params)'
+                    },
+                    typedName: {
+                        type: String,
+                        value: '',
+                        notify: true
+                    },
+                    fields: {
+                        type: Array,
+                        value: [{
+                            name: "name",
+                            label: "Stack Name *",
+                            type: "text",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            errorMessage: "Please enter template's name",
+                            show: true,
+                            required: true
+                        },{
+                            name: "source",
+                            label: "Template Source *",
+                            type: "radio",
+                            value: "inline",
+                            defaultValue: "inline",
+                            errorMessage: "Please enter template's source",
+                            show: true,
+                            required: true,
+                            options: [{
+                                title: "Inline Template *",
+                                val: "inline"
+                            }, {
+                                title: "Github URL *",
+                                val: "url"
+                            }],
+                            helpText: 'You can either specify a template url from Github, or place your template inline. If you need help read the instructions how to <a href="">add template</a>'
+                        }, {
+                            name: "url",
+                            label: "Github URL *",
+                            type: "text",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            show: false,
+                            required: true,
+                            showIf: {
+                                fieldName: "source",
+                                fieldValues: ["url"]
+                            },
+                            errorMessage: "Please enter a github repo"
+                        }, {
+                            name: "inline",
+                            label: "Inline Template *",
+                            type: "textarea",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            show: false,
+                            required: true,
+                            errorMessage: "Please enter inline template",
+                            showIf: {
+                                fieldName: "source",
+                                fieldValues: ["inline"]
+                            }
+                        }],
+                        notify: true
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        value: false
+                    },
+                    hideprogress: {
+                        type: Boolean,
+                        value: true
+                    }
+                },
+                observers: [
+                    '_fieldsChanged(fields.*, sendingData)',
+                    '_updateTypedName(fields.#0.*)'
+                ],
+                _fromTemplate: function(params){
+                    if (params.id) {
+                        var pid = params.id;
+                        var template = this.model.templatesArray.find(function(template) {
+                            return template._id == pid;
+                        });
+                        return template;
+                    }
+                },
+                _updateTypedName: function(t) {
+                    if (t.path == "fields.#0.value" && t.value) {
+                        this.typedName = '"' + t.value + '"';
+                    }
+                },
+                _getHeaderStyle: function(section) {
+                    return 'background-color: ' + section.color + '; color: #fff;';
+                },
+                _computeFieldType: function(field, value, show) {
+                    if (!(field.showIf && !field.show)) {
+                        return field.type == value;
+                    }
+                },
+                _fieldsChanged: function(fields, sendingData) {
+                    this.async(function() {
+                        var template = this.template,
+                            show = true,
+                            dependency;
+
+                        fields.base.forEach(function(el, index) {
+                            this.set('template.' + el.name, el.value);
+
+                            if (el.showIf) {
+                                if (el.showIf.fieldExists) {
+                                    dependency = template[el.showIf.fieldName],
+                                        show = dependency;
+                                    this.set('fields.' + index + '.show', show);
+                                } else {
+                                    dependency = template[el.showIf.fieldName],
+                                        show = el.showIf.fieldValues.indexOf(dependency) != -1;
+                                    this.set('fields.' + index + '.show', show);
+                                }
+
+                                if (!show) {
+                                    this._resetField(el, index);
+                                }
+                            }
+
+                            if (el.placeholderIf) {
+                                dependency = template[el.placeholderIf.fieldName];
+                                this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
+                            }
+                        }, this);
+
+                        var valid = fields.base.every(function(el, index) {
+                            return el.show && el.required ? el.value : true;
+                        }, this);
+
+                        this.set('template', template);
+
+                        this.set('formReady', valid && !sendingData);
+                    });
+                },
+                _submitForm: function() {
+                    var payload = this.template;
+                    console.log(payload);
+
+                    //   this.$.addTemplateAjax.body = payload;
+                    //   this.$.addTemplateAjax.addRequest();
+
+                    //test progress bar
+                    this.sendingData = true;
+                    // this.hideprogress = false;
+                },
+                _addTemplateAjaxRequest: function() {
+                    this.set('sendingData', true);
+                },
+                _addTemplateAjaxResponse: function(e) {
+                    this.set('sendingData', false);
+
+                    this.fire('addTemplate', {
+                        template: {
+                            name: this.template.name,
+                            description: this.template.description
+                        }
+                    });
+                },
+                _resetForm: function(e) {
+                    this.set('sendingData', false);
+                    // Reset template
+                    this.set('template.name', '');
+                    this.set('template.source', '');
+                    this.set('template.url', '');
+                    this.set('template.inline', '');
+
+                    // Reset Form Fields
+                    this.fields.forEach(function(el, index) {
+                        if (el.showIf) {
+                            this.set('fields.' + index + '.show', false);
+                        }
+
+                        // Reset Form Fields Validation
+                        this._resetField(el, index);
+                    }, this);
+                    this.typedName = "";
+                },
+                _resetField: function(el, index) {
+                    this.set('fields.' + index + '.value', el.defaultValue);
+
+                    var input = this.querySelector('#' + el.name);
+                    if (input) {
+                        input.invalid = false;
+                    }
+                }
+            });
+        })();
+        // test progress bar, code from demo
+        // var progress, button, animationFrame;
+        // var repeat, maxRepeat = 1,
+        //     animating = false;
+        //
+        // function nextProgress() {
+        //     animating = true;
+        //     if (progress.value < progress.max) {
+        //         progress.value += (progress.step || 1);
+        //
+        //     } else {
+        //         if (++repeat >= maxRepeat) {
+        //             animating = false;
+        //             button.disabled = false;
+        //             return;
+        //         }
+        //         progress.value = progress.min;
+        //     }
+        //     var animationFrame = requestAnimationFrame(nextProgress);
+        // }
+        //
+        // function startProgress() {
+        //     repeat = 0;
+        //     progress.value = progress.min;
+        //     button.disabled = true;
+        //     if (!animating) {
+        //         nextProgress();
+        //     }
+        // }
+        // window.addEventListener('WebComponentsReady', function() {
+        //     progress = document.querySelector('paper-progress');
+        //     button = document.querySelector('paper-button#submit');
+        // });
+    </script>
+</dom-module>
