@@ -40,7 +40,7 @@ a {
 }
 
 p {
-    font-size: 14px;
+    font-size: 16px;
     line-height: 22px;
 }
 
@@ -170,6 +170,13 @@ paper-fab {
     position: fixed;
     right: 32px;
     bottom: 16px;
+    z-index: 10;
+}
+
+.fab-top-right {
+    position: absolute;
+    right: 32px;
+    bottom: -50%;
     z-index: 10;
 }
 

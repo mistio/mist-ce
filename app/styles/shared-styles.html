@@ -216,6 +216,7 @@
         paper-material paper-button:not([disabled]),
         paper-button.blue {
             background-color: var(--mist-blue);
+            font-weight: 500;
             color: #fff;
             margin: 0;
             @apply(--layout-flex);
@@ -240,6 +241,48 @@
             .page-title {
                 font-size: 24px!important;
             }
+        }
+        /* Courrier font */
+        .monospace {
+            font-family: monospace;
+        }
+        .page {
+            display: block;
+            width: 900px;
+            max-width: 900px;
+            margin: 36px 36px 36px 72px;
+        }
+        .page-block {
+            width: 100%;
+        }
+        .smallcaps {
+            text-transform: uppercase;
+            font-size: 14px;
+            opacity: 0.87;
+        }
+        .inline {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            align-self: center;
+        }
+        .pad-left {
+            padding-left: 8px;
+        }
+        .pad-right {
+            padding-right: 8px;
+        }
+        .pad-left2 {
+            padding-left: 16px;
+        }
+        .pad-right2 {
+            padding-right: 16px;
+        }
+        .blue-text {
+            color: var(--mist-blue);
+        }
+        .micon {
+            opacity: 0.54;
         }
         /* Paper progress */
         
@@ -568,10 +611,7 @@
 </dom-module>
 <dom-module id="single-page">
     <template>
-        <style>
-        /*TAKE CARE: needs renaming, will possibly break used with css id="lists"*/
-        /* Lists Basic Styling */
-        
+        <style>        
         .info-head > * {
             font-weight: 700;
             padding: 16px 0;
@@ -580,7 +620,20 @@
         .info-head {
             border-bottom: 1px solid #7f7f7f;
         }
-        
+        .subhead {
+            background-color: #dedede;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: baseline;
+            padding: 16px 70px;
+            line-height: 20px;
+            font-size: 13px;
+            position: relative;
+        }
+        .subhead h5 {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
         .info-body .info-item {
             border-bottom: 1px solid #d4d4d4;
             padding: 16px 0;

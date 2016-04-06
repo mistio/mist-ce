@@ -13,6 +13,8 @@
 
             .flex-horizontal-with-ratios {
                 @apply(--layout-horizontal);
+                align-items: center;
+                flex: 1 100%;
             }
 
             .flexchild {
@@ -33,15 +35,17 @@
               display: inline-block;
             }
         </style>
-        <paper-item class$="info-item flex-horizontal-with-ratios [[indexClass]]">
-            <div class="flexchild">
+        <paper-item class$="info-item [[indexClass]]">
+            <div class="flex-horizontal-with-ratios">
                 <span class="check">
                     <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectTemplate"></app-check>
                     <paper-tooltip for="check" position="right">Select item</paper-tooltip>
-                </span>
-                <span class="name"><a is="pushstate-anchor" class="regular" href="templates/[[template._id]]">[[template.name]]</a></span>
+                </span>            
+                <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/templates/[[template._id]]">
+                    <span class="name flexchild">[[template.name]]</span>
+                    <div class="flexchild">[[template.location_type]]</div>
+                </a>
             </div>
-            <div class="flexchild">[[template.type]]</div>
             <content></content>
         </paper-item>
     </template>
@@ -70,10 +74,6 @@
                     indexClass: {
                         type: String,
                         computed: '_computeIsIndexClass(index, count)'
-                    },
-                    isDefaultText: {
-                        type: String,
-                        computed: '_computeIsDefaultText(template.isDefault)'
                     }
                 },
                 listeners: {
@@ -87,7 +87,7 @@
                     );
                     return classes.join(' ');
                 },
-                _selectScriptChanged: function(e) {
+                _selectTemplateChanged: function(e) {
                     var selected = e.detail.value;
                     this.fire('toggleSelectedScript', {
                         template: this.template,
@@ -97,10 +97,7 @@
                 _templateUrl: function(template){
                     return "/templates/"+template.id;
                 },
-                _viewScript: function(e) {
-                    page.show('/templates/' + this.template.id);
-                },
-                _selectScript: function(e) {
+                _selectTemplate: function(e) {
                     // This is used to prevent event bubbling
                     e.stopPropagation();
                     if (Polymer.dom(e).localTarget === this.$.check) {
@@ -109,9 +106,6 @@
                             item: this
                         });
                     }
-                },
-                _computeIsDefaultText: function(isDefault) {
-                    return isDefault ? 'Default' : null;
                 }
             });
         })();

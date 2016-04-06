@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+a<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="template-edit.html">
 <link rel="import" href="template-item.html">
@@ -16,7 +16,6 @@
         paper-material {
             display: block;
             padding: 20px;
-            margin: 36px;
         }
 
         paper-menu-button paper-button {
@@ -25,6 +24,7 @@
 
         .flex-horizontal-with-ratios {
             @apply(--layout-horizontal);
+            align-content: stretch;
         }
 
         .flexchild {
@@ -138,57 +138,102 @@
                     <paper-tooltip for="deleteTemplate" position="top">Delete Template</paper-tooltip>
                     <paper-icon-button id="deleteTemplate" class="bottom" icon="icons:delete" on-tap="_deleteTemplate"></paper-icon-button>
                 </paper-toolbar>
+                <div class="subhead">
+                    <!-- <span class="monospace">Inline template</span> -->
+                    <span class="inline pad-right"><img src="../../images/icons/github-circle.svg" class="micon"/></span>
+                    <span class="inline pad-right">Template from Github </span>
+                    <a href="[[template.template]]" class="inline">
+                        <iron-icon icon="icons:link" class="blue-text" id="link-to-template"></iron-icon>
+                        <paper-tooltip for="link-to-template" position="bottom">[[template.template]]</paper-tooltip>
+                    </a>
+                    <div class="fab-top-right">
+                        <paper-fab icon="av:play-arrow" on-tap="_runTemplate" id="runTemplateFab"></paper-fab>
+                        <paper-tooltip for="runTemplateFab" position="bottom">Create Stacks from Template</paper-tooltip>
+                    </div>
+                </div>
                 <div class="content">
-                    <paper-material>
-                        <div class="info-table">
-                            <div class="info-body info-group">
-                                <template is="dom-if" if="[[template.description]]">
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div hidden$="[[!template.description]]" class="flexchild">Description</div>
-                                        <div class="flexchild">[[template.description]]</div>
-                                    </div>
-                                </template>
-                                <template is="dom-if" if="[[template.created_at]]">
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Created at</div>
-                                        <div class="flexchild">[[template.created_at]]</div>
-                                    </div>
-                                </template>
-                                <template is="dom-if" if="[[template.entrypoint]]">
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Location</div>
-                                        <div class="flexchild">[[template.entrypoint]]</div>
-                                    </div>
-                                </template>
-                                <div class="info-item flex-horizontal-with-ratios">
-                                    <div class="flexchild">Type</div>
-                                    <div class="flexchild">[[template.exec_type]]</div>
-                                </div>
-                                <template is="dom-if" if="[[template.location_type]]">
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Location</div>
-                                        <div class="flexchild">[[template.location_type]]</div>
-                                    </div>
-                                </template>
-                                <template is="dom-if" if="[[template.stacks.length > 0]]">
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Created at</div>
-                                        <div class="flexchild">[[template.stacks]]</div>
-                                    </div>
-                                </template>
-                                <template is="dom-if" if="[[template.template]]">
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Template</div>
-                                        <div class="flexchild command-container">[[template.template]]</div>
-                                    </div>
+                    <div class="page">
+                        <div class="flex-horizontal-with-ratios">
+                            <div class="page-block">
+                                <h3 class="smallcaps">Description</h3>
+                                <p>[[template.description]]</p>
+                            </div>
+                            <div class="page-block">
+                                <h3 class="smallcaps">Created</h3>
+                                <p>[[template.created_at]]</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page">
+                        <div class="flex-horizontal-with-ratios">
+                            <div class="page-block">
+                                <h3 class="smallcaps">Stacks</h3>
+                                [[template.stack.length]]
+                                <p hidden$="[[template.stack.length]]">
+                                    You have not yet created a stack from template [[template.name]].
+                                </p>
+                                <paper-button hidden$="[[template.stack.length]]" class="blue pad-left2 pad-right2"> Create Stack</paper-button>
+                                <template is="dom-if" if="[[template.stack.length > 0]]">
+                                    <iron-list>
+                                        <template is="dom-repeat" items="[[template.stack]]">
+                                            [[item]]
+                                        </template>
+                                    </iron-list>
                                 </template>
                             </div>
                         </div>
-                    </paper-material>
-                    <div class="absolute-bottom-right">
-                        <paper-fab icon="av:play-arrow" on-tap="_runTemplate" id="runTemplateFab"></paper-fab>
-                        <paper-tooltip for="runTemplateFab" position="top">Run Template</paper-tooltip>
                     </div>
+                    <div class="page">
+                        <h3 class="smallcaps">Metadata</h3>
+                        <paper-material>                        
+                            <div class="info-table">
+                                <div class="info-body info-group">
+                                    <template is="dom-if" if="[[template.description]]">
+                                        <div class="info-item flex-horizontal-with-ratios">
+                                            <div hidden$="[[!template.description]]" class="flexchild">Description</div>
+                                            <div class="flexchild">[[template.description]]</div>
+                                        </div>
+                                    </template>
+                                    <template is="dom-if" if="[[template.created_at]]">
+                                        <div class="info-item flex-horizontal-with-ratios">
+                                            <div class="flexchild">Created at</div>
+                                            <div class="flexchild">[[timestamp]]</div>
+                                        </div>
+                                    </template>                                
+                                    <div class="info-item flex-horizontal-with-ratios">
+                                        <div class="flexchild">Type</div>
+                                        <div class="flexchild">[[template.exec_type]]</div>
+                                    </div>
+                                    <template is="dom-if" if="[[template.location_type]]">
+                                        <div class="info-item flex-horizontal-with-ratios">
+                                            <div class="flexchild">Location</div>
+                                            <div class="flexchild">[[template.location_type]]</div>
+                                        </div>
+                                    </template>
+                                    <template is="dom-if" if="[[template.entrypoint]]">
+                                        <div class="info-item flex-horizontal-with-ratios">
+                                            <div class="flexchild">Entrypoint</div>
+                                            <div class="flexchild">
+                                                [[template.template]]/[[template.entrypoint]]
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <template is="dom-if" if="[[template.stacks.length > 0]]">
+                                        <div class="info-item flex-horizontal-with-ratios">
+                                            <div class="flexchild">Stacks</div>
+                                            <div class="flexchild">[[template.stacks]]</div>
+                                        </div>
+                                    </template>
+                                    <template is="dom-if" if="[[template.template]]">
+                                        <div class="info-item flex-horizontal-with-ratios">
+                                            <div class="flexchild">Template</div>
+                                            <div class="flexchild command-container">[[template.template]]</div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </paper-material>
+                    </div>                    
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
@@ -230,11 +275,21 @@
                 isInline: {
                     type: Boolean,
                     computed: '_computeIsInline(template.source)'
+                },
+                created_at: {
+                    type: String
+                },
+                timestamp: {
+                    type: String,
+                    computed: 'formatTimestamp(template.created_at)'
                 }
             },
             listeners: {
                 'confirmation': '_deleteTemplateResponse',
                 'updateSelectedTemplate': '_updateTemplate'
+            },
+            getFormattedTimestamp: function (created_at) {
+                return new Date(this.created_at).toLocaleString('en-US', {timeZoneName: 'short'});
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
