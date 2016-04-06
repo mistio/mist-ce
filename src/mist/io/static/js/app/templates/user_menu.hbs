@@ -21,7 +21,7 @@
     {{/if}}
 
     <ul class="ui-listview orgs-list">
-        <li class="organization-item"><a href="/switch_context" class="ui-btn ui-btn-icon-left ui-mini icon-teams">{{view.gravatarName}}</a></li>
+        <li class="organization-item"><a href="/switch_context" class="ui-btn ui-btn-icon-left ui-mini icon-team">Personal Account</a></li>
         {{#each org in Mist.orgs}}
             {{component "organization-item" organization=org}}
         {{/each}}
