@@ -1275,6 +1275,10 @@ ul.checkbox-list .ui-grid-b {
     height: 36px;
 }
 
+#user-menu-popup {
+    max-width: 200px;
+}
+
 #user-menu-popup #user-email {
     text-align: center;
     margin: .5em 0 1em;
@@ -1291,7 +1295,7 @@ ul.checkbox-list .ui-grid-b {
     padding: 10px 10px 8px;
 }
 #add-org .ui-btn {
-    display: inline-block;
+    text-align: center;
 }
 .ui-popup ul.ui-listview li.organization-item.org-active a,
 .ui-popup ul.ui-listview li.organization-item.org-active a:after {
