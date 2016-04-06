@@ -9,6 +9,7 @@ import requests
 import subprocess
 import re
 import mongoengine as me
+from mongoengine import ValidationError, NotUniqueError
 from time import sleep, time
 from datetime import datetime
 from hashlib import sha256
@@ -523,7 +524,14 @@ def _add_cloud_ec2(user, title, params):
         cloud.apisecret = api_secret
         cloud.enabled = True
         cloud.owner = user
-        cloud.save()
+
+        try:
+            cloud.save()
+        except ValidationError as e:
+            raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+        except NotUniqueError:
+            raise CloudExistsError()
+
         return cloud.id, cloud
 
 
@@ -671,7 +679,14 @@ def _add_cloud_azure(user, title, provider, params):
     cloud.apisecret = certificate
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     return cloud.id, cloud
 
 
