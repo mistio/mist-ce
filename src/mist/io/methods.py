@@ -352,7 +352,13 @@ def _add_cloud_bare_metal(user, title, provider, params):
     cloud.provider = provider
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     machine = Machine()
     machine.cloud = cloud
@@ -421,7 +427,14 @@ def _add_cloud_coreos(user, title, provider, params):
     cloud.provider = provider
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     machine = Machine()
     machine.ssh_port = port
     if machine_hostname:
@@ -703,7 +716,14 @@ def _add_cloud_linode(user, title, provider, params):
     cloud.apisecret = api_key
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     return cloud.id, cloud
 
 
@@ -738,7 +758,14 @@ def _add_cloud_docker(user, title, provider, params):
     cloud.apiurl = docker_host
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     return cloud.id, cloud
 
 
@@ -771,7 +798,14 @@ def _add_cloud_libvirt(user, title, provider, params):
     cloud.ssh_port = port
     cloud.images_location = images_location
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     return cloud.id, cloud
 
 
@@ -814,7 +848,13 @@ def _add_cloud_openstack(user, title, provider, params):
     cloud.compute_endpoint = compute_endpoint
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     return cloud.id, cloud
 
@@ -832,7 +872,13 @@ def _add_cloud_hostvirtual(user, title, provider, params):
     cloud.apisecret = api_key
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     return cloud.id, cloud
 
@@ -850,7 +896,13 @@ def _add_cloud_vultr(user, title, provider, params):
     cloud.apisecret = api_key
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     return cloud.id, cloud
 
@@ -870,7 +922,13 @@ def _add_cloud_packet(user, title, provider, params):
     cloud.owner = user
     if project_id:
         cloud.tenant_name = project_id
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     return cloud.id, cloud
 
@@ -897,7 +955,13 @@ def _add_cloud_vsphere(user, title, provider, params):
     cloud.apiurl = host
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     return cloud.id, cloud
 
