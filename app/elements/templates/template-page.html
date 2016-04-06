@@ -127,38 +127,67 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
         paper-icon-bottom.bottom {
             padding-right: 8px;
         }
+        .subhead {
+            box-sizing: border-box;
+            position: absolute;            
+            width: 100%;
+            left: 0;
+            height: 57px;
+            bottom: -57px;
+            right: 0;
+            z-index: 9;
+            color: rgba(0,0,0,0.87);
+        }
+        .content {
+            margin-top: 57px;
+        }
+        paper-header-panel ::content #dropShadow {
+            top: 56px;
+        }
+        paper-toolbar ::content #bottomBar .right-actions{
+            transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
+        }
+        paper-toolbar:not(.tall) ::content #bottomBar .right-actions{
+            margin-right: 70px;
+        }
+
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
-            <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
+            <paper-header-panel id="container" mode="waterfall-tall" main>
                 <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
                     <span class="bottom title">Template "[[template.name]]"</span>
-                    <paper-tooltip for="scheduleTemplate" position="top">Schedule Template</paper-tooltip>
-                    <paper-icon-button id="scheduleTemplate" class="bottom" icon="icons:schedule" on-tap="_scheduleTemplate"></paper-icon-button>
-                    <paper-tooltip for="editTemplate" position="top">Edit Template</paper-tooltip>
-                    <paper-icon-button id="editTemplate" class="bottom" icon="icons:create" on-tap="_editTemplate"></paper-icon-button>
-                    <paper-tooltip for="deleteTemplate" position="top">Delete Template</paper-tooltip>
-                    <paper-icon-button id="deleteTemplate" class="bottom" icon="icons:delete" on-tap="_deleteTemplate"></paper-icon-button>
+
+                    <span class="bottom right-actions">                        
+                        <paper-tooltip for="scheduleTemplate" position="top">Schedule Template</paper-tooltip>
+                        <paper-icon-button id="scheduleTemplate" icon="icons:schedule" on-tap="_scheduleTemplate"></paper-icon-button>
+                        <paper-tooltip for="editTemplate" position="top">Edit Template</paper-tooltip>
+                        <paper-icon-button id="editTemplate" icon="icons:create" on-tap="_editTemplate"></paper-icon-button>
+                        <paper-tooltip for="deleteTemplate" position="top">Delete Template</paper-tooltip>
+                        <paper-icon-button id="deleteTemplate" icon="icons:delete" on-tap="_deleteTemplate"></paper-icon-button>
+                    </span>
+
+                    <div class="subhead bottom">
+                        <span class="monospace" hidden$="[[!isInline]]">Inline template</span>
+                        <div hidden="[[isInline]]">
+                            <span class="pad-right micon-wrap"><img src="../../images/icons/github-circle.svg" class="micon"/></span>
+                            <span class="pad-right">Template from Github </span>
+                            <a href="[[template.template]]" target="_blank">
+                                <iron-icon icon="icons:link" class="blue-link" id="link-to-template"></iron-icon>
+                                <paper-tooltip for="link-to-template" position="bottom">[[template.template]]</paper-tooltip>
+                            </a>
+                        </div>
+                        <div class="fab-top-right">
+                            <paper-fab icon="av:play-arrow" on-tap="_runTemplate" id="runTemplateFab"></paper-fab>
+                            <paper-tooltip for="runTemplateFab" position="bottom">Create Stacks from Template</paper-tooltip>
+                        </div>
+                    </div>
                 </paper-toolbar>
-                <div class="subhead">
-                    <span class="monospace" hidden$="[[!isInline]]">Inline template</span>
-                    <div hidden="[[isInline]]">
-                        <span class="pad-right micon-wrap"><img src="../../images/icons/github-circle.svg" class="micon"/></span>
-                        <span class="pad-right">Template from Github </span>
-                        <a href="[[template.template]]" target="_blank">
-                            <iron-icon icon="icons:link" class="blue-link" id="link-to-template"></iron-icon>
-                            <paper-tooltip for="link-to-template" position="bottom">[[template.template]]</paper-tooltip>
-                        </a>
-                    </div>
-                    <div class="fab-top-right">
-                        <paper-fab icon="av:play-arrow" on-tap="_runTemplate" id="runTemplateFab"></paper-fab>
-                        <paper-tooltip for="runTemplateFab" position="bottom">Create Stacks from Template</paper-tooltip>
-                    </div>
-                </div>
-                <div class="content">
+                
+                <div class="content" style$="[[vpHeight]]">
                     <div class="page">
                         <div class="flex-horizontal-with-ratios">
                             <div class="page-block">
@@ -302,11 +331,16 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                 timestamp: {
                     type: String,
                     computed: '_getFormattedTimestamp(template.created_at)'
-                }
+                },
+                vpHeight: String
             },
             listeners: {
                 'confirmation': '_deleteTemplateResponse',
                 'updateSelectedTemplate': '_updateTemplate'
+            },
+            ready: function() {
+                var wh = window.innerHeight;
+                this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
             },
             _getFormattedTimestamp: function (timestamp) {
                 return new Date(timestamp).toLocaleString('en-US', {timeZoneName: 'short'});
