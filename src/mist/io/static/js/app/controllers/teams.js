@@ -161,10 +161,10 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     .POST('/org/' + args.team.organization.id + '/teams/' + args.team.id + '/members', {
                         'email': args.member.email
                     })
-                    .success(function(userID) {
+                    .success(function(member) {
                         Mist.notificationController.notify('An invitation was sent to user with email: ' + args.member.email);
                         that._addMember(args.team, {
-                            id: userID,
+                            id: member.id,
                             email: args.member.email
                         });
                     })

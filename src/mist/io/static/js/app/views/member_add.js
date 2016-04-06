@@ -23,8 +23,17 @@ define('app/views/member_add', ['app/views/popup'],
             //  Computed Properties
             //
 
-            isReady: Ember.computed('Mist.memberAddController.newMember.email', function() {
-                return !!Mist.memberAddController.newMember.email;
+            isReady: Ember.computed('Mist.memberAddController.newMember.email', 'team.members', function() {
+                var newEmail = Mist.memberAddController.newMember.email,
+                isUnique = false;
+
+                if (this.get('team') && this.get('team').members) {
+                    isUnique = this.get('team').members.every(function(member) {
+                        return member.email != newEmail;
+                    });
+                }
+
+                return /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$/.test(newEmail) && isUnique;
             }),
 
             //
