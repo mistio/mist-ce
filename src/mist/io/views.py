@@ -61,10 +61,14 @@ def exception_handler_mist(exc, request):
     """
     # mongoengine ValidationError
     if isinstance(exc, ValidationError):
+        trace = traceback.format_exc()
+        log.warning("Uncaught me.ValidationError!\n%s", trace)
         return Response("Validation Error", 400)
 
     # mongoengine NotUniqueError
     if isinstance(exc, NotUniqueError):
+        trace = traceback.format_exc()
+        log.warning("Uncaught me.NotUniqueError!\n%s", trace)
         return Response("NotUniqueError", 409)
 
     # non-mist exceptions. that shouldn't happen! never!
