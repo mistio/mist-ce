@@ -63,10 +63,10 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
 
                 Ember.run.later(function() {
                     Mist.dialogController.open({
-                        type: DIALOG_TYPES.OK_CANCEL,
-                        head: 'New Organization',
+                        type: DIALOG_TYPES.OK,
+                        head: 'Organization Created',
                         body: [{
-                            paragraph: 'Organization "' + organization.name + '" was created successfully. Do you want to switch context?'
+                            paragraph: 'Do you want to switch to organization "' + organization.name + '"?'
                         }],
                         callback: function(didConfirm) {
                             if (didConfirm) {
