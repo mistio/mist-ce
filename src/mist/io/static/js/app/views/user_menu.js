@@ -28,7 +28,7 @@ define('app/views/user_menu', ['ember', 'md5'],
             hasOrganization: Ember.computed('Mist.organization.id', function() {
                 return !!Mist.organization.id;
             }),
-            memberTeam: Ember.computed('hasOrganization', function() {
+            memberTeam: Ember.computed('hasOrganization', 'Mist.teamsController.model', function() {
                 var teams = [], teamsText = '';
                 if (this.get('hasOrganization')) {
                     Mist.teamsController.model.forEach(function(team) {

@@ -25,7 +25,7 @@ define('app/views/organization_item', ['ember'],
             //
 
             orgActive: Ember.computed('organization', 'Mist.organization', function() {
-                return !Mist.organization || Mist.organization && Mist.organization.id == this.get('organization.id');
+                return !Mist.organization.id && this.get('organization.id') == '' || Mist.organization.id == this.get('organization.id');
             })
         });
     }
