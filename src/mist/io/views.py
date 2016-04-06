@@ -265,7 +265,6 @@ def add_cloud(request):
     if not provider:
         raise RequiredParameterMissingError('provider')
 
-
     monitoring = None
     if int(api_version) == 2:
         ret = methods.add_cloud_v_2(owner, title, provider, params)
