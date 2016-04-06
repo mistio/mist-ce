@@ -506,7 +506,14 @@ def _add_cloud_vcloud(user, title, provider, params):
     cloud.apiurl = host
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     return cloud.id, cloud
 
 
