@@ -6,6 +6,7 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
 
 <dom-module id="template-page">
     <template>
+        <style is="custom-style" include="lists"></style>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
         :host {
@@ -16,6 +17,10 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
         paper-material {
             display: block;
             padding: 20px;
+        }
+
+        paper-material.no-pad {
+            padding: 0;
         }
 
         paper-menu-button paper-button {
@@ -139,13 +144,15 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                     <paper-icon-button id="deleteTemplate" class="bottom" icon="icons:delete" on-tap="_deleteTemplate"></paper-icon-button>
                 </paper-toolbar>
                 <div class="subhead">
-                    <!-- <span class="monospace">Inline template</span> -->
-                    <span class="inline pad-right"><img src="../../images/icons/github-circle.svg" class="micon"/></span>
-                    <span class="inline pad-right">Template from Github </span>
-                    <a href="[[template.template]]" class="inline">
-                        <iron-icon icon="icons:link" class="blue-text" id="link-to-template"></iron-icon>
-                        <paper-tooltip for="link-to-template" position="bottom">[[template.template]]</paper-tooltip>
-                    </a>
+                    <span class="monospace" hidden$="[[!isInline]]">Inline template</span>
+                    <div hidden="[[isInline]]">
+                        <span class="pad-right micon-wrap"><img src="../../images/icons/github-circle.svg" class="micon"/></span>
+                        <span class="pad-right">Template from Github </span>
+                        <a href="[[template.template]]" target="_blank">
+                            <iron-icon icon="icons:link" class="blue-link" id="link-to-template"></iron-icon>
+                            <paper-tooltip for="link-to-template" position="bottom">[[template.template]]</paper-tooltip>
+                        </a>
+                    </div>
                     <div class="fab-top-right">
                         <paper-fab icon="av:play-arrow" on-tap="_runTemplate" id="runTemplateFab"></paper-fab>
                         <paper-tooltip for="runTemplateFab" position="bottom">Create Stacks from Template</paper-tooltip>
@@ -160,7 +167,7 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                             </div>
                             <div class="page-block">
                                 <h3 class="smallcaps">Created</h3>
-                                <p>[[template.created_at]]</p>
+                                <p>[[template.created_at]] from <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a></p>
                             </div>
                         </div>
                     </div>
@@ -168,18 +175,21 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                         <div class="flex-horizontal-with-ratios">
                             <div class="page-block">
                                 <h3 class="smallcaps">Stacks</h3>
-                                [[template.stack.length]]
-                                <p hidden$="[[template.stack.length]]">
+                                <p hidden$="[[hasStacks]]">
                                     You have not yet created a stack from template [[template.name]].
                                 </p>
-                                <paper-button hidden$="[[template.stack.length]]" class="blue pad-left2 pad-right2"> Create Stack</paper-button>
-                                <template is="dom-if" if="[[template.stack.length > 0]]">
-                                    <iron-list>
-                                        <template is="dom-repeat" items="[[template.stack]]">
-                                            [[item]]
+                                <paper-material if="[[hasStacks]]" class="no-pad">
+                                    <iron-list is="dom-if" if="[[hasStacks]]" items="[[template.stacks]]">
+                                        <template is="dom-repeat">
+                                            <div class="row">
+                                                <!-- this will be replaced by "stack-item" element -->
+                                                <paper-item class="flex-horizontal">
+                                                <span class="flexchild">[[item]]</span>  <span class="opaque54">[[item.resources_description]] 3 machines, 2 keys, 1 network</span></paper-item>
+                                            </div>
                                         </template>
                                     </iron-list>
-                                </template>
+                                </paper-material>
+                                <paper-button class="blue pad-left2 pad-right2" hidden$="[[hasStacks]]"> Create <span hidden$="[[!hasStacks]]">new</span> Stack</paper-button>
                             </div>
                         </div>
                     </div>
@@ -210,11 +220,21 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                                             <div class="flexchild">[[template.location_type]]</div>
                                         </div>
                                     </template>
+                                    <template is="dom-if" if="[[template.template]]">
+                                        <div class="info-item flex-horizontal-with-ratios">
+                                            <div class="flexchild">Template</div>
+                                            <div class$="flexchild [[class]]">
+                                                <a href="[[template.template]]" class="blue-link regular" target="_blank">
+                                                    [[template.template]]
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </template>                                    
                                     <template is="dom-if" if="[[template.entrypoint]]">
                                         <div class="info-item flex-horizontal-with-ratios">
                                             <div class="flexchild">Entrypoint</div>
                                             <div class="flexchild">
-                                                [[template.template]]/[[template.entrypoint]]
+                                                [[template.entrypoint]]
                                             </div>
                                         </div>
                                     </template>
@@ -223,13 +243,7 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                                             <div class="flexchild">Stacks</div>
                                             <div class="flexchild">[[template.stacks]]</div>
                                         </div>
-                                    </template>
-                                    <template is="dom-if" if="[[template.template]]">
-                                        <div class="info-item flex-horizontal-with-ratios">
-                                            <div class="flexchild">Template</div>
-                                            <div class="flexchild command-container">[[template.template]]</div>
-                                        </div>
-                                    </template>
+                                    </template>                                    
                                 </div>
                             </div>
                         </paper-material>
@@ -268,6 +282,11 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                     type: Object,
                     computed: '_computeTemplate(params)'
                 },
+                hasStacks: {
+                    type: Boolean,
+                    value: false,
+                    computed: '_hasStacks(template)'
+                },
                 templateid: {
                     type: String,
                     computed: '_computeTemplateId(params)'
@@ -276,23 +295,29 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                     type: Boolean,
                     computed: '_computeIsInline(template.source)'
                 },
-                created_at: {
-                    type: String
+                class: {
+                    type: String,
+                    computed: '_class(isInline)'
                 },
                 timestamp: {
                     type: String,
-                    computed: 'formatTimestamp(template.created_at)'
+                    computed: '_getFormattedTimestamp(template.created_at)'
                 }
             },
             listeners: {
                 'confirmation': '_deleteTemplateResponse',
                 'updateSelectedTemplate': '_updateTemplate'
             },
-            getFormattedTimestamp: function (created_at) {
-                return new Date(this.created_at).toLocaleString('en-US', {timeZoneName: 'short'});
+            _getFormattedTimestamp: function (timestamp) {
+                return new Date(timestamp).toLocaleString('en-US', {timeZoneName: 'short'});
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
+            },
+            _hasStacks: function(template){
+                if (template.stacks.length > 0)
+                    return true;
+                return false;
             },
             _computeId: function(params) {
                 return params.id;
@@ -307,6 +332,9 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
             },
             _computeIsInline: function(source) {
                 return source == 'inline';
+            },
+            _class: function(isinline){
+                return isinline ? "command-container" : "";
             },
             _runTemplate: function(e) {
                 page.show('/run-template/' + this.template.id);

@@ -164,7 +164,33 @@ var app = Polymer({
                         default: "",
                         description: "Mist.io api token",
                         type: "api_token",
-                        used_in: ["mongod","nodecellar","host","key","nodejs"]
+                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"]
+                    },
+                    application_url: {
+                        used_in: ["nodecellar"],
+                        value: "https://github.com/cloudify-cosmo/nodecellar/archive/master.tar.gz"
+                    }
+                },
+                workflows: {}
+
+            },
+            {
+                _id: "56bb8e18e90e5b30cb3ab8ea",
+                created_at: "1455132184879",
+                description: "This template deploys a kubernettes stack",
+                entrypoint: "mist-blueprint.yaml",
+                exec_type: "cloudify",
+                location_type: "github",
+                name: "cloudmist2",
+                stacks: [],
+                template: "https://github.com/mistio/mist-cloudify-example",
+                user: "56b8beaae90e5b043ae75c98",
+                inputs: {
+                    api_token: {
+                        default: "",
+                        description: "Mist.io api token",
+                        type: "api_token",
+                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"]
                     },
                     application_url: {
                         used_in: ["nodecellar"],

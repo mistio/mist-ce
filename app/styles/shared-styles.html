@@ -105,7 +105,7 @@
             /*accent color*/
             --mist-blue: #039BE5;
         }
-
+        
         .green {
             background-color: var(--green-color);
             color: #fff;
@@ -233,7 +233,7 @@
         }
         
         :host >::content .input-content.label-is-floating.paper-input-container label {
-            color: rgba(0,0,0,0.54) !important;
+            color: rgba(0, 0, 0, 0.54) !important;
             text-transform: uppercase;
         }
         
@@ -243,47 +243,70 @@
             }
         }
         /* Courrier font */
+        
         .monospace {
             font-family: monospace;
         }
+        
         .page {
             display: block;
-            width: 900px;
             max-width: 900px;
             margin: 36px 36px 36px 72px;
         }
+        
         .page-block {
             width: 100%;
         }
+        
         .smallcaps {
             text-transform: uppercase;
             font-size: 14px;
             opacity: 0.87;
         }
+        
         .inline {
             display: inline-flex;
             justify-content: center;
             align-items: center;
             align-self: center;
         }
+        
+        .no-pad {
+            padding: 0;
+        }
+        
         .pad-left {
             padding-left: 8px;
         }
+        
         .pad-right {
             padding-right: 8px;
         }
+        
         .pad-left2 {
             padding-left: 16px;
         }
+        
         .pad-right2 {
             padding-right: 16px;
         }
-        .blue-text {
+        
+        .blue-link {
             color: var(--mist-blue);
         }
+        
+        .opaque54,
         .micon {
             opacity: 0.54;
         }
+        .micon {
+            float: left;
+        }
+        .micon-wrap {
+            display: inline;
+            vertical-align: baseline;
+        }
+
         /* Paper progress */
         
         paper-progress {
@@ -409,6 +432,15 @@
         </style>
     </template>
 </dom-module>
+<dom-module id="list-items">
+    <template>
+        <style>
+        paper-item.border {
+            border-bottom: 1px solid #ddd;
+        }
+        </style>
+    </template>
+</dom-module>
 <dom-module id="lists">
     <template>
         <style>
@@ -416,19 +448,20 @@
             border: 1px solid #ddd;
         }
         /* none of the two below works */
+        
         paper-input >::content div[pseudo="-webkit-search-cancel-button"] {
             opacity: 0 !important;
-            display: none; !important;
+            display: none;
+            !important;
         }
-        key-item-element ::content .paper-item:focus:before {
+        
+        key-item-element::content .paper-item:focus:before {
             background-color: none !important;
             opacity: 0 !important;
         }
+        
         .list-head {
-            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06),
-                0 2px 0 rgba(0, 0, 0, 0.075),
-                0 3px 0 rgba(0, 0, 0, 0.05),
-                0 4px 0 rgba(0, 0, 0, 0.015);
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06), 0 2px 0 rgba(0, 0, 0, 0.075), 0 3px 0 rgba(0, 0, 0, 0.05), 0 4px 0 rgba(0, 0, 0, 0.015);
             background-color: #f2f2f2;
             border-bottom: 1px solid #e5e5e5;
             padding: 0 16px;
@@ -465,7 +498,7 @@
         .row:hover {
             background-color: #eee;
         }
-
+        
         .list {
             position: relative;
             padding-bottom: 120px;
@@ -481,7 +514,7 @@
             display: flex;
             align-items: baseline;
         }
-
+        
         .list-options > .search {
             padding: 16px 8px 16px 16px;
             margin-right: 0;
@@ -489,7 +522,7 @@
             transition: all 200ms;
             background-color: #dedede;
         }
-
+        
         .list-options > .search.true {
             margin-right: 16px;
             background-color: #fff;
@@ -498,7 +531,7 @@
         .list-options paper-icon-button {
             vertical-align: top;
         }
-
+        
         -webkit-search-cancel-button {
             display: none !important;
         }
@@ -512,11 +545,11 @@
             text-transform: uppercase;
             transition: 200ms color;
         }
-
+        
         .list-head {
             text-transform: uppercase;
         }
-
+        
         paper-tooltip {
             text-transform: none;
             font-size: 16px;
@@ -542,15 +575,15 @@
             z-index: 3;
             display: none;
             transition: 200ms color;
-            height: inherit;        
+            height: inherit;
         }
         
         .row:hover .row-actions {
-            display: block;        
+            display: block;
         }
-
         /* tablet-large */
-        @media all and (max-width: 840px)  { 
+        
+        @media all and (max-width: 840px) {
             .row .row-actions {
                 display: block;
                 opacity: 0.32;
@@ -601,17 +634,13 @@
             padding: 2px 6px;
         }
         
-        paper-fab {
-            position: absolute !important;
-            top: -68px;
-            right: 32px;
-        }
+        
         </style>
     </template>
 </dom-module>
 <dom-module id="single-page">
     <template>
-        <style>        
+        <style>
         .info-head > * {
             font-weight: 700;
             padding: 16px 0;
@@ -620,6 +649,7 @@
         .info-head {
             border-bottom: 1px solid #7f7f7f;
         }
+        
         .subhead {
             background-color: #dedede;
             border-bottom: 1px solid #e5e5e5;
@@ -630,10 +660,12 @@
             font-size: 13px;
             position: relative;
         }
+        
         .subhead h5 {
             margin-top: 0;
             margin-bottom: 0;
         }
+        
         .info-body .info-item {
             border-bottom: 1px solid #d4d4d4;
             padding: 16px 0;
@@ -788,32 +820,33 @@
 <dom-module id="dialogs">
     <template>
         <style>
-            paper-menu,
-            paper-dropdown-menu {
-                width: 100%;
-            }
-
-            paper-dialog {
-                width: 300px;
-            }
-
-            paper-dialog-scrollable p {
-                margin: 0 24px 24px 24px;
-                font-size: 16px;
-                color: rgba(0,0,0,0.54);
-            }
-
-            paper-dialog paper-icon-button.close {
-                position: absolute;
-                margin: 0;
-                top: 15px;
-                right: 16px;
-            }
-            .btn-group {
-                display: flex;
-                justify-content: flex-end;
-                margin: 0 24px;
-            }
+        paper-menu,
+        paper-dropdown-menu {
+            width: 100%;
+        }
+        
+        paper-dialog {
+            width: 300px;
+        }
+        
+        paper-dialog-scrollable p {
+            margin: 0 24px 24px 24px;
+            font-size: 16px;
+            color: rgba(0, 0, 0, 0.54);
+        }
+        
+        paper-dialog paper-icon-button.close {
+            position: absolute;
+            margin: 0;
+            top: 15px;
+            right: 16px;
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            margin: 0 24px;
+        }
         </style>
     </template>
 </dom-module>
