@@ -176,7 +176,7 @@ paper-fab {
 .fab-top-right {
     position: absolute;
     right: 32px;
-    bottom: -50%;
+    bottom: -28px;
     z-index: 10;
 }
 

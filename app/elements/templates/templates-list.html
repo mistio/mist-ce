@@ -120,6 +120,9 @@
                         <span hidden$="[[!showDeleteOption]]" class="label">
                         Delete [[selectedTemplates.length]] template<span hidden$="[[!moreThanOneSelected]]">s</span> </span>
                         </span>
+                        <div class="fab-top-right">
+                            <paper-fab id="addBtn" icon="add" on-tap="_openAddTemplatePage"></paper-fab>
+                        </div>
                     </div>
                     <div hidden$="[[!hasTemplates]]" class="info-list">
                         <div class="list-head flex-horizontal-with-ratios">
@@ -159,10 +162,7 @@
                     </div>
                     <p hidden$="[[hasTemplates]]">
                         No templates found here. You can add some by using the action button!
-                    </p>
-                    <div class="absolute-top-right">
-                        <paper-fab id="addBtn" icon="add" on-tap="_openAddTemplatePage"></paper-fab>
-                    </div>
+                    </p>                    
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>

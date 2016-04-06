@@ -107,6 +107,9 @@
                         <span hidden$="[[!showDeleteOption]]" class="label">
                         Delete [[selectedKeys.length]] key<span hidden$="[[!moreThanOneSelected]]">s</span> </span>
                         </span>
+                        <div class="fab-top-right">
+                            <paper-fab id="addBtn" icon="add" on-tap="_openAddKeyModal"></paper-fab>
+                        </div>
                     </div>
                     <div hidden$="[[!hasKeys]]" class="info-list">
                         <div class="list-head flex-horizontal-with-ratios">
@@ -154,10 +157,7 @@
                     </div>
                     <p hidden$="[[hasKeys]]">
                         No keys found here. You can add some by using the action button!
-                    </p>
-                    <div class="absolute-top-right">
-                        <paper-fab id="addBtn" icon="add" on-tap="_openAddKeyModal"></paper-fab>
-                    </div>
+                    </p>                    
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>

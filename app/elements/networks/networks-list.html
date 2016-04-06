@@ -113,6 +113,10 @@
                         <span hidden$="[[!showDeleteOption]]" class="label">
                         Delete [[selectedNetwork.length]] network<span hidden$="[[!moreThanOneSelected]]">s</span> </span>
                         </span>
+
+                        <div class="fab-top-right">
+                            <a href="/add-network"><paper-fab id="addBtn" icon="add"></paper-fab></a>
+                        </div>
                     </div>
 
                     <div hidden$="[[!hasNetworks]]" class="info-list">
@@ -156,10 +160,7 @@
                     </div>
                     <p hidden$="[[hasNetworks]]">
                         No networks found here. You can add some by using the action button!
-                    </p>
-                    <div class="absolute-top-right">
-                        <a href="/add-network"><paper-fab id="addBtn" icon="add"></paper-fab></a>
-                    </div>
+                    </p>                    
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
