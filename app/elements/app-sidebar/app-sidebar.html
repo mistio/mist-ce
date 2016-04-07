@@ -341,6 +341,9 @@ Polymer({
     is: 'app-sidebar',
     enableCustomStyleProperties: true,
     properties: {
+        model: {
+            type: Object
+        },
         current: {
             type: String,
             notify: true
@@ -367,7 +370,7 @@ Polymer({
 
     },
     _itemCount: function(item) {
-        return this.get('model.' + item + 'Array.length');
+        return this.get('this.model.' + item + 'Array.length');
     },
     _sectionLink: function(name) {
         return '/' + name;
