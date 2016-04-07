@@ -342,7 +342,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             _addMember: function(team, member) {
                 var newMember = Ember.Object.create({
                     id: member.id,
-                    name: member.email,
+                    name: member.name,
                     email: member.email,
                     pending: member.pending
                 });
