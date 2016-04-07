@@ -26,8 +26,7 @@
 
             :host >::content paper-input-container {
                 padding-top: 16px;
-                padding-bottom: 16px;
-                Foinikas1
+                padding-bottom: 16px;            
             }            
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
@@ -44,6 +43,7 @@
                         <div class="grid-row">
                             <paper-input class="xs12 m6" id="stackName" label="Stack Name" value="{{stack.name::input}}" required error-message="The stack must have a name"></paper-input>
                             <div class="field-helptext xs12 m6"></div>
+                            <hr class="xs12 hr-equal" />
                             <template is="dom-repeat" items="{{fields}}" as="field">
                                 <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
                                     <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.name]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
