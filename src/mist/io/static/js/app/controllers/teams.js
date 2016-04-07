@@ -163,10 +163,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     })
                     .success(function(member) {
                         Mist.notificationController.notify('An invitation was sent to user with email: ' + args.member.email);
-                        that._addMember(args.team, {
-                            id: member.id,
-                            email: args.member.email
-                        });
+                        that._addMember(args.team, member);
                     })
                     .error(function(message) {
                         Mist.notificationController.notify(message);
@@ -346,7 +343,8 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 var newMember = Ember.Object.create({
                     id: member.id,
                     name: member.email,
-                    email: member.email
+                    email: member.email,
+                    pending: member.pending
                 });
                 Ember.run(this, function() {
                     team.members.pushObject(newMember);
