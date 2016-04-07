@@ -283,24 +283,31 @@ def add_cloud_v_2(user, title, provider, params):
     # validate cloud before adding
     if remove_on_error:
         try:
-            conn = connect_provider(cloud)
-        except InvalidCredsError as exc:
-            log.error("Error while adding cloud: %r" % exc)
-            raise CloudUnauthorizedError(exc)
-        except Exception as exc:
-            log.error("Error while adding cloud%r" % exc)
-            raise CloudUnavailableError(exc)
-        if provider not in ['vshere']:
-            # in some providers -eg vSphere- this is not needed
-            # as we are sure we got a succesfull connection with
-            # the provider if connect_provider doesn't fail
             try:
-                machines = conn.list_nodes()
+                conn = connect_provider(cloud)
             except InvalidCredsError as exc:
+                log.error("Error while adding cloud: %r" % exc)
                 raise CloudUnauthorizedError(exc)
             except Exception as exc:
-                log.error("Error while trying list_nodes: %r", exc)
-                raise CloudUnavailableError(exc=exc)
+                log.error("Error while adding cloud%r" % exc)
+                raise CloudUnavailableError(exc)
+            if provider not in ['vshere']:
+                # in some providers -eg vSphere- this is not needed
+                # as we are sure we got a succesfull connection with
+                # the provider if connect_provider doesn't fail
+                try:
+                    machines = conn.list_nodes()
+                except InvalidCredsError as exc:
+                    raise CloudUnauthorizedError(exc)
+                except Exception as exc:
+                    log.error("Error while trying list_nodes: %r", exc)
+                    raise CloudUnavailableError(exc=exc)
+        except Exception as exc:
+            try:
+                cloud.delete()
+            except:
+                pass
+            raise
     cloud.owner = user
     cloud.save()
     log.info("Cloud with id '%s' added succesfully with Api-Version: 2.", cloud_id)
