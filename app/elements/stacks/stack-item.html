@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<dom-module id="template-item">
+<dom-module id="stack-item">
     <template>
         <style include="shared-styles">
             :host {
@@ -38,12 +38,13 @@
         <paper-item class$="info-item [[indexClass]]">
             <div class="flex-horizontal-with-ratios">
                 <span class="check">
-                    <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectTemplate"></app-check>
+                    <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectStack"></app-check>
                     <paper-tooltip for="check" position="right">Select item</paper-tooltip>
                 </span>            
-                <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/templates/[[template._id]]">
-                    <span class="name flexchild">[[template.name]]</span>
-                    <div class="flexchild">[[template.location_type]]</div>
+                <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/stacks/[[stack.id]]">
+                    <span class="name flexchild">[[stack.name]]</span>
+                    <div class="flexchild">[[stack.template]]</div>
+                    <div class="flexchild">[[stack.description]]</div>
                 </a>
             </div>
             <content></content>
@@ -54,10 +55,10 @@
             'use strict';
 
             Polymer({
-                is: 'template-item',
+                is: 'stack-item',
 
                 properties: {
-                    template: {
+                    stack: {
                         type: Object
                     },
                     selected: {
@@ -77,7 +78,7 @@
                     }
                 },
                 listeners: {
-                    'selected-changed': '_selectTemplateChanged'
+                    'selected-changed': '_selectScriptChanged'
                 },
                 _computeIsIndexClass: function(index, count) {
                     var classes = [];
@@ -87,17 +88,17 @@
                     );
                     return classes.join(' ');
                 },
-                _selectTemplateChanged: function(e) {
+                _selectStackChanged: function(e) {
                     var selected = e.detail.value;
-                    this.fire('toggleSelectedTemplate', {
-                        template: this.template,
+                    this.fire('toggleSelectedStack', {
+                        stack: this.stack,
                         selected: selected
                     });
                 },
-                _templateUrl: function(template){
-                    return "/templates/"+template.id;
+                _stackUrl: function(stack){
+                    return "/stacks/"+stack.id;
                 },
-                _selectTemplate: function(e) {
+                _selectStack: function(e) {
                     // This is used to prevent event bubbling
                     e.stopPropagation();
                     if (Polymer.dom(e).localTarget === this.$.check) {

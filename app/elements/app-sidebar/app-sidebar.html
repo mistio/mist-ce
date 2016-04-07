@@ -256,7 +256,7 @@
                             <span class="title flex">dashboard</span>
                         </div>
                     </a>
-                    <a class="section" is="pushstate-anchor" href="/machines" active$="[[_isEqual(current, 'machines')]]" tabindex="1" style="background: [[ections.machines.color]];">
+                    <a class="section" is="pushstate-anchor" href="/machines" active$="[[_isEqual(current, 'machines')]]" tabindex="1" style$="[[style(sections.machines.color)]];">
                         <div class="layout horizontal center">
                             <section-symbol aria-hidden="true" icon="[[sections.machines.icon]]" color="[[sections.machines.color]]"></section-symbol>
                             <span class="title flex">
@@ -307,6 +307,15 @@
                             <span class="title flex">
                                 <span>templates</span>
                             <span class="count">[[model.templatesArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a class="section" is="pushstate-anchor" href="/stacks" active$="[[_isEqual(current, 'stacks')]]" tabindex="1" style$="[[style(sections.stacks.color)]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.stacks.icon]]" color="[[sections.stacks.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>stacks</span>
+                            <span class="count">[[model.stacksArray.length]]</span>
                             </span>
                         </div>
                     </a>
