@@ -1,10 +1,11 @@
-a<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../app-togglable/app-togglable.html">
 <link rel="import" href="template-edit.html">
 <link rel="import" href="template-item.html">
 <link rel="import" href="template-run.html">
 
-<dom-module id="template-page">
+<dom-module id="template-page"> 
     <template>
         <style is="custom-style" include="lists"></style>
         <style is="custom-style" include="single-page"></style>
@@ -241,7 +242,7 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                     </div>
                     <div class="page">
                         <h3 class="smallcaps">Metadata</h3>
-                        <paper-material>                        
+                        <paper-material>
                             <div class="info-table">
                                 <div class="info-body info-group">
                                     <template is="dom-if" if="[[template.description]]">
@@ -293,7 +294,21 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                                 </div>
                             </div>
                         </paper-material>
-                    </div>                    
+                    </div>      
+                    <div class="page">
+                        <h3 class="smallcaps">Inputs</h3>
+                        <paper-material>
+                            <template is="dom-repeat" items="[[template.inputs]]">
+                                <app-togglable title="[[item.name]]" info="[[item]]"></app-togglable>
+                            </template>
+                        </paper-material>
+                    </div>
+                    <div class="page">
+                        <h3 class="smallcaps">Workflows</h3>
+                        <paper-material>
+
+                        </paper-material>
+                    </div>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
@@ -351,7 +366,7 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                 },
                 hideprogress: {
                     type: Boolean,
-                    value: false
+                    value: true
                 },
                 vpHeight: String
             },

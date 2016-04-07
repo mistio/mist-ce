@@ -1,0 +1,79 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<dom-module id="app-togglable"> 
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: block;
+        }
+        .flex-horizontal-with-ratios {
+            @apply(--layout-horizontal);
+            align-content: stretch;
+        }
+
+        .flexchild {
+            @apply(--layout-flex);
+        }
+        .command-container {
+            background-color: #444;
+            color: #fff;
+            font-family: monospace;
+            padding: 10px;
+        }
+        :host .infoarea {
+            height: 0;
+            transition: height 0.18s ease-in;
+        }
+        :host[open] .infoarea {
+            height: auto;
+        }
+        </style>
+        <paper-item id="toggle" class="flex-horizontal-with-ratios">
+            <span class="flexchild">[[title]]</span>
+            <!--TODO: button does not work -->
+            <paper-icon-button icon="hardware:keyboard-arrow-down" on-tap="_toggle"></paper-icon-button>
+        </paper-item>
+        <div id="infoarea" class="command-container">
+            <template is="dom-repeat" items="[[infoItems]]">
+                [[item]] <br/>
+            </template>
+        </div>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'app-togglable',
+
+            properties: {
+                title: String,
+                infoItems: {
+                    type: Array,
+                    computed: "_makeInfoItems(info)"
+                },
+                info: {
+                    type: Object
+                },
+                open: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true,
+                }
+            },
+            _makeInfoItems: function(info){
+                var infoItems = [];
+                for(var prop in info) {
+                    infoItems.push(prop+": "+info[prop]);
+                }
+                return infoItems;
+            },
+            _toggle: function(){
+                var state = this.open;
+                this.open = true;
+            }
+
+        });
+    })();
+    </script>
+</dom-module>
