@@ -282,7 +282,17 @@
         .pad-right {
             padding-right: 8px;
         }
+
+        .pad1 {
+            padding-right: 8px;
+            padding-left: 8px;
+        }
         
+        .pad2 {
+            padding-right: 16px;
+            padding-left: 16px;
+        }
+
         .pad-left2 {
             padding-left: 16px;
         }
@@ -814,6 +824,19 @@
         
         paper-textarea.like-editor >::content iron-autogrow-textarea {
             background-color: var(--mist-dark-color);
+        }
+        .field-helptext {
+            font-size: 14px;
+            align-self: center;
+            color: rgba(0,0,0,0.54);
+        }
+        [focused] + .field-helptext {
+            font-size: 14px;
+            align-self: center;
+            color: rgba(0,0,0,0.87);
+        }
+        hr.hr-equal {
+            margin: 32px 0;            
         }
         </style>
     </template>

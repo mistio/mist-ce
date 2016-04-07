@@ -40,30 +40,35 @@
                     <span class="bottom title">Add Template {{typedName}}</span>
                 </paper-toolbar>
                 <div id="content">
-                    <paper-material>
+                    <paper-material class="page">
                         <div class="grid-row">
                             <template is="dom-repeat" items="{{fields}}" as="field">
                                 <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-                                    <paper-input class="xs12" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-                                </template>
+                                    <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                                    <div class="field-helptext xs12 m6"></div>
+                                    <hr class="xs12 hr-equal" />
+                                </template>                                
                                 <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
                                     <paper-textarea class="xs12" id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
                                 </template>
                                 <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
-                                    <paper-radio-group selected="{{field.value}}">
+                                    <paper-radio-group selected="{{field.value}}" class="xs12 m6">
                                         <template is="dom-repeat" items="[[field.options]]" as="option">
                                             <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
                                         </template>
                                     </paper-radio-group>
+                                    <div class="field-helptext xs12 m6">
+                                        You can either specify a template from a GitHub, or you can just place your template inline. If you need help read the documentation on <a href="" target="_blank" class="regular blue-link">how to add templates</a>.
+                                    </div>
                                 </template>
                                 <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-                                    <paper-dropdown-menu class="dropdown-block xs12 l6" label="[[field.label]]" horizontal-align="left">
+                                    <paper-dropdown-menu class="dropdown-block xs12" label="[[field.label]]" horizontal-align="left">
                                         <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
                                             <template is="dom-repeat" items="[[field.options]]" as="option">
                                                 <paper-item value="[[option.val]]">[[option.title]]</paper-item>
                                             </template>
                                         </paper-menu>
-                                    </paper-dropdown-menu>
+                                    </paper-dropdown-menu>                                    
                                 </template>
                             </template>
                             <paper-progress indeterminate value="800" min="100" max="1000" hidden$="[[!sendingData]]"></paper-progress>
