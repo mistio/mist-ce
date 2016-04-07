@@ -82,7 +82,7 @@
 }
 #dashboard-options .icon-teams,
 .icon-team:after {
-    content: '\0078';
+    content: '\0033';
 }
 #dashboard-options .icon-teams:hover,
 #dashboard-options .icon-team:hover {
@@ -241,7 +241,7 @@
     content: '\0074';
 }
 .icon-teams:after {
-    content: '\0077';
+    content: '\007a';
 }
 .ui-footer .icon-x:after, .ui-footer .icon-xx:after {
     font-size: 12px;
