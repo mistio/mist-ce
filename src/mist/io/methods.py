@@ -385,7 +385,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
     if use_ssh:
         try:
             ssh_command(
-                user, cloud.id, machine.machine.id, machine_hostname, 'uptime',
+                user, cloud.id, machine.machine_id, machine_hostname, 'uptime',
                 key_id=machine_key, username=machine_user, password=None,
                 port=port
             )
