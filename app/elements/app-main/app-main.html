@@ -324,8 +324,30 @@ var app = Polymer({
                     show: true,
                     required: true
                 }],
-                workflows: {}
-
+                workflows: [{
+                    name: "configure",
+                    actions: [
+                        {
+                            name: "mist.plugin.server.run_script",
+                            params: '',
+                            script: "scripts/nodecellar/install-nodecellar-app.sh",
+                            used_in: ["nodecellar"]
+                        },{
+                            name: "mist.plugin.server.run_script",
+                            params: '',
+                            script: "scripts/nodecellar/install-nodecellar-app.sh",
+                            used_in: ["nodecellar"]
+                        }]
+                },
+                {
+                    name: "create",
+                    actions: [{
+                            name: "mist.plugin.server.run_script",
+                            params: '',
+                            script: "scripts/nodecellar/install-nodecellar-app.sh",
+                            used_in: ["nodecellar"]
+                        }]
+                }]
             }],
             teamsArray: [{
                 description: "",

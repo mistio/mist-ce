@@ -20,23 +20,42 @@
             font-family: monospace;
             padding: 10px;
         }
-        :host .infoarea {
-            height: 0;
-            transition: height 0.18s ease-in;
+        paper-icon-button {
+            transition: transform 180ms ease-in;
         }
-        :host[open] .infoarea {
+        :host #infoarea {
+            height: 0;
+            overflow: hidden;
+            transition: height 180ms ease-in;
+        }
+        :host[open] #infoarea {
             height: auto;
         }
+        :host[open] paper-item:before {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: currentColor;
+            content: '';
+            opacity: 0.12;
+            pointer-events: none;
+        }
+        :host[open] paper-icon-button {
+            transform: rotate(-180deg);
+        }
         </style>
-        <paper-item id="toggle" class="flex-horizontal-with-ratios">
+        <paper-item id="toggle" class="flex-horizontal-with-ratios" on-tap="_toggle">
             <span class="flexchild">[[title]]</span>
-            <!--TODO: button does not work -->
-            <paper-icon-button icon="hardware:keyboard-arrow-down" on-tap="_toggle"></paper-icon-button>
+            <paper-icon-button icon="hardware:keyboard-arrow-down"></paper-icon-button>
         </paper-item>
-        <div id="infoarea" class="command-container">
-            <template is="dom-repeat" items="[[infoItems]]">
-                [[item]] <br/>
-            </template>
+        <div id="infoarea">
+            <div class="command-container">
+                <template is="dom-repeat" items="[[infoLines]]" as="line">
+                    [[line]]<br/>
+                </template>
+            </div>
         </div>
     </template>
     <script>
@@ -48,9 +67,9 @@
 
             properties: {
                 title: String,
-                infoItems: {
+                infoLines: {
                     type: Array,
-                    computed: "_makeInfoItems(info)"
+                    computed: "_makeInfoLines(info)"
                 },
                 info: {
                     type: Object
@@ -58,19 +77,33 @@
                 open: {
                     type: Boolean,
                     value: false,
-                    reflectToAttribute: true,
+                    reflectToAttribute: true
                 }
             },
-            _makeInfoItems: function(info){
-                var infoItems = [];
+            _makeInfoLines: function(info){
+                var infoLines = [];
                 for(var prop in info) {
-                    infoItems.push(prop+": "+info[prop]);
+                    var propvalue = info[prop];
+                    var textvalue;
+
+                    console.log(typeof propvalue);
+
+                    if ( typeof propvalue == Object) {
+                        textvalue = this._makeInfoLines(propvalue);
+                    }
+                    else if ( typeof propvalue == Array) {
+                        infoLines.push(propvalue);
+                        textvalue = "";
+                    }
+                    else {
+                        textvalue = propvalue;
+                    }
+                    infoLines.push(prop+": "+textvalue);
                 }
-                return infoItems;
+                return infoLines;
             },
             _toggle: function(){
-                var state = this.open;
-                this.open = true;
+                this.open = !this.open;
             }
 
         });

@@ -296,8 +296,8 @@
                         </paper-material>
                     </div>      
                     <div class="page">
-                        <h3 class="smallcaps">Inputs</h3>
-                        <paper-material>
+                        <h3 class="smallcaps">Inputs</h3>                        
+                        <paper-material id="inputs">
                             <template is="dom-repeat" items="[[template.inputs]]">
                                 <app-togglable title="[[item.name]]" info="[[item]]"></app-togglable>
                             </template>
@@ -305,8 +305,10 @@
                     </div>
                     <div class="page">
                         <h3 class="smallcaps">Workflows</h3>
-                        <paper-material>
-
+                        <paper-material id="workflows">
+                            <template is="dom-repeat" items="[[template.workflows]]">
+                                <app-togglable title="[[item.name]]" info="[[item]]"></app-togglable>
+                            </template>
                         </paper-material>
                     </div>
                 </div>
