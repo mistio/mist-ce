@@ -21,9 +21,11 @@
     {{/if}}
 
     <ul class="ui-listview orgs-list">
-        {{#each organization in view.orgs}}
-            {{component "organization-item" organization=organization}}
-        {{/each}}
+        {{#if view.orgs}}
+            {{#each organization in view.orgs}}
+                {{component "organization-item" organization=organization}}
+            {{/each}}
+        {{/if}}
 
         {{#if Mist.can_create_org}}
         <li class="text-center" id="add-org"><a {{action "addOrganizationClicked" target=view}} class="ui-btn ui-btn-d ui-caps ui-shadow">Add Organization</a></li>

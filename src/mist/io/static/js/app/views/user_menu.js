@@ -47,16 +47,10 @@ define('app/views/user_menu', ['ember', 'md5'],
             orgs: Ember.computed('Mist.orgs', function() {
                 var orgs = Mist.orgs.slice().addObject({
                     id: '',
-                    name: 'Personal Account'
+                    name: 'Personal'
                 });
 
-                return orgs.sortBy('name');
-
-                // return orgs.sort(function(a, b) {
-                //     if (a.name < b.name) return -1;
-                //     if (a.name > b.name) return 1;
-                //     return 0;
-                // });
+                return orgs.sortBy('id');
             }),
 
             //
