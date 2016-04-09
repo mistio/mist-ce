@@ -13,6 +13,7 @@ import re
 import requests
 import json
 import mongoengine as me
+from mongoengine import ValidationError, NotUniqueError
 
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
@@ -59,15 +60,28 @@ def exception_handler_mist(exc, request):
     isinstance(exc, context) is True.
 
     """
+    # mongoengine ValidationError
+    if isinstance(exc, ValidationError):
+        trace = traceback.format_exc()
+        log.warning("Uncaught me.ValidationError!\n%s", trace)
+        return Response("Validation Error", 400)
+
+    # mongoengine NotUniqueError
+    if isinstance(exc, NotUniqueError):
+        trace = traceback.format_exc()
+        log.warning("Uncaught me.NotUniqueError!\n%s", trace)
+        return Response("NotUniqueError", 409)
 
     # non-mist exceptions. that shouldn't happen! never!
     if not isinstance(exc, exceptions.MistError):
-        trace = traceback.format_exc()
-        log.critical("Uncaught non-mist exception? WTF!\n%s", trace)
-        return Response("Internal Server Error", 500)
+        if not isinstance(exc, (ValidationError, NotUniqueError)):
+            trace = traceback.format_exc()
+            log.critical("Uncaught non-mist exception? WTF!\n%s", trace)
+            return Response("Internal Server Error", 500)
 
     # mist exceptions are ok.
     log.info("MistError: %r", exc)
+
 
     # translate it to HTTP response based on http_code attribute
     return Response(str(exc), exc.http_code)
@@ -190,6 +204,8 @@ def list_clouds(request):
     ---
     """
     auth_context = auth_context_from_request(request)
+    if not auth_context.has_perm("cloud", "read"):
+        raise PolicyUnauthorizedError("To list clouds")
     return mist.core.methods.filter_list_clouds(auth_context)
 
 
@@ -265,7 +281,6 @@ def add_cloud(request):
 
     if not provider:
         raise RequiredParameterMissingError('provider')
-
 
     monitoring = None
     if int(api_version) == 2:

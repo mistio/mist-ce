@@ -191,7 +191,7 @@ class MistIoApi(object):
         req = MistRequests(uri=uri, api_token=api_token)
 
         req.get = req.unavailable_api_call
-        req.put = req.unavailable_api_call
+        req.post = req.unavailable_api_call
         req.delete = req.unavailable_api_call
 
         return req
