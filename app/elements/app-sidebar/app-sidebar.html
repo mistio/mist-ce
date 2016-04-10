@@ -184,7 +184,7 @@
 
         #section-list .section section-symbol,
         #section-list .section .all-symbol {
-            margin-right: 10px;
+            margin-right: 12px;
         }
 
         #section-list a span {
@@ -232,7 +232,8 @@
         }
 
         app-logo {
-            margin-right: 9px;
+            margin-right: 12px;
+            margin-left: -2px;
         }
 
         #mist-side-head {
@@ -253,7 +254,7 @@
                     <a href="/" is="pushstate-anchor" id="dashboard" class="section" tabindex="1">
                         <div class="layout horizontal center">
                             <app-logo solo></app-logo>
-                            <span class="title flex">dashboard</span>
+                            <span class="title flex">overview</span>
                         </div>
                     </a>
                     <a class="section" is="pushstate-anchor" href="/machines" active$="[[_isEqual(current, 'machines')]]" tabindex="1" style$="[[style(sections.machines.color)]];">
@@ -329,18 +330,14 @@
                         </div>
                     </a>
                 </nav>
-                <a href="/elements" class="flex section">
+                <!--a href="/elements" class="flex section">
                     <div class="layout horizontal center">
                         <div class="all-symbol" aria-hidden="true">
                             <iron-icon icon="add-circle-outline"></iron-icon>
                         </div>
                         <span class="title flex">_elements</span>
                     </div>
-                </a>
-            </div>
-            <div hidden$="[[!tag]]" id="current-tag" class="horizontal layout center">
-                <b>Tag:</b> <span class="flex">[[tag]]</span>
-                <iron-icon icon="clear" on-tap="clearTag"></iron-icon>
+                </a-->
             </div>
         </div>
     </template>

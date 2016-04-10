@@ -20,7 +20,6 @@
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../app-bar/app-bar.html">
 <link rel="import" href="../app-socket/app-socket.html">
-<link rel="import" href="../app-sidebar/app-sidebar.html">
 <link rel="import" href="../app-styles/app-styles.html">
 <link rel="import" href="../app-logo/app-logo.html">
 <link rel="import" href="../app-user-menu/app-user-menu.html">
@@ -54,7 +53,7 @@
             <!-- images -->
             <!-- <iron-route path="/images" title="images" href="../pages/page-items.html"></iron-route> -->
             <!-- <iron-route path="/images/:id" title="image"></iron-route> -->
-            <iron-route path="/images" title="images" href="../images/images-list.html"></iron-route>
+            <iron-route path="/images" title="images"  href="../pages/page-items.html"></iron-route>
             <iron-route path="/images/:id" title="image" href="../images/images-page.html"></iron-route>
             <!-- keys -->
             <iron-route path="/keys" title="keys" href="../keys/keys-list.html"></iron-route>
@@ -87,20 +86,21 @@
             </page-dashboard>
             <cloud-add model="[[model]]" keys="[[model.keysArray]]"></cloud-add>
             <!-- machines -->
-            <page-items model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
+            <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
             <page-machine params="[[params]]" model="[[model]]" machine="[[getMachine(params)]]" sections="[[sections]]"></page-machine>
             <!-- images -->
-            <!-- <page-list model="[[model]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-list> -->
-            <images-list model="[[model]]" images="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></images-list>
+            <page-items class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
+            <!-- <images-list model="[[model]]" images="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></images-list> -->
             <page-image params="[[params]]" model="[[model]]" image="[[getImage(params)]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-image>
             <!-- keys -->
-            <keys-list model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" keys="[[model.keysArray]]"></keys-list>
+            <page-items class="keys" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.keysArray]]"></page-items>
             <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
             <!-- networks -->
-            <networks-list model="[[model]]" networks="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></networks-list>
+            <networks-list class="networks" model="[[model]]" networks="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></networks-list>
             <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
             <network-add model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
             <!-- templates -->
+            <!--page-items class="templates" model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" items="[[model.templatesArray]]"></page-items-->
             <templates-list model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" templates="[[model.templatesArray]]"></templates-list>
             <template-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.templates]]"></template-page>
             <template-add model="[[model]]" sections="[[sections]]" section="[[sections.templates]]"></template-add>
@@ -109,8 +109,9 @@
             <stacks-list model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" stacks="[[model.stacksArray]]"></stacks-list>
             <stack-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.stacks]]"></stack-page>
             <!-- scripts - leave scipts last due to editors highlighting problem -->
-            <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
-            <scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list>
+            <<grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element>
+            <!--scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list!-->
+            <!--page-items model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.scriptsArray]]"></page-items-->
             <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
             <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
             <page-elements></page-elements>
@@ -119,6 +120,9 @@
         </iron-pages>
     </template>
 </dom-module>
+
+<script type="text/javascript" src="../../bower_components/swiftSet/swiftSet.js"></script>
+
 <script>
 var app = Polymer({
     is: 'app-main',
@@ -150,6 +154,7 @@ var app = Polymer({
 
     ready: function() {
         this.model = {
+            email: EMAIL,
             cloudsArray: [],
             machinesArray: [],
             imagesArray: [],
@@ -239,14 +244,14 @@ var app = Polymer({
                     name: "application_url",
                     label: "application_url",
                     value: "",
-                    defaultValue: "",                    
-                    used_in: ["nodecellar"],                    
+                    defaultValue: "",
+                    used_in: ["nodecellar"],
                     value: "https://github.com/cloudify-cosmo/nodecellar/archive/master.tar.gz",
 
                     description: "Application URL",
                     errorMessage: "Please enter application_url",
                     ui_type: "text",
-                    helptext: "Application_url is needed to...",                    
+                    helptext: "Application_url is needed to...",
                     show: true,
                     required: true,
                 }, {
@@ -264,7 +269,7 @@ var app = Polymer({
                     value: "",
                     errorMessage: "Please enter cloud id",
                     ui_type: "text",
-                    helptext: "You can choose cloud id from your clouds in mist.io...",                    
+                    helptext: "You can choose cloud id from your clouds in mist.io...",
                     show: true,
                     required: true
                 }, {
@@ -281,7 +286,7 @@ var app = Polymer({
                     ],
                     errorMessage: "Please enter cloud id",
                     ui_type: "text",
-                    helptext: "You can choose cloud id is needed to...",                    
+                    helptext: "You can choose cloud id is needed to...",
                     show: true,
                     required: true
                 }, {
@@ -299,7 +304,7 @@ var app = Polymer({
                     ],
                     errorMessage: "Please enter mongo cloud id",
                     ui_type: "text",
-                    helptext: "You can choose cloud for momngo to...",                    
+                    helptext: "You can choose cloud for momngo to...",
                     show: true,
                     required: true
                 }, {
@@ -308,7 +313,7 @@ var app = Polymer({
                     value: '',
                     errorMessage: "Please enter an IP",
                     ui_type: "text",
-                    helptext: "This the ip that will...",                    
+                    helptext: "This the ip that will...",
                     show: true,
                     required: true
                 }, {
@@ -320,7 +325,7 @@ var app = Polymer({
                     value: "",
                     errorMessage: "Please enter an IP",
                     ui_type: "text",
-                    helptext: "This the ip that will...",                    
+                    helptext: "This the ip that will...",
                     show: true,
                     required: true
                 }],

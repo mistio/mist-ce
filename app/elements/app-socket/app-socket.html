@@ -29,7 +29,7 @@ Polymer({
             return;
 
         this.socket = new SockJS(this.url, null,
-            {'protocols_whitelist': ['websocket', 'xhr-polling']}
+            {'transports': ['websocket', 'xhr-polling']}
         );
 
         // Connect the receiver
@@ -41,6 +41,7 @@ Polymer({
         // Handle error & close
         this.socket.onerror = this.connectionError;
         this.socket.onclose = this.connectionClosed;
+        this.socket.onheartbeat = this.heartbeat;
 
         // Initialize main handlers
         var that = this;
@@ -167,6 +168,11 @@ Polymer({
         xhr.send();
     },
 
+    heartbeat: function() {
+        console.debug('got heartbeat');
+        this.send('h'); // reply with empty frame
+    },
+
     connectionClosed: function () {
         console.log('CONNECTION CLOSED');
         // TODO: try to reconnect
@@ -197,6 +203,7 @@ Polymer({
     receive: function (message) {
         if (DEBUG_SOCKET)
             console.debug('RECEIVED: ' + message);
+
         var parts = message.split(',');
         var type = parts[0], namespace = parts[1];
         var body = JSON.parse(parts.splice(2).join(','));
@@ -337,7 +344,9 @@ Polymer({
                 function(cloud){
                     if (cloud.machinesArray != undefined ) {
                         cloud.machinesArray.forEach(function (machine) {
-                                machine.provider = cloud.title;
+                                machine.cloud = {'id': cloud.id,
+                                                 'title': cloud.title,
+                                                'provider': cloud.provider};
                         });
 
                     return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])

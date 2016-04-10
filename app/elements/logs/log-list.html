@@ -16,7 +16,6 @@
       </paper-material>
     </template>
 </dom-module>
-<script type="text/javascript" src="../../bower_components/swiftSet/swiftSet.js"></script>
 
 <script>
 Polymer({
@@ -106,9 +105,7 @@ Polymer({
                   //var ind = that.items.indexOf(item);
                   var dt = new Date(cell.data * 1000);
                   cell.element.innerHTML = /*ind + ' : ' + cell.data + ' : ' + */ dt.getTimeFromNow();
-                  console.info(dt, dt.getTimeFromNow());
-
-
+                  //console.info(dt, dt.getTimeFromNow());
               }
           }
         ];

@@ -32,9 +32,6 @@ h5,
 h6,
 a {
     text-rendering: optimizeLegibility;
-}
-
-a {
     text-decoration: none;
     letter-spacing: 0;
 }
@@ -340,4 +337,3 @@ iron-dropdown paper-material {
 .info-table tr:last-child td {
     border: none;
 }
-

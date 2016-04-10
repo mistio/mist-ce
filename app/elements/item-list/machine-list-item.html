@@ -9,81 +9,77 @@
         :host {
             @apply(--layout-horizontal);
             padding: 15px 24px;
+            width: 100%;
         }
-        
+
         :host(:not([narrow-viewport])) a {
             @apply(--layout-horizontal);
-            padding: 6px 6px 6px 0;
+            padding: 6px 0px 6px 0;
         }
-        
+
         :host([narrow-viewport]) a {
             @apply(--layout-vertical);
             padding: 0;
         }
-        
+
         #check {
             padding-right: 24px;
         }
+
         /* name id provider state tags */
-        
-        .name,
-        .provider,
-        .id,
-        .tags {
+        .field.field0 {
             width: 250px;
-            font-weight: 400;
-        }
-        
-        .state {
-            width: 100px;
-            font-weight: 400;
-        }
-        
-        .name {
             font-weight: 500;
+            text-overflow: ellipsis;
         }
-        
+
+        .field {
+            width: 150px;
+            font-weight: 400;
+            overflow: scroll;
+            margin-right: 24px;
+        }
+
+        .field.tags {
+            width: auto;
+        }
+
         .id {
             color: #757575;
         }
 
         :host([narrow-viewport]) .name,
-        :host([narrow-viewport]) .provider,
-        :host([narrow-viewport]) .id,
+        :host([narrow-viewport]) .cloud,
         :host([narrow-viewport]) .state,
         :host([narrow-viewport]) .tags {
             width: auto;
         }
-        
-        :host([medium-viewport]) .name,
-        :host([medium-viewport]) .provider,
-        :host([medium-viewport]) .id,
-        :host([medium-viewport]) .state,
-        :host([medium-viewport]) .tags {
-            width: 100px;
+
+        :host([narrow-viewport]) .field3,
+        :host([medium-viewport]) .field4 {
+            display: none;
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
-        <app-check id="check" allselected="{{allselected}}" selected="{{selected}}" on-tap="_onSelectItem">M</app-check>
-        <a href$="[[elementLink]]" is="pushstate-anchor">
-            <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
-            <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
-            <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
-            <div class="state label reverse" hidden$="[[!item.state]]">
-                <span class$="[[item.state]]" title="machine state">[[item.state]]</span>
-            </div>
-            <div class="tags" hidden$="[[!item.tags.length]]">
+        <content></content>
+        <a href$="[[itemLink]]" is="pushstate-anchor" ondragstart="return false;" ondrop="return false;">
+
+            <template is="dom-repeat" items="{{fields}}" as="field">
+              <a href$="[[itemLink]]" is="pushstate-anchor" ondragstart="return false;" ondrop="return false;">
+                <div class$="[[field]] field field[[index]]">{{itemField(item, field)}}</div>
+              </a>
+            </template>
+            <div class="field tags" hidden$="[[!item.tags.length]]">
                 <template is="dom-if" if="[[item.tags.length]]">
                     <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
                         <span class="tag">
-                            <template is="dom-if" if="[[item.key]]">[[item.key]] = </template>[[item.value]]
+                            <template is="dom-if" if="[[item.key]]">[[item.key]]=</template>[[item.value]]
                         </span>
                     </template>
                 </template>
             </div>
-        </a>
-        <paper-toggle-button></paper-toggle-button>
+            </a>
     </template>
 </dom-module>
 <script>
@@ -93,10 +89,18 @@ Polymer({
         // tags: {
         //   type: Array
         // },
+        actions: {
+            type: Array,
+        },
+        fields: {
+            type: Array,
+        },
         selected: {
+            type: Boolean
+        },
+        allselected: {
             type: Boolean,
-            notify: true,
-            value: false,
+            notify: true
         },
         item: {
             type: Object
@@ -104,29 +108,40 @@ Polymer({
         section: {
             type: Object
         },
-        elementLink: {
+        itemLink: {
             type: String,
-            computed: "_elementLink(section,item)"
+            computed: "_itemLink(section,item)"
         },
         narrowViewport: {
             type: Boolean,
             reflectToAttribute: true
         }
     },
-    _handleEventTwo: function(e) {
-        this.$.changeMe.innerHTML = e.detail.message;
+
+    itemField: function(item, field) {
+        var ret = item[field];
+        if (ret && ret.title)
+            return ret.title;
+        else if (!ret && item.extra && item.extra[field])
+            return item.extra[field];
+        else if (!ret && item.extra && item.extra[field+'_id'])
+            return item.extra[field+'_id'];
+        else
+            return ret;
     },
-    _elementLink: function(section, item) {
+    machineActions: function(item) {
+        var actions = ['destroy'];
+        if (item.state == 'running')
+          actions.push('stop');
+        if (item.state == 'stopped')
+          actions.push('start');
+        return actions;
+    },
+
+    _itemLink: function(section, item) {
         return "/" + section.id + "/" + item.uuid;
     },
-    _onSelectItem: function(e) {
-        if (Polymer.dom(e).localTarget === this.$.check) {
-            this.set('selected', !this.selected);
-            this.fire('list-item-select', {
-                item: this
-            });
-        }
-    },
+
     _itemTagsArray: function(tagsobject) {
         var tagsArray = [];
         if (tagsobject.length > 0) {
@@ -136,5 +151,9 @@ Polymer({
         }
         return tagsArray;
     },
+
+    _firstItem: function (index) {
+        return !index;
+    }
 });
 </script>
