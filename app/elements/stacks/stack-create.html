@@ -195,10 +195,41 @@
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
-                _computeFieldType: function(field, value, show) {
+                _computeFieldType: function(field, value, show) {                    
                     if (!(field.showIf && !field.show)) {
-                        return field.ui_type == value;
+                        if (field.type == "dropdown" && typeof field.options[0] == "string") {
+                            var query = this.model;
+                            for (var prop in field.options){
+                                var p = field.options[prop];
+
+                                if (p.startsWith("$.")){
+                                    p = this.stack[p.slice(2)]; 
+                                }
+
+                                if (query.hasOwnProperty(p)) {
+                                    query = query[p];
+                                }
+                            }
+                            
+                            field.options = [];
+
+                            for (var prop in query) {
+                                var dropdownItem = {};
+                                if (query[prop].hasOwnProperty("title")) {
+                                    dropdownItem.title = query[prop].title;
+                                }
+                                else if (query[prop].hasOwnProperty("name")) {
+                                    dropdownItem.title = query[prop].name;
+                                }
+                                dropdownItem.val = query[prop].id;
+
+                                field.options.push(dropdownItem);
+                            }
+
+                        }
+                        return field.type == value;
                     }
+
                 },
                 _fieldsChanged: function(fields, sendingData) {
                     this.async(function() {
@@ -206,14 +237,15 @@
                             show = true,
                             dependency;
 
-                        fields.base.forEach(function(el, index) {
+                        fields.base.forEach(function(el, index) {                            
                             this.set('stack.' + el.name, el.value);
 
                             if (el.showIf) {
                                 if (el.showIf.fieldExists) {
                                     dependency = stack[el.showIf.fieldName],
-                                        show = dependency;
+                                        show = dependency;                                    
                                     this.set('fields.' + index + '.show', show);
+
                                 } else {
                                     dependency = stack[el.showIf.fieldName],
                                         show = el.showIf.fieldValues.indexOf(dependency) != -1;
@@ -290,38 +322,5 @@
                 }
             });
         })();
-        // test progress bar, code from demo
-        // var progress, button, animationFrame;
-        // var repeat, maxRepeat = 1,
-        //     animating = false;
-        //
-        // function nextProgress() {
-        //     animating = true;
-        //     if (progress.value < progress.max) {
-        //         progress.value += (progress.step || 1);
-        //
-        //     } else {
-        //         if (++repeat >= maxRepeat) {
-        //             animating = false;
-        //             button.disabled = false;
-        //             return;
-        //         }
-        //         progress.value = progress.min;
-        //     }
-        //     var animationFrame = requestAnimationFrame(nextProgress);
-        // }
-        //
-        // function startProgress() {
-        //     repeat = 0;
-        //     progress.value = progress.min;
-        //     button.disabled = true;
-        //     if (!animating) {
-        //         nextProgress();
-        //     }
-        // }
-        // window.addEventListener('WebComponentsReady', function() {
-        //     progress = document.querySelector('paper-progress');
-        //     button = document.querySelector('paper-button#submit');
-        // });
     </script>
 </dom-module>

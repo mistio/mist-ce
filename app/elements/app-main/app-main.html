@@ -171,46 +171,6 @@ var app = Polymer({
                 }
             ],
             templatesArray: [{
-                _id: "56bb8e18e90e5b30cb3ab8eb",
-                created_at: "1455132184878",
-                description: "This template deploys a kubernettes stack",
-                entrypoint: "mist-blueprint.yaml",
-                exec_type: "cloudify",
-                location_type: "github",
-                name: "cloudmist",
-                stacks: ["kubstack1", "kubstack2"],
-                template: "https://github.com/mistio/mist-cloudify-example",
-                user: "56b8beaae90e5b043ae75c98",
-                inputs: [{
-                    name: "api_token",
-                    default: "",
-                    description: "Mist.io api token",
-                    type: "text",
-                    label: "api_token",
-                    value: "",
-                    defaultValue: "",
-                    errorMessage: "Please enter api_token",
-                    helptext: "Api token is used to...",
-                    show: true,
-                    required: true,
-                    used_in: ["mongod", "nodecellar", "host", "key", "nodejs"]
-                }, {
-                    name: "application_url",
-                    label: "application_url",
-                    type: "text",
-                    value: "",
-                    defaultValue: "",
-                    description: "Application URL",
-                    errorMessage: "Please enter application_url",
-                    helptext: "Application_url is needed to...",
-                    show: true,
-                    required: true,
-                    used_in: ["nodecellar"],
-                    value: "https://github.com/cloudify-cosmo/nodecellar/archive/master.tar.gz"
-                }],
-                workflows: {}
-
-            }, {
                 _id: "56bb8e18e90e5b30cb3ab8ea",
                 created_at: "1455132184879",
                 description: "This template deploys a kubernettes stack",
@@ -222,107 +182,54 @@ var app = Polymer({
                 template: "https://github.com/mistio/mist-cloudify-example",
                 user: "56b8beaae90e5b043ae75c98",
                 inputs: [{
-                    name: "api_token",
-                    default: "",
-                    description: "Mist.io api token",
-                    type: "api_token",
-                    label: "api_token",
-                    value: "",
-                    defaultValue: "",
-                    errorMessage: "Please enter api_token",
-                    ui_type: "text",
-                    used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                    helptext: "Api token is used to...",
-                    show: true,
-                    required: true,
-                }, {
-                    name: "application_url",
-                    label: "application_url",
-                    value: "",
-                    defaultValue: "",                    
-                    used_in: ["nodecellar"],                    
-                    value: "https://github.com/cloudify-cosmo/nodecellar/archive/master.tar.gz",
-
-                    description: "Application URL",
-                    errorMessage: "Please enter application_url",
-                    ui_type: "text",
-                    helptext: "Application_url is needed to...",                    
-                    show: true,
-                    required: true,
-                }, {
-                    name: "mongo_cloud_id",
-                    default: '',
-                    description: "The mist.io cloud id",
-                    type: "cloud",
-                    used_in: [
-                        "mongod",
-                        "nodecellar",
-                        "host",
-                        "key",
-                        "nodejs"
-                    ],
-                    value: "",
-                    errorMessage: "Please enter cloud id",
-                    ui_type: "text",
-                    helptext: "You can choose cloud id from your clouds in mist.io...",                    
-                    show: true,
-                    required: true
-                }, {
-                    name: "cloud_name",
+                    name: "cloud",
                     default: '',
                     value: "",
-                    description: "The mist.io cloud name",
-                    type: "cloud_name",
-                    used_in: ["mongod",
-                        "nodecellar",
-                        "host",
-                        "key",
-                        "nodejs"
+                    description: "The mist.io cloud",
+                    used_in: ["mongod", "nodecellar", "host", "key", "nodejs"
                     ],
                     errorMessage: "Please enter cloud id",
-                    ui_type: "text",
                     helptext: "You can choose cloud id is needed to...",                    
                     show: true,
-                    required: true
-                }, {
-                    name: "mongo_image_id",
-                    default: '',
+                    required: true,
+                    type: "dropdown",
+                    options: ["cloudsArray"]
+                },
+                {
+                    name: "cloud_image",
+                    default: "",
                     value: "",
-                    depends: "mongo_cloud_id",
-                    description: "The image id",
-                    type: "image_id",
-                    used_in: ["mongod",
-                        "nodecellar",
-                        "host",
-                        "key",
-                        "nodejs"
+                    description: "The cloud image",
+                    used_in: ["mongod", "nodecellar", "host", "key", "nodejs"
                     ],
-                    errorMessage: "Please enter mongo cloud id",
-                    ui_type: "text",
-                    helptext: "You can choose cloud for momngo to...",                    
-                    show: true,
-                    required: true
-                }, {
-                    name: "ip",
-                    used_in: ["host"],
-                    value: '',
-                    errorMessage: "Please enter an IP",
-                    ui_type: "text",
-                    helptext: "This the ip that will...",                    
-                    show: true,
-                    required: true
-                }, {
-                    name: "key_external_resource",
-                    default: false,
-                    description: "External resource for key",
-                    type: "use_external_resource",
-                    used_in: ["key"],
+                    errorMessage: "Please choose an image",
+                    helptext: "You can choose cloud id is needed to...",
+                    show: false,
+                    required: true,
+                    type: "dropdown",
+                    options: ["clouds","$.cloud", "imagesArray"],
+                    showIf: {
+                            fieldName: "cloud",
+                            fieldExists: true
+                        }
+                },
+                {
+                    name: "cloud_size",
+                    default: "",
                     value: "",
-                    errorMessage: "Please enter an IP",
-                    ui_type: "text",
-                    helptext: "This the ip that will...",                    
-                    show: true,
-                    required: true
+                    description: "The cloud size",
+                    used_in: ["mongod", "nodecellar", "host", "key", "nodejs"
+                    ],
+                    errorMessage: "Please choose an image",
+                    helptext: "You can choose cloud size according to your cloud",
+                    show: false,
+                    required: true,
+                    type: "dropdown",
+                    options: ["clouds","$.cloud", "sizesArray"],
+                    showIf: {
+                            fieldName: "cloud",
+                            fieldExists: true
+                        }
                 }],
                 workflows: [{
                     name: "configure",
