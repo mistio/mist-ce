@@ -1,7 +1,6 @@
 <link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
-<link rel="import" href="../element-action-menu/element-action-menu.html">
 <link rel="import" href="../app-image-icons/app-image-icons.html">
-<link rel="import" href="../tag-link/tag-link.html">
+
 <dom-module id="machine-list-item">
     <template>
         <style is="custom-style" include="tags-and-labels"></style>
@@ -38,10 +37,12 @@
             font-weight: 400;
             overflow: scroll;
             margin-right: 24px;
+            white-space: nowrap;
         }
 
         .field.tags {
             width: auto;
+            padding: 6px 0 0;
         }
 
         .id {
@@ -66,8 +67,8 @@
         <a href$="[[itemLink]]" is="pushstate-anchor" ondragstart="return false;" ondrop="return false;">
 
             <template is="dom-repeat" items="{{fields}}" as="field">
-              <a href$="[[itemLink]]" is="pushstate-anchor" ondragstart="return false;" ondrop="return false;">
-                <div class$="[[field]] field field[[index]]">{{itemField(item, field)}}</div>
+              <a href$="[[itemLink]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false">
+                <div class$="[[field]] field field[[index]] {{itemField(item, field)}}">{{itemField(item, field)}}</div>
               </a>
             </template>
             <div class="field tags" hidden$="[[!item.tags.length]]">
@@ -120,14 +121,41 @@ Polymer({
 
     itemField: function(item, field) {
         var ret = item[field];
-        if (ret && ret.title)
+
+        // return cloud title
+        if (field == 'cloud')
             return ret.title;
-        else if (!ret && item.extra && item.extra[field])
+
+        // field could be in the 'extra' section
+        if (!ret && item.extra && item.extra[field])
             return item.extra[field];
-        else if (!ret && item.extra && item.extra[field+'_id'])
+
+        // image info stored inside extra.image_id on ec2
+        if (!ret && item.extra && item.extra[field+'_id'])
             return item.extra[field+'_id'];
-        else
-            return ret;
+
+        // size info could be in all sorts of places
+        //  - Azure: extra.instance_size
+        //  - EC2: extra.instance_type
+        //  - Softlayer: extra.maxCpu / extra.maxMemory
+        //  - Linode: cloud.sizes[extra.PLANID]
+        //  - Nephoscale: extra.service_type
+        // TODO: complete the above list
+        // TODO: harmonize these on the backend
+
+        if (field == 'size') {
+            if (item.extra && item.extra.instance_type)
+                return item.extra.instance_type;
+            if (item.extra && item.extra.instance_size)
+                return item.extra.instance_size;
+            if (item.extra && item.extra.maxCpu && item.extra.maxMemory)
+                return item.extra.maxCpu + 'cpu, ' + item.extra.maxMemory + 'M ram';
+            if (item.extra && item.extra.PLANID)
+                return item.cloud.sizes[item.extra.PLANID];
+            if (item.extra && item.extra.service_type)
+                return item.extra.service_type;
+        }
+        return ret;
     },
     machineActions: function(item) {
         var actions = ['destroy'];
