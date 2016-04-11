@@ -94,6 +94,7 @@
 }
 
 #single-key-page .info-table td {
+    word-break: break-all;
 	margin: 0;
 	width: 50%;
 	font-size: 14px;
@@ -110,9 +111,6 @@
 }
 #single-key-page .info-table tr td:nth-child(2) {
     color: #7f7f7f;
-}
-#single-key-page .info-table .key-id {
-    word-break: break-all;
 }
 /* Conditional for < 500px */
 @media only screen and  (max-width: 500px) {

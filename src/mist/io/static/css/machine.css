@@ -126,6 +126,7 @@
 }
 
 #single-machine-page .info-table td {
+    word-break: break-all;
 	margin: 0;
 	width: 50%;
 	font-size: 14px;
