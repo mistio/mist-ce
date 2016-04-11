@@ -187,9 +187,8 @@ var app = Polymer({
                 user: "56b8beaae90e5b043ae75c98",
                 inputs: [{
                         name: "name",
-                        label: "Stack Name",
                         isLead: true,
-                        default: '',
+                        default: "",
                         value: "",
                         type: "text",
                         description: "Stack Name",
@@ -244,6 +243,17 @@ var app = Polymer({
                                 fieldName: "cloud",
                                 fieldExists: true
                             }
+                    },
+                    {
+                        name: "misc_input",
+                        default: "",
+                        value: "",
+                        description: "Some input",
+                        errorMessage: "Please fill in ",
+                        helptext: "You can choose cloud size according to your cloud",
+                        show: true,
+                        required: true,
+                        type: "text"
                     }
                 ],
                 workflows: [{

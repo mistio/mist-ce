@@ -40,36 +40,40 @@
                 </paper-toolbar>
                 <div id="content">
                     <paper-material class="page">
-                        <div class="grid-row">
-                            <paper-input class="xs12 m6" id="stackName" label="Stack Name" value="{{stack.name::input}}" required auto-validate error-message="The stack must have a name"></paper-input>
-                            <div class="field-helptext xs12 m6"></div>
-                            <hr class="xs12 hr-equal" />
+                        <div class="grid-row">                            
                             <template is="dom-repeat" items="{{fields}}" as="field">
-                                <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-                                    <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.name]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                                <template is="dom-if" if="[[field.isLead]]">
+                                    <paper-input class="xs12 m6" id="[[field.name]]" label="[[field.description]]" value="{{stack.name::input}}" required auto-validate error-message="[[field.errorMessage]]"></paper-input>
                                     <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                    <hr class="xs12 hr-equal" />
                                 </template>
-                                <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-                                    <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.name]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
-                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
-                                </template>
-                                <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
-                                    <paper-radio-group selected="{{field.value}}" class="xs12 m6">
-                                        <template is="dom-repeat" items="[[field.options]]" as="option">
-                                            <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
-                                        </template>
-                                    </paper-radio-group>
-                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
-                                </template>
-                                <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-                                    <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.name]]" horizontal-align="left">
-                                        <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                <template is="dom-if" if="[[!field.isLead]]">
+                                    <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
+                                        <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.name]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                    </template>
+                                    <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
+                                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.name]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
+                                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                    </template>
+                                    <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
+                                        <paper-radio-group selected="{{field.value}}" class="xs12 m6">
                                             <template is="dom-repeat" items="[[field.options]]" as="option">
-                                                <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                                <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
                                             </template>
-                                        </paper-menu>
-                                    </paper-dropdown-menu>
-                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                        </paper-radio-group>
+                                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                    </template>
+                                    <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
+                                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.name]]" horizontal-align="left">
+                                            <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                                <template is="dom-repeat" items="[[field.options]]" as="option">
+                                                    <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                                </template>
+                                            </paper-menu>
+                                        </paper-dropdown-menu>
+                                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                    </template>
                                 </template>
                             </template>
                             <paper-progress indeterminate value="800" min="100" max="1000" hidden$="[[!sendingData]]"></paper-progress>
@@ -158,7 +162,7 @@
                     }
                 },
                 observers: [
-                    '_fieldsChanged(fields.*, sendingData, stack.name)',
+                    '_fieldsChanged(fields.*, sendingData)',
                     '_updateTypedName(stack.name.*)',
                 ],
                 _fromTemplate: function(params){
@@ -223,15 +227,16 @@
                     }
 
                 },
-                _fieldsChanged: function(fields, sendingData, name) {
+                _fieldsChanged: function(fields, sendingData) {
                     this.async(function() {
                         var stack = this.stack,
                             show = true,
-                            dependency;
-                        var path = fields.path;
+                            dependency,
+                            path = fields.path;
 
-                        if (path.endsWith("value")){
-                            var valueChanged = this.get(path.replace("value", "name"))
+                        //todo: Stack name resets on fieldchange, it shouldn't
+                        if (path.endsWith("value")){                            
+                            var valueChanged = this.get(path.replace("value", "name"));
                             this._recomputeDependentFields(valueChanged);
                         }
                         fields.base.forEach(function(el, index) {                            
@@ -263,8 +268,6 @@
                         var valid = fields.base.every(function(el, index) {
                             return el.show && el.required ? el.value : true;
                         }, this);
-
-                        valid = valid && this.stack.name != "";
 
                         this.set('stack', stack);
 
@@ -318,7 +321,8 @@
                         input.invalid = false;
                     }
                 },
-                _recomputeDependentFields: function(name){
+                _recomputeDependentFields: function(changedFieldName){
+                    var name = changedFieldName;
                     this.fields.forEach(function(el, index) {                        
                         if (el.showIf && el.showIf.fieldName == name) {
                             this.set('fields.' + index + '.options', []);
