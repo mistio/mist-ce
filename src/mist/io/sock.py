@@ -1,4 +1,5 @@
-"""mist.io.socket
+"""mist.io.socket.
+
 
 Here we define the socketio Connection and handlers.
 
@@ -10,38 +11,32 @@ greenlet.
 
 import uuid
 import json
-import socket
 import random
 import traceback
 import datetime
-from time import time
 
 from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
-import tornado.iostream
-
-import requests
 
 try:
-    from mist.core.auth.methods import user_from_session_id
     from mist.core import config
     from mist.core.methods import get_stats
+    from mist.core.cloud.models import Cloud, Machine
+    from mist.core.keypair.models import Keypair
     multi_user = True
 except ImportError:
-    from mist.io.helpers import user_from_session_id
     from mist.io import config
     from mist.io.methods import get_stats
     multi_user = False
 
-from mist.io.helpers import amqp_subscribe_user
-from mist.io.methods import notify_user
-from mist.io.exceptions import MachineUnauthorizedError
+from mist.core.auth.methods import auth_context_from_session_id
+
 from mist.io.exceptions import BadRequestError
 from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
+from mist.core import methods as core_methods
 from mist.io import tasks
-from mist.io.shell import Shell
 from mist.io.hub.tornado_shell_client import ShellHubClient
 
 import logging
@@ -71,25 +66,15 @@ def get_conn_info(conn_info):
     return ip, user_agent, session_id
 
 
-def mist_conn_str(conn_dict):
-    parts = []
-    dt_last_rcv = datetime.datetime.fromtimestamp(conn_dict['last_rcv'])
-    conn_dict['last_rcv'] = dt_last_rcv
-    for key in ('name', 'last_rcv', 'user', 'ip', 'user_agent', 'closed',
-                'session_id'):
-        if key in conn_dict:
-            parts.append(conn_dict.pop(key))
-    parts.extend(conn_dict.values())
-    return ' - '.join(map(str, parts))
-
-
 class MistConnection(SockJSConnection):
     closed = False
 
     def on_open(self, conn_info):
         log.info("%s: Initializing", self.__class__.__name__)
         self.ip, self.user_agent, session_id = get_conn_info(conn_info)
-        self.user = user_from_session_id(session_id)
+        self.auth_context = auth_context_from_session_id(session_id)
+        self.user = self.auth_context.user
+        self.owner = self.auth_context.owner
         self.session_id = uuid.uuid4().hex
         CONNECTIONS.add(self)
 
@@ -119,7 +104,16 @@ class MistConnection(SockJSConnection):
         }
 
     def __repr__(self):
-        return mist_conn_str(self.get_dict())
+        conn_dict = self.get_dict()
+        parts = []
+        dt_last_rcv = datetime.datetime.fromtimestamp(conn_dict['last_rcv'])
+        conn_dict['last_rcv'] = dt_last_rcv
+        for key in ('name', 'last_rcv', 'user', 'ip', 'user_agent', 'closed',
+                    'session_id'):
+            if key in conn_dict:
+                parts.append(conn_dict.pop(key))
+        parts.extend(conn_dict.values())
+        return ' - '.join(map(str, parts))
 
 
 class ShellConnection(MistConnection):
@@ -139,7 +133,8 @@ class ShellConnection(MistConnection):
             'rows': data['rows'],
             'ip': self.ip,
             'user_agent': self.user_agent,
-            'email': self.user.email,
+            'owner_id': self.auth_context.owner.id,
+            'user_id': self.user.id,
             'provider': data.get('provider', '')
         }
         self.hub_client = ShellHubClient(worker_kwargs=self.ssh_info)
@@ -162,14 +157,13 @@ class ShellConnection(MistConnection):
         super(ShellConnection, self).on_close(stale=stale)
 
 
-class UserUpdatesConsumer(Consumer):
+class OwnerUpdatesConsumer(Consumer):
     def __init__(self, main_sockjs_conn,
                  amqp_url=config.BROKER_URL):
         self.sockjs_conn = main_sockjs_conn
-        email = self.sockjs_conn.user.email or 'noone'
-        super(UserUpdatesConsumer, self).__init__(
+        super(OwnerUpdatesConsumer, self).__init__(
             amqp_url=amqp_url,
-            exchange='mist-user_%s' % email.replace('@', ':'),
+            exchange='owner_%s' % self.sockjs_conn.owner.id,
             queue='mist-socket-%d' % random.randrange(2 ** 20),
             exchange_type='fanout',
             exchange_kwargs={'auto_delete': True},
@@ -177,7 +171,7 @@ class UserUpdatesConsumer(Consumer):
         )
 
     def on_message(self, unused_channel, basic_deliver, properties, body):
-        super(UserUpdatesConsumer, self).on_message(
+        super(OwnerUpdatesConsumer, self).on_message(
             unused_channel, basic_deliver, properties, body
         )
         self.sockjs_conn.process_update(
@@ -185,20 +179,22 @@ class UserUpdatesConsumer(Consumer):
         )
 
     def start_consuming(self):
-        super(UserUpdatesConsumer, self).start_consuming()
+        super(OwnerUpdatesConsumer, self).start_consuming()
         self.sockjs_conn.start()
 
 
 class MainConnection(MistConnection):
+
     def on_open(self, conn_info):
+        log.info("************** Open!")
         super(MainConnection, self).on_open(conn_info)
         self.running_machines = set()
         self.consumer = None
 
     def on_ready(self):
-        log.info("Ready to go!")
+        log.info("************** Ready to go!")
         if self.consumer is None:
-            self.consumer = UserUpdatesConsumer(self)
+            self.consumer = OwnerUpdatesConsumer(self)
             self.consumer.run()
         else:
             log.error("It seems we have received 'on_ready' more than once.")
@@ -209,22 +205,32 @@ class MainConnection(MistConnection):
         self.check_monitoring()
 
     def list_keys(self):
-        self.send('list_keys', methods.list_keys(self.user))
+        self.send('list_keys',
+                  core_methods.filter_list_keys(self.auth_context))
 
     def list_clouds(self):
-        clouds = methods.list_clouds(self.user)
-        self.send('list_clouds', clouds)
+        self.send('list_clouds',
+                  core_methods.filter_list_clouds(self.auth_context))
+        clouds = Cloud.objects(owner=self.owner, enabled=True)
+        log.info(clouds)
         for key, task in (('list_machines', tasks.ListMachines()),
                           ('list_images', tasks.ListImages()),
                           ('list_sizes', tasks.ListSizes()),
                           ('list_networks', tasks.ListNetworks()),
-                          ('list_locations', tasks.ListLocations()), ('list_projects', tasks.ListProjects()),):
-            for cloud_id in self.user.clouds:
-                if self.user.clouds[cloud_id].enabled:
-                    cached = task.smart_delay(self.user.email, cloud_id)
-                    if cached is not None:
-                        log.info("Emitting %s from cache", key)
-                        self.send(key, cached)
+                          ('list_locations', tasks.ListLocations()),
+                          ('list_projects', tasks.ListProjects()),):
+
+            for cloud in clouds:
+                cached = task.smart_delay(self.owner.id, cloud.id)
+                if cached is not None:
+                    log.info("Emitting %s from cache", key)
+                    if key == 'list_machines':
+                        cached['machines'] = core_methods.filter_list_machines(
+                            self.auth_context, **cached
+                        )
+                        if cached['machines'] is None:
+                            continue
+                    self.send(key, cached)
 
     def check_monitoring(self):
         try:
@@ -233,7 +239,7 @@ class MainConnection(MistConnection):
         except ImportError:
             func = methods.check_monitoring
         try:
-            self.send('monitoring', func(self.user))
+            self.send('monitoring', func(self.owner))
         except Exception as exc:
             log.warning("Check monitoring failed with: %r", exc)
 
@@ -241,7 +247,7 @@ class MainConnection(MistConnection):
                  metrics):
         error = False
         try:
-            data = get_stats(self.user, cloud_id, machine_id,
+            data = get_stats(self.owner, cloud_id, machine_id,
                              start, stop, step)
         except BadRequestError as exc:
             error = str(exc)
@@ -272,23 +278,22 @@ class MainConnection(MistConnection):
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
                                'list_networks', 'list_machines',
                                'list_locations', 'list_projects', 'ping']):
-            self.send(routing_key, result)
-            if routing_key == 'probe':
-                log.warn('send probe')
-
-            if routing_key == 'list_networks':
-                cloud_id = result['cloud_id']
-                log.warn('Got networks from %s',
-                         self.user.clouds[cloud_id].title)
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
                 machines = result['machines']
                 cloud_id = result['cloud_id']
+                filtered_machines = core_methods.filter_list_machines(
+                    self.auth_context, cloud_id, machines
+                )
+                if filtered_machines is not None:
+                    self.send(routing_key, {'cloud_id': cloud_id,
+                                            'machines': filtered_machines})
                 # update cloud machine count in multi-user setups
+                cloud = Cloud.objects.get(owner=self.owner, id=cloud_id)
                 try:
-                    mcount = self.user.clouds[cloud_id].machine_count
+                    mcount = Machine.objects(cloud=cloud).count()
                     if multi_user and len(machines) != mcount:
-                        tasks.update_machine_count.delay(self.user.email,
+                        tasks.update_machine_count.delay(self.owner.id,
                                                          cloud_id,
                                                          len(machines))
                 except Exception as exc:
@@ -313,29 +318,27 @@ class MainConnection(MistConnection):
                         continue
 
                     has_key = False
-                    for k in self.user.keypairs.values():
-                        for m in k.machines:
-                            if m[:2] == [cloud_id, machine['id']]:
-                                has_key = True
-                                break
-                        if has_key:
-                            break
-
-                    if has_key:
+                    keypairs = Keypair.objects(owner=self.owner)
+                    machine_obj = Machine.objects(cloud=cloud,
+                                          machine_id=machine["id"],
+                                          key_associations__not__size=0).first()
+                    if machine_obj:
                         cached = tasks.ProbeSSH().smart_delay(
-                            self.user.email, cloud_id, machine['id'], ips[0]
+                            self.owner.id, cloud_id, machine['id'], ips[0]
                         )
                         if cached is not None:
                             self.send('probe', cached)
 
                     cached = tasks.Ping().smart_delay(
-                        self.user.email, cloud_id, machine['id'], ips[0]
+                        self.owner.id, cloud_id, machine['id'], ips[0]
                     )
                     if cached is not None:
                         self.send('ping', cached)
+            else:
+                self.send(routing_key, result)
 
         elif routing_key == 'update':
-            self.user.refresh()
+            self.owner.reload()
             sections = result
             if 'clouds' in sections:
                 self.list_clouds()

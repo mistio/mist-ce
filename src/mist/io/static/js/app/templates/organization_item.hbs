@@ -1,0 +1,11 @@
+{{#unless orgActive}}
+    {{#if organization.id}}
+        <a href="/switch_context/{{organization.id}}" class="ui-btn ui-btn-icon-left ui-mini icon-teams">{{organization.name}}</a>
+    {{else}}
+        <a href="/switch_context" class="ui-btn ui-btn-icon-left ui-mini icon-team">{{organization.name}}</a>
+    {{/if}}
+{{/unless}}
+
+{{#if orgActive}}
+    <a href="#" class="ui-btn ui-btn-icon-left ui-mini {{if organization.id 'icon-teams' 'icon-team'}}">{{organization.name}}</a>
+{{/if}}

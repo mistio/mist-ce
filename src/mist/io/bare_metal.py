@@ -42,8 +42,8 @@ class BareMetalDriver(object):
         return ('<BareMetalDriver>')
 
     def list_nodes(self):
-        nodes = [self._to_node(machine_id, machine)
-                 for machine_id, machine in self.machines.items()]
+        nodes = [self._to_node(machine.machine_id, machine)
+                 for machine in self.machines]
         return nodes
 
     def list_sizes(self):
@@ -68,7 +68,8 @@ class BareMetalDriver(object):
         extra = {}
         if hasattr(machine, 'os_type') and machine.os_type:
             extra['os_type'] = machine.os_type
-            if machine.os_type == 'windows' and hasattr(machine, 'remote_desktop_port'):
+            if machine.os_type == 'windows' and hasattr(machine,
+                                                        'remote_desktop_port'):
                 extra['remote_desktop_port'] = machine.remote_desktop_port
 
         node = Node(id=machine_id, name=machine.name, state=state,

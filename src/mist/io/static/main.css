@@ -38,7 +38,11 @@
 @import url("css/script.css");
 @import url("css/script_list.css");
 @import url("css/script_add.css");
+@import url("css/team_list.css");
+@import url("css/team.css");
+@import url("css/team_add.css");
 @import url("css/modals.css");
+@import url("css/member_list.css");
 
 
 .ui-content, .header-grid {
@@ -612,32 +616,37 @@ textarea {
 @media only screen and  (max-width: 600px) {
     #create-machine.ui-collapsible-collapsed,
     #add-script.ui-collapsible-collapsed,
-    #create-network.ui-collapsible-collapsed {
+    #create-network.ui-collapsible-collapsed,
+    #add-team.ui-collapsible-collapsed {
         width: initial !important;
     }
 
     #create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading,
     #add-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading,
-    #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading {
+    #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading,
+    #add-team.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading {
         width: 63px;
         height: 63px;
     }
 
     #create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle,
     #add-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle,
-    #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle {
+    #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle,
+    #add-team.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .ui-collapsible-heading-toggle {
         padding: 0 !important;
     }
 
     #create-machine.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title,
     #add-script.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title,
-    #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title {
+    #create-network.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title,
+    #add-team.floating-collapsible.ui-collapsible-collapsed > h4.ui-collapsible-heading .title {
         display: none;
     }
     #machine-list-page .ui-filterable .ui-input-search,
     #script-list-page .ui-filterable .ui-input-search,
     #network-list-page .ui-filterable .ui-input-search,
-    #key-list-page .ui-filterable .ui-input-search {
+    #key-list-page .ui-filterable .ui-input-search,
+    #team-list-page .ui-filterable .ui-input-search {
         margin-right: 85px !important;
     }
 }
@@ -669,6 +678,8 @@ textarea {
 #machine-list-page .ui-filterable,
 #key-list-page .ui-filterable,
 #script-list-page .ui-filterable,
+#team-list-page .ui-filterable,
+#single-team-page .ui-filterable,
 #network-list-page .ui-filterable {
     position: relative;
     top: -59px;
@@ -685,6 +696,8 @@ textarea {
     #machine-list-page .ui-filterable,
     #key-list-page .ui-filterable,
     #script-list-page .ui-filterable,
+    #team-list-page .ui-filterable,
+    #single-team-page .ui-filterable,
     #network-list-page .ui-filterable  {
         margin-left: 50px !important;
         margin-right: 50px !important;
@@ -694,6 +707,8 @@ textarea {
 #machine-list-page .ui-filterable .ui-input-search,
 #key-list-page .ui-filterable .ui-input-search,
 #script-list-page .ui-filterable .ui-input-search,
+#team-list-page .ui-filterable .ui-input-search,
+#single-team-page .ui-filterable .ui-input-search,
 #network-list-page .ui-filterable .ui-input-search {
     margin-left: 55px;
 }
@@ -705,6 +720,8 @@ textarea {
 #key-list-page .ui-filterable .ui-input-search,
 #image-list-page .ui-filterable .ui-input-search,
 #script-list-page .ui-filterable .ui-input-search,
+#team-list-page .ui-filterable .ui-input-search,
+#single-team-page .ui-filterable .ui-input-search,
 #network-list-page .ui-filterable .ui-input-search {
     background-color: #fff;
     border-color: #b5b5b5;
@@ -719,6 +736,8 @@ textarea {
 #key-list-page .ui-filterable input,
 #network-list-page .ui-filterable input,
 #image-list-page .ui-filterable input,
+#team-list-page .ui-filterable input,
+#single-team-page .ui-filterable input,
 #script-list-page .ui-filterable input {
     min-height: 35px;
     position: relative;
@@ -728,6 +747,8 @@ textarea {
 #machine-list-page .machines-header,
 #image-list-page .images-header,
 #script-list-page .scripts-header,
+#team-list-page .teams-header,
+#single-team-page .members-header,
 #key-list-page .keys-header,
 #network-list-page .networks-header {
     background-color: #d4d4d4;
@@ -743,6 +764,8 @@ textarea {
 #machine-list-page .machines-header:after,
 #key-list-page .keys-header:after,
 #script-list-page .scripts-header:after,
+#team-list-page .teams-header:after,
+#single-team-page .members-header:after,
 #network-list-page .networks-header:after {
     content: '';
     clear: both;
@@ -1203,6 +1226,17 @@ ul.checkbox-list .ui-grid-b {
     text-transform: uppercase;
 }
 
+.org-name,
+.org-team-name {
+    font-weight: 400;
+    font-size: 11px;
+    opacity: 0.54;
+    text-transform: uppercase;
+}
+#me-btn .owner.org {
+    margin-top: 17px;
+}
+
 @media only screen and (max-width: 600px) {
     #me-btn .owner {
         display: none;
@@ -1241,6 +1275,10 @@ ul.checkbox-list .ui-grid-b {
     height: 36px;
 }
 
+#user-menu-popup {
+    max-width: 200px;
+}
+
 #user-menu-popup #user-email {
     text-align: center;
     margin: .5em 0 1em;
@@ -1248,6 +1286,25 @@ ul.checkbox-list .ui-grid-b {
 
 #user-menu-popup .ui-btn-icon-left {
     padding-left: 3.4em !important;
+}
+.orgs-list {
+    border-bottom: 1px solid #d4d4d4;
+}
+#add-org {
+    border-top: 1px solid #d4d4d4;
+    padding: 10px 10px 8px;
+}
+#add-org .ui-btn {
+    text-align: center;
+}
+.ui-popup ul.ui-listview li.organization-item.org-active a,
+.ui-popup ul.ui-listview li.organization-item.org-active a:after {
+    color: #009688;
+}
+.ui-popup ul.ui-listview li.organization-item.org-active a:hover,
+.ui-popup ul.ui-listview li.organization-item.org-active a:hover:after {
+    background-color: #009688 !important;
+    color: #fff;
 }
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {

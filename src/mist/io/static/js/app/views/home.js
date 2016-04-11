@@ -20,14 +20,24 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                 return !Mist.openIncidents && Mist.isCore;
             }),
 
-            hasIncidents: function () {
+            hasIncidents: Ember.computed('Mist.openIncidents', function () {
                 if (Mist.openIncidents)
                     return !!Mist.openIncidents.length;
-            }.property('Mist.openIncidents'),
+            }),
 
-            machineCount: function () {
+            machineCount: Ember.computed('Mist.cloudsController.machineCount', function () {
                 return Mist.cloudsController.machineCount;
-            }.property('Mist.cloudsController.machineCount'),
+            }),
+
+            isOrgOwner: Ember.computed('Mist.organization.id', 'Mist.teamsController.model', function() {
+                if (!!Mist.organization.id) {
+                    return Mist.teamsController.model.some(function(team) {
+                        return team.name.toLowerCase() == 'owners';
+                    });
+                }
+
+                return false;
+            }),
 
             //
             //  Initialization

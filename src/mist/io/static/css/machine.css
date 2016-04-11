@@ -4,6 +4,10 @@
 	overflow: hidden;
 }
 
+#single-machine-page .ui-content {
+    background-color: transparent;
+}
+
 #single-machine-page {
 	padding-bottom: 50px;
 }
@@ -122,6 +126,7 @@
 }
 
 #single-machine-page .info-table td {
+    word-break: break-all;
 	margin: 0;
 	width: 50%;
 	font-size: 14px;
