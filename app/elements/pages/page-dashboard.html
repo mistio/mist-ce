@@ -8,7 +8,6 @@
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <dom-module id="page-dashboard">
     <template>
@@ -187,9 +186,6 @@
                 display: block;
                 max-width: 1100px;
             }
-            paper-toolbar::content #topBar {
-                max-width: 1100px;
-            }
         }
         @media (min-width: 1900px) {
             paper-toolbar::content #topBar {
@@ -218,9 +214,8 @@
             <paper-toolbar class="paper-header">
                 <app-logo white class="flex"></app-logo>
                 <app-bar class="horizontal layout center end-justified" no-search>
-                    <a href="/elements">View all elements</a>
                 </app-bar>
-                <app-user-menu email="marios@mist.io"></app-user-menu>
+                <app-user-menu email="[[model.email]]"></app-user-menu>
             </paper-toolbar>
             <div class="content flex-horizontal-wide">
                 <div class="clouds flexchild-wide-top">
@@ -247,7 +242,7 @@
                     <app-incidents hidden$="[[onbstate]]" id="right" class="flex2child incidents top right">
                     </app-incidents>
                     <div id="left" class="flex3child top left">
-                        <div class="sections layout horizontal wrap">                            
+                        <div class="sections layout horizontal wrap">
                             <a href="/machines" class="main-section flex" is="pushstate-anchor">
                                 <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
                                 </section-tile>

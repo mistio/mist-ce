@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
+
+<link rel="import" href="../app-sidebar/app-sidebar.html">
 <link rel="import" href="../item-list/item-list.html">
 <link rel="import" href="../item-cards/item-cards.html">
 <dom-module id="page-items">
@@ -25,6 +27,8 @@
         .paper-header {
             @apply(--layout-horizontal);
             @apply(--layout-center);
+            margin-right: 0;
+            padding-right: 0;
         }
 
         .paper-header h2 {
@@ -82,10 +86,6 @@
             display: none;
         }
 
-        [size=xs] app-sidebar paper-toolbar /deep/ #topBar {
-            padding: 0 16px;
-        }
-
         [size=xs] app-sidebar {
             min-width: 100%;
             height: auto;
@@ -138,24 +138,24 @@
         }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
-            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
+            <app-sidebar model="[[model]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
             <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
                 <div class="paper-header">
                     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-                    <h2 class="flex">[[_filteredItems.length]] [[pageTitle]]</h2>
-                    <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
-                    <paper-icon-button class="toggleViewButton" icon="[[viewIcon]]" on-tap="toggleView" hidden$="[[_forceCards]]"></paper-icon-button>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <h2 class="flex" on-tap="toggleSearch">[[filteredItems.length]] [[pageTitle]]</h2>
+                    <app-bar class="horizontal layout center end-justified" showingSearch="{{showingSearch}}" query="{{q}}"></app-bar>
+                    <paper-icon-button class="toggleViewButton" icon="[[viewIcon]]" on-tap="toggleView"></paper-icon-button>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                 </div>
                 <div id="content">
                     <div id="section-heading" hidden$="[[!section]]">
                         <div class="description">[[section.description]]</div>
                     </div>
                     <template is="dom-if" if="[[_stampCards(view)]]">
-                        <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[_filteredItems]]"></item-cards>
+                        <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>
                     </template>
                     <template is="dom-if" if="[[_stampTable(view)]]">
-                        <item-list sections="[[sections]]" section="[[section]]" items="[[_filteredItems]]" on-tag-selected="updateTag"></item-list>
+                        <item-list sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-list>
                     </template>
                 </div>
             </paper-header-panel>
@@ -170,168 +170,57 @@
     var _lastNavigated = null;
     Polymer({
         is: 'page-items',
+
         enableCustomStyleProperties: true,
+
         properties: {
-            router: Object,
-            pageTitle: {
-                type: String
-            },
+            model: Object,
+            sections: Object,
+            section: Object,
+            pageTitle: String,
 
-            // Query Parameters
-            q: {
-                type: String,
-                notify: true,
-                value: '',
-                observer: '_qChanged'
-            },
-            tag: {
-                type: String,
-                notify: true,
-                value: ''
-            },
             view: {
-                type: String,
-                notify: true
+                type: String, // list or cards
+                value: 'table'
             },
-
-            tagList: {
-                type: Array,
-                computed: 'arrayParam(tag)',
-                value: function() {
-                    return [];
-                }
-            },
-
             viewIcon: {
                 type: String,
-                computed: 'computeViewIcon(view)',
-                value: 'view-module'
+                computed: 'computeViewIcon(view)'
             },
-            sections: Object,
-            section: {
-                type: Object,
-                notify: true,
-                value: {}
-            },
-            items: Array,
 
-            _filteredItems: Array,
-            _itemCount: Number,
-            _forceCards: {
-                type: Boolean
+            items: Array,
+            sortBy: {
+                type: String
             },
+            sortOrder: {
+                type: Number,
+                value: 1 // Descending order
+            },
+            sortedItems: {
+                type: Array,
+            },
+            filteredItems: {
+                type: Array
+            },
+            q: { // search query
+                type: String,
+                value: '',
+                observer: '_qChanged'
+            }
         },
+
         observers: [
-            'updateURL(q, section, tag, view, items)',
-            'updateMeta(section)',
+            'sortingObserver(items.*, sortBy, sortOrder)',
             'scrollToTop(section)'
         ],
-        listeners: {
-            'update-params': '_handleParamsUpdate'
-        },
+
         ready: function() {
-            this.view = this._forceCards ? 'cards' : 'table';
-        },
-        filter: function(item) {
-            if (this.q && this.q.length && item.name.indexOf(this.q) < 0) {
-                return false;
-            }
-
-            if (this.tagList.length) {
-                var match = false;
-                for (var i = 0; i < this.tagList.length; i++) {
-                    if (item.tags.join(' ').indexOf(this.tagList[i]) >= 0) match = true;
-                }
-                if (!match) return false;
-            }
-
-            return true;
+            if (this.section.id == 'machines')
+                this.set('sortBy', 'state');
+            else if (this.section.id == 'images')
+                this.set('sortBy', 'cloud');
         },
 
-        updateTag: function(e, detail) {
-            e.stopPropagation();
-            e.preventDefault();
-            var newTag = detail.name;
-            var t = this.tagList.slice(0);
-            if (t.indexOf(newTag) < 0) t.push(newTag);
-            this.tag = t.join(',');
-        },
-        clearTag: function() {
-            this.tag = null;
-        },
-        updateSection: function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            var newPkg = e.currentTarget.name;
-            var p = this.sections.slice(0);
-            if (p.indexOf(newPkg) < 0) p.push(newPkg);
-            this.section = p.join(',');
-        },
-        clearSection: function() {
-            this.section = null;
-        },
-        toggleSections: function() {
-            if (this.section) {
-                this.prevSection = this.section;
-                this.clearSection();
-            } else {
-                this.section = this.prevSection;
-            }
-        },
-        _parseQueryString: function() {
-            var query = window.location.search.substring(1);
-            var params = query.split('&');
-            var results = [];
-            for (var i = 0; i < params.length; i++) {
-                var pair = params[i].split('=');
-                results[pair[0]] = pair[1];
-            }
-            return results;
-        },
-        _buildQueryString: function() {
-            var out = [];
-            if (this.q && this.q.length) out.push("q=" + this.q);
-            if (this.tag && this.tag.length) out.push("tag=" + this.tag);
-            if (this.section && this.section.id && this.section.id.length) out.push("section=" + this.section.id);
-            if (this.view !== 'table') out.push("view=" + this.view);
-
-            return out.join("&");
-        },
-        _handleParamsUpdate: function(_, params) {
-            for (var key in params) {
-                this[key] = params[key];
-            }
-        },
-        _sectionLink: function(name) {
-            return '/' + name;
-        },
-        _qChanged: function(q) {
-            if (q) {
-                this.async(function() {
-                    //this.$.query refers to another templates #query and so throws error on focus
-                    this.$.query.focus();
-                    // make sure to force the cursor to the end of the
-                    // input. Only an issue in Firefox.
-                    this.$.query.setSelectionRange(q.length, q.length);
-                });
-            }
-        },
-        updateURL: function(q, section, tag, view, items) {
-            var qs = this._buildQueryString();
-            if (qs !== _lastNavigated && this.router) {
-                _lastNavigated = qs;
-                this.router.go(section.id + (qs.length ? '?' + qs : ''), {
-                    replace: true
-                });
-            }
-            this.updateMeta(section);
-
-            if (items) {
-                this._filteredItems = items.filter(this.filter.bind(this));
-                this._itemCount = this._filteredItems.length;
-            }
-            this.scrollToTop();
-        },
         updateMeta: function(section) {
             if (this.q && this.q.length) {
                 var t = "'" + this.q + "' ";
@@ -339,13 +228,12 @@
                 this.pageTitle = t;
             } else if (section && section.id) {
                 this.pageTitle = section.id;
-            } else if (this.tagList.length) {
-                this.pageTitle = section.id + "s Tagged '" + this.tagList.join("' or '") + "'";
             } else {
                 this.pageTitle = "All";
             }
             this.$.drawerPanel.closeDrawer();
         },
+
         toggleView: function() {
             if (this.view === 'table') {
                 this.view = 'cards';
@@ -353,6 +241,7 @@
                 this.view = 'table';
             }
         },
+
         computeViewIcon: function(view) {
             if (view === 'table') {
                 return 'view-module';
@@ -360,38 +249,79 @@
                 return 'view-list';
             }
         },
-        arrayParam: function(param) {
-            if (!param || !param.length) {
-                return [];
-            }
-            return param.toString().split(',');
-        },
-        cartOpen: function(e) {
-            this.fire('cart-open');
-        },
-        onSearch: function(e) {
-            // when a user clicks on the (x) button we need to be sure to
-            // clear the query
-            this.q = this.$.query.value;
-        },
-        scrollToTop: function() {
-            this.$.container.scroller.scrollTop = 0;
-        },
-        _stampCards: function(view) {
-            return view === 'cards';
-        },
-        _stampTable: function(view) {
-            return view === 'table';
-        },
+
         closeDrawer: function() {
             this.$.drawerPanel.closeDrawer();
         },
+
+        scrollToTop: function() {
+            this.$.container.scroller.scrollTop = 0;
+        },
+
+
+        toggleSearch: function (e) {
+            this.querySelector('app-bar').toggleSearch(e);
+        },
+
+        filterItems: function(items, q) {
+            return this.sortedItems.filter(this.filterItem.bind(this));
+        },
+
+        filterItem: function(item, index) {
+            var q = this.q, queryTerms = this.q.split(' ');
+
+            // Check if all terms exist in stringified item
+            for (var i=0; i<queryTerms.length; i++) {
+                if (queryTerms[i] && queryTerms[i].length &&
+                    JSON.stringify(item).indexOf(queryTerms[i]) < 0) {
+                        return false;
+                    }
+            }
+            return true;
+        },
+
+        sortingObserver: function(items, sortBy, sortOrder, q) {
+            this.set('sortedItems', items.base.sort(this._computeSort(this.sortBy, this.sortOrder)));
+            if (this.sortedItems.length != this.items.length)
+                this.set('sortedItems', this.items);
+            this.set('filteredItems', this.filterItems());
+        },
+
+        _computeSort: function(property, order) {
+            return function(a, b) {
+                if (a[property] === b[property]) {
+                    return 0;
+                }
+                return (order * (a[property] > b[property] ? 1 : -1));
+            };
+        },
+
+        _sectionLink: function(name) {
+            return '/' + name;
+        },
+
+        _qChanged: function(q) {
+            this.async(function() {
+              this.updateMeta(this.section);
+            });
+        },
+
+        _stampCards: function(view) {
+            return view === 'cards';
+        },
+
+        _stampTable: function(view) {
+            return view === 'table';
+        },
+
         _actualView: function(view, force) {
             return force ? 'cards' : view;
         },
+
         _isEqual: function(a, b) {
             return a === b;
         },
+
         _getColor: function() {
             return this.section && this.section.color ? this.section.color : '';
         },

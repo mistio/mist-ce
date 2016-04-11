@@ -1,0 +1,63 @@
+<link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-behavior.html">
+<link rel="import" href="../../bower_components/paper-dialog-behavior/paper-dialog-shared-styles.html">
+
+<dom-module id="item-actions">
+    <template>
+        <style include="paper-dialog-shared-styles"></style>
+        <style>
+            paper-button {width: 100%; text-align: left;}
+            paper-item {padding: 0; margin: 0}
+        </style>
+        <content>
+          <paper-listbox class="dropdown-content">
+            <template is="dom-repeat" items="[[actions]]">
+                <paper-item><paper-button><iron-icon icon="[[item.icon]]"></iron-icon> [[item.name]]</paper-button></paper-item>
+            </template>
+          </paper-listbox>
+        </content>
+    </template>
+</dom-module>
+
+<script>
+
+Polymer({
+    is: 'item-actions',
+
+    properties: {
+        actions: Array,
+        selectedAction: String,
+        item: Object,
+        items: Array
+    },
+
+    behaviors: [
+      Polymer.PaperDialogBehavior
+    ],
+
+    ready: function () {
+    },
+
+    show: function (x, y) {
+        if (this.selectedAction && this.item) {
+            // TODO: we already know the acion and a single item, so let's just
+            // display a confirmation dialog and then perform the action
+        } else if (this.selectedAction && this.items) {
+            // TODO: we know the action and a list of items so we need to
+            // display one or more dialogs and get done with it
+        } else if (this.item && this.actions) {
+            // TODO: display action select menu, then confirmation dialog
+        }
+
+        // ugly hack that displays dialog only after it is correctly positioned
+        var that = this;
+        that.set('hidden', true);
+        that.open();
+        setTimeout(function() {
+            that.set('style.top', (y-50) + 'px');
+            that.set('style.left', (x-120) + 'px');
+            that.set('hidden', false);
+        }, 25);
+
+    }
+});
+</script>

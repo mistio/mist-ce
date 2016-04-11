@@ -1,11 +1,20 @@
 <link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
+<link rel="import" href="../../bower_components/vaadin-icons/vaadin-icons.html">
+
 <link rel="import" href="../app-image-icons/app-image-icons.html">
+
 <link rel="import" href="../tag-link/tag-link.html">
+
 <link rel="import" href="machine-list-item.html">
 <link rel="import" href="image-list-item.html">
 <link rel="import" href="key-list-item.html">
 <link rel="import" href="network-list-item.html">
+
+<link rel="import" href="item-actions.html">
+
 <dom-module id="item-list">
     <template>
         <style>
@@ -24,12 +33,61 @@
             opacity: 0;
         }
 
+        .header iron-icon {
+            fill: #fff;
+        }
+
+        iron-list {
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        paper-button {
+            padding: 0 0 0 1em;
+        }
+
+        paper-button.more {
+            margin-right: 0px;
+            right: 0;
+        }
+
+        .row paper-button.more {
+            position: absolute;
+            top: 0;
+            right: 0px;
+            padding: 27px 0;
+        }
+
+        .row paper-button.more iron-icon {
+            float: right;
+            margin-right: 12px;
+        }
+
+        paper-button > span {
+            padding: 0 1em;
+        }
+
+        app-check {
+            margin-right: 24px;
+            margin-top: 6px;
+        }
+
+        div.actions {
+            width: 100%;
+            float: right;
+            text-align: right;
+        }
+
         .header {
             padding: 0 24px;
             line-height: 56px;
             font-size: 12px;
             font-weight: 500;
             border-bottom: 1px solid #e5e5e5;
+        }
+
+        .header > .item-list {
+            text-transform: capitalize;
         }
 
         .check-all {
@@ -40,10 +98,6 @@
         ::content .check-all iron-icon {
             color: white;
             opacity: 0.5;
-        }
-
-        :host([narrow-viewport]) .header >:not(.name):not(.check-all) {
-            display: none;
         }
 
         :host(:not([narrow-viewport])) .header,
@@ -76,30 +130,26 @@
             background-color: #fafafa;
         }
 
+        .row:nth-child(2n) {
+            background-color: #fff;
+        }
+
         .row.hover, .row:nth-child(2n+1).hover {
             background: #eee;
         }
-        /* for when inline actions come in */
 
-        :host(:not([narrow-viewport])) .row.hover >:last-child {
-            /*padding-right: 120px;*/
+        .field.desc, .field.asc {
+            font-weight: 600;
         }
 
-        .name {
-            width: 250px;
+        .field.field0 {
+            min-width: 250px;
             font-weight: 500;
         }
 
-        .id,
-        .provider,
-        .tags,
-        .type {
-            width: 250px;
-        }
-
-        .is-default,
-        .state {
-            width: 100px;
+        .field {
+            min-width: 150px;
+            margin-right: 24px;
         }
 
         .tag {
@@ -114,24 +164,20 @@
             font-style: italic;
             padding: 15px 24px;
         }
-        /* hide for wide */
 
-        .name .narrow {
+        /* hide for wide */
+        .header > .narrow {
             display: none;
         }
-        /* show for narrow */
 
-        :host([narrow-viewport]) .name .narrow {
-            display: inline;
+        /* show for narrow */
+        :host([narrow-viewport]) .header > div.field,
+        :host([narrow-viewport]) .header span {
+            display: none;
         }
 
-        :host([medium-viewport]) .name,
-        :host([medium-viewport]) .type,
-        :host([medium-viewport]) .provider,
-        :host([medium-viewport]) .id,
-        :host([medium-viewport]) .state,
-        :host([medium-viewport]) .tags {
-            width: 100px;
+        :host([narrow-viewport]) .header > .narrow {
+            display: inline !important;
         }
 
         :host(:not([narrow-viewport])) .row .description {
@@ -140,129 +186,119 @@
             text-overflow: ellipsis;
         }
 
-        .iron-list {
-            /*position: relative;
-            height: 100vh;
-            overflow: auto;*/
-        }
         </style>
-        <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
+
+        <iron-media-query query="(min-width: 1700px)" query-matches="{{xxwideViewport}}"></iron-media-query>
+        <iron-media-query query="(min-width: 1550px)" query-matches="{{xwideViewport}}"></iron-media-query>
+        <iron-media-query query="(min-width: 1400px)" query-matches="{{wideViewport}}"></iron-media-query>
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
-        <div class="header" style$="[[_getHeaderStyle(section.color)]]">
+        <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
+        <div class="header" style$="[[_getHeaderStyle(section.color, selectedItems.length)]]">
             <app-check class="check-all" selected="[[allselected]]" on-tap="_onSelectAll">
-                <iron-icon icon="check"></iron-icon>
+                <template is="dom-if" if="{{!selectedItems.length}}">
+                    <iron-icon icon="check"></iron-icon>
+                </template>
+                <template is="dom-if" if="[[selectedItems.length]]">
+                    <strong>[[selectedItems.length]]</strong>
+                </template>
             </app-check>
-            <template is="dom-if" if="[[ismachines]]">
-                <div class="name">Name <span class="narrow">/ ID / Provider / State / Tags</span></div>
-                <div class="id">Machine ID</div>
-                <div class="provider">Provider</div>
-                <div class="state">State</div>
-                <div class="tags">Tags</div>
+
+            <template is="dom-if" if="[[!selectedItems.length]]">
+              <template is="dom-repeat" items="[[fields]]">
+                  <div class$="{{item}} field field[[index]] {{_isSortedBy(item, sortBy, sortOrder)}}" on-tap="_changeSortOrder">
+                      [[item]]
+                  </div>
+              </template>
+              <div class="field tags">tags</div>
+
+              <span class="narrow">Sort&nbsp;by:&nbsp;[[sortBy]]&nbsp;[[_isSortedBy(sortBy, sortBy, sortOrder)]]</span>
             </template>
-            <template is="dom-if" if="[[isimages]]">
-                <div class="name">Name <span class="narrow">/ ID / Description</span></div>
-                <div class="id">Image ID</div>
-                <div class="description">Description</div>
-            </template>
-            <template is="dom-if" if="[[iskeys]]">
-                <div class="name">Name <span class="narrow">/ Default</span></div>
-                <div class="is-default">Default? </div>
-            </template>
-            <template is="dom-if" if="[[isnetworks]]">
-                <div class="name">Name <span class="narrow">/ Type / Provider</span></div>
-                <div class="type">Type </div>
-                <div class="provider">Provider </div>
-            </template>
-            <template is="dom-if" if="[[isscripts]]">
-                <div class="name">Name <span class="narrow">/ Description</span></div>
-                <div class="description">Description </div>
-            </template>
+
+            <div class="actions">
+              <template is="dom-if" if="[[selectedItems.length]]">
+                <template is="dom-repeat" items="{{topActions}}">
+                    <paper-button><iron-icon icon="[[item.icon]]"></iron-icon> <span>[[item.name]]</span></paper-button>
+                </template>
+              </template>
+              <template is="dom-if" if="[[moreActions.length]]">
+                <paper-button class="more"><iron-icon icon="more-vert"></iron-icon></paper-button>
+              </template>
+            </div>
         </div>
         <div class="row no-data" hidden$="[[items.length]]">
             no data yet
         </div>
-        <template is="dom-if" if="[[ismachines]]">
-            <iron-list items="[[items]]" as="item" selection-enabled multi-selection selected-items="[[selectedItems]]" style$="[[vpHeight]]">
-                <template>
-                    <div class="row" data-index$="[[index]]">
-                        <machine-list-item section="[[section]]" item="[[item]]"></machine-list-item>
-                    </div>
-                </template>
-            </iron-list>
-        </template>
-        <template is="dom-if" if="[[isimages]]">
-            <iron-list items="[[items]]" as="item" selection-enabled multi-selection selected-items="[[selectedItems]]" style$="[[vpHeight]]">
-                <template>
-                    <div class="row" data-index$="[[index]]">
-                        <image-list-item section="[[section]]" item="[[item]]"></image-list-item>
-                    </div>
-                </template>
-            </iron-list>
-        </template>
-        <template is="dom-if" if="[[iskeys]]">
-            <iron-list items="[[items]]" as="item" selection-enabled multi-selection selected-items="[[selectedItems]]" style$="[[vpHeight]]">
-                <template>
-                    <div class="row" data-index$="[[index]]">
-                        <key-list-item section="[[section]]" item="[[item]]"></key-list-item>
-                    </div>
-                </template>
-            </iron-list>
-        </template>
-        <template is="dom-if" if="[[isnetworks]]">
-            <iron-list items="[[items]]" as="item" selection-enabled multi-selection selected-items="[[selectedItems]]" style$="[[vpHeight]]">
-                <template>
-                    <div class="row" data-index$="[[index]]">
-                        <network-list-item section="[[section]]" item="[[item]]"></network-list-item>
-                    </div>
-                </template>
-            </iron-list>
-        </template>
-        <template is="dom-if" if="[[isscripts]]">
-            <iron-list items="[[items]]" as="item" selection-enabled multi-selection selected-items="[[selectedItems]]" style$="[[vpHeight]]">
-                <template>
-                    <div class="row" data-index$="[[index]]">
-                        <a href$="[[_itemLink(item)]]" is="pushstate-anchor">
-                            <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
-                            <div class="type" hidden$="[[!item.type]]">[[item.type]]</div>
-                            <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
-                            <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
-                            <div class="description" hidden$="[[!item.description]]">[[item.description]]</div>
-                            <div class="state" hidden$="[[!item.state]]">[[item.state]]</div>
-                            <div class="icon" hidden$="[[!item.icons.length]]">
-                                <template is="dom-if" if="[[item.icons]]">
-                                    <app-image-icons feed="[[item.icons]]"></app-image-icons>
-                                </template>
-                            </div>
-                            <div class="tags" hidden$="[[!item.tags.length]]">
-                                <template is="dom-if" if="[[item.tags.length]]">
-                                    <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
-                                        <span class="tag">
-                                            <template is="dom-if" if="[[item.key]]">[[item.key]] = </template>[[item.value]]
-                                        </span>
-                                    </template>
-                                </template>
-                            </div>
-                        </a>
-                    </div>
-                </template>
-        </template>
-    </template>
-    <div id="actions"></div>
-    </template>
+        <iron-list items="[[items]]" as="item" style$="[[vpHeight]]">
+            <template>
+                <div class="row" data-index$="[[index]]">
+                  <template is="dom-if" if="[[ismachines]]">
+                    <machine-list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]">
+                      <app-check id="check"  allselected="{{allselected}}" selected$="{{isSelected(item, selectedItems.splices)}}" item="[[item]]" on-tap="_selectItem">
+                        <iron-icon src="[[_computeItemImage(item)]]">M</iron-icon></app-check>
+                      <paper-tooltip for="check" position="right">Select item</paper-tooltip>
+                    </machine-list-item>
+                  </template>
+                  <template is="dom-if" if="[[isimages]]">
+                    <image-list-item section="[[section]]" item="[[item]]" fields="[[fields]]"></image-list-item>
+                  </template>
+                  <template is="dom-if" if="[[iskeys]]">
+                    <key-list-item section="[[section]]" item="[[item]]" fields="[[fields]]"></key-list-item>
+                  </template>
+                  <template is="dom-if" if="[[istemplates]]">
+                    <template-list-item section="[[section]]" item="[[item]]" fields="[[fields]]"></template-list-item>
+                  </template>
+                  <paper-button class="more" on-tap="_openItemActions"><iron-icon icon="more-vert"></iron-icon></paper-button>
+                </div>
+            </template>
+        </iron-list>
+        <item-actions></item-actions>
+      </template>
 </dom-module>
+
 <script>
+ACTION_ICONS = {
+  'destroy': 'delete',
+  'reboot': 'av:replay',
+  'tag': 'label',
+  'shell': 'vaadin:terminal'
+};
+
 Polymer({
     is: 'item-list',
 
     properties: {
         items: {
             type: Array,
-            observer: '_itemsChanged'
+            value: []
+        },
+        selectedItems: {
+            type: Array,
+            value: [],
+            notify: true
         },
         allselected: {
             type: Boolean,
-            value: false,
+            value: false
+        },
+        sortBy: {
+            type: String,
             notify: true
+        },
+        sortOrder: {
+            type: Number,
+            notify: true
+        },
+        actions: {
+            type: Array,
+            value: []
+        },
+        topActions: {
+            type: Array,
+            computed: "_topActions(actions)"
+        },
+        moreActions: {
+            type: Array,
+            computed: "_moreActions(actions)"
         },
         icons: {
             type: Array
@@ -274,13 +310,11 @@ Polymer({
             type: Object,
             notify: true
         },
-        narrowViewport: {
-            type: Boolean,
-            reflectToAttribute: true
-        },
-        selectedItems: {
-            type: Array
-        },
+        narrowViewport: Boolean,
+        mediumViewport: Boolean,
+        wideViewport: Boolean,
+        xwideViewport: Boolean,
+        xxwideViewport: Boolean,
         ismachines: {
             type: Boolean,
             computed: "isMachines(section)"
@@ -301,18 +335,134 @@ Polymer({
             type: Boolean,
             computed: "isScripts(section)"
         },
+        fields: {
+            type: Array,
+            computed: "displayedFields(section, narrowViewport, mediumViewport, wideViewport, xwideViewport, xxwideViewport)"
+        },
         vpHeight: String
     },
 
     listeners: {
-        'tap': '_tap',
-        'mouseover': '_mouseOver',
-        'mouseleave': '_mouseLeave'
+        //'tap': '_tap',
+        //'mouseover': '_mouseOver',
+        //'mouseleave': '_mouseLeave',
     },
 
+    observers: [
+      'itemsChanged(items.splices)',
+      'selectedItemsChanged(selectedItems.splices)',
+    ],
+
     ready: function() {
-        var wh = window.innerHeight;
-        this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
+        var wh = window.innerHeight - 187;
+        this.vpHeight = 'height:'+ wh +'px;';
+    },
+
+    itemsChanged: function (changeRecord) {
+        // If some selectedItems are no longer in the items list, unselect them
+        if (!this.selectedItems)
+            return;
+        var oldSelected = this.get('selectedItems').slice(0);
+        while (this.get('selectedItems.length')) {
+            this.pop('selectedItems');
+        }
+        for (var i=0; i < this.items.length; i++) {
+            if (oldSelected.indexOf(this.itemUid(this.items[i]))>-1) {
+              this.push('selectedItems', this.itemUid(this.items[i]));
+            }
+        }
+        if (this.get('items.length') != this.get('selectedItems.length'))
+            this.set('allselected', false);
+
+        // Not sure if this is needed
+        this.querySelector('iron-list').notifyResize();
+    },
+
+    selectedItemsChanged: function (changeRecord) {
+        // recompute the actions array property as the intersection
+        // of the available actions of the selected items
+        if (!this.selectedItems || !this.selectedItems.length)
+            this.set('actions', []);
+        var actions = new swiftSet.Set(), isection = new swiftSet.Set();
+        actions.addItems(this.itemActions(this.selectedItems[0]) || []);
+        for (var i=1; i<this.selectedItems.length; i++) {
+            isection.clear()
+            isection.addItems(actions.intersection(this.itemActions(this.selectedItems[i])));
+            actions.clear();
+            actions.addItems(isection.items());
+        }
+
+        this.set('actions', this.actionDetails(actions.items()));
+    },
+
+    actionDetails: function (actions) {
+      var ret = [];
+      for (var i=0; i<actions.length; i++) {
+          ret.push({'name': actions[i],
+                    'icon': ACTION_ICONS[actions[i]]})
+      }
+      return ret;
+    },
+
+    itemUid: function(item) {
+        // Returns a universal resource id of the form
+        //      resourceType:[cloudId]:itemId
+        // e.g. machine:3tm7aaHHZcMxpZ:bf04f27e924fa67023582,
+        //      key::MnhLdx9u22YjVJ
+        //
+        // TODO replace with mist uuids
+
+        // if item type is not defined derive it fro the current section id
+        var item_type = item.type ? item.type : (this.section &&
+                                                 this.section.id.slice(0,-1));
+        var cloudId = item.cloud ? item.cloud.id : '';
+
+        return item_type + ':' + cloudId + ':' + item.id;
+    },
+
+    itemIndex: function(itemUid) {
+        // returns the index of the item in the items list based on the itemUid
+
+        var chunks = itemUid.split(':'),
+            itemId = chunks[2];
+            cloudId = chunks[1];
+
+        for (var i = 0; i < this.items.length; i++) {
+            if (this.items[i].id == itemId && (!cloudId || cloudId == this.items[i].cloud.id))
+                return i;
+        }
+        return -1;
+    },
+
+    itemActions: function(itemUid) {
+        // the list of available actions for this item based on the itemUid
+
+        if (!itemUid)
+            return [];
+
+        var ret = [],
+            index = this.itemIndex(itemUid),
+            item_type = itemUid.split(':')[0];
+
+        if (index == -1)
+            return []
+
+        var item = this.items[index];
+        if (item_type == 'machine') {
+            if (item.state == 'running') {
+              // if key then add shell / run script
+              // if not monitoring then enable monitoring
+              ret.push('shell');
+              ret.push('tag');
+              ret.push('reboot');
+            } else {
+              ret.push('tag');
+            }
+            ret.push('destroy');
+        } else if (item_type == 'image') {
+            return ret;
+        }
+        return ret;
     },
 
     isMachines: function(section) {
@@ -345,6 +495,90 @@ Polymer({
         return false;
     },
 
+    isSelected: function(item, selectedItems, items) {
+        return this.selectedItems.indexOf(this.itemUid(item)) > -1;
+    },
+
+    displayedFields: function (section) {
+        if (this.isMachines(section))
+          if (this.get('xxwideViewport'))
+              return ['name', 'state', 'cloud', 'size', 'image', 'id'];
+          if (this.get('xwideViewport'))
+              return ['name', 'state', 'cloud', 'size', 'image']
+          if (this.get('wideViewport'))
+              return ['name', 'state', 'cloud', 'size']
+          if (!this.get('mediumViewport') && !this.get('narrowViewport'))
+              return ['name', 'state', 'cloud']
+          else
+              return ['name', 'state', 'cloud'];
+        if (this.isKeys(section))
+          return ['name']
+    },
+
+    _openItemActions: function (e) {
+        console.log(e, e.detail.y + 'px', e.detail.x + 'px');
+        var actionsItem = this.querySelector('item-actions');
+        actionsItem.set('actions',
+                        this.actionDetails(
+                          this.itemActions(
+                            this.itemUid(e.model.item)
+                          )));
+        actionsItem.show(e.detail.x, e.detail.y);
+    },
+
+    _topActions: function (actions) {
+        return actions.slice(0, 3);
+    },
+
+    _moreActions: function (actions) {
+        return actions.slice(3);
+    },
+
+    _computeItemImage: function (item) {
+        if (!item.cloud || !item.cloud.provider)
+            return ''
+
+        var provider = item.cloud.provider.split('_')[0];
+        return '../images/providers/provider-' + provider + '.png';
+    },
+
+    _selectItem: function(e, g) {
+        var item = e.model.item,
+            index = this.selectedItems.indexOf(this.itemUid(item)),
+            checkbox = g.sourceEvent.target.parentNode.parentNode;
+
+        if (index > -1) { // deselect
+            this.splice('selectedItems', index, 1);
+            //checkbox.set('selected', false);
+            this.set('allselected', false);
+        } else { // select
+            this.push('selectedItems', this.itemUid(item));
+            //checkbox.set('selected', true);
+            if (this.get('selectedItems.length') == this.get('items.length')){
+                this.set('allselected', true);
+            }
+        }
+    },
+
+    _changeSortOrder: function(e, g) {
+        console.warn('sort order', e.model.item);
+        if (this.get('sortBy') != e.model.item) {
+            this.set('sortBy', e.model.item);
+            this.set('sortOrder', 0);
+        } else if (!this.get('sortOrder')){
+            this.set('sortOrder', 1);
+        } else {
+            //this.set('sortBy', 'default');
+            this.set('sortOrder', 0);
+        }
+    },
+
+    _isSortedBy: function (e) {
+        console.info(e, this.sortBy, e == this.sortBy && (this.sortOrder ? 'desc' : 'asc'));
+        if (e == this.sortBy)
+          return this.sortOrder ? 'desc' : 'asc';
+    },
+
     _currentRowIndex: -1,
 
     _sharedActionMenu: null,
@@ -371,70 +605,7 @@ Polymer({
                 });
             }
         }
-        console.log('selected machines:', this.selectedItems);
         this.fire('update-params');
-    },
-
-    _mouseOver: function(e) {
-        // _mouseOver & _showActions give error with iron-list
-
-        var row = this._findAncestor(e.target, function(node) {
-            return node != this && !node.classList.contains('row') && node.id !== 'actions';
-        });
-        if (row && row.classList.contains('row')) {
-            if (this._currentRowIndex != row.dataset.index) {
-                this._hideActions();
-                this._showActions(row, row.dataset.index);
-            }
-        } else if (row.id !== 'actions') {
-            this._hideActions();
-        }
-    },
-
-    _mouseLeave: function() {
-        this._hideActions();
-    },
-
-    _showActions: function(row, index) {
-        // TODO
-        /*
-        // _mouseOver & _showActions give error with iron-list
-
-        var sharedActionMenu = this._sharedActionMenu;
-        var rowOffsetTop = row.offsetTop;
-
-        if (!sharedActionMenu) {
-            this._sharedActionMenu = document.createElement('element-action-menu');
-            this._sharedActionMenu.classList.add('hidden');
-            Polymer.dom(this.$.actions).appendChild(this._sharedActionMenu);
-            sharedActionMenu = this._sharedActionMenu;
-        }
-
-        sharedActionMenu.iconsOnly = true;
-        sharedActionMenu.element = this.elements[index].name; //brought: Cannot read property 'undefined' of undefined
-        sharedActionMenu.style.top = rowOffsetTop + 'px';
-
-        this._layoutIfNeeded(sharedActionMenu);
-        sharedActionMenu.classList.remove('hidden');
-        row.classList.add('hover');
-
-        this._currentRowIndex = index;
-        this._currentRow = row;*/
-    },
-
-    _hideActions: function() {
-        /* TODO
-        var row = this._currentRow;
-        var sharedActionMenu = this._sharedActionMenu;
-
-        if (row) {
-            if (sharedActionMenu) {
-                sharedActionMenu.classList.add('hidden');
-            }
-            row.classList.remove('hover');
-            this._currentRowIndex = -1;
-            this._currentRow = null;
-        }*/
     },
 
     _itemLink: function(item) {
@@ -453,16 +624,12 @@ Polymer({
         return "/" + this.section.id + "/" + p;
     },
 
-    _getHeaderStyle: function(color) {
-        return 'background-color: ' + color + '; color: #fff;';
-    },
+    _getHeaderStyle: function(color, selectedItemsLength) {
+        if (selectedItemsLength > 0)
+            return 'background-color: #666; color: #fff; padding-right: 0px;';
+        else
+            return 'background-color: ' + color + '; color: #fff;';
 
-    _itemsChanged: function() {
-        console.log('selected items:', this.selectedItems);
-        // this.classList.add('hidden');
-        this.async(function() {
-            // this.classList.remove('hidden');
-        }, 1);
     },
 
     _layoutIfNeeded: function(el) {
@@ -470,32 +637,17 @@ Polymer({
     },
 
     _onSelectAll: function(e) {
-        // e.stopPropagation();
-
-        // check where we are at and which elements we target to select
-        this.allselected = !this.allselected;
-
-        var els;
-        if (this.ismachines)
-            els = this.querySelectorAll('machine-list-item');
-        if (this.isimages)
-            els = this.querySelectorAll('image-list-item');
-        if (this.iskeys)
-            els = this.querySelectorAll('key-list-item');
-        if (this.isnetworks)
-            els = this.querySelectorAll('network-list-item');
-        if (this.isscripts)
-            els = this.querySelectorAll('script-list-item');
-
-        // update the selectedArrays
+        this.set('allselected', !this.allselected);
         if (this.allselected) {
-            //fill in the cooresponding selectedArray
+            for (var i=0; i<this.items.length; i++){
+                if (this.selectedItems.indexOf(this.itemUid(this.items[i]))==-1)
+                    this.push('selectedItems', this.itemUid(this.items[i]));
+            }
         } else {
-            //empty the cooresponding selected Array
+            while (this.get('selectedItems.length')) {
+                this.pop('selectedItems');
+            }
         }
-        [].forEach.call(els, function(el, index) {
-            el.selected = this.allselected;
-        }, this);
 
     }
 });

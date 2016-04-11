@@ -6,21 +6,21 @@
         :host {
             display: inline-block;
         }
-        
+
         :host([selected]) .check {
             transform: rotate3d(0, 1, 0, 180deg);
         }
-        
+
         :host([selected]) iron-icon {
             transform: rotate3d(0, 1, 0, -180deg) scale(1);
             opacity: 1;
         }
-        
+
         :host([selected]) .unchecked,
         :host([selected])::content iron-icon {
             opacity: 0;
         }
-        
+
         .check {
             border-radius: 50%;
             width: 36px;
@@ -32,7 +32,7 @@
             cursor: pointer;
             box-sizing: border-box;
         }
-        
+
         .unchecked {
             border-radius: inherit;
             width: 100%;
@@ -41,7 +41,7 @@
             will-change: opacity;
             text-transform: uppercase;
         }
-        
+
         iron-icon {
             transition: transform 300ms ease-in-out 100ms;
             will-change: opacity;
@@ -51,7 +51,7 @@
             left: 15%;
             opacity: 0;
         }
-        
+
         :host[disabled] {
             display: inline-block;
             opacity: 0;
@@ -70,6 +70,9 @@ Polymer({
     is: 'app-check',
 
     properties: {
+        item: {
+            type: Object
+        },
         selected: {
             type: Boolean,
             value: false,

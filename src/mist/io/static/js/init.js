@@ -429,7 +429,9 @@ var setupMainChannel = function(socket, callback) {
             var cloud = Mist.cloudsController.getCloud(data.cloud_id);
             if (cloud) {
                 var networks = [];
-                networks.pushObjects(data.networks.public, data.networks.private);
+                networks
+                    .pushObjects(data.networks.public)
+                    .pushObjects(data.networks.private);
                 cloud.networks.setModel(networks);
             }
         })

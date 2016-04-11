@@ -1,5 +1,4 @@
 <link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
-<link rel="import" href="../element-action-menu/element-action-menu.html">
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../tag-link/tag-link.html">
 <dom-module id="network-list-item">
@@ -9,36 +8,36 @@
             padding: 15px 24px;
             @apply(--layout-horizontal);
         }
-        
+
         a {
             @apply(--layout-horizontal);
             padding: 6px 6px 6px 0;
         }
-        
+
         :host([narrow-viewport]) a {
             @apply(--layout-vertical);
             padding: 0;
         }
-        
+
         #check {
             padding-right: 24px;
         }
-        
+
         .name {
             font-weight: 500;
             width: 250px;
         }
-        
+
         .type,
         .provider {
             width: 250px;
             font-weight: 400;
         }
-        
+
         .type {
             color: #757575;
         }
-        
+
         :host([narrow-viewport]) .name,
         :host([narrow-viewport]) .type,
         :host([narrow-viewport]) .provider {

@@ -4,28 +4,28 @@
         :host * {
             box-sizing: border-box;
         }
-        
+
         :host(.search-on) {
             left: 0;
             background: inherit;
             z-index: 1001;
         }
-        
+
         :host::content iron-icon {
             margin-right: 15px;
             cursor: pointer;
         }
-        
+
         #search {
             position: relative;
         }
-        
+
         #search iron-icon {
             margin-right: 0;
             margin-left: 16px;
             margin-top: -2px;
         }
-        
+
         #search[show] {
             position: absolute;
             width: 100%;
@@ -36,11 +36,11 @@
             background: #fff;
             margin-top: 2px;
         }
-        
+
         #search[show] iron-icon {
             margin-left: 0px;
         }
-        
+
         #search input {
             display: none;
             font-family: var(--primary-font-family);
@@ -51,11 +51,11 @@
             border-radius: 2px;
             -webkit-appearance: none;
         }
-        
+
         #search[show] input {
             display: block;
         }
-        
+
         #search input:focus {
             outline: 0;
         }
@@ -72,6 +72,7 @@
 <script>
 Polymer({
     is: 'app-bar',
+
     properties: {
         query: {
             type: String,
@@ -79,19 +80,25 @@ Polymer({
         },
         showingSearch: {
             type: Boolean,
-            value: false
+            value: false,
+            notify: true,
+            reflectToAttribute: true
         },
         noSearch: {
             type: Boolean,
             value: false
         }
     },
+
     observers: [
-        'updateSearchDisplay(showingSearch)'
+        'updateSearchDisplay(showingSearch)',
+        '_queryChanged(query)'
     ],
+
     listeners: {
         keyup: 'hotkeys'
     },
+
     toggleSearch: function(e) {
         if (e) {
             e.stopPropagation();
@@ -102,9 +109,12 @@ Polymer({
 
         this.showingSearch = !this.showingSearch;
     },
+
     clearSearch: function() {
+        //this.set('query', '');
         this.showingSearch = false;
     },
+
     updateSearchDisplay: function(showingSearch) {
         if (showingSearch) {
             this.classList.add('search-on');
@@ -115,17 +125,34 @@ Polymer({
             this.classList.remove('search-on');
         }
     },
+
     hotkeys: function(e) {
         // ESC
         if (e.keyCode === 27 && Polymer.dom(e).rootTarget === this.$.query) {
             this.showingSearch = false;
+            this.set('query', '');
+        }
+        if (e.keyCode === 13) {
+            this.showingSearch = false;
         }
     },
+
     performSearch: function(e) {
         e.preventDefault();
         this.fire('nav', {
             url: '?q=' + this.query
         });
-    }
+    },
+
+    _queryChanged: function(q) {
+        if (q) {
+            this.async(function() {
+                this.$.query.focus();
+                // make sure to force the cursor to the end of the
+                // input. Only an issue in Firefox.
+                this.$.query.setSelectionRange(q.length, q.length);
+            });
+        }
+    },
 });
 </script>

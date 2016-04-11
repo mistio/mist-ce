@@ -1,7 +1,5 @@
 <link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
-<link rel="import" href="../element-action-menu/element-action-menu.html">
 <link rel="import" href="../app-image-icons/app-image-icons.html">
-<link rel="import" href="../tag-link/tag-link.html">
 <link rel="import" href="../app-check/app-check.html">
 <dom-module id="key-list-item">
     <template>
@@ -10,26 +8,26 @@
             padding: 15px 24px;
             @apply(--layout-horizontal);
         }
-        
+
         a {
             @apply(--layout-horizontal);
             padding: 6px 6px 6px 0;
         }
-        
+
         #check {
             padding-right: 24px;
         }
-        
+
         .name {
             width: 250px;
             font-weight: 500;
         }
-        
+
         .is-default {
             font-weight: 400;
             width: 100px;
         }
-        
+
         :host([narrow-viewport]) .name,
         :host([narrow-viewport]) .is-default {
             width: auto;

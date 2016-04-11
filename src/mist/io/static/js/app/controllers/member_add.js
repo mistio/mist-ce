@@ -17,7 +17,6 @@ define('app/controllers/member_add', ['ember'],
             newMember: Ember.Object.create({
                 email: ''
             }),
-            formReady: false,
 
             //
             // Methods
@@ -35,7 +34,6 @@ define('app/controllers/member_add', ['ember'],
 
             clear: function() {
                 this.get('newMember').set('email', '');
-                this.set('formReady', false);
             },
 
             add: function(team) {
@@ -49,23 +47,7 @@ define('app/controllers/member_add', ['ember'],
                         }
                     }
                 })
-            },
-
-            //
-            // Private Methods
-            //
-
-            _updateFormReady: function() {
-                this.set('formReady', /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$/.test(this.get('newMember.email')));
-            },
-
-            //
-            // Observers
-            //
-
-            formObserver: function() {
-                Ember.run.once(this, '_updateFormReady');
-            }.observes('newMember.email'),
+            }
         });
     }
 );

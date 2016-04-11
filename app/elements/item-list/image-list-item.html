@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
-<link rel="import" href="../element-action-menu/element-action-menu.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../app-image-icons/app-image-icons.html">
+
 <link rel="import" href="../tag-link/tag-link.html">
 <dom-module id="image-list-item">
     <template>
@@ -9,30 +10,30 @@
             padding: 15px 24px;
             @apply(--layout-horizontal);
         }
-        
+
         a {
             @apply(--layout-horizontal);
             padding: 6px 6px 6px 0;
         }
-        
+
         :host([narrow-viewport]) a {
             @apply(--layout-vertical);
             padding: 0;
         }
-        
+
         #check {
             padding-right: 24px;
         }
-        
+
         .name {
             width: 250px;
             font-weight: 500;
         }
-        
+
         .id {
             color: #757575;
         }
-        
+
         .id,
         .provider {
             width: 250px;
@@ -40,7 +41,7 @@
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <app-check id="check" selected="[[selected]]" on-tap="_onSelectItem">I</app-check>
+        <paper-icon-button icon="star" active></paper-icon-button>
         <a href$="[[elementLink]]" is="pushstate-anchor">
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
