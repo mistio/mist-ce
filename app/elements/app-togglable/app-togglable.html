@@ -52,8 +52,9 @@
         </paper-item>
         <div id="infoarea">
             <div class="command-container">
-                <template is="dom-repeat" items="[[infoLines]]" as="line">
-                    [[line]]<br/>
+                <!-- to fix: unneeded indexes come in  -->
+                <template is="dom-repeat" items="[[infoLines]]" as="line">                
+                    [[line]]<br/>                    
                 </template>
             </div>
         </div>
@@ -81,26 +82,32 @@
                 }
             },
             _makeInfoLines: function(info){
-                var infoLines = [];
-                for(var prop in info) {
-                    var propvalue = info[prop];
-                    var textvalue;
+                var lines = [];
+                if (typeof info == 'object') {
+                    for (var prop in info) {
+                        var val = info[prop];    
+                        if (typeof val == 'object' || typeof val == 'array') {
+                            lines.push(prop+": ");
+                            var objlines = this._makeInfoLines(val);
+                            for (var j = 0; j < objlines.length; j++ ){                                
+                                lines.push(objlines[j]);
+                            }
+                        }
+                        else {
+                            lines.push(prop+": "+val)
+                        }
+                    }
 
-                    console.log(typeof propvalue);
-
-                    if ( typeof propvalue == Object) {
-                        textvalue = this._makeInfoLines(propvalue);
-                    }
-                    else if ( typeof propvalue == Array) {
-                        infoLines.push(propvalue);
-                        textvalue = "";
-                    }
-                    else {
-                        textvalue = propvalue;
-                    }
-                    infoLines.push(prop+": "+textvalue);
                 }
-                return infoLines;
+                else if (typeof info == 'array') {
+                    for (var i=0; i<info.length; i++) {   
+                        lines.push(info(i));
+                    }
+                }
+                else {
+                    lines.push(info+"...");
+                }
+                return lines;
             },
             _toggle: function(){
                 this.open = !this.open;
