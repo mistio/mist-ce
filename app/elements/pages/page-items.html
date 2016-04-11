@@ -210,7 +210,7 @@
         },
 
         observers: [
-            'sortingObserver(items.*, sortBy, sortOrder)',
+            'sortingObserver(items.*, sortBy, sortOrder, q)',
             'scrollToTop(section)'
         ],
 
@@ -257,7 +257,6 @@
         scrollToTop: function() {
             this.$.container.scroller.scrollTop = 0;
         },
-
 
         toggleSearch: function (e) {
             this.querySelector('app-bar').toggleSearch(e);
