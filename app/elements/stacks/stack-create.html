@@ -41,7 +41,7 @@
                 <div id="content">
                     <paper-material class="page">
                         <div class="grid-row">
-                            <paper-input class="xs12 m6" id="stackName" label="Stack Name" value="{{stack.name::input}}" required error-message="The stack must have a name"></paper-input>
+                            <paper-input class="xs12 m6" id="stackName" label="Stack Name" value="{{stack.name::input}}" required auto-validate error-message="The stack must have a name"></paper-input>
                             <div class="field-helptext xs12 m6"></div>
                             <hr class="xs12 hr-equal" />
                             <template is="dom-repeat" items="{{fields}}" as="field">
@@ -155,25 +155,11 @@
                     hideprogress: {
                         type: Boolean,
                         value: true
-                    },
-                    stackNameField: {
-                        type: Object,
-                        value: {
-                            name: "stack_name",
-                            default: "",
-                            type: "text",
-                            label: "Stack Name",
-                            value: "",
-                            defaultValue: "",
-                            errorMessage: "The stack must have a name",
-                            show: true,
-                            required: true
-                        }
                     }
                 },
                 observers: [
-                    '_fieldsChanged(fields.*, sendingData)',
-                    '_updateTypedName(stack.name.*)'
+                    '_fieldsChanged(fields.*, sendingData, stack.name)',
+                    '_updateTypedName(stack.name.*)',
                 ],
                 _fromTemplate: function(params){
                     if (params.id) {
@@ -197,53 +183,64 @@
                 },
                 _computeFieldType: function(field, value, show) {                    
                     if (!(field.showIf && !field.show)) {
-                        if (field.type == "dropdown" && typeof field.options[0] == "string") {
-                            var query = this.model;
-                            for (var prop in field.options){
-                                var p = field.options[prop];
+                        if (field.type == "dropdown" && field.query) {
+                            var inputModel = this.model;
+                            for (var prop in field.query){
+                                var p = field.query[prop];
 
                                 if (p.startsWith("$.")){
                                     p = this.stack[p.slice(2)]; 
                                 }
 
-                                if (query.hasOwnProperty(p)) {
-                                    query = query[p];
+                                if (inputModel.hasOwnProperty(p)) {
+                                    inputModel = inputModel[p];
                                 }
                             }
                             
-                            field.options = [];
+                            var updatedOptions = [];
 
-                            for (var prop in query) {
+                            for (var prop in inputModel) {
                                 var dropdownItem = {};
-                                if (query[prop].hasOwnProperty("title")) {
-                                    dropdownItem.title = query[prop].title;
+                                if (inputModel[prop].hasOwnProperty("title")) {
+                                    dropdownItem.title = inputModel[prop].title;
                                 }
-                                else if (query[prop].hasOwnProperty("name")) {
-                                    dropdownItem.title = query[prop].name;
+                                else if (inputModel[prop].hasOwnProperty("name")) {
+                                    dropdownItem.title = inputModel[prop].name;
                                 }
-                                dropdownItem.val = query[prop].id;
+                                dropdownItem.val = inputModel[prop].id;
 
-                                field.options.push(dropdownItem);
+                                updatedOptions.push(dropdownItem);
+
                             }
-
+                            for (var index in this.fields){
+                                var existingField = this.fields[index]
+                                if (existingField.name == field.name){
+                                    this.set("fields." + index + ".options", updatedOptions)
+                                } 
+                            }
                         }
                         return field.type == value;
                     }
 
                 },
-                _fieldsChanged: function(fields, sendingData) {
+                _fieldsChanged: function(fields, sendingData, name) {
                     this.async(function() {
                         var stack = this.stack,
                             show = true,
                             dependency;
+                        var path = fields.path;
 
+                        if (path.endsWith("value")){
+                            var valueChanged = this.get(path.replace("value", "name"))
+                            this._recomputeDependentFields(valueChanged);
+                        }
                         fields.base.forEach(function(el, index) {                            
                             this.set('stack.' + el.name, el.value);
 
                             if (el.showIf) {
                                 if (el.showIf.fieldExists) {
                                     dependency = stack[el.showIf.fieldName],
-                                        show = dependency;                                    
+                                        show = dependency;                                        
                                     this.set('fields.' + index + '.show', show);
 
                                 } else {
@@ -266,6 +263,8 @@
                         var valid = fields.base.every(function(el, index) {
                             return el.show && el.required ? el.value : true;
                         }, this);
+
+                        valid = valid && this.stack.name != "";
 
                         this.set('stack', stack);
 
@@ -306,7 +305,6 @@
                         if (el.showIf) {
                             this.set('fields.' + index + '.show', false);
                         }
-
                         // Reset Form Fields Validation
                         this._resetField(el, index);
                     }, this);
@@ -319,6 +317,15 @@
                     if (input) {
                         input.invalid = false;
                     }
+                },
+                _recomputeDependentFields: function(name){
+                    this.fields.forEach(function(el, index) {                        
+                        if (el.showIf && el.showIf.fieldName == name) {
+                            this.set('fields.' + index + '.options', []);
+                            this._computeFieldType(el,el.type,el.show)
+                        }
+                    }, this);
+                    
                 }
             });
         })();

@@ -164,7 +164,8 @@ var app = Polymer({
                     name: "kubstack1",
                     id: "1234567890",
                     description: "3 machines, 2 keys, 1 network",
-                    template: "cloudmist ver.2"
+                    template: "cloudmist ver.2",
+                    machines: ["machine_id1", "machine_id2", "machine_id2"],
 
                 },
                 {   name: "kubstack2",
@@ -184,7 +185,19 @@ var app = Polymer({
                 stacks: [],
                 template: "https://github.com/mistio/mist-cloudify-example",
                 user: "56b8beaae90e5b043ae75c98",
-                inputs: [
+                inputs: [{
+                        name: "name",
+                        label: "Stack Name",
+                        isLead: true,
+                        default: '',
+                        value: "",
+                        type: "text",
+                        description: "Stack Name",
+                        errorMessage: "The stack must have a name",
+                        helptext: "",                    
+                        show: true,
+                        required: true,
+                    },                    
                     {
                         name: "cloud",
                         default: '',
@@ -196,7 +209,7 @@ var app = Polymer({
                         show: true,
                         required: true,
                         type: "dropdown",
-                        options: ["cloudsArray"]
+                        query: ["cloudsArray"]
                     },
                     {
                         name: "cloud_image",
@@ -206,10 +219,10 @@ var app = Polymer({
                         used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
                         errorMessage: "Please choose an image",
                         helptext: "You can choose cloud id is needed to...",
-                        show: false,
+                        show: true,
                         required: true,
                         type: "dropdown",
-                        options: ["clouds","$.cloud", "imagesArray"],
+                        query: ["clouds","$.cloud", "imagesArray"],
                         showIf: {
                                 fieldName: "cloud",
                                 fieldExists: true
@@ -223,16 +236,33 @@ var app = Polymer({
                         used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
                         errorMessage: "Please choose an image",
                         helptext: "You can choose cloud size according to your cloud",
-                        show: false,
+                        show: true,
                         required: true,
                         type: "dropdown",
-                        options: ["clouds","$.cloud", "sizesArray"],
+                        query: ["clouds","$.cloud", "sizesArray"],
                         showIf: {
                                 fieldName: "cloud",
                                 fieldExists: true
                             }
                     }
-                ]
+                ],
+                workflows: [{
+                    name: "create",
+                    actions: [{name:'some action 1'}],
+                    parameters: [{
+                        name: "cloud",
+                        default: '',
+                        value: "",
+                        description: "The mist.io cloud",
+                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
+                        errorMessage: "Please enter cloud id",
+                        helptext: "You can choose cloud id is needed to...",                
+                        show: true,
+                        required: true,
+                        type: "dropdown",
+                        query: ["cloudsArray"]
+                    }]
+                }]
             }],
             teamsArray: [{
                 description: "",
