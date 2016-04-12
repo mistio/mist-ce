@@ -1056,6 +1056,17 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
     # this is only needed if association doesn't exist and host is not provided
     # associations will otherwise be created by shell.autoconfigure upon
     # succesful connection
+    if isinstance(port, basestring):
+        port = 22
+        if port.isdigit():
+            port = int(port)
+        else:
+            port = 22
+    elif isinstance(port, int):
+        port = port
+    else:
+        port = 22
+
     if not host:
         if not associated:
             try:
