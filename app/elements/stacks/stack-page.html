@@ -144,16 +144,12 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
         paper-toolbar:not(.tall) ::content #bottomBar .right-actions{
             margin-right: 70px;
         }
-        .parsing-loader {
-            text-align: center;
-            margin: 36px;
-            padding: 36px;
-        }
-        .parsing-loader paper-progress {
-            width: 100%;
-        }
-        .parsing-loader.error paper-progress ::content #primaryProgress {
-            background-color: var(--red-color);
+        .resource-head {
+            font-weight: 500;
+            padding: 8px;
+            color: rgba(0,0,0,0.84);
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
         }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
@@ -174,7 +170,13 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
 
                     <div class="subhead bottom">
                         <div>
-                            Stack created from template [[stack.template]] <a href$="/templates/[[stack.template_id]]" class="regular blue-link"> <iron-icon icon="icons:link" class="blue-link" id="link-to-template"></iron-icon></a>
+                            <!-- Stack created from template [[stack.template]] <a href$="/templates/[[stack.template_id]]" class="regular blue-link"> <iron-icon icon="icons:link" class="blue-link" id="link-to-template"></iron-icon></a> -->
+                            <!-- <template is="dom-if" if="[[workflows.length]]">
+                                <h3 class="smallcaps">Workflows</h3>
+                                <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                    <paper-button class="blue" id$="[[workflow.name]]" on-tap="doWorkflow">[[workflow.name]]</paper-button>
+                                </template>
+                            </template> -->
                         </div>
                         <div class="fab-top-right">
                             <paper-fab icon="av:play-arrow" on-tap="_showStackActions" id="runTemplateFab"></paper-fab>                            
@@ -184,42 +186,52 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                 
                 <div class="content" style$="[[vpHeight]]">                                        
                     <div class="page">
-                        <template is="dom-if" if="[[workflows.length]]">
-                            <h3 class="smallcaps">Workflows</h3>
-                            <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                <paper-button class="blue" id$="[[workflow.name]]" on-tap="doWorkflow">[[workflow.name]]</paper-button>
+
+                        <div class="flex-horizontal-with-ratios">
+                            <div class="page-block">
+                                <h3 class="smallcaps">Created from template</h3>
+                                <p><a href$="/templates/[[stack.template_id]]" class="regular blue-link"> [[stack.template]]</a>: [[template.description]]</p>
+
+                            </div>
+                            <div class="page-block">
+                                <h3 class="smallcaps">Created</h3>
+                                <p>[[stack.created_at]] from <a href="/members/[[template.user]]" class="regular blue-link">[[stack.user]]</a></p>
+                            </div>
+                        </div>
+
+                        <div class="resources-list">
+                            <h3 class="smallcaps">Resources list</h3>
+                            <template is="dom-if" if="[[machines.length]]">                                
+                                <paper-material class="no-pad">
+                                    <h3 class="smallcaps resource-head">machines</h3>
+                                    <template is="dom-repeat" items="[[machines]]" as="machine">
+                                        <paper-item>
+                                            [[machine.name]]
+                                        </paper-item>
+                                    </template>
+                                </paper-material>
                             </template>
-                        </template>                        
-                        <template is="dom-if" if="[[machines.length]]">
-                            <h3 class="smallcaps">machines</h3>
-                            <paper-material class="no-pad">
-                                <template is="dom-repeat" items="[[machines]]" as="machine">
-                                    <paper-item>
-                                        [[machine.name]]
-                                    </paper-item>
-                                </template>
-                            </paper-material>
-                        </template>
-                        <template is="dom-if" if="[[networks.length]]">
-                            <h3 class="smallcaps">networks</h3>
-                            <paper-material class="no-pad">
-                                <template is="dom-repeat" items="[[networks]]" as="network">
-                                    <paper-item>
-                                        [[network.name]]
-                                    </paper-item>
-                                </template>
-                            </paper-material>
-                        </template>
-                        <template is="dom-if" if="[[keys.length]]">
-                            <h3 class="smallcaps">keys</h3>
-                            <paper-material class="no-pad">
-                                <template is="dom-repeat" items="[[keys]]" as="key">                            
-                                    <paper-item>
-                                        [[key.id]]
-                                    </paper-item>
-                                </template>
-                            </paper-material>
-                        </template>
+                            <template is="dom-if" if="[[networks.length]]">
+                                <paper-material class="no-pad">
+                                    <h3 class="smallcaps resource-head">networks</h3>
+                                    <template is="dom-repeat" items="[[networks]]" as="network">
+                                        <paper-item>
+                                            [[network.name]]
+                                        </paper-item>
+                                    </template>
+                                </paper-material>
+                            </template>
+                            <template is="dom-if" if="[[keys.length]]">
+                                <paper-material class="no-pad">
+                                    <h3 class="smallcaps resource-head">keys</h3>
+                                    <template is="dom-repeat" items="[[keys]]" as="key">                            
+                                        <paper-item>
+                                            [[key.id]]
+                                        </paper-item>
+                                    </template>
+                                </paper-material>
+                            </template>
+                        </div>
                     </div>                    
                 </div>
             </paper-header-panel>
