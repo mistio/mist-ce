@@ -146,9 +146,10 @@ var app = Polymer({
     listeners: {
         'iron-activate': 'updateDocTitle',
         'iron-activate': 'updateCount',
+        'iron-navigate': 'scrollToTop',
         'page-meta': 'updateTitle',
         'toast': 'showToast',
-        'subscribeLogEvents': 'subscribeLogEvents'
+        'subscribeLogEvents': 'subscribeLogEvents',
     },
     _toast: null,
 
@@ -181,7 +182,7 @@ var app = Polymer({
                 entrypoint: "mist-blueprint.yaml",
                 exec_type: "cloudify",
                 location_type: "github",
-                name: "cloudmist ver.2",
+                name: "cloudmist",
                 stacks: [],
                 template: "https://github.com/mistio/mist-cloudify-example",
                 user: "56b8beaae90e5b043ae75c98",
@@ -263,7 +264,7 @@ var app = Polymer({
                         name: "cloud",
                         default: '',
                         value: "",
-                        description: "The mist.io cloud",
+                        description: "create stack",
                         used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
                         errorMessage: "Please enter cloud id",
                         helptext: "You can choose cloud id is needed to...",                
@@ -272,6 +273,113 @@ var app = Polymer({
                         type: "dropdown",
                         query: ["cloudsArray"]
                     }]
+                },{
+                    name: "delete",
+                    actions: [{name:'some action 2'}],
+                    parameters: []
+                }]
+            },{
+                _id: "56bb8e18e90e5b30cb3ab8eb",
+                created_at: "1455132184879",
+                description: "This template deploys a kubernettes stack",
+                entrypoint: "mist-blueprint.yaml",
+                exec_type: "cloudify",
+                location_type: "github",
+                name: "cloudmist var.2",
+                stacks: [],
+                template: "https://github.com/mistio/mist-cloudify-example",
+                user: "56b8beaae90e5b043ae75c98",
+                inputs: [{
+                        name: "name",
+                        isLead: true,
+                        default: "",
+                        value: "",
+                        type: "text",
+                        description: "Stack Name",
+                        errorMessage: "The stack must have a name",
+                        helptext: "",                    
+                        show: true,
+                        required: true,
+                    },                    
+                    {
+                        name: "cloud",
+                        default: '',
+                        value: "",
+                        description: "The mist.io cloud",
+                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
+                        errorMessage: "Please enter cloud id",
+                        helptext: "You can choose cloud id is needed to...",                    
+                        show: true,
+                        required: true,
+                        type: "dropdown",
+                        query: ["cloudsArray"]
+                    },
+                    {
+                        name: "cloud_image",
+                        default: "",
+                        value: "",
+                        description: "The cloud image",
+                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
+                        errorMessage: "Please choose an image",
+                        helptext: "You can choose cloud id is needed to...",
+                        show: true,
+                        required: true,
+                        type: "dropdown",
+                        query: ["clouds","$.cloud", "imagesArray"],
+                        showIf: {
+                                fieldName: "cloud",
+                                fieldExists: true
+                            }
+                    },
+                    {
+                        name: "cloud_size",
+                        default: "",
+                        value: "",
+                        description: "The cloud size",
+                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
+                        errorMessage: "Please choose an image",
+                        helptext: "You can choose cloud size according to your cloud",
+                        show: true,
+                        required: true,
+                        type: "dropdown",
+                        query: ["clouds","$.cloud", "sizesArray"],
+                        showIf: {
+                                fieldName: "cloud",
+                                fieldExists: true
+                            }
+                    },
+                    {
+                        name: "misc_input",
+                        default: "",
+                        value: "",
+                        description: "Some input",
+                        errorMessage: "Please fill in ",
+                        helptext: "You can choose cloud size according to your cloud",
+                        show: true,
+                        required: true,
+                        type: "text"
+                    }
+                ],
+                workflows: [{
+                    name: "create",
+                    actions: [{name:'some action 1'}],
+                    parameters: [{
+                        name: "cloud",
+                        default: '',
+                        value: "",
+                        description: "create stack",
+                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
+                        errorMessage: "Please enter cloud id",
+                        helptext: "You can choose cloud id is needed to...",                
+                        show: true,
+                        required: true,
+                        type: "dropdown",
+                        query: ["cloudsArray"]
+                    }]
+                },{
+                    name: "delete",
+                    actions: [{name:'some action 2'}],
+                    parameters: []
                 }]
             }],
             teamsArray: [{
@@ -489,6 +597,14 @@ var app = Polymer({
             });
             ga('set', 'page', loc);
         }, 2000);
-    }
+    },
+
+    scrollToTop: function() {
+        // TODO: scroll to top on iron-navigate
+        // https://groups.google.com/forum/#!topic/polymer-dev/tDetYDnxG48
+        // https://github.com/Polymer/docs/blob/master/js/app.js#L141:L147
+        // scrollIntoViewIfNeeded
+        // document.querySelector('#mainContainer').scrollTop();
+    }    
 });
 </script>
