@@ -122,7 +122,8 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
         }
         .subhead {
             box-sizing: border-box;
-            position: absolute;            
+            position: absolute;
+            font-size: 14px;
             width: 100%;
             left: 0;
             height: 57px;
@@ -173,7 +174,7 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
 
                     <div class="subhead bottom">
                         <div>
-                            stack from template
+                            Stack created from template <a href$="/templates/[[stack.template_id]]" class="regular blue-link">[[stack.template]]</a>
                         </div>
                         <div class="fab-top-right">
                             <paper-fab icon="av:play-arrow" on-tap="_stackActions" id="runTemplateFab"></paper-fab>                            
@@ -183,10 +184,36 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                 
                 <div class="content" style$="[[vpHeight]]">                                        
                     <div class="page">
-                        <h3 class="smallcaps">Metadata</h3>
-                        <paper-material>                        
-                            stack info
-                        </paper-material>
+                        <template is="dom-if" if="[[machines.length]]">
+                            <h3 class="smallcaps">machines</h3>
+                            <paper-material class="no-pad">
+                                <template is="dom-repeat" items="[[machines]]" as="machine">
+                                    <paper-item>
+                                        [[machine.name]]
+                                    </paper-item>
+                                </template>
+                            </paper-material>
+                        </template>
+                        <template is="dom-if" if="[[networks.length]]">
+                            <h3 class="smallcaps">networks</h3>
+                            <paper-material class="no-pad">
+                                <template is="dom-repeat" items="[[networks]]" as="network">
+                                    <paper-item>
+                                        [[network.name]]
+                                    </paper-item>
+                                </template>
+                            </paper-material>
+                        </template>
+                        <template is="dom-if" if="[[keys.length]]">
+                            <h3 class="smallcaps">keys</h3>
+                            <paper-material class="no-pad">
+                                <template is="dom-repeat" items="[[keys]]" as="key">                            
+                                    <paper-item>
+                                        [[key.id]]
+                                    </paper-item>
+                                </template>
+                            </paper-material>
+                        </template>
                     </div>                    
                 </div>
             </paper-header-panel>
@@ -201,6 +228,9 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
             is: 'stack-page',
 
             properties: {
+                model: {
+                    type: Object
+                },
                 sections: {
                     type: Object
                 },
@@ -219,11 +249,32 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                 },
                 stack: {
                     type: Object,
-                    computed: '_computeStack(params)'
+                    computed: '_computeStack(params)',
+                    notify: true
                 },
                 stackid: {
                     type: String,
                     computed: '_computeStackId(params)'
+                },
+                template: {
+                    type: Object,
+                    computed: '_computeTemplate(stack)'
+                },
+                machines: {
+                    type: Array,
+                    computed: '_computeMachines(stack)'
+                },
+                networks: {
+                    type: Array,
+                    computed: '_computeNetworks(stack)'
+                },
+                keys: {
+                    type: Array,
+                    computed: '_computeKeys(stack)'
+                },
+                workflows: {
+                    type: Array,
+                    computed: '_computeWorkflows(params)'
                 },
                 vpHeight: String
             },
@@ -246,6 +297,53 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
             _computeStackId: function(params) {
                 return params.id;
             },
+            _computeTemplate: function(stack){                
+                return this.model.templatesArray.find(function(template) {
+                    return template.id == stack.template_id;
+                }, this);
+            },
+            _computeMachines: function(stack){
+                var machines = [];
+                if(stack.machines){
+                    var stackMachines = stack.machines;
+                    this.model.machinesArray.find(function(machine) {
+                        var machineId = machine.id;
+                        if (stackMachines.indexOf(machineId)>-1) {
+                            machines.push(machine);
+                        }
+                    }, this);
+                }
+                return machines;
+            },
+            _computeNetworks: function(stack){
+                var networks = [];
+                if(stack.networks){
+                    var stackNets = stack.networks;
+                    this.model.networksArray.find(function(network) {
+                        var networkId = network.id;
+                        if (stackNets.indexOf(networkId)>-1) {
+                            networks.push(network);
+                        }
+                    }, this);
+                }
+                return networks;
+            },
+            _computeKeys: function(stack){
+                var keys = [];
+                if(stack.keys){
+                    var stackKeys = stack.keys;
+                    this.model.keysArray.find(function(key) {
+                        var keyId = key.id;
+                        if (stackKeys.indexOf(keyId)>-1) {
+                            keys.push(key);
+                        }
+                    }, this);
+                }
+                return keys;
+            },
+            _computeWorkflows: function(stack){
+                return stack.workflows;
+            },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element'),
                     i;
@@ -254,12 +352,12 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                 }
                 dialog._openDialog();
             },
-            _goBack: function(){
+            _goBack: function() {
                 history.back();
             },
-            _stackActions: function(){
+            _stackActions: function() {
 
-            }
+            },
         });
     })();
     </script>

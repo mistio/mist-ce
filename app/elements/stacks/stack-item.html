@@ -100,7 +100,7 @@
                 },
                 _selectStack: function(e) {
                     // This is used to prevent event bubbling
-                    e.stopPropagation();
+                    // e.stopPropagation();
                     if (Polymer.dom(e).localTarget === this.$.check) {
                         this.set('selected', !this.selected);
                         this.fire('list-item-select', {
