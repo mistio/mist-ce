@@ -21,7 +21,7 @@
     {{/if}}
 
     <ul class="ui-listview orgs-list">
-        {{#if view.orgs}}
+        {{#if Mist.orgs}}
             {{#each organization in view.orgs}}
                 {{component "organization-item" organization=organization}}
             {{/each}}
