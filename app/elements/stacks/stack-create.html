@@ -43,8 +43,14 @@
                         <div class="grid-row">                            
                             <template is="dom-repeat" items="{{fields}}" as="field">
                                 <template is="dom-if" if="[[field.isLead]]">
-                                    <paper-input class="xs12 m6" id="[[field.name]]" label="[[field.description]]" value="{{stack.name::input}}" required auto-validate error-message="[[field.errorMessage]]"></paper-input>
-                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                    <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
+                                        
+                                        <!-- <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.name]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input> -->
+
+                                        <paper-input class="xs12 m6" id="[[field.name]]" label="[[field.description]]" value="{{stack.name::input}}" required error-message="[[field.errorMessage]]"></paper-input>
+                                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+
+                                    </template>
                                     <hr class="xs12 hr-equal" />
                                 </template>
                                 <template is="dom-if" if="[[!field.isLead]]">
@@ -127,7 +133,7 @@
                     stack: {
                         type: Object,
                         value: {
-                            name: ""
+                            // name: ""
                         }
                     },
                     params: {
@@ -179,13 +185,14 @@
                 },
                 _updateTypedName: function(t) {
                     if (t.value) {
+                        this.fields[0].value = t.value;
                         this.typedName = '"' + t.value + '"';
                     }
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
-                _computeFieldType: function(field, value, show) {                    
+                _computeFieldType: function(field, value, show) {
                     if (!(field.showIf && !field.show)) {
                         if (field.type == "dropdown" && field.query) {
                             var inputModel = this.model;
@@ -212,14 +219,13 @@
                                     dropdownItem.title = inputModel[prop].name;
                                 }
                                 dropdownItem.val = inputModel[prop].id;
-
                                 updatedOptions.push(dropdownItem);
 
                             }
                             for (var index in this.fields){
-                                var existingField = this.fields[index]
+                                var existingField = this.fields[index];
                                 if (existingField.name == field.name){
-                                    this.set("fields." + index + ".options", updatedOptions)
+                                    this.set("fields." + index + ".options", updatedOptions);
                                 } 
                             }
                         }
@@ -232,11 +238,11 @@
                         var stack = this.stack,
                             show = true,
                             dependency,
-                            path = fields.path;
-
+                            path = fields.path,
+                            valueChanged = this.get(path.replace("value", "name"));
+                            
                         //todo: Stack name resets on fieldchange, it shouldn't
                         if (path.endsWith("value")){                            
-                            var valueChanged = this.get(path.replace("value", "name"));
                             this._recomputeDependentFields(valueChanged);
                         }
                         fields.base.forEach(function(el, index) {                            
@@ -293,8 +299,7 @@
 
                     this.fire('createStack', {
                         template: {
-                            name: this.stack.name,
-                            description: this.stack.description
+                            name: this.stack.name
                         }
                     });
                 },
@@ -329,7 +334,6 @@
                             this._computeFieldType(el,el.type,el.show)
                         }
                     }, this);
-                    
                 }
             });
         })();
