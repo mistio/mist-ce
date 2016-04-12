@@ -929,24 +929,25 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
     log.warn('MULTICREATE ASYNC %d' % quantity)
-
     if multi_user:
         from mist.core.helpers import log_event
     else:
         log_event = lambda *args, **kwargs: None
     job_id = job_id or uuid.uuid4().hex
 
-    if quantity == 1:
-        names = [machine_name]
-    else:
-        names = []
-        for i in range(1, quantity+1):
-            names.append('%s-%d' % (machine_name, i))
 
     if owner.find("@") != -1:
         owner = Owner.objects.get(email=owner)
     else:
         owner = Owner.objects.get(id=owner)
+
+    names = []
+    if quantity == 1:
+        names = [machine_name]
+    else:
+        names = []
+        for i in range(1, quantity + 1):
+            names.append('%s-%d' % (machine_name, i))
 
     log_event(owner.id, 'job', 'async_machine_creation_started', job_id=job_id,
               cloud_id=cloud_id, script=script, script_id=script_id,
@@ -956,17 +957,13 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
 
     THREAD_COUNT = 5
     pool = ThreadPool(THREAD_COUNT)
-
-    names = []
-    for i in range(1, quantity+1):
-        names.append('%s-%d' % (machine_name,i))
     specs = []
     for name in names:
         specs.append((
             (owner, cloud_id, key_id, name, location_id, image_id,
-             size_id, script, image_extra, disk, image_name, size_name,
+             size_id, image_extra, disk, image_name, size_name,
              location_name, ips, monitoring, networks, docker_env,
-             docker_command, 22, script_id, script_params, job_id),
+             docker_command, 22, script, script_id, script_params, job_id),
             {'hostname': hostname, 'plugins': plugins,
              'post_script_id': post_script_id,
              'post_script_params': post_script_params,
@@ -986,6 +983,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
         error = False
         node = {}
         try:
+
             node = create_machine(*args, **kwargs)
         except MachineCreationError as exc:
             error = str(exc)
