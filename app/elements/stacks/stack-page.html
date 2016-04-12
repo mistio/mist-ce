@@ -174,16 +174,22 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
 
                     <div class="subhead bottom">
                         <div>
-                            Stack created from template <a href$="/templates/[[stack.template_id]]" class="regular blue-link">[[stack.template]]</a>
+                            Stack created from template [[stack.template]] <a href$="/templates/[[stack.template_id]]" class="regular blue-link"> <iron-icon icon="icons:link" class="blue-link" id="link-to-template"></iron-icon></a>
                         </div>
                         <div class="fab-top-right">
-                            <paper-fab icon="av:play-arrow" on-tap="_stackActions" id="runTemplateFab"></paper-fab>                            
+                            <paper-fab icon="av:play-arrow" on-tap="_showStackActions" id="runTemplateFab"></paper-fab>                            
                         </div>
                     </div>
                 </paper-toolbar>
                 
                 <div class="content" style$="[[vpHeight]]">                                        
                     <div class="page">
+                        <template is="dom-if" if="[[workflows.length]]">
+                            <h3 class="smallcaps">Workflows</h3>
+                            <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                <paper-button class="blue" id$="[[workflow.name]]" on-tap="doWorkflow">[[workflow.name]]</paper-button>
+                            </template>
+                        </template>                        
                         <template is="dom-if" if="[[machines.length]]">
                             <h3 class="smallcaps">machines</h3>
                             <paper-material class="no-pad">
@@ -219,6 +225,10 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
             </paper-header-panel>
         </paper-drawer-panel>
         <dialog-element></dialog-element>
+        <iron-ajax id="workflowRequest" 
+            url="" 
+            on-response="handleWorkflowResponse" 
+            on-error="handleWorkflowError"></iron-ajax>
     </template>
     <script>
     (function() {
@@ -245,7 +255,8 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                     type: Object
                 },
                 model: {
-                    type: Object
+                    type: Object,
+                    notify: true
                 },
                 stack: {
                     type: Object,
@@ -254,11 +265,13 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                 },
                 stackid: {
                     type: String,
-                    computed: '_computeStackId(params)'
+                    computed: '_computeStackId(params)',
+                    notify: true
                 },
                 template: {
                     type: Object,
-                    computed: '_computeTemplate(stack)'
+                    computed: '_computeTemplate(stack)',
+                    notify: true
                 },
                 machines: {
                     type: Array,
@@ -274,7 +287,7 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                 },
                 workflows: {
                     type: Array,
-                    computed: '_computeWorkflows(params)'
+                    computed: '_computeWorkflows(template)'
                 },
                 vpHeight: String
             },
@@ -297,9 +310,9 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
             _computeStackId: function(params) {
                 return params.id;
             },
-            _computeTemplate: function(stack){                
+            _computeTemplate: function(stack){
                 return this.model.templatesArray.find(function(template) {
-                    return template.id == stack.template_id;
+                    return template._id == stack.template_id;
                 }, this);
             },
             _computeMachines: function(stack){
@@ -341,8 +354,8 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                 }
                 return keys;
             },
-            _computeWorkflows: function(stack){
-                return stack.workflows;
+            _computeWorkflows: function(template){
+                return template.workflows;
             },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element'),
@@ -355,9 +368,19 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
             _goBack: function() {
                 history.back();
             },
-            _stackActions: function() {
-
+            _showStackActions: function() {
+                // make actions  
             },
+            doWorkflow: function(e){
+                var action = e.target.id;
+                this.$.workflowRequest.url = "/api/v1/stacks/"+this.stack.id+"/"+action;
+                this.$.workflowRequest.params = {};
+                // this.$.workflowRequest.generateRequest();
+                console.log(action, this.$.workflowRequest.url);
+            },
+            handleWorkflowResponse: function(){
+                // handle workflow response
+            }
         });
     })();
     </script>
