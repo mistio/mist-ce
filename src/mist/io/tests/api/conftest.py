@@ -107,3 +107,8 @@ def public_key():
 @pytest.fixture
 def cloud_name():
     return config.API_TESTING_CLOUD
+
+
+@pytest.fixture
+def org_name():
+    return config.ORG_NAME

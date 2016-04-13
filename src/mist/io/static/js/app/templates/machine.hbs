@@ -102,7 +102,11 @@
                 <tbody>
                 <tr>
                     <td>ID</td>
+                    {{#if model.uuid}}
+                    <td>{{model.uuid}}</td>
+                    {{else}}
                     <td>{{model.id}}</td>
+                    {{/if}}
                 </tr>
                 <tr>
                     <td>Last probed</td>

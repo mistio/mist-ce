@@ -147,7 +147,7 @@ class CloudNameExistsError(ConflictError):
 
 
 class KeypairExistsError(ConflictError):
-    msg = "Keypair exists"
+    msg = "Key name exists"
 
 
 # INTERNAL ERROR (translated as 500 in views)

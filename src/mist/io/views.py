@@ -61,10 +61,14 @@ def exception_handler_mist(exc, request):
     """
     # mongoengine ValidationError
     if isinstance(exc, ValidationError):
+        trace = traceback.format_exc()
+        log.warning("Uncaught me.ValidationError!\n%s", trace)
         return Response("Validation Error", 400)
 
     # mongoengine NotUniqueError
     if isinstance(exc, NotUniqueError):
+        trace = traceback.format_exc()
+        log.warning("Uncaught me.NotUniqueError!\n%s", trace)
         return Response("NotUniqueError", 409)
 
     # non-mist exceptions. that shouldn't happen! never!
@@ -187,6 +191,8 @@ def list_clouds(request):
     ---
     """
     auth_context = auth_context_from_request(request)
+    if not auth_context.has_perm("cloud", "read"):
+        raise PolicyUnauthorizedError("To list clouds")
     return mist.core.methods.filter_list_clouds(auth_context)
 
 
@@ -262,7 +268,6 @@ def add_cloud(request):
 
     if not provider:
         raise RequiredParameterMissingError('provider')
-
 
     monitoring = None
     if int(api_version) == 2:

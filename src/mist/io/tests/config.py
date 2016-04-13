@@ -152,3 +152,5 @@ API_TESTING_MACHINE_PUBLIC_KEY = test_settings.get(
 API_TESTING_MACHINE_NAME = test_settings.get("API_TESTING_MACHINE_NAME", '')
 
 API_TESTING_CLOUD = test_settings.get('API_TESTING_CLOUD', '')
+
+ORG_NAME = test_settings.get('ORG_NAME', '')

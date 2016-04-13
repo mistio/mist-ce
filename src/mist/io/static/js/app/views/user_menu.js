@@ -28,10 +28,29 @@ define('app/views/user_menu', ['ember', 'md5'],
             hasOrganization: Ember.computed('Mist.organization.id', function() {
                 return !!Mist.organization.id;
             }),
-            // isActive: Ember.computed('Mist.organization', 'Mist.org')
-            memberTeam: Ember.computed('hasOrganization', function() {
-                return 'needs work';
-                // return this.get('hasOrganization') ? Mist.teamsController.model.slice().shift().name : null;
+            memberTeam: Ember.computed('hasOrganization', 'Mist.teamsController.model', function() {
+                var teams = [], teamsText = '';
+                if (this.get('hasOrganization')) {
+                    Mist.teamsController.model.forEach(function(team) {
+                        team.members.forEach(function(member) {
+                            if (member.email == Mist.email) {
+                                teams.push(team.name);
+                            }
+                        });
+                    });
+
+                    teamsText = teams.indexOf('Owners') > -1 ? 'Owners' : teams.join(' - ');
+                }
+
+                return teamsText;
+            }),
+            orgs: Ember.computed('Mist.orgs', function() {
+                var orgs = Mist.orgs.slice().addObject({
+                    id: '',
+                    name: 'Personal'
+                });
+
+                return orgs.sortBy('id');
             }),
 
             //

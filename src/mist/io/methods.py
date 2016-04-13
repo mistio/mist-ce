@@ -9,6 +9,7 @@ import requests
 import subprocess
 import re
 import mongoengine as me
+from mongoengine import ValidationError, NotUniqueError
 from time import sleep, time
 from datetime import datetime
 from hashlib import sha256
@@ -282,24 +283,31 @@ def add_cloud_v_2(user, title, provider, params):
     # validate cloud before adding
     if remove_on_error:
         try:
-            conn = connect_provider(cloud)
-        except InvalidCredsError as exc:
-            log.error("Error while adding cloud: %r" % exc)
-            raise CloudUnauthorizedError(exc)
-        except Exception as exc:
-            log.error("Error while adding cloud%r" % exc)
-            raise CloudUnavailableError(exc)
-        if provider not in ['vshere']:
-            # in some providers -eg vSphere- this is not needed
-            # as we are sure we got a succesfull connection with
-            # the provider if connect_provider doesn't fail
             try:
-                machines = conn.list_nodes()
+                conn = connect_provider(cloud)
             except InvalidCredsError as exc:
+                log.error("Error while adding cloud: %r" % exc)
                 raise CloudUnauthorizedError(exc)
             except Exception as exc:
-                log.error("Error while trying list_nodes: %r", exc)
-                raise CloudUnavailableError(exc=exc)
+                log.error("Error while adding cloud%r" % exc)
+                raise CloudUnavailableError(exc)
+            if provider not in ['vshere']:
+                # in some providers -eg vSphere- this is not needed
+                # as we are sure we got a succesfull connection with
+                # the provider if connect_provider doesn't fail
+                try:
+                    machines = conn.list_nodes()
+                except InvalidCredsError as exc:
+                    raise CloudUnauthorizedError(exc)
+                except Exception as exc:
+                    log.error("Error while trying list_nodes: %r", exc)
+                    raise CloudUnavailableError(exc=exc)
+        except Exception as exc:
+            try:
+                cloud.delete()
+            except:
+                pass
+            raise
     cloud.owner = user
     cloud.save()
     log.info("Cloud with id '%s' added succesfully with Api-Version: 2.", cloud_id)
@@ -351,7 +359,13 @@ def _add_cloud_bare_metal(user, title, provider, params):
     cloud.provider = provider
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     machine = Machine()
     machine.cloud = cloud
@@ -371,7 +385,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
     if use_ssh:
         try:
             ssh_command(
-                user, cloud.id, machine.machine.id, machine_hostname, 'uptime',
+                user, cloud.id, machine.machine_id, machine_hostname, 'uptime',
                 key_id=machine_key, username=machine_user, password=None,
                 port=port
             )
@@ -420,7 +434,14 @@ def _add_cloud_coreos(user, title, provider, params):
     cloud.provider = provider
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     machine = Machine()
     machine.ssh_port = port
     if machine_hostname:
@@ -492,7 +513,14 @@ def _add_cloud_vcloud(user, title, provider, params):
     cloud.apiurl = host
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     return cloud.id, cloud
 
 
@@ -523,7 +551,14 @@ def _add_cloud_ec2(user, title, params):
         cloud.apisecret = api_secret
         cloud.enabled = True
         cloud.owner = user
-        cloud.save()
+
+        try:
+            cloud.save()
+        except ValidationError as e:
+            raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+        except NotUniqueError:
+            raise CloudExistsError()
+
         return cloud.id, cloud
 
 
@@ -671,7 +706,14 @@ def _add_cloud_azure(user, title, provider, params):
     cloud.apisecret = certificate
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     return cloud.id, cloud
 
 
@@ -688,7 +730,14 @@ def _add_cloud_linode(user, title, provider, params):
     cloud.apisecret = api_key
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     return cloud.id, cloud
 
 
@@ -723,7 +772,14 @@ def _add_cloud_docker(user, title, provider, params):
     cloud.apiurl = docker_host
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     return cloud.id, cloud
 
 
@@ -756,7 +812,14 @@ def _add_cloud_libvirt(user, title, provider, params):
     cloud.ssh_port = port
     cloud.images_location = images_location
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
     return cloud.id, cloud
 
 
@@ -799,7 +862,13 @@ def _add_cloud_openstack(user, title, provider, params):
     cloud.compute_endpoint = compute_endpoint
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     return cloud.id, cloud
 
@@ -817,7 +886,13 @@ def _add_cloud_hostvirtual(user, title, provider, params):
     cloud.apisecret = api_key
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     return cloud.id, cloud
 
@@ -835,7 +910,13 @@ def _add_cloud_vultr(user, title, provider, params):
     cloud.apisecret = api_key
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     return cloud.id, cloud
 
@@ -855,7 +936,13 @@ def _add_cloud_packet(user, title, provider, params):
     cloud.owner = user
     if project_id:
         cloud.tenant_name = project_id
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     return cloud.id, cloud
 
@@ -882,7 +969,13 @@ def _add_cloud_vsphere(user, title, provider, params):
     cloud.apiurl = host
     cloud.enabled = True
     cloud.owner = user
-    cloud.save()
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
 
     return cloud.id, cloud
 
@@ -1243,7 +1336,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.VSPHERE:
         conn = driver(host=cloud.apiurl, username=cloud.apikey, password=cloud.apisecret)
     elif cloud.provider == 'bare_metal':
-        conn = BareMetalDriver(Machine.objects(owner=user, cloud=cloud))
+        conn = BareMetalDriver(Machine.objects(cloud=cloud))
     elif cloud.provider == 'coreos':
         conn = CoreOSDriver(Machine.objects(owner=user, cloud=cloud))
     elif cloud.provider == Provider.LIBVIRT:
@@ -1455,11 +1548,12 @@ def list_machines(user, cloud_id):
         if m.driver.type == 'bare_metal':
             can_reboot = False
             keys = Keypair.objects(owner=user)
-            machine = Machine.objects(owner=user,
-                                      key_associations__keypair__in=keys,
-                                      machine_id=machine_id)
-            if machine:
-                can_reboot = True
+            try:
+                machine = Machine.objects.get(cloud=cloud_id, machine_id=m.id)
+                if machine.key_associations:
+                    can_reboot = True
+            except Machine.DoesNotExist:
+                pass
             m.extra['can_reboot'] = can_reboot
 
         if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:

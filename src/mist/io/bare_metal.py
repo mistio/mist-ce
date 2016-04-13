@@ -42,8 +42,8 @@ class BareMetalDriver(object):
         return ('<BareMetalDriver>')
 
     def list_nodes(self):
-        nodes = [self._to_node(machine_id, machine)
-                 for machine_id, machine in self.machines.items()]
+        nodes = [self._to_node(machine.machine_id, machine)
+                 for machine in self.machines]
         return nodes
 
     def list_sizes(self):
