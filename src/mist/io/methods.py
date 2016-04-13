@@ -1325,7 +1325,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.VSPHERE:
         conn = driver(host=cloud.apiurl, username=cloud.apikey, password=cloud.apisecret)
     elif cloud.provider == 'bare_metal':
-        conn = BareMetalDriver(Machine.objects(owner=user, cloud=cloud))
+        conn = BareMetalDriver(Machine.objects(cloud=cloud))
     elif cloud.provider == 'coreos':
         conn = CoreOSDriver(Machine.objects(owner=user, cloud=cloud))
     elif cloud.provider == Provider.LIBVIRT:
@@ -1537,11 +1537,12 @@ def list_machines(user, cloud_id):
         if m.driver.type == 'bare_metal':
             can_reboot = False
             keys = Keypair.objects(owner=user)
-            machine = Machine.objects(owner=user,
-                                      key_associations__keypair__in=keys,
-                                      machine_id=machine_id)
-            if machine:
-                can_reboot = True
+            try:
+                machine = Machine.objects.get(cloud=cloud_id, machine_id=m.id)
+                if machine.key_associations:
+                    can_reboot = True
+            except Machine.DoesNotExist:
+                pass
             m.extra['can_reboot'] = can_reboot
 
         if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
