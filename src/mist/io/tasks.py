@@ -132,7 +132,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
         owner = Owner.objects.get(id=owner)
     tmp_log = lambda msg, *args: log.error('Post deploy: %s' % msg, *args)
     tmp_log('Entering post deploy steps for %s %s %s',
-            owner.id, cloud_id, machine_id)
+            owner.email, cloud_id, machine_id)
 
     try:
         # find the node we're looking for and get its hostname
@@ -175,7 +175,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                                     key_id=key_id, ssh_user=ssh_user,
                                     shell=shell)
             log_dict = {
-                    'owner_id': owner.id,
+                    'owner_id': owner.email,
                     'event_type': 'job',
                     'cloud_id': cloud_id,
                     'machine_id': machine_id,
@@ -252,7 +252,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                                 % machine_id, repr(e))
                     notify_admin('Enable monitoring on creation failed for '
                                  'user %s machine %s: %r'
-                                 % (owner.id, machine_id, e))
+                                 % (owner.email, machine_id, e))
                     log_event(action='enable_monitoring_failed', error=repr(e),
                               **log_dict)
 
@@ -296,9 +296,9 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             raise
         notify_user(owner, "Deployment script failed for machine %s" % machine_id)
         notify_admin("Deployment script failed for machine %s in cloud %s by "
-                     "user %s" % (machine_id, cloud_id, owner.id), repr(exc))
+                     "user %s" % (machine_id, cloud_id, owner.email), repr(exc))
         log_event(
-            owner.id,
+            owner.email,
             event_type='job',
             action='post_deploy_finished',
             cloud_id=cloud_id,
@@ -725,11 +725,11 @@ class ListNetworks(UserTask):
     def execute(self, owner_id, cloud_id):
         owner = Owner.objects.get(id=owner_id)
         log.warn('Running list networks for user %s cloud %s'
-                 % (owner.id, cloud_id))
+                 % (owner.email, cloud_id))
         from mist.io import methods
         networks = methods.list_networks(owner, cloud_id)
         log.warn('Returning list networks for user %s cloud %s'
-                 % (owner.id, cloud_id))
+                 % (owner.email, cloud_id))
         return {'cloud_id': cloud_id, 'networks': networks}
 
 
@@ -745,10 +745,10 @@ class ListImages(UserTask):
         from mist.io import methods
         owner = Owner.objects.get(id=owner_id)
         log.warn('Running list images for user %s cloud %s',
-                 owner.id, cloud_id)
+                 owner.email, cloud_id)
         images = methods.list_images(owner, cloud_id)
         log.warn('Returning list images for user %s cloud %s',
-                 owner.id, cloud_id)
+                 owner.email, cloud_id)
         return {'cloud_id': cloud_id, 'images': images}
 
 
@@ -763,11 +763,11 @@ class ListProjects(UserTask):
     def execute(self, owner_id, cloud_id):
         owner = Owner.objects.get(id=owner_id)
         log.warn('Running list projects for user %s cloud %s',
-                 owner.id, cloud_id)
+                 owner.email, cloud_id)
         from mist.io import methods
         projects = methods.list_projects(owner, cloud_id)
         log.warn('Returning list projects for user %s cloud %s',
-                 owner.id, cloud_id)
+                 owner.email, cloud_id)
         return {'cloud_id': cloud_id, 'projects': projects}
 
 
@@ -788,7 +788,7 @@ class ListMachines(UserTask):
         from mist.io import methods
         owner = Owner.objects.get(id=owner_id)
         log.warn('Running list machines for user %s cloud %s',
-                 owner.id, cloud_id)
+                 owner.email, cloud_id)
         machines = methods.list_machines(owner, cloud_id)
         if multi_user:
             from mist.core.methods import get_machine_tags, set_machine_tags
@@ -813,7 +813,7 @@ class ListMachines(UserTask):
                         machine['tags'].append(tag_dict)
                 # FIXME: optimize!
         log.warn('Returning list machines for user %s cloud %s',
-                 owner.id, cloud_id)
+                 owner.email, cloud_id)
         return {'cloud_id': cloud_id, 'machines': machines}
 
     def error_rerun_handler(self, exc, errors, owner_id, cloud_id):
@@ -835,15 +835,6 @@ class ListMachines(UserTask):
         if index < len(times):
             return times[index]
         else: # If cloud still unresponsive disable it & notify user
-            cloud.enabled = False
-            cloud.save()
-            # user.clouds_dict[cloud_id].enabled = False
-            # user.clouds_dict[cloud_id].save()
-            notify_user(owner, "Cloud %s disabled after not responding for "
-                               "30 mins" % cloud.title,
-                        email_notify=True, cloud_id=cloud_id)
-            log_event(owner.id, 'incident', action='disable_cloud',
-                      cloud_id=cloud_id, error="Cloud unresponsive")
             return 20*60
 
 
@@ -948,7 +939,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
     else:
         owner = Owner.objects.get(id=owner)
 
-    log_event(owner.id, 'job', 'async_machine_creation_started', job_id=job_id,
+    log_event(owner.email, 'job', 'async_machine_creation_started', job_id=job_id,
               cloud_id=cloud_id, script=script, script_id=script_id,
               script_params=script_params, monitoring=monitoring,
               persist=persist, quantity=quantity, key_id=key_id,
@@ -993,7 +984,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
             error = repr(exc)
         finally:
             name = args[3]
-            log_event(owner.id, 'job', 'machine_creation_finished',
+            log_event(owner.email, 'job', 'machine_creation_finished',
                       job_id=job_id, cloud_id=cloud_id, machine_name=name,
                       error=error, machine_id=node.get('id', ''))
 
