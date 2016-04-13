@@ -239,6 +239,12 @@ paper-button.blue > * {
     color: #fff;
 }
 
+paper-button.blue-link {
+    background-color: transparent;
+    color: #039BE5;
+    font-weight: 500;
+}
+
 iron-dropdown paper-material {
     width: 191px;
     top: 57px !important;

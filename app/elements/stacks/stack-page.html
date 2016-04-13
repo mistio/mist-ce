@@ -1,6 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="workflow-form.html">
+<link rel="import" href="stack-machine-item.html">
+<link rel="import" href="stack-network-item.html">
+<link rel="import" href="stack-key-item.html">
 
 <dom-module id="stack-page">
     <template>
@@ -135,7 +139,7 @@
         paper-tabs {
             height: 57px !important;
             text-transform: uppercase;
-            font-size: 12px;
+/*            font-size: 12px;*/
         }
         paper-tabs ::content #selectionBar {
             background-color: var(--mist-blue);
@@ -148,7 +152,7 @@
             line-height: 57px;
         }
         .content {
-            margin-top: 57px;
+            margin-top: 114px;
         }
         paper-header-panel ::content #dropShadow {
             top: 56px;
@@ -161,11 +165,26 @@
         }
         .resource-head {
             font-weight: 500;
-            padding: 8px;
+            padding: 8px 16px;
             color: rgba(0,0,0,0.84);
             background-color: #fff;
             border-bottom: 1px solid #ddd;
             margin-bottom: 0;
+        }
+        .wf-header {
+            background-color: #616161;
+            color: #fff;
+            padding: 8px;
+            text-transform: uppercase;
+        }
+        .wf-item {
+            margin-bottom: 16px;
+        }
+        .resources-list {
+            margin-bottom: 36px;
+        }
+        .section {
+            padding-top: 36px;
         }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
@@ -185,11 +204,10 @@
                     </span>
 
                     <div id="workflowBar" class="subhead bottom">
-                            <!-- Stack created from template [[stack.template]] <a href$="/templates/[[stack.template_id]]" class="regular blue-link"> <iron-icon icon="icons:link" class="blue-link" id="link-to-template"></iron-icon></a> -->
                         <paper-tabs selected="{{selected}}">
-                          <paper-tab selected>Resources</paper-tab>
-                          <paper-tab>Workflows</paper-tab>
-                          <paper-tab>State</paper-tab>
+                            <paper-tab selected>Resources</paper-tab>
+                            <paper-tab>Workflows</paper-tab>
+                            <paper-tab>Stack State</paper-tab>
                         </paper-tabs>
                         <div class="fab-top-right">
                             <paper-fab icon="av:play-arrow" on-tap="_showStackActions" id="runTemplateFab"></paper-fab>                            
@@ -197,9 +215,9 @@
                     </div>
                 </paper-toolbar>
                 
-                <div class="content" style$="[[vpHeight]]">                    
+                <div class="content">                    
                     <iron-pages selected="{{selected}}">
-                        <div id="resources" class="page">                            
+                        <div id="resources" class="page">
                             <div class="flex-horizontal-with-ratios">
                                 <div class="page-block">
                                     <h3 class="smallcaps">Created from template</h3>
@@ -215,43 +233,54 @@
                             <div class="resources-list">
                                 <h3 class="smallcaps">Resources list</h3>
                                 <template is="dom-if" if="[[machines.length]]">                                
-                                    <paper-material class="no-pad">
+                                    <paper-material class="no-pad resources-list">
                                         <h3 class="smallcaps resource-head">machines</h3>
                                         <template is="dom-repeat" items="[[machines]]" as="machine">
-                                            <paper-item>
-                                                [[machine.name]]
-                                            </paper-item>
+                                            <stack-machine-item model="[[model]]" machine="[[machine]]" hasIncident></stack-machine-item>
+                                            <stack-machine-item model="[[model]]" machine="[[machine]]"></stack-machine-item>
+                                            <stack-machine-item model="[[model]]" machine="[[machine]]"></stack-machine-item>
                                         </template>
                                     </paper-material>
                                 </template>
                                 <template is="dom-if" if="[[networks.length]]">
-                                    <paper-material class="no-pad">
+                                    <paper-material class="no-pad resources-list">
                                         <h3 class="smallcaps resource-head">networks</h3>
                                         <template is="dom-repeat" items="[[networks]]" as="network">
-                                            <paper-item>
-                                                [[network.name]]
-                                            </paper-item>
+                                            <stack-network-item model="[[model]]" network="[[network]]"></stack-network-item>
                                         </template>
                                     </paper-material>
                                 </template>
                                 <template is="dom-if" if="[[keys.length]]">
-                                    <paper-material class="no-pad">
+                                    <paper-material class="no-pad resources-list">
                                         <h3 class="smallcaps resource-head">keys</h3>
                                         <template is="dom-repeat" items="[[keys]]" as="key">
-                                            <paper-item>
-                                                [[key.id]]
-                                            </paper-item>
+                                            <stack-key-item model="[[model]]" key="[[key]]"></stack-key-item>
                                         </template>
                                     </paper-material>
                                 </template>
-                            </div>
+                            </div>                                                    
                         </div>
                         <div id="workflows" class="page">
                             <template is="dom-if" if="[[workflows.length]]">
-                                <h3 class="smallcaps">Workflows</h3>
-                                <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                    <paper-button class="blue" id$="[[workflow.name]]" on-tap="doWorkflow">[[workflow.name]]</paper-button>
-                                </template>
+                                <div class="workflows">
+                                    <h3 class="smallcaps">Workflows</h3>
+                                    <div class='grid-row'>
+                                        <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                            <div class="m12 wf-item">
+                                                <div class="wf-header" id$="[[workflow.name]]">[[workflow.name]]</div>
+
+                                                <workflow-form id$="[[workflow.name]]form" hidden$="[[!workflow.params.length]]" model="[[model]]" workflow="[[workflow]]" fields="[[workflow.params]]"></workflow-form>
+
+                                                <paper-material hidden$="[[workflow.params.length]]">
+                                                    <div class="center">
+                                                        <paper-button on-tap="doWorkflow">[[workflow.name]]</paper-button>
+                                                    </div>
+                                                </paper-material>
+                                                
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
                             </template>
                         </div>
                         <div id="state" class="page">
@@ -337,11 +366,7 @@
             listeners: {
                 // 'confirmation': '_deleteStackResponse',
                 // 'updateSelectedStack': '_updateStack'
-            },
-            ready: function() {
-                var wh = window.innerHeight;
-                this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
-            },
+            },            
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
             },
@@ -416,10 +441,18 @@
             },
             doWorkflow: function(e){
                 var action = e.target.id;
-                this.$.workflowRequest.url = "/api/v1/stacks/"+this.stack.id+"/"+action;
-                this.$.workflowRequest.params = {};
-                // this.$.workflowRequest.generateRequest();
-                console.log(action, this.$.workflowRequest.url);
+                var workflow = this.workflows.find(function(workflow) {
+                    return workflow.name == action;
+                });
+                if ( workflow.params == null || workflow.params == undefined ){
+                    this.$.workflowRequest.url = "/api/v1/stacks/"+this.stack.id+"/"+action;
+                    this.$.workflowRequest.params = {};
+                    // this.$.workflowRequest.generateRequest();
+                }
+                else {
+                    // show form
+
+                }
             },
             handleWorkflowResponse: function(){
                 // handle workflow response
