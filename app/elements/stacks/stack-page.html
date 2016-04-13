@@ -1,5 +1,6 @@
-a<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 
 <dom-module id="stack-page">
     <template>
@@ -122,8 +123,7 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
         }
         .subhead {
             box-sizing: border-box;
-            position: absolute;
-            font-size: 14px;
+            position: absolute;            
             width: 100%;
             left: 0;
             height: 57px;
@@ -131,6 +131,21 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
             right: 0;
             z-index: 9;
             color: rgba(0,0,0,0.87);
+        }
+        paper-tabs {
+            height: 57px !important;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        paper-tabs ::content #selectionBar {
+            background-color: var(--mist-blue);
+        }
+        paper-tab ::content paper-ripple {
+            color: #999;
+        }
+        #workflowBar {
+            padding: 0 0 0 60px;
+            line-height: 57px;
         }
         .content {
             margin-top: 57px;
@@ -169,71 +184,82 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
                         <paper-icon-button id="deleteTemplate" icon="icons:delete" on-tap="_deleteTemplate"></paper-icon-button>
                     </span>
 
-                    <div class="subhead bottom">
-                        <div>
+                    <div id="workflowBar" class="subhead bottom">
                             <!-- Stack created from template [[stack.template]] <a href$="/templates/[[stack.template_id]]" class="regular blue-link"> <iron-icon icon="icons:link" class="blue-link" id="link-to-template"></iron-icon></a> -->
-                            <!-- <template is="dom-if" if="[[workflows.length]]">
-                                <h3 class="smallcaps">Workflows</h3>
-                                <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                    <paper-button class="blue" id$="[[workflow.name]]" on-tap="doWorkflow">[[workflow.name]]</paper-button>
-                                </template>
-                            </template> -->
-                        </div>
+                        <paper-tabs selected="{{selected}}">
+                          <paper-tab selected>Resources</paper-tab>
+                          <paper-tab>Workflows</paper-tab>
+                          <paper-tab>State</paper-tab>
+                        </paper-tabs>
                         <div class="fab-top-right">
                             <paper-fab icon="av:play-arrow" on-tap="_showStackActions" id="runTemplateFab"></paper-fab>                            
                         </div>
                     </div>
                 </paper-toolbar>
                 
-                <div class="content" style$="[[vpHeight]]">                                        
-                    <div class="page">
+                <div class="content" style$="[[vpHeight]]">                    
+                    <iron-pages selected="{{selected}}">
+                        <div id="resources" class="page">                            
+                            <div class="flex-horizontal-with-ratios">
+                                <div class="page-block">
+                                    <h3 class="smallcaps">Created from template</h3>
+                                    <p><a href$="/templates/[[stack.template_id]]" class="regular blue-link"> [[stack.template]]</a>: [[template.description]]</p>
 
-                        <div class="flex-horizontal-with-ratios">
-                            <div class="page-block">
-                                <h3 class="smallcaps">Created from template</h3>
-                                <p><a href$="/templates/[[stack.template_id]]" class="regular blue-link"> [[stack.template]]</a>: [[template.description]]</p>
-
+                                </div>
+                                <div class="page-block">
+                                    <h3 class="smallcaps">Created</h3>
+                                    <p>[[stack.created_at]] from <a href="/members/[[template.user]]" class="regular blue-link">[[stack.user]]</a></p>
+                                </div>
                             </div>
-                            <div class="page-block">
-                                <h3 class="smallcaps">Created</h3>
-                                <p>[[stack.created_at]] from <a href="/members/[[template.user]]" class="regular blue-link">[[stack.user]]</a></p>
+
+                            <div class="resources-list">
+                                <h3 class="smallcaps">Resources list</h3>
+                                <template is="dom-if" if="[[machines.length]]">                                
+                                    <paper-material class="no-pad">
+                                        <h3 class="smallcaps resource-head">machines</h3>
+                                        <template is="dom-repeat" items="[[machines]]" as="machine">
+                                            <paper-item>
+                                                [[machine.name]]
+                                            </paper-item>
+                                        </template>
+                                    </paper-material>
+                                </template>
+                                <template is="dom-if" if="[[networks.length]]">
+                                    <paper-material class="no-pad">
+                                        <h3 class="smallcaps resource-head">networks</h3>
+                                        <template is="dom-repeat" items="[[networks]]" as="network">
+                                            <paper-item>
+                                                [[network.name]]
+                                            </paper-item>
+                                        </template>
+                                    </paper-material>
+                                </template>
+                                <template is="dom-if" if="[[keys.length]]">
+                                    <paper-material class="no-pad">
+                                        <h3 class="smallcaps resource-head">keys</h3>
+                                        <template is="dom-repeat" items="[[keys]]" as="key">
+                                            <paper-item>
+                                                [[key.id]]
+                                            </paper-item>
+                                        </template>
+                                    </paper-material>
+                                </template>
                             </div>
                         </div>
-
-                        <div class="resources-list">
-                            <h3 class="smallcaps">Resources list</h3>
-                            <template is="dom-if" if="[[machines.length]]">                                
-                                <paper-material class="no-pad">
-                                    <h3 class="smallcaps resource-head">machines</h3>
-                                    <template is="dom-repeat" items="[[machines]]" as="machine">
-                                        <paper-item>
-                                            [[machine.name]]
-                                        </paper-item>
-                                    </template>
-                                </paper-material>
-                            </template>
-                            <template is="dom-if" if="[[networks.length]]">
-                                <paper-material class="no-pad">
-                                    <h3 class="smallcaps resource-head">networks</h3>
-                                    <template is="dom-repeat" items="[[networks]]" as="network">
-                                        <paper-item>
-                                            [[network.name]]
-                                        </paper-item>
-                                    </template>
-                                </paper-material>
-                            </template>
-                            <template is="dom-if" if="[[keys.length]]">
-                                <paper-material class="no-pad">
-                                    <h3 class="smallcaps resource-head">keys</h3>
-                                    <template is="dom-repeat" items="[[keys]]" as="key">                            
-                                        <paper-item>
-                                            [[key.id]]
-                                        </paper-item>
-                                    </template>
-                                </paper-material>
+                        <div id="workflows" class="page">
+                            <template is="dom-if" if="[[workflows.length]]">
+                                <h3 class="smallcaps">Workflows</h3>
+                                <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                    <paper-button class="blue" id$="[[workflow.name]]" on-tap="doWorkflow">[[workflow.name]]</paper-button>
+                                </template>
                             </template>
                         </div>
-                    </div>                    
+                        <div id="state" class="page">
+                            <div class="flex-horizontal-with-ratios">
+                                <h3 class="smallcaps">Stack State</h3>
+                            </div>
+                        </div>
+                    </iron-pages>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
@@ -253,6 +279,10 @@ a<link rel="import" href="../../bower_components/polymer/polymer.html">
             properties: {
                 model: {
                     type: Object
+                },
+                selected: {
+                    type: Number,
+                    value: 0
                 },
                 sections: {
                     type: Object
