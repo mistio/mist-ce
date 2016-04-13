@@ -153,6 +153,7 @@ Polymer({
         };
 
         this.getScripts();
+        this.getTemplates();
     },
 
     getScripts: function () {
@@ -167,7 +168,18 @@ Polymer({
         xhr.open("GET", '/api/v1/scripts', true);
         xhr.send();
     },
-
+    getTemplates: function () {
+        var xhr = new XMLHttpRequest(), that = this;
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status == 200) {
+                    that._updateModel('templates', JSON.parse(xhr.responseText));
+                }
+            }
+        }
+        xhr.open("GET", '/api/v1/templates', true);
+        xhr.send();
+    },
     heartbeat: function() {
         console.debug('got heartbeat');
         this.send('h'); // reply with empty frame
@@ -300,6 +312,9 @@ Polymer({
 
     _updateKeys: function (data) {
         return this._updateModel('keys', data);
+    },
+    _updateTemplates: function (data) {
+        return this._updateModel('templates', data);
     },
 
     _updateSizes: function (data) {

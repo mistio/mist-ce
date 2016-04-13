@@ -84,7 +84,7 @@
             <page-dashboard model="[[model]]" sections="[[sections]]">
                 <title>Dashboard</title>
             </page-dashboard>
-            <cloud-add model="[[model]]" keys="[[model.keysArray]]"></cloud-add>
+            <cloud-add model="[[model]]" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
             <!-- machines -->
             <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
             <page-machine params="[[params]]" model="[[model]]" machine="[[getMachine(params)]]" sections="[[sections]]"></page-machine>
@@ -205,10 +205,10 @@ var app = Polymer({
                         type: "text",
                         description: "Stack Name",
                         errorMessage: "The stack must have a name",
-                        helptext: "",                    
+                        helptext: "",
                         show: true,
                         required: true,
-                    },                    
+                    },
                     {
                         name: "cloud",
                         default: '',
@@ -216,7 +216,7 @@ var app = Polymer({
                         description: "The mist.io cloud",
                         used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
                         errorMessage: "Please enter cloud id",
-                        helptext: "You can choose cloud id is needed to...",                    
+                        helptext: "You can choose cloud id is needed to...",
                         show: true,
                         required: true,
                         type: "dropdown",
@@ -332,10 +332,10 @@ var app = Polymer({
                         type: "text",
                         description: "Stack Name",
                         errorMessage: "The stack must have a name",
-                        helptext: "",                    
+                        helptext: "",
                         show: true,
                         required: true,
-                    },                    
+                    },
                     {
                         name: "cloud",
                         default: '',
@@ -343,7 +343,7 @@ var app = Polymer({
                         description: "The mist.io cloud",
                         used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
                         errorMessage: "Please enter cloud id",
-                        helptext: "You can choose cloud id is needed to...",                    
+                        helptext: "You can choose cloud id is needed to...",
                         show: true,
                         required: true,
                         type: "dropdown",
@@ -887,6 +887,6 @@ var app = Polymer({
         // https://github.com/Polymer/docs/blob/master/js/app.js#L141:L147
         // scrollIntoViewIfNeeded
         // document.querySelector('#mainContainer').scrollTop();
-    }    
+    }
 });
 </script>

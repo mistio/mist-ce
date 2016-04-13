@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../app-form/app-form.html">
 <dom-module id="script-add">
     <template>
         <style is="custom-style" include="forms"></style>
@@ -38,51 +39,11 @@
                     <span class="bottom title">Add Script {{typedName}}</span>
                 </paper-toolbar>
                 <div id="content">
-                    <paper-material>
-                        <div class="grid-row">
-                        <template is="dom-repeat" items="{{fields}}" as="field">
-                            <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-                                <paper-input class="xs12" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-                            </template>
-                            <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-                                <paper-textarea class="xs12" id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
-                            </template>
-                            <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-                                <paper-dropdown-menu class="dropdown-block xs12 l6" label="[[field.label]]" horizontal-align="left">
-                                    <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
-                                        <template is="dom-repeat" items="[[field.options]]" as="option">
-                                            <paper-item value="[[option.val]]">[[option.title]]</paper-item>
-                                        </template>
-                                    </paper-menu>
-                                </paper-dropdown-menu>
-                            </template>
-                        </template>
-                        <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
-                        <hr class="xs12" />
-                        <!-- <div class="notifications xs12">
-                            <div class="red">
-                                <iron-icon icon="icons:error-outline"></iron-icon> Error message from server
-                                <div class="info-code">
-                                    <code>test code</code>
-                                </div>
-                            </div>
-                            <div class="green">
-                                <iron-icon icon="check"></iron-icon> Success message from server
-                            </div>
-                            <div class="blue">
-                                Info message from server
-                            </div>
-                        </div> -->
-                        <div class="clearfix bottom-actions xs12">
-                            <paper-button id="submit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm" onclick="startProgress();">Add</paper-button>
-                            <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
-                        </div>
-                    </div>
-                    </paper-material>
+                    <app-form fields="[[fields]]" form="[[script]]" url="/api/v1/scripts" on-request="_addScriptAjaxRequest" on-response="_addScriptAjaxResponse" on-leadchange="_updateTypedName"></app-form>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <iron-ajax id="addScriptAjax" url="/scripts" method="POST" on-request="_addScriptAjaxRequest" on-response="_addScriptAjaxResponse"></iron-ajax>
+
     </template>
     <script>
     (function() {
@@ -98,7 +59,7 @@
                 section: {
                     type: Object
                 },
-                color: {                    
+                color: {
                     type: String,
                     computed: '_getHeaderStyle(section)'
                 },
@@ -107,10 +68,10 @@
                     value: function() {
                         return {
                             name: '',
-                            url: '',
-                            type: '',
-                            entryPoint: '',
-                            source: '',
+                            script: '',
+                            exec_type: '',
+                            entrypoint: '',
+                            location_type: '',
                             description: ''
                         }
                     }
@@ -127,6 +88,7 @@
                         label: "Script Name *",
                         type: "text",
                         value: "",
+                        isLead: true,
                         defaultValue: "",
                         placeholder: "",
                         errorMessage: "Please enter script's name",
@@ -143,7 +105,7 @@
                         show: true,
                         required: false
                     }, {
-                        name: "type",
+                        name: "exec_type",
                         label: "Type *",
                         type: "dropdown",
                         value: "",
@@ -159,7 +121,7 @@
                             val: "ansible"
                         }]
                     }, {
-                        name: "source",
+                        name: "location_type",
                         label: "Source *",
                         type: "dropdown",
                         value: "",
@@ -178,7 +140,7 @@
                             val: "inline"
                         }]
                     }, {
-                        name: "url",
+                        name: "script",
                         label: "Url *",
                         type: "text",
                         value: "http://",
@@ -187,12 +149,12 @@
                         show: false,
                         required: true,
                         showIf: {
-                            fieldName: "source",
+                            fieldName: "location_type",
                             fieldValues: ["url"]
                         },
                         errorMessage: "Please enter a url"
                     }, {
-                        name: "url",
+                        name: "script",
                         label: "Github Repo *",
                         type: "text",
                         value: "https://github.com/owner/repo",
@@ -201,24 +163,10 @@
                         show: false,
                         required: true,
                         showIf: {
-                            fieldName: "source",
+                            fieldName: "location_type",
                             fieldValues: ["github"]
                         },
                         errorMessage: "Please enter a github repo"
-                    }, {
-                        name: "entryPoint",
-                        label: "Entry point",
-                        type: "text",
-                        value: "",
-                        defaultValue: "",
-                        placeholder: "",
-                        show: false,
-                        required: false,
-                        showIf: {
-                            fieldName: "source",
-                            fieldValues: ["github", "url"]
-                        },
-                        errorMessage: "Please enter entry point"
                     }, {
                         name: "script",
                         label: "Script *",
@@ -230,16 +178,30 @@
                         required: true,
                         errorMessage: "Please enter inline script",
                         showIf: {
-                            fieldName: "source",
+                            fieldName: "location_type",
                             fieldValues: ["inline"]
                         },
                         placeholderIf: {
-                            fieldName: "type",
+                            fieldName: "location_type",
                             fieldOptions: {
                                 "executable": "#!/bin/bash\necho 'hello world'",
                                 "ansible": "- name: Dummy ansible playbook\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug:\n\t\t\t\tmsg: 'Hello World'\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug: msg='Hello World'\n"
                             }
                         }
+                    }, {
+                        name: "entrypoint",
+                        label: "Entry point",
+                        type: "text",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "location_type",
+                            fieldValues: ["github", "url"]
+                        },
+                        errorMessage: "Please enter entry point"
                     }],
                     notify: true
                 },
@@ -256,77 +218,22 @@
                     value: true
                 }
             },
-            observers: [
-                '_fieldsChanged(fields.*, sendingData)',
-                '_updateTypedName(fields.#0.*)'
-            ],
             _updateTypedName: function(t) {
-                if (t.path == "fields.#0.value" && t.value) {
-                    this.typedName = '"'+t.value+'"';
+                console.log(t)
+                if (t.detail.leadValue) {
+                    this.typedName = '"'+t.detail.leadValue+'"';
                 }
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
-            },
-            _computeFieldType: function(field, value, show) {
-                if (!(field.showIf && !field.show)) {
-                    return field.type == value;
-                }
-            },
-            _fieldsChanged: function(fields, sendingData) {
-                var script = this.script,
-                    show = true,
-                    dependency;
-
-                fields.base.forEach(function(el, index) {
-                    this.set('script.' + el.name, el.value);
-
-                    if (el.showIf) {
-                        if (el.showIf.fieldExists) {
-                            dependency = script[el.showIf.fieldName],
-                                show = dependency;
-                            this.set('fields.' + index + '.show', show);
-                        } else {
-                            dependency = script[el.showIf.fieldName],
-                                show = el.showIf.fieldValues.indexOf(dependency) != -1;
-                            this.set('fields.' + index + '.show', show);
-                        }
-
-                        if (!show) {
-                            this._resetField(el, index);
-                        }
-                    }
-
-                    if (el.placeholderIf) {
-                        dependency = script[el.placeholderIf.fieldName];
-                        this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
-                    }
-                }, this);
-
-                var valid = fields.base.every(function(el, index) {
-                    return el.show && el.required ? el.value : true;
-                }, this);
-
-                this.set('script', script);
-
-                this.set('formReady', valid && !sendingData);
-            },
-            _submitForm: function() {
-                var payload = this.script;
-                console.log(payload);
-
-                //   this.$.addScriptAjax.body = payload;
-                //   this.$.addScriptAjax.addRequest();
-
-                //test progress bar
-                this.hideprogress = false;
             },
             _addScriptAjaxRequest: function() {
                 this.set('sendingData', true);
             },
             _addScriptAjaxResponse: function(e) {
                 this.set('sendingData', false);
-
+                console.log("response")
+                console.log(e.detail.response)
                 this.fire('addScript', {
                     script: {
                         name: this.script.name,
@@ -334,68 +241,40 @@
                     }
                 });
             },
-            _resetForm: function(e) {
-                // Reset script
-                this.set('script.name', '');
-                this.set('script.url', '');
-                this.set('script.type', '');
-                this.set('script.entryPoint', '');
-                this.set('script.source', '');
-                this.set('script.description', '');
-
-                // Reset Form Fields
-                this.fields.forEach(function(el, index) {
-                    if (el.showIf) {
-                        this.set('fields.' + index + '.show', false);
-                    }
-
-                    // Reset Form Fields Validation
-                    this._resetField(el, index);
-                }, this);
-                this.typedName = "";
-            },
-            _resetField: function(el, index) {
-                this.set('fields.' + index + '.value', el.defaultValue);
-
-                var input = this.querySelector('#' + el.name);
-                if (input) {
-                    input.invalid = false;
-                }
-            }
         });
     })();
     // test progress bar, code from demo
-    var progress, button, animationFrame;
-    var repeat, maxRepeat = 1,
-        animating = false;
+    // var progress, button, animationFrame;
+    // var repeat, maxRepeat = 1,
+    //     animating = false;
 
-    function nextProgress() {
-        animating = true;
-        if (progress.value < progress.max) {
-            progress.value += (progress.step || 1);
+    // function nextProgress() {
+    //     animating = true;
+    //     if (progress.value < progress.max) {
+    //         progress.value += (progress.step || 1);
 
-        } else {
-            if (++repeat >= maxRepeat) {
-                animating = false;
-                button.disabled = false;
-                return;
-            }
-            progress.value = progress.min;
-        }
-        var animationFrame = requestAnimationFrame(nextProgress);
-    }
+    //     } else {
+    //         if (++repeat >= maxRepeat) {
+    //             animating = false;
+    //             button.disabled = false;
+    //             return;
+    //         }
+    //         progress.value = progress.min;
+    //     }
+    //     var animationFrame = requestAnimationFrame(nextProgress);
+    // }
 
-    function startProgress() {
-        repeat = 0;
-        progress.value = progress.min;
-        button.disabled = true;
-        if (!animating) {
-            nextProgress();
-        }
-    }
-    window.addEventListener('WebComponentsReady', function() {
-        progress = document.querySelector('paper-progress');
-        button = document.querySelector('paper-button#submit');
-    });
+    // function startProgress() {
+    //     repeat = 0;
+    //     progress.value = progress.min;
+    //     button.disabled = true;
+    //     if (!animating) {
+    //         nextProgress();
+    //     }
+    // }
+    // window.addEventListener('WebComponentsReady', function() {
+    //     progress = document.querySelector('paper-progress');
+    //     button = document.querySelector('paper-button#submit');
+    // });
     </script>
 </dom-module>
