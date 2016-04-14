@@ -10,6 +10,7 @@
 <link rel="import" href="../../bower_components/iron-routes/iron-routes.html">
 <link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-drawer-panel/paper-drawer-panel.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
@@ -274,14 +275,14 @@ var app = Polymer({
                     actions: [{name:'some action 1'}],
                     params: [{
                         name: "misc_input",
-                        default: "",
+                        default: true,
                         value: "",
                         description: "Some input",
                         errorMessage: "Please fill in ",
                         helptext: "You can choose cloud size according to your cloud",
                         show: true,
                         required: true,
-                        type: "text"
+                        type: "toggle"
                         // name: "cloud",
                         // default: '',
                         // value: "",
@@ -400,17 +401,6 @@ var app = Polymer({
                     name: "create",
                     actions: [{name:'some action 1'}],
                     params: [{
-                        name: "name",
-                        isLead: true,
-                        default: "",
-                        value: "",
-                        type: "text",
-                        description: "Stack Name",
-                        errorMessage: "The stack must have a name",
-                        helptext: "",                    
-                        show: true,
-                        required: true,
-                    },{
                         name: "cloud",
                         default: '',
                         value: "",
@@ -456,24 +446,25 @@ var app = Polymer({
                             }
                     },
                     {
-                        name: "misc_input",
-                        default: "",
+                        name: "deploy now",
+                        default: true,
                         value: "",
                         description: "Some input",
                         errorMessage: "Please fill in ",
                         helptext: "You can choose cloud size according to your cloud",
                         show: true,
                         required: true,
-                        type: "text"
+                        type: "toggle"
                     }]
                 },{
                     name: "delete",
-                    actions: [{name:'some action 2'}],
-                    params: []
+                    actions: [{name:'some action 2'}]
                 },{
-                    name: "another action",
-                    actions: [{name:'some action 2'}],
-                    params: []
+                    name: "scale_up",
+                    actions: [{name:'some action 2'}]
+                },{
+                    name: "scale_down",
+                    actions: [{name:'some action 2'}]
                 }]
             }],
             teamsArray: [{

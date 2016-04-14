@@ -25,13 +25,19 @@
         :host >::content paper-input-container {
             padding-top: 16px;
             padding-bottom: 16px;
+        }        
+        .grid-row > * {
+            margin-top: 8px;
+            margin-bottom: 8px;
         }
-
+        h2.title {
+            line-height: 20px;
+        }
         </style>
 
         <paper-material>
             <div class="grid-row">
-
+            <h2 class="xs12 title"><content></content></h2>
             <template is="dom-repeat" items="{{fields}}" as="field">
                     <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
                         <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
@@ -57,6 +63,12 @@
                                 </template>
                             </paper-menu>
                         </paper-dropdown-menu>
+                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'toggle', field.show)]]">
+                        <div class="xs12 m6">
+                            <paper-toggle-button checked="{{field.defaultValue}}">[[field.name]]</paper-toggle-button>
+                        </div>
                         <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                     </template>
                     <template is="dom-if" if="[[field.isLead]]">
