@@ -1920,19 +1920,17 @@ def _create_machine_ec2(conn, key_name, private_key, public_key,
     sanitized by create_machine.
 
     """
-
-    # import key. This is supported only for EC2 at the moment.
     with get_temp_file(public_key) as tmp_key_path:
         try:
-            log.info("Attempting to import key (ec2-only)")
+            # create keypair with key name and pub key
             conn.ex_import_keypair(name=key_name, keyfile=tmp_key_path)
-        except Exception as exc:
-            if 'Duplicate' in exc.message:
-                log.debug('Key already exists, not importing anything.')
-            else:
-                log.error('Failed to import key.')
-                raise CloudUnavailableError("Failed to import key "
-                                              "(ec2-only): %r" % exc, exc=exc)
+        except:
+            # get existing key with that pub key
+            try:
+                keypair = conn.ex_find_or_import_keypair_by_key_material(pubkey=public_key)
+                key_name = keypair['keyName']
+            except Exception as exc:
+                raise CloudUnavailableError("Failed to import key")
 
     # create security group
     name = config.EC2_SECURITYGROUP.get('name', '')
@@ -1947,22 +1945,19 @@ def _create_machine_ec2(conn, key_name, private_key, public_key,
         else:
             raise InternalServerError("Couldn't create security group", exc)
 
-    with get_temp_file(private_key) as tmp_key_path:
-        #deploy_node wants path for ssh private key
-        try:
-            node = conn.create_node(
-                name=machine_name,
-                image=image,
-                size=size,
-                location=location,
-                ssh_key=tmp_key_path,
-                max_tries=1,
-                ex_keyname=key_name,
-                ex_securitygroup=config.EC2_SECURITYGROUP['name'],
-                ex_userdata=user_data
-            )
-        except Exception as e:
-            raise MachineCreationError("EC2, got exception %s" % e, e)
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            image=image,
+            size=size,
+            location=location,
+            max_tries=1,
+            ex_keyname=key_name,
+            ex_securitygroup=config.EC2_SECURITYGROUP['name'],
+            ex_userdata=user_data
+        )
+    except Exception as e:
+        raise MachineCreationError("EC2, got exception %s" % e, e)
 
     return node
 
