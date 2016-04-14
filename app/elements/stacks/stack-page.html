@@ -5,6 +5,7 @@
 <link rel="import" href="stack-machine-item.html">
 <link rel="import" href="stack-network-item.html">
 <link rel="import" href="stack-key-item.html">
+<link rel="import" href="../app-form/app-form.html">
 
 <dom-module id="stack-page">
     <template>
@@ -166,7 +167,7 @@
         .resource-head {
             font-weight: 500;
             padding: 8px 16px;
-            color: rgba(0,0,0,0.84);
+            opacity: 0.87;
             background-color: #fff;
             border-bottom: 1px solid #ddd;
             margin-bottom: 0;
@@ -178,13 +179,29 @@
             text-transform: uppercase;
         }
         .wf-item {
-            margin-bottom: 16px;
+            margin-bottom: 40px;
+            margin-top: 40px;
         }
         .resources-list {
             margin-bottom: 36px;
         }
         .section {
             padding-top: 36px;
+        }
+        #workflows > paper-drawer-panel#workflows-panel {
+            top: 57px;
+            overflow: auto;
+        }
+        #workflows > paper-drawer-panel#workflows-panel ::content #dropShadow {
+            top: 0;
+        }
+        #workflows > paper-drawer-panel#workflows-panel paper-header-panel[drawer] {
+            border-right: 1px solid #ddd;
+        }
+        #workflows-navigation paper-item {
+            text-transform: capitalize;
+            padding: 16px;
+            font-weight: 500;
         }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
@@ -262,25 +279,35 @@
                         </div>
                         <div id="workflows" class="page">
                             <template is="dom-if" if="[[workflows.length]]">
-                                <div class="workflows">
-                                    <h3 class="smallcaps">Workflows</h3>
-                                    <div class='grid-row'>
-                                        <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                            <div class="m12 wf-item">
-                                                <div class="wf-header" id$="[[workflow.name]]">[[workflow.name]]</div>
+                                
+                                    <paper-drawer-panel id="workflows-panel">
+                                        <paper-header-panel drawer id="workflows-navigation">
+                                            <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                                <paper-item id$="[[workflow.name]]">[[workflow.name]]</paper-item>
+                                            </template>
+                                        </paper-header-panel>
+                                        <paper-header-panel main>
+                                            <div class="page">
+                                                <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                                    <div class="m12 wf-item">  
 
-                                                <workflow-form id$="[[workflow.name]]form" hidden$="[[!workflow.params.length]]" model="[[model]]" workflow="[[workflow]]" fields="[[workflow.params]]"></workflow-form>
+                                                        <app-form hidden$="[[!workflow.params.length]]" fields="[[workflow.params]]" form="[[payload]]" url$="/api/v1/stacks/[[stackId]]/[[workflow.name]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse"></app-form>
 
-                                                <paper-material hidden$="[[workflow.params.length]]">
-                                                    <div class="center">
-                                                        <paper-button on-tap="doWorkflow">[[workflow.name]]</paper-button>
+                                                        <paper-material hidden$="[[workflow.params.length]]">
+                                                            <div class="center">
+                                                                <paper-button on-tap="doWorkflow">[[workflow.name]]</paper-button>
+                                                            </div>
+                                                        </paper-material>
                                                     </div>
-                                                </paper-material>
-                                                
+                                                </template>
                                             </div>
-                                        </template>
-                                    </div>
-                                </div>
+                                        </paper-header-panel>
+                                    </paper-drawer-panel>
+
+                                <!-- </div> -->
+                            </template>
+                            <template is="dom-if" if="[[!workflows.length]]">
+                                
                             </template>
                         </div>
                         <div id="state" class="page">
@@ -361,7 +388,11 @@
                     type: Array,
                     computed: '_computeWorkflows(template)'
                 },
-                vpHeight: String
+                vpHeight: String,
+                payload: {
+                    type: Object,
+                    value: {}
+                }
             },
             listeners: {
                 // 'confirmation': '_deleteStackResponse',

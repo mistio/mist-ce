@@ -223,6 +223,9 @@
                 if (t.detail.leadValue) {
                     this.typedName = '"'+t.detail.leadValue+'"';
                 }
+                else {
+                    this.typedName = '';
+                }
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';

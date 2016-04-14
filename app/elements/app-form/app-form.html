@@ -33,19 +33,22 @@
             <div class="grid-row">
             <template is="dom-repeat" items="{{fields}}" as="field">
                 <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-                    <paper-input class="xs12" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                    <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                 </template>
                 <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-                    <paper-textarea class="xs12" id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
+                    <paper-input class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
+                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                 </template>
                 <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-                    <paper-dropdown-menu class="dropdown-block xs12 l6" label="[[field.label]]" horizontal-align="left">
+                    <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left">
                         <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
                             <template is="dom-repeat" items="[[field.options]]" as="option">
                                 <paper-item value="[[option.val]]">[[option.title]]</paper-item>
                             </template>
                         </paper-menu>
                     </paper-dropdown-menu>
+                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                 </template>
             </template>
             <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
@@ -154,12 +157,12 @@
                 var form = this.form,
                     show = true,
                     dependency;
-                var isLead = this.get(fields.path.replace("value","isLead"))
-                if (isLead == true){
-                    this.fire("leadchange", {leadValue:this.get(fields.path)})
-                }
 
                 fields.base.forEach(function(el, index) {
+
+                    if (el.isLead == true){
+                        this.fire("leadchange", {leadValue:el.value})
+                    }
 
                     if (el.showIf) {
                         if (el.showIf.fieldExists) {
