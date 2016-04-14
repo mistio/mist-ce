@@ -26,6 +26,16 @@
             padding: 0;
         }
 
+        paper-material.form-view {
+            padding: 20px;
+            margin: 36px;
+        }
+
+        paper-material.form-view h2 {
+            padding: 0;
+            line-height: 20px;
+        }
+
         paper-menu-button paper-button {
             display: block;
         }
@@ -140,7 +150,6 @@
         paper-tabs {
             height: 57px !important;
             text-transform: uppercase;
-/*            font-size: 12px;*/
         }
         paper-tabs ::content #selectionBar {
             background-color: var(--mist-blue);
@@ -181,6 +190,13 @@
         .wf-item {
             margin-bottom: 40px;
             margin-top: 40px;
+            display: none;
+        }
+        .wf-item[show="true"]{
+            display: block;
+        }
+        *[narrow] .wf-item {
+            display: block;   
         }
         .resources-list {
             margin-bottom: 36px;
@@ -188,20 +204,27 @@
         .section {
             padding-top: 36px;
         }
-        #workflows > paper-drawer-panel#workflows-panel {
+        paper-drawer-panel#workflows-panel {
             top: 57px;
             overflow: auto;
         }
-        #workflows > paper-drawer-panel#workflows-panel ::content #dropShadow {
+        paper-drawer-panel#workflows-panel ::content #dropShadow {
             top: 0;
         }
-        #workflows > paper-drawer-panel#workflows-panel paper-header-panel[drawer] {
-            border-right: 1px solid #ddd;
+        paper-drawer-panel#workflows-panel paper-header-panel[drawer] {
+            /*border-right: 1px solid #ddd;*/
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.12) inset;
+        }
+        paper-drawer-panel#workflows-panel ::content #drawer{
+            background-color: #f0f0f0;
         }
         #workflows-navigation paper-item {
             text-transform: capitalize;
             padding: 16px;
             font-weight: 500;
+        }
+        .grid-row .center {
+            text-align: center; 
         }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
@@ -277,27 +300,30 @@
                                 </template>
                             </div>                                                    
                         </div>
-                        <div id="workflows" class="page">
+                        <div id="workflows">
                             <template is="dom-if" if="[[workflows.length]]">
                                 
-                                    <paper-drawer-panel id="workflows-panel">
-                                        <paper-header-panel drawer id="workflows-navigation">
+                                    <paper-drawer-panel id="workflows-panel" responsiveWidth="900px" peeking>
+                                        <paper-header-panel drawer id="workflowsNavigation">
                                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                                <paper-item id$="[[workflow.name]]">[[workflow.name]]</paper-item>
+                                                <paper-item id$="[[workflow.name]]" on-tap="_workflowNavigation">[[workflow.name]]</paper-item>
                                             </template>
                                         </paper-header-panel>
                                         <paper-header-panel main>
-                                            <div class="page">
+                                            <div id="workflowsView" class="pad">
                                                 <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                                    <div class="m12 wf-item">  
+                                                    <div id$="[[workflow.name]]show" class="m12 wf-item">  
 
-                                                        <app-form hidden$="[[!workflow.params.length]]" fields="[[workflow.params]]" form="[[payload]]" url$="/api/v1/stacks/[[stackId]]/[[workflow.name]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse"></app-form>
+                                                        <app-form hidden$="[[!workflow.params.length]]" fields="[[workflow.params]]" form="[[payload]]" url$="/api/v1/stacks/[[stackId]]/[[workflow.name]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse">[[workflow.name]]</app-form>
 
-                                                        <paper-material hidden$="[[workflow.params.length]]">
-                                                            <div class="center">
-                                                                <paper-button on-tap="doWorkflow">[[workflow.name]]</paper-button>
-                                                            </div>
+                                                        <paper-material class="form-view grid-row" hidden$="[[workflow.params.length]]">
+                                                            <h2 class="xs12">[[workflow.name]]</h2>
+                                                            <p class="xs12 center">
+                                                                <paper-button on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
+                                                            </p>
+                                                            <h5>*no paremetres required</h5>
                                                         </paper-material>
+
                                                     </div>
                                                 </template>
                                             </div>
@@ -307,7 +333,9 @@
                                 <!-- </div> -->
                             </template>
                             <template is="dom-if" if="[[!workflows.length]]">
-                                
+                                <p class="center">
+                                    The stack has no workflows.
+                                </p>
                             </template>
                         </div>
                         <div id="state" class="page">
@@ -320,10 +348,10 @@
             </paper-header-panel>
         </paper-drawer-panel>
         <dialog-element></dialog-element>
-        <iron-ajax id="workflowRequest" 
+        <!-- <iron-ajax id="workflowRequest" 
             url="" 
             on-response="handleWorkflowResponse" 
-            on-error="handleWorkflowError"></iron-ajax>
+            on-error="handleWorkflowError"></iron-ajax> -->
     </template>
     <script>
     (function() {
@@ -396,10 +424,24 @@
             },
             listeners: {
                 // 'confirmation': '_deleteStackResponse',
-                // 'updateSelectedStack': '_updateStack'
-            },            
+                // 'updateSelectedStack': '_updateStack',
+                'stackChanged': '_stackChanged'
+            },
+            _workflowNavigation: function(e){
+                var action = e.target.id;
+                
+                var pages = this.querySelector('#workflowsView').children;
+                [].forEach.call(pages,function(p,index){
+                    p.setAttribute("show", false);
+                    console.log(action, p);
+                });
+
+                var page = this.querySelector('#'+action+'show');
+                page.setAttribute("show", true);
+                
+            },
             _getHeaderStyle: function(section) {
-                return 'background-color: ' + section.color + '; color: #fff;';
+                return 'background-color: ' + section.color + '; color: #fff;';                
             },
             _computeStack: function(params) {
                 return this.model.stacksArray.find(function(stack) {
@@ -453,8 +495,14 @@
                 }
                 return keys;
             },
-            _computeWorkflows: function(template){
+            _computeWorkflows: function(template){                
                 return template.workflows;
+            },
+            _stackChanged: function(){
+                // if (this.workflows){
+                    this.querySelector('#workflowsView').children[0].setAttribute("show", true);
+                    this.querySelector('#workflowsNavigation').children[0].setAttribute("focused", true);
+                // }
             },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element'),
