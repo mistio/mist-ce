@@ -31,26 +31,40 @@
 
         <paper-material>
             <div class="grid-row">
+
             <template is="dom-repeat" items="{{fields}}" as="field">
-                <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-                    <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
-                </template>
-                <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-                    <paper-input class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
-                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
-                </template>
-                <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-                    <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left">
-                        <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                    <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
+                        <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
+                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
+                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                     <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
+                        <paper-radio-group selected="{{field.value}}" class="xs12 m6">
                             <template is="dom-repeat" items="[[field.options]]" as="option">
-                                <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
                             </template>
-                        </paper-menu>
-                    </paper-dropdown-menu>
-                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
-                </template>
+                        </paper-radio-group>
+                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
+                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left">
+                            <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                <template is="dom-repeat" items="[[field.options]]" as="option">
+                                    <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                </template>
+                            </paper-menu>
+                        </paper-dropdown-menu>
+                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                    <template is="dom-if" if="[[field.isLead]]">
+                        <hr class="xs12"/>
+                    </template>
+                
             </template>
+
             <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
             <hr class="xs12" />
             <!-- <div class="notifications xs12">
