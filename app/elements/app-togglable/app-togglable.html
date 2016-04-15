@@ -1,6 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<!-- <link rel="import" href="../../bower_components/yamljs/bin/yaml.js"> -->
 <dom-module id="app-togglable"> 
     <template>
         <style include="shared-styles">
@@ -49,7 +48,7 @@
         }
         :host[open] paper-icon-button {
             transform: rotate(-180deg);
-        }
+        }        
         </style>
         <paper-item id="toggle" class="flex-horizontal-with-ratios" on-tap="_toggle">
             <span class="flexchild">[[title]]</span>

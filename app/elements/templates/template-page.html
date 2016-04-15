@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<link rel="import" href="../app-togglable/app-togglable.html">
+<link rel="import" href="../app-togglable/app-togglable-list.html">
 <link rel="import" href="template-edit.html">
 <link rel="import" href="template-item.html">
 <link rel="import" href="template-run.html">
@@ -17,7 +17,7 @@
 
         paper-material {
             display: block;
-            padding: 20px;
+            padding: 8px;
         }
 
         paper-material.no-pad {
@@ -292,20 +292,10 @@
                         </paper-material>
                     </div>      
                     <div class="page">
-                        <h3 class="smallcaps">Inputs</h3>                        
-                        <paper-material id="inputs">
-                            <template is="dom-repeat" items="[[template.inputs]]">
-                                <app-togglable title="[[item.name]]" info="[[item]]"></app-togglable>
-                            </template>
-                        </paper-material>
+                        <app-togglable-list title="Inputs" items="[[template.inputs]]"></app-togglable-list>
                     </div>
                     <div class="page">
-                        <h3 class="smallcaps">Workflows</h3>
-                        <paper-material id="workflows">
-                            <template is="dom-repeat" items="[[template.workflows]]">
-                                <app-togglable title="[[item.name]]" info="[[item]]"></app-togglable>
-                            </template>
-                        </paper-material>
+                        <app-togglable-list title="Workflows" items="[[template.workflows]]"></app-togglable-list>
                     </div>
                 </div>
             </paper-header-panel>
@@ -460,6 +450,15 @@
             },
             _goBack: function(){
                 history.back();
+            },
+            toggleAll: function(e){
+                var t = e.target;
+
+
+                var els = this.querySelectorAll('app-togglable');
+                [].forEach.call(els, function(el, index) {
+                        el.open = true;
+                });
             }
         });
     })();
