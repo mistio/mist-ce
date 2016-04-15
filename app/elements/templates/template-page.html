@@ -222,12 +222,12 @@
                                     You have not yet created a stack from template [[template.name]].
                                 </p>
                                 <paper-material if="[[hasStacks]]" class="no-pad">
-                                    <iron-list is="dom-if" if="[[hasStacks]]" items="[[template.stacks]]">
+                                    <iron-list is="dom-if" if="[[hasStacks]]" items="[[stacks]]">
                                         <template is="dom-repeat">
                                             <div class="row">
                                                 <!-- this will be replaced by "stack-item" element -->
                                                 <paper-item class="flex-horizontal">
-                                                <span class="flexchild">[[item]]</span>  <span class="opaque54">[[item.resources_description]] 3 machines, 2 keys, 1 network</span></paper-item>
+                                                <span class="flexchild"><a href="/stacks/[[item.id]]">[[item.name]]</a></span>  <span class="opaque54">[[item.resources_description]] 3 machines, 2 keys, 1 network</span></paper-item>
                                             </div>
                                         </template>
                                     </iron-list>
@@ -346,6 +346,10 @@
                     value: false,
                     computed: '_hasStacks(template)'
                 },
+                stacks: {
+                    type: Array,
+                    computed: '_computeStacks(template)'  
+                },
                 templateid: {
                     type: String,
                     computed: '_computeTemplateId(params)'
@@ -400,6 +404,19 @@
             },
             _computeIsInline: function(source) {
                 return source == 'inline';
+            },
+            _computeStacks: function(template){
+                var stacks = [];
+                if (template.stacks) {
+                    var templateStacks = template.stacks;
+                    this.model.stacksArray.find(function(stack) {
+                        var stackId = stack.id;
+                        if (templateStacks.indexOf(stackId) > -1) {
+                            stacks.push(stack);
+                        }
+                    }, this);
+                }
+                return stacks;
             },
             _class: function(isinline){
                 return isinline ? "command-container" : "";
