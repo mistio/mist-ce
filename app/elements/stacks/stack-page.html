@@ -416,7 +416,14 @@
                             </template>
                         </div>
                         <div id="state" class="page">
+                            <h3 class="smallcaps">Stack State : runtime properties </h3>
+                            <paper-material class="pad1">
+                                <template is="dom-repeat" items="[[stack.state]]">
+                                    <app-togglable title="[[item.name]] : [[item.id]]" info="[[item.runtime_properties]]"></app-togglable>
+                                </template>
+                            </paper-material>
                             <app-togglable-list title="Stack State" items="[[stack.state]]"></app-togglable-list>
+                            <app-togglable-list title="Stack Parameters" items="[[stack.inputs]]"></app-togglable-list>
                         </div>
                     </iron-pages>
                 </div>
