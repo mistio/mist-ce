@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../app-togglable/app-togglable-list.html">
 <link rel="import" href="workflow-form.html">
 <link rel="import" href="stack-machine-item.html">
 <link rel="import" href="stack-network-item.html">
@@ -415,9 +416,7 @@
                             </template>
                         </div>
                         <div id="state" class="page">
-                            <div class="flex-horizontal-with-ratios">
-                                <h3 class="smallcaps">Stack State</h3>
-                            </div>
+                            <app-togglable-list title="Stack State" items="[[stack.state]]"></app-togglable-list>
                         </div>
                     </iron-pages>
                 </div>
