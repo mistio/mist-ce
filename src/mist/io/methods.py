@@ -1327,7 +1327,7 @@ def connect_provider(cloud):
     elif cloud.provider == 'bare_metal':
         conn = BareMetalDriver(Machine.objects(cloud=cloud))
     elif cloud.provider == 'coreos':
-        conn = CoreOSDriver(Machine.objects(owner=user, cloud=cloud))
+        conn = CoreOSDriver(Machine.objects(cloud=cloud))
     elif cloud.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if cloud.apisecret:
