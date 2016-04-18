@@ -7,9 +7,10 @@ import gevent.socket
 
 
 import mist.io.exceptions
-import mist.io.model
 import mist.io.shell
 import mist.io.hub.main
+
+import mist.core.user.models
 
 
 log = logging.getLogger(__name__)
@@ -20,14 +21,14 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
         super(ShellHubWorker, self).__init__(*args, **kwargs)
         self.shell = None
         self.channel = None
-        for key in ('email', 'cloud_id', 'machine_id', 'host',
+        for key in ('owner_id', 'email', 'cloud_id', 'machine_id', 'host',
                     'columns', 'rows'):
             if not self.params.get(key):
                 log.error("%s: Param '%s' missing from worker kwargs.",
                           self.lbl, key)
                 self.stop()
         self.provider = ''
-        self.user = mist.io.model.User()
+        self.owner = mist.core.user.models.Owner(id=self.params['owner_id'])
 
     def on_ready(self, msg=''):
         super(ShellHubWorker, self).on_ready(msg)
@@ -43,14 +44,14 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
         self.shell = mist.io.shell.Shell(data['host'])
         try:
             key_id, ssh_user = self.shell.autoconfigure(
-                self.user, data['cloud_id'], data['machine_id']
+                self.owner, data['cloud_id'], data['machine_id']
             )
         except Exception as exc:
             if self.provider == 'docker':
                 self.shell = mist.io.shell.Shell(data['host'],
                                                  provider='docker')
                 key_id, ssh_user = self.shell.autoconfigure(
-                    self.user, data['cloud_id'], data['machine_id']
+                    self.owner, data['cloud_id'], data['machine_id']
                 )
             else:
                 log.warning("%s: Couldn't connect with SSH, error %r.",

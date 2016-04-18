@@ -1,0 +1,24 @@
+<div id="organization-add" class="large-popup" data-role="popup" data-position="right" data-display="overlay" data-overlay-theme="b" data-transition="pop">
+    <div id="add-organization" class="large-popup
+            ui-popup
+            ui-body-a
+            ui-overlay-shadow
+            ui-corner-all" data-role="popup" data-enhanced="true">
+
+        <div class="ui-header ui-caps">
+            <h1 class="ui-title">Add Organization</h1>
+
+            <a class="close" {{action "backClicked" target=view}} data-rel="back">&#10005;</a>
+        </div>
+        <div data-role="content" data-theme="a">
+            <form {{action "addClicked" on="submit" target=view}}>
+                <div class="form-field required {{if Mist.organizationAddController.newOrganization.name 'filled' 'empty'}}">
+                    <label for="organization-name">Name</label>
+                    {{input value=Mist.organizationAddController.newOrganization.name id="organization-name"}}
+                </div>
+
+                <button type="submit" class="ui-btn ui-btn-d ui-shadow ui-caps {{if Mist.organizationAddController.formReady '' 'ui-state-disabled'}}">Add</button>
+            </form>
+        </div>
+    </div>
+</div>

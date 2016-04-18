@@ -71,6 +71,18 @@
 #single-script-page .info-table tr:hover {
     background-color: #f2f2f2;
 }
+#single-script-page .info-table .script-id {
+    word-break: break-all;
+}
+#single-script-page .info-table tr td:nth-child(1) {
+	padding-left: 70px;
+}
+/* Conditional for < 500px */
+@media only screen and  (max-width: 500px) {
+	#single-script-page .info-table tr td:nth-child(1) {
+		padding-left: 30px;
+	}
+}
 #single-script-page .log-list ul {
     margin: 0;
 }

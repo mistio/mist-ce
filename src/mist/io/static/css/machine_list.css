@@ -1,6 +1,9 @@
 
 /* Machine List Page CSS
 -----------------------------------------------------------------------------------------------------------*/
+#machine-list-page .ui-content {
+    background-color: transparent;
+}
 #machine-list-page .ui-filterable {
     clear: both;
 }
