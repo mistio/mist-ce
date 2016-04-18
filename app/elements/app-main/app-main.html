@@ -29,7 +29,6 @@
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../app-check/app-check.html">
 <link rel="import" href="../pages/page-dashboard.html">
-<link rel="import" href="../pages/page-machine.html">
 <link rel="import" href="../pages/page-image.html">
 <link rel="import" href="../pages/page-key.html">
 <link rel="import" href="../pages/page-network.html">
@@ -51,7 +50,7 @@
             <iron-route path="/add-cloud" title="add cloud" href="../clouds/cloud-add.html"></iron-route>
             <!-- machines -->
             <iron-route path="/machines" title="machines" href="../pages/page-items.html"></iron-route>
-            <iron-route path="/machines/:uuid" title="machine"></iron-route>
+            <iron-route path="/machines/:uuid" title="machine" href="../pages/page-machine.html"></iron-route>
             <!-- images -->
             <!-- <iron-route path="/images" title="images" href="../pages/page-items.html"></iron-route> -->
             <!-- <iron-route path="/images/:id" title="image"></iron-route> -->
@@ -89,7 +88,7 @@
             <cloud-add model="[[model]]" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
             <!-- machines -->
             <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
-            <page-machine params="[[params]]" model="[[model]]" machine="[[getMachine(params)]]" sections="[[sections]]"></page-machine>
+            <page-machine params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></page-machine>
             <!-- images -->
             <page-items class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
             <!-- <images-list model="[[model]]" images="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></images-list> -->

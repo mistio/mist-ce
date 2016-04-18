@@ -256,12 +256,13 @@
         .page {
             display: block;
             max-width: 900px;
-            margin: 36px 36px 36px 72px;
+            padding: 24px;
+            margin: 0 auto;
         }
 
         .page-block {
             width: 100%;
-            padding-right: 24px;            
+            padding-right: 24px;   
         }
 
         .smallcaps {
@@ -332,15 +333,38 @@
         paper-progress {
             --paper-progress-active-color: var(--mist-blue);
         }
+        /* paper header */
+        .paper-header [paper-drawer-toggle] {
+            margin-left: 10px;
+        }
+
+        .paper-header {
+            @apply(--layout-horizontal);
+            @apply(--layout-center);
+        }
+
+        .paper-header h2 {
+            margin-left: 20px;
+            @apply(--layout-flex);
+            text-transform: capitalize;
+        }
+
+        .paper-header .toggleViewButton {
+            --paper-icon-button-ink-color: transparent;
+        }
+
+        .paper-header .cartButton {
+            margin-right: 10px;
+        }
         </style>
     </template>
 </dom-module>
 <dom-module id="tags-and-labels">
     <template>
         <style>
-        .label {
+        .label > span{
             padding-right: 10px;
-            color: rgba(255, 255, 255, 0.82);
+            color: #fff;
             font-size: 14px;
         }
 
@@ -924,12 +948,18 @@
         .info-table .info-table-divider {
             background-color: #eeedeb;
         }
-
+        .info-teble table {
+            table-layout: fixed;
+        }
         .info-table tr td {
             width: 50%;
             padding: 16px;
             border-bottom: 1px solid #eeedeb;
             font-size: 14px;
+            overflow: hidden !important;
+            word-break: break-all !important;
+            word-wrap: break-word !important; 
+            white-space: normal !important;
         }
 
         .info-table tr td:first-child {
