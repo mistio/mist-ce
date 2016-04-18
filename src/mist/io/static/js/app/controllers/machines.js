@@ -168,22 +168,8 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor(machine.cloud.provider == 'libvirt' ? 'terminated' : 'stopped');
                 machine.lockOn('pending');
                 this.set('shutingdownMachine', true);
-<<<<<<< HEAD
-                Mist.ajax.POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
-                    'action' : 'stop'
-                }).success(function() {
-                    //that._shutdownMachine(machineId);
-                }).error(function() {
-                    machine.restoreState();
-                    Mist.notificationController.notify('Failed to shutdown machine');
-                }).complete(function(success) {
-                    that.set('shutingdownMachine', false);
-                    that.trigger('onMachineShutdown');
-                    if (callback) callback(success);
-                });
-=======
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'stop'
                     })
                     .success(function() {
@@ -198,7 +184,6 @@ define('app/controllers/machines', ['app/models/machine'],
                         that.trigger('onMachineShutdown');
                         if (callback) callback(success);
                     });
->>>>>>> staging
             },
 
             destroyMachine: function(machineId, callback) {
@@ -208,23 +193,8 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.lockOn('pending');
                 this.set('destroyingMachine', true);
                 machine.set('beingDestroyed', true);
-<<<<<<< HEAD
-                Mist.ajax.POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
-                    'action' : 'destroy'
-                }).success(function() {
-                    //that._destroyMachine(machineId);
-                }).error(function() {
-                    machine.restoreState();
-                    Mist.notificationController.notify('Failed to destroy machine');
-                }).complete(function(success) {
-                    that.set('destroyingMachine', false);
-                    machine.set("beingDestroyed",false);
-                    that.trigger('onMachineDestroy');
-                    if (callback) callback(success);
-                });
-=======
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'destroy'
                     })
                     .success(function() {
@@ -240,7 +210,6 @@ define('app/controllers/machines', ['app/models/machine'],
                         that.trigger('onMachineDestroy');
                         if (callback) callback(success);
                     });
->>>>>>> staging
             },
 
             rebootMachine: function(machineId, callback) {
@@ -249,22 +218,8 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('running');
                 machine.lockOn('rebooting');
                 this.set('rebootingMachine', true);
-<<<<<<< HEAD
-                Mist.ajax.POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
-                    'action' : 'reboot'
-                }).success(function() {
-                    //that.rebootMachine(machineId);
-                }).error(function() {
-                    machine.restoreState();
-                    Mist.notificationController.notify('Failed to reboot machine');
-                }).complete(function(success) {
-                    that.set('rebootingMachine', false);
-                    that.trigger('onMachineReboot');
-                    if (callback) callback(success);
-                });
-=======
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'reboot'
                     })
                     .success(function() {
@@ -279,7 +234,6 @@ define('app/controllers/machines', ['app/models/machine'],
                         that.trigger('onMachineReboot');
                         if (callback) callback(success);
                     });
->>>>>>> staging
             },
 
             undefineMachine: function(machineId, callback) {
@@ -288,22 +242,8 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('undefined');
                 machine.lockOn('pending');
                 this.set('undefiningMachine', true);
-<<<<<<< HEAD
-                Mist.ajax.POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
-                    'action' : 'undefine'
-                }).success(function() {
-                    //that._destroyMachine(machineId);
-                }).error(function() {
-                    machine.restoreState();
-                    Mist.notificationController.notify('Failed to undefine machine');
-                }).complete(function(success) {
-                    that.set('undefiningMachine', false);
-                    that.trigger('onMachineUndefine');
-                    if (callback) callback(success);
-                });
-=======
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'undefine'
                     })
                     .success(function() {
@@ -318,7 +258,6 @@ define('app/controllers/machines', ['app/models/machine'],
                         that.trigger('onMachineUndefine');
                         if (callback) callback(success);
                     });
->>>>>>> staging
             },
 
             suspendMachine: function(machineId, callback) {
@@ -327,21 +266,8 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('suspended');
                 machine.lockOn('pending');
                 this.set('suspendingMachine', true);
-<<<<<<< HEAD
-                Mist.ajax.POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
-                    'action' : 'suspend'
-                }).success(function() {
-                    //that._destroyMachine(machineId);
-                }).error(function() {
-                    machine.restoreState();
-                    Mist.notificationController.notify('Failed to suspend machine');
-                }).complete(function(success) {
-                    that.set('suspendingMachine', false);
-                    if (callback) callback(success);
-                });
-=======
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'suspend'
                     })
                     .success(function() {
@@ -355,7 +281,6 @@ define('app/controllers/machines', ['app/models/machine'],
                         that.set('suspendingMachine', false);
                         if (callback) callback(success);
                     });
->>>>>>> staging
             },
 
             resumeMachine: function(machineId, callback) {
@@ -364,21 +289,8 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('running');
                 machine.lockOn('pending');
                 this.set('resumingMachine', true);
-<<<<<<< HEAD
-                Mist.ajax.POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
-                    'action' : 'resume'
-                }).success(function() {
-                    //that.startMachine(machineId);
-                }).error(function() {
-                    machine.restoreState();
-                    Mist.notificationController.notify('Failed to resume machine');
-                }).complete(function(success) {
-                    that.set('resumingMachine', false);
-                    if (callback) callback(success);
-                });
-=======
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'resume'
                     })
                     .success(function() {
@@ -392,7 +304,6 @@ define('app/controllers/machines', ['app/models/machine'],
                         that.set('resumingMachine', false);
                         if (callback) callback(success);
                     });
->>>>>>> staging
             },
 
             startMachine: function(machineId, callback) {
@@ -401,22 +312,8 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.waitFor('running');
                 machine.lockOn('pending');
                 this.set('startingMachine', true);
-<<<<<<< HEAD
-                Mist.ajax.POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
-                    'action' : 'start'
-                }).success(function() {
-                    //that.startMachine(machineId);
-                }).error(function() {
-                    machine.restoreState();
-                    Mist.notificationController.notify('Failed to start machine');
-                }).complete(function(success) {
-                    that.set('startingMachine', false);
-                    that.trigger('onMachineStart');
-                    if (callback) callback(success);
-                });
-=======
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'start'
                     })
                     .success(function() {
@@ -431,7 +328,6 @@ define('app/controllers/machines', ['app/models/machine'],
                         that.trigger('onMachineStart');
                         if (callback) callback(success);
                     });
->>>>>>> staging
             },
 
             getMachine: function(machineId) {
