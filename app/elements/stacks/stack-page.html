@@ -350,7 +350,7 @@
                                 </div>
                                 <div class="page-block">
                                     <h3 class="smallcaps">Created</h3>
-                                    <p>[[stack.created_at]] from <a href="/members/[[template.user]]" class="regular blue-link">[[stack.user]]</a></p>
+                                    <p>[[timestamp]] by <a href="/members/[[template.user]]" class="regular blue-link">[[stack.user]]</a></p>
                                 </div>
                             </div>
                             <div class="resources-list">
@@ -422,7 +422,7 @@
                                     <app-togglable title="[[item.name]] : [[item.id]]" info="[[item.runtime_properties]]"></app-togglable>
                                 </template>
                             </paper-material>
-                            <app-togglable-list title="Stack State" items="[[stack.state]]"></app-togglable-list>
+                            <!-- <app-togglable-list title="Stack State" items="[[stack.state]]"></app-togglable-list> -->
                             <app-togglable-list title="Stack Parameters" items="[[stack.inputs]]"></app-togglable-list>
                         </div>
                     </iron-pages>
@@ -495,6 +495,10 @@
                 workflows: {
                     type: Array,
                     computed: '_computeWorkflows(template)'
+                },
+                timestamp: {
+                    type: String,
+                    computed: '_getFormattedTimestamp(stack)'
                 },
                 vpHeight: String,
                 payload: {
@@ -583,6 +587,10 @@
                 this.querySelector('#workflowsView').children[0].setAttribute("show", true);
                 this.querySelector('#workflowsNavigation').children[0].setAttribute("focused", true);
                 // }
+            },
+            _getFormattedTimestamp: function (stack) {
+                var timestamp = parseInt(stack.created_at);
+                return new Date(timestamp).toLocaleString('en-US', {timeZoneName: 'short'});
             },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element'),

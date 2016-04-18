@@ -210,7 +210,7 @@
                             </div>
                             <div class="page-block">
                                 <h3 class="smallcaps">Created</h3>
-                                <p>[[template.created_at]] from <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a></p>
+                                <p>[[timestamp]] by <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a></p>
                             </div>
                         </div>
                     </div>
@@ -354,7 +354,7 @@
                 },
                 timestamp: {
                     type: String,
-                    computed: '_getFormattedTimestamp(template.created_at)'
+                    computed: '_getFormattedTimestamp(template)'
                 },
                 hideprogress: {
                     type: Boolean,
@@ -370,7 +370,8 @@
                 var wh = window.innerHeight;
                 this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
             },
-            _getFormattedTimestamp: function (timestamp) {
+            _getFormattedTimestamp: function (template) {
+                var timestamp = parseInt(template.created_at);
                 return new Date(timestamp).toLocaleString('en-US', {timeZoneName: 'short'});
             },
             _getHeaderStyle: function(section) {
