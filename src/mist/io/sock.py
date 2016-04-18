@@ -1,7 +1,7 @@
 """mist.io.socket.
 
 
-Here we define the socketio Connection and handlers.
+Here we define the sockjs Connection and handlers.
 
 When a user loads mist.io or comes back online, their browser will request a
 new socket and the initialize function will be triggered on the server within a

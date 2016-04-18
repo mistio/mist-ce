@@ -1,11 +1,12 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../app-togglable/app-togglable-list.html">
 <link rel="import" href="workflow-form.html">
 <link rel="import" href="stack-machine-item.html">
 <link rel="import" href="stack-network-item.html">
 <link rel="import" href="stack-key-item.html">
-
+<link rel="import" href="../app-form/app-form.html">
 <dom-module id="stack-page">
     <template>
         <style is="custom-style" include="lists"></style>
@@ -15,53 +16,69 @@
             display: block;
             background: #fafafa;
         }
-
+        
         paper-material {
             display: block;
             padding: 20px;
         }
-
+        
         paper-material.no-pad {
             padding: 0;
         }
-
+        
+        paper-material.form-view {
+            padding: 20px;
+            margin: 36px;
+        }
+        
+        paper-material.form-view,
+        app-form {
+            max-width: 900px;
+        }
+        
+        paper-material.form-view h2 {
+            padding: 0;
+            line-height: 20px;
+        }
+        
         paper-menu-button paper-button {
             display: block;
         }
-
+        
         .flex-horizontal-with-ratios {
             @apply(--layout-horizontal);
             align-content: stretch;
+            flex: 100%;
         }
-
+        
         .flexchild {
             @apply(--layout-flex);
         }
-
+        
         .command-container {
             background-color: #444;
             color: #fff;
             font-family: monospace;
             padding: 10px;
         }
-
+        
         a {
             color: black;
             text-decoration: none;
         }
-
+        
         #container {
             background: #fafafa;
         }
-
+        
         .paper-header [paper-drawer-toggle] {
             margin-left: 10px;
         }
-
+        
         .paper-header {
             @apply(--layout-horizontal);
         }
-
+        
         .paper-header {
             height: 60px;
             font-size: 24px;
@@ -71,120 +88,214 @@
             transition: height 0.2s;
             transition: font-size 0.2s;
         }
-
+        
         .paper-header.tall {
             height: 320px;
             font-size: 16px;
         }
-
+        
         .paper-header h2 {
             margin-left: 20px;
             @apply(--layout-flex);
             text-transform: capitalize;
         }
-
+        
         .paper-header .toggleViewButton {
             --paper-icon-button-ink-color: transparent;
         }
-
+        
         .paper-header .cartButton {
             margin-right: 10px;
         }
-
+        
         #content {
             overflow: auto;
             -webkit-overflow-scrolling: touch;
             padding: 0 10px;
         }
-
+        
         paper-icon-button {
             transition: all 200ms;
         }
-
+        
         paper-icon-button.active-sort {
             transform: rotate(180deg);
         }
-
+        
         paper-icon-button.active-sort::content iron-icon {
             color: #D48900 !important;
         }
-
+        
         app-bar .menu-icon {
             margin-right: 15px;
         }
-
+        
         [size=xs] > * {
             display: none;
         }
-
+        
         [size=xs] app-sidebar {
             min-width: 100%;
             height: auto;
         }
-
+        
         paper-icon-bottom.bottom {
             padding-right: 8px;
         }
+        
         .subhead {
             box-sizing: border-box;
-            position: absolute;            
+            position: absolute;
             width: 100%;
             left: 0;
             height: 57px;
             bottom: -57px;
             right: 0;
             z-index: 9;
-            color: rgba(0,0,0,0.87);
+            color: rgba(0, 0, 0, 0.87);
         }
+        
         paper-tabs {
             height: 57px !important;
             text-transform: uppercase;
-/*            font-size: 12px;*/
         }
-        paper-tabs ::content #selectionBar {
+        
+        paper-tabs::content #selectionBar {
             background-color: var(--mist-blue);
         }
-        paper-tab ::content paper-ripple {
+        
+        paper-tab::content paper-ripple {
             color: #999;
         }
+        
         #workflowBar {
             padding: 0 0 0 60px;
             line-height: 57px;
         }
+        
         .content {
             margin-top: 114px;
         }
-        paper-header-panel ::content #dropShadow {
+        
+        paper-header-panel::content #dropShadow {
             top: 56px;
         }
-        paper-toolbar ::content #bottomBar .right-actions{
+        
+        paper-toolbar::content #bottomBar .right-actions {
             transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
         }
-        paper-toolbar:not(.tall) ::content #bottomBar .right-actions{
+        
+        paper-toolbar:not(.tall)::content #bottomBar .right-actions {
             margin-right: 70px;
         }
+        
         .resource-head {
             font-weight: 500;
             padding: 8px 16px;
-            color: rgba(0,0,0,0.84);
+            opacity: 0.87;
             background-color: #fff;
             border-bottom: 1px solid #ddd;
             margin-bottom: 0;
         }
+        
         .wf-header {
             background-color: #616161;
             color: #fff;
             padding: 8px;
             text-transform: uppercase;
         }
+        
         .wf-item {
-            margin-bottom: 16px;
+            margin-bottom: 40px;
+            margin-top: 40px;
+            display: none;
         }
+        
+        .wf-item[show="true"] {
+            display: block;
+        }
+        
+        *[narrow] .wf-item {
+            display: block;
+        }
+        
         .resources-list {
             margin-bottom: 36px;
         }
+        
         .section {
             padding-top: 36px;
+        }
+        
+        paper-drawer-panel#workflows-panel {
+            top: 57px;
+            overflow: auto;
+        }
+        
+        paper-drawer-panel#workflows-panel::content #dropShadow {
+            top: 0;
+        }
+        
+        paper-drawer-panel#workflows-panel paper-header-panel[drawer] {
+            /*border-right: 1px solid #ddd;*/
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12) inset;
+        }
+        
+        paper-drawer-panel#workflows-panel::content #drawer {
+            background-color: #f0f0f0;
+        }
+        
+        #workflows-navigation paper-item {
+            text-transform: capitalize;
+            padding: 16px;
+            font-weight: 500;
+        }
+        
+        .grid-row .center {
+            text-align: center;
+        }
+        
+        #quickActions {
+            width: 100%;
+            background-color: var(--mist-blue);
+            color: #fff;
+            height: 57px;
+            position: absolute;
+            bottom: -1px;
+            right: 0;
+            padding-left: 60px;
+            box-sizing: border-box;
+            transition: all 0.18s ease-in;
+            overflow: hidden;
+            opacity: 1;
+        }
+        
+        #quickActions paper-button {
+            padding: 0 8px !important;
+            height: 57px;
+            line-height: 57px;
+            font-weight: 500;
+        }
+        
+        #quickActions iron-icon {
+            color: #fff;
+        }
+        
+        #quickActions.hidden {
+            width: 0;
+            padding: 0;
+            opacity: 0;
+            right: 0;
+        }
+        
+        paper-fab {
+            transition: all 0.18s ease-in;
+        }
+        
+        paper-fab.hidden {
+            width: 0;
+            height: 0;
+            padding: 0;
         }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
@@ -195,44 +306,56 @@
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
                     <span class="bottom title">Stack "[[stack.name]]"</span>
-
                     <span class="bottom right-actions">                        
                         <paper-tooltip for="editTemplate" position="top">Edit Stack</paper-tooltip>
                         <paper-icon-button id="editTemplate" icon="icons:create" on-tap="_editTemplate"></paper-icon-button>
                         <paper-tooltip for="deleteTemplate" position="top">Delete Stack</paper-tooltip>
                         <paper-icon-button id="deleteTemplate" icon="icons:delete" on-tap="_deleteTemplate"></paper-icon-button>
                     </span>
-
                     <div id="workflowBar" class="subhead bottom">
                         <paper-tabs selected="{{selected}}">
                             <paper-tab selected>Resources</paper-tab>
                             <paper-tab>Workflows</paper-tab>
                             <paper-tab>Stack State</paper-tab>
                         </paper-tabs>
+                        <paper-item id="quickActions" class="hidden">
+                            <div class="flex-horizontal-with-ratios">
+                                <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                    <template is="dom-if" if="[[!workflow.params]]">
+                                        <paper-button id="[[workflow.name]]" on-tap="doWorkflow">[[workflow.name]]</paper-button>
+                                    </template>
+                                </template>
+                                <div class="flexchild">
+                                    <paper-button>
+                                        <iron-icon icon="icons:more-vert" on-tap="navigateToWorkflows"></iron-icon>
+                                    </paper-button>
+                                </div>
+                                <paper-button>
+                                    <iron-icon icon="icons:clear" on-tap="_toggleQuickActions"></iron-icon>
+                                </paper-button>
+                            </div>
+                        </paper-item>
                         <div class="fab-top-right">
-                            <paper-fab icon="av:play-arrow" on-tap="_showStackActions" id="runTemplateFab"></paper-fab>                            
+                            <paper-fab icon="av:play-arrow" on-tap="_toggleQuickActions" id="runTemplateFab"></paper-fab>
                         </div>
                     </div>
                 </paper-toolbar>
-                
-                <div class="content">                    
+                <div class="content">
                     <iron-pages selected="{{selected}}">
                         <div id="resources" class="page">
                             <div class="flex-horizontal-with-ratios">
                                 <div class="page-block">
                                     <h3 class="smallcaps">Created from template</h3>
                                     <p><a href$="/templates/[[stack.template_id]]" class="regular blue-link"> [[stack.template]]</a>: [[template.description]]</p>
-
                                 </div>
                                 <div class="page-block">
                                     <h3 class="smallcaps">Created</h3>
-                                    <p>[[stack.created_at]] from <a href="/members/[[template.user]]" class="regular blue-link">[[stack.user]]</a></p>
+                                    <p>[[timestamp]] by <a href="/members/[[template.user]]" class="regular blue-link">[[stack.user]]</a></p>
                                 </div>
                             </div>
-
                             <div class="resources-list">
                                 <h3 class="smallcaps">Resources list</h3>
-                                <template is="dom-if" if="[[machines.length]]">                                
+                                <template is="dom-if" if="[[machines.length]]">
                                     <paper-material class="no-pad resources-list">
                                         <h3 class="smallcaps resource-head">machines</h3>
                                         <template is="dom-repeat" items="[[machines]]" as="machine">
@@ -258,45 +381,56 @@
                                         </template>
                                     </paper-material>
                                 </template>
-                            </div>                                                    
+                            </div>
                         </div>
-                        <div id="workflows" class="page">
+                        <div id="workflows">
                             <template is="dom-if" if="[[workflows.length]]">
-                                <div class="workflows">
-                                    <h3 class="smallcaps">Workflows</h3>
-                                    <div class='grid-row'>
+                                <paper-drawer-panel id="workflows-panel" responsiveWidth="900px">
+                                    <paper-header-panel drawer id="workflowsNavigation">
                                         <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                            <div class="m12 wf-item">
-                                                <div class="wf-header" id$="[[workflow.name]]">[[workflow.name]]</div>
-
-                                                <workflow-form id$="[[workflow.name]]form" hidden$="[[!workflow.params.length]]" model="[[model]]" workflow="[[workflow]]" fields="[[workflow.params]]"></workflow-form>
-
-                                                <paper-material hidden$="[[workflow.params.length]]">
-                                                    <div class="center">
-                                                        <paper-button on-tap="doWorkflow">[[workflow.name]]</paper-button>
-                                                    </div>
-                                                </paper-material>
-                                                
-                                            </div>
+                                            <paper-item id$="[[workflow.name]]" on-tap="_workflowNavigation">[[workflow.name]]</paper-item>
                                         </template>
-                                    </div>
-                                </div>
+                                    </paper-header-panel>
+                                    <paper-header-panel main>
+                                        <div id="workflowsView" class="pad">
+                                            <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                                <div id$="[[workflow.name]]show" class="m12 wf-item">
+                                                    <app-form hidden$="[[!workflow.params.length]]" fields="[[workflow.params]]" form="[[payload]]" url$="/api/v1/stacks/[[stackId]]/[[workflow.name]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse">[[workflow.name]]</app-form>
+                                                    <paper-material class="form-view grid-row" hidden$="[[workflow.params.length]]">
+                                                        <h2 class="xs12">[[workflow.name]]</h2>
+                                                        <p class="xs12 center">
+                                                            <paper-button on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
+                                                        </p>
+                                                        <h5>*no paremetres required</h5>
+                                                    </paper-material>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </paper-header-panel>
+                                </paper-drawer-panel>
+                            </template>
+                            <template is="dom-if" if="[[!workflows.length]]">
+                                <p class="center">
+                                    The stack has no workflows.
+                                </p>
                             </template>
                         </div>
                         <div id="state" class="page">
-                            <div class="flex-horizontal-with-ratios">
-                                <h3 class="smallcaps">Stack State</h3>
-                            </div>
+                            <h3 class="smallcaps">Stack State : runtime properties </h3>
+                            <paper-material class="pad1">
+                                <template is="dom-repeat" items="[[stack.state]]">
+                                    <app-togglable title="[[item.name]] : [[item.id]]" info="[[item.runtime_properties]]"></app-togglable>
+                                </template>
+                            </paper-material>
+                            <!-- <app-togglable-list title="Stack State" items="[[stack.state]]"></app-togglable-list> -->
+                            <app-togglable-list title="Stack Parameters" items="[[stack.inputs]]"></app-togglable-list>
                         </div>
                     </iron-pages>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
         <dialog-element></dialog-element>
-        <iron-ajax id="workflowRequest" 
-            url="" 
-            on-response="handleWorkflowResponse" 
-            on-error="handleWorkflowError"></iron-ajax>
+        <iron-ajax id="workflowRequest" url="" on-response="handleWorkflowResponse" on-error="handleWorkflowError"></iron-ajax>
     </template>
     <script>
     (function() {
@@ -311,7 +445,8 @@
                 },
                 selected: {
                     type: Number,
-                    value: 0
+                    value: 0,
+                    notify: true
                 },
                 sections: {
                     type: Object
@@ -361,12 +496,34 @@
                     type: Array,
                     computed: '_computeWorkflows(template)'
                 },
-                vpHeight: String
+                timestamp: {
+                    type: String,
+                    computed: '_getFormattedTimestamp(stack)'
+                },
+                vpHeight: String,
+                payload: {
+                    type: Object,
+                    value: {}
+                }
             },
             listeners: {
                 // 'confirmation': '_deleteStackResponse',
-                // 'updateSelectedStack': '_updateStack'
-            },            
+                // 'updateSelectedStack': '_updateStack',
+                'stackChanged': '_stackChanged'
+            },
+            _workflowNavigation: function(e) {
+                var action = e.target.id;
+
+                var pages = this.querySelector('#workflowsView').children;
+                [].forEach.call(pages, function(p, index) {
+                    p.setAttribute("show", false);
+                    console.log(action, p);
+                });
+
+                var page = this.querySelector('#' + action + 'show');
+                page.setAttribute("show", true);
+
+            },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
             },
@@ -378,52 +535,62 @@
             _computeStackId: function(params) {
                 return params.id;
             },
-            _computeTemplate: function(stack){
+            _computeTemplate: function(stack) {
                 return this.model.templatesArray.find(function(template) {
                     return template._id == stack.template_id;
                 }, this);
             },
-            _computeMachines: function(stack){
+            _computeMachines: function(stack) {
                 var machines = [];
-                if(stack.machines){
+                if (stack.machines) {
                     var stackMachines = stack.machines;
                     this.model.machinesArray.find(function(machine) {
                         var machineId = machine.id;
-                        if (stackMachines.indexOf(machineId)>-1) {
+                        if (stackMachines.indexOf(machineId) > -1) {
                             machines.push(machine);
                         }
                     }, this);
                 }
                 return machines;
             },
-            _computeNetworks: function(stack){
+            _computeNetworks: function(stack) {
                 var networks = [];
-                if(stack.networks){
+                if (stack.networks) {
                     var stackNets = stack.networks;
                     this.model.networksArray.find(function(network) {
                         var networkId = network.id;
-                        if (stackNets.indexOf(networkId)>-1) {
+                        if (stackNets.indexOf(networkId) > -1) {
                             networks.push(network);
                         }
                     }, this);
                 }
                 return networks;
             },
-            _computeKeys: function(stack){
+            _computeKeys: function(stack) {
                 var keys = [];
-                if(stack.keys){
+                if (stack.keys) {
                     var stackKeys = stack.keys;
                     this.model.keysArray.find(function(key) {
                         var keyId = key.id;
-                        if (stackKeys.indexOf(keyId)>-1) {
+                        if (stackKeys.indexOf(keyId) > -1) {
                             keys.push(key);
                         }
                     }, this);
                 }
                 return keys;
             },
-            _computeWorkflows: function(template){
+            _computeWorkflows: function(template) {
                 return template.workflows;
+            },
+            _stackChanged: function() {
+                // if (this.workflows){
+                this.querySelector('#workflowsView').children[0].setAttribute("show", true);
+                this.querySelector('#workflowsNavigation').children[0].setAttribute("focused", true);
+                // }
+            },
+            _getFormattedTimestamp: function (stack) {
+                var timestamp = parseInt(stack.created_at);
+                return new Date(timestamp).toLocaleString('en-US', {timeZoneName: 'short'});
             },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element'),
@@ -436,25 +603,26 @@
             _goBack: function() {
                 history.back();
             },
-            _showStackActions: function() {
-                // make actions  
+            _toggleQuickActions: function(e) {
+                this.$.runTemplateFab.toggleClass("hidden");
+                this.$.quickActions.toggleClass("hidden");
             },
-            doWorkflow: function(e){
+            navigateToWorkflows: function() {
+                this._toggleQuickActions();
+                this.selected = 1;
+            },
+            doWorkflow: function(e) {
                 var action = e.target.id;
                 var workflow = this.workflows.find(function(workflow) {
                     return workflow.name == action;
                 });
-                if ( workflow.params == null || workflow.params == undefined ){
-                    this.$.workflowRequest.url = "/api/v1/stacks/"+this.stack.id+"/"+action;
+                if (workflow.params == null || workflow.params == undefined) {
+                    this.$.workflowRequest.url = "/api/v1/stacks/" + this.stack.id + "/" + action;
                     this.$.workflowRequest.params = {};
                     // this.$.workflowRequest.generateRequest();
                 }
-                else {
-                    // show form
-
-                }
             },
-            handleWorkflowResponse: function(){
+            handleWorkflowResponse: function() {
                 // handle workflow response
             }
         });

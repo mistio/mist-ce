@@ -18,7 +18,11 @@
             background-color: #444;
             color: #fff;
             font-family: monospace;
-            padding: 10px;
+            padding: 0;
+        }
+        pre {
+            padding: 20px;
+            margin: 0;
         }
         paper-icon-button {
             transition: transform 180ms ease-in;
@@ -44,7 +48,7 @@
         }
         :host[open] paper-icon-button {
             transform: rotate(-180deg);
-        }
+        }        
         </style>
         <paper-item id="toggle" class="flex-horizontal-with-ratios" on-tap="_toggle">
             <span class="flexchild">[[title]]</span>
@@ -52,17 +56,14 @@
         </paper-item>
         <div id="infoarea">
             <div class="command-container">
-                <!-- to fix: unneeded indexes come in  -->
-                <template is="dom-repeat" items="[[infoLines]]" as="line">                
-                    [[line]]<br/>                    
-                </template>
+<pre>[[infoString]]</pre>
             </div>
         </div>
-    </template>
+    </template>    
     <script>
-    (function() {
-        'use strict';
 
+    (function() {
+        'use strict';        
         Polymer({
             is: 'app-togglable',
 
@@ -75,39 +76,18 @@
                 info: {
                     type: Object
                 },
+                infoString: {
+                    type: String,
+                    computed: "_makeString(info)"
+                },
                 open: {
                     type: Boolean,
                     value: false,
                     reflectToAttribute: true
                 }
             },
-            _makeInfoLines: function(info){
-                var lines = [];
-                if (typeof info == 'object') {
-                    for (var prop in info) {
-                        var val = info[prop];    
-                        if (typeof val == 'object' || typeof val == 'array') {
-                            lines.push(prop+": ");
-                            var objlines = this._makeInfoLines(val);
-                            for (var j = 0; j < objlines.length; j++ ){                                
-                                lines.push(objlines[j]);
-                            }
-                        }
-                        else {
-                            lines.push(prop+": "+val)
-                        }
-                    }
-
-                }
-                else if (typeof info == 'array') {
-                    for (var i=0; i<info.length; i++) {   
-                        lines.push(info(i));
-                    }
-                }
-                else {
-                    lines.push(info);
-                }
-                return lines;
+            _makeString: function(info){
+                return YAML.dump(info);
             },
             _toggle: function(){
                 this.open = !this.open;

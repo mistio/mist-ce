@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../../bower_components/toast-er/toast-er.html">
 
 <link rel="import" href="../app-sidebar/app-sidebar.html">
 <link rel="import" href="../item-list/item-list.html">
@@ -20,6 +21,14 @@
             background: #fafafa;
         }
 
+        paper-toolbar {
+            --paper-toolbar-height: 60px;
+        }
+
+        :host paper-toolbar #topBar {
+            padding: 0px;
+        }
+
         .paper-header [paper-drawer-toggle] {
             margin-left: 10px;
         }
@@ -29,22 +38,26 @@
             @apply(--layout-center);
             margin-right: 0;
             padding-right: 0;
+            color: #fff;
         }
 
         .paper-header h2 {
-            margin-left: 20px;
+            margin-left: 16px;
             @apply(--layout-flex);
             text-transform: capitalize;
         }
 
-        .paper-header .toggleViewButton {
+        .toggleViewButton {
+            position: absolute;
+            right: 24px;
+            top: 8px;
             --paper-icon-button-ink-color: transparent;
         }
 
         #content {
             overflow: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 0 10px;
+            padding: 0px;
         }
 
         app-bar .menu-icon {
@@ -75,11 +88,11 @@
         .items-title,
         #section-heading {
             max-width: 1500px;
-            margin: 20px auto;
+            margin: 0px auto;
         }
 
         #section-heading {
-            margin: 0px auto 16px;
+            margin: 0px auto 0px;
         }
 
         [size=xs] > * {
@@ -140,13 +153,17 @@
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
             <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
-                <div class="paper-header">
+                <paper-toolbar class="medium-tall" style$="color: fff; background-color: [[section.color]]">
                     <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-                    <h2 class="flex" on-tap="toggleSearch">[[filteredItems.length]] [[pageTitle]]</h2>
-                    <app-bar class="horizontal layout center end-justified" showingSearch="{{showingSearch}}" query="{{q}}"></app-bar>
-                    <paper-icon-button class="toggleViewButton" icon="[[viewIcon]]" on-tap="toggleView"></paper-icon-button>
+                    <span class="title"></span>
+
                     <app-user-menu email="[[model.email]]"></app-user-menu>
-                </div>
+                    <span class="paper-header bottom">
+                        <h2 class="flex" on-tap="toggleSearch">[[filteredItems.length]] [[pageTitle]]</h2>
+                        <app-bar class="horizontal layout center end-justified" showingSearch="{{showingSearch}}" query="{{q}}"></app-bar>
+                        <paper-icon-button class="toggleViewButton" icon="[[viewIcon]]" on-tap="toggleView"></paper-icon-button>
+                    </span>
+                </paper-toolbar>
                 <div id="content">
                     <div id="section-heading" hidden$="[[!section]]">
                         <div class="description">[[section.description]]</div>
@@ -160,6 +177,8 @@
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
+        <toast-er></toast-er>
+
         <div class="absolute-bottom-right">
             <app-fab></app-fab>
         </div>

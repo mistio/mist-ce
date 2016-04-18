@@ -104,6 +104,11 @@ Polymer({
                       // console.debug('monitoring', data);
                     }, 250);
                 },
+                reload: function (data) {
+                    that.debounce(that._reloadPage(data), function () {
+                      console.debug('reloading page', data);
+                    }, 250);
+                }
             },
             logs: {
                 logs: function (data) {
@@ -153,7 +158,7 @@ Polymer({
         };
 
         this.getScripts();
-        this.getTemplates();
+        // this.getTemplates();
     },
 
     getScripts: function () {
@@ -226,6 +231,11 @@ Polymer({
             console.warn('Unknown endpoint', Object.keys(body)[0], 'in namespace', namespace);
         else
             endpoint(body[Object.keys(body)[0]]);
+    },
+
+    _reloadPage: function (data) {
+        console.warn('reloading', data);
+        document.location.reload();
     },
 
     _updateModel: function (section, data) {

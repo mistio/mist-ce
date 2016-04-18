@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<link rel="import" href="../app-togglable/app-togglable.html">
+<link rel="import" href="../app-togglable/app-togglable-list.html">
 <link rel="import" href="template-edit.html">
 <link rel="import" href="template-item.html">
 <link rel="import" href="template-run.html">
@@ -17,7 +17,7 @@
 
         paper-material {
             display: block;
-            padding: 20px;
+            padding: 8px;
         }
 
         paper-material.no-pad {
@@ -210,7 +210,7 @@
                             </div>
                             <div class="page-block">
                                 <h3 class="smallcaps">Created</h3>
-                                <p>[[template.created_at]] from <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a></p>
+                                <p>[[timestamp]] by <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a></p>
                             </div>
                         </div>
                     </div>
@@ -222,12 +222,12 @@
                                     You have not yet created a stack from template [[template.name]].
                                 </p>
                                 <paper-material if="[[hasStacks]]" class="no-pad">
-                                    <iron-list is="dom-if" if="[[hasStacks]]" items="[[template.stacks]]">
+                                    <iron-list is="dom-if" if="[[hasStacks]]" items="[[stacks]]">
                                         <template is="dom-repeat">
                                             <div class="row">
                                                 <!-- this will be replaced by "stack-item" element -->
                                                 <paper-item class="flex-horizontal">
-                                                <span class="flexchild">[[item]]</span>  <span class="opaque54">[[item.resources_description]] 3 machines, 2 keys, 1 network</span></paper-item>
+                                                <span class="flexchild"><a href="/stacks/[[item.id]]">[[item.name]]</a></span>  <span class="opaque54">[[item.resources_description]] 3 machines, 2 keys, 1 network</span></paper-item>
                                             </div>
                                         </template>
                                     </iron-list>
@@ -292,20 +292,10 @@
                         </paper-material>
                     </div>      
                     <div class="page">
-                        <h3 class="smallcaps">Inputs</h3>                        
-                        <paper-material id="inputs">
-                            <template is="dom-repeat" items="[[template.inputs]]">
-                                <app-togglable title="[[item.name]]" info="[[item]]"></app-togglable>
-                            </template>
-                        </paper-material>
+                        <app-togglable-list title="Inputs" items="[[template.inputs]]"></app-togglable-list>
                     </div>
                     <div class="page">
-                        <h3 class="smallcaps">Workflows</h3>
-                        <paper-material id="workflows">
-                            <template is="dom-repeat" items="[[template.workflows]]">
-                                <app-togglable title="[[item.name]]" info="[[item]]"></app-togglable>
-                            </template>
-                        </paper-material>
+                        <app-togglable-list title="Workflows" items="[[template.workflows]]"></app-togglable-list>
                     </div>
                 </div>
             </paper-header-panel>
@@ -346,6 +336,10 @@
                     value: false,
                     computed: '_hasStacks(template)'
                 },
+                stacks: {
+                    type: Array,
+                    computed: '_computeStacks(template)'  
+                },
                 templateid: {
                     type: String,
                     computed: '_computeTemplateId(params)'
@@ -360,7 +354,7 @@
                 },
                 timestamp: {
                     type: String,
-                    computed: '_getFormattedTimestamp(template.created_at)'
+                    computed: '_getFormattedTimestamp(template)'
                 },
                 hideprogress: {
                     type: Boolean,
@@ -376,7 +370,8 @@
                 var wh = window.innerHeight;
                 this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
             },
-            _getFormattedTimestamp: function (timestamp) {
+            _getFormattedTimestamp: function (template) {
+                var timestamp = parseInt(template.created_at);
                 return new Date(timestamp).toLocaleString('en-US', {timeZoneName: 'short'});
             },
             _getHeaderStyle: function(section) {
@@ -400,6 +395,19 @@
             },
             _computeIsInline: function(source) {
                 return source == 'inline';
+            },
+            _computeStacks: function(template){
+                var stacks = [];
+                if (template.stacks) {
+                    var templateStacks = template.stacks;
+                    this.model.stacksArray.find(function(stack) {
+                        var stackId = stack.id;
+                        if (templateStacks.indexOf(stackId) > -1) {
+                            stacks.push(stack);
+                        }
+                    }, this);
+                }
+                return stacks;
             },
             _class: function(isinline){
                 return isinline ? "command-container" : "";
@@ -443,6 +451,15 @@
             },
             _goBack: function(){
                 history.back();
+            },
+            toggleAll: function(e){
+                var t = e.target;
+
+
+                var els = this.querySelectorAll('app-togglable');
+                [].forEach.call(els, function(el, index) {
+                        el.open = true;
+                });
             }
         });
     })();

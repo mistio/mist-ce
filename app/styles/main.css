@@ -165,7 +165,7 @@ paper-fab {
 
 .absolute-bottom-right {
     position: fixed;
-    right: 32px;
+    right: 16px;
     bottom: 16px;
     z-index: 10;
 }
