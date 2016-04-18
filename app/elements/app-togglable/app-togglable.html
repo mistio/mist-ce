@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <dom-module id="app-togglable"> 
     <template>
         <style include="shared-styles">
@@ -28,12 +29,12 @@
             transition: transform 180ms ease-in;
         }
         :host #infoarea {
-            height: 0;
+            /*height: 0;*/
             overflow: hidden;
             transition: height 180ms ease-in;
         }
         :host[open] #infoarea {
-            height: auto;
+            /*height: auto;*/
         }
         :host[open] paper-item:before {
             position: absolute;
@@ -54,11 +55,11 @@
             <span class="flexchild">[[title]]</span>
             <paper-icon-button icon="hardware:keyboard-arrow-down"></paper-icon-button>
         </paper-item>
-        <div id="infoarea">
+        <iron-collapse id="infoarea">
             <div class="command-container">
 <pre>[[infoString]]</pre>
             </div>
-        </div>
+        </iron-collapse>
     </template>    
     <script>
 
@@ -91,6 +92,7 @@
             },
             _toggle: function(){
                 this.open = !this.open;
+                this.$.infoarea.toggle();
             }
 
         });
