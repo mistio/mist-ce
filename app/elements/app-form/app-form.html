@@ -29,7 +29,7 @@
 
         </style>
 
-        <paper-material>
+        <paper-material class="page">
             <div class="grid-row">
             <template is="dom-repeat" items="{{fields}}" as="field">
                 <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
@@ -95,6 +95,9 @@
              * @event leadchange
              */
             properties: {
+                model: {
+                    type: Object
+                },
                 sections: {
                     type: Object
                 },
@@ -108,8 +111,18 @@
                 form: {
                     type: Object,
                     value: function(){
-                        return {};
-                    }
+                        var uniqueFields = [];
+                        for (var field in this.fields){
+                            if (this.fields[field].defaultValue){
+                                uniqueFields[this.fields[field].name] = this.fields[field].defaultValue
+                            }else{
+                                uniqueFields[this.fields[field].name] = ''
+                            }
+
+                        }
+                        return uniqueFields
+                    },
+                    // computed: '_computePayload(fields)'
                 },
                 fields: {
                     type: Array,
@@ -141,8 +154,44 @@
             ],
             _computeFieldType: function(field, value, show) {
                 if (!(field.showIf && !field.show)) {
+                    if (field.type == "dropdown" && field.query) {
+                        var inputModel = this.model;
+                        for (var prop in field.query){
+                            var p = field.query[prop];
+
+                            if (p.startsWith("$.")){
+                                p = this.form[p.slice(2)];
+                            }
+
+                            if (inputModel.hasOwnProperty(p)) {
+                                inputModel = inputModel[p];
+                            }
+                        }
+
+                        var updatedOptions = [];
+
+                        for (var prop in inputModel) {
+                            var dropdownItem = {};
+                            if (inputModel[prop].hasOwnProperty("title")) {
+                                dropdownItem.title = inputModel[prop].title;
+                            }
+                            else if (inputModel[prop].hasOwnProperty("name")) {
+                                dropdownItem.title = inputModel[prop].name;
+                            }
+                            dropdownItem.val = inputModel[prop].id;
+                            updatedOptions.push(dropdownItem);
+
+                        }
+                        for (var index in this.fields){
+                            var existingField = this.fields[index];
+                            if (existingField.name == field.name){
+                                this.set("fields." + index + ".options", updatedOptions);
+                            }
+                        }
+                    }
                     return field.type == value;
                 }
+
             },
             _handleRequest: function(e){
                 this.fire("request", e.detail)
@@ -151,49 +200,52 @@
                 this.fire("response", e.detail)
             },
             _fieldsChanged: function(fields, sendingData) {
-                var form = this.form,
-                    show = true,
-                    dependency;
-                var isLead = this.get(fields.path.replace("value","isLead"))
-                if (isLead == true){
-                    this.fire("leadchange", {leadValue:this.get(fields.path)})
-                }
+                this.async(function() {
+                    var form = this.form,
+                        show = true,
+                        dependency;
+                    var isLead = this.get(fields.path.replace("value","isLead"))
+                    if (isLead == true){
+                        console.log(fields.path)
+                        this.fire("leadchange", {leadValue:this.get(fields.path)})
+                    }
 
-                fields.base.forEach(function(el, index) {
+                    fields.base.forEach(function(el, index) {
 
-                    if (el.showIf) {
-                        if (el.showIf.fieldExists) {
-                            dependency = form[el.showIf.fieldName],
-                                show = dependency;
-                            this.set('fields.' + index + '.show', show);
-                        } else {
-                            dependency = form[el.showIf.fieldName],
-                                show = el.showIf.fieldValues.indexOf(dependency) != -1;
-                            this.set('fields.' + index + '.show', show);
-                        }
+                        if (el.showIf) {
+                            if (el.showIf.fieldExists) {
+                                dependency = form[el.showIf.fieldName],
+                                    show = dependency;
+                                this.set('fields.' + index + '.show', show);
+                            } else {
+                                dependency = form[el.showIf.fieldName],
+                                    show = el.showIf.fieldValues.indexOf(dependency) != -1;
+                                this.set('fields.' + index + '.show', show);
+                            }
 
-                        if (!show) {
-                            this._resetField(el, index);
+                            if (!show) {
+                                this._resetField(el, index);
+                            }else{
+                                this.set('form.' + el.name, el.value);
+                            }
                         }else{
                             this.set('form.' + el.name, el.value);
                         }
-                    }else{
-                        this.set('form.' + el.name, el.value);
-                    }
 
-                    if (el.placeholderIf) {
-                        dependency = form[el.placeholderIf.fieldName];
-                        this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
-                    }
-                }, this);
+                        if (el.placeholderIf) {
+                            dependency = form[el.placeholderIf.fieldName];
+                            this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
+                        }
+                    }, this);
 
-                var valid = fields.base.every(function(el, index) {
-                    return el.show && el.required ? el.value : true;
-                }, this);
+                    var valid = fields.base.every(function(el, index) {
+                        return el.show && el.required ? el.value : true;
+                    }, this);
 
-                this.set('form', form);
+                    this.set('form', form);
 
-                this.set('formReady', valid && !sendingData);
+                    this.set('formReady', valid && !sendingData);
+                })
             },
             _submitForm: function() {
                 var payload = this.form;
@@ -231,7 +283,25 @@
                 if (input) {
                     input.invalid = false;
                 }
+            },
+            _assertShowIfQuery: function(name){
+                this.fields.forEach(function(el, index) {
+                    if (el.showIf && el.showIf.fieldName == name) {
+                        if (this._query(el.showIf.query) in el.showIf.queryResult){
+                            this.set('fields.' + index + '.options', []);
+                            this._computeFieldType(el,el.type,el.show)
+
+                        }
+                    }
             }
+            _recomputeDependentFields: function(name){
+                this.fields.forEach(function(el, index) {
+                    if (el.showIf && el.showIf.fieldName == name) {
+                        this.set('fields.' + index + '.options', []);
+                        this._computeFieldType(el,el.type,el.show)
+                    }
+                }, this);
+            },
         });
     })();
     // test progress bar, code from demo
