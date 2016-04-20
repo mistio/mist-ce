@@ -15,6 +15,7 @@
                 display: block;
                 padding: 20px;
                 margin: 36px;
+                max-width: 900px;
             }
 
             paper-progress {
@@ -43,7 +44,7 @@
                     <span class="bottom title">Create Stack {{typedName}} from template [[template.name]]</span>
                 </paper-toolbar>
                 <div id="content">
-                    <paper-material class="page">
+                    <paper-material>
                         <div class="grid-row">
                             <paper-input class="xs12" id="stackname"  label="Stack Name" auto-validate required="true" error-message="Please enter stack name"></paper-input>
                             <paper-textarea class="xs12 m6" id="stackdescription" label="Stack Description" rows="2" max-rows="15"  auto-validate ></paper-textarea>
@@ -54,7 +55,7 @@
                             <paper-button id="submit" class="submit-btn pull-left"  raised on-tap="_submitForm" onclick="startProgress();">Create</paper-button>
                         </div>
                     </paper-material>
-                    <app-form model="[[model]]" fields="[[fields]]" form="[[script]]" url="/api/v1/stacks" on-submit="_stackAjaxRequest" on-response="_stackAjaxResponse" alterrequest ></app-form>
+                    <!-- <app-form model="[[model]]" fields="[[fields]]" form="[[script]]" url="/api/v1/stacks" on-submit="_stackAjaxRequest" on-response="_stackAjaxResponse" alterrequest ></app-form> -->
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>

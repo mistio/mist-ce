@@ -177,7 +177,7 @@
                             <iron-list items="[[presentedStacks]]" as="stack" selected-items="{{selectedStacks}}" multi-selection style$="[[vpHeight]]">
                                 <template>
                                     <div class="row">
-                                        <stack-item selected="[[selected]]" stack="[[stack]]" index="[[index]]" count="[[presentedStacks.length]]">
+                                        <stack-item model="[[model]]" selected="[[selected]]" stack="[[stack]]" index="[[index]]" count="[[presentedStacks.length]]">
                                             <div class="row-actions">
                                                 <paper-tooltip for="runStackBtn" position="top">Run Stack</paper-tooltip>
                                                 <paper-icon-button id="runStackBtn" on-tap="_runSelected" icon="schedule"></paper-icon-button>

@@ -43,7 +43,7 @@
                 </span>
                 <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/stacks/[[stack.id]]">
                     <span class="name flexchild">[[stack.name]]</span>
-                    <div class="flexchild">[[stack.template]]</div>
+                    <div class="flexchild">[[templateName]]</div>
                     <div class="flexchild">[[stack.description]]</div>
                 </a>
             </div>
@@ -58,6 +58,9 @@
                 is: 'stack-item',
 
                 properties: {
+                    model: {
+                        type: Object
+                    },
                     stack: {
                         type: Object
                     },
@@ -65,6 +68,10 @@
                         type: Boolean,
                         value: false,
                         notify: true
+                    },
+                    templateName: {
+                        type: String,
+                        computed: "_templateName(stack)"
                     },
                     index: {
                         type: Number
@@ -107,6 +114,13 @@
                             item: this
                         });
                     }
+                },
+                _templateName: function(stack){
+                    var templateId = stack.template;
+                    var template = this.model.templatesArray.find(function(template) {
+                        return template.id == templateId;
+                    }, this);   
+                    return template.name;
                 }
             });
         })();
