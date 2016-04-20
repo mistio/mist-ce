@@ -4,6 +4,7 @@
 <link rel="import" href="template-edit.html">
 <link rel="import" href="template-item.html">
 <link rel="import" href="template-run.html">
+<link rel="import" href="template-stack-item.html">
 
 <dom-module id="template-page"> 
     <template>
@@ -158,6 +159,27 @@
         .parsing-loader.error paper-progress ::content #primaryProgress {
             background-color: var(--red-color);
         }
+
+        .section {
+            padding-top: 36px;
+        }
+        .red {
+            color: var(--red-color);
+            background-color: transparent;
+        }
+        .required {
+            font-size: 0.9em;
+        }
+
+
+        .resource-head {
+            font-weight: 500;
+            padding: 8px 16px;
+            opacity: 0.87;
+            background-color: #fff;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 0;
+        }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
@@ -203,7 +225,7 @@
                             <a href="/add-template" class="regular blue-link">Cancel Task</a>
                         </div>
 
-                        <div class="flex-horizontal-with-ratios">
+                        <div class="flex-horizontal-with-ratios section">
                             <div class="page-block">
                                 <h3 class="smallcaps">Description</h3>
                                 <p>[[template.description]]</p>
@@ -214,29 +236,30 @@
                             </div>
                         </div>
                     </div>
-                    <div class="page">
+                    <div class="page section">
                         <div class="flex-horizontal-with-ratios">
-                            <div class="page-block">
-                                <h3 class="smallcaps">Stacks</h3>
-                                <p hidden$="[[hasStacks]]">
-                                    You have not yet created a stack from template [[template.name]].
-                                </p>
-                                <paper-material if="[[hasStacks]]" class="no-pad">
-                                    <iron-list is="dom-if" if="[[hasStacks]]" items="[[stacks]]">
-                                        <template is="dom-repeat">
-                                            <div class="row">
-                                                <!-- this will be replaced by "stack-item" element -->
-                                                <paper-item class="flex-horizontal">
-                                                <span class="flexchild"><a href="/stacks/[[item.id]]">[[item.name]]</a></span>  <span class="opaque54">[[item.resources_description]] 3 machines, 2 keys, 1 network</span></paper-item>
-                                            </div>
+                            <div class="page-block">                                
+                                <template is="dom-if" if="[[hasStacks]]">
+                                    <paper-material class="no-pad">
+                                        <h3 class="smallcaps resource-head">stacks</h3>
+                                        <template is="dom-repeat" items="[[stacks]]">
+                                            <template-stack-item model="[[model]]" stack="[[item]]"></template-stack-item>
                                         </template>
-                                    </iron-list>
-                                </paper-material>
-                                <paper-button class="blue pad-left2 pad-right2" hidden$="[[hasStacks]]" on-tap="_createStack"> Create <span hidden$="[[!hasStacks]]">new</span> Stack</paper-button>
+                                    </paper-material>
+                                </template>
+
+                                <template is="dom-if" if="[[!hasStacks]]">
+                                    <h3 class="smallcaps">Stacks</h3>
+                                    <p>
+                                        You have not yet created a stack from template [[template.name]].
+                                    </p>
+                                    <paper-button class="blue pad-left2 pad-right2" on-tap="_createStack"> Create <span hidden$="[[!hasStacks]]">new</span> Stack</paper-button>
+                                </template>
+
                             </div>
                         </div>
                     </div>
-                    <div class="page">
+                    <div class="page section">
                         <h3 class="smallcaps">Metadata</h3>
                         <paper-material>
                             <div class="info-table">
@@ -281,22 +304,32 @@
                                             </div>
                                         </div>
                                     </template>
-                                    <template is="dom-if" if="[[template.stacks.length > 0]]">
-                                        <div class="info-item flex-horizontal-with-ratios">
-                                            <div class="flexchild">Stacks</div>
-                                            <div class="flexchild">[[template.stacks]]</div>
-                                        </div>
-                                    </template>                                    
                                 </div>
                             </div>
                         </paper-material>
-                    </div>      
-                    <div class="page">
-                        <app-togglable-list title="Inputs" items="[[template.inputs]]"></app-togglable-list>
                     </div>
-                    <div class="page">
-                        <app-togglable-list title="Workflows" items="[[template.workflows]]"></app-togglable-list>
-                    </div>
+                    <template is="dom-if" if="[[template.inputs.length]]">
+                        <div class="page">
+                            <div class="section">
+                                <h3 class="smallcaps">Template Inputs </h3>
+                                <p class="required"><span class="red">*</span> required fields</p>
+                                <paper-material class="no-pad">
+                                    <table class="info-table">
+                                        <template is="dom-repeat" items="[[template.inputs]]">
+                                            <tr><td>[[item.name]] <span id="required" class="red" hidden="[[!item.required]]">*</span></td>
+                                            <td>
+                                            [[item.description]]</td></tr>
+                                        </template>
+                                    </table>
+                                </paper-material>
+                            </div>
+                        </div>
+                    </template>
+                    <template is="dom-if" if="[[template.workflows.length]]">
+                        <div class="page section">
+                            <app-togglable-list title="Workflows" items="[[template.workflows]]"></app-togglable-list>
+                        </div>
+                    </template>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
@@ -378,9 +411,19 @@
                 return 'background-color: ' + section.color + '; color: #fff;';
             },
             _hasStacks: function(template){
-                if (template.stacks.length > 0)
-                    return true;
-                return false;
+                var stacks =[];
+                if (this.model.stacksArray){
+                    this.model.stacksArray.find(function(stack) {
+                        if (stack.template == template.id)
+                            stacks.push(stack)
+                    }, this);
+
+                    return stacks.length > 0 ? true : false;
+                }
+                else {
+                    return false
+                }
+
             },
             _computeId: function(params) {
                 return params.id;
@@ -398,15 +441,10 @@
             },
             _computeStacks: function(template){
                 var stacks = [];
-                if (template.stacks) {
-                    var templateStacks = template.stacks;
-                    this.model.stacksArray.find(function(stack) {
-                        var stackId = stack.id;
-                        if (templateStacks.indexOf(stackId) > -1) {
-                            stacks.push(stack);
-                        }
-                    }, this);
-                }
+                this.model.stacksArray.find(function(stack) {
+                    if (stack.template == template.id)
+                        stacks.push(stack);
+                });
                 return stacks;
             },
             _class: function(isinline){

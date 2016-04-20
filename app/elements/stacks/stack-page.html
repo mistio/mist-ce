@@ -178,7 +178,7 @@
         }
 
         paper-header-panel::content #dropShadow {
-            top: 56px;
+            top: 55px;
         }
 
         paper-toolbar::content #bottomBar .right-actions {
@@ -551,43 +551,45 @@
                 }, this);
             },
             _computeMachines: function(stack) {
-                var machines = [];
-                if (stack.machines) {
-                    var stackMachines = stack.machines;
-                    this.model.machinesArray.find(function(machine) {
-                        var machineId = machine.id;
-                        if (stackMachines.indexOf(machineId) > -1) {
-                            machines.push(machine);
-                        }
-                    }, this);
-                }
-                return machines;
+                // var machines = [];
+                // if (stack.machines) {
+                //     var stackMachines = stack.machines;
+                //     this.model.machinesArray.find(function(machine) {
+                //         var machineId = machine.id;
+                //         if (stackMachines.indexOf(machineId) > -1) {
+                //             machines.push(machine);
+                //         }
+                //     }, this);
+                // }
+                // return machines;
+
+                
             },
             _computeNetworks: function(stack) {
-                var networks = [];
-                if (stack.networks) {
-                    var stackNets = stack.networks;
-                    this.model.networksArray.find(function(network) {
-                        var networkId = network.id;
-                        if (stackNets.indexOf(networkId) > -1) {
-                            networks.push(network);
-                        }
-                    }, this);
-                }
-                return networks;
+                // var networks = [];
+                // if (stack.networks) {
+                //     var stackNets = stack.networks;
+                //     this.model.networksArray.find(function(network) {
+                //         var networkId = network.id;
+                //         if (stackNets.indexOf(networkId) > -1) {
+                //             networks.push(network);
+                //         }
+                //     }, this);
+                // }
+                // return networks;
             },
             _computeKeys: function(stack) {
-                var keys = [];
-                if (stack.keys) {
-                    var stackKeys = stack.keys;
-                    this.model.keysArray.find(function(key) {
-                        var keyId = key.id;
-                        if (stackKeys.indexOf(keyId) > -1) {
-                            keys.push(key);
-                        }
-                    }, this);
-                }
-                return keys;
+                // var keys = [];
+                // if (stack.keys) {
+                //     var stackKeys = stack.keys;
+                //     this.model.keysArray.find(function(key) {
+                //         var keyId = key.id;
+                //         if (stackKeys.indexOf(keyId) > -1) {
+                //             keys.push(key);
+                //         }
+                //     }, this);
+                // }
+                // return keys;
             },
             _computeWorkflows: function(template) {
                 return template.workflows;
@@ -627,9 +629,10 @@
                     return workflow.name == action;
                 });
                 if (workflow.params == null || workflow.params == undefined) {
-                    this.$.workflowRequest.url = "/api/v1/stacks/" + this.stack.id + "/" + action;
-                    this.$.workflowRequest.params = {};
-                    // this.$.workflowRequest.generateRequest();
+                    this.$.workflowRequest.url = "/api/v1/stacks/" + this.stack.id;
+                    this.$.workflowRequest.headers = {"csrf": CSRF};
+                    this.$.workflowRequest.params = {"workflow":action};
+                    this.$.workflowRequest.generateRequest();
                 }
             },
             handleWorkflowResponse: function() {
