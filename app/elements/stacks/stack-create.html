@@ -43,11 +43,22 @@
                     <span class="bottom title">Create Stack {{typedName}} from template [[template.name]]</span>
                 </paper-toolbar>
                 <div id="content">
-                    <app-form model="[[model]]" fields="[[fields]]" form="[[script]]" url="/api/v1/templates" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse" on-leadchange="_updateTypedName"></app-form>
+                    <paper-material class="page">
+                        <div class="grid-row">
+                            <paper-input class="xs12" id="stackname"  label="Stack Name" auto-validate required="true" error-message="Please enter stack name"></paper-input>
+                            <paper-textarea class="xs12 m6" id="stackdescription" label="Stack Description" rows="2" max-rows="15"  auto-validate ></paper-textarea>
+                             <paper-toggle-button  id="stackdeploy">Deploy now</paper-toggle-button>
+                            <paper-textarea class="xs12 m6" id="stackinputs" label="Stack Inputs yaml" rows="10" max-rows="50"  auto-validate ></paper-textarea>
+                        </div>
+                        <div class="clearfix bottom-actions xs12">
+                            <paper-button id="submit" class="submit-btn pull-left"  raised on-tap="_submitForm" onclick="startProgress();">Create</paper-button>
+                        </div>
+                    </paper-material>
+                    <app-form model="[[model]]" fields="[[fields]]" form="[[script]]" url="/api/v1/stacks" on-submit="_stackAjaxRequest" on-response="_stackAjaxResponse" alterrequest ></app-form>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <!-- <iron-ajax id="addTemplateAjax" url="/templates" method="POST" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></iron-ajax> -->
+        <iron-ajax id="addStackAjax" url="/api/v1/stacks" method="POST" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></iron-ajax>
     </template>
     <script>
         (function() {
@@ -223,18 +234,44 @@
                 _submitForm: function() {
                     var payload = this.template;
                     console.log(payload);
+                    var inputs = {};
+                    if (this.$.stackinputs.value){
+                        inputs = YAML.parse(this.$.stackinputs.value)
+                    }else{
+                        inputs = e.detail.payload
+                    }
+                    var body = {inputs: inputs}
+                    body["template_id"] = this.template._id
+                    body["name"] = this.$.stackname.value
+                    body["description"] = this.$.stackdescription.value
+                    body["deploy"] = this.$.stackdeploy.checked
 
-                    //   this.$.addTemplateAjax.body = payload;
-                    //   this.$.addTemplateAjax.addRequest();
-
+                    this.$.addStackAjax.headers["Content-Type"] = 'application/json';
+                    this.$.addStackAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.addStackAjax.body = body;
+                    this.$.addStackAjax.generateRequest();
                     //test progress bar
                     this.sendingData = true;
                     // this.hideprogress = false;
                 },
-                _addTemplateAjaxRequest: function() {
+                _stackAjaxRequest: function(e) {
+                    console.log(e)
+                    var inputs = {};
+                    if (this.$.stackinputs.value){
+                        inputs = YAML.parse(this.$.stackinputs.value)
+                    }else{
+                        inputs = e.detail.payload
+                    }
+                    var body = {inputs: inputs}
+                    body["template_id"] = this.template._id
+                    body["name"] = this.$.stackname.value
+                    body["description"] = this.$.stackdescription.value
+                    body["deploy"] = this.$.stackdeploy.checked
+                    e.detail.formAjax.body = body
+                    e.detail.formAjax.generateRequest()
                     this.set('sendingData', true);
                 },
-                _addTemplateAjaxResponse: function(e) {
+                _createStackAjaxResponse: function(e) {
                     this.set('sendingData', false);
 
                     this.fire('createStack', {

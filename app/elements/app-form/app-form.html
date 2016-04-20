@@ -140,7 +140,7 @@
                 form: {
                     type: Object,
                     value: function(){
-                        var uniqueFields = [];
+                        var uniqueFields = {};
                         for (var field in this.fields){
                             if (this.fields[field].defaultValue){
                                 uniqueFields[this.fields[field].name] = this.fields[field].defaultValue
@@ -169,6 +169,10 @@
                     type: Boolean,
                     value: false
                 },
+                alterrequest: {
+                    type: Boolean,
+                    value: false
+                },
                 formReady: {
                     type: Boolean,
                     value: false
@@ -182,6 +186,12 @@
                 '_fieldsChanged(fields.*, sendingData)',
             ],
             _computeFieldType: function(field, value, show) {
+                if (!field.helptext && field.description){
+                    field.helptext = field.description
+                }
+                if (!field.label && field.name){
+                    field.label = field.name
+                }
                 if (!(field.showIf && !field.show)) {
                     if (field.type == "dropdown" && field.query) {
                         var inputModel = this.model;
@@ -276,14 +286,15 @@
                 })
             },
             _submitForm: function() {
-                var payload = this.form;
-                console.log(payload);
-
+              var payload = this.form;
+              console.log(payload);
               this.$.formAjax.headers["Content-Type"] = 'application/json';
-              this.$.formAjax.body = payload;
               this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
-              this.$.formAjax.generateRequest();
-
+              this.fire("submit", {payload: payload, formAjax: this.$.formAjax})
+              if (!this.alterrequest){
+                  this.$.formAjax.body = payload;
+                  this.$.formAjax.generateRequest();
+              }
                 //test progress bar
                 this.hideprogress = false;
             },
@@ -321,7 +332,8 @@
 
                         }
                     }
-            }
+                })
+            },
             _recomputeDependentFields: function(name){
                 this.fields.forEach(function(el, index) {
                     if (el.showIf && el.showIf.fieldName == name) {

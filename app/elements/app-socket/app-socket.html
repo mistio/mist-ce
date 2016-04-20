@@ -158,7 +158,8 @@ Polymer({
         };
 
         this.getScripts();
-        // this.getTemplates();
+        this.getTemplates();
+        this.getStacks();
     },
 
     getScripts: function () {
@@ -183,6 +184,45 @@ Polymer({
             }
         }
         xhr.open("GET", '/api/v1/templates', true);
+        xhr.send();
+    },
+    getStacks: function () {
+        var xhr = new XMLHttpRequest(), that = this;
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                if (xhr.status == 200) {
+                    var stacks = JSON.parse(xhr.responseText)
+                    for (i in stacks){
+                        stacks[i].template_id = stacks[i].template
+                        if (stacks[i].node_instances){
+                            stacks[i].state = stacks[i].node_instances
+                            for (s in stacks[i].state){
+                                stacks[i].state[s].runtime_properties = YAML.stringify(stacks[i].state[s].runtime_properties)
+                            }
+                            delete stacks[i].node_instances
+                        }
+                        if (stacks[i].inputs){
+                            var inputs = stacks[i].inputs
+                            stacks[i].inputs = []
+                            for (input in inputs){
+                                stacks[i].inputs.push({
+                                    name:input,
+                                    value:inputs[input],
+                                    default: "",
+                                    type: "text",
+                                    description: "",
+                                    errorMessage: "",
+                                    helptext: "",
+                                    show: true,
+                                })
+                            }
+                        }
+                    }
+                    that._updateModel('stacks', stacks);
+                }
+            }
+        }
+        xhr.open("GET", '/api/v1/stacks', true);
         xhr.send();
     },
     heartbeat: function() {
@@ -253,7 +293,10 @@ Polymer({
             // If we know things have changed no need to keep checking
             if (changed)
                 break;
-
+            // check if _id is used instead of id
+            if (!data[i].id){
+                data[i].id = data[i]._id
+            }
             // Check if item exists in respective model
             var item = this.get('model.' + section + '.' + data[i].id);
             if (!item) { // If does not exist then model needs to be updated

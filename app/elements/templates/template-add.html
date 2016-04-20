@@ -41,7 +41,7 @@
                     <span class="bottom title">Add Template {{typedName}}</span>
                 </paper-toolbar>
                 <div id="content">
-                    <app-form fields="[[fields]]" form="[[payload]]" url="/api/v1/templates" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></app-form>
+                    <app-form fields="[[fields]]" form="[[template]]" url="/api/v1/templates" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></app-form>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
@@ -69,9 +69,11 @@
                         value: function() {
                             return {
                                 name: '',
-                                source: '',
-                                url: '',
-                                inline: ''
+                                description: '',
+                                exec_type: '',
+                                location_type: '',
+                                template: '',
+                                entrypoint: ''
                             }
                         }
                     },
@@ -90,7 +92,7 @@
                         isLead: true,
                         defaultValue: "",
                         placeholder: "",
-                        errorMessage: "Please enter template's name",                        
+                        errorMessage: "Please enter template's name",
                         show: true,
                         required: true
                     }, {
