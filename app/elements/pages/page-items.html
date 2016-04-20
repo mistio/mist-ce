@@ -1,6 +1,5 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
-<link rel="import" href="../../bower_components/toast-er/toast-er.html">
 
 <link rel="import" href="../app-sidebar/app-sidebar.html">
 <link rel="import" href="../item-list/item-list.html">
@@ -177,7 +176,6 @@
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <toast-er></toast-er>
 
         <div class="absolute-bottom-right">
             <app-fab></app-fab>
@@ -238,6 +236,10 @@
                 this.set('sortBy', 'state');
             else if (this.section.id == 'images')
                 this.set('sortBy', 'cloud');
+            else if (this.section.id == 'scripts')
+                this.set('sortBy', 'name');
+            else
+                this.set('sortBy', 'id');
         },
 
         updateMeta: function(section) {

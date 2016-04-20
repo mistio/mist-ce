@@ -20,6 +20,7 @@
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
+
 <link rel="import" href="../app-bar/app-bar.html">
 <link rel="import" href="../app-socket/app-socket.html">
 <link rel="import" href="../app-styles/app-styles.html">
@@ -44,6 +45,7 @@
     </style>
     <template>
         <app-socket model="{{model}}"></app-socket>
+
         <iron-routes for="app-main" selected="[[section]]">
             <!-- dashboard -->
             <iron-route path="/" title=""></iron-route>
@@ -57,14 +59,14 @@
             <iron-route path="/images" title="images"  href="../pages/page-items.html"></iron-route>
             <iron-route path="/images/:id" title="image" href="../images/images-page.html"></iron-route>
             <!-- keys -->
-            <iron-route path="/keys" title="keys" href="../keys/keys-list.html"></iron-route>
+            <iron-route path="/keys" title="keys" href="../pages/page-items.html"></iron-route>
             <iron-route path="/keys/:id" title="keys" href="../keys/key-page.html"></iron-route>
             <!-- networks -->
-            <iron-route path="/networks" title="networks" href="../networks/networks-list.html"></iron-route>
+            <iron-route path="/networks" title="networks" href="../pages/page-items.html"></iron-route>
             <iron-route path="/networks/:id" title="network" href="../networks/network-page.html"></iron-route>
             <iron-route path="/add-network" title="network" href="../networks/network-add.html"></iron-route>
             <!-- templates -->
-            <iron-route path="/templates" title="templates" href="../templates/templates-list.html"></iron-route>
+            <iron-route path="/templates" title="templates" href="../pages/page-items.html"></iron-route>
             <iron-route path="/templates/:id" title="template" href="../templates/template-page.html"></iron-route>
             <iron-route path="/add-template" title="add template" href="../templates/template-add.html"></iron-route>
             <!-- stackss -->
@@ -72,7 +74,7 @@
             <iron-route path="/stacks" title="stacks" href="../stacks/stacks-list.html"></iron-route>
             <iron-route path="/stacks/:id" title="stack" href="../stacks/stack-page.html"></iron-route>
             <!-- scripts -->
-            <iron-route path="/scripts" title="scripts" href="../scripts/scripts-list.html"></iron-route>
+            <iron-route path="/scripts" title="scripts" href="../pages/page-items.html"></iron-route>
             <iron-route path="/scripts/:id" title="script" href="../scripts/script-page.html"></iron-route>
             <iron-route path="/add-script" title="add script" href="../scripts/script-add.html"></iron-route>
             <!-- other -->
@@ -97,7 +99,8 @@
             <page-items class="keys" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.keysArray]]"></page-items>
             <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
             <!-- networks -->
-            <networks-list class="networks" model="[[model]]" networks="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></networks-list>
+            <!--networks-list class="networks" model="[[model]]" networks="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></networks-list-->
+            <page-items class="networks" model="[[model]]" sections="[[sections]]" section="[[sections.networks]]" items="[[model.networksArray]]"></page-items>
             <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
             <network-add model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
             <!-- templates -->
@@ -111,8 +114,8 @@
             <stack-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.stacks]]"></stack-page>
             <!-- scripts - leave scipts last due to editors highlighting problem -->
             <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
-            <scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list>
-            <!--page-items model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.scriptsArray]]"></page-items-->
+            <!--scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-->
+            <page-items model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
             <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
             <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
             <page-elements></page-elements>
@@ -621,7 +624,7 @@ var app = Polymer({
                         // description: "create stack",
                         // used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
                         // errorMessage: "Please enter cloud id",
-                        // helptext: "You can choose cloud id is needed to...",                
+                        // helptext: "You can choose cloud id is needed to...",
                         // show: true,
                         // required: true,
                         // type: "dropdown",
@@ -739,7 +742,7 @@ var app = Polymer({
                         description: "The mist.io cloud",
                         used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
                         errorMessage: "Please enter cloud id",
-                        helptext: "You can choose cloud id is needed to...",                    
+                        helptext: "You can choose cloud id is needed to...",
                         show: true,
                         required: true,
                         type: "dropdown",

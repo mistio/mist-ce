@@ -391,9 +391,12 @@ Polymer({
                 if (cloud.imagesArray != undefined ) {
                     cloud.imagesArray.forEach(function (image,index,arr) {
                         arr[index].icons = self._generateIcon(image);
+                        arr[index].cloud = {'id': cloud.id,
+                                            'title': cloud.title,
+                                            'provider': cloud.provider};
                         self.model.imagesArray.push(arr[index])
-                        });
-                    }
+                    });
+                }
                 return allImages = allImages.concat(cloud.imagesArray != undefined ? cloud.imagesArray : [])
             });
         }
