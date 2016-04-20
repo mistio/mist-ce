@@ -470,7 +470,24 @@
             },
             _goBack: function(){
                 history.back();
-            }
+            },
+            _showDialog: function(info) {
+                var dialog = this.querySelector('dialog-element'),
+                    i;
+                for (i in info) {
+                    dialog[i] = info[i];
+                }
+                dialog._openDialog();
+            },
+            _deleteSelected: function(e) {
+                this._showDialog({
+                    title: this._formatTitle(),
+                    body: this._formatBody(),
+                    danger: true,
+                    reason: "delete_machine"
+                });
+            },
+
         });
     })();
     </script>
