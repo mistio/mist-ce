@@ -425,6 +425,16 @@
                         </div>
                         <div id="state" class="page">
                             <div class="section">
+                                <h3 class="smallcaps">Runtime properties</h3>
+                                <paper-material class="no-pad">
+                                    <table class="info-table">
+                                        <template is="dom-repeat" items="[[stack.state]]">
+                                            <tr><td>[[item.name]]</td><td>[[item.id]][[item.host_id]]</td></tr>
+                                        </template>
+                                    </table>
+                                </paper-material>
+                            </div>
+                            <div class="section">
                                 <h3 class="smallcaps">Stack Parameters </h3>
                                 <paper-material class="no-pad">
                                     <table class="info-table">
@@ -565,7 +575,7 @@
 
                 var state = stack.state;
                 for(var prop in state) {
-                    
+
                 }
 
             },
