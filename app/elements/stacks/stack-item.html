@@ -41,7 +41,7 @@
                     <app-check id="check" allselected="{{allselected}}" checked="{{selected}}" selected="{{selected}}" on-tap="_selectStack"></app-check>
                     <paper-tooltip for="check" position="right">Select item</paper-tooltip>
                 </span>
-                <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/stacks/[[stack._id]]">
+                <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/stacks/[[stack.id]]">
                     <span class="name flexchild">[[stack.name]]</span>
                     <div class="flexchild">[[stack.template]]</div>
                     <div class="flexchild">[[stack.description]]</div>
