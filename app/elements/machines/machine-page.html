@@ -1,11 +1,15 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../app-rules/app-rules.html">
+<link rel="import" href="../dialog/dialog-element.html">
+<link rel="import" href="machine-edit.html">
 <dom-module id="machine-page">
     <template>
         <style is="custom-style" include="tags-and-labels"></style>
         <style is="custom-style" include="info-table-style"></style>
+        <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
         :host {
+            display: block;
             background: #fafafa;
         }
 
@@ -15,6 +19,15 @@
             padding: 20px;
         }
 
+        .flex-horizontal-with-ratios {
+            @apply(--layout-horizontal);
+            align-content: stretch;
+            flex: 100%;
+        }
+
+        .flexchild {
+            @apply(--layout-flex);
+        }
         .paper-header h2 {
             @apply(--layout-flex-none);
         }
@@ -30,112 +43,151 @@
             margin-bottom: 0;
             cursor: pointer;
         }
-        ::content {
-            table {
-            table-layout: fixed !important;
-            word-break: break-all !important;
-            word-wrap: break-word !important; 
+        .subhead {
+            box-sizing: border-box;
+            position: absolute;            
+            width: 100%;
+            left: 0;
+            height: 57px;
+            bottom: -57px;
+            right: 0;
+            z-index: 9;
+            color: rgba(0,0,0,0.87);
         }
-        ::content table tr  {
-            overflow: hidden !important;
-            white-space: normal !important;
-            word-break: break-all !important;
-            word-wrap: break-word !important; 
+        .content {
+            margin-top: 57px;
         }
-
-
+        paper-header-panel ::content #dropShadow {
+            top: 56px;
+        }
+        paper-toolbar ::content #bottomBar .right-actions{
+            transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
+        }
+        paper-toolbar:not(.tall) ::content #bottomBar .right-actions{
+            margin-right: 70px;
+        }
+        .label {
+            padding: 2px !important;
+        }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
-            <app-sidebar tag="[[tag]]" sections="{{sections}}" current="machines" drawer></app-sidebar>
-            <paper-header-panel id="container" main>
-                <div class="paper-header">
-                    <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-                    <h2>Machine: [[machine.name]]</h2>
-                    <div class="label flex">
-                        <span class$="[[machine.state]]" title="machine state">[[machine.state]]</span>
-                    </div>
-                    <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
-                    <paper-icon-button icon="icons:sort"></paper-icon-button>
+            <app-sidebar tag="[[tag]]" sections="[[sections]]" current="machines" drawer></app-sidebar>
+            <paper-header-panel id="container" mode="waterfall-tall" main>
+                <paper-toolbar class="tall" style$="[[_getHeaderStyle(section.color)]]">
+                    <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
+                    <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
-                </div>
-                <div id="content" class="page">
-                    <paper-material class="info-card" >
-                        <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">Basic Info</h2>
-                        <iron-collapse id="collapse" opened>
-                            <div class="card-content">
-                                <table class="info-table">
-                                    <template is="dom-if" if="[[machine.public_ips]]">
-                                        <tr>
-                                            <td>
-                                                Public IPs
-                                            </td>
-                                            <td>
-                                                <template is="dom-repeat" items="[[machine.public_ips]]">
-                                                    <p class="machine-ip">[[item]]</p>
-                                                </template>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                    <template is="dom-if" if="[[machine.private_ips]]">
-                                        <tr>
-                                            <td>
-                                                Private IPs
-                                            </td>
-                                            <td>
-                                                <template is="dom-repeat" items="[[machine.private_ips]]">
-                                                    <p class="machine-ip">[[item]]</p>
-                                                </template>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                    <template is="dom-if" if="[[machine.df]]">
-                                        <tr>
-                                            <td colspan="2">
-                                                <div class="df">[[machine.df]]</div>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                    <template is="dom-if" if="[[machine.extra.dns_name]]">
-                                        <tr>
-                                            <td>
-                                                DNS Name
-                                            </td>
-                                            <td>
-                                                [[machine.extra.dns_name]]
-                                            </td>
-                                        </tr>
-                                    </template>
-                                    <template is="dom-if" if="[[machine.extra.launchdatetime]]">
-                                        <tr>
-                                            <td>
-                                                Launch Date
-                                            </td>
-                                            <td>
-                                                [[machine.extra.launchdatetime]]
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </table>
+                    <span class="bottom title">Machine: [[machine.name]]</span>
+                    <span class="bottom right-actions">
+                        <template is="dom-if" if="[[machine.can_rename]]">
+                            <paper-tooltip for="editMachine" position="top">Rename Machine</paper-tooltip>
+                            <paper-icon-button id="editMachine" icon="icons:create" on-tap="_editMachine"></paper-icon-button>
+                        </template>
+                        <template is="dom-if" if="[[machine.can_destroy]]">
+                            <paper-tooltip for="deleteTemplate" position="top">Delete Machine</paper-tooltip>
+                            <paper-icon-button id="deleteTemplate" icon="icons:delete" on-tap="_deleteTemplate"></paper-icon-button>
+                        </template>
+                    </span>
+                    <div class="subhead bottom">
+                        <div class="label">
+                            <span class$="[[machine.state]]" title="machine state">[[machine.state]]</span>
+                        </div>
+                        <div class="fab-top-right">
+                            <paper-fab icon="av:play-arrow" on-tap="_toggleQuickActions" id="runTemplateFab"></paper-fab>
+                        </div>
+                    </div>
+                </paper-toolbar>
+                <div class="content">
+                    <div class="page">
+                        <div class="flex-horizontal-with-ratios">
+                            <div class="page-block">
+                                <h3 class="smallcaps">Cloud & Image</h3>
+                                <p>[[machine.cloud.title]] & [[machineImage]]</p>
                             </div>
-                        </iron-collapse>
-                    </paper-material>
-                    <paper-material class="info-card">
-                        <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="togglefull">Full Metadata List</h2>
-                        <iron-collapse id="collapsefull" opened>
-                            <div class="card-content">
-                                <element-for-in content="[[machine.extra]]"></element-for-in>
+                            <div class="page-block">
+                                <h3 class="smallcaps">Created</h3>
+                                <p>[[machine.extra.created]] by <a href="/members/[[template.user]]" class="regular blue-link">mario olivarez</a></p>
                             </div>
-                        </iron-collapse>
-                    </paper-material>
-                    
-                    <app-rules></app-rules>
-                    
+                        </div>
+                        <paper-material class="info-card">
+                            <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">Basic Info</h2>
+                            <iron-collapse id="collapse" opened>
+                                <div class="card-content">
+                                    <table class="info-table">
+                                        <template is="dom-if" if="[[machine.public_ips]]">
+                                            <tr>
+                                                <td>
+                                                    Public IPs
+                                                </td>
+                                                <td>
+                                                    <template is="dom-repeat" items="[[machine.public_ips]]">
+                                                        <p class="machine-ip">[[item]]</p>
+                                                    </template>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        <template is="dom-if" if="[[machine.private_ips]]">
+                                            <tr>
+                                                <td>
+                                                    Private IPs
+                                                </td>
+                                                <td>
+                                                    <template is="dom-repeat" items="[[machine.private_ips]]">
+                                                        <p class="machine-ip">[[item]]</p>
+                                                    </template>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        <template is="dom-if" if="[[machine.df]]">
+                                            <tr>
+                                                <td colspan="2">
+                                                    <div class="df">[[machine.df]]</div>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        <template is="dom-if" if="[[machine.extra.dns_name]]">
+                                            <tr>
+                                                <td>
+                                                    DNS Name
+                                                </td>
+                                                <td>
+                                                    [[machine.extra.dns_name]]
+                                                </td>
+                                            </tr>
+                                        </template>
+                                        <template is="dom-if" if="[[machine.extra.launchdatetime]]">
+                                            <tr>
+                                                <td>
+                                                    Launch Date
+                                                </td>
+                                                <td>
+                                                    [[machine.extra.launchdatetime]]
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </table>
+                                </div>
+                            </iron-collapse>
+                        </paper-material>
+                        <paper-material class="info-card">
+                            <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="togglefull">Full Metadata List</h2>
+                            <iron-collapse id="collapsefull" opened>
+                                <div class="card-content">
+                                    <element-for-in content="[[machine.extra]]"></element-for-in>
+                                </div>
+                            </iron-collapse>
+                        </paper-material>
+                        
+                        <app-rules></app-rules>
+                    </div>
                 </div>
                 <div class="absolute-bottom-right">
                     <app-fab></app-fab>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
+        <dialog-element></dialog-element>
+        <machine-edit machine="[[machine]]"></machine-edit>
     </template>
 </dom-module>
 <script>
@@ -171,7 +223,14 @@ Polymer({
         tag: {
             type: String,
             value: ""
+        },
+        machineImage: {
+            type: String,
+            computed: "_machineImage(machine.imageId)"
         }
+    },
+    listeners: {
+        'confirmation': '_editMachineResponse',
     },
     _computeMachine: function(params) {
         return this.model.machinesArray.find(function(machine) {
@@ -207,6 +266,27 @@ Polymer({
     },
     togglefull: function() {
       this.$.collapsefull.toggle();
+    },
+    _goBack: function() {
+        history.back();
+    },
+    _showDialog: function(info) {
+        var dialog = this.querySelector('dialog-element'),
+            i;
+        for (i in info) {
+            dialog[i] = info[i];
+        }
+        dialog._openDialog();
+    },
+    _editMachine: function(e) {
+        var el = this.querySelector('machine-edit');
+        el._openEditMachineModal();
+    },
+    _machineImage: function(id){
+        var image = this.model.imagesArray.find(function(image) {
+            return image.id == id;
+        }, this);   
+        return image.name;
     }
 });
 </script>
