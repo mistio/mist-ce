@@ -182,20 +182,20 @@
         <iron-media-query query="(min-width: 1400px)" query-matches="{{wideViewport}}"></iron-media-query>
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-
         <div class="header" style$="[[_getHeaderStyle(section.color, selectedItems.length)]]">
-            <app-check class="check-all" selected="[[allselected]]" on-tap="_onSelectAll">
-                <template is="dom-if" if="[[!selectedItems.length]]">
-                    <iron-icon icon="check"></iron-icon>
-                </template>
-                <template is="dom-if" if="[[selectedItems.length]]">
-                    <strong>[[selectedItems.length]]</strong>
-                </template>
-            </app-check>
-
+            <template is="dom-if" if="[[!isimages]]">
+                <app-check class="check-all" selected="[[allselected]]" on-tap="_onSelectAll">
+                    <template is="dom-if" if="[[!selectedItems.length]]">
+                        <iron-icon icon="check"></iron-icon>
+                    </template>
+                    <template is="dom-if" if="[[selectedItems.length]]">
+                        <strong>[[selectedItems.length]]</strong>
+                    </template>
+                </app-check>
+            </template>
             <template is="dom-if" if="[[!selectedItems.length]]">
               <template is="dom-repeat" items="[[fields]]">
-                  <div class$="{{item}} field field[[index]] {{_isSortedBy(item, sortBy, sortOrder)}}" on-tap="_changeSortOrder">
+                  <div class$="[[item]] field field[[index]] [[_isSortedBy(item, sortBy, sortOrder)]]" on-tap="_changeSortOrder">
                       [[item]]
                   </div>
               </template>
@@ -212,7 +212,7 @@
                 </paper-dropdown-menu>[[_isSortedBy(sortBy, sortBy, sortOrder)]]
               </div>
             </template>
-            <item-actions id="actions" items="{{items}}" selected-items="[[selectedItems]]"></item-actions>
+            <item-actions id="actions" items="[[items]]" selected-items="[[selectedItems]]"></item-actions>
         </div>
         <div class="row no-data" hidden$="[[items.length]]">
             no data yet
@@ -220,23 +220,20 @@
         <iron-list items="[[items]]" as="item" style$="[[vpHeight]]">
             <template>
                 <div class="row" data-index$="[[index]]">
-                  <template is="dom-if" if="[[ismachines]]">
+
+                  <template is="dom-if" if="[[!isimages]]">
                     <machine-list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]">
-                      <app-check id="check"  allselected="{{allselected}}" selected$="{{isSelected(item, selectedItems.splices)}}" item="[[item]]" on-tap="_selectItem">
+                      <app-check id="check" allselected="{{allselected}}" selected$="{{isSelected(item, selectedItems.splices)}}" item="[[item]]" on-tap="_selectItem">
                         <iron-icon src="[[_computeItemImage(item)]]">M</iron-icon></app-check>
                       <paper-tooltip for="check" position="right">Select item</paper-tooltip>
                     </machine-list-item>
+                    <paper-button class="more" on-tap="_openItemActions"><iron-icon icon="more-vert"></iron-icon></paper-button>
                   </template>
+
                   <template is="dom-if" if="[[isimages]]">
-                    <image-list-item section="[[section]]" item="[[item]]" fields="[[fields]]"></image-list-item>
+                    <machine-list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]"></machine-list-item>
                   </template>
-                  <template is="dom-if" if="[[iskeys]]">
-                    <key-list-item section="[[section]]" item="[[item]]" fields="[[fields]]"></key-list-item>
-                  </template>
-                  <template is="dom-if" if="[[istemplates]]">
-                    <template-list-item section="[[section]]" item="[[item]]" fields="[[fields]]"></template-list-item>
-                  </template>
-                  <paper-button class="more" on-tap="_openItemActions"><iron-icon icon="more-vert"></iron-icon></paper-button>
+
                 </div>
             </template>
         </iron-list>
@@ -416,19 +413,30 @@ Polymer({
     },
 
     displayedFields: function (section) {
-        if (this.isMachines(section))
-          if (this.get('xxwideViewport'))
-              return ['name', 'state', 'cloud', 'size', 'image', 'id'];
-          if (this.get('xwideViewport'))
-              return ['name', 'state', 'cloud', 'size', 'image']
-          if (this.get('wideViewport'))
-              return ['name', 'state', 'cloud', 'size']
-          if (!this.get('mediumViewport') && !this.get('narrowViewport'))
-              return ['name', 'state', 'cloud']
-          else
-              return ['name', 'state', 'cloud'];
-        if (this.isKeys(section))
-          return ['name']
+        if (this.isMachines(this.section)){
+            if (this.get('xxwideViewport'))
+                return ['name', 'state', 'cloud', 'size', 'image', 'id'];
+            if (this.get('xwideViewport'))
+                return ['name', 'state', 'cloud', 'size', 'image']
+            if (this.get('wideViewport'))
+                return ['name', 'state', 'cloud', 'size']
+            if (!this.get('mediumViewport') && !this.get('narrowViewport'))
+                return ['name', 'state', 'cloud']
+            else
+                return ['name', 'state', 'cloud'];
+        }
+        if (this.isImages(this.section)) {
+            return ['name', 'cloud', 'id']
+        }
+        if (this.isKeys(this.section)) {
+            return ['id', 'machines', 'default']
+        }
+        if (this.isNetworks(this.section)) {
+            return ['name', 'cloud', 'state', 'id', 'public', 'router_external', 'subnets']
+        }
+        if (this.isScripts(this.section)) {
+            return ['name', 'script_id', 'exec_type', 'location_type'];
+        }
     },
 
     _openItemActions: function (e) {

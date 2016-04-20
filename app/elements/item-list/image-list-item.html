@@ -9,6 +9,7 @@
         :host {
             padding: 15px 24px;
             @apply(--layout-horizontal);
+            width: 100%;
         }
 
         a {
@@ -41,7 +42,6 @@
         }
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <paper-icon-button icon="star" active></paper-icon-button>
         <a href$="[[elementLink]]" is="pushstate-anchor">
             <div class="name" hidden$="[[!item.name]]">[[item.name]]</div>
             <div class="id" hidden$="[[!item.id]]">[[item.id]]</div>
@@ -52,6 +52,7 @@
             </div>
             <div class="provider" hidden$="[[!item.provider]]">[[item.provider]]</div>
         </a>
+        <paper-icon-button icon="star" active></paper-icon-button>
     </template>
 </dom-module>
 <script>
