@@ -6,6 +6,7 @@
 <link rel="import" href="stack-network-item.html">
 <link rel="import" href="stack-key-item.html">
 <link rel="import" href="../app-form/app-form.html">
+<link rel="import" href="../element-for-in/element-for-in.html">
 <dom-module id="stack-page">
     <template>
         <style is="custom-style" include="lists"></style>
@@ -296,6 +297,12 @@
             height: 0;
             padding: 0;
         }
+        .no-data-message {
+            padding: 70px;
+        }
+        iron-pages {
+            margin-bottom: 68px;
+        }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
@@ -342,10 +349,10 @@
                 <div class="content">
                     <iron-pages selected="{{selected}}">
                         <div id="resources" class="page">
-                            <div class="flex-horizontal-with-ratios">
+                            <div class="flex-horizontal-with-ratios section">
                                 <div class="page-block">
                                     <h3 class="smallcaps">Created from template</h3>
-                                    <p><a href$="/templates/[[stack.template_id]]" class="regular blue-link"> [[stack.template]]</a> [[template.description]]</p>
+                                    <p><a href$="/templates/[[template.id]]" class="regular blue-link"> [[template.name]]</a> [[template.description]]</p>
                                 </div>
                                 <div class="page-block">
                                     <h3 class="smallcaps">Created</h3>
@@ -409,20 +416,24 @@
                                 </paper-drawer-panel>
                             </template>
                             <template is="dom-if" if="[[!workflows.length]]">
-                                <p class="center">
-                                    The stack has no workflows.
-                                </p>
+                                <div class="no-data-message">
+                                    <p>
+                                        The stack has no workflows.
+                                    </p>
+                                </div>
                             </template>
                         </div>
                         <div id="state" class="page">
-                            <h3 class="smallcaps">Stack State : runtime properties </h3>
-                            <paper-material class="pad1">
-                                <template is="dom-repeat" items="[[stack.state]]">
-                                    <app-togglable title="[[item.name]] : [[item.id]]" info="[[item.runtime_properties]]"></app-togglable>
-                                </template>
-                            </paper-material>
-                            <!-- <app-togglable-list title="Stack State" items="[[stack.state]]"></app-togglable-list> -->
-                            <app-togglable-list title="Stack Parameters" items="[[stack.inputs]]"></app-togglable-list>
+                            <div class="section">
+                                <h3 class="smallcaps">Stack Parameters </h3>
+                                <paper-material class="no-pad">
+                                    <table class="info-table">
+                                        <template is="dom-repeat" items="[[stack.inputs]]">
+                                            <tr><td>[[item.name]]</td><td>[[item.value]]</td></tr>
+                                        </template>
+                                    </table>
+                                </paper-material>
+                            </div>
                         </div>
                     </iron-pages>
                 </div>
