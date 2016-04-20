@@ -956,17 +956,13 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
 
     THREAD_COUNT = 5
     pool = ThreadPool(THREAD_COUNT)
-
-    names = []
-    for i in range(1, quantity+1):
-        names.append('%s-%d' % (machine_name,i))
     specs = []
     for name in names:
         specs.append((
             (owner, cloud_id, key_id, name, location_id, image_id,
-             size_id, script, image_extra, disk, image_name, size_name,
+             size_id, image_extra, disk, image_name, size_name,
              location_name, ips, monitoring, networks, docker_env,
-             docker_command, 22, script_id, script_params, job_id),
+             docker_command, 22, script, script_id, script_params, job_id),
             {'hostname': hostname, 'plugins': plugins,
              'post_script_id': post_script_id,
              'post_script_params': post_script_params,
