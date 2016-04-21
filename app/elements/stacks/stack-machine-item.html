@@ -83,7 +83,7 @@
             <div class="icon">
                 <iron-icon icon="hardware:computer"></iron-icon>
             </div>
-            <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/machines/[[machineuuid]]">
+            <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/machines/[[machine.uuid]]">
                 <div class="flexchild"><span class="name">[[machine.name]]</span></div>
                 <div class="flexchild"><span class$="state [[machine.state]]"></span></div>
                 <div class="flexchild capitalize">[[machine.cloud.provider]]</div>
@@ -102,13 +102,12 @@
                     type: Object,
                     notify: true
                 },
-                machineuuid: {
-                    type: String,
-                    notify: true
-                },
+                // machineuuid: {
+                //     type: String,
+                //     notify: true
+                // },
                 machine: {
-                    type: Object,
-                    computed: '_computeMachine(machineuuid, model)'
+                    type: Object                    
                 },
                 hasIncident: {
                     type: Boolean,
@@ -116,36 +115,36 @@
                     notify: true,
                     reflectToAttribute: true
                 },
-                name: {
-                    type: String,
-                    computed: "_name(machine)"
-                },
-                state: {
-                    type: String,
-                    computed: "_state(machine)"
-                },
-                cloud: {
-                    type: String,
-                    computed: "_cloud(machine)"
-                },
+                // name: {
+                //     type: String,
+                //     computed: "_name(machine)"
+                // },
+                // state: {
+                //     type: String,
+                //     computed: "_state(machine)"
+                // },
+                // cloud: {
+                //     type: String,
+                //     computed: "_cloud(machine)"
+                // },
             },
-            _computeMachine: function(machineuuid, model){
-                // TODO: does not define a machine obj for the item
-                var uuid = machineuuid;
-                var machine = this.model.machinesArray.find(function(machine) {
-                        return machine.uuid == uuid;
-                }, this);
-                return machine;
-            },
-            _name: function(machine){
-                return machine.name;
-            },
-            _state: function(machine){
-                return machine.name;
-            },
-            _name: function(machine){
-                return machine.name;
-            }
+            // _computeMachine: function(machineuuid, model){
+            //     // TODO: does not define a machine obj for the item
+            //     var uuid = machineuuid;
+            //     var machine = this.model.machinesArray.find(function(machine) {
+            //             return machine.uuid == uuid;
+            //     }, this);
+            //     return machine;
+            // },
+            // _name: function(machine){
+            //     return machine.name;
+            // },
+            // _state: function(machine){
+            //     return machine.name;
+            // },
+            // _name: function(machine){
+            //     return machine.name;
+            // }
            
         });
     })();

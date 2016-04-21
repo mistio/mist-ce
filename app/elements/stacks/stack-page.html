@@ -369,11 +369,11 @@
                             </div>
                             <div class="resources-list">
                                 <h3 class="smallcaps">Resources list</h3>
-                                <template is="dom-if" if="[[stack.machines.length]]">
+                                <template is="dom-if" if="[[listMachines.length]]">
                                     <paper-material class="no-pad resources-list">
                                         <h3 class="smallcaps resource-head">machines</h3>
-                                        <template is="dom-repeat" items="[[stack.machines]]" as="machine">
-                                            <stack-machine-item model="[[model]]" machineuuid="[[machine]]"></stack-machine-item>
+                                        <template is="dom-repeat" items="[[listMachines]]" as="machine">
+                                            <stack-machine-item model="[[model]]" machine="[[machine]]"></stack-machine-item>
                                         </template>
                                     </paper-material>
                                 </template>
@@ -514,12 +514,15 @@
                 },
                 machines: {
                     type: Array,
-                    value:[],
                     computed: '_machines(stack)'
-                },
+                },                
                 runtimeProperties: {
                     type: Array,
                     computed: '_runtimeProperties(stack)'
+                },
+                listMachines: {
+                    type: Array,
+                    computed: '_listMachines(runtimeProperties)'
                 },
                 networks: {
                     type: Array,
@@ -571,6 +574,21 @@
             _machines: function(stack){
                 return stack.machines;
             },
+            _listMachines: function(runtimeProperties){
+                var machines = [];
+                if (runtimeProperties) {
+                    runtimeProperties.forEach(function(rtpy) {
+                        if (rtpy.mist_type == 'machine'){
+                            var mac = this.model.machinesArray.find(function(mach){
+                                return mach.id == rtpy.machine_id
+                            }, this);
+                            if (mac)
+                                machines.push(mac);
+                        }
+                    }, this);
+                }
+                return machines;
+            },
             _computeNetworks: function(runtimeProperties) {
                 var networks = [];
                 if (runtimeProperties) {
@@ -603,7 +621,7 @@
             },
             _computeWorkflows: function(template) {
                 var workflows = [];
-                var removeThese = ["scale"];
+                var removeThese = ["scale", "install"];
                 if (template.workflows){
                     template.workflows.find(function(workflow) {
                         if (removeThese.indexOf(workflow.name) == -1) {
