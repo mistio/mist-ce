@@ -327,13 +327,13 @@
                         <paper-item id="quickActions" class="hidden">
                             <div class="flex-horizontal-with-ratios">
                                 <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                    <template is="dom-if" if="[[!workflow.params]]">
-                                        <paper-button id="[[workflow.name]]" on-tap="doWorkflow">[[workflow.name]]</paper-button>
-                                    </template>
+                                    <!-- <template is="dom-if" if=[[!workflow.params.length]]> -->
+                                        <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation">[[workflow.name]]</paper-button>
+                                    <!-- </template> -->
                                 </template>
                                 <div class="flexchild">
                                     <paper-button>
-                                        <iron-icon icon="icons:more-vert" on-tap="navigateToWorkflows"></iron-icon>
+                                        <iron-icon icon="icons:more-vert" on-tap="_navigateToWorkflows"></iron-icon>
                                     </paper-button>
                                 </div>
                                 <paper-button>
@@ -401,14 +401,22 @@
                                         <div id="workflowsView" class="pad">
                                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
                                                 <div id$="[[workflow.name]]show" class="m12 wf-item">
-                                                    <app-form hidden$="[[!workflow.params.length]]" fields="[[workflow.params]]" form="[[payload]]" url$="/api/v1/stacks/[[stackId]]/[[workflow.name]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse">[[workflow.name]]</app-form>
-                                                    <paper-material class="form-view grid-row" hidden$="[[workflow.params.length]]">
-                                                        <h2 class="xs12">[[workflow.name]]</h2>
-                                                        <p class="xs12 center">
-                                                            <paper-button on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
-                                                        </p>
-                                                        <h5>*no paremetres required</h5>
-                                                    </paper-material>
+                                                    
+                                                    <template is="dom-if" if=[[workflow.params.length]]>
+                                                        <app-form fields="[[workflow.params]]" form="[[payload]]" url$="/api/v1/stacks/[[stackId]]/[[workflow.name]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>    
+                                                    </template>
+                                                    
+                                                    <template is="dom-if" if=[[!workflow.params.length]]>
+                                                        <paper-material class="form-view grid-row">
+                                                            <h2 class="xs12">[[workflow.name]]</h2>
+                                                            <p hidden$="[[!workflow.description]]">[[workflow.description]]</p>
+                                                            <p class="xs12 center">
+                                                                <paper-button id="[[workflow.name]]" on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
+                                                            </p>
+                                                            <h5>*no paremetres required</h5>
+                                                        </paper-material>
+                                                    </template>
+
                                                 </div>
                                             </template>
                                         </div>
@@ -429,7 +437,7 @@
                                 <paper-material class="no-pad">
                                     <table class="info-table">
                                         <template is="dom-repeat" items="[[stack.state]]">
-                                            <tr><td>[[item.name]]</td><td>[[item.id]][[item.host_id]]</td></tr>
+                                            <tr><td>[[item.name]]</td><td>[[item.id]], [[item.host_id]]</td></tr>
                                         </template>
                                     </table>
                                 </paper-material>
@@ -531,19 +539,6 @@
                 // 'updateSelectedStack': '_updateStack',
                 'stackChanged': '_stackChanged'
             },
-            _workflowNavigation: function(e) {
-                var action = e.target.id;
-
-                var pages = this.querySelector('#workflowsView').children;
-                [].forEach.call(pages, function(p, index) {
-                    p.setAttribute("show", false);
-                    console.log(action, p);
-                });
-
-                var page = this.querySelector('#' + action + 'show');
-                page.setAttribute("show", true);
-
-            },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
             },
@@ -573,10 +568,8 @@
                 // }
                 // return machines;
 
-                var state = stack.state;
-                for(var prop in state) {
-
-                }
+                var machineName = stack.state[0];
+                
 
             },
             _computeNetworks: function(stack) {
@@ -606,13 +599,20 @@
                 // return keys;
             },
             _computeWorkflows: function(template) {
-                return template.workflows;
+                var workflows = [];
+                var removeThese = ["scale"];
+            
+                template.workflows.find(function(workflow) {
+                    if (removeThese.indexOf(workflow.name) == -1) {
+                        workflows.push(workflow);
+                    }
+                }, this);
+
+                return workflows;
             },
             _stackChanged: function() {
-                // if (this.workflows){
                 this.querySelector('#workflowsView').children[0].setAttribute("show", true);
                 this.querySelector('#workflowsNavigation').children[0].setAttribute("focused", true);
-                // }
             },
             _getFormattedTimestamp: function (stack) {
                 var timestamp = parseInt(stack.created_at);
@@ -633,9 +633,27 @@
                 this.$.runTemplateFab.toggleClass("hidden");
                 this.$.quickActions.toggleClass("hidden");
             },
-            navigateToWorkflows: function() {
+            _workflowNavigation: function(e) {
+                var action = e.target.id;
+
+                var pages = this.querySelector('#workflowsView').children;
+                [].forEach.call(pages, function(p, index) {
+                    p.setAttribute("show", false);
+                    console.log(action, p);
+                });
+
+                var page = this.querySelector('#' + action + 'show');
+                page.setAttribute("show", true);
+
+            },
+            _navigateToWorkflows: function() {
                 this._toggleQuickActions();
                 this.selected = 1;
+            },
+            _quickActionsNavigation: function(e){
+                this._toggleQuickActions();
+                this.selected = 1;
+                this._workflowNavigation(e);
             },
             doWorkflow: function(e) {
                 var action = e.target.id;
