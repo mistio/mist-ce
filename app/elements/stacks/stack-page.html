@@ -263,7 +263,8 @@
             position: absolute;
             bottom: -1px;
             right: 0;
-            padding-left: 60px;
+            border-bottom: 1px;
+            padding-left: 49px;
             box-sizing: border-box;
             transition: all 0.18s ease-in;
             overflow: hidden;
@@ -303,6 +304,13 @@
         iron-pages {
             margin-bottom: 68px;
         }
+        h2.info-title {
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 24px;
+            margin: 0;
+            padding: 8px 16px;
+        }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
@@ -331,11 +339,11 @@
                                         <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation">[[workflow.name]]</paper-button>
                                     <!-- </template> -->
                                 </template>
-                                <div class="flexchild">
+<!--                                 <div class="flexchild">
                                     <paper-button>
                                         <iron-icon icon="icons:more-vert" on-tap="_navigateToWorkflows"></iron-icon>
                                     </paper-button>
-                                </div>
+                                </div> -->
                                 <paper-button>
                                     <iron-icon icon="icons:clear" on-tap="_toggleQuickActions"></iron-icon>
                                 </paper-button>
@@ -434,20 +442,21 @@
                         <div id="state" class="page">
                             <div class="section">
                                 <h3 class="smallcaps">Runtime properties</h3>
-                                <paper-material class="no-pad">
-                                    <table class="info-table">
-                                        <template is="dom-repeat" items="[[stack.state]]">
-                                            <tr><td>[[item.name]]</td><td>[[item.id]], [[item.host_id]]</td></tr>
-                                        </template>
-                                    </table>
-                                </paper-material>
+
+                                <template is="dom-repeat" items="[[runtimeProperties]]">
+                                    <paper-material class="no-pad info-card">
+                                        <h2 class="info-title" style$="[[color]]">[[item.name]]</h2>
+                                        <element-for-in content="[[item]]"></element-for-in>
+                                    </paper-material>
+                                </template>
+
                             </div>
                             <div class="section">
                                 <h3 class="smallcaps">Stack Parameters </h3>
                                 <paper-material class="no-pad">
                                     <table class="info-table">
                                         <template is="dom-repeat" items="[[stack.inputs]]">
-                                            <tr><td>[[item.name]]</td><td>[[item.value]]</td></tr>
+                                                <tr><td>[[item.name]]</td><td>[[item.value]]</td></tr>
                                         </template>
                                     </table>
                                 </paper-material>
@@ -469,7 +478,8 @@
 
             properties: {
                 model: {
-                    type: Object
+                    type: Object,
+                    notify: true
                 },
                 selected: {
                     type: Number,
@@ -528,12 +538,19 @@
                     type: String,
                     computed: '_getFormattedTimestamp(stack)'
                 },
+                runtimeProperties: {
+                    type: Array,
+                    computed: '_runtimeProperties(stack)'
+                },
                 vpHeight: String,
                 payload: {
                     type: Object,
                     value: {}
                 }
             },
+            observers: [
+                  // '_runtimePropertiesChanged(runtimeProperties.*)'
+            ],
             listeners: {
                 // 'confirmation': '_deleteStackResponse',
                 // 'updateSelectedStack': '_updateStack',
@@ -568,7 +585,7 @@
                 // }
                 // return machines;
 
-                var machineName = stack.state[0];
+                // var machineName = stack.state[0];
                 
 
             },
@@ -601,16 +618,17 @@
             _computeWorkflows: function(template) {
                 var workflows = [];
                 var removeThese = ["scale"];
-            
-                template.workflows.find(function(workflow) {
-                    if (removeThese.indexOf(workflow.name) == -1) {
-                        workflows.push(workflow);
-                    }
-                }, this);
-
+                if (template.workflows){
+                    template.workflows.find(function(workflow) {
+                        if (removeThese.indexOf(workflow.name) == -1) {
+                            workflows.push(workflow);
+                        }
+                    }, this);
+                }
                 return workflows;
             },
             _stackChanged: function() {
+                console.log("Stack Changed");
                 this.querySelector('#workflowsView').children[0].setAttribute("show", true);
                 this.querySelector('#workflowsNavigation').children[0].setAttribute("focused", true);
             },
@@ -655,6 +673,27 @@
                 this.selected = 1;
                 this._workflowNavigation(e);
             },
+            _runtimeProperties: function(stack){
+                var rtp = [];
+                var state = stack.state;
+                for (var i = 0; i < state.length; i++) {
+                    var rtpObj = YAML.parse(state[i].runtime_properties);
+                    rtpObj.name = state[i].name;
+                    rtp.push(rtpObj);
+                }
+
+                console.log("rtp exist", rtp);
+                return rtp;
+            },
+            _runtimePropertiesChanged: function(changerecord){
+                var rtp = [];
+                var state = this.stack.state;
+                for (var i = 0; i < state.length; i++) {
+                    rtp.push(state[i].runtime_properties);
+                }
+                this.runtimeProperties = [];
+                this.runtimeProperties = rtp;
+            },
             doWorkflow: function(e) {
                 var action = e.target.id;
                 var workflow = this.workflows.find(function(workflow) {
@@ -669,7 +708,10 @@
             },
             handleWorkflowResponse: function() {
                 // handle workflow response
-            }
+            },
+            toggle: function() {
+              this.$.collapse.toggle();
+            },
         });
     })();
     </script>

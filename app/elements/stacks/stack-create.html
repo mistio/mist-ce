@@ -20,7 +20,7 @@
 
             paper-progress {
                 position: absolute;
-                bottom: 85px;
+                bottom: 80px;
                 width: 100%;
                 left: 0;
                 right: 0;
@@ -51,11 +51,12 @@
                              <paper-toggle-button  id="stackdeploy">Deploy now</paper-toggle-button>
                             <paper-textarea class="xs12 m6" id="stackinputs" label="Stack Inputs yaml" rows="10" max-rows="50"  auto-validate ></paper-textarea>
                         </div>
+                        <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
+                        <hr class="xs12" />
                         <div class="clearfix bottom-actions">
                             <paper-button id="submit" class="submit-btn pull-left"  raised on-tap="_submitForm" onclick="startProgress();">Create</paper-button>
                         </div>
                     </paper-material>
-                    <!-- <app-form model="[[model]]" fields="[[fields]]" form="[[script]]" url="/api/v1/stacks" on-submit="_stackAjaxRequest" on-response="_stackAjaxResponse" alterrequest ></app-form> -->
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
@@ -253,7 +254,7 @@
                     this.$.addStackAjax.generateRequest();
                     //test progress bar
                     this.sendingData = true;
-                    // this.hideprogress = false;
+                    this.hideprogress = false;
                 },
                 _stackAjaxRequest: function(e) {
                     console.log(e)
@@ -318,5 +319,38 @@
                 }
             });
         })();
+
+        // progress bar
+        var progress = document.querySelector('paper-progress#progress'),
+            button = document.querySelector('paper-button#submit'),
+            animationFrame;
+        var repeat, maxRepeat = 1,
+            animating = false;
+
+        function nextProgress() {
+            animating = true;
+            if (progress.value < progress.max) {
+                progress.value += (progress.step || 1);
+
+            } else {
+                if (++repeat >= maxRepeat) {
+                    animating = false;
+                    button.disabled = false;
+                    return;
+                }
+                progress.value = progress.min;
+            }
+            var animationFrame = requestAnimationFrame(nextProgress);
+        }
+
+        function startProgress() {
+            repeat = 0;
+            progress.value = progress.min;
+            button.disabled = true;
+            if (!animating) {
+                nextProgress();
+            }
+        }
+
     </script>
 </dom-module>
