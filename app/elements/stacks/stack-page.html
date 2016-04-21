@@ -369,13 +369,11 @@
                             </div>
                             <div class="resources-list">
                                 <h3 class="smallcaps">Resources list</h3>
-                                <template is="dom-if" if="[[machines.length]]">
+                                <template is="dom-if" if="[[stack.machines.length]]">
                                     <paper-material class="no-pad resources-list">
                                         <h3 class="smallcaps resource-head">machines</h3>
-                                        <template is="dom-repeat" items="[[machines]]" as="machine">
-                                            <stack-machine-item model="[[model]]" machine="[[machine]]" hasIncident></stack-machine-item>
-                                            <stack-machine-item model="[[model]]" machine="[[machine]]"></stack-machine-item>
-                                            <stack-machine-item model="[[model]]" machine="[[machine]]"></stack-machine-item>
+                                        <template is="dom-repeat" items="[[stack.machines]]" as="machine">
+                                            <stack-machine-item model="[[model]]" machineuuid="[[machine]]"></stack-machine-item>
                                         </template>
                                     </paper-material>
                                 </template>
@@ -499,10 +497,6 @@
                 params: {
                     type: Object
                 },
-                model: {
-                    type: Object,
-                    notify: true
-                },
                 stack: {
                     type: Object,
                     computed: '_computeStack(params)',
@@ -520,15 +514,20 @@
                 },
                 machines: {
                     type: Array,
-                    computed: '_computeMachines(stack)'
+                    value:[],
+                    computed: '_machines(stack)'
+                },
+                runtimeProperties: {
+                    type: Array,
+                    computed: '_runtimeProperties(stack)'
                 },
                 networks: {
                     type: Array,
-                    computed: '_computeNetworks(stack)'
+                    computed: '_computeNetworks(runtimeProperties)'
                 },
                 keys: {
                     type: Array,
-                    computed: '_computeKeys(stack)'
+                    computed: '_computeKeys(runtimeProperties)'
                 },
                 workflows: {
                     type: Array,
@@ -537,11 +536,7 @@
                 timestamp: {
                     type: String,
                     computed: '_getFormattedTimestamp(stack)'
-                },
-                runtimeProperties: {
-                    type: Array,
-                    computed: '_runtimeProperties(stack)'
-                },
+                },                
                 vpHeight: String,
                 payload: {
                     type: Object,
@@ -549,12 +544,13 @@
                 }
             },
             observers: [
-                  // '_runtimePropertiesChanged(runtimeProperties.*)'
+                  // '_runtimePropertiesChanged(runtimeProperties.*)',
+                  // 'stackChanged(stack)'
             ],
             listeners: {
                 // 'confirmation': '_deleteStackResponse',
                 // 'updateSelectedStack': '_updateStack',
-                'stackChanged': '_stackChanged'
+                // 'stackChanged': '_stackChanged'
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
@@ -572,48 +568,38 @@
                     return template._id == stack.template_id;
                 }, this);
             },
-            _computeMachines: function(stack) {
-                // var machines = [];
-                // if (stack.machines) {
-                //     var stackMachines = stack.machines;
-                //     this.model.machinesArray.find(function(machine) {
-                //         var machineId = machine.id;
-                //         if (stackMachines.indexOf(machineId) > -1) {
-                //             machines.push(machine);
-                //         }
-                //     }, this);
-                // }
-                // return machines;
-
-                // var machineName = stack.state[0];
-                
-
+            _machines: function(stack){
+                return stack.machines;
             },
-            _computeNetworks: function(stack) {
-                // var networks = [];
-                // if (stack.networks) {
-                //     var stackNets = stack.networks;
-                //     this.model.networksArray.find(function(network) {
-                //         var networkId = network.id;
-                //         if (stackNets.indexOf(networkId) > -1) {
-                //             networks.push(network);
-                //         }
-                //     }, this);
-                // }
-                // return networks;
+            _computeNetworks: function(runtimeProperties) {
+                var networks = [];
+                if (runtimeProperties) {
+                    runtimeProperties.forEach(function(rtpy) {
+                        if (rtpy.mist_type == 'network'){
+                            var net = this.model.networksArray.find(function(net){
+                                return net.id == rtpy.id
+                            }, this);
+                            if (net)
+                                networks.push(net);
+                        }
+                    }, this);
+                }
+                return networks;
             },
-            _computeKeys: function(stack) {
-                // var keys = [];
-                // if (stack.keys) {
-                //     var stackKeys = stack.keys;
-                //     this.model.keysArray.find(function(key) {
-                //         var keyId = key.id;
-                //         if (stackKeys.indexOf(keyId) > -1) {
-                //             keys.push(key);
-                //         }
-                //     }, this);
-                // }
-                // return keys;
+            _computeKeys: function(runtimeProperties) {
+                var keys = [];
+                if (runtimeProperties) {
+                    runtimeProperties.forEach(function(rtpy) {
+                        if (rtpy.mist_type == 'keypair'){
+                            var key = this.model.keysArray.find(function(key){
+                                return key.id == rtpy.key_id
+                            }, this);
+                            if (key)
+                                keys.push(key);
+                        }
+                    }, this);   
+                }
+                return keys;
             },
             _computeWorkflows: function(template) {
                 var workflows = [];
@@ -627,8 +613,12 @@
                 }
                 return workflows;
             },
-            _stackChanged: function() {
-                console.log("Stack Changed");
+            _stackChanged: function(changerecord) {
+                var stack = this.stack;
+                this._computeMachines(this.machines);
+                this._computeKeys(this.runtimeProperties);
+                this._computeNetworks(this.runtimeProperties);
+
                 this.querySelector('#workflowsView').children[0].setAttribute("show", true);
                 this.querySelector('#workflowsNavigation').children[0].setAttribute("focused", true);
             },
@@ -676,10 +666,12 @@
             _runtimeProperties: function(stack){
                 var rtp = [];
                 var state = stack.state;
-                for (var i = 0; i < state.length; i++) {
-                    var rtpObj = YAML.parse(state[i].runtime_properties);
-                    rtpObj.name = state[i].name;
-                    rtp.push(rtpObj);
+                if(state){
+                    for (var i = 0; i < state.length; i++) {
+                        var rtpObj = YAML.parse(state[i].runtime_properties);
+                        rtpObj.name = state[i].name;
+                        rtp.push(rtpObj);
+                    }
                 }
 
                 console.log("rtp exist", rtp);
