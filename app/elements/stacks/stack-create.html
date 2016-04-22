@@ -49,6 +49,9 @@
             *:not(paper-button)[disabled] {
                 display: none;
             }
+            paper-radio-group {
+                padding: 16px 8px;
+            }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
@@ -320,8 +323,8 @@
                             name: "yaml_or_form",
                             label: "YAML or form",
                             type: "radio",
-                            value: "yaml",
-                            defaultValue: "yaml",
+                            value: "",
+                            defaultValue: "",
                             helptext: "Choose the way you want to insert inputs",
                             errorMessage: "Choose an input format",
                             show: true,
@@ -816,28 +819,65 @@
                 })
             },
             _submitForm: function() {
-              var payload = this.stack;
+              var payload = this.template;
               console.log("PAYLOAD: ",payload);
 
+                // var inputs = {};
+                // if (this.form){
+                //     inputs = this.form
+                // }else{
+                //     inputs = e.detail.payload
+                // }
+                // var body = {inputs: inputs}
+                // body["template_id"] = this.template.id
+                // body["name"] = this.form.name
+                // body["description"] = this.form.description
+                // body["deploy"] = this.form.deploy
+
+
                 var inputs = {};
-                if (this.form){
-                    inputs = this.form
+                var inputsfield = this.fields.find(function(field){
+                    return field.name == "stackinputs";
+                });
+                if (inputsfield.value){
+                    inputs = YAML.parse(inputsfield.value)
                 }else{
                     inputs = e.detail.payload
                 }
                 var body = {inputs: inputs}
-                body["template_id"] = this.template.id
+                body["template_id"] = this.template._id
                 body["name"] = this.form.name
                 body["description"] = this.form.description
                 body["deploy"] = this.form.deploy
 
-              this.$.formAjax.headers["Content-Type"] = 'application/json';
-              this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
-              this.fire("submit", {payload: payload, formAjax: this.$.formAjax})
-              if (!this.alterrequest){
-                  this.$.formAjax.body = payload;
-                  this.$.formAjax.generateRequest();
-              }
+                this.$.formAjax.headers["Content-Type"] = 'application/json';
+                this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.formAjax.body = body;
+                this.$.formAjax.generateRequest();
+
+
+                // console.log(e)
+                // var inputs = {};
+                // if (this.$.stackinputs.value){
+                //     inputs = YAML.parse(this.$.stackinputs.value)
+                // }else{
+                //     inputs = e.detail.payload
+                // }
+                // var body = {inputs: inputs}
+                // body["template_id"] = this.template._id
+                // body["name"] = this.$.stackname.value
+                // body["description"] = this.$.stackdescription.value
+                // body["deploy"] = this.$.stackdeploy.checked
+                // e.detail.formAjax.body = body
+                // e.detail.formAjax.generateRequest()
+
+              // this.$.formAjax.headers["Content-Type"] = 'application/json';
+              // this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+              // this.fire("submit", {payload: payload, formAjax: this.$.formAjax})
+              // if (!this.alterrequest){
+              //     this.$.formAjax.body = payload;
+              //     this.$.formAjax.generateRequest();
+              // }
                 //test progress bar
                 this.hideprogress = false;
             },
