@@ -1,8 +1,8 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../app-rules/app-rules.html">
 <link rel="import" href="../dialog-element/dialog-element.html">
-<link rel="import" href="machine-edit.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
+<link rel="import" href="machine-edit.html">
 <dom-module id="machine-page">
     <template>
         <style is="custom-style" include="tags-and-labels"></style>
@@ -102,8 +102,8 @@
                     <div class="page">
                         <div class="flex-horizontal-with-ratios">
                             <div class="page-block">
-                                <h3 class="smallcaps">Cloud & Image</h3>
-                                <p>[[machine.cloud.title]] & [[machineImage]]</p>
+                                <h3 class="smallcaps">Cloud</h3>
+                                <p>[[machine.cloud.title]] [[machineImage]]</p>
                             </div>
                             <div class="page-block">
                                 <h3 class="smallcaps">Created</h3>
@@ -202,17 +202,13 @@ Polymer({
             notify: true
         },
         router: Object,
-        pageTitle: {
-            type: String
-        },
         params: {
             type: Object,
             notify: true
         },
         machine: {
             type: Object,
-            computed: '_computeMachine(params)',
-            notify: true
+            computed: '_computeMachine(params)'
         },
         sections: {
             type: Array,
@@ -286,8 +282,11 @@ Polymer({
     _machineImage: function(id){
         var image = this.model.imagesArray.find(function(image) {
             return image.id == id;
-        }, this);   
-        return image.name;
+        }, this);
+        if (image)
+            return image.name;
+        else
+            return "";
     }
 });
 </script>
