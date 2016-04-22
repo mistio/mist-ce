@@ -317,6 +317,38 @@
                         //     show: true,
                         //     required: true
                         // },{
+                            name: "yaml_or_form",
+                            label: "YAML or form",
+                            type: "radio",
+                            value: "yaml",
+                            defaultValue: "yaml",
+                            helptext: "Choose the way you want to insert inputs",
+                            errorMessage: "Choose an input format",
+                            show: true,
+                            required: true,
+                            options: [{
+                                title: "YAML",
+                                val: "yaml"
+                            }, {
+                                title: "Form",
+                                val: "form"
+                            }]
+                        },{
+                            name: "stackinputs",
+                            label: "Stack Inputs YAML",
+                            type: "textarea",
+                            value: "mist_uri: http://192.168.65.3/\nssh_user: ubuntu\nprivate_key_path: id-rsa\nkey_name: demokey\ncloud_id: 20d91550c0264ce2a3b19aee18d40d06\nimage_id: ami-4f4acd3c\ncoreos: true\nsize_id: c1.medium\nlocation_id: '0'\nmonitoring: false\nworker_name: GigaDemoFirstWorker\nmaster_name: GigaDemoMaster\nkey_external_resource: true\nworker_external_resource: false\nworker_external_resource_id: 'i-ebb8c563'\nworker_configured: false\nmaster_external_resource: false\nmaster_external_resource_id: 'i-3fb9c4b7'\nmaster_configured: false",
+                            defaultValue: "mist_uri: http://192.168.65.3/\nssh_user: ubuntu\nprivate_key_path: id-rsa\nkey_name: demokey\ncloud_id: 20d91550c0264ce2a3b19aee18d40d06\nimage_id: ami-4f4acd3c\ncoreos: true\nsize_id: c1.medium\nlocation_id: '0'\nmonitoring: false\nworker_name: GigaDemoFirstWorker\nmaster_name: GigaDemoMaster\nkey_external_resource: true\nworker_external_resource: false\nworker_external_resource_id: 'i-ebb8c563'\nworker_configured: false\nmaster_external_resource: false\nmaster_external_resource_id: 'i-3fb9c4b7'\nmaster_configured: false",
+                            placeholder: "",
+                            helptext: "Enter the stack inputs in yaml format",
+                            errorMessage: "Please enter stacks's inputs",
+                            show: true,
+                            required: true,
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["yaml"]
+                            }
+                        },{
                             name: "key_name",
                             label: "SSH Key",
                             type: "dropdown",
@@ -324,10 +356,13 @@
                             defaultValue: "",
                             errorMessage: "Please choose an ssh key",
                             helptext: "You can choose a key from your existing keys",
-                            errorMessage: "Please enter mist URI",
                             show: true,
                             required: true,
-                            query: ["keysArray"]
+                            query: ["keysArray"],
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
                         },{
                             name: "worker_name",
                             label: "Worker name",
@@ -339,7 +374,11 @@
                             errorMessage: "Please enter mist URI",
                             helptext: "The machine name of kubernetes master. Name must be unique in cloud.",
                             show: true,
-                            required: true
+                            required: true,
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
                         },{
                             name: "master_name",
                             label: "Master name",
@@ -350,34 +389,44 @@
                             errorMessage: "Please enter a name for the master",
                             helptext: "The machine name of kubernetes worker. Name must be unique in cloud.",
                             show: true,
-                            required: true
+                            required: true,
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
                         },{
                             name: "cloud_id",
                             label: "Cloud",
                             type: "dropdown",
                             value: "",
                             defaultValue: "",
-                            errorMessage: "Please choose an ssh key",
+                            errorMessage: "Please choose an cloud",
                             helptext: "Choose on which one of your clouds you want your stack deployed",
-                            errorMessage: "Please enter mist URI",
                             show: true,
                             required: true,
-                            query: ["cloudsArray"]
+                            query: ["cloudsArray"],
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
                         },{
                             name: "image_id",
                             label: "Image",
                             type: "dropdown",
                             value: "ami-4fa9c538",
                             defaultValue: "ami-4fa9c538",
-                            errorMessage: "Please choose an ssh key",
+                            errorMessage: "Please choose an image",
                             helptext: "Choose an image for the machines.",
-                            errorMessage: "Please enter mist URI",
                             show: true,
                             required: true,
                             query: ["clouds","$.cloud_id", "imagesArray"],
                             showIf: {
                                 fieldName: "cloud_id",
                                 fieldExists: true
+                            },
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
                             }
                         },{
                             name: "size_id",
@@ -387,13 +436,16 @@
                             defaultValue: "c1.medium",
                             errorMessage: "Please choose a size for your machines",
                             helptext: "Choose the size for your machines.",
-                            errorMessage: "Please enter a size",
                             show: true,
                             required: true,
                             query: ["clouds","$.cloud_id", "sizesArray"],
                             showIf: {
                                 fieldName: "cloud_id",
                                 fieldExists: true
+                            },
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
                             }
                         },{
                             name: "location_id",
@@ -401,7 +453,6 @@
                             type: "dropdown",
                             value: "",
                             defaultValue: "0",
-                            errorMessage: "Please choose a size for your machines",
                             helptext: "Choose a host location for your machines.",
                             errorMessage: "Please enter a location",
                             show: true,
@@ -410,6 +461,10 @@
                             showIf: {
                                 fieldName: "cloud_id",
                                 fieldExists: true
+                            },
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
                             }
                         },{
                             name: "coreos",
@@ -762,7 +817,7 @@
             },
             _submitForm: function() {
               var payload = this.stack;
-              console.log(payload);
+              console.log("PAYLOAD: ",payload);
 
                 var inputs = {};
                 if (this.form){
