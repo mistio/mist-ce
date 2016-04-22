@@ -1023,10 +1023,7 @@ def add_key(user, key_id, private_key):
     """Adds a new keypair and returns the new key_id."""
 
     log.info("Adding key with id '%s'.", key_id)
-    if not key_id:
-        raise KeypairParameterMissingError(key_id)
-    if not private_key:
-        raise RequiredParameterMissingError("Private key is not provided")
+
     key = Keypair.objects(owner=user, name=key_id)
     if key:
         raise KeypairExistsError(key_id)
@@ -1046,6 +1043,18 @@ def add_key(user, key_id, private_key):
     log.info("Added key with id '%s'", key_id)
     trigger_session_update(user, ['keys'])
     return key_id
+
+
+def validate_add_key(key_id, private_key):
+    if not key_id:
+        raise KeypairParameterMissingError(key_id)
+    if not private_key:
+        raise RequiredParameterMissingError("Private key is not provided")
+
+
+def validate_edit_key(new_id):
+    if not new_id:
+        raise RequiredParameterMissingError("new_id")
 
 
 def delete_key(user, key_id):

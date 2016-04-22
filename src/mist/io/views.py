@@ -31,6 +31,7 @@ import mist.core.methods
 #     from pyramid.view import view_config
 
 from mist.io import methods
+from mist.io.methods import validate_add_key, validate_edit_key
 
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
@@ -447,6 +448,7 @@ def add_key(request):
       type: string
     """
     params = params_from_request(request)
+    #TODO id must be name
     key_id = params.get('id', '')
     private_key = params.get('priv', '')
 
@@ -454,7 +456,10 @@ def add_key(request):
     key_tags = auth_context.get_tags("key", "add")
     if key_tags is None:
         raise UnauthorizedError()
+
+    validate_add_key(key_id, private_key)
     key_id = methods.add_key(auth_context.owner, key_id, private_key)
+
     if key_tags:
         mist.core.methods.set_keypair_tags(auth_context.owner, key_tags, key_id)
     keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
@@ -489,7 +494,8 @@ def delete_key(request):
       type: string
     """
     auth_context = auth_context_from_request(request)
-    key_id = request.matchdict.get('key')
+    #TODO key_id must be keypair_name
+    key_id = request.matchdict.get('key') #TODO key must be kaypair_name
     if not key_id:
         raise KeypairParameterMissingError()
 
@@ -527,7 +533,7 @@ def delete_keys(request):
     auth_context = auth_context_from_request(request)
 
     params = params_from_request(request)
-    key_ids = params.get('key_ids', [])
+    key_ids = params.get('key_ids', [])  #TODO keypair_names
     if type(key_ids) != list or len(key_ids) == 0:
         raise RequiredParameterMissingError('No key ids provided')
     # remove duplicate ids if there are any
@@ -588,8 +594,8 @@ def edit_key(request):
     old_id = request.matchdict['key']
     params = params_from_request(request)
     new_id = params.get('new_id')
-    if not new_id:
-        raise RequiredParameterMissingError("new_id")
+
+    validate_edit_key(new_id)
 
     auth_context = auth_context_from_request(request)
     try:
@@ -616,6 +622,7 @@ def set_default_key(request):
       required: true
       type: string
     """
+    #TODO key_name
     key_id = request.matchdict['key']
 
     auth_context = auth_context_from_request(request)
@@ -739,6 +746,8 @@ def associate_key(request):
       description: The ssh user
       type: string
     """
+    #TODO key_name, keypair
+    #TODO validate
     key_id = request.matchdict['key']
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
@@ -752,8 +761,10 @@ def associate_key(request):
         host = request.json_body.get('host')
     except:
         host = None
+
     if not host:
         raise RequiredParameterMissingError('host')
+
     auth_context = auth_context_from_request(request)
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
@@ -808,6 +819,7 @@ def disassociate_key(request):
     host:
       type: string
     """
+    #TODO keyname
     key_id = request.matchdict['key']
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
