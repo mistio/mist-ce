@@ -420,16 +420,12 @@
                             defaultValue: "ami-4fa9c538",
                             errorMessage: "Please choose an image",
                             helptext: "Choose an image for the machines.",
-                            show: true,
+                            show: false,
                             required: true,
                             query: ["clouds","$.cloud_id", "imagesArray"],
                             showIf: {
                                 fieldName: "cloud_id",
                                 fieldExists: true
-                            },
-                            showIf: {
-                                fieldName: "yaml_or_form",
-                                fieldValues: ["form"]
                             }
                         },{
                             name: "size_id",
@@ -439,16 +435,12 @@
                             defaultValue: "c1.medium",
                             errorMessage: "Please choose a size for your machines",
                             helptext: "Choose the size for your machines.",
-                            show: true,
+                            show: false,
                             required: true,
                             query: ["clouds","$.cloud_id", "sizesArray"],
                             showIf: {
                                 fieldName: "cloud_id",
                                 fieldExists: true
-                            },
-                            showIf: {
-                                fieldName: "yaml_or_form",
-                                fieldValues: ["form"]
                             }
                         },{
                             name: "location_id",
@@ -458,16 +450,12 @@
                             defaultValue: "0",
                             helptext: "Choose a host location for your machines.",
                             errorMessage: "Please enter a location",
-                            show: true,
+                            show: false,
                             required: true,
                             query: ["clouds","$.cloud_id", "locationsArray"],
                             showIf: {
                                 fieldName: "cloud_id",
                                 fieldExists: true
-                            },
-                            showIf: {
-                                fieldName: "yaml_or_form",
-                                fieldValues: ["form"]
                             }
                         },{
                             name: "coreos",
