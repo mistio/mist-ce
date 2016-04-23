@@ -1,13 +1,13 @@
 <link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 
-<dom-module id="machine-list-item">
+<dom-module id="list-item">
     <template>
         <style is="custom-style" include="tags-and-labels"></style>
         <style>
         :host {
             @apply(--layout-horizontal);
-            padding: 8px 24px;
+            padding: 0px 24px;
             width: 100%;
         }
 
@@ -21,9 +21,6 @@
             padding: 0;
         }
 
-        #check {
-            padding-right: 24px;
-        }
 
         /* name id provider state tags */
         .field.field0 {
@@ -38,6 +35,7 @@
             overflow: scroll;
             margin-right: 24px;
             white-space: nowrap;
+            padding: 14px 0;
         }
 
         .field.tags {
@@ -64,28 +62,25 @@
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
         <content></content>
-        <a href$="[[itemLink]]" is="pushstate-anchor" ondragstart="return false;" ondrop="return false;">
-
-            <template is="dom-repeat" items="{{fields}}" as="field">
-              <a href$="[[itemLink]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false">
-                <div class$="[[field]] field field[[index]] {{itemField(item, field)}}">{{itemField(item, field)}}</div>
-              </a>
-            </template>
-            <div class="field tags" hidden$="[[!item.tags.length]]">
-                <template is="dom-if" if="[[item.tags.length]]">
-                    <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
-                        <span class="tag">
-                            <template is="dom-if" if="[[item.key]]">[[item.key]]=</template>[[item.value]]
-                        </span>
-                    </template>
+        <template is="dom-repeat" items="{{fields}}" as="field">
+          <a href="[[uri]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false">
+            <div class$="[[field]] field field[[index]] {{itemField(item, field)}}">{{itemField(item, field)}}</div>
+          </a>
+        </template>
+        <div class="field tags" hidden$="[[!item.tags.length]]">
+            <template is="dom-if" if="[[item.tags.length]]">
+                <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
+                    <span class="tag">
+                        <template is="dom-if" if="[[item.key]]">[[item.key]]=</template>[[item.value]]
+                    </span>
                 </template>
-            </div>
-            </a>
+            </template>
+        </div>
     </template>
 </dom-module>
 <script>
 Polymer({
-    is: 'machine-list-item',
+    is: 'list-item',
     properties: {
         // tags: {
         //   type: Array
@@ -109,9 +104,8 @@ Polymer({
         section: {
             type: Object
         },
-        itemLink: {
-            type: String,
-            computed: "_itemLink(section,item)"
+        uri: {
+            type: String
         },
         narrowViewport: {
             type: Boolean,
@@ -156,18 +150,6 @@ Polymer({
                 return item.extra.service_type;
         }
         return ret;
-    },
-    machineActions: function(item) {
-        var actions = ['destroy'];
-        if (item.state == 'running')
-          actions.push('stop');
-        if (item.state == 'stopped')
-          actions.push('start');
-        return actions;
-    },
-
-    _itemLink: function(section, item) {
-        return "/" + section.id + "/" + (item.uuid || item.id);
     },
 
     _itemTagsArray: function(tagsobject) {

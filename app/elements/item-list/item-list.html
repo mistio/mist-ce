@@ -7,11 +7,7 @@
 
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 
-<link rel="import" href="machine-list-item.html">
-<link rel="import" href="image-list-item.html">
-<link rel="import" href="key-list-item.html">
-<link rel="import" href="network-list-item.html">
-
+<link rel="import" href="list-item.html">
 <link rel="import" href="item-actions.html">
 
 <dom-module id="item-list">
@@ -64,7 +60,7 @@
 
         app-check {
             margin-right: 24px;
-            margin-top: 6px;
+            margin-top: 14px;
         }
 
         .header {
@@ -220,20 +216,15 @@
         <iron-list items="[[items]]" as="item" style$="[[vpHeight]]">
             <template>
                 <div class="row" data-index$="[[index]]">
-
-                  <template is="dom-if" if="[[!isimages]]">
-                    <machine-list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]">
-                      <app-check id="check" allselected="{{allselected}}" selected$="{{isSelected(item, selectedItems.splices)}}" item="[[item]]" on-tap="_selectItem">
-                        <iron-icon src="[[_computeItemImage(item)]]">M</iron-icon></app-check>
-                      <paper-tooltip for="check" position="right">Select item</paper-tooltip>
-                    </machine-list-item>
+                    <list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]" uri$="[[_itemLink(item)]]">
+                        <template is="dom-if" if="[[!isimages]]">
+                            <app-check id="check" allselected="{{allselected}}" selected$="{{isSelected(item, selectedItems.splices)}}" item="[[item]]" on-tap="_selectItem">
+                                <iron-icon src="[[_computeItemImage(item)]]">M</iron-icon>
+                            </app-check>
+                            <paper-tooltip for="check" position="right">Select item</paper-tooltip>
+                        </template>
+                    </list-item>
                     <paper-button class="more" on-tap="_openItemActions"><iron-icon icon="more-vert"></iron-icon></paper-button>
-                  </template>
-
-                  <template is="dom-if" if="[[isimages]]">
-                    <machine-list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]"></machine-list-item>
-                  </template>
-
                 </div>
             </template>
         </iron-list>
@@ -325,29 +316,44 @@ Polymer({
         this.vpHeight = 'height:'+ wh +'px;';
     },
 
-    itemsChanged: function (changeRecord) {
-        // If some selectedItems are no longer in the items list, unselect them
-        console.warn('itemsChanged');
-        if (!this.selectedItems) {
-            console.log('returning');
-            return;
-        }
-        var oldSelected = this.get('selectedItems').slice(0);
-        while (this.get('selectedItems.length')) {
-            this.pop('selectedItems');
-            console.log('poping 1 element');
-        }
-        for (var i=0; i < this.items.length; i++) {
-            if (oldSelected.indexOf(this.itemUid(this.items[i]))>-1) {
-              this.push('selectedItems', this.itemUid(this.items[i]));
-              console.log('pushing back 1 element');
+    attached: function() {
+        // Re-render iron-list a few times in case the items don't change
+        // Prevents empty iron-list when reloading from the list page
+        var that = this,
+            counter = 0,
+            looper = setInterval(function(){
+                counter++;
+            if (counter >= 5) {
+                clearInterval(looper);
             }
-        }
-        if (this.get('items.length') != this.get('selectedItems.length'))
-            this.set('allselected', false);
+            that.querySelector('iron-list').notifyResize();
+        }, 300);
+    },
 
-        // Not sure if this is needed
-        this.querySelector('iron-list').notifyResize();
+    itemsChanged: function (changeRecord) {
+        var that = this;
+        this.debounce('itemsChanged', function () {
+            // If some selectedItems are no longer in the items list, unselect them
+            console.debug('itemsChanged');
+            if (!that.selectedItems) {
+                console.log('returning');
+                return;
+            }
+            var oldSelected = that.get('selectedItems').slice(0);
+            while (that.get('selectedItems.length')) {
+                that.pop('selectedItems');
+                console.log('poping 1 element');
+            }
+            for (var i=0; i < that.items.length; i++) {
+                if (oldSelected.indexOf(that.itemUid(that.items[i]))>-1) {
+                  that.push('selectedItems', that.itemUid(that.items[i]));
+                  console.log('pushing back 1 element');
+                }
+            }
+            if (that.get('items.length') != that.get('selectedItems.length'))
+                that.set('allselected', false);
+
+        }, 300);
     },
 
     selectedItemsChanged: function (changeRecord) {
@@ -432,7 +438,7 @@ Polymer({
             return ['id', 'machines', 'default']
         }
         if (this.isNetworks(this.section)) {
-            return ['name', 'cloud', 'state', 'id', 'public', 'router_external', 'subnets']
+            return ['name', 'cloud', 'state', 'id', 'public']
         }
         if (this.isScripts(this.section)) {
             return ['name', 'script_id', 'exec_type', 'location_type'];
@@ -535,8 +541,8 @@ Polymer({
         else if (s == "networks")
             p = item.name
         else if (s == "scripts")
-            p = item.id //??
-
+            p = item.script_id
+        console.log(item, "/" + this.section.id + "/" + p);
         return "/" + this.section.id + "/" + p;
     },
 
