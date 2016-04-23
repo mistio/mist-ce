@@ -615,12 +615,6 @@
                     }],
                     notify: true
                     },
-                    // fields: {
-                    //     type: Array,
-                    //     // value: [],
-                    //     // notify: true,
-                    //     // computed: "_fields(template)"
-                    // },
                     typedName: {
                         type: String,
                         value: '',
@@ -669,37 +663,7 @@
                 },
                 _uri: function(model){
                     return window.location.protocol+"//"+window.location.hostname+"/";
-                },
-                // _keys: function(model){
-                //     return this.model.keysArray;
-                // },
-                // _clouds: function(model){
-                //     return this.model.cloudsArray;
-                // },
-                // _images: function(model){
-                //     var cloud = this.$.cloud_id;
-                //     if (cloud.selected){
-                //         var cloudId = cloud.selected;
-                //         return this.model.clouds[cloudId].imagesArray;
-                //     }
-                //     else {
-                //         return [];
-                //     }
-                // },
-                // _fields: function(template){
-                //     return template.inputs;
-                // },
-                // _updateTypedName: function(t) {
-                //     console.log(t)
-                //     if (t.detail.leadValue) {
-                //         this.typedName = '"'+t.detail.leadValue+'"';
-                //     }else{
-                //         this.typedName = '';
-                //     }
-                // },
-                attached: function(){
-
-                },
+                },                
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
@@ -714,50 +678,44 @@
                     field.label = field.name
                 }
 
-                // if ( && form[field.showIf.fieldName])
                 if (field.type == "dropdown" && field.query) {
 
-                    // if (field.andshowIf && field.andshowIf.fieldName == "cloud_id" && !this.form["cloud_id"]) {
+                    var inputModel = this.model;
+                    for (var prop in field.query){
+                        var p = field.query[prop];
 
-                    // }
-                    // else {
-                        var inputModel = this.model;
-                        for (var prop in field.query){
-                            var p = field.query[prop];
-
-                            if (p.startsWith("$.")){
-                                p = this.form[p.slice(2)];
-                            }
-
-                            if (inputModel.hasOwnProperty(p)) {
-                                inputModel = inputModel[p];
-                            }
+                        if (p.startsWith("$.")){
+                            p = this.form[p.slice(2)];
                         }
 
-                        var updatedOptions = [];
-
-                        for (var prop in inputModel) {
-                            var dropdownItem = {};
-                            if (inputModel[prop].hasOwnProperty("title")) {
-                                dropdownItem.title = inputModel[prop].title;
-                            }
-                            else if (inputModel[prop].hasOwnProperty("name")) {
-                                dropdownItem.title = inputModel[prop].name;
-                            }
-                            else if (inputModel[prop].hasOwnProperty("id")) {
-                                dropdownItem.title = inputModel[prop].id;
-                            }
-                            dropdownItem.val = inputModel[prop].id;
-                            updatedOptions.push(dropdownItem);
-
+                        if (inputModel.hasOwnProperty(p)) {
+                            inputModel = inputModel[p];
                         }
-                        for (var index in this.fields){
-                            var existingField = this.fields[index];
-                            if (existingField.name == field.name){
-                                this.set("fields." + index + ".options", updatedOptions);
-                            }
+                    }
+
+                    var updatedOptions = [];
+
+                    for (var prop in inputModel) {
+                        var dropdownItem = {};
+                        if (inputModel[prop].hasOwnProperty("title")) {
+                            dropdownItem.title = inputModel[prop].title;
                         }
-                    // }
+                        else if (inputModel[prop].hasOwnProperty("name")) {
+                            dropdownItem.title = inputModel[prop].name;
+                        }
+                        else if (inputModel[prop].hasOwnProperty("id")) {
+                            dropdownItem.title = inputModel[prop].id;
+                        }
+                        dropdownItem.val = inputModel[prop].id;
+                        updatedOptions.push(dropdownItem);
+
+                    }
+                    for (var index in this.fields){
+                        var existingField = this.fields[index];
+                        if (existingField.name == field.name){
+                            this.set("fields." + index + ".options", updatedOptions);
+                        }
+                    }
 
                 }
                 if (!(field.showIf && !field.show)) {
@@ -767,20 +725,18 @@
             },
             _handleRequest: function(e){
                 this.fire("request", e.detail)
+                console.log("request",e.detail);
             },
             _handleResponse: function(e){
                 this.fire("response", e.detail)
+                console.log("response",e);
             },
             _fieldsChanged: function(fields, sendingData) {
                 this.async(function() {
                     var form = this.form,
                         show = true,
                         dependency;
-                    // var isLead = this.get(fields.path.replace("value","isLead"))
-                    // if (isLead == true){
-                    //     console.log(fields.path)
-                    //     this.fire("leadchange", {leadValue:this.get(fields.path)})
-                    // }
+
                     fields.base.forEach(function(el, index) {                        
                         if (el.showIf) {
 
@@ -839,79 +795,58 @@
                         return el.show && el.required ? el.value : true;
                     }, this);
 
-                    this.set('form.mist_uri',this.uri);
-                    this.set('form.template_id',this.template.id);
                     this.set('form', form);
-
-                    this.set('stack.name', this.form.name);
-                    this.set('stack.template_id', this.form.template_id);
-                    this.set('stack.description', this.form.description);
-                    this.set('stack.deploy', this.form.deploy);
-                    this.set('stack.inputs', this.form);
-
                     this.set('formReady', valid && !sendingData);
                 })
             },
             _submitForm: function() {
-              var payload = this.template;
-              console.log("PAYLOAD: ",payload);
+                this.set('form.mist_uri',this.uri);
 
-                // var inputs = {};
-                // if (this.form){
-                //     inputs = this.form
-                // }else{
-                //     inputs = e.detail.payload
-                // }
-                // var body = {inputs: inputs}
-                // body["template_id"] = this.template.id
-                // body["name"] = this.form.name
-                // body["description"] = this.form.description
-                // body["deploy"] = this.form.deploy
-
-
-                var inputs = {};
-                var inputsfield = this.fields.find(function(field){
-                    return field.name == "stackinputs";
+                var payload = this.template;
+                var yamlField = this.fields.find(function(field){
+                    return field.name == "yaml_or_form";
                 });
-                if (inputsfield.value){
-                    inputs = YAML.parse(inputsfield.value)
-                }else{
-                    inputs = e.detail.payload
+                var yaml = yamlField.value == 'yaml'? true : false;
+                
+                var inputs = {};
+                var stackname = this.form.name,
+                    stackdescription = this.form.description,
+                    deploy = this.form.deploy;
+
+                if (yaml){
+                    var inputsfield = this.fields.find(function(field){
+                        return field.name == "stackinputs";
+                    });
+                    if (inputsfield.value){
+                        inputs = YAML.parse(inputsfield.value);
+                    }
+                    else {
+                        inputs = e.detail.payload
+                    }
                 }
-                var body = {inputs: inputs}
-                body["template_id"] = this.template._id
-                body["name"] = this.form.name
-                body["description"] = this.form.description
-                body["deploy"] = this.form.deploy
+                else {
+                    inputs = this.form;
+                    inputs["image_id"] = "ami-4f4acd3c";
+                    var clean = ["name","description","stackinputs", "yaml_or_form", "deploy"];
+                    for (var i=0; i<clean.length; i++ )
+                    {   var prop = clean[i];
+                        delete inputs[prop];
+                    }
+                }
+                
+                var body = {inputs: inputs};
+                body["template_id"] = this.template._id;
+                body["name"] = stackname;
+                body["description"] = stackdescription;
+                body["deploy"] = deploy;
 
                 this.$.formAjax.headers["Content-Type"] = 'application/json';
                 this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.formAjax.body = body;
+
+                //console.log(body);
                 this.$.formAjax.generateRequest();
 
-
-                // console.log(e)
-                // var inputs = {};
-                // if (this.$.stackinputs.value){
-                //     inputs = YAML.parse(this.$.stackinputs.value)
-                // }else{
-                //     inputs = e.detail.payload
-                // }
-                // var body = {inputs: inputs}
-                // body["template_id"] = this.template._id
-                // body["name"] = this.$.stackname.value
-                // body["description"] = this.$.stackdescription.value
-                // body["deploy"] = this.$.stackdeploy.checked
-                // e.detail.formAjax.body = body
-                // e.detail.formAjax.generateRequest()
-
-              // this.$.formAjax.headers["Content-Type"] = 'application/json';
-              // this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
-              // this.fire("submit", {payload: payload, formAjax: this.$.formAjax})
-              // if (!this.alterrequest){
-              //     this.$.formAjax.body = payload;
-              //     this.$.formAjax.generateRequest();
-              // }
                 //test progress bar
                 this.hideprogress = false;
             },
@@ -940,25 +875,7 @@
                     input.invalid = false;
                 }
             },
-            _assertShowIfQuery: function(name){
-                this.fields.forEach(function(el, index) {
-                    if (el.showIf && el.showIf.fieldName == name) {
-                        if (this._query(el.showIf.query) in el.showIf.queryResult){
-                            this.set('fields.' + index + '.options', []);
-                            this._computeFieldType(el,el.type,el.show)
-
-                        }
-                    }
-                })
-            },
-            _recomputeDependentFields: function(name){
-                this.fields.forEach(function(el, index) {
-                    if (el.showIf && el.showIf.fieldName == name) {
-                        this.set('fields.' + index + '.options', []);
-                        this._computeFieldType(el,el.type,el.show)
-                    }
-                }, this);
-            },
+            
         });
     })();
     // test progress bar, code from demo
