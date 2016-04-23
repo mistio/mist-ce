@@ -446,7 +446,7 @@
                             name: "location_id",
                             label: "Location",
                             type: "dropdown",
-                            value: "",
+                            value: "0",
                             defaultValue: "0",
                             helptext: "Choose a host location for your machines.",
                             errorMessage: "Please enter a location",
@@ -740,6 +740,7 @@
                             }
                         }
                     }
+
                     return field.type == value;
                 }
 
@@ -764,18 +765,28 @@
 
                         if (el.showIf) {
                             if (el.showIf.fieldExists) {
-                                dependency = form[el.showIf.fieldName],
+                                    dependency = form[el.showIf.fieldName];
+                                    if (dependency.showif){
+                                        dependency = form[dependency.showIf.fieldName];
+                                    }
                                     show = dependency;
+
                                 this.set('fields.' + index + '.show', show);
-                            } else {
-                                dependency = form[el.showIf.fieldName],
+                            } 
+                            else {
+                                    dependency = form[el.showIf.fieldName];
                                     show = el.showIf.fieldValues.indexOf(dependency) != -1;
+                                    if (dependency.showif){
+                                        dependency = dependency.push(form[dependency.showIf.fieldName]);
+                                        show = show && el.showIf.fieldValues.indexOf(dependency) != -1;
+                                    }
                                 this.set('fields.' + index + '.show', show);
                             }
 
                             if (!show) {
                                 this._resetField(el, index);
-                            }else{
+                            }
+                            else {
                                 this.set('form.' + el.name, el.value);
                             }
                         }
