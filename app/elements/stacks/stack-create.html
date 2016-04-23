@@ -62,115 +62,7 @@
                     <app-user-menu email="marios@mist.io"></app-user-menu>
                     <span class="bottom title">Create Stack {{typedName}} from template [[template.name]]</span>
                 </paper-toolbar>
-                <div id="content">
-                    <!-- <paper-material>
-                        <div class="grid-row">
-                            <paper-input class="xs12" id="stackname"  label="Stack Name" auto-validate required="true" error-message="Please enter stack name"></paper-input>
-                            <paper-textarea class="xs12 m6" id="stackdescription" label="Stack Description" rows="2" max-rows="15"  auto-validate ></paper-textarea>
-                             <paper-toggle-button  id="stackdeploy">Deploy now</paper-toggle-button>
-                            <paper-textarea class="xs12 m6" id="stackinputs" label="Stack Inputs yaml" rows="10" max-rows="50"  auto-validate ></paper-textarea>
-                        </div>
-                        <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
-                        <hr class="xs12" />
-                        <div class="clearfix bottom-actions">
-                            <paper-button id="submit" class="submit-btn pull-left"  raised on-tap="_submitForm" onclick="startProgress();">Create</paper-button>
-                        </div>
-                    </paper-material>
- -->
-
-<!-- 
-                    <paper-material>
-                        <div class="grid-row">
-                            <paper-input class="xs12 m6" id="stackname"  label="Stack Name" auto-validate required="true" error-message="Please enter stack name"></paper-input>
-                            <div class="field-helptext xs12 m6">
-                            </div>
-
-                            <hr class="xs12"/>
-                            
-                            <paper-textarea class="xs12 m6" id="stackdescription" label="Stack Description" rows="2" max-rows="15"  auto-validate ></paper-textarea>
-                            <div class="field-helptext xs12 m6">
-                                Choose a usefull description for your stack
-                            </div>
-
-                            <div class="spacer"></div>
-
-                            <paper-input class="xs12 m6" id="mist_uri" placeholder="" label="Mist URI" value="[[uri]]" auto-validate required="true" error-message="URI is required for stack creation"></paper-input>
-                            <div class="field-helptext xs12 m6">Your current mist installation URI</div>
-
-                            <div class="spacer"></div>
-
-                            <paper-dropdown-menu class="dropdown-block xs12 m6" label="SSH Key" horizontal-align="left">
-                                <paper-menu id="key_name" attr-for-selected="value" selected="" class="dropdown-content">
-                                    <template is="dom-repeat" items="[[keys]]" as="option">
-                                        <paper-item value="[[option.id]]">[[option.id]]</paper-item>
-                                    </template>
-                                </paper-menu>
-                            </paper-dropdown-menu>
-                            <div class="field-helptext xs12 m6">You can choose a key from your existing keys.</div>
-
-                            <div class="spacer"></div>
-
-
-                            <paper-dropdown-menu class="dropdown-block xs12 m6" label="Cloud" horizontal-align="left">
-                                <paper-menu id="cloud_id" attr-for-selected="value" selected="20d91550c0264ce2a3b19aee18d40d06" class="dropdown-content">
-                                    <template is="dom-repeat" items="[[clouds]]" as="option">
-                                        <paper-item value="[[option.id]]">[[option.title]]</paper-item>
-                                    </template>
-                                </paper-menu>
-                            </paper-dropdown-menu>
-                            <div class="field-helptext xs12 m6">Choose on which one of your clouds you want your stack deployed</div>
-
-                            <div class="spacer"></div>
-
-
-                            <paper-dropdown-menu class="dropdown-block xs12 m6" label="Image" horizontal-align="left">
-                                <paper-menu id="image_id" attr-for-selected="value" selected="ami-4f4acd3c" class="dropdown-content">
-                                    <template is="dom-repeat" items="[[images]]" as="option">
-                                        <paper-item value="[[option.id]]">[[option.name]]</paper-item>
-                                    </template>
-                                </paper-menu>
-                            </paper-dropdown-menu>
-                            <div class="field-helptext xs12 m6">Choose an image for the machines.</div>
-
-                            <div class="spacer"></div>
-
-
-                            <paper-input class="xs12 m6" id="master_name"  label="Master Name" value="GigaDemoMaster" auto-validate required="true" error-message="Please enter a name for the master machine"></paper-input>
-                            <div class="field-helptext xs12 m6">
-                                The machine name of kubernetes master. Name must be unique in cloud.
-                            </div>
-
-                            <div class="spacer"></div>
-                            
-                            <paper-input class="xs12 m6" id="worker_name"  label="Worker Name" value="GigaDemoFirstWorker" auto-validate required="true" error-message="Please enter a name for the worker machine"></paper-input>
-                            <div class="field-helptext xs12 m6">
-                                The machine name of kubernetes worker. Name must be unique in cloud.
-                            </div> -->
-
-                            <!-- <div class="spacer"></div>
-
-                            <paper-input class="xs12 m6" id="ssh_user" placeholder="" label="SSH user" value="ubuntu" auto-validate required="true" error-message="SSh user is a required field" disabled></paper-input>
-                            <div class="field-helptext xs12 m6">SSH user (predefined for demo purposes)</div>
-
-                            <paper-input class="xs12 m6" id="private_key_path" placeholder="" label="Private Key Path" value="id-rsa" auto-validate required="true" error-message="Private key path is a required field" disabled></paper-input>
-                            <div class="field-helptext xs12 m6">Private key path (predefined for demo purposes)</div>
-
-                            <div class="spacer"></div>
-
-                            <paper-toggle-button  class="xs12 m6" id="stackdeploy">Deploy now</paper-toggle-button>
-                            <div class="field-helptext xs12 m6">
-                                Enable this option to deploy your stack now.
-                            </div> -->
-                            
-                           <!--  <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
-                            <hr class="xs12" />
-                            <div class="clearfix bottom-actions">
-                                <paper-button id="submit" class="submit-btn pull-left pad2"  raised on-tap="_submitForm" onclick="startProgress();">Create Stack</paper-button>
-                            </div>
-                        </div>
-                    </paper-material> -->
-
-
+                <div id="content">                
                     <paper-material>
                         <div class="grid-row">
                         <h2 class="xs12 title"><content></content></h2>
@@ -239,13 +131,12 @@
                         </div>
                     </div>
                     </paper-material>
-
-                    <iron-ajax id="formAjax" url="/api/v1/stacks" contentType="application/json" method="POST" on-request="_handleRequest" on-response="_handleResponse"></iron-ajax>
-
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <!-- <iron-ajax id="addStackAjax" url="/api/v1/stacks" method="POST" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></iron-ajax> -->
+        
+        <iron-ajax id="formAjax" url="/api/v1/stacks" contentType="application/json" method="POST" on-request="_handleRequest" on-response="_handleResponse"></iron-ajax>
+
     </template>
     <script>
         (function() {
@@ -603,12 +494,6 @@
                     }],
                     notify: true
                     },
-                    // fields: {
-                    //     type: Array,
-                    //     // value: [],
-                    //     // notify: true,
-                    //     // computed: "_fields(template)"
-                    // },
                     typedName: {
                         type: String,
                         value: '',
@@ -657,37 +542,7 @@
                 },
                 _uri: function(model){
                     return window.location.protocol+"//"+window.location.hostname+"/";
-                },
-                // _keys: function(model){
-                //     return this.model.keysArray;
-                // },
-                // _clouds: function(model){
-                //     return this.model.cloudsArray;
-                // },
-                // _images: function(model){
-                //     var cloud = this.$.cloud_id;
-                //     if (cloud.selected){
-                //         var cloudId = cloud.selected;
-                //         return this.model.clouds[cloudId].imagesArray;
-                //     }
-                //     else {
-                //         return [];
-                //     }
-                // },
-                // _fields: function(template){
-                //     return template.inputs;
-                // },
-                // _updateTypedName: function(t) {
-                //     console.log(t)
-                //     if (t.detail.leadValue) {
-                //         this.typedName = '"'+t.detail.leadValue+'"';
-                //     }else{
-                //         this.typedName = '';
-                //     }
-                // },
-                attached: function(){
-
-                },
+                },                
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
@@ -756,11 +611,7 @@
                     var form = this.form,
                         show = true,
                         dependency;
-                    // var isLead = this.get(fields.path.replace("value","isLead"))
-                    // if (isLead == true){
-                    //     console.log(fields.path)
-                    //     this.fire("leadchange", {leadValue:this.get(fields.path)})
-                    // }
+
                     fields.base.forEach(function(el, index) {
 
                         if (el.showIf) {
@@ -821,19 +672,6 @@
               var payload = this.template;
               console.log("PAYLOAD: ",payload);
 
-                // var inputs = {};
-                // if (this.form){
-                //     inputs = this.form
-                // }else{
-                //     inputs = e.detail.payload
-                // }
-                // var body = {inputs: inputs}
-                // body["template_id"] = this.template.id
-                // body["name"] = this.form.name
-                // body["description"] = this.form.description
-                // body["deploy"] = this.form.deploy
-
-
                 var inputs = {};
                 var inputsfield = this.fields.find(function(field){
                     return field.name == "stackinputs";
@@ -854,29 +692,6 @@
                 this.$.formAjax.body = body;
                 this.$.formAjax.generateRequest();
 
-
-                // console.log(e)
-                // var inputs = {};
-                // if (this.$.stackinputs.value){
-                //     inputs = YAML.parse(this.$.stackinputs.value)
-                // }else{
-                //     inputs = e.detail.payload
-                // }
-                // var body = {inputs: inputs}
-                // body["template_id"] = this.template._id
-                // body["name"] = this.$.stackname.value
-                // body["description"] = this.$.stackdescription.value
-                // body["deploy"] = this.$.stackdeploy.checked
-                // e.detail.formAjax.body = body
-                // e.detail.formAjax.generateRequest()
-
-              // this.$.formAjax.headers["Content-Type"] = 'application/json';
-              // this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
-              // this.fire("submit", {payload: payload, formAjax: this.$.formAjax})
-              // if (!this.alterrequest){
-              //     this.$.formAjax.body = payload;
-              //     this.$.formAjax.generateRequest();
-              // }
                 //test progress bar
                 this.hideprogress = false;
             },
@@ -891,7 +706,6 @@
                     if (el.showIf) {
                         this.set('fields.' + index + '.show', false);
                     }
-
                     // Reset Form Fields Validation
                     this._resetField(el, index);
                 }, this);
