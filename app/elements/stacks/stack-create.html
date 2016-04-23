@@ -20,18 +20,37 @@
 
             paper-progress {
                 position: absolute;
-                bottom: 80px;
+                bottom: 87px;
                 width: 100%;
                 left: 0;
                 right: 0;
             }
-
             :host >::content paper-input-container {
                 padding-top: 16px;
                 padding-bottom: 16px;
             }
             paper-item.lead {
                 font-size: 2em;
+            }
+            paper-toggle-button[disabled] ::content {
+                color: rgba(0,0,0,0.32);
+            }
+            paper-toggle-button ::content paper-input-container input {
+                color: color: rgba(0,0,0,0.54);
+            }
+            .spacer {
+                display: block;
+                height: 24px;
+                width: 100%;
+            }
+            .bottom-actions {
+                padding-left: 20px;
+            }
+            *:not(paper-button)[disabled] {
+                display: none;
+            }
+            paper-radio-group {
+                padding: 16px 8px;
             }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
@@ -44,7 +63,7 @@
                     <span class="bottom title">Create Stack {{typedName}} from template [[template.name]]</span>
                 </paper-toolbar>
                 <div id="content">
-                    <paper-material>
+                    <!-- <paper-material>
                         <div class="grid-row">
                             <paper-input class="xs12" id="stackname"  label="Stack Name" auto-validate required="true" error-message="Please enter stack name"></paper-input>
                             <paper-textarea class="xs12 m6" id="stackdescription" label="Stack Description" rows="2" max-rows="15"  auto-validate ></paper-textarea>
@@ -57,10 +76,176 @@
                             <paper-button id="submit" class="submit-btn pull-left"  raised on-tap="_submitForm" onclick="startProgress();">Create</paper-button>
                         </div>
                     </paper-material>
+ -->
+
+<!-- 
+                    <paper-material>
+                        <div class="grid-row">
+                            <paper-input class="xs12 m6" id="stackname"  label="Stack Name" auto-validate required="true" error-message="Please enter stack name"></paper-input>
+                            <div class="field-helptext xs12 m6">
+                            </div>
+
+                            <hr class="xs12"/>
+                            
+                            <paper-textarea class="xs12 m6" id="stackdescription" label="Stack Description" rows="2" max-rows="15"  auto-validate ></paper-textarea>
+                            <div class="field-helptext xs12 m6">
+                                Choose a usefull description for your stack
+                            </div>
+
+                            <div class="spacer"></div>
+
+                            <paper-input class="xs12 m6" id="mist_uri" placeholder="" label="Mist URI" value="[[uri]]" auto-validate required="true" error-message="URI is required for stack creation"></paper-input>
+                            <div class="field-helptext xs12 m6">Your current mist installation URI</div>
+
+                            <div class="spacer"></div>
+
+                            <paper-dropdown-menu class="dropdown-block xs12 m6" label="SSH Key" horizontal-align="left">
+                                <paper-menu id="key_name" attr-for-selected="value" selected="" class="dropdown-content">
+                                    <template is="dom-repeat" items="[[keys]]" as="option">
+                                        <paper-item value="[[option.id]]">[[option.id]]</paper-item>
+                                    </template>
+                                </paper-menu>
+                            </paper-dropdown-menu>
+                            <div class="field-helptext xs12 m6">You can choose a key from your existing keys.</div>
+
+                            <div class="spacer"></div>
+
+
+                            <paper-dropdown-menu class="dropdown-block xs12 m6" label="Cloud" horizontal-align="left">
+                                <paper-menu id="cloud_id" attr-for-selected="value" selected="20d91550c0264ce2a3b19aee18d40d06" class="dropdown-content">
+                                    <template is="dom-repeat" items="[[clouds]]" as="option">
+                                        <paper-item value="[[option.id]]">[[option.title]]</paper-item>
+                                    </template>
+                                </paper-menu>
+                            </paper-dropdown-menu>
+                            <div class="field-helptext xs12 m6">Choose on which one of your clouds you want your stack deployed</div>
+
+                            <div class="spacer"></div>
+
+
+                            <paper-dropdown-menu class="dropdown-block xs12 m6" label="Image" horizontal-align="left">
+                                <paper-menu id="image_id" attr-for-selected="value" selected="ami-4f4acd3c" class="dropdown-content">
+                                    <template is="dom-repeat" items="[[images]]" as="option">
+                                        <paper-item value="[[option.id]]">[[option.name]]</paper-item>
+                                    </template>
+                                </paper-menu>
+                            </paper-dropdown-menu>
+                            <div class="field-helptext xs12 m6">Choose an image for the machines.</div>
+
+                            <div class="spacer"></div>
+
+
+                            <paper-input class="xs12 m6" id="master_name"  label="Master Name" value="GigaDemoMaster" auto-validate required="true" error-message="Please enter a name for the master machine"></paper-input>
+                            <div class="field-helptext xs12 m6">
+                                The machine name of kubernetes master. Name must be unique in cloud.
+                            </div>
+
+                            <div class="spacer"></div>
+                            
+                            <paper-input class="xs12 m6" id="worker_name"  label="Worker Name" value="GigaDemoFirstWorker" auto-validate required="true" error-message="Please enter a name for the worker machine"></paper-input>
+                            <div class="field-helptext xs12 m6">
+                                The machine name of kubernetes worker. Name must be unique in cloud.
+                            </div> -->
+
+                            <!-- <div class="spacer"></div>
+
+                            <paper-input class="xs12 m6" id="ssh_user" placeholder="" label="SSH user" value="ubuntu" auto-validate required="true" error-message="SSh user is a required field" disabled></paper-input>
+                            <div class="field-helptext xs12 m6">SSH user (predefined for demo purposes)</div>
+
+                            <paper-input class="xs12 m6" id="private_key_path" placeholder="" label="Private Key Path" value="id-rsa" auto-validate required="true" error-message="Private key path is a required field" disabled></paper-input>
+                            <div class="field-helptext xs12 m6">Private key path (predefined for demo purposes)</div>
+
+                            <div class="spacer"></div>
+
+                            <paper-toggle-button  class="xs12 m6" id="stackdeploy">Deploy now</paper-toggle-button>
+                            <div class="field-helptext xs12 m6">
+                                Enable this option to deploy your stack now.
+                            </div> -->
+                            
+                           <!--  <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
+                            <hr class="xs12" />
+                            <div class="clearfix bottom-actions">
+                                <paper-button id="submit" class="submit-btn pull-left pad2"  raised on-tap="_submitForm" onclick="startProgress();">Create Stack</paper-button>
+                            </div>
+                        </div>
+                    </paper-material> -->
+
+
+                    <paper-material>
+                        <div class="grid-row">
+                        <h2 class="xs12 title"><content></content></h2>
+                        <template is="dom-repeat" items="{{fields}}" as="field">
+                                <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
+                                    <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-input>
+                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
+                                    <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-textarea>
+                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                </template>
+                                 <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
+                                    <paper-radio-group selected="{{field.value}}" class="xs12 m6" disabled="[[field.disabled]]">
+                                        <template is="dom-repeat" items="[[field.options]]" as="option">
+                                            <paper-radio-button name="[[option.val]]">[[option.id]] [[option.title]] [[option.name]]</paper-radio-button>
+                                        </template>
+                                    </paper-radio-group>
+                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]" disabled="[[field.disabled]]">
+                                    <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left">
+                                        <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                            <template is="dom-repeat" items="[[field.options]]" as="option">
+                                                <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                            </template>
+                                        </paper-menu>
+                                    </paper-dropdown-menu>
+                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'toggle', field.show)]]">
+                                    <div class="xs12 m6">
+                                        <div class="spacer" hidden$="[[field.disabled]]"></div>
+                                        <paper-toggle-button checked="{{field.defaultValue}}" disabled="[[field.disabled]]">[[field.label]]</paper-toggle-button>
+                                        <div class="spacer" hidden$="[[field.disabled]]"></div>
+                                    </div>
+                                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                                </template>
+                                <template is="dom-if" if="[[field.isLead]]">
+                                    <hr class="xs12"/>
+                                </template>
+
+                        </template>
+
+                        <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
+                        <hr class="xs12" />
+                        <!-- <div class="notifications xs12">
+                            <div class="red">
+                                <iron-icon icon="icons:error-outline"></iron-icon> Error message from server
+                                <div class="info-code">
+                                    <code>test code</code>
+                                </div>
+                            </div>
+                            <div class="green">
+                                <iron-icon icon="check"></iron-icon> Success message from server
+                            </div>
+                            <div class="blue">
+                                Info message from server
+                            </div>
+                        </div> -->
+                        <div class="clearfix bottom-actions xs12">
+                            <paper-button id="submit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm" onclick="startProgress();">
+                                Create stack
+                            </paper-button>
+                            <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
+                        </div>
+                    </div>
+                    </paper-material>
+
+                    <iron-ajax id="formAjax" url="/api/v1/stacks" contentType="application/json" method="POST" on-request="_handleRequest" on-response="_handleResponse"></iron-ajax>
+
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <iron-ajax id="addStackAjax" url="/api/v1/stacks" method="POST" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></iron-ajax>
+        <!-- <iron-ajax id="addStackAjax" url="/api/v1/stacks" method="POST" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></iron-ajax> -->
     </template>
     <script>
         (function() {
@@ -87,6 +272,10 @@
                         type: Object,
                         value: {}
                     },
+                    form: {
+                        type: Object,
+                        value: {}
+                    },
                     params: {
                         type: Object
                     },
@@ -96,11 +285,342 @@
                         computed: '_fromTemplate(params)'
                     },
                     fields: {
-                        type: Array,
-                        value: [],
-                        notify: true,
-                        computed: "_fields(template)"
+                    type: Array,
+                    value: [{
+                        name: "name",
+                        label: "Stack Name",
+                        type: "text",
+                        value: "",
+                        isLead: true,
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please enter a name for the stack",
+                        show: true,
+                        required: true
+                        },{
+                            name: "description",
+                            label: "Stack Description",
+                            type: "textarea",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            helptext: "Choose a usefull description for your stack",
+                            errorMessage: "Please enter stacks's description",
+                            show: true,
+                            required: false
+                        },{
+                        //     name: "mist_uri",
+                        //     label: "Mist URI",
+                        //     type: "text",
+                        //     value: "",
+                        //     defaultValue: "",
+                        //     placeholder: "",
+                        //     helptext: "Your current mist installation URI",
+                        //     errorMessage: "Please enter mist URI",
+                        //     show: true,
+                        //     required: true
+                        // },{
+                            name: "yaml_or_form",
+                            label: "YAML or form",
+                            type: "radio",
+                            value: "",
+                            defaultValue: "",
+                            helptext: "Choose the way you want to insert inputs",
+                            errorMessage: "Choose an input format",
+                            show: true,
+                            required: true,
+                            options: [{
+                                title: "YAML",
+                                val: "yaml"
+                            }, {
+                                title: "Form",
+                                val: "form"
+                            }]
+                        },{
+                            name: "stackinputs",
+                            label: "Stack Inputs YAML",
+                            type: "textarea",
+                            value: "mist_uri: http://192.168.65.3/\nssh_user: ubuntu\nprivate_key_path: id-rsa\nkey_name: demokey\ncloud_id: 20d91550c0264ce2a3b19aee18d40d06\nimage_id: ami-4f4acd3c\ncoreos: true\nsize_id: c1.medium\nlocation_id: '0'\nmonitoring: false\nworker_name: GigaDemoFirstWorker\nmaster_name: GigaDemoMaster\nkey_external_resource: true\nworker_external_resource: false\nworker_external_resource_id: 'i-ebb8c563'\nworker_configured: false\nmaster_external_resource: false\nmaster_external_resource_id: 'i-3fb9c4b7'\nmaster_configured: false",
+                            defaultValue: "mist_uri: http://192.168.65.3/\nssh_user: ubuntu\nprivate_key_path: id-rsa\nkey_name: demokey\ncloud_id: 20d91550c0264ce2a3b19aee18d40d06\nimage_id: ami-4f4acd3c\ncoreos: true\nsize_id: c1.medium\nlocation_id: '0'\nmonitoring: false\nworker_name: GigaDemoFirstWorker\nmaster_name: GigaDemoMaster\nkey_external_resource: true\nworker_external_resource: false\nworker_external_resource_id: 'i-ebb8c563'\nworker_configured: false\nmaster_external_resource: false\nmaster_external_resource_id: 'i-3fb9c4b7'\nmaster_configured: false",
+                            placeholder: "",
+                            helptext: "Enter the stack inputs in yaml format",
+                            errorMessage: "Please enter stacks's inputs",
+                            show: true,
+                            required: true,
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["yaml"]
+                            }
+                        },{
+                            name: "key_name",
+                            label: "SSH Key",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "",
+                            errorMessage: "Please choose an ssh key",
+                            helptext: "You can choose a key from your existing keys",
+                            show: true,
+                            required: true,
+                            query: ["keysArray"],
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "worker_name",
+                            label: "Worker name",
+                            type: "text",
+                            value: "",
+                            defaultValue: "GigaDemoFirstWorker",
+                            placeholder: "",
+                            helptext: "Your current mist installation URI",
+                            errorMessage: "Please enter mist URI",
+                            helptext: "The machine name of kubernetes master. Name must be unique in cloud.",
+                            show: true,
+                            required: true,
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "master_name",
+                            label: "Master name",
+                            type: "text",
+                            value: "",
+                            defaultValue: "GigaDemoMaster",
+                            placeholder: "",
+                            errorMessage: "Please enter a name for the master",
+                            helptext: "The machine name of kubernetes worker. Name must be unique in cloud.",
+                            show: true,
+                            required: true,
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "cloud_id",
+                            label: "Cloud",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "",
+                            errorMessage: "Please choose an cloud",
+                            helptext: "Choose on which one of your clouds you want your stack deployed",
+                            show: true,
+                            required: true,
+                            query: ["cloudsArray"],
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "image_id",
+                            label: "Image",
+                            type: "dropdown",
+                            value: "ami-4fa9c538",
+                            defaultValue: "ami-4fa9c538",
+                            errorMessage: "Please choose an image",
+                            helptext: "Choose an image for the machines.",
+                            show: true,
+                            required: true,
+                            query: ["clouds","$.cloud_id", "imagesArray"],
+                            showIf: {
+                                fieldName: "cloud_id",
+                                fieldExists: true
+                            },
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "size_id",
+                            label: "Size",
+                            type: "dropdown",
+                            value: "c1.medium",
+                            defaultValue: "c1.medium",
+                            errorMessage: "Please choose a size for your machines",
+                            helptext: "Choose the size for your machines.",
+                            show: true,
+                            required: true,
+                            query: ["clouds","$.cloud_id", "sizesArray"],
+                            showIf: {
+                                fieldName: "cloud_id",
+                                fieldExists: true
+                            },
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "location_id",
+                            label: "Location",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "0",
+                            helptext: "Choose a host location for your machines.",
+                            errorMessage: "Please enter a location",
+                            show: true,
+                            required: true,
+                            query: ["clouds","$.cloud_id", "locationsArray"],
+                            showIf: {
+                                fieldName: "cloud_id",
+                                fieldExists: true
+                            },
+                            showIf: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        },{
+                            name: "coreos",
+                            label: "coreos",
+                            type: "toggle",
+                            value: true,
+                            defaultValue: true,
+                            placeholder: true,
+                            helptext: "",
+                            errorMessage: "",
+                            show: true,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "ssh_user",
+                            label: "SSH User",
+                            type: "text",
+                            value: "ubuntu",
+                            defaultValue: "ubuntu",
+                            placeholder: "",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "private_key_path",
+                            label: "Private Key Path",
+                            type: "text",
+                            value: "id-rsa",
+                            defaultValue: "id-rsa",
+                            placeholder: "",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "monitoring",
+                            label: "Monitoring",
+                            type: "toggle",
+                            value: false,
+                            defaultValue: false,
+                            placeholder: "",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "key_external_resource",
+                            label: "key_external_resource",
+                            type: "toggle",
+                            value: true,
+                            defaultValue: true,
+                            placeholder: "",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "worker_external_resource",
+                            label: "worker_external_resource",
+                            type: "toggle",
+                            value: false,
+                            defaultValue: false,
+                            placeholder: "",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "worker_external_resource_id",
+                            label: "worker_external_resource_id",
+                            type: "text",
+                            value: "i-ebb8c563",
+                            defaultValue: "i-ebb8c563",
+                            placeholder: "i-ebb8c563",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "worker_configured",
+                            label: "worker_configured",
+                            type: "toggle",
+                            value: false,
+                            defaultValue: false,
+                            placeholder: false,
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "master_external_resource",
+                            label: "master_external_resource",
+                            type: "toggle",
+                            value: false,
+                            defaultValue: false,
+                            placeholder: false,
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "master_external_resource_id",
+                            label: "master_external_resource_id",
+                            type: "text",
+                            value: "i-3fb9c4b7",
+                            defaultValue: "i-3fb9c4b7",
+                            placeholder: "i-3fb9c4b7",
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "master_configured",
+                            label: "master_configured",
+                            type: "toggle",
+                            value: false,
+                            defaultValue: false,
+                            placeholder: false,
+                            helptext: "",
+                            errorMessage: "",
+                            show: false,
+                            required: true,
+                            disabled: true
+                        },{
+                            name: "deploy",
+                            label: "Deploy Now",
+                            type: "toggle",
+                            value: true,
+                            defaultValue: true,
+                            placeholder: true,
+                            helptext: "Enable this option to deploy your stack now",
+                            errorMessage: "",
+                            show: true,
+                            required: true
+                    }],
+                    notify: true
                     },
+                    // fields: {
+                    //     type: Array,
+                    //     // value: [],
+                    //     // notify: true,
+                    //     // computed: "_fields(template)"
+                    // },
                     typedName: {
                         type: String,
                         value: '',
@@ -117,7 +637,23 @@
                     hideprogress: {
                         type: Boolean,
                         value: true
-                    }
+                    },
+                    keys: {
+                        type: Array,
+                        computed: "_keys(model)"
+                    },
+                    clouds: {
+                        type: Array,
+                        computed: "_clouds(model)"
+                    },
+                    images: {
+                        type: Array,
+                        computed: "_images(model)"
+                    },
+                    uri: {
+                        type: String,
+                        computed: "_uri(model)"
+                    },
                 },
                 observers: [
                     '_fieldsChanged(fields.*, sendingData)',
@@ -131,226 +667,297 @@
                         return template;
                     }
                 },
-                _fields: function(template){
-                    return template.inputs;
+                _uri: function(model){
+                    return window.location.protocol+"//"+window.location.hostname+"/";
                 },
-                _updateTypedName: function(t) {
-                    console.log(t)
-                    if (t.detail.leadValue) {
-                        this.typedName = '"'+t.detail.leadValue+'"';
-                    }else{
-                        this.typedName = '';
-                    }
+                // _keys: function(model){
+                //     return this.model.keysArray;
+                // },
+                // _clouds: function(model){
+                //     return this.model.cloudsArray;
+                // },
+                // _images: function(model){
+                //     var cloud = this.$.cloud_id;
+                //     if (cloud.selected){
+                //         var cloudId = cloud.selected;
+                //         return this.model.clouds[cloudId].imagesArray;
+                //     }
+                //     else {
+                //         return [];
+                //     }
+                // },
+                // _fields: function(template){
+                //     return template.inputs;
+                // },
+                // _updateTypedName: function(t) {
+                //     console.log(t)
+                //     if (t.detail.leadValue) {
+                //         this.typedName = '"'+t.detail.leadValue+'"';
+                //     }else{
+                //         this.typedName = '';
+                //     }
+                // },
+                attached: function(){
+
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
-                _computeFieldType: function(field, value, show) {
-                    if (!(field.showIf && !field.show)) {
-                        if (field.type == "dropdown" && field.query) {
-                            var inputModel = this.model;
-                            for (var prop in field.query){
-                                var p = field.query[prop];
-
-                                if (p.startsWith("$.")){
-                                    p = this.stack[p.slice(2)];
-                                }
-
-                                if (inputModel.hasOwnProperty(p)) {
-                                    inputModel = inputModel[p];
-                                }
-                            }
-
-                            var updatedOptions = [];
-
-                            for (var prop in inputModel) {
-                                var dropdownItem = {};
-                                if (inputModel[prop].hasOwnProperty("title")) {
-                                    dropdownItem.title = inputModel[prop].title;
-                                }
-                                else if (inputModel[prop].hasOwnProperty("name")) {
-                                    dropdownItem.title = inputModel[prop].name;
-                                }
-                                dropdownItem.val = inputModel[prop].id;
-                                updatedOptions.push(dropdownItem);
-
-                            }
-                            for (var index in this.fields){
-                                var existingField = this.fields[index];
-                                if (existingField.name == field.name){
-                                    this.set("fields." + index + ".options", updatedOptions);
-                                }
-                            }
-                        }
-                        return field.type == value;
-                    }
-
-                },
-                _fieldsChanged: function(fields, sendingData) {
-                    this.async(function() {
-                        var stack = this.stack,
-                            show = true,
-                            dependency,
-                            path = fields.path,
-                            valueChanged = this.get(path.replace("value", "name"));
-
-                        //todo: Stack name resets on fieldchange, it shouldn't
-                        if (path.endsWith("value")){
-                            this._recomputeDependentFields(valueChanged);
-                        }
-                        fields.base.forEach(function(el, index) {
-                            this.set('stack.' + el.name, el.value);
-
-                            if (el.showIf) {
-                                if (el.showIf.fieldExists) {
-                                    dependency = stack[el.showIf.fieldName],
-                                        show = dependency;
-                                    this.set('fields.' + index + '.show', show);
-
-                                } else {
-                                    dependency = stack[el.showIf.fieldName],
-                                        show = el.showIf.fieldValues.indexOf(dependency) != -1;
-                                    this.set('fields.' + index + '.show', show);
-                                }
-
-                                if (!show) {
-                                    this._resetField(el, index);
-                                }
-                            }
-
-                            if (el.placeholderIf) {
-                                dependency = stack[el.placeholderIf.fieldName];
-                                this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
-                            }
-                        }, this);
-
-                        var valid = fields.base.every(function(el, index) {
-                            return el.show && el.required ? el.value : true;
-                        }, this);
-
-                        this.set('stack', stack);
-
-                        this.set('formReady', valid && !sendingData);
-                    });
-                },
-                _submitForm: function() {
-                    var payload = this.template;
-                    console.log(payload);
-                    var inputs = {};
-                    if (this.$.stackinputs.value){
-                        inputs = YAML.parse(this.$.stackinputs.value)
-                    }else{
-                        inputs = e.detail.payload
-                    }
-                    var body = {inputs: inputs}
-                    body["template_id"] = this.template._id
-                    body["name"] = this.$.stackname.value
-                    body["description"] = this.$.stackdescription.value
-                    body["deploy"] = this.$.stackdeploy.checked
-
-                    this.$.addStackAjax.headers["Content-Type"] = 'application/json';
-                    this.$.addStackAjax.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.addStackAjax.body = body;
-                    this.$.addStackAjax.generateRequest();
-                    //test progress bar
-                    this.sendingData = true;
-                    this.hideprogress = false;
-                },
-                _stackAjaxRequest: function(e) {
-                    console.log(e)
-                    var inputs = {};
-                    if (this.$.stackinputs.value){
-                        inputs = YAML.parse(this.$.stackinputs.value)
-                    }else{
-                        inputs = e.detail.payload
-                    }
-                    var body = {inputs: inputs}
-                    body["template_id"] = this.template._id
-                    body["name"] = this.$.stackname.value
-                    body["description"] = this.$.stackdescription.value
-                    body["deploy"] = this.$.stackdeploy.checked
-                    e.detail.formAjax.body = body
-                    e.detail.formAjax.generateRequest()
-                    this.set('sendingData', true);
-                },
-                _createStackAjaxResponse: function(e) {
-                    this.set('sendingData', false);
-
-                    this.fire('createStack', {
-                        template: {
-                            name: this.stack.name
-                        }
-                    });
-                },
-                _resetForm: function(e) {
-                    this.set('sendingData', false);
-                    // Reset template
-                    this.set('stack.name', '');
-
-                    // Reset Form Fields
-                    this.fields.forEach(function(el, index) {
-                        if (el.showIf) {
-                            this.set('fields.' + index + '.show', false);
-                        }
-                        // Reset Form Fields Validation
-                        this._resetField(el, index);
-                    }, this);
-                    this.typedName = "";
-                },
-                _resetField: function(el, index) {
-                    this.set('fields.' + index + '.value', el.defaultValue);
-
-                    var input = this.querySelector('#' + el.name);
-                    if (input) {
-                        input.invalid = false;
-                    }
-                },
-                _recomputeDependentFields: function(changedFieldName){
-                    var name = changedFieldName;
-                    this.fields.forEach(function(el, index) {
-                        if (el.showIf && el.showIf.fieldName == name) {
-                            this.set('fields.' + index + '.options', []);
-                            this._computeFieldType(el,el.type,el.show)
-                        }
-                    }, this);
-                },
                 _goBack: function(){
                     history.back();
+                },
+                _computeFieldType: function(field, value, show) {                
+                if (!field.helptext && field.description){
+                    field.helptext = field.description
                 }
-            });
-        })();
-
-        // progress bar
-        var progress = document.querySelector('paper-progress#progress'),
-            button = document.querySelector('paper-button#submit'),
-            animationFrame;
-        var repeat, maxRepeat = 1,
-            animating = false;
-
-        function nextProgress() {
-            animating = true;
-            if (progress.value < progress.max) {
-                progress.value += (progress.step || 1);
-
-            } else {
-                if (++repeat >= maxRepeat) {
-                    animating = false;
-                    button.disabled = false;
-                    return;
+                if (!field.label && field.name){
+                    field.label = field.name
                 }
-                progress.value = progress.min;
+                if (!(field.showIf && !field.show)) {
+                    if (field.type == "dropdown" && field.query) {
+                        var inputModel = this.model;
+                        for (var prop in field.query){
+                            var p = field.query[prop];
+
+                            if (p.startsWith("$.")){
+                                p = this.form[p.slice(2)];
+                            }
+
+                            if (inputModel.hasOwnProperty(p)) {
+                                inputModel = inputModel[p];
+                            }
+                        }
+
+                        var updatedOptions = [];
+
+                        for (var prop in inputModel) {
+                            var dropdownItem = {};
+                            if (inputModel[prop].hasOwnProperty("title")) {
+                                dropdownItem.title = inputModel[prop].title;
+                            }
+                            else if (inputModel[prop].hasOwnProperty("name")) {
+                                dropdownItem.title = inputModel[prop].name;
+                            }
+                            else if (inputModel[prop].hasOwnProperty("id")) {
+                                dropdownItem.title = inputModel[prop].id;
+                            }
+                            dropdownItem.val = inputModel[prop].id;
+                            updatedOptions.push(dropdownItem);
+
+                        }
+                        for (var index in this.fields){
+                            var existingField = this.fields[index];
+                            if (existingField.name == field.name){
+                                this.set("fields." + index + ".options", updatedOptions);
+                            }
+                        }
+                    }
+                    return field.type == value;
+                }
+
+            },
+            _handleRequest: function(e){
+                this.fire("request", e.detail)
+            },
+            _handleResponse: function(e){
+                this.fire("response", e.detail)
+            },
+            _fieldsChanged: function(fields, sendingData) {
+                this.async(function() {
+                    var form = this.form,
+                        show = true,
+                        dependency;
+                    // var isLead = this.get(fields.path.replace("value","isLead"))
+                    // if (isLead == true){
+                    //     console.log(fields.path)
+                    //     this.fire("leadchange", {leadValue:this.get(fields.path)})
+                    // }
+                    fields.base.forEach(function(el, index) {
+
+                        if (el.showIf) {
+                            if (el.showIf.fieldExists) {
+                                dependency = form[el.showIf.fieldName],
+                                    show = dependency;
+                                this.set('fields.' + index + '.show', show);
+                            } else {
+                                dependency = form[el.showIf.fieldName],
+                                    show = el.showIf.fieldValues.indexOf(dependency) != -1;
+                                this.set('fields.' + index + '.show', show);
+                            }
+
+                            if (!show) {
+                                this._resetField(el, index);
+                            }else{
+                                this.set('form.' + el.name, el.value);
+                            }
+                        }
+                        else {
+                            this.set('form.' + el.name, el.value);
+                        }
+
+                        if (el.placeholderIf) {
+                            dependency = form[el.placeholderIf.fieldName];
+                            this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
+                        }
+                    }, this);
+
+                    var valid = fields.base.every(function(el, index) {
+                        return el.show && el.required ? el.value : true;
+                    }, this);
+
+                    this.set('form.mist_uri',this.uri);
+                    this.set('form.template_id',this.template.id);
+                    this.set('form', form);
+
+                    this.set('stack.name', this.form.name);
+                    this.set('stack.template_id', this.form.template_id);
+                    this.set('stack.description', this.form.description);
+                    this.set('stack.deploy', this.form.deploy);
+                    this.set('stack.inputs', this.form);
+
+                    this.set('formReady', valid && !sendingData);
+                })
+            },
+            _submitForm: function() {
+              var payload = this.template;
+              console.log("PAYLOAD: ",payload);
+
+                // var inputs = {};
+                // if (this.form){
+                //     inputs = this.form
+                // }else{
+                //     inputs = e.detail.payload
+                // }
+                // var body = {inputs: inputs}
+                // body["template_id"] = this.template.id
+                // body["name"] = this.form.name
+                // body["description"] = this.form.description
+                // body["deploy"] = this.form.deploy
+
+
+                var inputs = {};
+                var inputsfield = this.fields.find(function(field){
+                    return field.name == "stackinputs";
+                });
+                if (inputsfield.value){
+                    inputs = YAML.parse(inputsfield.value)
+                }else{
+                    inputs = e.detail.payload
+                }
+                var body = {inputs: inputs}
+                body["template_id"] = this.template._id
+                body["name"] = this.form.name
+                body["description"] = this.form.description
+                body["deploy"] = this.form.deploy
+
+                this.$.formAjax.headers["Content-Type"] = 'application/json';
+                this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.formAjax.body = body;
+                this.$.formAjax.generateRequest();
+
+
+                // console.log(e)
+                // var inputs = {};
+                // if (this.$.stackinputs.value){
+                //     inputs = YAML.parse(this.$.stackinputs.value)
+                // }else{
+                //     inputs = e.detail.payload
+                // }
+                // var body = {inputs: inputs}
+                // body["template_id"] = this.template._id
+                // body["name"] = this.$.stackname.value
+                // body["description"] = this.$.stackdescription.value
+                // body["deploy"] = this.$.stackdeploy.checked
+                // e.detail.formAjax.body = body
+                // e.detail.formAjax.generateRequest()
+
+              // this.$.formAjax.headers["Content-Type"] = 'application/json';
+              // this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+              // this.fire("submit", {payload: payload, formAjax: this.$.formAjax})
+              // if (!this.alterrequest){
+              //     this.$.formAjax.body = payload;
+              //     this.$.formAjax.generateRequest();
+              // }
+                //test progress bar
+                this.hideprogress = false;
+            },
+            _resetForm: function(e) {
+                // Reset script
+                for (var attr in this.form){
+                    this.set('form.' + attr, '');
+                }
+
+                // Reset Form Fields
+                this.fields.forEach(function(el, index) {
+                    if (el.showIf) {
+                        this.set('fields.' + index + '.show', false);
+                    }
+
+                    // Reset Form Fields Validation
+                    this._resetField(el, index);
+                }, this);
+                this.typedName = "";
+            },
+            _resetField: function(el, index) {
+                this.set('fields.' + index + '.value', el.defaultValue);
+
+                var input = this.querySelector('#' + el.name);
+                if (input) {
+                    input.invalid = false;
+                }
+            },
+            _assertShowIfQuery: function(name){
+                this.fields.forEach(function(el, index) {
+                    if (el.showIf && el.showIf.fieldName == name) {
+                        if (this._query(el.showIf.query) in el.showIf.queryResult){
+                            this.set('fields.' + index + '.options', []);
+                            this._computeFieldType(el,el.type,el.show)
+
+                        }
+                    }
+                })
+            },
+            _recomputeDependentFields: function(name){
+                this.fields.forEach(function(el, index) {
+                    if (el.showIf && el.showIf.fieldName == name) {
+                        this.set('fields.' + index + '.options', []);
+                        this._computeFieldType(el,el.type,el.show)
+                    }
+                }, this);
+            },
+        });
+    })();
+    // test progress bar, code from demo
+    var progress = document.querySelector('paper-progress#progress');
+    var button = document.querySelector('paper-button#submit');
+    var animationFrame;
+    var repeat, maxRepeat = 1,
+        animating = false;
+
+    function nextProgress() {
+        animating = true;
+        if (progress.value < progress.max) {
+            progress.value += (progress.step || 1);
+
+        } else {
+            if (++repeat >= maxRepeat) {
+                animating = false;
+                button.disabled = false;
+                return;
             }
-            var animationFrame = requestAnimationFrame(nextProgress);
-        }
-
-        function startProgress() {
-            repeat = 0;
             progress.value = progress.min;
-            button.disabled = true;
-            if (!animating) {
-                nextProgress();
-            }
         }
+        var animationFrame = requestAnimationFrame(nextProgress);
+    }
 
+    function startProgress() {
+        repeat = 0;
+        progress.value = progress.min;
+        button.disabled = true;
+        if (!animating) {
+            nextProgress();
+        }
+    }
+    
     </script>
 </dom-module>
