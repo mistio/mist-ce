@@ -30,13 +30,8 @@
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../app-check/app-check.html">
 <link rel="import" href="../pages/page-dashboard.html">
-<link rel="import" href="../pages/page-image.html">
-<link rel="import" href="../pages/page-key.html">
-<link rel="import" href="../pages/page-network.html">
-<link rel="import" href="../pages/page-elements.html">
-<link rel="import" href="../pages/page-account.html">
 <link rel="import" href="../pages/page-not-found.html">
-<link rel="import" href="../grid-list-element/grid-list-element.html">
+<!--link rel="import" href="../grid-list-element/grid-list-element.html"-->
 <dom-module id="app-main">
     <style>
     paper-toast {
@@ -57,7 +52,7 @@
             <!-- <iron-route path="/images" title="images" href="../pages/page-items.html"></iron-route> -->
             <!-- <iron-route path="/images/:id" title="image"></iron-route> -->
             <iron-route path="/images" title="images"  href="../pages/page-items.html"></iron-route>
-            <iron-route path="/images/:id" title="image" href="../images/images-page.html"></iron-route>
+            <iron-route path="/images/:id" title="image" href="../images/image-page.html"></iron-route>
             <!-- keys -->
             <iron-route path="/keys" title="keys" href="../pages/page-items.html"></iron-route>
             <iron-route path="/keys/:id" title="keys" href="../keys/key-page.html"></iron-route>
@@ -1106,6 +1101,20 @@ var app = Polymer({
         }];
 
         this.sections = _generateMap(this.sectionsArray);
+    },
+
+    attached: function() {
+        // Load neighbouring pages progressively, do not rely on lazy loading
+        var that = this;
+        this.importHref('../elements/pages/page-items.html', function() {
+            console.debug('page-items loaded');
+            that.importHref('../elements/pages/page-account.html', function() {
+                console.debug('page-account loaded');
+                this.importHref('../elements/pages/page-elements.html', function() {
+                    console.debug('page-elements loaded');
+                });
+            });
+        });
     },
 
     subscribeLogEvents: function(searchFilter) {
