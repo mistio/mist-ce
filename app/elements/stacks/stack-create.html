@@ -766,7 +766,7 @@
                         if (el.showIf) {
                             if (el.showIf.fieldExists) {
                                     dependency = form[el.showIf.fieldName];
-                                    if (dependency.showif){
+                                    if (dependency && dependency.showif){
                                         dependency = form[dependency.showIf.fieldName];
                                     }
                                     show = dependency;
@@ -776,7 +776,7 @@
                             else {
                                     dependency = form[el.showIf.fieldName];
                                     show = el.showIf.fieldValues.indexOf(dependency) != -1;
-                                    if (dependency.showif){
+                                    if (dependency && dependency.showif){
                                         dependency = dependency.push(form[dependency.showIf.fieldName]);
                                         show = show && el.showIf.fieldValues.indexOf(dependency) != -1;
                                     }
