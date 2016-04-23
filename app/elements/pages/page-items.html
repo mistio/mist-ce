@@ -232,6 +232,10 @@
         ],
 
         ready: function() {
+
+        },
+
+        attached: function() {
             if (this.section.id == 'machines')
                 this.set('sortBy', 'state');
             else if (this.section.id == 'images')
@@ -301,10 +305,14 @@
         },
 
         sortingObserver: function(items, sortBy, sortOrder, q) {
-            this.set('sortedItems', items.base.sort(this._computeSort(this.sortBy, this.sortOrder)));
-            if (this.sortedItems.length != this.items.length)
-                this.set('sortedItems', this.items);
-            this.set('filteredItems', this.filterItems());
+            var that = this;
+            this.debounce('sortItems', function () {
+                console.debug('sortItems');
+                that.set('sortedItems', items.base.sort(that._computeSort(this.sortBy, this.sortOrder)));
+                if (that.sortedItems.length != that.items.length)
+                    that.set('sortedItems', that.items);
+                that.set('filteredItems', that.filterItems());
+            }, 300);
         },
 
         _computeSort: function(property, order) {
