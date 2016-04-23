@@ -94,6 +94,14 @@
             position: relative;
         }
 
+        .clouds paper-button.online {
+            border-color: green !important;
+        }
+
+        .clouds paper-button.offline {
+            border-color: #D96557 !important;
+        }
+
         .clouds paper-button:not(#addcoud) {
             background-color: #fff;
             color: inherit;
@@ -220,18 +228,12 @@
             <div class="content flex-horizontal-wide">
                 <div class="clouds flexchild-wide-top">
                     <div class="flex">
-                        <template is="dom-repeat" items="{{model.cloudsArray}}">
-                            <paper-button raised class="link">
-                                <template is="dom-if" if="{{isOnline(item)}}">
-                                    <iron-icon icon="check"></iron-icon>
-                                </template>
-                                <template is="dom-if" if="{{isOffline(item)}}">
-                                    <iron-icon icon="clear"></iron-icon>
-                                </template>
+                        <template is="dom-repeat" items="[[model.cloudsArray]]">
+                            <paper-button raised class$="link [[isOnline(item)]] [[isOffline(item)]]">
+                                <iron-icon src="[[_computeProviderLogo(item.provider)]]"></iron-icon>
                                 <span class="cloud-title">{{item.title}}</span>
                             </paper-button>
                         </template>
-                        <a href="/add-cloud"> add cloud </a>
                     </div>
                 </div>
                 <div class="container flex-horizontal-with-ratios flexchild-wide">
@@ -289,20 +291,6 @@
     </template>
 </dom-module>
 <script>
-function getRandomGaugeValue(offset, factor) {
-    return offset + Math.round(factor * Math.random());
-}
-
-// window.setInterval(function() {
-//     var gauge = document.getElementById('mutating_gauge');
-//     gauge.data = [
-//         ["Label", "Value"],
-//         ["Memory", getRandomGaugeValue(40, 60)],
-//         ["CPU", getRandomGaugeValue(40, 60)],
-//         ["Network", getRandomGaugeValue(60, 20)]
-//     ];
-
-// }, 3000);
 
 Polymer({
     is: 'page-dashboard',
@@ -399,10 +387,13 @@ Polymer({
         };
     },
     isOnline: function(cloud) {
-        return cloud.state == 'online';
+        return cloud.state == 'online' && 'online';
     },
     isOffline: function(cloud) {
-        return cloud.state == 'offline';
+        return cloud.state == 'offline' && 'offline';
+    },
+    _computeProviderLogo: function(className) {
+        return '../images/providers/provider-' + className.split('_')[0] + '.png';
     }
 });
 </script>

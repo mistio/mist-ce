@@ -167,7 +167,7 @@ Polymer({
     },
 
     _itemLink: function(section, item) {
-        return "/" + section.id + "/" + item.uuid;
+        return "/" + section.id + "/" + (item.uuid || item.id);
     },
 
     _itemTagsArray: function(tagsobject) {
