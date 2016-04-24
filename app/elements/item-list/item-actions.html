@@ -111,6 +111,12 @@ ACTIONS = {
     'icon': 'delete',
     'confirm': true,
     'multi': true
+  },
+  'delete': {
+    'name': 'delete',
+    'icon': 'delete',
+    'confirm': true,
+    'multi': true
   }
 }
 
@@ -266,7 +272,14 @@ Polymer({
             ret.push('destroy');
         } else if (item.type == 'image') {
             return ret;
+        } else if (item.type == 'key') {
+            ret.push('delete');
+        } else if (item.type == 'template') {
+            ret.push('delete');
+        } else if (item.type == 'stack') {
+            ret.push('delete');
         }
+
         return ret;
     },
 
@@ -309,7 +322,7 @@ Polymer({
 
     _performAction: function(action, items) {
         var run = function() {
-            var uri, payload, item = items.shift();
+            var uri, payload, item = items.shift(), method = 'POST';
 
             if (action.name == 'reboot') {
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
@@ -318,6 +331,14 @@ Polymer({
             } else if (action.name == 'destroy') {
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
                 payload = {'action': 'destroy'};
+            } else if (action.name == 'delete' && item.type == 'template') {
+                uri = '/api/v1/templates/' + item.id;
+                method = 'DELETE';
+            } else if (action.name == 'delete' && item.type == 'stack') {
+                uri = '/api/v1/stacks/' + item.id;
+                method = 'DELETE';
+            } else {
+                console.error('unknown action', action, 'on item', item );
             }
 
             var xhr = new XMLHttpRequest();
@@ -334,7 +355,7 @@ Polymer({
                 }
             };
 
-            xhr.open('POST', uri);
+            xhr.open(method, uri);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.setRequestHeader("Csrf-Token", CSRF_TOKEN);
             xhr.send(JSON.stringify(payload));
