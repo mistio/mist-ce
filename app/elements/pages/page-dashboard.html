@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
 <link rel="import" href="../section-tile/section-tile.html">
-<link rel="import" href="../app-incidents/app-incidents.html">
+<!--link rel="import" href="../app-incidents/app-incidents.html"-->
 <link rel="import" href="../app-forms/app-forms.html">
 <link rel="import" href="../app-fab/app-fab.html">
 <link rel="import" href="../logs/log-list.html">
@@ -241,8 +241,10 @@
                     <template is="dom-if" if="[[onbstate]]">
                         <onb-element class="onb-area flex2child top right" onbstate="[[onbstate]]" model="[[model]]"></onb-element>
                     </template>
-                    <app-incidents hidden$="[[onbstate]]" id="right" class="flex2child incidents top right">
-                    </app-incidents>
+                    <!--template is="dom-if" if="[[model.monitoring]]">
+                        <app-incidents hidden$="[[onbstate]]" id="right" class="flex2child incidents top right" model="[[model]]">
+                        </app-incidents>
+                    </template-->
                     <div id="left" class="flex3child top left">
                         <div class="sections layout horizontal wrap">
                             <a href="/machines" class="main-section flex" is="pushstate-anchor">
@@ -275,7 +277,7 @@
                 </div>
                 <div class="bottom full flexchild-wide">
                     <div class="graphs">
-                        <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
+                        <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                     </div>
                     <div class="logs">
                         <log-list></log-list>
@@ -312,8 +314,11 @@ Polymer({
         },
         dashboard: {
             type: Object
+        },
+        replaceTargets: {
+            type: Object,
+            value: { 'bucky.': '' }
         }
-
     },
     ready: function() {},
     attached: function() {
@@ -385,6 +390,11 @@ Polymer({
           },
           "timezone": "browser"
         };
+
+        var that = this;
+        setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
+            that.querySelector('dashboard-panel').resize();
+        }, 5000);
     },
     isOnline: function(cloud) {
         return cloud.state == 'online' && 'online';
