@@ -178,7 +178,7 @@
         </paper-drawer-panel>
 
         <div class="absolute-bottom-right">
-            <app-fab></app-fab>
+            <paper-fab icon="add" on-tap="_fabAction" hidden$="[[!section.add]]"></paper-fab>
         </div>
     </template>
 </dom-module>
@@ -313,6 +313,11 @@
                     that.set('sortedItems', that.items);
                 that.set('filteredItems', that.filterItems());
             }, 300);
+        },
+
+        _fabAction: function(e) {
+            console.debug('fabAction', e, this.section.add);
+            page(this.section.add);
         },
 
         _computeSort: function(property, order) {
