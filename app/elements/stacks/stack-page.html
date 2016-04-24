@@ -319,7 +319,7 @@
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
-                    <span class="bottom title">Stack "[[stack.name]]"</span>
+                    <span class="bottom title">Stack "{{stack.name}}"</span>
                     <span class="bottom right-actions">
                         <paper-tooltip for="editTemplate" position="top">Edit Stack</paper-tooltip>
                         <paper-icon-button id="editTemplate" icon="icons:create" on-tap="_editTemplate"></paper-icon-button>
@@ -407,11 +407,11 @@
                                         <div id="workflowsView" class="pad">
                                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
                                                 <div id$="[[workflow.name]]show" class="m12 wf-item">
-                                                    
+
                                                     <template is="dom-if" if=[[workflow.params.length]]>
-                                                        <app-form fields="[[workflow.params]]" form="[[payload]]" url$="/api/v1/stacks/[[stackId]]/[[workflow.name]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>    
+                                                        <app-form fields="[[workflow.params]]" form="[[payload]]" url$="/api/v1/stacks/[[stackId]]/[[workflow.name]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
                                                     </template>
-                                                    
+
                                                     <template is="dom-if" if=[[!workflow.params.length]]>
                                                         <paper-material class="form-view grid-row">
                                                             <h2 class="xs12">[[workflow.name]]</h2>
@@ -515,7 +515,7 @@
                 machines: {
                     type: Array,
                     computed: '_machines(stack)'
-                },                
+                },
                 runtimeProperties: {
                     type: Array,
                     computed: '_runtimeProperties(stack)'
@@ -539,7 +539,7 @@
                 timestamp: {
                     type: String,
                     computed: '_getFormattedTimestamp(stack)'
-                },                
+                },
                 vpHeight: String,
                 payload: {
                     type: Object,
@@ -615,7 +615,7 @@
                             if (key)
                                 keys.push(key);
                         }
-                    }, this);   
+                    }, this);
                 }
                 return keys;
             },
@@ -641,8 +641,8 @@
                 this.querySelector('#workflowsNavigation').children[0].setAttribute("focused", true);
             },
             _getFormattedTimestamp: function (stack) {
-                var timestamp = parseInt(stack.created_at);
-                return new Date(timestamp).toLocaleString('en-US', {timeZoneName: 'short'});
+                //var timestamp = parseInt();
+                return new Date(this.stack.created_at).toLocaleString('en-US', {timeZoneName: 'short'});
             },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element'),
@@ -676,7 +676,7 @@
                 this._toggleQuickActions();
                 this.selected = 1;
             },
-            _quickActionsNavigation: function(e){
+            _quickActionsNavigation: function(e) {
                 this._toggleQuickActions();
                 this.selected = 1;
                 this._workflowNavigation(e);
@@ -684,15 +684,15 @@
             _runtimeProperties: function(stack){
                 var rtp = [];
                 var state = stack.state;
-                if(state){
+                if(state) {
                     for (var i = 0; i < state.length; i++) {
                         var rtpObj = YAML.parse(state[i].runtime_properties);
-                        rtpObj.name = state[i].name;
-                        rtp.push(rtpObj);
+                        if (rtpObj) {
+                            rtpObj.name = state[i].name;
+                            rtp.push(rtpObj);
+                        }
                     }
                 }
-
-                console.log("rtp exist", rtp);
                 return rtp;
             },
             _runtimePropertiesChanged: function(changerecord){
