@@ -6,7 +6,7 @@
 <link rel="import" href="template-run.html">
 <link rel="import" href="template-stack-item.html">
 
-<dom-module id="template-page"> 
+<dom-module id="template-page">
     <template>
         <style is="custom-style" include="lists"></style>
         <style is="custom-style" include="single-page"></style>
@@ -127,7 +127,7 @@
         }
         .subhead {
             box-sizing: border-box;
-            position: absolute;            
+            position: absolute;
             width: 100%;
             left: 0;
             height: 57px;
@@ -194,7 +194,7 @@
                     <app-user-menu email="marios@mist.io"></app-user-menu>
                     <span class="bottom title">Template "[[template.name]]"</span>
 
-                    <span class="bottom right-actions">                        
+                    <span class="bottom right-actions">
                         <paper-tooltip for="scheduleTemplate" position="top">Schedule Template</paper-tooltip>
                         <paper-icon-button id="scheduleTemplate" icon="icons:schedule" on-tap="_scheduleTemplate"></paper-icon-button>
                         <paper-tooltip for="editTemplate" position="top">Edit Template</paper-tooltip>
@@ -219,7 +219,7 @@
                         </div>
                     </div>
                 </paper-toolbar>
-                
+
                 <div class="content" style$="[[vpHeight]]">
                     <div class="page">
                         <div class="parsing-loader" hidden$="[[hideprogress]]">
@@ -242,7 +242,7 @@
                     </div>
                     <div class="page section">
                         <div class="flex-horizontal-with-ratios">
-                            <div class="width100">                                
+                            <div class="width100">
                                 <template is="dom-if" if="[[hasStacks]]">
                                     <paper-material class="no-pad">
                                         <h3 class="smallcaps resource-head">stacks</h3>
@@ -279,7 +279,7 @@
                                             <div class="flexchild">Created at</div>
                                             <div class="flexchild">[[timestamp]]</div>
                                         </div>
-                                    </template>                                
+                                    </template>
                                     <div class="info-item flex-horizontal-with-ratios">
                                         <div class="flexchild">Type</div>
                                         <div class="flexchild">[[template.exec_type]]</div>
@@ -299,7 +299,7 @@
                                                 </a>
                                             </div>
                                         </div>
-                                    </template>                                    
+                                    </template>
                                     <template is="dom-if" if="[[template.entrypoint]]">
                                         <div class="info-item flex-horizontal-with-ratios">
                                             <div class="flexchild">Entrypoint</div>
@@ -375,7 +375,7 @@
                 },
                 stacks: {
                     type: Array,
-                    computed: '_computeStacks(template)'  
+                    computed: '_computeStacks(template)'
                 },
                 templateid: {
                     type: String,
@@ -401,15 +401,15 @@
             },
             listeners: {
                 'confirmation': '_deleteTemplateResponse',
-                'updateSelectedTemplate': '_updateTemplate'                
+                'updateSelectedTemplate': '_updateTemplate'
             },
             ready: function() {
                 var wh = window.innerHeight;
                 this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
             },
             _getFormattedTimestamp: function (template) {
-                var timestamp = parseInt(template.created_at);
-                return new Date(timestamp).toLocaleString('en-US', {timeZoneName: 'short'});
+                //var timestamp = parseInt(template.created_at);
+                return new Date(template.created_at).toLocaleString('en-US', {timeZoneName: 'short'});
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
