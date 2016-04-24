@@ -18,7 +18,7 @@
         }
 
         :host paper-material {
-            min-width: 100%;
+            min-width: 50%;
         }
 
         h3 {
@@ -69,136 +69,38 @@
                 overflow-y: scroll;
             }
         }
+
+        span.rule-condition {
+            font-weight: normal;
+        }
+
+        span.time {
+            float: right;
+        }
         </style>
         <paper-material>
-
-
             <!-- title goes here, should change on stateChanged-->
             <h2 class="app-title">{{title}}</h2>
             <div class="content-area">
                 <content></content>
-                <div class="block active-alerts">
-                    <h3>Now active</h3>
-                    <a class="list-item layout horizontal wrap red" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:report-problem"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                    <a class="list-item layout horizontal wrap red" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:report-problem"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                </div>
-                <div class="block resolved-alerts">
-                    <h3>Resolved</h3>
-                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:check"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:check"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:check"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:check"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:check"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:check"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:check"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:check"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:check"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:check"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
-                    <a class="list-item layout horizontal wrap green" href$="[[whatTriggeredIt]]">
-                        <div class="flexchild expression">
-                            <iron-icon icon="icons:check"></iron-icon>
-                            an incident expression
-                        </div>
-                        <div>
-                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                        </div>
-                    </a>
+                <div class="block">
+                    <template is="dom-repeat" items="[[model.incidents]]">
+                        <a class$="list-item layout horizontal wrap [[incidentColor(item)]]" href$="[[machineUri(item)]]">
+                            <div class="flexchild expression">
+                                <iron-icon icon="[[incidentIcon(item)]]"></iron-icon>
+                                <span class="machine">[[machineName(item)]]</span>: <span class="rule-condition">[[ruleCondition(item)]]</span>
+                                <span class="time">
+                                    <template is="dom-if" if="!item.finished_at">
+                                        <sc-timeago datetime="[[incidentDuration(item)]]"></sc-timeago>
+                                    </template>
+                                    [[incidentTime(item)]]
+                                </span>
+                            </div>
+                            <div>
+                                <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                            </div>
+                        </a>
+                    </template>
                 </div>
                 <!-- state MIDDLE : urge user to add rules -->
                 <!-- state ONBOARD : urge user to add machine monitoring -->
@@ -212,6 +114,9 @@ Polymer({
     properties: {
         title: {
             String, value: "Incidents"
+        },
+        model: {
+            type: Object
         },
         state: {
             String, value: "ONBOARD"
@@ -235,6 +140,39 @@ Polymer({
         setTimeout(function() {
             this.classList.add('active');
         }.bind(this), (index + 1) * 50);
+    },
+    incidentColor: function(item){
+        if (!item.finished_at)
+            return 'red';
+        return 'green';
+    },
+    incidentIcon: function(item) {
+        if (!item.finished_at)
+            return 'icons:report-problem';
+        return 'icons:check';
+    },
+    machineName: function(item) {
+        if (item.logs.length)
+            return item.logs[0].machine_name;
+        return this.model.clouds[item.cloud_id].machines[item.machine_id].name;
+    },
+    machineUri: function(item) {
+        console.log(this.model.clouds, item.cloud_id, this.model.incidents, this.model.monitoring);
+        return '/machines/'  + item.machine_id;
+    },
+    ruleCondition: function(item) {
+        return item.logs.length && item.logs[0].condition;
+    },
+    incidentDuration: function(item) {
+        if (!item.finished_at)
+            return new Date(item.started_at*1000)
+        return new Date(item.started_at*1000)
+        //return Date.now()-(item.finished_at-item.started_at)*1000;
+    },
+    incidentTime: function(item) {
+        if (!item.finished_at)
+            return 'for '
+        return ''
     }
 });
 </script>
