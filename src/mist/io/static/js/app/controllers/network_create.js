@@ -162,7 +162,7 @@ define('app/controllers/network_create', ['ember'],
                     }
                 }
 
-                var url = '/clouds/' + this.network.cloud.id +
+                var url = '/api/v1/clouds/' + this.network.cloud.id +
                     '/networks';
                 var that = this;
                 that.set('creatingNetwork', true);

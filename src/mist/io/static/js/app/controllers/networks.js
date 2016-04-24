@@ -32,7 +32,7 @@ define('app/controllers/networks', [
                 else
                     machineId = args.machine.id;
 
-                var url = '/clouds/' + this.cloud.id +
+                var url = '/api/v1/clouds/' + this.cloud.id +
                     '/networks/' + args.network.id;
 
                 var that = this;
@@ -55,7 +55,7 @@ define('app/controllers/networks', [
             },
 
             reserveIP: function(args) {
-                var url = '/clouds/' + this.cloud.id +
+                var url = '/api/v1/clouds/' + this.cloud.id +
                     '/networks/' + args.network.id;
 
                 var that = this;
@@ -80,7 +80,7 @@ define('app/controllers/networks', [
             deleteNetwork: function(networkId, callback) {
                 var that = this;
                 that.set('deletingNetwork', true);
-                var url = '/clouds/' + this.cloud.id +
+                var url = '/api/v1/clouds/' + this.cloud.id +
                     '/networks/' + networkId;
                 Mist.ajax
                     .DELETE(url)

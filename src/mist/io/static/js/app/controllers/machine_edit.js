@@ -41,7 +41,7 @@ define('app/controllers/machine_edit', ['ember'],
                 if (this.formReady) {
                     var that = this;
                     this.set('renamingMachine', true);
-                    Mist.ajax.POST('/clouds/' + this.machine.cloud.id + '/machines/' + this.machine.id, {
+                    Mist.ajax.POST('/api/v1/clouds/' + this.machine.cloud.id + '/machines/' + this.machine.id, {
                         'action' : 'rename',
                         'name': this.newName
                     }).success(function() {

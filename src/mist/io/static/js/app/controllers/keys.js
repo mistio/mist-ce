@@ -88,7 +88,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                 var that = this;
                 this.set('addingKey', true);
                 Mist.ajax
-                    .PUT('/keys', {
+                    .PUT('/api/v1/keys', {
                         'id': args.keyId,
                         'priv': args.keyPrivate
                     })
@@ -110,7 +110,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                 var that = this;
                 this.set('renamingKey', true);
                 Mist.ajax
-                    .PUT('/keys/' + keyId, {
+                    .PUT('/api/v1/keys/' + keyId, {
                         'new_id': newKeyId
                     })
                     .success(function() {
@@ -130,7 +130,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                 var that = this;
                 this.set('deletingKey', true);
                 Mist.ajax
-                    .DELETE('/keys/' + keyId, {})
+                    .DELETE('/api/v1/keys/' + keyId, {})
                     .success(function() {
                         that._deleteKey(keyId);
                     })
@@ -148,7 +148,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                 var that = this;
                 this.set('settingDefaultKey', true);
                 Mist.ajax
-                    .POST('/keys/' + keyId, {})
+                    .POST('/api/v1/keys/' + keyId, {})
                     .success(function() {
                         that._setDefaultKey(keyId);
                     })
@@ -169,7 +169,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                 var that = this;
                 this.set('associatingKey', true);
                 Mist.ajax
-                    .PUT('/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/keys/' + keyId, {
+                    .PUT('/api/v1/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/keys/' + keyId, {
                         'host': machine.getHost(),
                         'user': user,
                         'port': port
@@ -193,7 +193,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                 var that = this;
                 this.set('disassociatingKey', true);
                 Mist.ajax
-                    .DELETE('/clouds/' + cloud_id + '/machines/' + machine.id + '/keys/' + keyId, {
+                    .DELETE('/api/v1/clouds/' + cloud_id + '/machines/' + machine.id + '/keys/' + keyId, {
                         'host': machine.getHost()
                     })
                     .success(function() {
@@ -213,7 +213,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                 var that = this;
                 this.set('generatingKey', true);
                 Mist.ajax
-                    .POST('/keys', {})
+                    .POST('/api/v1/keys', {})
                     .error(function(err) {
                         Mist.notificationController.notify(err);
                     })
@@ -228,7 +228,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                 var that = this;
                 this.set('gettingPrivateKey', true);
                 Mist.ajax
-                    .GET('/keys/' + keyId + '/private', {})
+                    .GET('/api/v1/keys/' + keyId + '/private', {})
                     .error(function(err) {
                         Mist.notificationController.notify(err);
                     })
@@ -243,7 +243,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                 var that = this;
                 this.set('gettingPublicKey', true);
                 Mist.ajax
-                    .GET('/keys/' + keyId + '/public', {})
+                    .GET('/api/v1/keys/' + keyId + '/public', {})
                     .error(function(err) {
                         Mist.notificationController.notify(err);
                     })
