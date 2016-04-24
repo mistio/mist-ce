@@ -417,7 +417,7 @@ Polymer({
                         cloud.machinesArray.forEach(function (machine) {
                                 machine.cloud = {'id': cloud.id,
                                                  'title': cloud.title,
-                                                'provider': cloud.provider};
+                                                 'provider': cloud.provider};
                         });
 
                     return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])

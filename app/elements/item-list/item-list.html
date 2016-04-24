@@ -385,33 +385,35 @@ Polymer({
     },
 
     isMachines: function(section) {
-        if (section && section.id == "machines")
-            return true;
-        return false;
+        return section && section.id == "machines";
     },
 
     isImages: function(section) {
-        if (section && section.id == "images")
-            return true;
-        return false;
+        return section && section.id == "images";
     },
 
     isKeys: function(section) {
-        if (section && section.id == "keys")
-            return true;
-        return false;
+        return section && section.id == "keys";
     },
 
     isNetworks: function(section) {
-        if (section && section.id == "networks")
-            return true;
-        return false;
+        return section && section.id == "networks";
     },
 
     isScripts: function(section) {
-        if (section && section.id == "scripts")
-            return true;
-        return false;
+        return section && section.id == "scripts";
+    },
+
+    isTemplates: function(section) {
+        return section && section.id == "templates";
+    },
+
+    isStacks: function(section) {
+        return section && section.id == "stacks";
+    },
+
+    isTeams: function(section) {
+        return section && section.id == "teams";
     },
 
     isSelected: function(item, selectedItems, items) {
@@ -443,6 +445,14 @@ Polymer({
         if (this.isScripts(this.section)) {
             return ['name', 'script_id', 'exec_type', 'location_type'];
         }
+        if (this.isTemplates(this.section)) {
+            return ['name', 'exec_type', 'location_type'];
+        }
+        if (this.isStacks(this.section)) {
+            return ['name', 'template', 'description']
+        }
+        return ['id'];
+
     },
 
     _openItemActions: function (e) {
@@ -534,15 +544,13 @@ Polymer({
         var p, s = this.section.id;
         if (s == "machines")
             p = item.uuid
-        else if (s == "images")
-            p = item.id
-        else if (s == "keys")
-            p = item.id
         else if (s == "networks")
             p = item.name
         else if (s == "scripts")
             p = item.script_id
-        console.log(item, "/" + this.section.id + "/" + p);
+        else
+            p = item.id
+
         return "/" + this.section.id + "/" + p;
     },
 

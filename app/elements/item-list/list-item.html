@@ -21,6 +21,9 @@
             padding: 0;
         }
 
+        #check {
+            padding-right: 24px;
+        }
 
         /* name id provider state tags */
         .field.field0 {
@@ -40,7 +43,7 @@
 
         .field.tags {
             width: auto;
-            padding: 6px 0 0;
+            padding: 20px 0 0;
         }
 
         .id {
@@ -119,6 +122,9 @@ Polymer({
         // return cloud title
         if (field == 'cloud')
             return ret.title;
+
+        if (field == 'template')
+            return document.querySelector('app-main').model.templates[ret].name;
 
         // field could be in the 'extra' section
         if (!ret && item.extra && item.extra[field])
