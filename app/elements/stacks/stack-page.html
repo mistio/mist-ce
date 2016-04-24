@@ -311,6 +311,24 @@
             margin: 0;
             padding: 8px 16px;
         }
+        #selectworkflow {
+            padding: 36px;
+        }
+        #selectworkflow.hidden {
+            display: none;
+        }
+        .parsing-loader {
+            text-align: center;
+            margin: 36px 36px 0 0;
+            padding: 36px 36px 0 0;
+        }
+        .parsing-loader paper-progress {
+            width: 100%;
+        }
+        .parsing-loader.error paper-progress ::content #primaryProgress {
+            background-color: var(--red-color);
+        }
+
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
@@ -319,7 +337,8 @@
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
-                    <span class="bottom title">Stack "{{stack.name}}"</span>
+                    <span class="bottom title">Stack {{stack.name}}
+                    </span>
                     <span class="bottom right-actions">
                         <paper-tooltip for="editTemplate" position="top">Edit Stack</paper-tooltip>
                         <paper-icon-button id="editTemplate" icon="icons:create" on-tap="_editTemplate"></paper-icon-button>
@@ -335,15 +354,8 @@
                         <paper-item id="quickActions" class="hidden">
                             <div class="flex-horizontal-with-ratios">
                                 <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                    <!-- <template is="dom-if" if=[[!workflow.params.length]]> -->
                                         <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation">[[workflow.name]]</paper-button>
-                                    <!-- </template> -->
                                 </template>
-<!--                                 <div class="flexchild">
-                                    <paper-button>
-                                        <iron-icon icon="icons:more-vert" on-tap="_navigateToWorkflows"></iron-icon>
-                                    </paper-button>
-                                </div> -->
                                 <paper-button>
                                     <iron-icon icon="icons:clear" on-tap="_toggleQuickActions"></iron-icon>
                                 </paper-button>
@@ -356,46 +368,56 @@
                 </paper-toolbar>
                 <div class="content">
                     <iron-pages selected="{{selected}}">
-                        <div id="resources" class="page">
-                            <div class="flex-horizontal-with-ratios section">
-                                <div class="page-block">
-                                    <h3 class="smallcaps">Created from template</h3>
-                                    <p><a href$="/templates/[[template.id]]" class="regular blue-link"> [[template.name]]</a> [[template.description]]</p>
+                        <div id="resources" class="page">                    
+                            <template is="dom-if" if="[[runtimeProperties]]">
+                                <div class="flex-horizontal-with-ratios section">
+                                    <div class="page-block">
+                                        <h3 class="smallcaps">Created from template</h3>
+                                        <p><a href$="/templates/[[template.id]]" class="regular blue-link"> [[template.name]]</a> [[template.description]]</p>
+                                    </div>
+                                    <div class="page-block">
+                                        <h3 class="smallcaps">Created</h3>
+                                        <p>[[timestamp]] 
+                                        </p>
+                                    </div>
                                 </div>
-                                <div class="page-block">
-                                    <h3 class="smallcaps">Created</h3>
-                                    <p>[[timestamp]] 
-                                    <!-- <a href="/members/[[template.user]]" class="regular blue-link">[[stack.user]]</a> -->
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="resources-list">
-                                <h3 class="smallcaps">Resources list</h3>
-                                <template is="dom-if" if="[[listMachines.length]]">
-                                    <paper-material class="no-pad resources-list">
-                                        <h3 class="smallcaps resource-head">machines</h3>
-                                        <template is="dom-repeat" items="[[listMachines]]" as="machine">
-                                            <stack-machine-item model="[[model]]" machine="[[machine]]"></stack-machine-item>
-                                        </template>
-                                    </paper-material>
+                                <template is="dom-if" if="[[!resourcelist]]">
+                                    <div class="parsing-loader">
+                                        <h3>Creating stack [[stack.name]]</h3>
+                                        <paper-progress id="satckpageprogress" value="30" indeterminate></paper-progress>
+                                        <h4>This may take a while.</h4>
+                                    </div>
                                 </template>
-                                <template is="dom-if" if="[[networks.length]]">
-                                    <paper-material class="no-pad resources-list">
-                                        <h3 class="smallcaps resource-head">networks</h3>
-                                        <template is="dom-repeat" items="[[networks]]" as="network">
-                                            <stack-network-item model="[[model]]" network="[[network]]"></stack-network-item>
+                                <template is="dom-if" if="[[resourcelist]]">
+                                    <div class="resources-list">
+                                        <h3 class="smallcaps">Resources list</h3>
+                                        <template is="dom-if" if="[[listMachines.length]]">
+                                            <paper-material class="no-pad resources-list">
+                                                <h3 class="smallcaps resource-head">machines [[listMachines.length]]</h3>
+                                                <template is="dom-repeat" items="[[listMachines2]]" as="machine">
+                                                    <stack-machine-item model="[[model]]" machine="[[machine]]"></stack-machine-item>
+                                                </template>
+                                            </paper-material>
                                         </template>
-                                    </paper-material>
-                                </template>
-                                <template is="dom-if" if="[[keys.length]]">
-                                    <paper-material class="no-pad resources-list">
-                                        <h3 class="smallcaps resource-head">keys</h3>
-                                        <template is="dom-repeat" items="[[keys]]" as="key">
-                                            <stack-key-item model="[[model]]" key="[[key]]"></stack-key-item>
+                                        <template is="dom-if" if="[[networks.length]]">
+                                            <paper-material class="no-pad resources-list">
+                                                <h3 class="smallcaps resource-head">networks</h3>
+                                                <template is="dom-repeat" items="[[networks]]" as="network">
+                                                    <stack-network-item model="[[model]]" network="[[network]]"></stack-network-item>
+                                                </template>
+                                            </paper-material>
                                         </template>
-                                    </paper-material>
+                                        <template is="dom-if" if="[[keys.length]]">
+                                            <paper-material class="no-pad resources-list">
+                                                <h3 class="smallcaps resource-head">keys [[keys.length]]</h3>
+                                                <template is="dom-repeat" items="[[keys]]" as="key">
+                                                    <stack-key-item model="[[model]]" key="[[key]]"></stack-key-item>
+                                                </template>
+                                            </paper-material>
+                                        </template>
+                                    </div>
                                 </template>
-                            </div>
+                            </template>
                         </div>
                         <div id="workflows">
                             <template is="dom-if" if="[[workflows.length]]">
@@ -406,7 +428,7 @@
                                         </template>
                                     </paper-header-panel>
                                     <paper-header-panel main>
-                                        <div id="workflowsView" class="pad">
+                                        <div id="workflowsView" class="pad">        
                                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
                                                 <div id$="[[workflow.name]]show" class="m12 wf-item">
 
@@ -427,6 +449,9 @@
 
                                                 </div>
                                             </template>
+<!--                                             <div id="selectworkflow">
+                                                Select a workflow to run
+                                            </div> -->
                                         </div>
                                     </paper-header-panel>
                                 </paper-drawer-panel>
@@ -441,15 +466,15 @@
                         </div>
                         <div id="state" class="page">
                             <div class="section">
-                                <h3 class="smallcaps">Runtime properties</h3>
-
-                                <template is="dom-repeat" items="[[runtimeProperties]]">
-                                    <paper-material class="no-pad info-card">
-                                        <h2 class="info-title" style$="[[color]]">[[item.name]]</h2>
-                                        <element-for-in content="[[item]]"></element-for-in>
-                                    </paper-material>
+                                <template is="dom-if" if="[[runtimeProperties.length]]">
+                                    <h3 class="smallcaps">Runtime properties</h3>
+                                    <template is="dom-repeat" items="[[runtimeProperties]]">
+                                        <paper-material class="no-pad info-card">
+                                            <h2 class="info-title" style$="[[color]]">[[item.name]]</h2>
+                                            <element-for-in content="[[item]]"></element-for-in>
+                                        </paper-material>
+                                    </template>
                                 </template>
-
                             </div>
                             <div class="section">
                                 <h3 class="smallcaps">Stack Parameters </h3>
@@ -501,22 +526,19 @@
                 },
                 stack: {
                     type: Object,
-                    computed: '_computeStack(params)',
-                    notify: true
+                    computed: '_computeStack(params)'
                 },
                 stackid: {
                     type: String,
-                    computed: '_computeStackId(params)',
-                    notify: true
+                    computed: '_computeStackId(params)'
                 },
                 template: {
                     type: Object,
-                    computed: '_computeTemplate(stack)',
-                    notify: true
+                    computed: '_computeTemplate(stack)'
                 },
                 machines: {
                     type: Array,
-                    computed: '_machines(stack)'
+                    computed: '_machines(stack)',
                 },
                 runtimeProperties: {
                     type: Array,
@@ -526,13 +548,17 @@
                     type: Array,
                     computed: '_listMachines(runtimeProperties)'
                 },
+                listMachines2: {
+                    type: Array,
+                    computed: '_listMachines2(stack)'
+                },
                 networks: {
                     type: Array,
                     computed: '_computeNetworks(runtimeProperties)'
                 },
                 keys: {
                     type: Array,
-                    computed: '_computeKeys(runtimeProperties)'
+                    computed: '_computeKeys(runtimeProperties)'                  
                 },
                 workflows: {
                     type: Array,
@@ -546,11 +572,16 @@
                 payload: {
                     type: Object,
                     value: {}
+                },
+                resourcelist: {
+                    type: Boolean,
+                    computed: '_resourcelist(stack)'
                 }
             },
             observers: [
                   // '_runtimePropertiesChanged(runtimeProperties.*)',
                   // 'stackChanged(stack)'
+                  // 'paramsChanged(params)'
             ],
             listeners: {
                 // 'confirmation': '_deleteStackResponse',
@@ -565,6 +596,14 @@
                     return stack.id == params.id;
                 }, this);
             },
+            // paramsChanged: function(params) {
+            //     this.stack = this.model.stacksArray.find(function(stack) {
+            //         return stack.id == params.id;
+            //     }, this);
+            // },
+            _resourcelist: function(stack) {
+                return this.keys.length + this.networks.length + this.listMachines.length > 0 ? true : false;
+            },
             _computeStackId: function(params) {
                 return params.id;
             },
@@ -574,7 +613,7 @@
                 }, this);
             },
             _machines: function(stack){
-                return stack.machines;
+                return stack.machines;                
             },
             _listMachines: function(runtimeProperties){
                 var machines = [];
@@ -589,6 +628,14 @@
                         }
                     }, this);
                 }
+                return machines;                
+            },
+            _listMachines2: function(stack){
+                var machines = [];
+                this.model.machinesArray.forEach(function(machine) {
+                    if (this.stack.machines.indexOf(machine.uuid) != -1) 
+                        machines.push(machine)
+                }, this);
                 return machines;
             },
             _computeNetworks: function(runtimeProperties) {

@@ -63,114 +63,7 @@
                     <span class="bottom title">Create Stack {{typedName}} from template [[template.name]]</span>
                 </paper-toolbar>
                 <div id="content">
-                    <!-- <paper-material>
-                        <div class="grid-row">
-                            <paper-input class="xs12" id="stackname"  label="Stack Name" auto-validate required="true" error-message="Please enter stack name"></paper-input>
-                            <paper-textarea class="xs12 m6" id="stackdescription" label="Stack Description" rows="2" max-rows="15"  auto-validate ></paper-textarea>
-                             <paper-toggle-button  id="stackdeploy">Deploy now</paper-toggle-button>
-                            <paper-textarea class="xs12 m6" id="stackinputs" label="Stack Inputs yaml" rows="10" max-rows="50"  auto-validate ></paper-textarea>
-                        </div>
-                        <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
-                        <hr class="xs12" />
-                        <div class="clearfix bottom-actions">
-                            <paper-button id="submit" class="submit-btn pull-left"  raised on-tap="_submitForm" onclick="startProgress();">Create</paper-button>
-                        </div>
-                    </paper-material>
- -->
-
-<!-- 
-                    <paper-material>
-                        <div class="grid-row">
-                            <paper-input class="xs12 m6" id="stackname"  label="Stack Name" auto-validate required="true" error-message="Please enter stack name"></paper-input>
-                            <div class="field-helptext xs12 m6">
-                            </div>
-
-                            <hr class="xs12"/>
-                            
-                            <paper-textarea class="xs12 m6" id="stackdescription" label="Stack Description" rows="2" max-rows="15"  auto-validate ></paper-textarea>
-                            <div class="field-helptext xs12 m6">
-                                Choose a usefull description for your stack
-                            </div>
-
-                            <div class="spacer"></div>
-
-                            <paper-input class="xs12 m6" id="mist_uri" placeholder="" label="Mist URI" value="[[uri]]" auto-validate required="true" error-message="URI is required for stack creation"></paper-input>
-                            <div class="field-helptext xs12 m6">Your current mist installation URI</div>
-
-                            <div class="spacer"></div>
-
-                            <paper-dropdown-menu class="dropdown-block xs12 m6" label="SSH Key" horizontal-align="left">
-                                <paper-menu id="key_name" attr-for-selected="value" selected="" class="dropdown-content">
-                                    <template is="dom-repeat" items="[[keys]]" as="option">
-                                        <paper-item value="[[option.id]]">[[option.id]]</paper-item>
-                                    </template>
-                                </paper-menu>
-                            </paper-dropdown-menu>
-                            <div class="field-helptext xs12 m6">You can choose a key from your existing keys.</div>
-
-                            <div class="spacer"></div>
-
-
-                            <paper-dropdown-menu class="dropdown-block xs12 m6" label="Cloud" horizontal-align="left">
-                                <paper-menu id="cloud_id" attr-for-selected="value" selected="20d91550c0264ce2a3b19aee18d40d06" class="dropdown-content">
-                                    <template is="dom-repeat" items="[[clouds]]" as="option">
-                                        <paper-item value="[[option.id]]">[[option.title]]</paper-item>
-                                    </template>
-                                </paper-menu>
-                            </paper-dropdown-menu>
-                            <div class="field-helptext xs12 m6">Choose on which one of your clouds you want your stack deployed</div>
-
-                            <div class="spacer"></div>
-
-
-                            <paper-dropdown-menu class="dropdown-block xs12 m6" label="Image" horizontal-align="left">
-                                <paper-menu id="image_id" attr-for-selected="value" selected="ami-4f4acd3c" class="dropdown-content">
-                                    <template is="dom-repeat" items="[[images]]" as="option">
-                                        <paper-item value="[[option.id]]">[[option.name]]</paper-item>
-                                    </template>
-                                </paper-menu>
-                            </paper-dropdown-menu>
-                            <div class="field-helptext xs12 m6">Choose an image for the machines.</div>
-
-                            <div class="spacer"></div>
-
-
-                            <paper-input class="xs12 m6" id="master_name"  label="Master Name" value="GigaDemoMaster" auto-validate required="true" error-message="Please enter a name for the master machine"></paper-input>
-                            <div class="field-helptext xs12 m6">
-                                The machine name of kubernetes master. Name must be unique in cloud.
-                            </div>
-
-                            <div class="spacer"></div>
-                            
-                            <paper-input class="xs12 m6" id="worker_name"  label="Worker Name" value="GigaDemoFirstWorker" auto-validate required="true" error-message="Please enter a name for the worker machine"></paper-input>
-                            <div class="field-helptext xs12 m6">
-                                The machine name of kubernetes worker. Name must be unique in cloud.
-                            </div> -->
-
-                            <!-- <div class="spacer"></div>
-
-                            <paper-input class="xs12 m6" id="ssh_user" placeholder="" label="SSH user" value="ubuntu" auto-validate required="true" error-message="SSh user is a required field" disabled></paper-input>
-                            <div class="field-helptext xs12 m6">SSH user (predefined for demo purposes)</div>
-
-                            <paper-input class="xs12 m6" id="private_key_path" placeholder="" label="Private Key Path" value="id-rsa" auto-validate required="true" error-message="Private key path is a required field" disabled></paper-input>
-                            <div class="field-helptext xs12 m6">Private key path (predefined for demo purposes)</div>
-
-                            <div class="spacer"></div>
-
-                            <paper-toggle-button  class="xs12 m6" id="stackdeploy">Deploy now</paper-toggle-button>
-                            <div class="field-helptext xs12 m6">
-                                Enable this option to deploy your stack now.
-                            </div> -->
-                            
-                           <!--  <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
-                            <hr class="xs12" />
-                            <div class="clearfix bottom-actions">
-                                <paper-button id="submit" class="submit-btn pull-left pad2"  raised on-tap="_submitForm" onclick="startProgress();">Create Stack</paper-button>
-                            </div>
-                        </div>
-                    </paper-material> -->
-
-
+                    
                     <paper-material>
                         <div class="grid-row">
                         <h2 class="xs12 title"><content></content></h2>
@@ -215,7 +108,7 @@
 
                         </template>
 
-                        <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
+                        <paper-progress id="satckprogress" value="0" hidden$="[[hideprogress]]"></paper-progress>
                         <hr class="xs12" />
                         <!-- <div class="notifications xs12">
                             <div class="red">
@@ -245,7 +138,7 @@
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <!-- <iron-ajax id="addStackAjax" url="/api/v1/stacks" method="POST" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></iron-ajax> -->
+
     </template>
     <script>
         (function() {
@@ -648,6 +541,9 @@
                         type: String,
                         computed: "_uri(model)"
                     },
+                    sid: {
+                        type: String
+                    }
                 },
                 observers: [
                     '_fieldsChanged(fields.*, sendingData)',
@@ -728,8 +624,26 @@
                 console.log("request",e.detail);
             },
             _handleResponse: function(e){
-                this.fire("response", e.detail)
-                console.log("response",e);
+                this.fire("stack-create-response", e.detail)
+                this.sid = e.detail.__data__.response.stack.id;
+                setTimeout(this.delayed.bind(this),2000);
+                
+            },
+            delayed: function(){
+                window.location.href = '/stacks/'+this.sid;
+            },
+            waittoredirect: function(sid){
+                var stack = parent.model.stacksArray.find(function(stack){
+                    return stack.id == sid;
+                });
+                console.log("response",new_stack);
+                if (stack){
+                    page.show('/stacks/'+ sid);    
+                }
+                else {
+                    this.waittoredirect(sid);                    
+                }
+                
             },
             _fieldsChanged: function(fields, sendingData) {
                 this.async(function() {
@@ -879,7 +793,7 @@
         });
     })();
     // test progress bar, code from demo
-    var progress = document.querySelector('paper-progress#progress');
+    var progress = document.querySelector('paper-progress#satckprogress');
     var button = document.querySelector('paper-button#submit');
     var animationFrame;
     var repeat, maxRepeat = 1,
