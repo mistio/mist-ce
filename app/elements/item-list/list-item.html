@@ -150,7 +150,7 @@ Polymer({
                 return item.extra.instance_size;
             if (item.extra && item.extra.maxCpu && item.extra.maxMemory)
                 return item.extra.maxCpu + 'cpu, ' + item.extra.maxMemory + 'M ram';
-            if (item.extra && item.extra.PLANID)
+            if (item.extra && item.extra.PLANID && item.cloud.sizes)
                 return item.cloud.sizes[item.extra.PLANID];
             if (item.extra && item.extra.service_type)
                 return item.extra.service_type;
