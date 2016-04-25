@@ -86,7 +86,7 @@
 
             </template>
 
-            <paper-progress id="appformprogress" value="0" hidden$="[[hideprogress]]"></paper-progress>
+            <paper-progress id="appformprogresselement" value="100" hidden$="[[hideprogress]]"></paper-progress>
             <hr class="xs12" />
             <!-- <div class="notifications xs12">
                 <div class="red">
@@ -103,7 +103,7 @@
                 </div>
             </div> -->
             <div class="clearfix bottom-actions xs12">
-                <paper-button id="submit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm" onclick="startProgress();">
+                <paper-button id="appformsubmit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm" onclick="startProgress();">
                     <template is="dom-if" if="[[btncontent.length]]">
                         [[btncontent]]
                     </template>
@@ -325,11 +325,11 @@
                 // body["deploy"] = deploy;
 
                 this.$.formAjax.body = payload;
-
                 //this.$.formAjax.generateRequest();
 
                 //test progress bar
                 this.hideprogress = false;
+
             },
             _resetForm: function(e) {
                 // Reset script
@@ -378,8 +378,8 @@
         });
     })();
     // test progress bar, code from demo
-    var progress = document.querySelector('paper-progress#appformprogress');
-    var button = document.querySelector('paper-button#submit');
+    var progress = document.querySelector('paper-progress#appformprogresselement');
+    var button = document.querySelector('paper-button#appformsubmit');
     var animationFrame;
     var repeat, maxRepeat = 1,
         animating = false;
@@ -401,7 +401,7 @@
     }
 
     function startProgress() {
-        repeat = 1;
+        repeat = 0;
         progress.value = progress.min;
         button.disabled = true;
         if (!animating) {
