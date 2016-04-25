@@ -433,7 +433,7 @@
                                                 <div id$="[[workflow.name]]show" class="m12 wf-item">
 
                                                     <template is="dom-if" if=[[workflow.params.length]]>
-                                                        <app-form fields="[[workflow.params]]" form="[[payload]]" url$="/api/v1/stacks/[[stackId]]/[[workflow.name]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
+                                                        <app-form model=[[model]] fields="[[workflow.params]]" url$="/api/v1/stacks/[[stackId]]/[[workflow.name]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
                                                     </template>
 
                                                     <template is="dom-if" if=[[!workflow.params.length]]>
@@ -580,6 +580,171 @@
                     type: Boolean,
                     computed: '_resourcelist(stack)',
                     notify: true
+                },
+                customScaleUp: {
+                    type: Object,
+                    value: {
+                        name: "scale_cluster_up",
+                        params: [{
+                            defaultValue: "",
+                            description: null,
+                            errorMessage: "Please fill in ",
+                            helptext: "Choose a name for the worker.",
+                            label: "name",
+                            name: "name",
+                            required: true,
+                            show: true,
+                            type: "text",
+                            value: ""
+                        },{
+                            name: "key_name",
+                            label: "SSH Key",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "",
+                            errorMessage: "Please choose an ssh key",
+                            helptext: "You can choose a key from your existing keys",
+                            show: true,
+                            required: true,
+                            query: ["keysArray"]
+                        },{
+                            defaultValue: "",
+                            description: null,
+                            errorMessage: "Please fill in ",
+                            helptext: "Number of workers to add. Currently only one per time.",
+                            label: "delta",
+                            name: "delta",
+                            required: true,
+                            show: true,
+                            type: "dropdown",
+                            value: "",
+                            options: [{
+                                title: "1",
+                                val: "1"
+                            }]                       
+                        },{                        
+                            name: "cloud_id",
+                            label: "Cloud",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "",
+                            errorMessage: "Please choose an cloud",
+                            helptext: "Choose on which one of your clouds you want your stack deployed",
+                            show: true,
+                            required: true,
+                            query: ["cloudsArray"]
+                        },{
+                            name: "image_id",
+                            label: "Image",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "ami-4f4acd3c",
+                            errorMessage: "Please choose an image",
+                            helptext: "Choose an image for the machines.",
+                            show: false,
+                            required: true,
+                            query: ["clouds","$.cloud_id", "imagesArray"],
+                            showIf: {
+                                fieldName: "cloud_id",
+                                fieldExists: true
+                            }
+                        },{
+                            name: "size_id",
+                            label: "Size",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "c1.medium",
+                            errorMessage: "Please choose a size for your machines",
+                            helptext: "Choose the size for your machines.",
+                            show: false,
+                            required: true,
+                            query: ["clouds","$.cloud_id", "sizesArray"],
+                            showIf: {
+                                fieldName: "cloud_id",
+                                fieldExists: true
+                            }
+                        },{
+                            name: "location_id",
+                            label: "Location",
+                            type: "dropdown",
+                            value: "",
+                            defaultValue: "0",
+                            helptext: "Choose a host location for your machines.",
+                            errorMessage: "Please enter a location",
+                            show: false,
+                            required: true,
+                            query: ["clouds","$.cloud_id", "locationsArray"],
+                            showIf: {
+                                fieldName: "cloud_id",
+                                fieldExists: true
+                            }
+                        },{
+                            // 7
+                            defaultValue: "true",
+                            description: null,
+                            errorMessage: "Please fill in ",
+                            helptext: "",
+                            label: "coreos",
+                            name: "coreos",
+                            required: true,
+                            show: true,
+                            type: "toggle",
+                            value: "true",
+                            disabled: "true"
+                        },{
+                            // 2
+                            defaultValue: "false",
+                            description: null,
+                            errorMessage: "Please fill in ",
+                            helptext: "",
+                            label: "monitoring",
+                            name: "monitoring",
+                            required: true,
+                            show: true,
+                            type: "toggle",
+                            value: "false",
+                            disabled: "true"
+                        },{
+                            // 10
+                            defaultValue: "false",
+                            description: null,
+                            errorMessage: "Please fill in ",
+                            helptext: "",
+                            label: "use_external_resource",
+                            name: "use_external_resource",
+                            required: true,
+                            show: true,
+                            type: "toggle",
+                            value: "false",
+                            disabled: "true"
+                        },{
+                        // 0
+                            defaultValue: "",
+                            description: null,
+                            errorMessage: "Please fill in ",
+                            helptext: "",
+                            label: "external_resource_id",
+                            name: "external_resource_id",
+                            required: false,
+                            show: false,
+                            type: "text",
+                            value:  "",
+                            disabled: "true"
+                        },{
+                            // 5
+                            defaultValue: "",
+                            description: null,
+                            errorMessage: "Please fill in ",
+                            helptext: "",
+                            label: "networks",
+                            name: "networks",
+                            required: false,
+                            show: true,
+                            type: "text",
+                            value: "",
+                            disabled: "true"
+                        }]
+                    }
                 }
             },
             observers: [
@@ -674,9 +839,13 @@
             },
             _computeWorkflows: function(template) {
                 var workflows = [];
-                var removeThese = ["scale", "install"];
+                var removeThese = ["scale", "install", "scale_cluster_up"];
                 if (template.workflows){
-                    template.workflows.find(function(workflow) {
+                    template.workflows.forEach(function(workflow) {
+                        // use custom workflow fields with dropdowns
+                        if (workflow.name == "scale_cluster_up") {
+                            workflows.push(this.customScaleUp);
+                        }
                         if (removeThese.indexOf(workflow.name) == -1) {
                             workflows.push(workflow);
                         }

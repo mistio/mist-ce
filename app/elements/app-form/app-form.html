@@ -33,6 +33,15 @@
         h2.title {
             line-height: 20px;
         }
+        paper-toggle-button[disabled] ::content {
+            color: rgba(0,0,0,0.32);
+        }
+        paper-toggle-button ::content paper-input-container input {
+            color: color: rgba(0,0,0,0.54);
+        }
+        *:not(paper-button)[disabled] {
+            display: none;
+        }
         </style>
 
         <paper-material class="page">
@@ -40,15 +49,15 @@
             <h2 class="xs12 title"><content></content></h2>
             <template is="dom-repeat" items="{{fields}}" as="field">
                     <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-                        <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                        <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-input>
                         <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
+                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-textarea>
                         <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                     </template>
                      <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
-                        <paper-radio-group selected="{{field.value}}" class="xs12 m6">
+                        <paper-radio-group selected="{{field.value}}" class="xs12 m6" disabled="[[field.disabled]]">
                             <template is="dom-repeat" items="[[field.options]]" as="option">
                                 <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
                             </template>
@@ -56,7 +65,7 @@
                         <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left">
+                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]">
                             <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
                                 <template is="dom-repeat" items="[[field.options]]" as="option">
                                     <paper-item value="[[option.val]]">[[option.title]]</paper-item>
@@ -67,7 +76,7 @@
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'toggle', field.show)]]">
                         <div class="xs12 m6">
-                            <paper-toggle-button checked="{{field.defaultValue}}">[[field.name]]</paper-toggle-button>
+                            <paper-toggle-button checked="{{field.defaultValue}}" disabled="[[field.disabled]]">[[field.name]]</paper-toggle-button>
                         </div>
                         <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                     </template>
@@ -77,7 +86,7 @@
 
             </template>
 
-            <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
+            <paper-progress id="appformprogress" value="0" hidden$="[[hideprogress]]"></paper-progress>
             <hr class="xs12" />
             <!-- <div class="notifications xs12">
                 <div class="red">
@@ -196,6 +205,8 @@
                 '_fieldsChanged(fields.*, sendingData)',
             ],
             _computeFieldType: function(field, value, show) {
+                var inputModel = this.model;
+
                 if (!field.helptext && field.description){
                     field.helptext = field.description
                 }
@@ -204,7 +215,7 @@
                 }
                 if (!(field.showIf && !field.show)) {
                     if (field.type == "dropdown" && field.query) {
-                        var inputModel = this.model;
+                        
                         for (var prop in field.query){
                             var p = field.query[prop];
 
@@ -226,6 +237,9 @@
                             }
                             else if (inputModel[prop].hasOwnProperty("name")) {
                                 dropdownItem.title = inputModel[prop].name;
+                            }
+                            else if (inputModel[prop].hasOwnProperty("id")) {
+                                dropdownItem.title = inputModel[prop].id;
                             }
                             dropdownItem.val = inputModel[prop].id;
                             updatedOptions.push(dropdownItem);
@@ -296,15 +310,24 @@
                 })
             },
             _submitForm: function() {
-              var payload = this.form;
-              console.log(payload);
-              this.$.formAjax.headers["Content-Type"] = 'application/json';
-              this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
-              this.fire("submit", {payload: payload, formAjax: this.$.formAjax})
-              if (!this.alterrequest){
-                  this.$.formAjax.body = payload;
-                  this.$.formAjax.generateRequest();
-              }
+                var payload = this.form;
+                console.log(payload);
+                this.$.formAjax.headers["Content-Type"] = 'application/json';
+                this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.fire("submit", {payload: payload, formAjax: this.$.formAjax})
+
+                console.log( 'payload: ',payload, 'formAjax: ', formAjax );
+
+                // var body = {inputs: inputs};
+                // body["template_id"] = this.template._id;
+                // body["name"] = stackname;
+                // body["description"] = stackdescription;
+                // body["deploy"] = deploy;
+
+                this.$.formAjax.body = payload;
+
+                //this.$.formAjax.generateRequest();
+
                 //test progress bar
                 this.hideprogress = false;
             },
@@ -355,7 +378,9 @@
         });
     })();
     // test progress bar, code from demo
-    var progress, button, animationFrame;
+    var progress = document.querySelector('paper-progress#appformprogress');
+    var button = document.querySelector('paper-button#submit');
+    var animationFrame;
     var repeat, maxRepeat = 1,
         animating = false;
 
@@ -376,16 +401,13 @@
     }
 
     function startProgress() {
-        repeat = 0;
+        repeat = 1;
         progress.value = progress.min;
         button.disabled = true;
         if (!animating) {
             nextProgress();
         }
     }
-    window.addEventListener('WebComponentsReady', function() {
-        progress = document.querySelector('paper-progress#progress');
-        button = document.querySelector('paper-button#submit');
-    });
+
     </script>
 </dom-module>
