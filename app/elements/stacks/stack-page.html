@@ -381,20 +381,20 @@
                                         </p>
                                     </div>
                                 </div>
-                                <template is="dom-if" if="[[!resourcelist]]">
+                                <template is="dom-if" if="{{!resourcelist}}">
                                     <div class="parsing-loader">
                                         <h3>Creating stack [[stack.name]]</h3>
                                         <paper-progress id="satckpageprogress" value="30" indeterminate></paper-progress>
                                         <h4>This may take a while.</h4>
                                     </div>
                                 </template>
-                                <template is="dom-if" if="[[resourcelist]]">
+                                <template is="dom-if" if="{{resourcelist}}">
                                     <div class="resources-list">
                                         <h3 class="smallcaps">Resources list</h3>
-                                        <template is="dom-if" if="[[listMachines.length]]">
+                                        <template is="dom-if" if="{{listMachines}}">
                                             <paper-material class="no-pad resources-list">
-                                                <h3 class="smallcaps resource-head">machines [[listMachines.length]]</h3>
-                                                <template is="dom-repeat" items="[[listMachines2]]" as="machine">
+                                                <h3 class="smallcaps resource-head">machines {{listMachines.length}}</h3>
+                                                <template is="dom-repeat" items="{{listMachines}}" as="machine">
                                                     <stack-machine-item model="[[model]]" machine="[[machine]]"></stack-machine-item>
                                                 </template>
                                             </paper-material>
@@ -407,10 +407,10 @@
                                                 </template>
                                             </paper-material>
                                         </template>
-                                        <template is="dom-if" if="[[keys.length]]">
+                                        <template is="dom-if" if="{{keys.length}}">
                                             <paper-material class="no-pad resources-list">
-                                                <h3 class="smallcaps resource-head">keys [[keys.length]]</h3>
-                                                <template is="dom-repeat" items="[[keys]]" as="key">
+                                                <h3 class="smallcaps resource-head">keys {{keys.length}}</h3>
+                                                <template is="dom-repeat" items="{{keys}}" as="key">
                                                     <stack-key-item model="[[model]]" key="[[key]]"></stack-key-item>
                                                 </template>
                                             </paper-material>
@@ -546,11 +546,13 @@
                 },
                 listMachines: {
                     type: Array,
-                    computed: '_listMachines(runtimeProperties)'
+                    computed: '_listMachines(runtimeProperties)',
+                    notify:true
                 },
                 listMachines2: {
                     type: Array,
-                    computed: '_listMachines2(stack)'
+                    computed: '_listMachines2(stack)',
+                    notify:true
                 },
                 networks: {
                     type: Array,
@@ -558,7 +560,8 @@
                 },
                 keys: {
                     type: Array,
-                    computed: '_computeKeys(runtimeProperties)'                  
+                    computed: '_computeKeys(runtimeProperties)',
+                    notify:true
                 },
                 workflows: {
                     type: Array,
@@ -575,11 +578,12 @@
                 },
                 resourcelist: {
                     type: Boolean,
-                    computed: '_resourcelist(stack)'
+                    computed: '_resourcelist(stack)',
+                    notify: true
                 }
             },
             observers: [
-                  // '_runtimePropertiesChanged(runtimeProperties.*)',
+                  '_runtimePropertiesChanged(stack.*,runtimeProperties.*)',
                   // 'stackChanged(stack)'
                   // 'paramsChanged(params)'
             ],
@@ -744,14 +748,47 @@
                 }
                 return rtp;
             },
-            _runtimePropertiesChanged: function(changerecord){
-                var rtp = [];
-                var state = this.stack.state;
-                for (var i = 0; i < state.length; i++) {
-                    rtp.push(state[i].runtime_properties);
-                }
-                this.runtimeProperties = [];
-                this.runtimeProperties = rtp;
+            _runtimePropertiesChanged: function(satck,changerecord){
+                // var rtp = [];
+                // var state = this.stack.state;
+                // for (var i = 0; i < state.length; i++) {
+                //     rtp.push(state[i].runtime_properties);
+                // }
+                // this.runtimeProperties = [];
+                // this.runtimeProperties = rtp;
+                console.log("_runtimePropertiesChanged", changerecord);
+                this.updateResources(this.runtimeProperties);                
+            },
+            updateResources: function(runtimeProperties){
+                var machines = [];
+                var keys = [];
+                this.async(function(){
+                    if (runtimeProperties) {
+                        runtimeProperties.forEach(function(rtpy) {
+                            if (rtpy.mist_type == 'machine'){
+                                var mac = this.model.machinesArray.find(function(mach){
+                                    return mach.id == rtpy.machine_id
+                                }, this);
+                                if (mac)
+                                    machines.push(mac);
+                            }
+                            else if (rtpy.mist_type == 'keypair') {
+                                var key = this.model.keysArray.find(function(key){
+                                    return key.id == rtpy.key_id
+                                }, this);
+                                if (key)
+                                    keys.push(key);
+                            }
+                        }, this);
+                    }
+                    this.set("machinesList2",machines);
+                    this.set("keys",keys);
+                    if(keys.length>0 || machines.length>0)
+                        this.updateResourcelist('true');
+                });
+            },
+            updateResourcelist: function(val){
+                this.set("resourceList", true);
             },
             doWorkflow: function(e) {
                 var action = e.target.id;
