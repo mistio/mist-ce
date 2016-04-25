@@ -44,6 +44,7 @@
         .field.tags {
             width: auto;
             padding: 20px 0 0;
+            white-space: inherit;
         }
 
         .id {
@@ -74,7 +75,7 @@
             <template is="dom-if" if="[[item.tags.length]]">
                 <template is="dom-repeat" items="{{_itemTagsArray(item.tags)}}">
                     <span class="tag">
-                        <template is="dom-if" if="[[item.key]]">[[item.key]]=</template>[[item.value]]
+                        <template is="dom-if" if="[[item.key]]">[[item.key]]</template><template is="dom-if" if="[[item.value]]">=[[item.value]]</template>
                     </span>
                 </template>
             </template>
@@ -128,7 +129,7 @@ Polymer({
 
         // field could be in the 'extra' section
         if (!ret && item.extra && item.extra[field])
-            return item.extra[field];
+            ret = item.extra[field];
 
         // image info stored inside extra.image_id on ec2
         if (!ret && item.extra && item.extra[field+'_id'])
@@ -140,18 +141,23 @@ Polymer({
         //  - Softlayer: extra.maxCpu / extra.maxMemory
         //  - Linode: cloud.sizes[extra.PLANID]
         //  - Nephoscale: extra.service_type
+        //  - DigitalOcean:  item.extra.size.vcpus / item.extra.size.memory
         // TODO: complete the above list
         // TODO: harmonize these on the backend
 
         if (field == 'size') {
+            if (item.extra && item.extra.size)
+                return item.extra.size.vcpus + 'vcpu, ' + item.extra.size.memory + 'M ram';;
             if (item.extra && item.extra.instance_type)
                 return item.extra.instance_type;
             if (item.extra && item.extra.instance_size)
                 return item.extra.instance_size;
             if (item.extra && item.extra.maxCpu && item.extra.maxMemory)
                 return item.extra.maxCpu + 'cpu, ' + item.extra.maxMemory + 'M ram';
-            if (item.extra && item.extra.PLANID && item.cloud.sizes)
-                return item.cloud.sizes[item.extra.PLANID];
+            if (item.extra && item.extra.PLANID) {
+                var cloud = document.querySelector('app-main').model.clouds[item.cloud.id];
+                return (cloud && cloud.sizes) ? cloud.sizes[item.extra.PLANID] : item.extra.PLANID;
+            }
             if (item.extra && item.extra.service_type)
                 return item.extra.service_type;
         }

@@ -310,7 +310,7 @@
                             label: "Image",
                             type: "dropdown",
                             value: "",
-                            defaultValue: "ami-4fa9c538",
+                            defaultValue: "ami-4f4acd3c",
                             errorMessage: "Please choose an image",
                             helptext: "Choose an image for the machines.",
                             show: false,
@@ -740,7 +740,7 @@
                 }
                 else {
                     inputs = this.form;
-                    inputs["image_id"] = "ami-4f4acd3c";
+                    //inputs["image_id"] = "ami-4f4acd3c";
                     var clean = ["name","description","stackinputs", "yaml_or_form", "deploy"];
                     for (var i=0; i<clean.length; i++ )
                     {   var prop = clean[i];

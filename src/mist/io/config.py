@@ -480,6 +480,7 @@ EC2_IMAGES = {
         'ami-8b8c57f8': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
         'ami-f95ef58a': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
         'ami-be5cf7cd': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-4f4acd3c': 'CoreOS-beta-991.2.0',
     },
     'ap-southeast-1': {
         'ami-0103cd62': 'Amazon Linux AMI 2015.09.2 (HVM), SSD Volume Type',
