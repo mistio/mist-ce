@@ -393,7 +393,9 @@ Polymer({
 
         var that = this;
         setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-            that.querySelector('dashboard-panel').resize();
+            if (that.querySelector('dashboard-panel'))
+                that.querySelector('dashboard-panel').resize();
+            
         }, 5000);
     },
     isOnline: function(cloud) {
