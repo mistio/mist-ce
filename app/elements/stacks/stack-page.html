@@ -433,7 +433,7 @@
                                                 <div id$="[[workflow.name]]show" class="m12 wf-item">
 
                                                     <template is="dom-if" if=[[workflow.params.length]]>
-                                                        <app-form model=[[model]] fields="[[workflow.params]]" url$="/api/v1/stacks/[[stackId]]/[[workflow.name]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
+                                                        <app-form model=[[model]] fields="[[workflow.params]]" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[params.id]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
                                                     </template>
 
                                                     <template is="dom-if" if=[[!workflow.params.length]]>

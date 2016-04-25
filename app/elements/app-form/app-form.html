@@ -107,7 +107,7 @@
                     <template is="dom-if" if="[[btncontent.length]]">
                         [[btncontent]]
                     </template>
-                    <template is="dom-if" if="[[!btncontent || btncontent.length == 0]]">
+                    <template is="dom-if" if="[[!btncontent.length]]">
                         Add
                     </template>
                 </paper-button>
@@ -200,6 +200,9 @@
                     type: Boolean,
                     value: true
                 },
+                workflow: {
+                    type: String
+                }
             },
             observers: [
                 '_fieldsChanged(fields.*, sendingData)',
@@ -261,6 +264,7 @@
             },
             _handleResponse: function(e){
                 this.fire("response", e.detail)
+                console.log(e);
             },
             _fieldsChanged: function(fields, sendingData) {
                 this.async(function() {
@@ -310,23 +314,22 @@
                 })
             },
             _submitForm: function() {
-                var payload = this.form;
-                console.log(payload);
+
+                if (this.workflow) {
+                    var body = {inputs: this.form};
+                    body["workflow"] = this.workflow;
+                }
+                else {
+                    var payload = this.form;
+                    this.$.formAjax.body = payload;
+                }
+
                 this.$.formAjax.headers["Content-Type"] = 'application/json';
                 this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
-                this.fire("submit", {payload: payload, formAjax: this.$.formAjax})
+                this.$.formAjax.body = body;
+                this.$.formAjax.generateRequest();
 
-                console.log( 'payload: ',payload, 'formAjax: ', formAjax );
-
-                // var body = {inputs: inputs};
-                // body["template_id"] = this.template._id;
-                // body["name"] = stackname;
-                // body["description"] = stackdescription;
-                // body["deploy"] = deploy;
-
-                this.$.formAjax.body = payload;
-                //this.$.formAjax.generateRequest();
-
+                 console.log( 'payload: ',payload, 'formAjax: ', formAjax, "body ", body );
                 //test progress bar
                 this.hideprogress = false;
 
