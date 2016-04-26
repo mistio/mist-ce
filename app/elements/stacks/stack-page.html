@@ -394,7 +394,8 @@
                                         <div class="parsing-loader error">
                                             <h3>There seems to be an error</h3>
                                             <paper-progress id="satckpageprogress" value="100"></paper-progress>
-                                            <h4>The available stack state information has returned no resources after too long.</h4>
+                                            <h4>The available stack state information has returned no resources after too long or the inputs are wrong.</h4>
+                                            <!-- <p class="command-container">[[stack.status]]</p> -->
                                         </div>
                                     </template>
                                 </template>
@@ -790,9 +791,17 @@
 
             },
             _computeStack: function(params) {
-                return this.model.stacksArray.find(function(stack) {
+                var stack =  this.model.stacksArray.find(function(stack) {
                     return stack.id == params.id;
                 }, this);
+                if (stack) {
+                    return stack;
+                } 
+                else {
+                    return {
+                        name: "Stack is missing"
+                    }
+                }
             },
             _computeStackId: function(params) {
                 return params.id;
@@ -810,13 +819,17 @@
 
                 return sum > 0 ? true : false;
             },
-            _showLateError: function(){
+            _showLateError: function(stack){
                 var now = Date.now();
                 var crat = new Date(this.stack.created_at);
-                var diff = Math.abs(now-crat)
-                console.log('diff', diff, now, crat);
+                var diff = Math.abs(now-crat);
 
-                return diff > 3600 ? true: false;
+                var status = this.stack.status;
+                if (status){
+                    var error = status.startsWith("Error");
+                }
+
+                return (error || diff > 31146611) ? true: false;
             }, 
             _computeTemplate: function(stack) {
                 return this.model.templatesArray.find(function(template) {
@@ -930,7 +943,7 @@
             _computeWorkflows: function(template) {
                 var workflows = [];
                 var removeThese = ["scale", "install", "scale_cluster_up"];
-                if (template.workflows){
+                if (this.stack && template && template.workflows.length>0){
                     template.workflows.forEach(function(workflow) {
                         // use custom workflow fields with dropdowns
                         if (workflow.name == "scale_cluster_up") {
