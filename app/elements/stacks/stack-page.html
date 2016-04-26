@@ -383,16 +383,25 @@
                                     </div>
                                 </div>
                                 <template is="dom-if" if="{{!resourcelist}}">
-                                    <div class="parsing-loader">
-                                        <h3>Creating stack [[stack.name]]</h3>
-                                        <paper-progress id="satckpageprogress" value="30" indeterminate></paper-progress>
-                                        <h4>This may take a while.</h4>
-                                    </div>
+                                    <template is="dom-if" if="{{!showLateError}}">
+                                        <div class="parsing-loader">
+                                            <h3>Creating stack [[stack.name]]</h3>
+                                            <paper-progress id="stackpageprogress" value="30" indeterminate></paper-progress>
+                                            <h4>This may take a while.</h4>
+                                        </div>
+                                    </template>
+                                    <template is="dom-if" if="{{showLateError}}">
+                                        <div class="parsing-loader error">
+                                            <h3>There seems to be an error</h3>
+                                            <paper-progress id="satckpageprogress" value="100"></paper-progress>
+                                            <h4>The available stack state information has returned no resources after too long.</h4>
+                                        </div>
+                                    </template>
                                 </template>
                                 <template is="dom-if" if="{{resourcelist}}">
                                     <div class="resources-list">
                                         <h3 class="smallcaps">Resources list</h3>
-                                        <template is="dom-if" if="{{listMachines}}">
+                                        <template is="dom-if" if="{{listMachines.length}}">
                                             <paper-material class="no-pad resources-list">
                                                 <h3 class="smallcaps resource-head">machines {{listMachines.length}}</h3>
                                                 <template is="dom-repeat" items="{{listMachines}}" as="machine">
@@ -466,6 +475,11 @@
                             </template>
                         </div>
                         <div id="state" class="page">
+                            <template is="dom-if" if="[[!stack.state.length]]">
+                                <div class="section">
+                                    <h4>Stack State seems to be empty</h4>
+                                </div>
+                            </template>
                             <div class="section">
                                 <template is="dom-if" if="[[runtimeProperties.length]]">
                                     <h3 class="smallcaps">Runtime properties</h3>
@@ -478,14 +492,16 @@
                                 </template>
                             </div>
                             <div class="section">
-                                <h3 class="smallcaps">Stack Parameters </h3>
-                                <paper-material class="no-pad">
-                                    <table class="info-table">
-                                        <template is="dom-repeat" items="[[stack.inputs]]">
-                                                <tr><td>[[item.name]]</td><td>[[item.value]]</td></tr>
-                                        </template>
-                                    </table>
-                                </paper-material>
+                                <template is="dom-if" if="[[stack.inputs.length]]">
+                                    <h3 class="smallcaps">Stack Parameters </h3>
+                                    <paper-material class="no-pad">
+                                        <table class="info-table">
+                                            <template is="dom-repeat" items="[[stack.inputs]]">
+                                                    <tr><td>[[item.name]]</td><td>[[item.value]]</td></tr>
+                                            </template>
+                                        </table>
+                                    </paper-material>
+                                </template>
                             </div>
                         </div>
                     </iron-pages>
@@ -523,13 +539,16 @@
                     computed: '_getHeaderStyle(section)'
                 },
                 params: {
-                    type: Object
+                    type: Object,
+                    observer: "_paramsChanged"
                 },
                 stack: {
                     type: Object,
-                    computed: '_computeStack(params)'
+                    computed: '_computeStack(params)',
+                    // observer: "_stackChanged",
+                    notify: true
                 },
-                stackid: {
+                stackId: {
                     type: String,
                     computed: '_computeStackId(params)'
                 },
@@ -579,7 +598,12 @@
                 },
                 resourcelist: {
                     type: Boolean,
-                    computed: '_resourcelist(stack)',
+                    computed: '_resourcelist(runtimeProperties)',
+                    notify: true
+                },
+                showLateError: {
+                    type: Boolean,
+                    computed: "_showLateError(stack)",
                     notify: true
                 },
                 customScaleUp: {
@@ -746,41 +770,84 @@
                             disabled: "true"
                         }]
                     }
-                }
+                },
+                
             },
             observers: [
                   '_runtimePropertiesChanged(stack.*,runtimeProperties.*)',
                   // 'stackChanged(stack)'
-                  // 'paramsChanged(params)'
+                  // '_paramsChanged(params)'
             ],
             listeners: {
                 // 'confirmation': '_deleteStackResponse',
                 // 'updateSelectedStack': '_updateStack',
-                // 'stackChanged': '_stackChanged'
+                // 'stackChanged': '_stackChanged's
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
+            },
+            _paramsChanged: function(params, old) {
+
             },
             _computeStack: function(params) {
                 return this.model.stacksArray.find(function(stack) {
                     return stack.id == params.id;
                 }, this);
             },
-            // paramsChanged: function(params) {
-            //     this.stack = this.model.stacksArray.find(function(stack) {
-            //         return stack.id == params.id;
-            //     }, this);
-            // },
-            _resourcelist: function(stack) {
-                return this.keys.length + this.networks.length + this.listMachines.length > 0 ? true : false;
-            },
             _computeStackId: function(params) {
                 return params.id;
             },
+            _resourcelist: function(runtimeProperties) {
+                var sum = 0;
+                if (this.keys)
+                    sum += this.keys.length;
+                if (this.networks)
+                    sum += this.keys.length;
+                if (this.listMachines)
+                    sum += this.listMachines.length;
+
+                
+
+                return sum > 0 ? true : false;
+            },
+            _showLateError: function(){
+                var now = Date.now();
+                var crat = new Date(this.stack.created_at);
+                var diff = Math.abs(now-crat)
+                console.log('diff', diff, now, crat);
+
+                return diff > 3600 ? true: false;
+            }, 
             _computeTemplate: function(stack) {
                 return this.model.templatesArray.find(function(template) {
                     return template._id == stack.template_id;
                 }, this);
+            },
+            _runtimeProperties: function(stack){
+                var rtp = [];
+                var state = stack.state;
+                if(state) {
+                    for (var i = 0; i < state.length; i++) {
+                        var rtpObj = YAML.parse(state[i].runtime_properties);
+                        if (rtpObj) {
+                            rtpObj.name = state[i].name;
+                            rtp.push(rtpObj);
+                        }
+                    }
+                }
+                return rtp;
+            },
+            _runtimePropertiesChanged: function(satck,changerecord){
+                // var rtp = [];
+                // var state = this.stack.state;
+                // for (var i = 0; i < state.length; i++) {
+                //     rtp.push(state[i].runtime_properties);
+                // }
+                // this.runtimeProperties = [];
+                // this.runtimeProperties = rtp;
+                
+                //console.log("_runtimePropertiesChanged", changerecord);
+                this.updateResources(this.runtimeProperties);                
             },
             _machines: function(stack){
                 return stack.machines;                
@@ -793,8 +860,20 @@
                             var mac = this.model.machinesArray.find(function(mach){
                                 return mach.id == rtpy.machine_id
                             }, this);
-                            if (mac)
+                            if (mac){
                                 machines.push(mac);
+                            }
+                            else {
+                                var deadMachine = {
+                                    name:rtpy.name, 
+                                    state: 'missing',
+                                    cloud: {
+                                        provider: 'machine_id: '+rtpy.machine_id
+                                    },
+                                    isDead : true 
+                                };
+                                machines.push(deadMachine)
+                            }
                         }
                     }, this);
                 }
@@ -831,8 +910,18 @@
                             var key = this.model.keysArray.find(function(key){
                                 return key.id == rtpy.key_id
                             }, this);
-                            if (key)
+                            if (key){
                                 keys.push(key);
+                            }
+                            else {
+                                var deadKey = {
+                                    id: rtpy.key_id, 
+                                    isDefault: '', 
+                                    machines: []
+                                };
+                                keys.push(deadKey);
+                            }
+
                         }
                     }, this);
                 }
@@ -855,13 +944,13 @@
                 return workflows;
             },
             _stackChanged: function(changerecord) {
-                var stack = this.stack;
-                this._computeMachines(this.machines);
-                this._computeKeys(this.runtimeProperties);
-                this._computeNetworks(this.runtimeProperties);
+                // var stack = this.stack;
+                // this._computeMachines(this.machines);
+                // this._computeKeys(this.runtimeProperties);
+                // this._computeNetworks(this.runtimeProperties);
 
-                this.querySelector('#workflowsView').children[0].setAttribute("show", true);
-                this.querySelector('#workflowsNavigation').children[0].setAttribute("focused", true);
+                // this.querySelector('#workflowsView').children[0].setAttribute("show", true);
+                // this.querySelector('#workflowsNavigation').children[0].setAttribute("focused", true);
             },
             _getFormattedTimestamp: function (stack) {
                 //var timestamp = parseInt();
@@ -903,32 +992,7 @@
                 this._toggleQuickActions();
                 this.selected = 1;
                 this._workflowNavigation(e);
-            },
-            _runtimeProperties: function(stack){
-                var rtp = [];
-                var state = stack.state;
-                if(state) {
-                    for (var i = 0; i < state.length; i++) {
-                        var rtpObj = YAML.parse(state[i].runtime_properties);
-                        if (rtpObj) {
-                            rtpObj.name = state[i].name;
-                            rtp.push(rtpObj);
-                        }
-                    }
-                }
-                return rtp;
-            },
-            _runtimePropertiesChanged: function(satck,changerecord){
-                // var rtp = [];
-                // var state = this.stack.state;
-                // for (var i = 0; i < state.length; i++) {
-                //     rtp.push(state[i].runtime_properties);
-                // }
-                // this.runtimeProperties = [];
-                // this.runtimeProperties = rtp;
-                console.log("_runtimePropertiesChanged", changerecord);
-                this.updateResources(this.runtimeProperties);                
-            },
+            },            
             updateResources: function(runtimeProperties){
                 var machines = [];
                 var keys = [];
@@ -951,8 +1015,6 @@
                             }
                         }, this);
                     }
-                    this.set("listMachines",machines);
-                    this.set("keys",keys);
                     if(keys.length>0 || machines.length>0)
                         this.updateResourcelist('true');
                 });

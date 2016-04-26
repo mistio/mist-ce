@@ -85,7 +85,9 @@
             </div>
             <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/machines/[[machine.uuid]]">
                 <div class="flexchild"><span class="name">[[machine.name]]</span></div>
-                <div class="flexchild"><span class$="state [[machine.state]]"></span></div>
+                <div class="flexchild"><span class$="state [[machine.state]]">
+                    <template is="dom-if" if="[[machine.isDead]]">[[machine.state]]</template>
+                </span></div>
                 <div class="flexchild capitalize">[[machine.cloud.provider]]</div>
             </a>
         </paper-item>
@@ -110,6 +112,9 @@
                     value: false,
                     notify: true,
                     reflectToAttribute: true
+                },
+                isDead: {
+                    type: Boolean
                 }
             },
             
