@@ -929,8 +929,9 @@
                             else {
                                 var deadKey = {
                                     id: rtpy.key_id, 
-                                    isDefault: '', 
-                                    machines: []
+                                    isDefault: false, 
+                                    machines: [],
+                                    isDead : true 
                                 };
                                 keys.push(deadKey);
                             }

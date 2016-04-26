@@ -67,7 +67,10 @@
             </div>
             <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/keys/[[key.id]]">
                 <div class="flexchild"><span class="name">[[key.id]]</span></div>
-                <div class="flexchild">[[isDefaultText]]</div>
+                <div class="flexchild">
+                    <template is="dom-if" if="[[!key.isDead]]">[[isDefaultText]]</template>
+                    <template is="dom-if" if="[[key.isDead]]"> missing</template>
+                </div>
                 <div class="flexchild">[[machinesText]]</div>
             </a>
         </paper-item>
@@ -85,6 +88,9 @@
                 },
                 key: {
                     type: Object
+                },
+                isDead: {
+                    type: Boolean
                 },
                 isDefaultText: {
                     type: String,
