@@ -138,6 +138,7 @@
         }
         .content {
             margin-top: 57px;
+            padding-bottom: 80px
         }
         paper-header-panel ::content #dropShadow {
             top: 56px;
@@ -317,7 +318,8 @@
                     <template is="dom-if" if="[[template.inputs.length]]">
                         <div class="page">
                             <div class="section">
-                                <h3 class="smallcaps">Template Inputs </h3>
+                                <h3 class="smallcaps">Template Inputs </h3>                                
+                                <p> The template will require you to insert the following inputs in order to create a stack from</p>
                                 <p class="required"><span class="red">*</span> required fields</p>
                                 <paper-material class="no-pad">
                                     <table class="info-table">
@@ -333,7 +335,18 @@
                     </template>
                     <template is="dom-if" if="[[template.workflows.length]]">
                         <div class="page section">
-                            <app-togglable-list title="Workflows" items="[[template.workflows]]"></app-togglable-list>
+                            <h3 class="smallcaps">Available Workflows </h3>
+                            <p> This template offers the following workflows to be run on stacks created form</p>
+                            <paper-material class="no-pad">
+                                <table class="info-table">
+                                    <template is="dom-repeat" items="[[template.workflows]]" as="[[item]]">
+                                        <tr>
+                                            <td>[[item.name]]</td>
+                                            <td>[[item.description]]</td>
+                                        </tr>
+                                    </template>
+                                </table>
+                            </paper-material>
                         </div>
                     </template>
                 </div>
