@@ -2545,7 +2545,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                 else:
                     for key_assoc in machine.key_associations:
                         key_assoc.port = port
-                        machine.save()
+                    machine.save()
         elif action is 'stop':
             # In libcloud it is not possible to call this with machine.stop()
             if conn.type == 'azure':
@@ -2611,7 +2611,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     else:
                         for key_assoc in machine.key_associations:
                             key_assoc.port = port
-                            machine.save()
+                        machine.save()
         elif action is 'destroy':
             if conn.type is Provider.DOCKER and node.state == 0:
                 conn.ex_stop_node(node)
