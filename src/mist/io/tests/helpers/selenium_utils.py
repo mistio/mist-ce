@@ -4,10 +4,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-# chrome_options = Options()
-# chrome_options.add_argument('--dns-prefetch-disable')
-# driver = Chrome(chrome_options=options)
-
 import logging
 
 log = logging.getLogger(__name__)
@@ -28,10 +24,10 @@ def choose_driver(flavor=None):
             service_args = ['--verbose']
             chrome_options = Options()
             chrome_options.add_argument('--dns-prefetch-disable')
-            driver = webdriver.Chrome(executable_path=config.WEBDRIVER_PATH,
-                                      service_args=service_args,
-                                      service_log_path=config.WEBDRIVER_LOG,
-                                      chrome_options=chrome_options)
+            driver = webdriver.Chrome(service_args=service_args,
+                                      chrome_options=chrome_options,
+                                      executable_path=config.WEBDRIVER_PATH,
+                                      service_log_path=config.WEBDRIVER_LOG)
 
         elif flavor == "phantomjs":
             driver = webdriver.PhantomJS(executable_path=config.WEBDRIVER_PATH)
