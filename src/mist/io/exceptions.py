@@ -1,4 +1,5 @@
-"""Custom exceptions used by mist
+"""
+Custom exceptions used by mist
 
 Error handling in mist is done via exceptions. In this file we define a large
 variety of exceptions.
@@ -17,7 +18,7 @@ errors. Feel free to create a new exception when an existing one doesn't quite
 fit the purpose.
 
 Exceptions raised like that can easily and selectively be caught in try except
-statements and handled with appropriately. If they are not caught explicitely,
+statements and handled with appropriately. If they are not caught explicitly,
 they will be caught in the exception_handler special view in views.py and
 transformed to appropriate http responses.
 
@@ -61,8 +62,8 @@ class RequiredParameterMissingError(BadRequestError):
     msg = "Required parameter not provided"
 
 
-class KeypairParameterMissingError(RequiredParameterMissingError):
-    msg = "Keypair id parameter missing"
+class KeyParameterMissingError(RequiredParameterMissingError):
+    msg = "Key name parameter missing"
 
 
 class KeyValidationError(BadRequestError):

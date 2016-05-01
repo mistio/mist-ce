@@ -47,9 +47,8 @@ from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver, CoreOSDriver
 from mist.io.helpers import check_host, sanitize_host, \
-                            transform_key_machine_associations
+    transform_key_machine_associations
 from mist.io.exceptions import *
-
 
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import amqp_publish_user
@@ -58,13 +57,14 @@ from mist.io.helpers import StdStreamCapture
 import mist.io.tasks
 import mist.io.inventory
 
-
 # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
+
 libcloud.security.CA_CERTS_PATH.append('cacert.pem')
 libcloud.security.CA_CERTS_PATH.append('./src/mist.io/cacert.pem')
 
 import logging
+
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
@@ -198,7 +198,7 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if provider == 'vcloud':
             for prefix in ['https://', 'http://']:
                 cloud.apiurl = cloud.apiurl.replace(prefix, '')
-            cloud.apiurl = cloud.apiurl.split('/')[0] # need host, not url
+            cloud.apiurl = cloud.apiurl.split('/')[0]  # need host, not url
 
         # validate cloud before adding
         if remove_on_error:
@@ -550,7 +550,7 @@ def _add_cloud_vcloud(user, title, provider, params):
             raise RequiredParameterMissingError('host')
         host = sanitize_host(host)
     elif provider == 'indonesian_vcloud':
-        host = params.get('indonesianRegion','my.idcloudonline.com')
+        host = params.get('indonesianRegion', 'my.idcloudonline.com')
         if host not in ['my.idcloudonline.com', 'compute.idcloudonline.com']:
             host = 'my.idcloudonline.com'
 
@@ -971,7 +971,6 @@ def _add_cloud_openstack(user, title, provider, params):
     region = params.get('region', '')
     compute_endpoint = params.get('compute_endpoint', '')
 
-
     cloud = Cloud()
     cloud.title = title
     cloud.provider = provider
@@ -1177,102 +1176,101 @@ def delete_cloud(owner, cloud_id):
     trigger_session_update(owner, ['clouds'])
 
 
-def add_key(user, key_id, private_key):
+def add_key(user, key_name, private_key):
     """
-    Adds a new keypair and returns the new key_id.
+    Adds a new key and returns the new key_id.
     :param user:
-    :param key_id:
+    :param key_name:
     :param private_key:
     :return: return key_id
     """
 
-    log.info("Adding key with id '%s'.", key_id)
+    log.info("Adding key with id '%s'.", key_name)
 
-    key = Keypair.objects(owner=user, name=key_id)
+    key = Keypair.objects(owner=user, name=key_name)
     if key:
-        raise KeypairExistsError(key_id)
+        raise KeypairExistsError(key_name)
 
-    keypair = Keypair()
-    keypair.private = private_key
-    keypair.name = key_id
-    keypair.construct_public_from_private()
+    key = Keypair()
+    key.private = private_key
+    key.name = key_name
+    key.construct_public_from_private()
     if not Keypair.objects(owner=user, default=True):
-        keypair.default = True
+        key.default = True
 
-    if not keypair.isvalid():
+    if not key.isvalid():
         raise KeyValidationError()
-    keypair.owner = user
-    keypair.save()
+    key.owner = user
+    key.save()
 
-    log.info("Added key with id '%s'", key_id)
+    log.info("Added key with id '%s'", key_name)
     trigger_session_update(user, ['keys'])
-    return key_id
+    return key_name
 
 
-def validate_add_key(key_id, private_key):
+def validate_add_key(key_name, private_key):
     """
     Validate add key
-    :param key_id:
+    :param key_name:
     :param private_key:
     """
 
-    if not key_id:
-        raise KeypairParameterMissingError(key_id)
+    if not key_name:
+        raise KeyParameterMissingError(key_name)
     if not private_key:
         raise RequiredParameterMissingError("Private key is not provided")
 
 
-def validate_edit_key(new_id):
+def validate_edit_key(new_name):
     """
     validate edit key
-    :param new_id:
-    :return:
+    :param new_name:
     """
 
-    if not new_id:
+    if not new_name:
         raise RequiredParameterMissingError("new_id")
 
 
-def delete_key(user, key_id):
+def delete_key(user, key_name):
     """
-    Deletes given keypair.
+    Deletes given key.
     If key was default, then it checks
     if there are still keys left and assigns another one as default.
     :param user: The User
-    :param key_id: The key_id to be deleted
+    :param key_name: The key_name to be deleted
     """
 
-    log.info("Deleting key with id '%s'.", key_id)
-    key = Keypair.objects.get(owner=user, name=key_id)
+    log.info("Deleting key with id '%s'.", key_name)
+    key = Keypair.objects.get(owner=user, name=key_name)
     default_key = key.default
     key.delete()
     other_key = Keypair.objects(owner=user).first()
     if default_key and other_key:
         other_key.default = True
         other_key.save()
-    log.info("Deleted key with id '%s'.", key_id)
+    log.info("Deleted key with id '%s'.", key_name)
     trigger_session_update(user, ['keys'])
 
 
-def set_default_key(user, key_id):
+def set_default_key(user, key_name):
     """
     Sets a new default key
     :param user: The User
-    :param key_id: The id of the key we want to set as default
+    :param key_name: The name of the key we want to set as default
     """
 
-    log.info("Setting key with id '%s' as default.", key_id)
+    log.info("Setting key with id '%s' as default.", key_name)
 
     default_key = Keypair.objects(owner=user, default=True).first()
     if default_key:
         default_key.default = False
         default_key.save()
 
-    key = Keypair.objects.get(owner=user, name=key_id)
+    key = Keypair.objects.get(owner=user, name=key_name)
     key.default = True
     key.save()
 
-    log.info("Successfully set key with id '%s' as default.", key_id)
+    log.info("Successfully set key with id '%s' as default.", key_name)
     trigger_session_update(user, ['keys'])
 
 
@@ -1286,7 +1284,7 @@ def edit_key(user, new_key, old_key):
 
     log.info("Renaming key '%s' to '%s'.", old_key, new_key)
     if not new_key:
-        raise KeypairParameterMissingError("new name")
+        raise KeyParameterMissingError("new name")
 
     if old_key == new_key:
         log.warning("Same name provided, will not edit key. No reason")
@@ -1299,15 +1297,15 @@ def edit_key(user, new_key, old_key):
     trigger_session_update(user, ['keys'])
 
 
-def associate_key(user, key_id, cloud_id, machine_id, host='', username=None,
+def associate_key(user, key_name, cloud_id, machine_id, host='', username=None,
                   port=22):
     """
     Associates a key with a machine.
     If host is set it will also attempt to actually deploy it to the
-    machine. To do that it requires another keypair (existing_key) that can
+    machine. To do that it requires another key (existing_key) that can
     connect to the machine.
     :param user:
-    :param key_id:
+    :param key_name:
     :param cloud_id:
     :param machine_id:
     :param host:
@@ -1315,18 +1313,18 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None,
     :param port:
     """
 
-    log.info("Associating key %s to host %s", key_id, host)
+    log.info("Associating key %s to host %s", key_name, host)
     if not host:
         log.info("Host not given so will only create association without "
                  "actually deploying the key to the server.")
 
-    key = Keypair.objects.get(owner=user, name=key_id)
+    key = Keypair.objects.get(owner=user, name=key_name)
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     associated = False
     if Machine.objects(cloud=cloud, key_associations__keypair__exact=key,
                        machine_id=machine_id):
-        log.warning("Keypair '%s' already associated with machine '%s' "
-                    "in cloud '%s'", key_id, cloud_id, machine_id)
+        log.warning("Key '%s' already associated with machine '%s' "
+                    "in cloud '%s'", key_name, cloud_id, machine_id)
         associated = True
 
     # check if key already associated
@@ -1371,12 +1369,12 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None,
         try:
             # maybe key was already deployed?
             ssh_command(user, cloud_id, machine_id, host, 'uptime',
-                        key_id=key_id, username=username, port=port)
+                        key_id=key_name, username=username, port=port)
             log.info("Key was already deployed, local association created.")
         except MachineUnauthorizedError:
             # oh screw this
             raise MachineUnauthorizedError(
-                "Couldn't connect to deploy new SSH keypair."
+                "Couldn't connect to deploy new SSH key."
             )
     else:
         # deployment probably succeeded
@@ -1385,25 +1383,25 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None,
         # there is no need to manually set the association in keypair.machines
         # that is automatically handled by Shell, if it is configured by
         # shell. Auto configure (which ssh_command does)
-        ssh_command(user, cloud_id, machine_id, host, 'uptime', key_id=key_id,
+        ssh_command(user, cloud_id, machine_id, host, 'uptime', key_id=key_name,
                     username=username, port=port)
-        log.info("Key associated and deployed succesfully.")
+        log.info("Key associated and deployed successfully.")
 
 
-def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
+def disassociate_key(user, key_name, cloud_id, machine_id, host=None):
     """
     Disassociates a key from a machine.
     If host is set it will also attempt to actually remove it from
     the machine.
     :param user:
-    :param key_id:
+    :param key_name:
     :param cloud_id:
     :param machine_id:
     :param host:
     """
 
     log.info("Disassociating key, undeploy = %s" % host)
-    key = Keypair.objects.get(owner=user, name=key_id)
+    key = Keypair.objects.get(owner=user, name=key_name)
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     machine = Machine.objects.get(cloud=cloud,
                                   key_associations__keypair__exact=key,
@@ -1411,14 +1409,14 @@ def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
     # key not associated
     if not machine:
         raise BadRequestError("Keypair '%s' is not associated with "
-                              "machine '%s'" % (key_id, machine_id))
+                              "machine '%s'" % (key_name, machine_id))
 
     if host:
         log.info("Trying to actually remove key from authorized_keys.")
-        command = 'grep -v "' + key.public +\
-                  '" ~/.ssh/authorized_keys ' +\
-                  '> ~/.ssh/authorized_keys.tmp ; ' +\
-                  'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
+        command = 'grep -v "' + key.public + \
+                  '" ~/.ssh/authorized_keys ' + \
+                  '> ~/.ssh/authorized_keys.tmp ; ' + \
+                  'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' + \
                   '&& chmod go-w ~/.ssh/authorized_keys'
         try:
             ssh_command(user, cloud_id, machine_id, host, command)
@@ -1498,17 +1496,16 @@ def connect_provider(cloud):
                 ca_cert_temp_file.write(cloud.ca_cert_file)
                 ca_cert_temp_file.close()
                 libcloud.security.VERIFY_SSL_CERT = True
-                libcloud.security.CA_CERTS_PATH.insert(0,ca_cert_temp_file.name)
+                libcloud.security.CA_CERTS_PATH.insert(0,
+                                                       ca_cert_temp_file.name)
             conn = driver(host=cloud.apiurl, port=cloud.docker_port,
                           key_file=key_temp_file.name,
                           cert_file=cert_temp_file.name)
         else:
             conn = driver(cloud.apikey, cloud.apisecret, cloud.apiurl,
                           cloud.docker_port)
-    elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN,
-                              Provider.RACKSPACE]:
-        conn = driver(cloud.apikey, cloud.apisecret,
-                      region=cloud.region)
+    elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
+        conn = driver(cloud.apikey, cloud.apisecret, region=cloud.region)
     elif cloud.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
@@ -1517,7 +1514,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.DIGITAL_OCEAN:
         if cloud.apikey == cloud.apisecret:  # API v2
             conn = driver(cloud.apisecret)
-        else:   # API v1
+        else:  # API v1
             driver = get_driver('digitalocean_first_gen')
             conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider == Provider.VSPHERE:
@@ -1530,8 +1527,8 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if cloud.apisecret:
-           conn = driver(cloud.apiurl, user=cloud.apikey,
-                         ssh_key=cloud.apisecret, ssh_port=cloud.ssh_port)
+            conn = driver(cloud.apiurl, user=cloud.apikey,
+                          ssh_key=cloud.apisecret, ssh_port=cloud.ssh_port)
         else:
             conn = driver(cloud.apiurl, user=cloud.apikey)
     else:
@@ -1622,13 +1619,13 @@ def get_machine_actions(machine_from_api, conn, extra):
         if machine_from_api.state is NodeState.SUSPENDED:
             can_resume = True
 
-    if conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD] and \
-                    machine_from_api.state is NodeState.PENDING:
+    if conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD] \
+            and machine_from_api.state is NodeState.PENDING:
         can_start = True
         can_stop = True
 
-    if conn.type == Provider.LIBVIRT and \
-                    extra.get('tags', {}).get('type', None) == 'hypervisor':
+    if conn.type == Provider.LIBVIRT \
+            and extra.get('tags', {}).get('type', None) == 'hypervisor':
         # allow only reboot action for libvirt hypervisor
         can_stop = False
         can_destroy = False
@@ -1639,8 +1636,8 @@ def get_machine_actions(machine_from_api, conn, extra):
 
     if conn.type in (Provider.LINODE, Provider.NEPHOSCALE,
                      Provider.DIGITAL_OCEAN,
-                     Provider.OPENSTACK, Provider.RACKSPACE) or \
-                    conn.type in config.EC2_PROVIDERS:
+                     Provider.OPENSTACK, Provider.RACKSPACE) or conn.type in \
+            config.EC2_PROVIDERS:
         can_rename = True
     else:
         can_rename = False
@@ -1690,7 +1687,7 @@ def list_machines(user, cloud_id):
         if m.extra.get('DATACENTERID', None):
             # for Linode
             dc = config.LINODE_DATACENTERS.get(m.extra['DATACENTERID'])
-            tags.append({'key': 'DATACENTERID', 'value':dc})
+            tags.append({'key': 'DATACENTERID', 'value': dc})
         elif m.extra.get('vdc', None):
             # for vCloud
             tags.append({'key': 'vdc', 'value': m.extra['vdc']})
@@ -1700,49 +1697,49 @@ def list_machines(user, cloud_id):
         size = size or m.extra.get('instancetype', None)
 
         if m.driver.type is Provider.GCE:
-                # show specific extra metadata for GCE. Wrap in try/except
-                # to prevent from future GCE API changes
-                # identify Windows servers
-                os_type = 'linux'
-                try:
-                    if 'windows-cloud' in \
-                            m.extra['disks'][0].get('licenses')[0]:
-                        os_type = 'windows'
-                except:
-                    pass
-                m.extra['os_type'] = os_type
+            # show specific extra metadata for GCE. Wrap in try/except
+            # to prevent from future GCE API changes
+            # identify Windows servers
+            os_type = 'linux'
+            try:
+                if 'windows-cloud' in \
+                        m.extra['disks'][0].get('licenses')[0]:
+                    os_type = 'windows'
+            except:
+                pass
+            m.extra['os_type'] = os_type
 
-                # windows specific metadata including user/password
-                try:
-                    for item in m.extra.get('metadata', {}).get('items', []):
-                        if item.get('key') in ['gce-initial-windows-password',
-                                               'gce-initial-windows-user']:
-                            m.extra[item.get('key')] = item.get('value')
-                except:
-                    pass
+            # windows specific metadata including user/password
+            try:
+                for item in m.extra.get('metadata', {}).get('items', []):
+                    if item.get('key') in ['gce-initial-windows-password',
+                                           'gce-initial-windows-user']:
+                        m.extra[item.get('key')] = item.get('value')
+            except:
+                pass
 
-                try:
-                    if m.extra.get('boot_disk'):
-                        m.extra['boot_disk_size'] = \
-                            m.extra.get('boot_disk').size
-                        m.extra['boot_disk_type'] = \
-                            m.extra.get('boot_disk').extra.get('type')
-                        m.extra.pop('boot_disk')
-                except:
-                    pass
+            try:
+                if m.extra.get('boot_disk'):
+                    m.extra['boot_disk_size'] = \
+                        m.extra.get('boot_disk').size
+                    m.extra['boot_disk_type'] = \
+                        m.extra.get('boot_disk').extra.get('type')
+                    m.extra.pop('boot_disk')
+            except:
+                pass
 
-                try:
-                    if m.extra.get('zone'):
-                        m.extra['zone'] = m.extra.get('zone').name
-                except:
-                    pass
+            try:
+                if m.extra.get('zone'):
+                    m.extra['zone'] = m.extra.get('zone').name
+            except:
+                pass
 
-                try:
-                    if m.extra.get('machineType'):
-                        m.extra['machineType'] = \
-                            m.extra.get('machineType').split('/')[-1]
-                except:
-                    pass
+            try:
+                if m.extra.get('machineType'):
+                    m.extra['machineType'] = \
+                        m.extra.get('machineType').split('/')[-1]
+            except:
+                pass
         for k in m.extra.keys():
             try:
                 json.dumps(m.extra[k])
@@ -1804,6 +1801,8 @@ def list_machines(user, cloud_id):
     return ret
 
 
+# FIXME docker_env is list here nad dict in func _create_machine_docker
+# FIXME do not use mutable values for arguments
 def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    image_id, size_id, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
@@ -1818,7 +1817,6 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                    cronjob={}, command=None, tags=None,
                    bare_metal=False, hourly=True,
                    softlayer_backend_vlan_id=None):
-
     """
     Creates a new virtual machine on the specified cloud.
     If the cloud is Rackspace it attempts to deploy the node with an ssh key
@@ -1901,6 +1899,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     else:
         public_key = None
 
+    # FIXME function expects int, float args and takes int
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
                     bandwidth='', price='', driver=conn)
     image = NodeImage(image_id, name=image_name, extra=image_extra,
@@ -1908,6 +1907,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     location = NodeLocation(location_id, name=location_name, country='',
                             driver=conn)
 
+    # FIXME function expect dict arg and takes list
     if conn.type is Provider.DOCKER:
         if public_key:
             node = _create_machine_docker(conn, machine_name, image_id, '',
@@ -2024,7 +2024,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             user.id, cloud_id, node.id, monitoring, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script=script,
-            script_id=script_id, script_params=script_params, job_id = job_id,
+            script_id=script_id, script_params=script_params, job_id=job_id,
             hostname=hostname, plugins=plugins, post_script_id=post_script_id,
             post_script_params=post_script_params, cronjob=cronjob,
         )
@@ -2036,7 +2036,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
                 node.extra.get('username'), node.extra.get('password'),
                 public_key, script=script, script_id=script_id,
                 script_params=script_params,
-                job_id = job_id, hostname=hostname, plugins=plugins,
+                job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_params=post_script_params,
                 networks=networks, cronjob=cronjob,
             )
@@ -2048,7 +2048,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             user.id, cloud_id, node.id, monitoring, key_id,
             node.extra.get('password'), public_key, script=script,
             script_id=script_id, script_params=script_params,
-            job_id = job_id, hostname=hostname, plugins=plugins,
+            job_id=job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
             post_script_params=post_script_params, cronjob=cronjob
         )
@@ -2092,7 +2092,7 @@ def _create_machine_rackspace(conn, public_key, machine_name,
     :return: return node
     """
 
-    key = str(public_key).replace('\n','')
+    key = str(public_key).replace('\n', '')
 
     try:
         server_key = ''
@@ -2108,7 +2108,8 @@ def _create_machine_rackspace(conn, public_key, machine_name,
     except:
         try:
             server_key = conn.ex_import_keypair_from_string(
-                name='mistio'+str(random.randint(1,100000)), key_material=key)
+                name='mistio' + str(random.randint(1, 100000)),
+                key_material=key)
             server_key = server_key.name
         except AttributeError:
             # RackspaceFirstGenNodeDriver based on OpenStack_1_0_NodeDriver
@@ -2126,7 +2127,7 @@ def _create_machine_rackspace(conn, public_key, machine_name,
 
 
 def _create_machine_openstack(conn, private_key, public_key, machine_name,
-                             image, size, location, networks, user_data):
+                              image, size, location, networks, user_data):
     """
     Create a machine in Openstack.
     Here there is no checking done, all parameters are expected to be
@@ -2144,7 +2145,7 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
     :return: return node
     """
 
-    key = str(public_key).replace('\n','')
+    key = str(public_key).replace('\n', '')
 
     try:
         server_key = ''
@@ -2159,7 +2160,7 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
             server_key = server_key.name
     except:
         server_key = conn.ex_import_keypair_from_string(
-            name='mistio'+str(random.randint(1,100000)), key_material=key)
+            name='mistio' + str(random.randint(1, 100000)), key_material=key)
         server_key = server_key.name
 
     # select the right OpenStack network object
@@ -2192,7 +2193,7 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
 
 # FIXME private_key unused
 def _create_machine_ec2(conn, key_name, private_key, public_key,
-                       machine_name, image, size, location, user_data):
+                        machine_name, image, size, location, user_data):
     """
     Create a machine in Amazon EC2.
     Here there is no checking done, all parameters are expected to be
@@ -2252,9 +2253,10 @@ def _create_machine_ec2(conn, key_name, private_key, public_key,
 
     return node
 
+
 # FIXME key_name unused
 def _create_machine_nephoscale(conn, key_name, private_key, public_key,
-                              machine_name, image, size, location, ips):
+                               machine_name, image, size, location, ips):
     """
     Create a machine in Nephoscale.
     Here there is no checking done, all parameters are expected to be
@@ -2312,9 +2314,9 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key,
         if console_keys:
             console_key = console_keys[0].id
     if size.name and size.name.startswith('D'):
-        baremetal=True
+        baremetal = True
     else:
-        baremetal=False
+        baremetal = False
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -2340,7 +2342,6 @@ def _create_machine_softlayer(conn, key_name, private_key,
                               public_key, machine_name, image,
                               size, location, bare_metal,
                               cloud_init, hourly, softlayer_backend_vlan_id):
-
     """
     Create a machine in Softlayer.
     Here there is no checking done, all parameters are expected to be
@@ -2359,7 +2360,7 @@ def _create_machine_softlayer(conn, key_name, private_key,
     :param softlayer_backend_vlan_id:
     :return: return node
     """
-    key = str(public_key).replace('\n','')
+    key = str(public_key).replace('\n', '')
     try:
         server_key = ''
         keys = conn.list_key_pairs()
@@ -2372,9 +2373,8 @@ def _create_machine_softlayer(conn, key_name, private_key,
             server_key = server_key.id
     except:
         server_key = \
-            conn.create_key_pair('mistio'+str(random.randint(1,100000)), key)
+            conn.create_key_pair('mistio' + str(random.randint(1, 100000)), key)
         server_key = server_key.id
-
 
     if '.' in machine_name:
         domain = '.'.join(machine_name.split('.')[1:])
@@ -2408,6 +2408,7 @@ def _create_machine_softlayer(conn, key_name, private_key,
     return node
 
 
+# FIXME docker_env is list
 # FIXME do not use mutable value for an argument
 def _create_machine_docker(conn, machine_name, image, script=None,
                            public_key=None, docker_env={}, docker_command=None,
@@ -2459,7 +2460,6 @@ def _create_machine_docker(conn, machine_name, image, script=None,
 def _create_machine_digital_ocean(conn, key_name, private_key,
                                   public_key, machine_name, image,
                                   size, location, user_data):
-
     """
     Create a machine in Digital Ocean.
     Here there is no checking done, all parameters are expected to be
@@ -2494,8 +2494,8 @@ def _create_machine_digital_ocean(conn, key_name, private_key,
     except:
         try:
             server_key = \
-                conn.ex_create_ssh_key('mistio'+
-                                       str(random.randint(1,100000)), key)
+                conn.ex_create_ssh_key('mistio' +
+                                       str(random.randint(1, 100000)), key)
         except:
             # on API v1 if we can't create that key, means that key is already
             # on our account. Since we don't know the id, we pass all the ids
@@ -2690,7 +2690,8 @@ def _create_machine_vultr(conn, public_key, machine_name,
             server_key = conn.ex_create_ssh_key(machine_name, key)
     except:
         server_key = \
-            conn.ex_create_ssh_key('mistio'+str(random.randint(1,100000)), key)
+            conn.ex_create_ssh_key('mistio' + str(random.randint(1, 100000)),
+                                   key)
 
     try:
         server_key = server_key.id
@@ -2753,7 +2754,6 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
                 port_bindings.append(binding)
             except:
                 pass
-
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -2827,7 +2827,7 @@ def _create_machine_vcloud(conn, machine_name,
             ex_vm_ipmode='DHCP'
         )
     except Exception as e:
-            raise MachineCreationError("vCloud, got exception %s" % e, e)
+        raise MachineCreationError("vCloud, got exception %s" % e, e)
 
     return node
 
@@ -2855,8 +2855,8 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
     key = public_key.replace('\n', '')
 
     metadata = {
-                # 'startup-script': script,
-                'sshKeys': 'user:%s' % key}
+        # 'startup-script': script,
+        'sshKeys': 'user:%s' % key}
     # metadata for ssh user, ssh key and script to deploy
     if cloud_init:
         metadata['startup-script'] = cloud_init
@@ -2878,7 +2878,7 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
 
 # FIXME key_name unused
 def _create_machine_linode(conn, key_name, private_key, public_key,
-                          machine_name, image, size, location):
+                           machine_name, image, size, location):
     """
     Create a machine in Linode.
     Here there is no checking done, all parameters are expected to be
@@ -2961,7 +2961,7 @@ def _machine_action(user, cloud_id, machine_id,
             # did not find the machine_id on the list of nodes,
             # still do not fail
             raise MachineUnavailableError("Error while attempting to %s machine"
-                                  % action)
+                                          % action)
     except:
         machine = Node(machine_id, name=machine_id,
                        state=0, public_ips=[],
@@ -2977,7 +2977,9 @@ def _machine_action(user, cloud_id, machine_id,
             if conn.type is Provider.DOCKER:
                 node_info = conn.inspect_node(node)
                 try:
-                    port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+                    port = \
+                        node_info.extra['network_settings'][
+                            'Ports']['22/tcp'][0]['HostPort']
                 except KeyError:
                     port = 22
 
@@ -3034,7 +3036,7 @@ def _machine_action(user, cloud_id, machine_id,
                             return False
 
                     else:
-                       machine.reboot()
+                        machine.reboot()
                 elif conn.type == 'azure':
                     conn.reboot_node(machine,
                                      ex_cloud_service_name=cloud_service)
@@ -3045,7 +3047,8 @@ def _machine_action(user, cloud_id, machine_id,
                 if conn.type is Provider.DOCKER:
                     node_info = conn.inspect_node(node)
                     try:
-                        port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
+                        port = node_info.extra['network_settings'][
+                            'Ports']['22/tcp'][0]['HostPort']
                     except KeyError:
                         port = 22
                     machine = Machine.objects.get(cloud=cloud,
@@ -3073,7 +3076,7 @@ def _machine_action(user, cloud_id, machine_id,
     except Exception as e:
         log.error("%r", e)
         raise MachineUnavailableError("Error while attempting to %s machine"
-                                  % action)
+                                      % action)
 
 
 def start_machine(user, cloud_id, machine_id):
@@ -3208,7 +3211,7 @@ def destroy_machine(user, cloud_id, machine_id):
 
     _machine_action(user, cloud_id, machine_id, 'destroy')
 
-    # we dont have to disassociate keys because
+    # we don't have to disassociate keys because
 
 
 def ssh_command(user, cloud_id, machine_id, host, command,
@@ -3275,7 +3278,8 @@ def list_images(user, cloud_id, term=None):
             for gce_image in rest_images:
                 if gce_image.extra.get('licenses'):
                     gce_image.extra['licenses'] = None
-            # GCE has some objects in extra so we make sure they are not passed
+                    # GCE has some objects in extra so we make sure
+                    # they are not passed
         elif conn.type == Provider.AZURE:
             # do not show Microsoft Windows images
             # from Azure's response we can't know which images are default
@@ -3295,7 +3299,7 @@ def list_images(user, cloud_id, term=None):
         elif conn.type == Provider.DOCKER:
             # get mist.io default docker images from config
             rest_images = [NodeImage(id=image, name=name, driver=conn, extra={})
-                              for image, name in config.DOCKER_IMAGES.items()]
+                           for image, name in config.DOCKER_IMAGES.items()]
             rest_images += conn.list_images()
         elif conn.type == Provider.LIBVIRT:
             rest_images = conn.list_images(location=cloud.images_location)
@@ -3308,8 +3312,8 @@ def list_images(user, cloud_id, term=None):
 
         images = starred_images + ec2_images + rest_images
         images = [img for img in images
-                  if img.name and img.id[:3] not in ['aki', 'ari']
-                  and 'windows' not in img.name.lower()]
+                  if img.name and img.id[:3] not in ['aki', 'ari'] and
+                  'windows' not in img.name.lower()]
 
         if term and conn.type == Provider.LIBVIRT:
             # fetch a new listing of the images and search for the term
@@ -3320,8 +3324,8 @@ def list_images(user, cloud_id, term=None):
         # search directly on docker registry for the query
         elif term:
             images = [img for img in images
-                      if term in img.id.lower()
-                      or term in img.name.lower()][:40]
+                      if term in img.id.lower() or
+                      term in img.name.lower()][:40]
     except Exception as e:
         log.error(repr(e))
         raise CloudUnavailableError(cloud_id, e)
@@ -3420,8 +3424,8 @@ def list_keys(user):
         key_object = {}
         machines = Machine.objects(cloud__in=clouds,
                                    key_associations__keypair__exact=key)
-        key_object["id"] = key.name # This is for backwards compatibility
-        key_object['_real_id'] = key.id  # Fuck backwards compatibility
+        key_object["id"] = key.name  # TODO change id to name
+        key_object['_real_id'] = key.id  # TODO change _real_id to id
         key_object["isDefault"] = key.default
         key_object["machines"] = \
             transform_key_machine_associations(machines, key)
@@ -3639,13 +3643,9 @@ def nephoscale_network_to_dict(network):
     :param network:
     :return:
     """
-    net = {}
-    net['name'] = network.name
-    net['id'] = network.id
-    net['subnets'] = network.subnets
-    net['is_default'] = network.is_default
-    net['zone'] = network.zone
-    net['domain_type'] = network.domain_type
+    net = {'name': network.name, 'id': network.id, 'subnets': network.subnets,
+           'is_default': network.is_default, 'zone': network.zone,
+           'domain_type': network.domain_type}
     return net
 
 
@@ -3655,12 +3655,9 @@ def gce_network_to_dict(network):
     :param network:
     :return:
     """
-    net = {}
-    net['name'] = network.name
-    net['id'] = network.id
-    net['extra'] = network.extra
-    net['subnets'] = [{'name': network.cidr,
-                       'gateway_ip': network.extra.get('gatewayIPv4')}]
+    net = {'name': network.name, 'id': network.id, 'extra': network.extra,
+           'subnets': [{'name': network.cidr,
+                        'gateway_ip': network.extra.get('gatewayIPv4')}]}
     return net
 
 
@@ -3674,16 +3671,11 @@ def openstack_network_to_dict(network, subnets=[], floating_ips=[], nodes=[]):
     :param nodes:
     :return: return dict net
     """
-    net = {}
-    net['name'] = network.name
-    net['id'] = network.id
-    net['status'] = network.status
-    net['router_external'] = network.router_external
-    net['extra'] = network.extra
-    net['public'] = bool(network.router_external)
-    net['subnets'] = [openstack_subnet_to_dict(subnet) for subnet in subnets
-                      if subnet.id in network.subnets]
-    net['floating_ips'] = []
+    net = {'name': network.name, 'id': network.id, 'status': network.status,
+           'router_external': network.router_external, 'extra': network.extra,
+           'public': bool(network.router_external),
+           'subnets': [openstack_subnet_to_dict(subnet) for subnet in subnets
+                       if subnet.id in network.subnets], 'floating_ips': []}
     for floating_ip in floating_ips:
         if floating_ip.floating_network_id == network.id:
             net['floating_ips'].\
@@ -3700,15 +3692,12 @@ def openstack_floating_ip_to_dict(floating_ip, nodes=[]):
     :return: return dict ret
     """
 
-    ret = {}
-    ret['id'] = floating_ip.id
-    ret['floating_network_id'] = floating_ip.floating_network_id
-    ret['floating_ip_address'] = floating_ip.floating_ip_address
-    ret['fixed_ip_address'] = floating_ip.fixed_ip_address
-    ret['status'] = str(floating_ip.status)
-    ret['port_id'] = floating_ip.port_id
-    ret['extra'] = floating_ip.extra
-    ret['node_id'] = ''
+    ret = {'id': floating_ip.id,
+           'floating_network_id': floating_ip.floating_network_id,
+           'floating_ip_address': floating_ip.floating_ip_address,
+           'fixed_ip_address': floating_ip.fixed_ip_address,
+           'status': str(floating_ip.status), 'port_id': floating_ip.port_id,
+           'extra': floating_ip.extra, 'node_id': ''}
 
     for node in nodes:
         if floating_ip.fixed_ip_address in node.private_ips:
@@ -3724,16 +3713,12 @@ def openstack_subnet_to_dict(subnet):
     :return: return dict net
     """
 
-    net = {}
-    net['name'] = subnet.name
-    net['id'] = subnet.id
-    net['cidr'] = subnet.cidr
-    net['enable_dhcp'] = subnet.enable_dhcp
-    net['dns_nameservers'] = subnet.dns_nameservers
-    net['allocation_pools'] = subnet.allocation_pools
-    net['gateway_ip'] = subnet.gateway_ip
-    net['ip_version'] = subnet.ip_version
-    net['extra'] = subnet.extra
+    net = {'name': subnet.name, 'id': subnet.id, 'cidr': subnet.cidr,
+           'enable_dhcp': subnet.enable_dhcp,
+           'dns_nameservers': subnet.dns_nameservers,
+           'allocation_pools': subnet.allocation_pools,
+           'gateway_ip': subnet.gateway_ip, 'ip_version': subnet.ip_version,
+           'extra': subnet.extra}
 
     return net
 
@@ -3758,7 +3743,7 @@ def openstack_router_to_dict(router):
     return ret
 
 
-#FIXME network_id unused
+# FIXME network_id unused
 def associate_ip(user, cloud_id, network_id, ip, machine_id=None, assign=True):
     """
     Associate ip
@@ -4121,9 +4106,9 @@ def delete_machine_tag(user, cloud_id, machine_id, tag):
         tags = machine.extra.get('tags', None)
         pair = None
         for mkey, mdata in tags.iteritems():
-            if type(mkey) ==  unicode:
+            if type(mkey) == unicode:
                 mkey = mkey.encode('utf-8')
-            if type(mdata) ==  unicode:
+            if type(mdata) == unicode:
                 mdata = mdata.encode('utf-8')
             if tag == mkey:
                 pair = {mkey: mdata}
@@ -4344,27 +4329,28 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
 
     # run SSH commands
     command = (
-       "echo \""
-       "sudo -n uptime 2>&1|"
-       "grep load|"
-       "wc -l && "
-       "echo -------- && "
-       "uptime && "
-       "echo -------- && "
-       "if [ -f /proc/uptime ]; then cat /proc/uptime; "
-       "else expr `date '+%s'` - `sysctl kern.boottime | "
-       "sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;"
-       "fi; "
-       "echo -------- && "
-       "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
-       "else sysctl hw.ncpu | awk '{print $2}';"
-       "fi;"
-       "echo -------- && "
-       "/sbin/ifconfig;"
-       "echo -------- &&"
-       "/bin/df -Pah;"
-       "echo --------"
-       "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
+        "echo \""
+        "sudo -n uptime 2>&1|"
+        "grep load|"
+        "wc -l && "
+        "echo -------- && "
+        "uptime && "
+        "echo -------- && "
+        "if [ -f /proc/uptime ]; then cat /proc/uptime; "
+        "else expr `date '+%s'` - `sysctl kern.boottime | "
+        "sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;"
+        "fi; "
+        "echo -------- && "
+        "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
+        "else sysctl hw.ncpu | awk '{print $2}';"
+        "fi;"
+        "echo -------- && "
+        "/sbin/ifconfig;"
+        "echo -------- &&"
+        "/bin/df -Pah;"
+        "echo --------"
+        "\"|sh"
+        # In case there is a default shell other than bash/sh (e.g. csh)
     )
 
     if key_id:
@@ -4438,7 +4424,7 @@ def find_public_ips(ips):
     return public_ips
 
 
-def notify_admin(title, message="", team = "all"):
+def notify_admin(title, message="", team="all"):
     """
     This will only work on a multi-user setup configured to send emails
     :param title:
@@ -4479,7 +4465,7 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
         cloud_id = kwargs['cloud_id']
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
         body += "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title,
-                                                      cloud_id)
+                                                    cloud_id)
         if 'machine_id' in kwargs:
             machine_id = kwargs['machine_id']
             body += "Machine:\n"
@@ -4528,7 +4514,7 @@ def find_metrics(user, cloud_id, machine_id):
     :return: return json resp
     """
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
-                                                  cloud_id, machine_id)
+                                                cloud_id, machine_id)
     headers = {'Authorization': get_auth_header(user)}
     try:
         resp = requests.get(url, headers=headers, verify=config.SSL_VERIFY)
@@ -4578,7 +4564,7 @@ def disassoc_metric(user, cloud_id, machine_id, metric_id):
     :param metric_id:
     """
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
-                                                  cloud_id, machine_id)
+                                                cloud_id, machine_id)
     try:
         resp = requests.delete(url,
                                headers={'Authorization': get_auth_header(user)},
@@ -4607,7 +4593,7 @@ def update_metric(user, metric_id, name=None, unit=None,
     :param machine_id:
     """
     url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
-    headers={'Authorization': get_auth_header(user)}
+    headers = {'Authorization': get_auth_header(user)}
     params = {
         'name': name,
         'unit': unit,
@@ -4670,7 +4656,7 @@ def deploy_python_plugin(user, cloud_id, machine_id, plugin_id,
 
     tmp_dir = "/tmp/mist-python-plugin-%d" % random.randrange(2 ** 20)
     retval, stdout = shell.command(
-                                    """
+        """
                                     sudo=$(command -v sudo)
                                     mkdir -p %s
                                     cd /opt/mistio-collectd/
@@ -4731,7 +4717,7 @@ def deploy_python_plugin(user, cloud_id, machine_id, plugin_id,
                         $(command -v sudo) mv %s/%s.py plugins/mist-python/
                         $(command -v sudo) chown -R root plugins/mist-python/
                         """ % (tmp_dir, plugin_id)
-                            )
+                                    )
 
     stdout += cmd_out
 
@@ -5052,7 +5038,7 @@ def get_deploy_collectd_command_unix(uuid, password, monitor, port=25826):
     """
     url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
     cmd = "wget -O mist_collectd.py %s && $(command -v sudo) " \
-          "python mist_collectd.py %s %s"\
+          "python mist_collectd.py %s %s" \
           % (url, uuid, password)
     if monitor != 'monitor1.mist.io':
         cmd += " -m %s" % monitor
@@ -5066,9 +5052,9 @@ def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
            '-Scope CurrentUser -Force;(New-Object System.Net.WebClient).' \
            'DownloadFile(\'https://raw.githubusercontent.com/mistio/' \
            'deploy_collectm/master/collectm.remote.install.ps1\',' \
-           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 '\
+           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 ' \
            '-SetupConfigFile -setupArgs \'-username "%s" -password "%s" ' \
-           '-servers @("%s:%s")\''  % (uuid, password, monitor, port)
+           '-servers @("%s:%s")\'' % (uuid, password, monitor, port)
 
 
 def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
@@ -5110,8 +5096,8 @@ def machine_name_validator(provider, name):
     elif provider is Provider.DIGITAL_OCEAN:
         if not re.search(r'^[0-9a-zA-Z]+[0-9a-zA-Z-.]{0,}[0-9a-zA-Z]+$', name):
             raise MachineNameValidationError("machine name may only contain "
-                                             "ASCII letters "
-                                             + "or numbers, dashes and dots")
+                                             "ASCII letters " +
+                                             "or numbers, dashes and dots")
     elif provider is Provider.PACKET:
         if not re.search(r'^[0-9a-zA-Z-.]+$', name):
             raise MachineNameValidationError("machine name may only contain "
