@@ -181,3 +181,9 @@ With docker installed on your system, you just need to pull it and start a conta
 The above commands, pulled the docker image, started it as a daemon, and exposed it to port 8000. You can now launch a browser on your ip:8000, eg http://104.236.188.180:8000/ and you should see the Mist.io UI.
 
 You can find more info on http://docs.mist.io/article/39-installation
+
+
+How to add authentication to mist.io dashboard
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Mist.io listens on port 8000 so you can either expose this port through another port (eg 80) through nginx and add http basic authentication there, this can also be done via haproxy. As suggested by @paimpozhil  here https://github.com/mistio/mist.io/pull/213/files , you need to add 4 lines on haproxy.conf file and restart haproxy.
