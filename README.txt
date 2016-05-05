@@ -186,4 +186,6 @@ You can find more info on http://docs.mist.io/article/39-installation
 How to add authentication to mist.io dashboard
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Mist.io listens on port 8000 so you can either expose this port through another port (eg 80) through nginx and add http basic authentication there, this can also be done via haproxy. As suggested by @paimpozhil  here https://github.com/mistio/mist.io/pull/213/files , you need to add 4 lines on haproxy.conf file and restart haproxy.
+By default mist.io listens on port 8000 on the localhost interface. You can use nginx and expose this port to port 80 and add http basic authentication there, or you can expose port 8000 on external interfaces (see the seconds section on the FAQ for this) and add http basic authentication there. The last one can be achieved with editing haproxy.conf file and adding 4 lines, as it has been suggested by @paimpozhil  here https://github.com/mistio/mist.io/pull/213/files. Make sure you restart haproxy after the edits::
+
+    user@user:~/mist.io$ ./bin/supervisorctl restart haproxy
