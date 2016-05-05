@@ -87,7 +87,42 @@ a:not(.regular) {
 catalog-app {
     overflow: hidden;
 }
-
+.logdetailswrapper {
+    -webkit-touch-callout: all; /* iOS Safari */
+    -webkit-user-select: all;   /* Chrome/Safari/Opera */
+    -khtml-user-select: all;    /* Konqueror */
+    -moz-user-select: all;      /* Firefox */
+    -ms-user-select: all;       /* Internet Explorer/Edge */
+    user-select: all;    
+}
+.logdetailswrapper table {
+    background-color: #f5f5f5;
+    word-break: break-all;
+    white-space: normal;
+    table-layout: fixed;
+}
+.logdetailswrapper table td {
+    padding: 8px;
+    vertical-align: top;
+    cursor: auto;
+}
+.logdetailswrapper table td:first-child {
+    text-align: right;
+    font-weight: 500; 
+    width: 90px;
+    text-transform: capitalize;
+}
+@media (max-width: 400px) {
+    .logdetailswrapper table td {
+        display: block;
+    }
+    .logdetailswrapper table td:first-child {
+        border-top: 1px solid #ccc;
+        text-align: left;
+        padding-bottom: 0;
+        width: 100%;
+    }
+}
 .menu-icon {
     display: block;
     width: 24px;
