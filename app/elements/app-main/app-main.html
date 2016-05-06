@@ -79,6 +79,7 @@
             <iron-route path="/stacks/:id" title="stack" href="../stacks/stack-page.html"></iron-route>
             <!-- teams -->
             <iron-route path="/teams" title="scripts" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/teams/:id" title="scripts" href="../teams/team-page.html"></iron-route>
             <!-- <iron-route path="/teams/:id" title="script" href="../teams/team-page.html"></iron-route>
             <iron-route path="/add-team" title="add script" href="../teams/team-add.html"></iron-route> -->
             <!-- scripts -->
@@ -124,6 +125,7 @@
             <stack-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.stacks]]" restamp="true"></stack-page>
             <!-- teams -->
             <page-items class="teams" model="[[model]]" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]"></page-items>
+            <team-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></team-page>
             <!-- scripts - leave scipts last due to editors highlighting problem -->
             <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
             <!--scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-->
@@ -815,9 +817,32 @@ var app = Polymer({
                 }]
             }],
             teamsArray: [{
-                name: "dev",
-                description: "developers team",
+                name: "python dev",
+                description: "python developers team",
                 id: "123",
+                created_at: 1455132184879,
+                members: [],
+                organisation: "mist.io"
+            },{
+                name: "qa",
+                description: "testing and qa team",
+                id: "321",
+                created_at: 1455132184879,
+                members: [{
+                  name: "debbie",
+                  email: "debbie@x.com",
+                  id: "654"
+                },{
+                  name: "john",
+                  email: "john@x.com",
+                  id: "987"
+                }],
+                organisation: "mist.io"
+            },{
+                name: "front dev",
+                description: "front end developers",
+                id: "213",
+                created_at: 1455132184879,
                 members: [{
                   name: "xris",
                   email: "xris@x.com",
@@ -826,20 +851,6 @@ var app = Polymer({
                   name: "rik",
                   email: "rik@x.com",
                   id: "789"
-                },{
-                  name: "john",
-                  email: "john@x.com",
-                  id: "987"
-                }],
-                organisation: "mist.io"
-            },{
-                name: "qa",
-                description: "testing and qa team",
-                id: "321",
-                members: [{
-                  name: "debbie",
-                  email: "debbie@x.com",
-                  id: "654"
                 },{
                   name: "john",
                   email: "john@x.com",
