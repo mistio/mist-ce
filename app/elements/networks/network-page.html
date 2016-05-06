@@ -226,9 +226,9 @@
                 return 'background-color: ' + section.color + '; color: #fff;';
             },
             _computeNetwork: function(params) {
-                var netid = params.id;
+                var netname = params.name;
                 var net = this.model.networksArray.find(function(network) {
-                    return network.id == netid;
+                    return network.name == netname;
                 }, this);
                 return net;
             },
