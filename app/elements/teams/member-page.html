@@ -1,9 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<link rel="import" href="../app-togglable/app-togglable-list.html">
 <!-- <link rel="import" href="add-team.html"> -->
 
-<dom-module id="team-page">
+<dom-module id="member-page">
     <template>
         <style is="custom-style" include="lists"></style>
         <style is="custom-style" include="single-page"></style>
@@ -174,20 +173,23 @@
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
-                    <span class="bottom title"><span class="up">[[team.name]]</span> Team</span>
+                    <span class="bottom title"><span class="up">[[member.name]]</span></span>
 
                     <span class="bottom right-actions">
-                        <paper-tooltip for="editTeam" position="top">Edit Team</paper-tooltip>
+                        <paper-tooltip for="editTeam" position="top">Edit Member</paper-tooltip>
                         <paper-icon-button id="editTeam" icon="icons:create" on-tap="_editTeam"></paper-icon-button>
-                        <paper-tooltip for="deleteTeam" position="top">Delete Team</paper-tooltip>
+                        <paper-tooltip for="deleteTeam" position="top">Delete Member</paper-tooltip>
                         <paper-icon-button id="deleteTeam" icon="icons:delete" on-tap="_deleteTeam"></paper-icon-button>
                     </span>
 
                     <div class="subhead bottom">
-                        <span>Organisation: [[team.organisation]]</span>
+                        <div>
+                            <span class="pad-right micon-wrap"><iron-icon icon="communication:email" class="micon"></iron-icon></span>
+                            <span>[[member.email]]</span>
+                        </div>
                         <div class="fab-top-right">
-                            <paper-fab icon="add" on-tap="_addMember" id="addMemberTeamFab"></paper-fab>
-                            <paper-tooltip for="runTeamFab" position="bottom">Add Member to Team</paper-tooltip>
+                            <paper-fab icon="add" on-tap="_addMemberToTeam" id="addMemberTeamFab"></paper-fab>
+                            <paper-tooltip for="runTeamFab" position="bottom">Add Member to a Team</paper-tooltip>
                         </div>
                     </div>
                 </paper-toolbar>
@@ -197,21 +199,21 @@
                         <div class="flex-horizontal-with-ratios section">
                             <div class="page-block">
                                 <h3 class="smallcaps">Description</h3>
-                                <p>[[team.description]]</p>
+                                <p>[[member.name]], [[member.email]]</p>
                             </div>
                             <div class="page-block">
-                                <h3 class="smallcaps">Created at</h3>
+                                <h3 class="smallcaps">Signed up at</h3>
                                 <p>[[timestamp]] </p>
                             </div>
                         </div>
                         <div class="flex-horizontal-with-ratios section">
                             <div class="width100">
-                                <template is="dom-if" if="[[hasMembers]]">
+                                <template is="dom-if" if="[[hasTeams]]">
                                     <paper-material class="no-pad">
-                                        <h3 class="smallcaps resource-head">Members in [[team.name]] team</h3>
-                                        <template is="dom-repeat" items="[[team.members]]">
+                                        <h3 class="smallcaps resource-head">[[member.name]] is member in teams</h3>
+                                        <template is="dom-repeat" items="[[teams]]">
                                             <paper-item>
-                                                <a href="/members/[[item.id]]"  class="flex-horizontal-with-ratios width100">
+                                                <a href="/teams/[[item.id]]" class="flex-horizontal-with-ratios width100">
                                                     <span class="flexchild">[[item.name]] </span>
                                                     <span class="flexchild">[[item.email]]</span>
                                                 </a>
@@ -223,22 +225,20 @@
                                 <template is="dom-if" if="[[!hasMembers]]">
                                     <h3 class="smallcaps">Members</h3>
                                     <p>
-                                        You have not yet added members in [[team.name]] team.
+                                        You have not yet added this member in any team.
                                     </p>
-                                    <paper-button class="blue pad-left2 pad-right2" on-tap="_addMember"> Add Member </paper-button>
+                                    <paper-button class="blue pad-left2 pad-right2" on-tap="_addMemberToTeam"> Add Member to team </paper-button>
                                 </template>
-                            </div>                            
+                            </div>
                         </div>
                         <div class="flex-horizontal-with-ratios section">
                             <div class="width100">
                                 <paper-material class="no-pad">
-                                    <!-- TODO: make interactive add edit of rules -->
-                                    <h3 class="smallcaps resource-head">Team Policy</h3>
-                                    <paper-item>ALLOW add cloud</paper-item>
-                                    <paper-item>ALLOW create machines</paper-item>
-                                    <paper-item>ALLOW read machines</paper-item>
-                                    <paper-item>ALLOW reboot machines</paper-item>
-                                    <paper-item>ALLOW monitor machines</paper-item>
+                                    <h3 class="smallcaps resource-head">Member Logs (log-list filtered by email)</h3>
+                                    <paper-item>Add cloud</paper-item>
+                                    <paper-item>Create machine</paper-item>
+                                    <paper-item>Reboot machine</paper-item>
+                                    <paper-item>Monitor machine</paper-item>
                                 </paper-material>
                             </div>
                         </div>
@@ -254,7 +254,7 @@
         'use strict';
 
         Polymer({
-            is: 'team-page',
+            is: 'member-page',
 
             properties: {
                 sections: {
@@ -273,89 +273,89 @@
                 model: {
                     type: Object
                 },
-                team: {
+                member: {
                     type: Object,
-                    computed: '_computeTeam(params)'
+                    computed: '_computeMember(params)'
                 },
-                hasMembers: {
+                hasTeams: {
                     type: Boolean,
                     value: false,
-                    computed: '_hasMembers(team)'
+                    computed: '_hasTeams(member)'
                 },
-                members: {
+                teams: {
                     type: Array,
-                    computed: '_computeMembers(team)'
+                    computed: '_computeTeams(member)'
                 },
-                teamid: {
+                memberid: {
                     type: String,
-                    computed: '_computeTeamId(params)'
+                    computed: '_computeMemberId(params)'
                 },
                 timestamp: {
                     type: String,
-                    computed: '_getFormattedTimestamp(team)'
+                    computed: '_getFormattedTimestamp(member)'
                 },
                 vpHeight: String
             },
             listeners: {
-                'confirmation': '_deleteTeamResponse',
-                'updateSelectedTeam': '_updateTeam'
+                'confirmation': '_deleteMemberResponse',
+                'updateSelectedMember': '_updateMember'
             },
             ready: function() {
                 var wh = window.innerHeight;
                 this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
             },
-            _getFormattedTimestamp: function (team) {
+            _getFormattedTimestamp: function (member) {
                 // var timestamp = parseInt(team.created_at);
-                return new Date(team.created_at).toLocaleString('en-US', {timeZoneName: 'short'});
+                return new Date(member.signed_in).toLocaleString('en-US', {timeZoneName: 'short'});
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
             },
-            _hasMembers: function(team){
-                if (team.members)
-                    return team.members.length > 0 ? true : false;
+            _hasTeams: function(member){
+                if (member.teams)
+                    return member.teams.length > 0 ? true : false;
             },
             _computeId: function(params) {
                 return params.id;
             },
-            _computeTeam: function(params) {
-                return this.model.teamsArray.find(function(team) {
-                    return team.id == params.id;
+            _computeMember: function(params) {
+                return this.model.membersArray.find(function(member) {
+                    return member.id == params.id;
                 }, this);
             },
-            _computeTeamId: function(params) {
+            _computeMemberId: function(params) {
                 return params.id;
             },
-            _computeMembers: function(team){
-                return team.members;
+            _computeTeams: function(member){
+                return member.teams;
             },
-            _addMember: function(e) {
-                page.show('/add-member/' + this.team.id);
+            _addMemberToTeam: function(e) {
+                page.show('/add-member-to-a-team/' + this.member.id);
             },
-            _editTeam: function(e) {
-                var el = this.querySelector('team-edit');
+            _editMember: function(e) {
+                var el = this.querySelector('member-edit');
                 el._openEditTeamModal();
             },
-            _updateTeam: function(e) {
+            _updateMember: function(e) {
                 var team = e.detail.team;
-                this.set('team.name', team.name);
-                this.set('team.description', team.description);
+                this.set('member.name', team.name);
+                this.set('member.description', team.description);
             },
-            _deleteTeam: function(e) {
+            _deleteMember: function(e) {
                 this._showDialog({
-                    title: 'Delete Team?',
-                    body: "Deleting teams cannot be undone. You are about to delete team: " + this.team.name ,
+                    title: 'Delete member?',
+                    body: "Deleting members cannot be undone. You are about to delete member: " + this.member.name ,
                     danger: true,
-                    reason: "delete_team"
+                    reason: "delete_member"
                 });
             },
-            _deleteTeamResponse: function(e) {
+            _deleteMemberResponse: function(e) {
                 var reason = e.detail.reason,
                     response = e.detail.response;
 
-                if (response.confirmed && reason == "delete_team") {
-                    console.log('i ll delete the team');
-                    page.show('/teams');
+                if (response.confirmed && reason == "delete_member") {
+                    console.log('i ll delete the member');
+                    page.show('/members');
                 }
             },
             _showDialog: function(info) {

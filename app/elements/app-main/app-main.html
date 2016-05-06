@@ -80,6 +80,7 @@
             <!-- teams -->
             <iron-route path="/teams" title="scripts" href="../pages/page-items.html"></iron-route>
             <iron-route path="/teams/:id" title="scripts" href="../teams/team-page.html"></iron-route>
+            <iron-route path="/members/:id" title="scripts" href="../teams/member-page.html"></iron-route>
             <!-- <iron-route path="/teams/:id" title="script" href="../teams/team-page.html"></iron-route>
             <iron-route path="/add-team" title="add script" href="../teams/team-add.html"></iron-route> -->
             <!-- scripts -->
@@ -126,6 +127,7 @@
             <!-- teams -->
             <page-items class="teams" model="[[model]]" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]"></page-items>
             <team-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></team-page>
+            <member-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-page>
             <!-- scripts - leave scipts last due to editors highlighting problem -->
             <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
             <!--scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-->
@@ -822,42 +824,88 @@ var app = Polymer({
                 id: "123",
                 created_at: 1455132184879,
                 members: [],
-                organisation: "mist.io"
+                organisation: "mist.io",
+                policy: ''
             },{
                 name: "qa",
                 description: "testing and qa team",
                 id: "321",
                 created_at: 1455132184879,
                 members: [{
-                  name: "debbie",
+                  name: "Debbie D. Doe",
                   email: "debbie@x.com",
                   id: "654"
                 },{
-                  name: "john",
+                  name: "John P. Pan",
                   email: "john@x.com",
                   id: "987"
                 }],
-                organisation: "mist.io"
+                organisation: "mist.io",
+                policy: ''
             },{
                 name: "front dev",
                 description: "front end developers",
                 id: "213",
                 created_at: 1455132184879,
                 members: [{
-                  name: "xris",
+                  name: "Xris Papakon",
                   email: "xris@x.com",
                   id: "456"
                 },{
-                  name: "rik",
+                  name: "Rik Rekveld",
                   email: "rik@x.com",
                   id: "789"
                 },{
-                  name: "john",
+                  name: "John P. Pan",
                   email: "john@x.com",
                   id: "987"
                 }],
-                organisation: "mist.io"
+                organisation: "mist.io",
+                policy: ''
             }],
+            membersArray: [
+                {
+                  name: "Xris Papakon",
+                  email: "xris@x.com",
+                  id: "456",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "front dev",
+                    id: "213",
+                  }]
+                },{
+                  name: "Rik Rekveld",
+                  email: "rik@x.com",
+                  id: "789",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "front dev",
+                    id: "213",
+                  }]
+                },{
+                  name: "John P. Pan",
+                  email: "john@x.com",
+                  id: "987",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "front dev",
+                    id: "213",
+                  },{
+                    name: "qa",
+                    id: "321",
+                  }]
+                },
+                {
+                  name: "Debbie D. Doe",
+                  email: "debbie@x.com",
+                  id: "654",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "qa",
+                    id: "321",
+                  }]
+                }
+            ],
             pending: {
                 clouds: true,
                 monitoring: true
