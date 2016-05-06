@@ -2517,11 +2517,11 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                                   % action)
     except:
         machine = Node(machine_id,
-                   name=machine_id,
-                   state=0,
-                   public_ips=[],
-                   private_ips=[],
-                   driver=conn)
+                       name=machine_id,
+                       state=NodeState.RUNNING,
+                       public_ips=[],
+                       private_ips=[],
+                       driver=conn)
     try:
         if action is 'start':
             # In liblcoud it is not possible to call this with machine.start()
@@ -3364,8 +3364,8 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
 
     conn = connect_provider(cloud)
 
-    machine = Node(machine_id, name='', state=0, public_ips=[],
-                   private_ips=[], driver=conn)
+    machine = Node(machine_id, name='', state=NodeState.RUNNING,
+                   public_ips=[], private_ips=[], driver=conn)
 
     tags_dict = {}
     if isinstance(tags, list):
