@@ -229,7 +229,7 @@
             _computeScript: function(params) {
                 var scriptid = params.id;
                 return this.model.scriptsArray.find(function(script) {
-                    return script.id == scriptid;
+                    return script.script_id == scriptid;
                 }, this);
             },
             _computeScriptId: function(params) {
