@@ -105,12 +105,16 @@ catalog-app {
     padding: 8px;
     vertical-align: top;
     cursor: auto;
+    border-bottom: 1px solid #ddd;
 }
 .logdetailswrapper table td:first-child {
-    text-align: right;
     font-weight: 500; 
-    width: 90px;
+    width: 190px;
     text-transform: capitalize;
+    padding-left: 24px;    
+}
+.logdetailswrapper table tr:last-child td {
+    border-bottom: 0 none;
 }
 @media (max-width: 400px) {
     .logdetailswrapper table td {
