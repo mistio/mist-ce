@@ -77,6 +77,10 @@
             <iron-route path="/create-stack/:id" title="add template" href="../stacks/stack-create.html"></iron-route>
             <iron-route path="/stacks" title="stacks"  href="../pages/page-items.html"></iron-route>
             <iron-route path="/stacks/:id" title="stack" href="../stacks/stack-page.html"></iron-route>
+            <!-- teams -->
+            <iron-route path="/teams" title="scripts" href="../pages/page-items.html"></iron-route>
+            <!-- <iron-route path="/teams/:id" title="script" href="../teams/team-page.html"></iron-route>
+            <iron-route path="/add-team" title="add script" href="../teams/team-add.html"></iron-route> -->
             <!-- scripts -->
             <iron-route path="/scripts" title="scripts" href="../pages/page-items.html"></iron-route>
             <iron-route path="/scripts/:id" title="script" href="../scripts/script-page.html"></iron-route>
@@ -118,6 +122,8 @@
             <page-items class="stacks" model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" items="[[model.stacksArray]]"></page-items>
             <!--stacks-list model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" stacks="[[model.stacksArray]]"></stacks-list-->
             <stack-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.stacks]]" restamp="true"></stack-page>
+            <!-- teams -->
+            <page-items class="teams" model="[[model]]" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]"></page-items>
             <!-- scripts - leave scipts last due to editors highlighting problem -->
             <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
             <!--scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-->
@@ -809,14 +815,37 @@ var app = Polymer({
                 }]
             }],
             teamsArray: [{
-                description: "",
-                entrypoint: "",
-                id: "448082e761c94660acfe54427c5ca461",
-                name: "test",
-                script: "#!/bin/bash\necho 'hello world '",
-                source: "inline",
-                type: "executable",
-                user: "marios@mist.io",
+                name: "dev",
+                description: "developers team",
+                id: "123",
+                members: [{
+                  name: "xris",
+                  email: "xris@x.com",
+                  id: "456"
+                },{
+                  name: "rik",
+                  email: "rik@x.com",
+                  id: "789"
+                },{
+                  name: "john",
+                  email: "john@x.com",
+                  id: "987"
+                }],
+                organisation: "mist.io"
+            },{
+                name: "qa",
+                description: "testing and qa team",
+                id: "321",
+                members: [{
+                  name: "debbie",
+                  email: "debbie@x.com",
+                  id: "654"
+                },{
+                  name: "john",
+                  email: "john@x.com",
+                  id: "987"
+                }],
+                organisation: "mist.io"
             }],
             pending: {
                 clouds: true,

@@ -451,6 +451,9 @@ Polymer({
         if (this.isStacks(this.section)) {
             return ['name', 'template', 'description']
         }
+        if (this.isTeams(this.section)) {
+            return ['name', 'description', 'organisation']
+        }
         return ['id'];
 
     },
