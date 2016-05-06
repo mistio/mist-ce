@@ -2529,7 +2529,6 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                 conn.ex_start_node(machine, ex_cloud_service_name=cloud_service)
             else:
                 conn.ex_start_node(machine)
-
             if conn.type is Provider.DOCKER:
                 node_info = conn.inspect_node(node)
                 try:
@@ -2605,8 +2604,8 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     machine.save()
 
         elif action is 'destroy':
-            if conn.type is Provider.DOCKER and node.state == 0:
-                conn.ex_stop_node(node)
+            if conn.type is Provider.DOCKER and node.state == NodeState.RUNNING:
+                conn.ex_stop_node(machine)
                 machine.destroy()
             elif conn.type == 'azure':
                 conn.destroy_node(machine, ex_cloud_service_name=cloud_service)
