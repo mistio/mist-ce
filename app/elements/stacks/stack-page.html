@@ -337,7 +337,7 @@
                 <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">Stack {{stack.name}}
                     </span>
                     <span class="bottom right-actions">
@@ -369,7 +369,7 @@
                 </paper-toolbar>
                 <div class="content">
                     <iron-pages selected="{{selected}}">
-                        <div id="resources" class="page">                    
+                        <div id="resources" class="page">
                             <template is="dom-if" if="[[runtimeProperties]]">
                                 <div class="flex-horizontal-with-ratios section">
                                     <div class="page-block">
@@ -378,7 +378,7 @@
                                     </div>
                                     <div class="page-block">
                                         <h3 class="smallcaps">Created</h3>
-                                        <p>[[timestamp]] 
+                                        <p>[[timestamp]]
                                         </p>
                                     </div>
                                 </div>
@@ -439,7 +439,7 @@
                                         </template>
                                     </paper-header-panel>
                                     <paper-header-panel main>
-                                        <div id="workflowsView" class="pad">        
+                                        <div id="workflowsView" class="pad">
                                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
                                                 <div id$="[[workflow.name]]show" class="m12 wf-item">
 
@@ -647,8 +647,8 @@
                             options: [{
                                 title: "1",
                                 val: "1"
-                            }]                       
-                        },{                        
+                            }]
+                        },{
                             name: "cloud_id",
                             label: "Cloud",
                             type: "dropdown",
@@ -772,7 +772,7 @@
                         }]
                     }
                 },
-                
+
             },
             observers: [
                   '_runtimePropertiesChanged(stack.*,runtimeProperties.*)',
@@ -796,7 +796,7 @@
                 }, this);
                 if (stack) {
                     return stack;
-                } 
+                }
                 else {
                     return {
                         name: "Stack is missing"
@@ -815,7 +815,7 @@
                 if (this.listMachines)
                     sum += this.listMachines.length;
 
-                
+
 
                 return sum > 0 ? true : false;
             },
@@ -830,7 +830,7 @@
                 }
 
                 return (error || diff > 31146611) ? true: false;
-            }, 
+            },
             _computeTemplate: function(stack) {
                 return this.model.templatesArray.find(function(template) {
                     return template._id == stack.template_id;
@@ -858,12 +858,12 @@
                 // }
                 // this.runtimeProperties = [];
                 // this.runtimeProperties = rtp;
-                
+
                 //console.log("_runtimePropertiesChanged", changerecord);
-                this.updateResources(this.runtimeProperties);                
+                this.updateResources(this.runtimeProperties);
             },
             _machines: function(stack){
-                return stack.machines;                
+                return stack.machines;
             },
             _listMachines: function(runtimeProperties){
                 var machines = [];
@@ -878,24 +878,24 @@
                             }
                             else {
                                 var deadMachine = {
-                                    name:rtpy.name, 
+                                    name:rtpy.name,
                                     state: 'missing',
                                     cloud: {
                                         provider: 'machine_id: '+rtpy.machine_id
                                     },
-                                    isDead : true 
+                                    isDead : true
                                 };
                                 machines.push(deadMachine)
                             }
                         }
                     }, this);
                 }
-                return machines;                
+                return machines;
             },
             _listMachines2: function(stack){
                 var machines = [];
                 this.model.machinesArray.forEach(function(machine) {
-                    if (this.stack.machines.indexOf(machine.uuid) != -1) 
+                    if (this.stack.machines.indexOf(machine.uuid) != -1)
                         machines.push(machine)
                 }, this);
                 return machines;
@@ -928,10 +928,10 @@
                             }
                             else {
                                 var deadKey = {
-                                    id: rtpy.key_id, 
-                                    isDefault: false, 
+                                    id: rtpy.key_id,
+                                    isDefault: false,
                                     machines: [],
-                                    isDead : true 
+                                    isDead : true
                                 };
                                 keys.push(deadKey);
                             }
@@ -1006,7 +1006,7 @@
                 this._toggleQuickActions();
                 this.selected = 1;
                 this._workflowNavigation(e);
-            },            
+            },
             updateResources: function(runtimeProperties){
                 var machines = [];
                 var keys = [];

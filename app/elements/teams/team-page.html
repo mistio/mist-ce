@@ -173,7 +173,7 @@
                 <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title"><span class="up">[[team.name]]</span> Team</span>
 
                     <span class="bottom right-actions">
@@ -227,7 +227,7 @@
                                     </p>
                                     <paper-button class="blue pad-left2 pad-right2" on-tap="_addMember"> Add Member </paper-button>
                                 </template>
-                            </div>                            
+                            </div>
                         </div>
                         <div class="flex-horizontal-with-ratios section">
                             <div class="width100">

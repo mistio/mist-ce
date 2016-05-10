@@ -6,7 +6,7 @@
         :host {
             background: #fafafa;
         }
-        
+
         paper-header {
             height: 60px;
             font-size: 16px;
@@ -17,7 +17,7 @@
         }
 
         .paper-header {
-            @apply(--layout-horizontal); 
+            @apply(--layout-horizontal);
         }
 
         </style>
@@ -31,7 +31,7 @@
                     <!-- <app-bar class="horizontal layout center end-justified"></app-bar>
                     <paper-icon-button icon="icons:sort"></paper-icon-button>
                     <paper-icon-button class="toggleViewButton" icon="[[viewIcon]]"></paper-icon-button>
-                    <app-user-menu email="marios@mist.io"></app-user-menu> -->
+                    <app-user-menu email="[[model.email]]"></app-user-menu> -->
                 </div>
                 <div id="content">
                     <p>Lorem</p>
@@ -62,17 +62,17 @@ Proin ornare lectus enim, a blandit risus blandit nec. Curabitur tincidunt quam 
         is: 'page-test',
         enableCustomStyleProperties: true,
         properties: {
-            
+
         },
         observers: [
-            
+
         ],
         listeners: {
-        
+
         },
         ready: function() {
-            
+
         }
-        
+
     });
 </script>

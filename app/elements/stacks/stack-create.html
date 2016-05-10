@@ -59,11 +59,11 @@
                 <paper-toolbar style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">Create Stack {{typedName}} from template [[template.name]]</span>
                 </paper-toolbar>
                 <div id="content">
-                    
+
                     <paper-material>
                         <div class="grid-row">
                         <h2 class="xs12 title"><content></content></h2>
@@ -559,14 +559,14 @@
                 },
                 _uri: function(model){
                     return window.location.protocol+"//"+window.location.hostname+"/";
-                },                
+                },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
                 _goBack: function(){
                     history.back();
                 },
-                _computeFieldType: function(field, value, show) {                
+                _computeFieldType: function(field, value, show) {
                 if (!field.helptext && field.description){
                     field.helptext = field.description
                 }
@@ -627,7 +627,7 @@
                 this.fire("stack-create-response", e.detail)
                 this.sid = e.detail.__data__.response.stack.id;
                 setTimeout(this.delayed.bind(this),2000);
-                
+
             },
             delayed: function(){
                 window.location.href = '/stacks/'+this.sid;
@@ -638,12 +638,12 @@
                 });
                 console.log("response",new_stack);
                 if (stack){
-                    page.show('/stacks/'+ sid);    
+                    page.show('/stacks/'+ sid);
                 }
                 else {
-                    this.waittoredirect(sid);                    
+                    this.waittoredirect(sid);
                 }
-                
+
             },
             _fieldsChanged: function(fields, sendingData) {
                 this.async(function() {
@@ -651,12 +651,12 @@
                         show = true,
                         dependency;
 
-                    fields.base.forEach(function(el, index) {                        
+                    fields.base.forEach(function(el, index) {
                         if (el.showIf) {
 
                             var showIf = false,
                                 andshowIf = false;
-                            
+
                             if (el.showIf.fieldExists) {
                                 dependency = form[el.showIf.fieldName],
                                     show = dependency;
@@ -684,7 +684,7 @@
                             var decide = showIf;
                             if (el.andshowIf){
                                 decide = showIf && andshowIf;
-                            }                        
+                            }
 
                             this.set('fields.' + index + '.show', decide);
 
@@ -721,7 +721,7 @@
                     return field.name == "yaml_or_form";
                 });
                 var yaml = yamlField.value == 'yaml'? true : false;
-                
+
                 var inputs = {};
                 var stackname = this.form.name,
                     stackdescription = this.form.description,
@@ -747,7 +747,7 @@
                         delete inputs[prop];
                     }
                 }
-                
+
                 var body = {inputs: inputs};
                 body["template_id"] = this.template._id;
                 body["name"] = stackname;
@@ -789,7 +789,7 @@
                     input.invalid = false;
                 }
             },
-            
+
         });
     })();
     // test progress bar, code from demo
@@ -823,6 +823,6 @@
             nextProgress();
         }
     }
-    
+
     </script>
 </dom-module>

@@ -192,7 +192,7 @@
                 <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">Template "[[template.name]]"</span>
 
                     <span class="bottom right-actions">
@@ -237,7 +237,7 @@
                             </div>
                             <div class="page-block">
                                 <h3 class="smallcaps">Created</h3>
-                                <p>[[timestamp]] 
+                                <p>[[timestamp]]
                                 <!-- <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a> -->
                                 </p>
                             </div>
@@ -318,7 +318,7 @@
                     <template is="dom-if" if="[[template.inputs.length]]">
                         <div class="page">
                             <div class="section">
-                                <h3 class="smallcaps">Template Inputs </h3>                                
+                                <h3 class="smallcaps">Template Inputs </h3>
                                 <p> The template will require you to insert the following inputs in order to create a stack from</p>
                                 <p class="required"><span class="red">*</span> required fields</p>
                                 <paper-material class="no-pad">

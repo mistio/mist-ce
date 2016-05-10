@@ -131,7 +131,7 @@
                 <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">Network "[[network.name]]"</span>
                     <paper-tooltip for="editNetwork" position="top">Edit Network</paper-tooltip>
                     <paper-icon-button id="editNetwork" class="bottom" icon="icons:create" on-tap="_editNetwork"></paper-icon-button>

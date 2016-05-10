@@ -88,7 +88,7 @@
         }
         .subhead {
             box-sizing: border-box;
-            position: absolute;            
+            position: absolute;
             width: 100%;
             left: 0;
             height: 57px;
@@ -123,7 +123,7 @@
                 <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">Templates</span>
 
                     <div hidden$="[[!hasTemplates]]" class="list-options subhead bottom">
@@ -144,7 +144,7 @@
                         <paper-icon-button id="deleteTemplateBtn" hidden$="[[!showDeleteOption]]" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
                         <span hidden$="[[!showDeleteOption]]" class="label">
                         Delete [[selectedTemplates.length]] template<span hidden$="[[!moreThanOneSelected]]">s</span> </span>
-                        </span>                        
+                        </span>
                     </div>
                     <div class="list-head flex-horizontal-with-ratios subhead bottom">
                             <div class="flexchild">
@@ -167,8 +167,8 @@
                         </div>
                 </paper-toolbar>
                 <div class="list content">
-                    
-                    <div hidden$="[[!hasTemplates]]" class="info-list">                        
+
+                    <div hidden$="[[!hasTemplates]]" class="info-list">
                         <div class="info-body">
                             <iron-list items="[[presentedTemplates]]" as="template" selected-items="{{selectedTemplates}}" multi-selection style$="[[vpHeight]]">
                                 <template>
@@ -190,7 +190,7 @@
                     </div>
                     <p hidden$="[[hasTemplates]]">
                         No templates found here. You can add some by using the action button!
-                    </p>                    
+                    </p>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
@@ -214,7 +214,7 @@
                 section: {
                     type: Object
                 },
-                color: {                    
+                color: {
                     type: String,
                     computed: '_getHeaderStyle(section)'
                 },

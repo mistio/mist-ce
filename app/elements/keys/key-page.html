@@ -190,7 +190,7 @@
                 <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">Key "[[key.id]]"</span>
                     <paper-tooltip for="makedefault" position="top">Make key default</paper-tooltip>
                     <paper-icon-button id="makedefault" hidden$="[[isDefault]]" on-tap="_makeDefaultKey" icon="star-border" class="bottom">Make Default</paper-icon-button>
@@ -276,6 +276,9 @@
                     type: Object
                 },
                 section: {
+                    type: Object
+                },
+                model: {
                     type: Object
                 },
                 color: {

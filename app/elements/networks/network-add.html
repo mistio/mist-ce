@@ -7,13 +7,13 @@
         :host {
             display: block;
         }
-        
+
         paper-material {
             display: block;
             padding: 20px;
             margin: 36px;
         }
-        
+
         paper-progress {
             position: absolute;
             bottom: 85px;
@@ -35,7 +35,7 @@
                 <paper-toolbar style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">Add Network {{typedName}}</span>
                 </paper-toolbar>
                 <div id="content">
@@ -96,7 +96,7 @@
                 section: {
                     type: Object
                 },
-                color: {                    
+                color: {
                     type: String,
                     computed: '_getHeaderStyle(section)'
                 },
@@ -318,7 +318,7 @@
                     notify: true
                 },
                 clouds: {
-                    type: Array                    
+                    type: Array
                 },
                 hasClouds: {
                     type: Boolean,

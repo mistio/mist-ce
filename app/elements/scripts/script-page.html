@@ -125,7 +125,7 @@
                 <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">Script "[[script.name]]"</span>
                     <paper-tooltip for="scheduleScript" position="top">Schedule Script</paper-tooltip>
                     <paper-icon-button id="scheduleScript" class="bottom" icon="icons:schedule" on-tap="_scheduleScript"></paper-icon-button>

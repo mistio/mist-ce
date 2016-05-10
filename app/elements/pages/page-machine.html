@@ -34,13 +34,13 @@
             table {
             table-layout: fixed !important;
             word-break: break-all !important;
-            word-wrap: break-word !important; 
+            word-wrap: break-word !important;
         }
         ::content table tr  {
             overflow: hidden !important;
             white-space: normal !important;
             word-break: break-all !important;
-            word-wrap: break-word !important; 
+            word-wrap: break-word !important;
         }
 
 
@@ -56,7 +56,7 @@
                     </div>
                     <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
                     <paper-icon-button icon="icons:sort"></paper-icon-button>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                 </div>
                 <div id="content" class="page">
                     <paper-material class="info-card" >
@@ -127,9 +127,9 @@
                             </div>
                         </iron-collapse>
                     </paper-material>
-                    
+
                     <app-rules></app-rules>
-                    
+
                 </div>
                 <div class="absolute-bottom-right">
                     <app-fab></app-fab>

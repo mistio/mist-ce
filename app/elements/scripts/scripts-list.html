@@ -93,7 +93,7 @@
                 <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">[[presentedScripts.length]] Scripts</span>
                 </paper-toolbar>
                 <div class="list">
@@ -158,7 +158,7 @@
                     </div>
                     <p hidden$="[[hasScripts]]">
                         No scripts found here. You can add some by using the action button!
-                    </p>                    
+                    </p>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
@@ -182,7 +182,7 @@
                 section: {
                     type: Object
                 },
-                color: {                    
+                color: {
                     type: String,
                     computed: '_getHeaderStyle(section)'
                 },

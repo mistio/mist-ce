@@ -93,7 +93,7 @@
                 <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">[[presentedImages.length]] Images</span>
                 </paper-toolbar>
                 <div class="list">
@@ -131,7 +131,7 @@
                             <iron-list items="[[images]]" as="image" selected-items="{{selectedImages}}" multi-selection style$="[[vpHeight]]">
                                 <template>
                                     <div class="row">
-                                        <image-item selected="[[selected]]" image="[[image]]" index="[[index]]" count="[[presentedImages.length]]">                                            
+                                        <image-item selected="[[selected]]" image="[[image]]" index="[[index]]" count="[[presentedImages.length]]">
                                             <div class="row-actions">
                                                 <paper-tooltip for="starImage" position="top">Star Image</paper-tooltip>
                                                 <paper-icon-button id="starImage" on-tap="_starImage" icon="star"></paper-icon-button>
@@ -161,7 +161,7 @@
                 section: {
                     type: Object
                 },
-                color: {                    
+                color: {
                     type: String,
                     computed: '_getHeaderStyle(section)'
                 },
@@ -331,9 +331,9 @@
                 if (!showSearchOption) {
                     this.set('searchTerm', '');
                 }
-            },            
+            },
             _starSelected: function(e) {
-                
+
             },
             _actualView: function(view, force) {
                 return force ? 'cards' : view;

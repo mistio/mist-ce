@@ -12,15 +12,15 @@
             display: block;
             background: #fafafa;
         }
-        
+
         paper-card {
             display: block;
         }
-        
+
         .flex-horizontal-with-ratios {
             @apply(--layout-horizontal);
         }
-        
+
         .flexchild {
             @apply(--layout-flex);
         }
@@ -32,11 +32,11 @@
         paper-icon-button {
             transition: all 200ms;
         }
-        
+
         paper-icon-button.active-sort {
             transform: rotate(180deg);
         }
-        
+
         paper-icon-button.active-sort::content iron-icon {
             color: #795548;
         }
@@ -44,22 +44,22 @@
         iron-icon#KeyDefault {
             padding: 8px;
         }
-        
+
         app-bar .menu-icon {
             margin-right: 15px;
         }
-        
+
         app-check {
             margin-right: 16px;
             display: inline-block;
             vertical-align: middle;
         }
-        
+
         #element-cards {
             max-width: 1500px;
             margin: 20px auto;
         }
-        
+
         [size=xs] > * {
             display: none;
         }
@@ -88,7 +88,7 @@
                 <paper-toolbar class="tall" style$="[[color]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="marios@mist.io"></app-user-menu>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">[[presentedNetworks.length]] Networks</span>
                 </paper-toolbar>
                 <div class="list">
@@ -97,12 +97,12 @@
                             <paper-icon-button id="searchNetworkBtn" icon="search" on-tap="_toggleSearchSelected"></paper-icon-button>
                             <paper-input id="searchinput" hidden$="[[!showSearchOption]]" type="search" value="{{searchTerm::keyup}}" placeholder="" no-label-float class="search"></paper-input>
                             <paper-icon-button hidden$="[[!showSearchOption]]" icon="close" on-tap="_toggleSearchSelected"></paper-icon-button>
-                            <span hidden$="[[showSearchOption]]" class="label">Search networks</span>                            
+                            <span hidden$="[[showSearchOption]]" class="label">Search networks</span>
                         </div>
-                    
+
                         <paper-tooltip for="editNetworkBtn" position="bottom">Edit</paper-tooltip>
-                        <paper-icon-button id="editNetworkBtn" hidden$="[[!showEditOption]]" on-tap="_editSelected" icon="image:edit"></paper-icon-button>                        
-                    
+                        <paper-icon-button id="editNetworkBtn" hidden$="[[!showEditOption]]" on-tap="_editSelected" icon="image:edit"></paper-icon-button>
+
                         <paper-tooltip for="deleteNetworkBtn" position="bottom">Delete</paper-tooltip>
                         <paper-icon-button id="deleteNetworkBtn" hidden$="[[!showDeleteOption]]" on-tap="_deleteSelected" icon="delete"></paper-icon-button>
                         <span hidden$="[[!showDeleteOption]]" class="label">
@@ -141,7 +141,7 @@
                                 <template>
                                     <div class="row">
                                         <network-item selected="{{selected}}" network="[[network]]" index="[[index]]" count="[[presentedNetworks.length]]">
-                                            <div class="row-actions">                       
+                                            <div class="row-actions">
                                                 <paper-tooltip for="editNetworkBtn" position="top">Edit</paper-tooltip>
                                                 <paper-icon-button id="editNetworkBtn" on-tap="_editSelected" icon="image:edit"></paper-icon-button>
                                                 <paper-tooltip for="deleteNetworkBtn" position="top">Delete</paper-tooltip>
@@ -155,7 +155,7 @@
                     </div>
                     <p hidden$="[[hasNetworks]]">
                         No networks found here. You can add some by using the action button!
-                    </p>                    
+                    </p>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
@@ -242,7 +242,7 @@
                 ready: function(){
                     var wh = window.innerHeight;
                     this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
-                },                
+                },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
