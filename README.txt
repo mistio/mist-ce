@@ -149,7 +149,7 @@ If this does not load check if a local firewall policy denies incoming access to
 
 
 Process rabbitmq is not running
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 First make sure that erlang is installed, otherwise it won't be able to start (on RedHat based OS you might have to install it manually, see the install section). On some Ubuntu systems there's an error that prevents rabbitmq from starting correctly, if that's the case for you try to start epmd manually and then restart rabbitmq::
 
@@ -161,3 +161,31 @@ First make sure that erlang is installed, otherwise it won't be able to start (o
     user@user:~/mist.io$ ./bin/supervisorctl status rabbitmq
     rabbitmq                         RUNNING   pid 18808, uptime 0:00:06
 
+
+Do you have an official mist.io docker image?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sure, find it on https://registry.hub.docker.com/u/mist/mistio/
+
+With docker installed on your system, you just need to pull it and start a container::
+
+    root@client-monit:~$ docker pull mist/mistio
+    Pulling repository mist/mistio
+    ...
+    ...
+    Status: Downloaded newer image for mist/mistio:latest
+    root@client-monit:~$ docker run -d -p 8000:8000 mist/mistio
+    8da5cc47bca22a5d1da729c4b23382c90ae0aaec50bcc2d608e9bea783b5b8a3
+
+
+The above commands, pulled the docker image, started it as a daemon, and exposed it to port 8000. You can now launch a browser on your ip:8000, eg http://104.236.188.180:8000/ and you should see the Mist.io UI.
+
+You can find more info on http://docs.mist.io/article/39-installation
+
+
+How to add authentication to mist.io dashboard
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By default mist.io listens on port 8000 on the localhost interface. You can use nginx and expose this port to port 80 and add http basic authentication there, or you can expose port 8000 on external interfaces (see the seconds section on the FAQ for this) and add http basic authentication there. The last one can be achieved with editing haproxy.conf file and adding 4 lines, as it has been suggested by @paimpozhil  here https://github.com/mistio/mist.io/pull/213/files. Make sure you restart haproxy after the edits::
+
+    user@user:~/mist.io$ ./bin/supervisorctl restart haproxy
