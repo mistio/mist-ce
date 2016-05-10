@@ -73,7 +73,7 @@
             <iron-route path="/templates" title="templates" href="../pages/page-items.html"></iron-route>
             <iron-route path="/templates/:id" title="template" href="../templates/template-page.html"></iron-route>
             <iron-route path="/add-template" title="add template" href="../templates/template-add.html"></iron-route>
-            <!-- stackss -->
+            <!-- stacks -->
             <iron-route path="/create-stack/:id" title="add template" href="../stacks/stack-create.html"></iron-route>
             <iron-route path="/stacks" title="stacks"  href="../pages/page-items.html"></iron-route>
             <iron-route path="/stacks/:id" title="stack" href="../stacks/stack-page.html"></iron-route>
@@ -103,8 +103,7 @@
             <machine-page params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-page>
             <!-- images -->
             <page-items class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
-            <!-- <images-list model="[[model]]" images="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></images-list> -->
-            <page-image params="[[params]]" model="[[model]]" image="[[getImage(params)]]" elements="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-image>
+            <image-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.images]]"></image-page>
             <!-- keys -->
             <page-items class="keys" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.keysArray]]"></page-items>
             <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>

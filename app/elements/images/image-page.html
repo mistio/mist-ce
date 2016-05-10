@@ -5,116 +5,116 @@
     <template>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
-        :host {
-            display: block;
-            background: #fafafa;
-        }
+            :host {
+                display: block;
+                background: #fafafa;
+            }
 
-        paper-material {
-            display: block;
-            padding: 20px;
-            margin: 36px;
-        }
+            paper-material {
+                display: block;
+                padding: 20px;
+                margin: 36px;
+            }
 
-        paper-menu-button paper-button {
-            display: block;
-        }
+            paper-menu-button paper-button {
+                display: block;
+            }
 
-        .flex-horizontal-with-ratios {
-            @apply(--layout-horizontal);
-        }
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+            }
 
-        .flexchild {
-            @apply(--layout-flex);
-        }
+            .flexchild {
+                @apply(--layout-flex);
+            }
 
-        .command-container {
-            background-color: #444;
-            color: #fff;
-            font-family: monospace;
-            padding: 10px;
-        }
+            .command-container {
+                background-color: #444;
+                color: #fff;
+                font-family: monospace;
+                padding: 10px;
+            }
 
-        a {
-            color: black;
-            text-decoration: none;
-        }
+            a {
+                color: black;
+                text-decoration: none;
+            }
 
-        #container {
-            background: #fafafa;
-        }
+            #container {
+                background: #fafafa;
+            }
 
-        .paper-header [paper-drawer-toggle] {
-            margin-left: 10px;
-        }
+            .paper-header [paper-drawer-toggle] {
+                margin-left: 10px;
+            }
 
-        .paper-header {
-            @apply(--layout-horizontal);
-        }
+            .paper-header {
+                @apply(--layout-horizontal);
+            }
 
-        .paper-header {
-            height: 60px;
-            font-size: 24px;
-            line-height: 60px;
-            padding: 0 10px;
-            color: white;
-            transition: height 0.2s;
-            transition: font-size 0.2s;
-        }
+            .paper-header {
+                height: 60px;
+                font-size: 24px;
+                line-height: 60px;
+                padding: 0 10px;
+                color: white;
+                transition: height 0.2s;
+                transition: font-size 0.2s;
+            }
 
-        .paper-header.tall {
-            height: 320px;
-            font-size: 16px;
-        }
+            .paper-header.tall {
+                height: 320px;
+                font-size: 16px;
+            }
 
-        .paper-header h2 {
-            margin-left: 20px;
-            @apply(--layout-flex);
-            text-transform: capitalize;
-        }
+            .paper-header h2 {
+                margin-left: 20px;
+                @apply(--layout-flex);
+                text-transform: capitalize;
+            }
 
-        .paper-header .toggleViewButton {
-            --paper-icon-button-ink-color: transparent;
-        }
+            .paper-header .toggleViewButton {
+                --paper-icon-button-ink-color: transparent;
+            }
 
-        .paper-header .cartButton {
-            margin-right: 10px;
-        }
+            .paper-header .cartButton {
+                margin-right: 10px;
+            }
 
-        #content {
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 0 10px;
-        }
+            #content {
+                overflow: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 0 10px;
+            }
 
-        paper-icon-button {
-            transition: all 200ms;
-        }
+            paper-icon-button {
+                transition: all 200ms;
+            }
 
-        paper-icon-button.active-sort {
-            transform: rotate(180deg);
-        }
+            paper-icon-button.active-sort {
+                transform: rotate(180deg);
+            }
 
-        paper-icon-button.active-sort::content iron-icon {
-            color: #D48900 !important;
-        }
+            paper-icon-button.active-sort::content iron-icon {
+                color: #D48900 !important;
+            }
 
-        app-bar .menu-icon {
-            margin-right: 15px;
-        }
+            app-bar .menu-icon {
+                margin-right: 15px;
+            }
 
-        [size=xs] > * {
-            display: none;
-        }
+            [size=xs] > * {
+                display: none;
+            }
 
-        [size=xs] app-sidebar {
-            min-width: 100%;
-            height: auto;
-        }
+            [size=xs] app-sidebar {
+                min-width: 100%;
+                height: auto;
+            }
 
-        paper-icon-bottom.bottom {
-            padding-right: 8px;
-        }
+            paper-icon-bottom.bottom {
+                padding-right: 8px;
+            }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
@@ -123,13 +123,24 @@
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="marios@mist.io"></app-user-menu>
-                    <span class="bottom title">Image "[[.name]]"</span>
+                    <span class="bottom title">Image "[[image.name]]"</span>
                 </paper-toolbar>
                 <div class="content">
                     <paper-material>
                         <div class="info-table">
                             <div class="info-body info-group">
-                                test
+                                <div class="info-item flex-horizontal-with-ratios">
+                                    <div class="flexchild">ID</div>
+                                    <div class="flexchild">[[image.id]]</div>
+                                </div>
+                                <div class="info-item flex-horizontal-with-ratios">
+                                    <div class="flexchild">Name</div>
+                                    <div class="flexchild">[[image.name]]</div>
+                                </div>
+                                <div class="info-item flex-horizontal-with-ratios">
+                                    <div class="flexchild">Provider</div>
+                                    <div class="flexchild">[[image.cloud.title]]</div>
+                                </div>
                             </div>
                         </div>
                     </paper-material>
@@ -141,55 +152,57 @@
         </paper-drawer-panel>
     </template>
     <script>
-    (function() {
-        'use strict';
+        (function() {
+            'use strict';
 
-        Polymer({
-            is: 'image-page',
+            Polymer({
+                is: 'image-page',
 
-            properties: {
-                sections: {
-                    type: Object
+                properties: {
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    params: {
+                        type: Object
+                    },
+                    model: {
+                        type: Object
+                    },
+                    image: {
+                        type: Object,
+                        computed: '_computeImage(params)'
+                    },
+                    imageid: {
+                        type: String,
+                        computed: '_computeImageId(params)'
+                    }
                 },
-                section: {
-                    type: Object
+                _getHeaderStyle: function(section) {
+                    return 'background-color: ' + section.color + '; color: #fff;';
                 },
-                color: {
-                    type: String,
-                    computed: '_getHeaderStyle(section)'
+                _computeImage: function(params) {
+                    return this.model.imagesArray.find(function(image) {
+                        console.log(image, params);
+                        return image.id == params.id;
+                    });
                 },
-                params: {
-                    type: Object
+                _computeImageId: function(params) {
+                    return params.id;
                 },
-                model: {
-                    type: Object
+                _starImage: function() {
+
                 },
-                image: {
-                    type: Object,
-                    computed: '_computeImage(params)'
-                },
-                imageid: {
-                    type: String,
-                    computed: '_computeImageId(params)'
-                },
-                isInline: {
-                    type: Boolean,
-                    computed: '_computeIsInline(image.source)'
+                _goBack: function() {
+                    history.back();
                 }
-            },
-            _getHeaderStyle: function(section) {
-                return 'background-color: ' + section.color + '; color: #fff;';
-            },
-            _computeId: function(params) {
-                return params.id;
-            },
-            _starImage: function(){
-
-            },
-            _goBack: function(){
-                history.back();
-            }
-        });
-    })();
+            });
+        })();
     </script>
 </dom-module>
