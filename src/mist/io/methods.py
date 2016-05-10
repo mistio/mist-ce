@@ -2517,11 +2517,11 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                                   % action)
     except:
         machine = Node(machine_id,
-                   name=machine_id,
-                   state=0,
-                   public_ips=[],
-                   private_ips=[],
-                   driver=conn)
+                       name=machine_id,
+                       state=NodeState.RUNNING,
+                       public_ips=[],
+                       private_ips=[],
+                       driver=conn)
     try:
         if action is 'start':
             # In liblcoud it is not possible to call this with machine.start()
@@ -2529,7 +2529,6 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                 conn.ex_start_node(machine, ex_cloud_service_name=cloud_service)
             else:
                 conn.ex_start_node(machine)
-
             if conn.type is Provider.DOCKER:
                 node_info = conn.inspect_node(node)
                 try:
@@ -2605,8 +2604,8 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     machine.save()
 
         elif action is 'destroy':
-            if conn.type is Provider.DOCKER and node.state == 0:
-                conn.ex_stop_node(node)
+            if conn.type is Provider.DOCKER and node.state == NodeState.RUNNING:
+                conn.ex_stop_node(machine)
                 machine.destroy()
             elif conn.type == 'azure':
                 conn.destroy_node(machine, ex_cloud_service_name=cloud_service)
@@ -3365,8 +3364,8 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
 
     conn = connect_provider(cloud)
 
-    machine = Node(machine_id, name='', state=0, public_ips=[],
-                   private_ips=[], driver=conn)
+    machine = Node(machine_id, name='', state=NodeState.RUNNING,
+                   public_ips=[], private_ips=[], driver=conn)
 
     tags_dict = {}
     if isinstance(tags, list):
