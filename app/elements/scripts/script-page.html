@@ -138,6 +138,10 @@
                     <paper-material>
                         <div class="info-table">
                             <div class="info-body info-group">
+                                <div class="info-item flex-horizontal-with-ratios">
+                                    <div class="flexchild">ID</div>
+                                    <div class="flexchild">[[script.script_id]]</div>
+                                </div>
                                 <template is="dom-if" if="[[script.description]]">
                                     <div class="info-item flex-horizontal-with-ratios">
                                         <div hidden$="[[!script.description]]" class="flexchild">Description</div>
@@ -146,7 +150,7 @@
                                 </template>
                                 <div class="info-item flex-horizontal-with-ratios">
                                     <div class="flexchild">Type</div>
-                                    <div class="flexchild">[[script.type]]</div>
+                                    <div class="flexchild">[[script.exec_type]]</div>
                                 </div>
                                 <template is="dom-if" if="[[script.entrypoint]]">
                                     <div class="info-item flex-horizontal-with-ratios">
@@ -160,7 +164,7 @@
                                         <div class="flexchild command-container">[[script.script]]</div>
                                     </div>
                                 </template>
-                                <template is="dom-if" if="[[isInline]]">
+                                <template is="dom-if" if="[[!isInline]]">
                                     <div class="info-item flex-horizontal-with-ratios">
                                         <div class="flexchild">Url</div>
                                         <div class="flexchild">[[script.script]]</div>
@@ -213,7 +217,7 @@
                 },
                 isInline: {
                     type: Boolean,
-                    computed: '_computeIsInline(script.source)'
+                    computed: '_computeIsInline(script.location_type)'
                 }
             },
             listeners: {
@@ -227,16 +231,15 @@
                 return params.id;
             },
             _computeScript: function(params) {
-                var scriptid = params.id;
                 return this.model.scriptsArray.find(function(script) {
-                    return script.script_id == scriptid;
-                }, this);
+                    return script.script_id == params.id;
+                });
             },
             _computeScriptId: function(params) {
                 return params.id;
             },
-            _computeIsInline: function(source) {
-                return source == 'inline';
+            _computeIsInline: function(location_type) {
+                return location_type == 'inline';
             },
             _runScript: function(e) {
                 page.show('/run-script/' + this.script.id);
