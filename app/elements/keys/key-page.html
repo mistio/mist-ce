@@ -167,7 +167,7 @@
             color: #fff !important;
             width: 20px;
             height: 20px;
-        }        
+        }
         ul {
             padding: 0;
         }
@@ -257,10 +257,11 @@
         <template is="dom-if" if="{{key.id}}">
             <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         </template>
-        <iron-ajax id="keyMakeDefaultRequest" url="{{baseUrl}}" method="POST" on-response="handleDefaultResponse" on-error="handleError"></iron-ajax>
+        <iron-ajax id="keyMakeDefaultRequest" url="/api/v1/keys/{{key.id}}" method="POST" on-response="handleDefaultResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyEditRequest" url="{{baseUrl}}" method="PUT" on-response="handleEditResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyDeleteRequest" url="{{baseUrl}}" method="DELETE" on-response="handleDeleteResponse" on-error="handleError"></iron-ajax>
         <paper-toast id="toast"></paper-toast>
+        <dialog-element></dialog-element>
     </template>
     <script>
     (function() {
@@ -341,7 +342,6 @@
                 }
                 this.visiblePrivateKey = false;
                 this.set('privateKey', null);
-                // console.log('update-params',params);
             },
             _baseUrl: function (params){
                 return '/keys/'+ this.params.id;
@@ -434,6 +434,8 @@
             },
             _makeDefaultKey: function(e) {
                 var isDefault = this.key.isDefault;
+                this.$.keyMakeDefaultRequest.headers["Content-Type"] = 'application/json';
+                this.$.keyMakeDefaultRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.keyMakeDefaultRequest.generateRequest();
                 this.set('key.isDefault', true);
             },
