@@ -9,7 +9,7 @@ import requests
 import subprocess
 import re
 import mongoengine as me
-from mongoengine import ValidationError, NotUniqueError
+from mongoengine import ValidationError, NotUniqueError, DoesNotExist
 from time import sleep, time
 from datetime import datetime
 from hashlib import sha256
@@ -2536,11 +2536,15 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                 except KeyError:
                     port = 22
 
-                machine = Machine.objects.get(cloud=cloud,
-                                              machine_id=machine_id)
-                for key_assoc in machine.key_associations:
-                    key_assoc.port = port
-                machine.save()
+                try:
+                    machine = Machine.objects.get(cloud=cloud,
+                                                  machine_id=machine_id)
+                except DoesNotExist:
+                    pass
+                else:
+                    for key_assoc in machine.key_associations:
+                        key_assoc.port = port
+                    machine.save()
         elif action is 'stop':
             # In libcloud it is not possible to call this with machine.stop()
             if conn.type == 'azure':
@@ -2597,12 +2601,16 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                         port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
                     except KeyError:
                         port = 22
-                    machine = Machine.objects.get(cloud=cloud,
-                                                  machine_id=machine_id)
-                    for key_assoc in machine.key_associations:
-                        key_assoc.port = port
-                    machine.save()
 
+                    try:
+                        machine = Machine.objects.get(cloud=cloud,
+                                                      machine_id=machine_id)
+                    except DoesNotExist:
+                        pass
+                    else:
+                        for key_assoc in machine.key_associations:
+                            key_assoc.port = port
+                        machine.save()
         elif action is 'destroy':
             if conn.type is Provider.DOCKER and node.state == NodeState.RUNNING:
                 conn.ex_stop_node(machine)
