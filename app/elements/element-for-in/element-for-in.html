@@ -1,5 +1,14 @@
 <dom-module id="element-for-in">
     <template></template>
+    <style include="shared-styles">
+        .flex-horizontal-with-ratios {
+            @apply(--layout-horizontal);
+        }
+
+        .flexchild {
+            @apply(--layout-flex);
+        }
+    </style>
 </dom-module>
 
 <script>
@@ -45,16 +54,14 @@
             });
         },
         createTpl: function(content) {
-            var tpl = '<table class="info-table">';
+            var tpl = '';
 
             for (var i = 0, len = content.length; i < len; i++) {
-                tpl += "<tr>";
-                tpl += "<td>" + this.processKeys(content[i].key) + "</td>";
-                tpl += "<td>" + content[i].value + "</td>";
-                tpl += "</tr>";
+                tpl += "<div class='info-item flex-horizontal-with-ratios'>";
+                tpl += "<div class='flexchild'>" + this.processKeys(content[i].key) + "</div>";
+                tpl += "<div class='flexchild'>" + content[i].value + "</div>";
+                tpl += "</div>";
             }
-
-            tpl += '</table>';
 
             return tpl;
         },

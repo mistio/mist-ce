@@ -123,33 +123,40 @@
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="[[model.email]]"></app-user-menu>
-                    <span class="bottom title">Image "[[image.name]]"</span>
+                    <template is="dom-if" if="[[image]]">
+                        <span class="bottom title">Image "[[image.name]]"</span>
+                    </template>
                 </paper-toolbar>
                 <div class="content">
-                    <paper-material>
-                        <div class="info-table">
-                            <div class="info-body info-group">
-                                <div class="info-item flex-horizontal-with-ratios">
-                                    <div class="flexchild">ID</div>
-                                    <div class="flexchild">[[image.id]]</div>
-                                </div>
-                                <div class="info-item flex-horizontal-with-ratios">
-                                    <div class="flexchild">Name</div>
-                                    <div class="flexchild">[[image.name]]</div>
-                                </div>
-                                <div class="info-item flex-horizontal-with-ratios">
-                                    <div class="flexchild">Provider</div>
-                                    <div class="flexchild">[[image.cloud.title]]</div>
+                    <template is="dom-if" if="[[image]]">
+                        <paper-material>
+                            <div class="info-table">
+                                <div class="info-body info-group">
+                                    <div class="info-item flex-horizontal-with-ratios">
+                                        <div class="flexchild">ID</div>
+                                        <div class="flexchild">[[image.id]]</div>
+                                    </div>
+                                    <div class="info-item flex-horizontal-with-ratios">
+                                        <div class="flexchild">Name</div>
+                                        <div class="flexchild">[[image.name]]</div>
+                                    </div>
+                                    <div class="info-item flex-horizontal-with-ratios">
+                                        <div class="flexchild">Provider</div>
+                                        <div class="flexchild">[[image.cloud.title]]</div>
+                                    </div>
+                                    <element-for-in content="[[image.extra]]"></element-for-in>
                                 </div>
                             </div>
-                        </div>
-                    </paper-material>
+                        </paper-material>
+                    </template>
+
                     <div class="absolute-bottom-right">
                         <paper-fab icon="star" on-tap="_starImage" id="starImageFab"></paper-fab>
                     </div>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
+        <iron-ajax id="imageStarRequest" url="/api/v1/clouds/{{image.cloud.id}}/images/{{image.id}}" method="POST" on-response="handleStarResponse" on-error="handleStarError"></iron-ajax>
     </template>
     <script>
         (function() {
@@ -198,7 +205,17 @@
                 _computeImageId: function(params) {
                     return params.id;
                 },
-                _starImage: function() {
+                _starImage: function(e) {
+                    console.log(e);
+                    var starred = this.image.star;
+                    this.$.imageStarRequest.headers["Content-Type"] = 'application/json';
+                    this.$.imageStarRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.imageStarRequest.generateRequest();
+                },
+                handleStarResponse: function(e) {
+                    console.log(e);
+                },
+                handleStarError: function(e) {
 
                 },
                 _goBack: function() {
