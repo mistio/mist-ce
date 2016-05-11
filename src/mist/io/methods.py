@@ -38,6 +38,7 @@ import ansible.constants
 
 # try:
 # from mist.core.user.models import User
+from mist.core.tag.models import Tag
 from mist.core.cloud.models import Cloud, Machine, KeyAssociation
 from mist.core.keypair.models import Keypair
 from mist.core import config
@@ -1014,6 +1015,19 @@ def delete_cloud(owner, cloud_id):
                         "Error: %r", exc)
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    machines = Machine.objects(cloud=cloud)
+    for machine in machines:
+        tags = Tag.objects(owner=owner, resource=machine)
+        for tag in tags:
+            try:
+                tag.delete()
+            except:
+                 pass
+        try:
+            machine.delete()
+        except:
+            pass
+
     cloud.delete()
     log.info("Succesfully deleted cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
