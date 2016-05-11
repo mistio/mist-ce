@@ -210,6 +210,7 @@
                     var starred = this.image.star;
                     this.$.imageStarRequest.headers["Content-Type"] = 'application/json';
                     this.$.imageStarRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.imageStarRequest.body = {};
                     this.$.imageStarRequest.generateRequest();
                 },
                 handleStarResponse: function(e) {

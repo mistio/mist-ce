@@ -258,7 +258,7 @@
         <template is="dom-if" if="{{key.id}}">
             <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         </template>
-        <iron-ajax id="keyMakeDefaultRequest" url="/api/v1/keys/{{key.id}}" method="POST" on-response="handleDefaultResponse" on-error="handleError"></iron-ajax>
+        <iron-ajax id="keyMakeDefaultRequest" url="/api/v1/keys/{{key.id}}" method="POST" on-response="_handleMakeDefaultResponse" on-error="_handleMakeDefaultError"></iron-ajax>
         <iron-ajax id="keyEditRequest" url="{{baseUrl}}" method="PUT" on-response="handleEditResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyDeleteRequest" url="{{baseUrl}}" method="DELETE" on-response="handleDeleteResponse" on-error="handleError"></iron-ajax>
         <paper-toast id="toast"></paper-toast>
@@ -440,7 +440,10 @@
                 var isDefault = this.key.isDefault;
                 this.$.keyMakeDefaultRequest.headers["Content-Type"] = 'application/json';
                 this.$.keyMakeDefaultRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.keyMakeDefaultRequest.body = {};
                 this.$.keyMakeDefaultRequest.generateRequest();
+            },
+            _handleMakeDefaultResponse: function(e) {
                 this.set('key.isDefault', true);
             },
             _deleteKey: function(e) {
