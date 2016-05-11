@@ -8,12 +8,12 @@
         --fedora-color: rgba(0, 0, 0, .5);
         --linux-color: rgba(50, 50, 50, .5);
     }
-    
+
     :host span {
         display: inline-block;
     }
     /*var lexicon = ["ubuntu", "mongo", "aws", "suse", "fedora", "linux"];*/
-    
+
     :host span.icon {
         border-radius: 100px;
         width: 32px;
@@ -24,7 +24,7 @@
         text-align: center;
         background-color: #ddd;
     }
-    
+
     :host span.icon img {
         display: inline-block;
         vertical-align: middle;
@@ -47,7 +47,7 @@ Polymer({
         feed: Array
     },
     _src: function(item){
-        return "../images/image-icons/"+ item +".svg";
+        return "../assets/image-icons/"+ item +".svg";
     }
 });
 </script>

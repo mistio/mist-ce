@@ -7,7 +7,7 @@
             justify-content: stretch;
         }
         .clouds-image {
-            background: url(../../images/onboarding/clouds.svg) center center no-repeat transparent;
+            background: url(../../assets/onboarding/clouds.svg) center center no-repeat transparent;
             background-size: 50%;
             width: 100%;
             height: 224px;
@@ -16,7 +16,7 @@
             text-align: center;
         }
         .mounts-image {
-            background: url(../../images/onboarding/mount.svg)  center bottom no-repeat transparent;
+            background: url(../../assets/onboarding/mount.svg)  center bottom no-repeat transparent;
             background-size: 100%;
             width: 100%;
             height: 250px;
@@ -31,7 +31,7 @@
             <div class="onb">
                 <div class="clouds-image"></div>
                 <div class="call-onboard">
-                    <h2 id="onbtext"></h2>                                        
+                    <h2 id="onbtext"></h2>
                     <paper-button id="onbbutton" class="blue"></paper-button>
                 </div>
                 <div class="mounts-image"></div>
@@ -92,7 +92,7 @@
 	            value: {},
 	            computed: 'getStateFromNum(onbstate)',
 	            notify: true
-	        }     
+	        }
 	    },
 	    observers: [
 	             'updateOnbTexts(state)'
@@ -112,4 +112,3 @@
 	});
 	</script>
 </dom-module>
-

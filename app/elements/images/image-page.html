@@ -177,19 +177,21 @@
                     },
                     image: {
                         type: Object,
-                        computed: '_computeImage(params)'
+                        computed: '_computeImage(params, model.imagesArray.*)'
                     },
                     imageid: {
                         type: String,
                         computed: '_computeImageId(params)'
                     }
                 },
+                ready: function() {
+                    console.log(this.params, this.model);
+                },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
-                _computeImage: function(params) {
-                    return this.model.imagesArray.find(function(image) {
-                        console.log(image, params);
+                _computeImage: function(params, images) {
+                    return images.base.find(function(image) {
                         return image.id == params.id;
                     });
                 },
