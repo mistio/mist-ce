@@ -133,10 +133,12 @@
                     <span class="title"></span>
                     <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">Network "[[network.name]]"</span>
-                    <paper-tooltip for="editNetwork" position="top">Edit Network</paper-tooltip>
-                    <paper-icon-button id="editNetwork" class="bottom" icon="icons:create" on-tap="_editNetwork"></paper-icon-button>
-                    <paper-tooltip for="deleteNetwork" position="top">Delete Network</paper-tooltip>
-                    <paper-icon-button id="deleteNetwork" class="bottom" icon="icons:delete" on-tap="_deleteNetwork" disabled$="[[!isOpenstack]]"></paper-icon-button>
+                    <div hidden$=[[!isOpenstack]]>
+                        <paper-tooltip for="editNetwork" position="top">Edit Network</paper-tooltip>
+                        <paper-icon-button id="editNetwork" class="bottom" icon="icons:create" on-tap="_editNetwork"></paper-icon-button>
+                        <paper-tooltip for="deleteNetwork" position="top">Delete Network</paper-tooltip>
+                        <paper-icon-button id="deleteNetwork" class="bottom" icon="icons:delete" on-tap="_deleteNetwork" disabled$="[[!isOpenstack]]"></paper-icon-button>
+                    </div>
                 </paper-toolbar>
                 <div class="content">
                     <paper-material>
@@ -170,6 +172,7 @@
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
+        <iron-ajax id="deleteNetworkAjaxRequest" url="/api/v1/clouds/[[network.cloud.id]]/networks/[[network.id]]" method="DELETE" on-response="_handleDeleteNetworkAjaxResponse" on-error="_handleDeleteNetworkAjaxError"></iron-ajax>
         <dialog-element></dialog-element>
     </template>
     <script>
@@ -200,7 +203,7 @@
                 },
                 network: {
                     type: Object,
-                    computed: '_computeNetwork(params)'
+                    computed: '_computeNetwork(params, model.networksArray.*)'
                 },
                 netid: {
                     type: String,
@@ -215,22 +218,16 @@
                     computed: '_computeHasSubnets(network.subnets)'
                 },
             },
-            observers: [
-                '_computeNetwork(params)',
-                '_computeNetworkId(params)'
-            ],
             listeners: {
-                'confirmation': '_deleteNetworkResponse'
+                'confirmation': '_deleteNetworkEventResponse'
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
             },
-            _computeNetwork: function(params) {
-                var netname = params.name;
-                var net = this.model.networksArray.find(function(network) {
-                    return network.name == netname;
+            _computeNetwork: function(params, networks) {
+                return networks.base.find(function(network) {
+                    return network.name == params.name;
                 }, this);
-                return net;
             },
             _computeNetworkId: function(params) {
                 return params.id;
@@ -241,6 +238,9 @@
             _computeIsOpenstack: function(provider) {
                 return provider == 'openstack';
             },
+            _editNetwork: function(e) {
+                console.log(e);
+            },
             _deleteNetwork: function(e) {
                 this._showDialog({
                     title: 'Delete Network?',
@@ -249,19 +249,24 @@
                     reason: "delete_network"
                 });
             },
-            _deleteNetworkResponse: function(e) {
+            _deleteNetworkEventResponse: function(e) {
                 var reason = e.detail.reason,
                     response = e.detail.response;
 
                 if (response.confirmed && reason == "delete_network") {
                     console.log('i ll delete the network');
-                    page.show('/networks');
+                    // this.$.deleteNetworkAjaxRequest.body = {};
+                    // this.$.deleteNetworkAjaxRequest.headers["Content-Type"] = 'application/json';
+                    // this.$.deleteNetworkAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    // this.$.deleteNetworkAjaxRequest.generateRequest();
                 }
             },
+            _handleDeleteNetworAjaxResponse: function(e) {
+                page.show('/networks');
+            },
             _showDialog: function(info) {
-                var dialog = this.querySelector('dialog-element'),
-                    i;
-                for (i in info) {
+                var dialog = this.querySelector('dialog-element');
+                for (var i in info) {
                     dialog[i] = info[i];
                 }
                 dialog._openDialog();

@@ -268,12 +268,11 @@ Polymer({
         history.back();
     },
     _showDialog: function(info) {
-        var dialog = this.querySelector('dialog-element'),
-            i;
-        for (i in info) {
+        var dialog = this.querySelector('dialog-element');
+        for (var i in info) {
             dialog[i] = info[i];
         }
-        dialog._openDialog();
+        console.log(dialog);
     },
     _editMachine: function(e) {
         var el = this.querySelector('machine-edit');

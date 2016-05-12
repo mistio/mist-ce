@@ -36,11 +36,11 @@
                     <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
                     <span class="title"></span>
                     <app-user-menu email="[[model.email]]"></app-user-menu>
-                    <span class="bottom title">Add Network {{typedName}}</span>
+                    <span class="bottom title">Add Network {{network.name}}</span>
                 </paper-toolbar>
                 <div id="content">
                     <paper-material>
-                        <div class="grid-row" hidden$=[[!hasClouds]]>
+                        <div class="grid-row" hidden$=[[!hasOpenstackClouds]]>
                             <template is="dom-repeat" items="{{fields}}" as="field">
                                 <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
                                     <paper-input id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" class="xs12"></paper-input>
@@ -73,14 +73,14 @@
                             </div>
                         </div>
 
-                        <div hidden$=[[hasClouds]]>
+                        <div hidden$=[[hasOpenstackClouds]]>
                             <p>You cannot add a network since you don't have an enabled Openstack cloud in your account!</p>
                         </div>
                     </paper-material>
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <iron-ajax id="addNetworkAjax" url="/scripts" method="POST" on-request="_addNetworkAjaxRequest" on-response="_addNetworkAjaxResponse"></iron-ajax>
+        <iron-ajax id="addNetworkRequest" url="/api/v1/clouds/[[network.cloud.id]]/networks" method="POST" on-response="_handleAddNetworkResponse" on-error="_handleAddNetworkError"></iron-ajax>
     </template>
     <script>
     (function() {
@@ -320,9 +320,13 @@
                 clouds: {
                     type: Array
                 },
-                hasClouds: {
+                openstackClouds: {
+                    type: Array,
+                    computed: '_computeOpenstackClouds(clouds.*)'
+                },
+                hasOpenstackClouds: {
                     type: Boolean,
-                    computed: '_computeHasClouds(clouds)'
+                    computed: '_computeHasOpenstackClouds(openstackClouds)'
                 },
                 sendingData: {
                     type: Boolean,
@@ -335,24 +339,18 @@
             },
             observers: [
                 '_fieldsChanged(fields.*, sendingData)',
-                '_cloudsChanged(clouds.*)',
-                '_updateTypedName(fields.#0.*)'
+                '_cloudsChanged(openstackClouds.*)'
             ],
-            ready: function(){
-                this.clouds =  this.clouds.filter(function(cloud) {
-                    return cloud.enabled && cloud.provider == 'openstack';
-                });
-            },
-            _updateTypedName: function(t) {
-                if (t.path == "fields.#0.value" && t.value) {
-                    this.typedName = '"'+t.value+'"';
-                }
-            },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
             },
-            _computeHasClouds: function(clouds) {
-                return clouds.length > 0;
+            _computeOpenstackClouds: function(clouds) {
+                return this.clouds.filter(function(cloud) {
+                    return cloud.enabled && cloud.provider == 'openstack';
+                });
+            },
+            _computeHasOpenstackClouds: function(openstackClouds) {
+                return openstackClouds.length > 0;
             },
             _computeFieldType: function(field, value, show) {
                 if (!(field.showIf && !field.show)) {
@@ -385,7 +383,7 @@
                 }, this);
 
                 var valid = fields.base.every(function(el, index) {
-                    return el.show && el.required ? el.value : true;
+                    return el.show && el.required ? el.value != '' : true;
                 }, this);
 
                 this.set('network', network);
@@ -468,18 +466,18 @@
                 }
 
                 console.log(payload);
-                //   this.$.addNetworkAjax.body = payload;
-                //   this.$.addNetworkAjax.generateRequest();
+                this.$.addNetworkRequest.body = payload;
+                this.$.addNetworkRequest.headers["Content-Type"] = 'application/json';
+                this.$.addNetworkRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.addNetworkRequest.generateRequest();
             },
-            _addNetworkAjaxRequest: function() {
-                this.set('sendingData', true);
-            },
-            _addNetworkAjaxResponse: function(e) {
+            _handleAddNetworkResponse: function(e) {
+                console.log(e);
                 this.set('sendingData', false);
 
-                this.fire('addNetwork', {
-                    network: {}
-                });
+                // this.fire('addNetwork', {
+                //     network: {}
+                // });
             },
             _resetForm: function(e) {
                 // Reset network

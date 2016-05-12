@@ -6,183 +6,199 @@
     <template>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
-        :host {
-            display: block;
-            background: #fafafa;
-        }
-
-        paper-material {
-            display: block;
-            padding: 20px;
-        }
-
-        paper-menu-button paper-button {
-            display: block;
-        }
-        a.machine {
-            color: var(--mist-blue) !important;
-        }
-        .machine-info {
-            font-size: 0.9rem;
-            color: rgba(0,0,0,0.54);
-        }
-
-        #container {
-            background: #fafafa;
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .paper-header [paper-drawer-toggle] {
-            margin-left: 10px;
-        }
-
-        .paper-header {
-            @apply(--layout-horizontal);
-        }
-
-        .paper-header {
-            height: 60px;
-            font-size: 24px;
-            line-height: 60px;
-            padding: 0 10px;
-            color: white;
-            transition: height 0.2s;
-            transition: font-size 0.2s;
-        }
-
-        .paper-header.tall {
-            height: 320px;
-            font-size: 16px;
-        }
-
-        .paper-header h2 {
-            margin-left: 20px;
-            @apply(--layout-flex);
-            text-transform: capitalize;
-        }
-
-        .paper-header .toggleViewButton {
-            --paper-icon-button-ink-color: transparent;
-        }
-
-        .paper-header .cartButton {
-            margin-right: 10px;
-        }
-
-        .content {
-            margin: 36px 36px 80px 36px;
-        }
-
-        paper-icon-button {
-            transition: all 200ms;
-        }
-
-        paper-icon-button.active-sort {
-            transform: rotate(180deg);
-        }
-
-        paper-icon-button.active-sort::content iron-icon {
-            color: #D48900 !important;
-        }
-
-        app-bar .menu-icon {
-            margin-right: 15px;
-        }
-
-        [size=xs] > * {
-            display: none;
-        }
-
-        [size=xs] app-sidebar {
-            min-width: 100%;
-            height: auto;
-        }
-
-        paper-icon-bottom.bottom,
-        iron-icon.bottom {
-            padding-right: 8px;
-        }
-        #keyPublicContainer textarea,
-        #keyPrivateContainer textarea {
-            height: 120px;
-            overflow: auto;
-            font-family: monospace;
-            width: 100%;
-            font-size: 14px;
-            line-height: 1.4em;
-            padding: 10px 15px;
-            box-sizing: border-box;
-            background-color: #f8f8f8;
-            border-color: #eeedeb;
-            color: rgba(0,0,0,0.54);
-            white-space: normal;
-        }
-
-        #keyPublicContainer textarea {
-            height: 120px;
-        }
-
-        #keyPrivateContainer {
-            text-align: center;
-        }
-
-        #keyPrivateContainer textarea {
-            height: 440px;
-        }
-
-        #keyPrivateContainer #showPrivateKeybtn {
-            margin: 20px 0;
-        }
-        paper-button.right {
-            text-align: right;
-        }
-        paper-button.link,
-        paper-button.link iron-icon {
-            background-color: transparent !important;
-            color: var(--mist-blue)     !important;
-        }
-        .head {
-            @apply(--layout-horizontal);
-            align-items: center;
-        }
-        h4.key  {
-            @apply(--layout-flex);
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            font-weight: 700;
-        }
-        .head paper-button {
-            flex: none !important;
-            display: inline-block;
-        }
-        paper-button.right, #showPrivateKeybtn  {
-            font-size: 0.9rem;
-        }
-        #showPrivateKeybtn  {
-            padding-left: 16px;
-            padding-right: 16px;
-            font-weight: 500;
-        }
-        #showPrivateKeybtn iron-icon {
-            color: #fff !important;
-            width: 20px;
-            height: 20px;
-        }
-        ul {
-            padding: 0;
-        }
-        ul li  {
-            list-style: none;
-        }
-        .wide {
-            display: none;
-        }
-        @media (min-width: 1339px) {
-            .wide {
-                display: inline;
+            :host {
+                display: block;
+                background: #fafafa;
             }
-        }
+
+            paper-material {
+                display: block;
+                padding: 20px;
+            }
+
+            paper-menu-button paper-button {
+                display: block;
+            }
+
+            a.machine {
+                color: var(--mist-blue) !important;
+            }
+
+            .machine-info {
+                font-size: 0.9rem;
+                color: rgba(0, 0, 0, 0.54);
+            }
+
+            #container {
+                background: #fafafa;
+                overflow: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .paper-header [paper-drawer-toggle] {
+                margin-left: 10px;
+            }
+
+            .paper-header {
+                @apply(--layout-horizontal);
+            }
+
+            .paper-header {
+                height: 60px;
+                font-size: 24px;
+                line-height: 60px;
+                padding: 0 10px;
+                color: white;
+                transition: height 0.2s;
+                transition: font-size 0.2s;
+            }
+
+            .paper-header.tall {
+                height: 320px;
+                font-size: 16px;
+            }
+
+            .paper-header h2 {
+                margin-left: 20px;
+                @apply(--layout-flex);
+                text-transform: capitalize;
+            }
+
+            .paper-header .toggleViewButton {
+                --paper-icon-button-ink-color: transparent;
+            }
+
+            .paper-header .cartButton {
+                margin-right: 10px;
+            }
+
+            .content {
+                margin: 36px 36px 80px 36px;
+            }
+
+            paper-icon-button {
+                transition: all 200ms;
+            }
+
+            paper-icon-button.active-sort {
+                transform: rotate(180deg);
+            }
+
+            paper-icon-button.active-sort::content iron-icon {
+                color: #D48900 !important;
+            }
+
+            app-bar .menu-icon {
+                margin-right: 15px;
+            }
+
+            [size=xs] > * {
+                display: none;
+            }
+
+            [size=xs] app-sidebar {
+                min-width: 100%;
+                height: auto;
+            }
+
+            paper-icon-bottom.bottom,
+            iron-icon.bottom {
+                padding-right: 8px;
+            }
+
+            #keyPublicContainer textarea,
+            #keyPrivateContainer textarea {
+                height: 120px;
+                overflow: auto;
+                font-family: monospace;
+                width: 100%;
+                font-size: 14px;
+                line-height: 1.4em;
+                padding: 10px 15px;
+                box-sizing: border-box;
+                background-color: #f8f8f8;
+                border-color: #eeedeb;
+                color: rgba(0, 0, 0, 0.54);
+                white-space: normal;
+            }
+
+            #keyPublicContainer textarea {
+                height: 120px;
+            }
+
+            #keyPrivateContainer {
+                text-align: center;
+            }
+
+            #keyPrivateContainer textarea {
+                height: 440px;
+            }
+
+            #keyPrivateContainer #showPrivateKeybtn {
+                margin: 20px 0;
+            }
+
+            paper-button.right {
+                text-align: right;
+            }
+
+            paper-button.link,
+            paper-button.link iron-icon {
+                background-color: transparent !important;
+                color: var(--mist-blue) !important;
+            }
+
+            .head {
+                @apply(--layout-horizontal);
+                align-items: center;
+            }
+
+            h4.key {
+                @apply(--layout-flex);
+                text-transform: uppercase;
+                font-size: 0.9rem;
+                font-weight: 700;
+            }
+
+            .head paper-button {
+                flex: none !important;
+                display: inline-block;
+            }
+
+            paper-button.right,
+            #showPrivateKeybtn {
+                font-size: 0.9rem;
+            }
+
+            #showPrivateKeybtn {
+                padding-left: 16px;
+                padding-right: 16px;
+                font-weight: 500;
+            }
+
+            #showPrivateKeybtn iron-icon {
+                color: #fff !important;
+                width: 20px;
+                height: 20px;
+            }
+
+            ul {
+                padding: 0;
+            }
+
+            ul li {
+                list-style: none;
+            }
+
+            .wide {
+                display: none;
+            }
+
+            @media (min-width: 1339px) {
+                .wide {
+                    display: inline;
+                }
+            }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
@@ -213,7 +229,9 @@
                     <paper-material>
                         <div class="head">
                             <h4 class="key">Public Key</h4>
-                            <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="right link">Copy <span class="wide">public key</span> <iron-icon icon="content-copy"></iron-icon> </paper-button>
+                            <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="right link">Copy <span class="wide">public key</span>
+                                <iron-icon icon="content-copy"></iron-icon>
+                            </paper-button>
                         </div>
                         <div id="keyPublicContainer">
                             <textarea id="keyPublic">
@@ -224,11 +242,16 @@
                     <paper-material>
                         <div class="head">
                             <h4 class="key">Private Key</h4>
-                            <paper-button hidden$="[[!visiblePrivateKey]]" id="hidePrivateKeybtn" on-tap="hidePrivateKey" class="right link">Hide <span class="wide">Private Key</span> <iron-icon icon="icons:visibility-off"></iron-icon></paper-button>
-                            <paper-button hidden$="[[!visiblePrivateKey]]" on-tap="copyPrivateKey" class="right link">Copy <span class="wide">private key</span> <iron-icon icon="content-copy"></iron-icon> </paper-button>
+                            <paper-button hidden$="[[!visiblePrivateKey]]" id="hidePrivateKeybtn" on-tap="hidePrivateKey" class="right link">Hide <span class="wide">Private Key</span>
+                                <iron-icon icon="icons:visibility-off"></iron-icon>
+                            </paper-button>
+                            <paper-button hidden$="[[!visiblePrivateKey]]" on-tap="copyPrivateKey" class="right link">Copy <span class="wide">private key</span>
+                                <iron-icon icon="content-copy"></iron-icon>
+                            </paper-button>
                         </div>
                         <div id="keyPrivateContainer">
-                            <paper-button hidden$="[[visiblePrivateKey]]" id="showPrivateKeybtn" on-tap="showPrivateKey"><iron-icon icon="icons:visibility"></iron-icon> View Private Key</paper-button>
+                            <paper-button hidden$="[[visiblePrivateKey]]" id="showPrivateKeybtn" on-tap="showPrivateKey">
+                                <iron-icon icon="icons:visibility"></iron-icon> View Private Key</paper-button>
                             <textarea hidden$="[[!visiblePrivateKey]]" id="keyPrivate">
                                 [[privateKey]]
                             </textarea>
@@ -261,220 +284,227 @@
         <iron-ajax id="keyMakeDefaultRequest" url="/api/v1/keys/{{key.id}}" method="POST" on-response="_handleMakeDefaultResponse" on-error="_handleMakeDefaultError"></iron-ajax>
         <iron-ajax id="keyEditRequest" url="{{baseUrl}}" method="PUT" on-response="handleEditResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyDeleteRequest" url="{{baseUrl}}" method="DELETE" on-response="handleDeleteResponse" on-error="handleError"></iron-ajax>
-        <paper-toast id="toast"></paper-toast>
+        <paper-toast></paper-toast>
+        <iron-ajax id="deleteKeyAjaxRequest" url="/api/v1/clouds/[[network.cloud.id]]/keys/[[key.id]]" method="DELETE" on-response="_handleDeleteKeyAjaxResponse" on-error="_handleDeleteKeyAjaxError"></iron-ajax>
         <dialog-element></dialog-element>
     </template>
     <script>
-    (function() {
-        'use strict';
+        (function() {
+            'use strict';
 
-        Polymer({
-            is: 'key-page',
+            Polymer({
+                is: 'key-page',
 
-            properties: {
-                sections: {
-                    type: Object
-                },
-                section: {
-                    type: Object
-                },
-                model: {
-                    type: Object
-                },
-                color: {
-                    type: String,
-                    computed: '_getHeaderStyle(section)'
-                },
-                params: {
-                    type: Object,
-                    notify: true
-                },
-                key: {
-                    type: Object,
-                    computed: '_computeKey(params)'
-                },
-                id: {
-                    type: String,
-                    computed: '_computeId(params)',
-                    notify: true
-                },
-                isDefault: {
-                    type: String,
-                    computed: '_computeIsDefault(key.isDefault)'
-                },
-                publicKey: {
-                    type: String,
-                    value: null
-                },
-                privateKey: {
-                    type: String,
-                    value: null
-                },
-                keyMachines: {
-                    type: Array,
-                    computed: '_computeKeyMachines(key)'
-                },
-                keyHasMachines: {
-                    type: Boolean,
-                    computed: '_keyHasMachines(keyMachines)'
-                },
-                keyHasMachinesMoreThanOne: {
-                    type: Boolean,
-                    computed: '_keyHasMachinesMoreThanOne(keyMachines)'
-                },
-                visiblePrivateKey: {
-                    type: Boolean,
-                    value: false
-                },
-                baseUrl: {
-                    type: String,
-                    computed: '_baseUrl(params)',
-                    notify: true
-                }
-            },
-            observers: [
-                'update(params)'
-            ],
-            listeners: {
-                'confirmation': '_deleteKeyResponse',
-                'updateSelectedKey': '_updateKey',
-                'paramsChanged' : 'update'
-            },
-            update: function(params){
-                if (this.$.keyPublicRequest) {
-                    this.$.keyPublicRequest.generateRequest();
-                }
-                this.visiblePrivateKey = false;
-                this.set('privateKey', null);
-            },
-            _baseUrl: function (params){
-                return '/keys/'+ this.params.id;
-            },
-            _getHeaderStyle: function(section) {
-                return 'background-color: ' + section.color + '; color: #fff;';
-            },
-            _computeKey: function(params) {
-                return this.model.keysArray.find(function(key) {
-                    return key.id == params.id;
-                });
-            },
-            _computeId: function(params) {
-                return params.id;
-            },
-            _computeKeyMachines: function(key) {
-                return key.machines;
-            },
-            _keyHasMachines: function(keyMachines){
-                return keyMachines.length > 0 ? true : false;
-            },
-            _keyHasMachinesMoreThanOne: function(keyMachines){
-                return keyMachines.length > 1 ? true : false;
-            },
-            getMachineUrl: function(keymachine){
-                var url;
-                var machine = this.model.machinesArray.find(function(machine) {
-                    return machine.id == keymachine[1];
-                });
-                url = "/machines/" + machine.uuid;
-                return url;
-            },
-            getMachineName: function(keymachine) {
-                var name;
-                var machine = this.model.machinesArray.find(function(machine) {
-                    return machine.id == keymachine[1];
-                });
-                name = machine.name;
-                return name;
-            },
-            _computeIsDefault: function(isDefault) {
-                return isDefault;
-            },
-            copyPublicKey: function() {
-                this.$.keyPublic.select();
-                document.execCommand('copy');
-                this.$.toast.text = 'The Public Key was copied to clipboard!';
-                this.$.toast.open();
-            },
-            copyPrivateKey: function() {
-                this.$.keyPrivate.select();
-                document.execCommand('copy');
-                this.$.toast.text = 'The Private Key was copied to clipboard!';
-                this.$.toast.open();
-            },
-            handlePublicResponse: function(data) {
-                this.publicKey = data.detail.response;
-            },
-            showPrivateKey: function() {
-                // this.$.keyPrivateRequest.generateRequest();
-                this.visiblePrivateKey = true;
-            },
-            hidePrivateKey: function() {
-                // this.$.keyPrivateRequest.generateRequest();
-                this.visiblePrivateKey = false;
-            },
-            handlePrivateResponse: function(data) {
-                this.privateKey = data.detail.response;
-            },
-            handleDefaultResponse: function(data) {
-                //needs to update the previous default key that it's not the default key anymore
-                var k = this.model.keysArray;
-                for (var i = 0, len = k.length; i < len; i++) {
-                    if (k[i].isDefault) {
-                        k[i].isDefault = false;
-                        break;
+                properties: {
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    model: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    params: {
+                        type: Object,
+                        notify: true
+                    },
+                    key: {
+                        type: Object,
+                        computed: '_computeKey(params)'
+                    },
+                    id: {
+                        type: String,
+                        computed: '_computeId(params)',
+                        notify: true
+                    },
+                    isDefault: {
+                        type: String,
+                        computed: '_computeIsDefault(key.isDefault)'
+                    },
+                    publicKey: {
+                        type: String,
+                        value: null
+                    },
+                    privateKey: {
+                        type: String,
+                        value: null
+                    },
+                    keyMachines: {
+                        type: Array,
+                        computed: '_computeKeyMachines(key)'
+                    },
+                    keyHasMachines: {
+                        type: Boolean,
+                        computed: '_keyHasMachines(keyMachines)'
+                    },
+                    keyHasMachinesMoreThanOne: {
+                        type: Boolean,
+                        computed: '_keyHasMachinesMoreThanOne(keyMachines)'
+                    },
+                    visiblePrivateKey: {
+                        type: Boolean,
+                        value: false
+                    },
+                    baseUrl: {
+                        type: String,
+                        computed: '_baseUrl(params)',
+                        notify: true
                     }
-                }
-                this.set('key.isDefault', true);
-                this.$.toast.text = this.key.id + ' has become your default Key!';
-                this.$.toast.open();
-            },
-            _editKey: function(e) {
-                var el = this.querySelector('key-edit');
-                el._openEditKeyModal();
-            },
-            _updateKey: function(e) {
-                var key = e.detail.key;
-                this.set('key.id', key.id);
-            },
-            _makeDefaultKey: function(e) {
-                var isDefault = this.key.isDefault;
-                this.$.keyMakeDefaultRequest.headers["Content-Type"] = 'application/json';
-                this.$.keyMakeDefaultRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                this.$.keyMakeDefaultRequest.body = {};
-                this.$.keyMakeDefaultRequest.generateRequest();
-            },
-            _handleMakeDefaultResponse: function(e) {
-                this.set('key.isDefault', true);
-            },
-            _deleteKey: function(e) {
-                this._showDialog({
-                    title: 'Delete Key?',
-                    body: "Deleting a key can not be undone. You are about to delete key" + this.key.id + ".",
-                    danger: true,
-                    reason: "delete_key"
-                });
-            },
-            _deleteKeyResponse: function(e) {
-                var reason = e.detail.reason,
-                    response = e.detail.response;
+                },
+                observers: [
+                    'update(params)'
+                ],
+                listeners: {
+                    'confirmation': '_deleteKeyEventResponse',
+                    'updateSelectedKey': '_updateKey',
+                    'paramsChanged': 'update'
+                },
+                update: function(params) {
+                    if (this.$.keyPublicRequest) {
+                        this.$.keyPublicRequest.generateRequest();
+                    }
+                    this.visiblePrivateKey = false;
+                    this.set('privateKey', null);
+                },
+                _baseUrl: function(params) {
+                    return '/keys/' + this.params.id;
+                },
+                _getHeaderStyle: function(section) {
+                    return 'background-color: ' + section.color + '; color: #fff;';
+                },
+                _computeKey: function(params) {
+                    return this.model.keysArray.find(function(key) {
+                        return key.id == params.id;
+                    });
+                },
+                _computeId: function(params) {
+                    return params.id;
+                },
+                _computeKeyMachines: function(key) {
+                    return key.machines;
+                },
+                _keyHasMachines: function(keyMachines) {
+                    return keyMachines.length > 0 ? true : false;
+                },
+                _keyHasMachinesMoreThanOne: function(keyMachines) {
+                    return keyMachines.length > 1 ? true : false;
+                },
+                getMachineUrl: function(keymachine) {
+                    var url;
+                    var machine = this.model.machinesArray.find(function(machine) {
+                        return machine.id == keymachine[1];
+                    });
+                    url = "/machines/" + machine.uuid;
+                    return url;
+                },
+                getMachineName: function(keymachine) {
+                    var name;
+                    var machine = this.model.machinesArray.find(function(machine) {
+                        return machine.id == keymachine[1];
+                    });
+                    name = machine.name;
+                    return name;
+                },
+                _computeIsDefault: function(isDefault) {
+                    return isDefault;
+                },
+                copyPublicKey: function() {
+                    this.$.keyPublic.select();
+                    document.execCommand('copy');
+                    this.$.toast.text = 'The Public Key was copied to clipboard!';
+                    this.$.toast.open();
+                },
+                copyPrivateKey: function() {
+                    this.$.keyPrivate.select();
+                    document.execCommand('copy');
+                    this.$.toast.text = 'The Private Key was copied to clipboard!';
+                    this.$.toast.open();
+                },
+                handlePublicResponse: function(data) {
+                    this.publicKey = data.detail.response;
+                },
+                showPrivateKey: function() {
+                    // this.$.keyPrivateRequest.generateRequest();
+                    this.visiblePrivateKey = true;
+                },
+                hidePrivateKey: function() {
+                    // this.$.keyPrivateRequest.generateRequest();
+                    this.visiblePrivateKey = false;
+                },
+                handlePrivateResponse: function(data) {
+                    this.privateKey = data.detail.response;
+                },
+                handleDefaultResponse: function(data) {
+                    //needs to update the previous default key that it's not the default key anymore
+                    var k = this.model.keysArray;
+                    for (var i = 0, len = k.length; i < len; i++) {
+                        if (k[i].isDefault) {
+                            k[i].isDefault = false;
+                            break;
+                        }
+                    }
+                    this.set('key.isDefault', true);
+                    this.$.toast.text = this.key.id + ' has become your default Key!';
+                    this.$.toast.open();
+                },
+                _editKey: function(e) {
+                    var el = this.querySelector('key-edit');
+                    el._openEditKeyModal();
+                },
+                _updateKey: function(e) {
+                    var key = e.detail.key;
+                    this.set('key.id', key.id);
+                },
+                _makeDefaultKey: function(e) {
+                    var isDefault = this.key.isDefault;
+                    this.$.keyMakeDefaultRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyMakeDefaultRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyMakeDefaultRequest.body = {};
+                    this.$.keyMakeDefaultRequest.generateRequest();
+                },
+                _handleMakeDefaultResponse: function(e) {
+                    this.set('key.isDefault', true);
+                },
+                _deleteKey: function(e) {
+                    this._showDialog({
+                        title: 'Delete Key?',
+                        body: "Deleting a key can not be undone. You are about to delete key" + this.key.id + ".",
+                        danger: true,
+                        reason: "delete_key"
+                    });
+                },
+                _deleteKeyEventResponse: function(e) {
+                    var reason = e.detail.reason,
+                        response = e.detail.response;
 
-                if (response.confirmed && reason == "delete_key") {
-                    console.log('i ll delete the key');
+                    if (response.confirmed && reason == "delete_key") {
+                        console.log('i ll delete the key');
+                        // this.$.deleteKeyAjaxRequest.body = {};
+                        // this.$.deleteKeyAjaxRequest.headers["Content-Type"] = 'application/json';
+                        // this.$.deleteKeyAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        // this.$.deleteKeyAjaxRequest.generateRequest();
+                    }
+                },
+                _handleDeleteKeyAjaxResponse: function(e) {
                     page.show('/keys');
+                },
+                _showDialog: function(info) {
+                    var dialog = this.querySelector('dialog-element'),
+                        i;
+                    for (i in info) {
+                        dialog[i] = info[i];
+                    }
+                    dialog._openDialog();
+                },
+                _goBack: function() {
+                    history.back();
                 }
-            },
-            _showDialog: function(info) {
-                var dialog = this.querySelector('dialog-element'),
-                    i;
-                for (i in info) {
-                    dialog[i] = info[i];
-                }
-                dialog._openDialog();
-            },
-            _goBack: function(){
-                history.back();
-            }
-        });
-    })();
+            });
+        })();
     </script>
 </dom-module>
