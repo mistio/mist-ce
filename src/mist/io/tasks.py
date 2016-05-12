@@ -71,6 +71,13 @@ app.conf.update(**config.CELERY_SETTINGS)
 
 @app.task
 def update_machine_count(owner, cloud_id, machine_count):
+    """
+    Counts the machines number of a cloud and of an owner.
+    :param owner:
+    :param cloud_id:
+    :param machine_count:
+    :return:
+    """
     if not multi_user:
         return
     if owner.find("@")!=-1:
@@ -79,6 +86,7 @@ def update_machine_count(owner, cloud_id, machine_count):
         owner = Owner.objects.get(id=owner)
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     cloud.machine_count = machine_count
+    cloud.save()
     # TODO machine count property function
     # TODO total machine count property function
     clouds = Cloud.objects(owner=owner)
