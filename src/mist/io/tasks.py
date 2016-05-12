@@ -842,16 +842,7 @@ class ListMachines(UserTask):
         index = len(errors) - 6
         if index < len(times):
             return times[index]
-        else: # If cloud still unresponsive disable it & notify user
-            cloud.enabled = False
-            cloud.save()
-            # user.clouds_dict[cloud_id].enabled = False
-            # user.clouds_dict[cloud_id].save()
-            notify_user(owner, "Cloud %s disabled after not responding for "
-                               "30 mins" % cloud.title,
-                        email_notify=True, cloud_id=cloud_id)
-            log_event(owner.id, 'incident', action='disable_cloud',
-                      cloud_id=cloud_id, error="Cloud unresponsive")
+        else: #
             return 20*60
 
 
