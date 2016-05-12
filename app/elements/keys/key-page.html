@@ -276,17 +276,14 @@
         <template is="dom-if" if="{{key.id}}">
             <iron-ajax auto id="keyPublicRequest" url="{{baseUrl}}/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
         </template>
-        <key-edit key="[[key]]"></key-edit>
-        <dialog-element></dialog-element>
         <template is="dom-if" if="{{key.id}}">
             <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         </template>
-        <iron-ajax id="keyMakeDefaultRequest" url="/api/v1/keys/{{key.id}}" method="POST" on-response="_handleMakeDefaultResponse" on-error="_handleMakeDefaultError"></iron-ajax>
-        <iron-ajax id="keyEditRequest" url="{{baseUrl}}" method="PUT" on-response="handleEditResponse" on-error="handleError"></iron-ajax>
-        <iron-ajax id="keyDeleteRequest" url="{{baseUrl}}" method="DELETE" on-response="handleDeleteResponse" on-error="handleError"></iron-ajax>
-        <paper-toast></paper-toast>
-        <iron-ajax id="deleteKeyAjaxRequest" url="/api/v1/clouds/[[network.cloud.id]]/keys/[[key.id]]" method="DELETE" on-response="_handleDeleteKeyAjaxResponse" on-error="_handleDeleteKeyAjaxError"></iron-ajax>
+        <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/{{key.id}}" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
+        <iron-ajax id="keyDeleteAjaxRequest" url="/api/v1/keys/[[key.id]]" method="DELETE" on-response="_handleKeyDeleteAjaxResponse" on-error="_handleKeyDeleteAjaxError"></iron-ajax>
+        <key-edit key="[[key]]"></key-edit>
         <dialog-element></dialog-element>
+        <paper-toast></paper-toast>
     </template>
     <script>
         (function() {
@@ -462,41 +459,39 @@
                 },
                 _makeDefaultKey: function(e) {
                     var isDefault = this.key.isDefault;
-                    this.$.keyMakeDefaultRequest.headers["Content-Type"] = 'application/json';
-                    this.$.keyMakeDefaultRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.keyMakeDefaultRequest.body = {};
-                    this.$.keyMakeDefaultRequest.generateRequest();
+                    this.$.keyMakeDefaultAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyMakeDefaultAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyMakeDefaultAjaxRequest.body = {};
+                    this.$.keyMakeDefaultAjaxRequest.generateRequest();
                 },
-                _handleMakeDefaultResponse: function(e) {
+                _handleKeyMakeDefaultAjaxResponse: function(e) {
                     this.set('key.isDefault', true);
                 },
                 _deleteKey: function(e) {
                     this._showDialog({
                         title: 'Delete Key?',
-                        body: "Deleting a key can not be undone. You are about to delete key" + this.key.id + ".",
+                        body: "Deleting a key can not be undone. You are about to delete key '" + this.key.id + "'.",
                         danger: true,
-                        reason: "delete_key"
+                        reason: "key.delete"
                     });
                 },
                 _deleteKeyEventResponse: function(e) {
                     var reason = e.detail.reason,
                         response = e.detail.response;
 
-                    if (response.confirmed && reason == "delete_key") {
-                        console.log('i ll delete the key');
-                        // this.$.deleteKeyAjaxRequest.body = {};
-                        // this.$.deleteKeyAjaxRequest.headers["Content-Type"] = 'application/json';
-                        // this.$.deleteKeyAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                        // this.$.deleteKeyAjaxRequest.generateRequest();
+                    if (response.confirmed && reason == "key.delete") {
+                        this.$.keyDeleteAjaxRequest.body = {};
+                        this.$.keyDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                        this.$.keyDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.keyDeleteAjaxRequest.generateRequest();
                     }
                 },
-                _handleDeleteKeyAjaxResponse: function(e) {
+                _handleKeyDeleteAjaxResponse: function(e) {
                     page.show('/keys');
                 },
                 _showDialog: function(info) {
-                    var dialog = this.querySelector('dialog-element'),
-                        i;
-                    for (i in info) {
+                    var dialog = this.querySelector('dialog-element');
+                    for (var i in info) {
                         dialog[i] = info[i];
                     }
                     dialog._openDialog();

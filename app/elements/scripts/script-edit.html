@@ -25,8 +25,8 @@
             <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
                 <p>
-                    <paper-input id="name" label="Name" error-message="Please enter script's name" value="{{script.name}}"></paper-input>
-                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter script's description" value="{{script.description}}"></paper-textarea>
+                    <paper-input id="name" label="Name" error-message="Please enter script's name" value="{{newScript.name}}"></paper-input>
+                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter script's description" value="{{newScript.description}}"></paper-textarea>
                 </p>
                 <div class="clearfix btn-group">
                     <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
@@ -34,7 +34,7 @@
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <iron-ajax id="editScriptAjax" url="/scripts/[[script.id]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+        <iron-ajax id="scriptEditAjaxRequest" url="/api/v1/scripts/[[script.script_id]]" method="PUT" on-response="_handleScriptEditAjaxResponse" on-error="_handleScriptEditAjaxError"></iron-ajax>
     </template>
 
     <script>
@@ -46,11 +46,11 @@
 
                 properties: {
                     script: {
+                        type: Object
+                    },
+                    newScript: {
                         type: Object,
-                        value: {
-                            name: null,
-                            description: null
-                        },
+                        computed: '_computeNewScript(script)',
                         notify: true
                     },
                     sendingData: {
@@ -59,14 +59,17 @@
                     },
                     formReady: {
                         type: Boolean,
-                        computed: '_computeFormReady(script.name, sendingData)'
+                        computed: '_computeFormReady(newScript.name, sendingData)'
                     }
                 },
                 listeners: {
                     'iron-overlay-closed': '_modalClosed'
                 },
-                ready: function() {
-
+                _computeNewScript: function(script) {
+                    return {
+                        name: script.name,
+                        description: script.description
+                    };
                 },
                 _computeFormReady: function(name, sendingData) {
                     var formReady = false;
@@ -91,22 +94,26 @@
                     this._formReset();
                 },
                 _submitForm: function(e) {
-                    this.fire('updateSelectedScript', {
-                        script: this.script
-                    });
-                    this._closeEditScriptModal();
+                    // this.fire('updateSelectedScript', {
+                    //     script: this.script
+                    // });
+
+                    this.$.scriptEditAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.scriptEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.scriptEditAjaxRequest.body = {
+                        new_name: this.newScript.name,
+                        new_description: this.newScript.description
+                    };
+                    this.$.scriptEditAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
                 },
                 _formReset: function() {
                     //   this.set('script.id', '');
                 },
-                _editScriptAjax: function(e) {
-                    //   this.$.editScriptAjax.generateRequest();
-                },
-                _editScriptRequest: function() {
-                    this.set('sendingData', true);
-                },
-                _editScriptResponse: function(e) {
+                _handleScriptEditAjaxResponse: function(e) {
                     this.set('sendingData', false);
+                    this._closeEditScriptModal();
                 }
             });
         })();

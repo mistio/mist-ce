@@ -8,122 +8,122 @@
     <template>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
-        :host {
-            display: block;
-        }
+            :host {
+                display: block;
+            }
 
-        paper-material {
-            display: block;
-            padding: 20px;
-            margin: 36px;
-        }
+            paper-material {
+                display: block;
+                padding: 20px;
+                margin: 36px;
+            }
 
-        paper-menu-button paper-button {
-            display: block;
-        }
+            paper-menu-button paper-button {
+                display: block;
+            }
 
-        .flex-horizontal-with-ratios {
-            @apply(--layout-horizontal);
-        }
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+            }
 
-        .flexchild {
-            @apply(--layout-flex);
-        }
+            .flexchild {
+                @apply(--layout-flex);
+            }
 
-        .command-container {
-            background-color: #444;
-            color: #fff;
-            font-family: monospace;
-            padding: 10px;
-        }
+            .command-container {
+                background-color: #444;
+                color: #fff;
+                font-family: monospace;
+                padding: 10px;
+            }
 
-        a {
-            color: black;
-            text-decoration: none;
-        }
+            a {
+                color: black;
+                text-decoration: none;
+            }
 
-        #container {
-            background: #fafafa;
-        }
+            #container {
+                background: #fafafa;
+            }
 
-        .paper-header [paper-drawer-toggle] {
-            margin-left: 10px;
-        }
+            .paper-header [paper-drawer-toggle] {
+                margin-left: 10px;
+            }
 
-        .paper-header {
-            @apply(--layout-horizontal);
-        }
+            .paper-header {
+                @apply(--layout-horizontal);
+            }
 
-        .paper-header {
-            height: 60px;
-            font-size: 24px;
-            line-height: 60px;
-            padding: 0 10px;
-            color: white;
-            transition: height 0.2s;
-            transition: font-size 0.2s;
-        }
+            .paper-header {
+                height: 60px;
+                font-size: 24px;
+                line-height: 60px;
+                padding: 0 10px;
+                color: white;
+                transition: height 0.2s;
+                transition: font-size 0.2s;
+            }
 
-        .paper-header.tall {
-            height: 320px;
-            font-size: 16px;
-        }
+            .paper-header.tall {
+                height: 320px;
+                font-size: 16px;
+            }
 
-        .paper-header h2 {
-            margin-left: 20px;
-            @apply(--layout-flex);
-            text-transform: capitalize;
-        }
+            .paper-header h2 {
+                margin-left: 20px;
+                @apply(--layout-flex);
+                text-transform: capitalize;
+            }
 
-        .paper-header .toggleViewButton {
-            --paper-icon-button-ink-color: transparent;
-        }
+            .paper-header .toggleViewButton {
+                --paper-icon-button-ink-color: transparent;
+            }
 
-        .paper-header .cartButton {
-            margin-right: 10px;
-        }
+            .paper-header .cartButton {
+                margin-right: 10px;
+            }
 
-        #content {
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 0 10px;
-        }
+            #content {
+                overflow: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 0 10px;
+            }
 
-        paper-icon-button {
-            transition: all 200ms;
-        }
+            paper-icon-button {
+                transition: all 200ms;
+            }
 
-        paper-icon-button.active-sort {
-            transform: rotate(180deg);
-        }
+            paper-icon-button.active-sort {
+                transform: rotate(180deg);
+            }
 
-        paper-icon-button.active-sort::content iron-icon {
-            color: #D48900 !important;
-        }
+            paper-icon-button.active-sort::content iron-icon {
+                color: #D48900 !important;
+            }
 
-        app-bar .menu-icon {
-            margin-right: 15px;
-        }
+            app-bar .menu-icon {
+                margin-right: 15px;
+            }
 
-        h4.key  {
-            @apply(--layout-flex);
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            font-weight: 700;
-        }
+            h4.key {
+                @apply(--layout-flex);
+                text-transform: uppercase;
+                font-size: 0.9rem;
+                font-weight: 700;
+            }
 
-        [size=xs] > * {
-            display: none;
-        }
+            [size=xs] > * {
+                display: none;
+            }
 
-        [size=xs] app-sidebar {
-            min-width: 100%;
-            height: auto;
-        }
+            [size=xs] app-sidebar {
+                min-width: 100%;
+                height: auto;
+            }
 
-        paper-icon-bottom.bottom {
-            padding-right: 8px;
-        }
+            paper-icon-bottom.bottom {
+                padding-right: 8px;
+            }
         </style>
         <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
             <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
@@ -133,12 +133,10 @@
                     <span class="title"></span>
                     <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">Network "[[network.name]]"</span>
-                    <div hidden$=[[!isOpenstack]]>
-                        <paper-tooltip for="editNetwork" position="top">Edit Network</paper-tooltip>
-                        <paper-icon-button id="editNetwork" class="bottom" icon="icons:create" on-tap="_editNetwork"></paper-icon-button>
+                    <template is="dom-if" if=[[isOpenstack]]>
                         <paper-tooltip for="deleteNetwork" position="top">Delete Network</paper-tooltip>
                         <paper-icon-button id="deleteNetwork" class="bottom" icon="icons:delete" on-tap="_deleteNetwork" disabled$="[[!isOpenstack]]"></paper-icon-button>
-                    </div>
+                    </template>
                 </paper-toolbar>
                 <div class="content">
                     <paper-material>
@@ -172,109 +170,109 @@
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <iron-ajax id="deleteNetworkAjaxRequest" url="/api/v1/clouds/[[network.cloud.id]]/networks/[[network.id]]" method="DELETE" on-response="_handleDeleteNetworkAjaxResponse" on-error="_handleDeleteNetworkAjaxError"></iron-ajax>
+        <iron-ajax id="networkDeleteAjaxRequest" url="/api/v1/clouds/[[network.cloud.id]]/networks/[[network.id]]" method="DELETE" on-response="_handleNetworDeletekAjaxResponse" on-error="_handleNetworDeletekAjaxError"></iron-ajax>
         <dialog-element></dialog-element>
     </template>
     <script>
-    (function() {
-        'use strict';
+        (function() {
+            'use strict';
 
-        Polymer({
-            is: 'network-page',
+            Polymer({
+                is: 'network-page',
 
-            properties: {
-                model: {
-                    type: Object,
-                    notify: true
+                properties: {
+                    model: {
+                        type: Object,
+                        notify: true
+                    },
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    params: {
+                        type: Object,
+                        notify: true
+                    },
+                    network: {
+                        type: Object,
+                        computed: '_computeNetwork(params, model.networksArray.*)'
+                    },
+                    netid: {
+                        type: String,
+                        computed: '_computeNetworkId(params)'
+                    },
+                    isOpenstack: {
+                        type: Boolean,
+                        computed: '_computeIsOpenstack(network.cloud.provider)'
+                    },
+                    hasSubnets: {
+                        type: Boolean,
+                        computed: '_computeHasSubnets(network.subnets)'
+                    },
                 },
-                sections: {
-                    type: Object
+                listeners: {
+                    'confirmation': '_deleteNetworkEventResponse'
                 },
-                section: {
-                    type: Object
+                _getHeaderStyle: function(section) {
+                    return 'background-color: ' + section.color + '; color: #fff;';
                 },
-                color: {
-                    type: String,
-                    computed: '_getHeaderStyle(section)'
+                _computeNetwork: function(params, networks) {
+                    return networks.base.find(function(network) {
+                        console.log(network);
+                        return network.name == params.name;
+                    }, this);
                 },
-                params: {
-                    type: Object,
-                    notify: true
+                _computeNetworkId: function(params) {
+                    return params.id;
                 },
-                network: {
-                    type: Object,
-                    computed: '_computeNetwork(params, model.networksArray.*)'
+                _computeHasSubnets: function(subnets) {
+                    return subnets && subnets.length;
                 },
-                netid: {
-                    type: String,
-                    computed: '_computeNetworkId(params)'
+                _computeIsOpenstack: function(provider) {
+                    return provider == 'openstack';
                 },
-                isOpenstack: {
-                    type: Boolean,
-                    computed: '_computeIsOpenstack(network.cloud.provider)'
+                _editNetwork: function(e) {
+                    console.log(e);
                 },
-                hasSubnets: {
-                    type: Boolean,
-                    computed: '_computeHasSubnets(network.subnets)'
+                _deleteNetwork: function(e) {
+                    this._showDialog({
+                        title: 'Delete Network?',
+                        body: "Deleting scripts cannot be undone. You are about to delete network: '" + this.network.name + "'.",
+                        danger: true,
+                        reason: "network.delete"
+                    });
                 },
-            },
-            listeners: {
-                'confirmation': '_deleteNetworkEventResponse'
-            },
-            _getHeaderStyle: function(section) {
-                return 'background-color: ' + section.color + '; color: #fff;';
-            },
-            _computeNetwork: function(params, networks) {
-                return networks.base.find(function(network) {
-                    return network.name == params.name;
-                }, this);
-            },
-            _computeNetworkId: function(params) {
-                return params.id;
-            },
-            _computeHasSubnets: function(subnets) {
-                return subnets && subnets.length;
-            },
-            _computeIsOpenstack: function(provider) {
-                return provider == 'openstack';
-            },
-            _editNetwork: function(e) {
-                console.log(e);
-            },
-            _deleteNetwork: function(e) {
-                this._showDialog({
-                    title: 'Delete Network?',
-                    body: "Deleting scripts cannot be undone. You are about to delete network: " + this.network.name,
-                    danger: true,
-                    reason: "delete_network"
-                });
-            },
-            _deleteNetworkEventResponse: function(e) {
-                var reason = e.detail.reason,
-                    response = e.detail.response;
+                _deleteNetworkEventResponse: function(e) {
+                    var reason = e.detail.reason,
+                        response = e.detail.response;
 
-                if (response.confirmed && reason == "delete_network") {
-                    console.log('i ll delete the network');
-                    // this.$.deleteNetworkAjaxRequest.body = {};
-                    // this.$.deleteNetworkAjaxRequest.headers["Content-Type"] = 'application/json';
-                    // this.$.deleteNetworkAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    // this.$.deleteNetworkAjaxRequest.generateRequest();
+                    if (response.confirmed && reason == "network.delete") {
+                        this.$.networkDeleteAjaxRequest.body = {};
+                        this.$.networkDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                        this.$.networkDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.networkDeleteAjaxRequest.generateRequest();
+                    }
+                },
+                _handleNetworDeletekAjaxResponse: function(e) {
+                    page.show('/networks');
+                },
+                _showDialog: function(info) {
+                    var dialog = this.querySelector('dialog-element');
+                    for (var i in info) {
+                        dialog[i] = info[i];
+                    }
+                    dialog._openDialog();
+                },
+                _goBack: function() {
+                    history.back();
                 }
-            },
-            _handleDeleteNetworAjaxResponse: function(e) {
-                page.show('/networks');
-            },
-            _showDialog: function(info) {
-                var dialog = this.querySelector('dialog-element');
-                for (var i in info) {
-                    dialog[i] = info[i];
-                }
-                dialog._openDialog();
-            },
-            _goBack: function(){
-                history.back();
-            }
-        });
-    })();
+            });
+        })();
     </script>
 </dom-module>

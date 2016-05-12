@@ -27,7 +27,7 @@
             <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
                 <p>
-                    <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{key.id}}"></paper-input>
+                    <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{newKey.id}}"></paper-input>
                 </p>
                 <div class="clearfix btn-group">
                 <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
@@ -35,7 +35,7 @@
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <iron-ajax id="editKeyAjax" url="/keys/[[key.id]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+        <iron-ajax id="keyEditAjaxRequest" url="/api/v1/keys/[[key.id]]" method="PUT" on-response="_handleKeyEditAjaxResponse" on-error="_handleKeyEditAjaxError"></iron-ajax>
     </template>
 
     <script>
@@ -47,10 +47,11 @@
 
                 properties: {
                     key: {
+                        type: Object
+                    },
+                    newKey: {
                         type: Object,
-                        value: {
-                            id: null
-                        },
+                        computed: '_computeNewKey(key)',
                         notify: true
                     },
                     sendingData: {
@@ -59,14 +60,16 @@
                     },
                     formReady: {
                         type: Boolean,
-                        computed: '_computeFormReady(key.id, sendingData)'
+                        computed: '_computeFormReady(newKey.id, sendingData)'
                     }
                 },
                 listeners: {
                     'iron-overlay-closed': '_modalClosed'
                 },
-                ready: function() {
-
+                _computeNewKey: function(key) {
+                    return {
+                        id: key.id
+                    };
                 },
                 _computeFormReady: function(id, sendingData) {
                     var formReady = false;
@@ -91,22 +94,25 @@
                     this._formReset();
                 },
                 _submitForm: function(e) {
-                    this.fire('updateSelectedKey', {
-                        key: this.key
-                    });
-                    this._closeEditKeyModal();
+                    // this.fire('updateSelectedKey', {
+                    //     key: this.key
+                    // });
+
+                    this.$.keyEditAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyEditAjaxRequest.body = {
+                        new_id: this.newKey.id
+                    };
+                    this.$.keyEditAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
                 },
                 _formReset: function() {
                     //   this.set('key.id', '');
                 },
-                _editKeyAjax: function(e) {
-                    //   this.$.editKeyAjax.generateRequest();
-                },
-                _editKeyRequest: function() {
-                    this.set('sendingData', true);
-                },
-                _editKeyResponse: function(e) {
+                _handleKeyEditAjaxResponse: function(e) {
                     this.set('sendingData', false);
+                    this._closeEditKeyModal();
                 }
             });
         })();

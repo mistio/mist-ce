@@ -144,7 +144,7 @@
                                 </div>
                                 <template is="dom-if" if="[[script.description]]">
                                     <div class="info-item flex-horizontal-with-ratios">
-                                        <div hidden$="[[!script.description]]" class="flexchild">Description</div>
+                                        <div class="flexchild">Description</div>
                                         <div class="flexchild">[[script.description]]</div>
                                     </div>
                                 </template>
@@ -180,6 +180,7 @@
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
+        <iron-ajax id="scriptDeleteAjaxRequest" url="/api/v1/scripts/[[script.script_id]]" method="DELETE" on-response="_handleScriptDeleteAjaxResponse" on-error="_handleScriptDeleteAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
     </template>
@@ -221,7 +222,7 @@
                 }
             },
             listeners: {
-                'confirmation': '_deleteScriptResponse',
+                'confirmation': '_deleteScriptEventResponse',
                 'updateSelectedScript': '_updateScript'
             },
             _getHeaderStyle: function(section) {
@@ -256,24 +257,28 @@
             _deleteScript: function(e) {
                 this._showDialog({
                     title: 'Delete Script?',
-                    body: "Deleting scripts cannot be undone. You are about to delete script: " + this.script.name ,
+                    body: "Deleting scripts cannot be undone. You are about to delete script: '" + this.script.name + "'." ,
                     danger: true,
-                    reason: "delete_script"
+                    reason: "script.delete"
                 });
             },
-            _deleteScriptResponse: function(e) {
+            _deleteScriptEventResponse: function(e) {
                 var reason = e.detail.reason,
                     response = e.detail.response;
 
-                if (response.confirmed && reason == "delete_script") {
-                    console.log('i ll delete the script');
-                    page.show('/scripts');
+                if (response.confirmed && reason == "script.delete") {
+                    this.$.scriptDeleteAjaxRequest.body = {};
+                    this.$.scriptDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.scriptDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.scriptDeleteAjaxRequest.generateRequest();
                 }
             },
+            _handleScriptDeleteAjaxResponse: function(e) {
+                page.show('/scripts');
+            },
             _showDialog: function(info) {
-                var dialog = this.querySelector('dialog-element'),
-                    i;
-                for (i in info) {
+                var dialog = this.querySelector('dialog-element');
+                for (var i in info) {
                     dialog[i] = info[i];
                 }
                 dialog._openDialog();
