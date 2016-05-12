@@ -360,7 +360,7 @@ var setupMainChannel = function(socket, callback) {
         //  TODO: This is a temporary ajax-request to get the scripts.
         //  It should be converted into a "list_scripts" socket handler
         //  as soon as the cloud supports it
-        Mist.ajax.GET('/scripts').success(function(scripts) {
+        Mist.ajax.GET('/api/v1/scripts').success(function(scripts) {
             Mist.scriptsController.setModel(scripts, true);
         });
     }

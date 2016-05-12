@@ -73,7 +73,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 var that = this;
                 that.set('addingScript', true);
                 Mist.ajax
-                    .POST('/scripts', {
+                    .POST('/api/v1/scripts', {
                         'name': args.script.name,
                         'exec_type': args.script.type.value,
                         'location_type': args.script.source.value,
@@ -98,7 +98,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 var that = this;
                 that.set('deletingScript', true);
                 Mist.ajax
-                    .DELETE('/scripts/' + args.script.id, {})
+                    .DELETE('/api/v1/scripts/' + args.script.id, {})
                     .success(function() {
                         that._deleteObject(args.script);
                     })
@@ -116,7 +116,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 var that = this;
                 that.set('renamingScript', true);
                 Mist.ajax
-                    .PUT('/scripts/' + args.script.id, {
+                    .PUT('/api/v1/scripts/' + args.script.id, {
                         new_name: args.newName,
                         new_description: args.newDescription
                     })
@@ -137,7 +137,7 @@ define('app/controllers/scripts', ['app/controllers/base_array', 'app/models/scr
                 var that = this;
                 that.set('runningScript', true);
                 Mist.ajax
-                    .POST('/scripts/' + args.script.script.id, {
+                    .POST('/api/v1/scripts/' + args.script.script.id, {
                         'machine_id': args.script.machine.id,
                         'cloud_id': args.script.machine.cloud.id,
                         'params': args.script.parameters

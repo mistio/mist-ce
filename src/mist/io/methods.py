@@ -9,12 +9,13 @@ import subprocess
 import re
 
 from time import time
+
+import mongoengine as me
+from mongoengine import ValidationError, NotUniqueError, DoesNotExist
+
 from StringIO import StringIO
 from tempfile import NamedTemporaryFile
 from xml.sax.saxutils import escape
-
-import mongoengine as me
-from mongoengine import ValidationError, NotUniqueError
 
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
@@ -32,14 +33,10 @@ import ansible.callbacks
 import ansible.utils
 import ansible.constants
 
-# try:
-# from mist.core.user.models import User
+from mist.core.tag.models import Tag
 from mist.core.cloud.models import Cloud, Machine, KeyAssociation
 from mist.core.keypair.models import Keypair
 from mist.core import config
-# except ImportError:
-#     print "Seems to be on IO version"
-#     from mist.io import config, model
 
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
@@ -1171,6 +1168,19 @@ def delete_cloud(owner, cloud_id):
                         "Error: %r", exc)
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    machines = Machine.objects(cloud=cloud)
+    for machine in machines:
+        tags = Tag.objects(owner=owner, resource=machine)
+        for tag in tags:
+            try:
+                tag.delete()
+            except:
+                 pass
+        try:
+            machine.delete()
+        except:
+            pass
+
     cloud.delete()
     log.info("Successfully deleted cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
@@ -2963,9 +2973,12 @@ def _machine_action(user, cloud_id, machine_id,
             raise MachineUnavailableError("Error while attempting to %s machine"
                                           % action)
     except:
-        machine = Node(machine_id, name=machine_id,
-                       state=0, public_ips=[],
-                       private_ips=[], driver=conn)
+        machine = Node(machine_id,
+                       name=machine_id,
+                       state=NodeState.RUNNING,
+                       public_ips=[],
+                       private_ips=[],
+                       driver=conn)
     try:
         if action is 'start':
             # In liblcoud it is not possible to call this with machine.start()
@@ -2973,7 +2986,6 @@ def _machine_action(user, cloud_id, machine_id,
                 conn.ex_start_node(machine, ex_cloud_service_name=cloud_service)
             else:
                 conn.ex_start_node(machine)
-
             if conn.type is Provider.DOCKER:
                 node_info = conn.inspect_node(node)
                 try:
@@ -2983,11 +2995,15 @@ def _machine_action(user, cloud_id, machine_id,
                 except KeyError:
                     port = 22
 
-                machine = Machine.objects.get(cloud=cloud,
-                                              machine_id=machine_id)
-                for key_assoc in machine.key_associations:
-                    key_assoc.port = port
-                machine.save()
+                try:
+                    machine = Machine.objects.get(cloud=cloud,
+                                                  machine_id=machine_id)
+                except DoesNotExist:
+                    pass
+                else:
+                    for key_assoc in machine.key_associations:
+                        key_assoc.port = port
+                    machine.save()
         elif action is 'stop':
             # In libcloud it is not possible to call this with machine.stop()
             if conn.type == 'azure':
@@ -3051,15 +3067,19 @@ def _machine_action(user, cloud_id, machine_id,
                             'Ports']['22/tcp'][0]['HostPort']
                     except KeyError:
                         port = 22
-                    machine = Machine.objects.get(cloud=cloud,
-                                                  machine_id=machine_id)
-                    for key_assoc in machine.key_associations:
-                        key_assoc.port = port
-                    machine.save()
 
+                    try:
+                        machine = Machine.objects.get(cloud=cloud,
+                                                      machine_id=machine_id)
+                    except DoesNotExist:
+                        pass
+                    else:
+                        for key_assoc in machine.key_associations:
+                            key_assoc.port = port
+                        machine.save()
         elif action is 'destroy':
-            if conn.type is Provider.DOCKER and node.state == 0:
-                conn.ex_stop_node(node)
+            if conn.type is Provider.DOCKER and node.state == NodeState.RUNNING:
+                conn.ex_stop_node(machine)
                 machine.destroy()
             elif conn.type == 'azure':
                 conn.destroy_node(machine, ex_cloud_service_name=cloud_service)
@@ -3987,8 +4007,8 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
 
     conn = connect_provider(cloud)
 
-    machine = Node(machine_id, name='', state=0, public_ips=[],
-                   private_ips=[], driver=conn)
+    machine = Node(machine_id, name='', state=NodeState.RUNNING,
+                   public_ips=[], private_ips=[], driver=conn)
 
     tags_dict = {}
     if isinstance(tags, list):

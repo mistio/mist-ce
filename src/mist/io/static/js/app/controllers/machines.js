@@ -99,7 +99,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 this.set('addingMachine', true);
 
                 Mist.ajax
-                    .POST('clouds/' + this.cloud.id + '/machines', {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines', {
                         'provider': provider,
                         'name': name,
                         'key': key ? key.id : null,
@@ -169,7 +169,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.lockOn('pending');
                 this.set('shutingdownMachine', true);
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'stop'
                     })
                     .success(function() {
@@ -194,7 +194,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 this.set('destroyingMachine', true);
                 machine.set('beingDestroyed', true);
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'destroy'
                     })
                     .success(function() {
@@ -219,7 +219,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.lockOn('rebooting');
                 this.set('rebootingMachine', true);
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'reboot'
                     })
                     .success(function() {
@@ -243,7 +243,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.lockOn('pending');
                 this.set('undefiningMachine', true);
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'undefine'
                     })
                     .success(function() {
@@ -267,7 +267,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.lockOn('pending');
                 this.set('suspendingMachine', true);
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'suspend'
                     })
                     .success(function() {
@@ -290,7 +290,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.lockOn('pending');
                 this.set('resumingMachine', true);
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'resume'
                     })
                     .success(function() {
@@ -313,7 +313,7 @@ define('app/controllers/machines', ['app/models/machine'],
                 machine.lockOn('pending');
                 this.set('startingMachine', true);
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/machines/' + machineId, {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/machines/' + machineId, {
                         'action': 'start'
                     })
                     .success(function() {

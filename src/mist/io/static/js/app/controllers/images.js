@@ -37,7 +37,7 @@ define('app/controllers/images', [
             searchImages: function(filter, callback) {
                 var that = this;
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/images', {
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/images', {
                         'search_term': filter
                     })
                     .error(function() {
@@ -59,7 +59,7 @@ define('app/controllers/images', [
             toggleImageStar: function(image, callback) {
                 var that = this;
                 Mist.ajax
-                    .POST('/clouds/' + this.cloud.id + '/images/' + image.id, {})
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/images/' + image.id, {})
                     .success(function(star) {
                         if (!that.objectExists(image.id))
                             that._addObject(image);

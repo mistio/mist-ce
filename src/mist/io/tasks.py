@@ -71,6 +71,13 @@ app.conf.update(**config.CELERY_SETTINGS)
 
 @app.task
 def update_machine_count(owner, cloud_id, machine_count):
+    """
+    Counts the machines number of a cloud and of an owner.
+    :param owner:
+    :param cloud_id:
+    :param machine_count:
+    :return:
+    """
     if not multi_user:
         return
     if owner.find("@")!=-1:
@@ -79,6 +86,7 @@ def update_machine_count(owner, cloud_id, machine_count):
         owner = Owner.objects.get(id=owner)
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     cloud.machine_count = machine_count
+    cloud.save()
     # TODO machine count property function
     # TODO total machine count property function
     clouds = Cloud.objects(owner=owner)
@@ -834,16 +842,7 @@ class ListMachines(UserTask):
         index = len(errors) - 6
         if index < len(times):
             return times[index]
-        else: # If cloud still unresponsive disable it & notify user
-            cloud.enabled = False
-            cloud.save()
-            # user.clouds_dict[cloud_id].enabled = False
-            # user.clouds_dict[cloud_id].save()
-            notify_user(owner, "Cloud %s disabled after not responding for "
-                               "30 mins" % cloud.title,
-                        email_notify=True, cloud_id=cloud_id)
-            log_event(owner.id, 'incident', action='disable_cloud',
-                      cloud_id=cloud_id, error="Cloud unresponsive")
+        else: #
             return 20*60
 
 
