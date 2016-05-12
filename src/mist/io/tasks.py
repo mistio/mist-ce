@@ -320,7 +320,7 @@ def openstack_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
 
     from mist.io.methods import connect_provider
     if owner.find("@")!=-1:
-        owner = Owner.objects.get(email=email)
+        owner = Owner.objects.get(email=owner)
     else:
         owner = Owner.objects.get(id=owner)
 
