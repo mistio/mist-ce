@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../app-togglable/app-togglable-list.html">
-<!-- <link rel="import" href="add-team.html"> -->
+<link rel="import" href="team-edit.html">
 
 <dom-module id="team-page">
     <template>
@@ -247,6 +247,7 @@
             </paper-header-panel>
         </paper-drawer-panel>
         <team-edit team="[[team]]"></team-edit>
+        <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[team.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
         <dialog-element></dialog-element>
     </template>
     <script>
@@ -297,7 +298,7 @@
                 vpHeight: String
             },
             listeners: {
-                'confirmation': '_deleteTeamResponse',
+                'confirmation': '_deleteTeamEventResponse',
                 'updateSelectedTeam': '_updateTeam'
             },
             ready: function() {
@@ -346,22 +347,26 @@
                     title: 'Delete Team?',
                     body: "Deleting teams cannot be undone. You are about to delete team: " + this.team.name ,
                     danger: true,
-                    reason: "delete_team"
+                    reason: "team.delete"
                 });
             },
-            _deleteTeamResponse: function(e) {
+            _deleteTeamEventResponse: function(e) {
                 var reason = e.detail.reason,
                     response = e.detail.response;
 
-                if (response.confirmed && reason == "delete_team") {
-                    console.log('i ll delete the team');
-                    page.show('/teams');
+                if (response.confirmed && reason == "team.delete") {
+                    this.$.teamDeleteAjaxRequest.body = {};
+                    this.$.teamDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.teamDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.teamDeleteAjaxRequest.generateRequest();
                 }
             },
+            _handleKeyDeleteAjaxResponse: function(e) {
+                page.show('/teams');
+            },
             _showDialog: function(info) {
-                var dialog = this.querySelector('dialog-element'),
-                    i;
-                for (i in info) {
+                var dialog = this.querySelector('dialog-element');
+                for (var i in info) {
                     dialog[i] = info[i];
                 }
                 dialog._openDialog();
