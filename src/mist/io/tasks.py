@@ -304,7 +304,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             raise
         notify_user(owner, "Deployment script failed for machine %s" % machine_id)
         notify_admin("Deployment script failed for machine %s in cloud %s by "
-                     "user %s" % (machine_id, cloud_id, owner.id), repr(exc))
+                     "user %s" % (machine_id, cloud_id, owner.email), repr(exc))
         log_event(
             owner.id,
             event_type='job',
