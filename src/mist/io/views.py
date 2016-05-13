@@ -1,4 +1,5 @@
-"""mist.io.views
+"""
+mist.io.views
 
 Here we define the HTTP API of the app. The view functions here are
 responsible for taking parameters from the web requests, passing them on to
@@ -8,8 +9,6 @@ only check that all required params are provided. Any further checking should
 be performed inside the corresponding method functions.
 
 """
-
-import re
 import requests
 import json
 import mongoengine as me
@@ -21,7 +20,7 @@ from pyramid.response import Response
 from mist.core.helpers import view_config
 from mist.core.auth.methods import user_from_request
 from mist.core.keypair.models import Keypair
-from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+from mist.core.cloud.models import Cloud, Machine
 from mist.core.exceptions import PolicyUnauthorizedError
 from mist.core import config
 import mist.core.methods
@@ -31,13 +30,15 @@ import mist.core.methods
 #     from pyramid.view import view_config
 
 from mist.io import methods
+from mist.io.methods import validate_add_key, validate_edit_key
 
 import mist.io.exceptions as exceptions
 from mist.io.exceptions import *
 import pyramid.httpexceptions
 
 from mist.io.helpers import get_auth_header, params_from_request
-from mist.io.helpers import trigger_session_update, transform_key_machine_associations
+from mist.io.helpers import trigger_session_update, \
+                            transform_key_machine_associations
 
 from mist.core.auth.methods import auth_context_from_request
 
@@ -52,8 +53,8 @@ OK = Response("OK", 200)
 
 @view_config(context=Exception)
 def exception_handler_mist(exc, request):
-    """Here we catch exceptions and transform them to proper http responses
-
+    """
+    Here we catch exceptions and transform them to proper http responses.
     This is a special pyramid view that gets triggered whenever an exception
     is raised from any other view. It catches all exceptions exc where
     isinstance(exc, context) is True.
@@ -81,7 +82,6 @@ def exception_handler_mist(exc, request):
     # mist exceptions are ok.
     log.info("MistError: %r", exc)
 
-
     # translate it to HTTP response based on http_code attribute
     return Response(str(exc), exc.http_code)
 
@@ -89,13 +89,16 @@ def exception_handler_mist(exc, request):
 @view_config(context='pyramid.httpexceptions.HTTPNotFound',
              renderer='templates/404.pt')
 def not_found(self, request):
-    return pyramid.httpexceptions.HTTPFound(request.host_url + "/#" + request.path)
+    return pyramid.httpexceptions.HTTPFound(request.host_url + "/#" +
+                                            request.path)
 
 
 @view_config(route_name='home', request_method='GET',
              renderer='templates/home.pt')
 def home(request):
-    """Home page view"""
+    """
+    Home page view
+    """
     user = user_from_request(request)
 
     return {
@@ -119,7 +122,9 @@ def home(request):
 
 @view_config(route_name="check_auth", request_method='POST', renderer="json")
 def check_auth(request):
-    """Check on the mist.core service if authenticated"""
+    """
+    Check on the mist.core service if authenticated
+    """
 
     params = params_from_request(request)
     email = params.get('email', '').lower()
@@ -138,7 +143,7 @@ def check_auth(request):
         user.email = email
         user.mist_api_token = ret_dict.pop('token', '')
         user.save()
-        log.info("successfully check_authed")
+        log.info("successfully check_auth")
         return ret_dict
     else:
         log.error("Couldn't check_auth to mist.io: %r", ret)
@@ -147,7 +152,9 @@ def check_auth(request):
 
 @view_config(route_name='account', request_method='POST', renderer='json')
 def update_user_settings(request):
-    """try free plan, by communicating to the mist.core service"""
+    """
+    Try free plan, by communicating to the mist.core service
+    """
 
     params = params_from_request(request)
     action = params.get('action', '').lower()
@@ -188,7 +195,7 @@ def update_user_settings(request):
 def list_clouds(request):
     """
     Request a list of all added clouds.
-    READ permission requrired on cloud.
+    READ permission required on cloud.
     ---
     """
     auth_context = auth_context_from_request(request)
@@ -202,9 +209,8 @@ def list_clouds(request):
 def add_cloud(request):
     """
     Add a new cloud
-    Adds a new cloud to the user and returns the cloud_id
+    Adds a new cloud provider to the user and returns the cloud_id
     ADD permission required on cloud.
-
     ---
     api_key:
       type: string
@@ -259,7 +265,7 @@ def add_cloud(request):
     owner = auth_context.owner
     params = params_from_request(request)
     # remove spaces from start/end of string fields that are often included
-    # when pasting keys, preventing thus succesfull connection with the
+    # when pasting keys, preventing thus successful connection with the
     # cloud
     for key in params.keys():
         if type(params[key]) in [unicode, str]:
@@ -368,7 +374,7 @@ def rename_cloud(request):
       required: true
       type: string
     new_name:
-      description: ' New name for the key (will also serve as the key''s id)'
+      description: New name for the key (will also serve as the key's id)
       type: string
     """
     auth_context = auth_context_from_request(request)
@@ -390,7 +396,7 @@ def rename_cloud(request):
 def toggle_cloud(request):
     """
     Toggle a cloud
-    Toggles cloud with given cloud_id.
+    Toggles cloud with given cloud_id. Means enabled/disabled
     EDIT permission required on cloud.
     ---
     cloud:
@@ -399,8 +405,8 @@ def toggle_cloud(request):
       type: string
     new_state:
       enum:
-      - '0'
-      - '1'
+      - 0
+      - 1
       type: string
     """
     auth_context = auth_context_from_request(request)
@@ -418,7 +424,7 @@ def toggle_cloud(request):
         raise PolicyUnauthorizedError("To edit cloud")
 
     cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
-    cloud.enabled=bool(int(new_state))
+    cloud.enabled = bool(int(new_state))
     cloud.save()
     trigger_session_update(auth_context.owner, ['clouds'])
     return OK
@@ -429,7 +435,7 @@ def toggle_cloud(request):
 def list_keys(request):
     """
     List keys
-    Retrieves a list of all added Keys
+    Retrieves a list of all added keys
     READ permission required on key.
     ---
     """
@@ -445,51 +451,58 @@ def add_key(request):
     Add key with specific id
     ADD permission required on key.
     ---
-    id:
-      description: ' The Key name (id)'
+    name:
+      description: The key name (previous id)
       required: true
       type: string
     priv:
-      description: ' The private key'
+      description: The private key
       required: true
       type: string
     """
     params = params_from_request(request)
-    key_id = params.get('id', '')
+    # TODO next week, change this with name, and return id for ui
+    key_name = params.get('name', params.get('id', ''))
     private_key = params.get('priv', '')
 
     auth_context = auth_context_from_request(request)
     key_tags = auth_context.get_tags("key", "add")
     if key_tags is None:
         raise UnauthorizedError()
-    key_id = methods.add_key(auth_context.owner, key_id, private_key)
-    if key_tags:
-        mist.core.methods.set_keypair_tags(auth_context.owner, key_tags, key_id)
-    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
 
-    # since its a new key machines fields should be an empty list
+    validate_add_key(key_name, private_key)
+    key_name = methods.add_key(auth_context.owner, key_name, private_key)
+
+    if key_tags:
+        mist.core.methods.set_key_tags(auth_context.owner, key_tags,
+                                       key_name)
+    key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
+
+    # since its a new key, machines fields should be an empty list
 
     clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
-                               key_associations__keypair__exact=keypair)
+                               key_associations__keypair__exact=key)
 
-    assoc_machines = transform_key_machine_associations(machines, keypair)
+    assoc_machines = transform_key_machine_associations(machines, key)
 
-    return {'id': key_id,
+    # TODO next week return id for the ui, not key_name
+    return {'id': key_name,
             'machines': assoc_machines,
-            'isDefault': keypair.default}
+            'isDefault': key.default}
 
 
-@view_config(route_name='api_v1_key_action', request_method='DELETE', renderer='json')
+@view_config(route_name='api_v1_key_action', request_method='DELETE',
+             renderer='json')
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
 def delete_key(request):
     """
     Delete key
-    Delete key. When a keypair gets deleted, it takes its asociations with it
-    so just need to remove from the server too. If the default key gets delet-
-    ed, it sets the next one as default, provided that at least another key e-
-    xists. It returns the list of all keys after the deletion, excluding the
-    private keys (check also list_keys).
+    When a key gets deleted, it takes its associations with it
+    so just need to remove from the server too. If the default key gets
+    deleted, it sets the next one as default, provided that at least another
+    key exists. It returns the list of all keys after the deletion, excluding
+    the private keys (check also list_keys).
     REMOVE permission required on key.
     ---
     key:
@@ -498,20 +511,20 @@ def delete_key(request):
       type: string
     """
     auth_context = auth_context_from_request(request)
-    key_id = request.matchdict.get('key')
-    if not key_id:
-        raise KeypairParameterMissingError()
+    key_name = request.matchdict.get('key')  # TODO key must be key_name
+    if not key_name:
+        raise KeyParameterMissingError()
 
     try:
-        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
-                                                      key_id)
-    if not auth_context.has_perm('key', 'remove', keypair.id, keypair_tags):
+    key_tags = mist.core.methods.get_key_tags(auth_context.owner,
+                                              key_name)
+    if not auth_context.has_perm('key', 'remove', key.id, key_tags):
         raise PolicyUnauthorizedError("To remove key")
-    methods.delete_key(auth_context.owner, key_id)
+    methods.delete_key(auth_context.owner, key_name)
     return list_keys(request)
 
 
@@ -527,91 +540,95 @@ def delete_keys(request):
     be returned.
     REMOVE permission required on each key.
     ---
-    key_ids:
+    key_names:
       required: true
       type: array
       items:
         type: string
-        name: key_id
+        name: key_name
     """
     auth_context = auth_context_from_request(request)
 
     params = params_from_request(request)
-    key_ids = params.get('key_ids', [])
-    if type(key_ids) != list or len(key_ids) == 0:
+    # TODO next week, change this with name, and return id for ui
+    key_names = params.get('names', params.get('key_ids', []))
+    if type(key_names) != list or len(key_names) == 0:
         raise RequiredParameterMissingError('No key ids provided')
     # remove duplicate ids if there are any
-    key_ids = sorted(key_ids)
+    key_names = sorted(key_names)
     i = 1
-    while i < len(key_ids):
-        if key_ids[i] == key_ids[i - 1]:
-            key_ids = key_ids[:i] + key_ids[i + 1:]
+    while i < len(key_names):
+        if key_names[i] == key_names[i - 1]:
+            key_names = key_names[:i] + key_names[i + 1:]
         else:
             i += 1
     report = {}
-    for key_id in key_ids:
+    for key_name in key_names:
         try:
-            keypair = Keypair.objects.get(owner=auth_context.owner,
-                                          name=key_id)
+            key = Keypair.objects.get(owner=auth_context.owner, 
+                                      name=key_name)
         except me.DoesNotExist:
-            report[key_id] = 'not_found'
+            report[key_name] = 'not_found'
         else:
-            keypair_tags = mist.core.methods.get_keypair_tags(
+            key_tags = mist.core.methods.get_key_tags(
                 auth_context.owner,
-                key_id)
+                key_name)
             if not auth_context.has_perm('key',
                                          'remove',
-                                         keypair.id,
-                                         keypair_tags):
-                report[key_id] = 'unauthorized'
+                                         key.id,
+                                         key_tags):
+                report[key_name] = 'unauthorized'
             else:
-                methods.delete_key(auth_context.owner, key_id)
-                report[key_id] = 'deleted'
+                methods.delete_key(auth_context.owner, key_name)
+                report[key_name] = 'deleted'
 
     # if no key id was valid raise exception
-    if len(filter(lambda key_id: report[key_id] == 'not_found',
-                  report)) == len(key_ids):
-        raise NotFoundError('No valid key id provided')
+    if len(filter(lambda key_name: report[key_name] == 'not_found',
+                  report)) == len(key_names):
+        raise NotFoundError('No valid key name provided')
     # if user was unauthorized for all keys
-    if len(filter(lambda key_id: report[key_id] == 'deleted',
-                  report)) == len(key_ids):
+    if len(filter(lambda key_name: report[key_name] == 'deleted',
+                  report)) == len(key_names):
         raise NotFoundError('Unauthorized to modify any of the keys')
     return report
 
 
-@view_config(route_name='api_v1_key_action', request_method='PUT', renderer='json')
+@view_config(route_name='api_v1_key_action', request_method='PUT',
+             renderer='json')
 @view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
     """
     Edit a key
-    Edits a given key's name from old_key -> new_key
+    Edits a given key's name from old_key to new_key
     EDIT permission required on key.
     ---
-    new_id:
-      description: The new Key name (id)
+    new_name:
+      description: The new key name (id)
       type: string
     key:
-      description: ' The old key name (id)'
+      description: The old key name (id)
       in: path
       required: true
       type: string
     """
-    old_id = request.matchdict['key']
+    old_name = request.matchdict['key']  # TODO key to key_name
     params = params_from_request(request)
-    new_id = params.get('new_id')
-    if not new_id:
-        raise RequiredParameterMissingError("new_id")
+    # TODO next week, change this with name, and return id for ui
+    new_name = params.get('new_name', params.get('new_id', ''))
+
+    validate_edit_key(new_name)
 
     auth_context = auth_context_from_request(request)
     try:
-        keypair = Keypair.objects.get(owner=auth_context.owner, name=old_id)
+        key = Keypair.objects.get(owner=auth_context.owner, name=old_name)
     except me.DoesNotExist:
         raise NotFoundError('Key with that id does not exist')
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, old_id)
-    if not auth_context.has_perm('key', 'edit', keypair.id, keypair_tags):
+    key_tags = mist.core.methods.get_key_tags(auth_context.owner,
+                                                      old_name)
+    if not auth_context.has_perm('key', 'edit', key.id, key_tags):
         raise PolicyUnauthorizedError("To edit key")
-    methods.edit_key(auth_context.owner, new_id, old_id)
-    return {'new_id': new_id}
+    methods.edit_key(auth_context.owner, new_name, old_name)
+    return {'new_id': new_name}  # TODO return new_id and not new_name
 
 
 @view_config(route_name='api_v1_key_action', request_method='POST')
@@ -623,91 +640,94 @@ def set_default_key(request):
     EDIT permission required on key.
     ---
     key:
+      description: The key name
+      in: path
+      required: true
+      type: string
+    """
+    # TODO key to key_name
+    key_name = request.matchdict['key']
+
+    auth_context = auth_context_from_request(request)
+    try:
+        key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
+    except me.DoesNotExist:
+        raise NotFoundError('Key id does not exist')
+
+    key_tags = mist.core.methods.get_key_tags(auth_context.owner,
+                                              key_name)
+    if not auth_context.has_perm('key', 'edit', key.id, key_tags):
+        raise PolicyUnauthorizedError("To edit key")
+
+    methods.set_default_key(auth_context.owner, key_name)
+    return OK
+
+
+@view_config(route_name='api_v1_key_private', request_method='GET',
+             renderer='json')
+@view_config(route_name='key_private', request_method='GET', renderer='json')
+def get_private_key(request):
+    """
+    Gets private key from key name.
+    It is used in single key view when the user clicks the display
+    private key button.
+    READ_PRIVATE permission required on key.
+    ---
+    key:
       description: The key id
       in: path
       required: true
       type: string
     """
-    key_id = request.matchdict['key']
+
+    key_name = request.matchdict['key']  # TODO key to key_name
+    if not key_name:
+        raise RequiredParameterMissingError("key_name")
 
     auth_context = auth_context_from_request(request)
     try:
-        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
-                                                      key_id)
-    if not auth_context.has_perm('key', 'edit', keypair.id, keypair_tags):
-        raise PolicyUnauthorizedError("To edit key")
-
-    methods.set_default_key(auth_context.owner, key_id)
-    return OK
-
-
-@view_config(route_name='api_v1_key_private', request_method='GET', renderer='json')
-@view_config(route_name='key_private', request_method='GET', renderer='json')
-def get_private_key(request):
-    """
-    Gets private key from keypair name.
-    It is used in single key view when the user clicks the display private key
-    button.
-    READ_PRIVATE permission required on key.
-    ---
-    key:
-      description: ' The key id'
-      in: path
-      required: true
-      type: string
-    """
-
-    key_id = request.matchdict['key']
-    if not key_id:
-        raise RequiredParameterMissingError("key_id")
-
-    auth_context = auth_context_from_request(request)
-    try:
-        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-    except me.DoesNotExist:
-        raise NotFoundError('Key id does not exist')
-
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
-                                                      key_id)
-    if not auth_context.has_perm('key', 'read_private', keypair.id,
-                                 keypair_tags):
+    key_tags = mist.core.methods.get_key_tags(auth_context.owner,
+                                              key_name)
+    if not auth_context.has_perm('key', 'read_private', key.id,
+                                 key_tags):
         raise PolicyUnauthorizedError("To read private key")
-    return keypair.private
+    return key.private
 
 
-@view_config(route_name='api_v1_key_public', request_method='GET', renderer='json')
+@view_config(route_name='api_v1_key_public', request_method='GET',
+             renderer='json')
 @view_config(route_name='key_public', request_method='GET', renderer='json')
 def get_public_key(request):
     """
     Get public key
-    Gets public key from keypair name.
+    Gets public key from key name.
     READ permission required on key.
     ---
     key:
-      description: ' The key id'
+      description: The key name
       in: path
       required: true
       type: string
     """
-    key_id = request.matchdict['key']
-    if not key_id:
-        raise RequiredParameterMissingError("key_id")
+    key_name = request.matchdict['key']  # TODO key to key_name
+    if not key_name:
+        raise RequiredParameterMissingError("key_name")
 
     auth_context = auth_context_from_request(request)
     try:
-        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
     except me.DoesNotExist:
-        raise NotFoundError('Key id does not exist')
+        raise NotFoundError('Key name does not exist')
 
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
-                                                      key_id)
-    if not auth_context.has_perm('key', 'read', keypair.id, keypair_tags):
+    key_tags = mist.core.methods.get_key_tags(auth_context.owner,
+                                                      key_name)
+    if not auth_context.has_perm('key', 'read', key.id, key_tags):
         raise PolicyUnauthorizedError("To read key")
-    return keypair.public
+    return key.public
 
 
 @view_config(route_name='api_v1_keys', request_method='POST', renderer='json')
@@ -718,19 +738,21 @@ def generate_keypair(request):
     Generate key pair
     ---
     """
-    keypair = Keypair()
-    keypair.generate()
-    return {'priv': keypair.private, 'public': keypair.public}
+    key = Keypair()
+    key.generate()
+    return {'priv': key.private, 'public': key.public}
 
 
-@view_config(route_name='api_v1_key_association', request_method='PUT', renderer='json')
-@view_config(route_name='key_association', request_method='PUT', renderer='json')
+@view_config(route_name='api_v1_key_association', request_method='PUT',
+             renderer='json')
+@view_config(route_name='key_association', request_method='PUT',
+             renderer='json')
 def associate_key(request):
     """
     Associate a key to a machine
-    Associates a key with a machine. If host is set it will also attempt to ac-
-    tually deploy it to the machine. To do that it requires another keypair (-
-    existing_key) that can connect to the machine.
+    Associates a key with a machine. If host is set it will also attempt to
+    actually deploy it to the machine. To do that it requires another key
+    (existing_key) that can connect to the machine.
     READ permission required on cloud.
     READ_PRIVATE permission required on key.
     ASSOCIATE_KEY permission required on machine.
@@ -756,7 +778,9 @@ def associate_key(request):
       description: The ssh user
       type: string
     """
-    key_id = request.matchdict['key']
+    # TODO key to key_name
+    # TODO validate
+    key_name = request.matchdict['key']
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
@@ -769,15 +793,19 @@ def associate_key(request):
         host = request.json_body.get('host')
     except:
         host = None
+
     if not host:
         raise RequiredParameterMissingError('host')
+
     auth_context = auth_context_from_request(request)
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
         raise UnauthorizedError()
-    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
-    if not auth_context.has_perm('key', 'read_private', keypair.id, keypair_tags):
+    key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
+    key_tags = mist.core.methods.get_key_tags(auth_context.owner,
+                                              key_name)
+    if not auth_context.has_perm('key', 'read_private', key.id,
+                                 key_tags):
         raise UnauthorizedError()
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
@@ -790,27 +818,29 @@ def associate_key(request):
                                  machine_tags):
         raise PolicyUnauthorizedError("To associate key with this machine")
 
-    methods.associate_key(auth_context.owner, key_id, cloud_id, machine_id, host,
-                          username=ssh_user, port=ssh_port)
+    methods.associate_key(auth_context.owner, key_name, cloud_id, machine_id,
+                          host, username=ssh_user, port=ssh_port)
     clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
-                               key_associations__keypair__exact=keypair)
+                               key_associations__keypair__exact=key)
 
-    assoc_machines = transform_key_machine_associations(machines, keypair)
-    # FIX filter machines based on auth_context
+    assoc_machines = transform_key_machine_associations(machines, key)
+    # FIXME filter machines based on auth_context
 
     return assoc_machines
 
 
-@view_config(route_name='api_v1_key_association', request_method='DELETE', renderer='json')
-@view_config(route_name='key_association', request_method='DELETE', renderer='json')
+@view_config(route_name='api_v1_key_association', request_method='DELETE',
+             renderer='json')
+@view_config(route_name='key_association', request_method='DELETE',
+             renderer='json')
 def disassociate_key(request):
     """
     Disassociate a key from a machine
     Disassociates a key from a machine. If host is set it will also attempt to
     actually remove it from the machine.
     READ permission required on cloud.
-    DISSASOCIATE_KEY permsion required on machine.
+    DISSASOCIATE_KEY permission required on machine.
     ---
     key:
       in: path
@@ -827,7 +857,8 @@ def disassociate_key(request):
     host:
       type: string
     """
-    key_id = request.matchdict['key']
+    # TODO key_name to key for ui
+    key_name = request.matchdict['key']
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     try:
@@ -850,19 +881,21 @@ def disassociate_key(request):
                                  machine_tags):
         raise UnauthorizedError()
 
-    methods.disassociate_key(auth_context.owner, key_id, cloud_id, machine_id, host)
-    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    methods.disassociate_key(auth_context.owner, key_name, cloud_id, machine_id,
+                             host)
+    key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
     clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
-                               key_associations__keypair__exact=keypair)
+                               key_associations__keypair__exact=key)
 
-    assoc_machines = transform_key_machine_associations(machines, keypair)
-    # FIX filter machines based on auth_context
+    assoc_machines = transform_key_machine_associations(machines, key)
+    # FIXME filter machines based on auth_context
 
     return assoc_machines
 
 
-@view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
+@view_config(route_name='api_v1_machines', request_method='GET',
+             renderer='json')
 @view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
     """
@@ -901,19 +934,19 @@ def create_machine(request):
       required: true
       type: string
     async:
-      description: ' Create machines asynchronously, returning a jobId'
+      description: Create machines asynchronously, returning a jobId
       type: boolean
     quantity:
-      description: ' The number of machines that will be created, async only'
+      description: The number of machines that will be created, async only
       type: integer
     azure_port_bindings:
       type: string
     cloud_id:
-      description: The Cloud ID
+      description: The Cloud id
       required: true
       type: string
     disk:
-      description: ' Only required by Linode cloud'
+      description: Only required by Linode cloud
       type: string
     docker_command:
       type: string
@@ -928,10 +961,10 @@ def create_machine(request):
     hostname:
       type: string
     image_extra:
-      description: ' Needed only by Linode cloud'
+      description: Needed only by Linode provider
       type: string
     image_id:
-      description: ' Id of image to be used with the creation'
+      description: Id of image to be used with the creation
       required: true
       type: string
     image_name:
@@ -941,11 +974,11 @@ def create_machine(request):
     job_id:
       type: string
     key_id:
-      description: ' Associate machine with this key_id'
+      description: Associate machine with this key_id
       required: true
       type: string
     location_id:
-      description: ' Id of the cloud''s location to create the machine'
+      description: Id of the cloud's location to create the machine
       required: true
       type: string
     location_name:
@@ -974,7 +1007,7 @@ def create_machine(request):
     script_params:
       type: string
     size_id:
-      description: ' Id of the size of the machine'
+      description: Id of the size of the machine
       required: true
       type: string
     size_name:
@@ -982,16 +1015,16 @@ def create_machine(request):
     ssh_port:
       type: integer
     softlayer_backend_vlan_id:
-      description: 'Specify id of a backend(private) vlan'
+      description: Specify id of a backend(private) vlan
       type: integer
     project_id:
-      description: ' Needed only by Packet.net cloud'
+      description: Needed only by Packet.net cloud
       type: string
     billing:
-      description: ' Needed only by SoftLayer cloud'
+      description: Needed only by SoftLayer cloud
       type: string
     bare_metal:
-      description: ' Needed only by SoftLayer cloud'
+      description: Needed only by SoftLayer cloud
       type: string
     """
     params = params_from_request(request)
@@ -1046,9 +1079,9 @@ def create_machine(request):
     project_id = params.get('project', None)
     bare_metal = params.get('bare_metal', False)
     # bare_metal True creates a hardware server in SoftLayer,
-    # whule bare_metal False creates a virtual cloud server
+    # while bare_metal False creates a virtual cloud server
     # hourly True is the default setting for SoftLayer hardware
-    # servers, while False means the server has montly pricing
+    # servers, while False means the server has monthly pricing
     softlayer_backend_vlan_id = params.get('softlayer_backend_vlan_id', None)
     hourly = params.get('billing', True)
 
@@ -1088,10 +1121,10 @@ def create_machine(request):
         if not auth_context.has_perm("script", "run", script_id, script_tags):
             raise UnauthorizedError("Can't run script.")
     if key_id:
-        key_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
-                                                      key_id)
-        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-        if not auth_context.has_perm("key", "read", keypair.id, key_tags):
+        key_tags = mist.core.methods.get_key_tags(auth_context.owner,
+                                                  key_id)
+        key = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+        if not auth_context.has_perm("key", "read", key.id, key_tags):
             raise PolicyUnauthorizedError("To read key")
 
     import uuid
@@ -1102,7 +1135,8 @@ def create_machine(request):
             image_extra, disk, image_name, size_name,
             location_name, ips, monitoring, networks,
             docker_env, docker_command)
-    kwargs = {'script_id': script_id, 'script_params': script_params, 'script': script,
+    kwargs = {'script_id': script_id, 'script_params': script_params,
+              'script': script,
               'job_id': job_id, 'docker_port_bindings': docker_port_bindings,
               'docker_exposed_ports': docker_exposed_ports,
               'azure_port_bindings': azure_port_bindings,
@@ -1131,7 +1165,8 @@ def create_machine(request):
     return ret
 
 
-@view_config(route_name='api_v1_machine', request_method='POST', renderer='json')
+@view_config(route_name='api_v1_machine', request_method='POST',
+             renderer='json')
 @view_config(route_name='machine', request_method='POST', renderer='json')
 def machine_actions(request):
     """
@@ -1187,7 +1222,7 @@ def machine_actions(request):
             machine_uuid = ""
         if not auth_context.has_perm("machine", action, machine_uuid,
                                      machine_tags):
-            raise PolicyUnauthorizedError("To %s machine" %action)
+            raise PolicyUnauthorizedError("To %s machine" % action)
 
     if action in ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename',
                   'undefine', 'suspend', 'resume'):
@@ -1200,9 +1235,11 @@ def machine_actions(request):
         elif action == 'destroy':
             methods.destroy_machine(auth_context.owner, cloud_id, machine_id)
         elif action == 'resize':
-            methods.resize_machine(auth_context.owner, cloud_id, machine_id, plan_id)
+            methods.resize_machine(auth_context.owner, cloud_id, machine_id,
+                                   plan_id)
         elif action == 'rename':
-            methods.rename_machine(auth_context.owner, cloud_id, machine_id, name)
+            methods.rename_machine(auth_context.owner, cloud_id, machine_id,
+                                   name)
         elif action == 'undefine':
             methods.undefine_machine(auth_context.owner, cloud_id, machine_id)
         elif action == 'resume':
@@ -1215,7 +1252,8 @@ def machine_actions(request):
     raise BadRequestError()
 
 
-@view_config(route_name='api_v1_machine_rdp', request_method='GET', renderer='json')
+@view_config(route_name='api_v1_machine_rdp', request_method='GET',
+             renderer='json')
 @view_config(route_name='machine_rdp', request_method='GET', renderer='json')
 def machine_rdp(request):
     """
@@ -1276,12 +1314,13 @@ def machine_rdp(request):
                     pragma='no-cache',
                     body=rdp_content)
 
-
+# TODO keep it here or to core
 # Views set_machine_tags and delete_machine_tags are defined in core.views
 #
 # @view_config(route_name='api_v1_machine_tags', request_method='POST',
 #              renderer='json')
-# @view_config(route_name='machine_tags', request_method='POST', renderer='json')
+# @view_config(route_name='machine_tags', request_method='POST',
+#              renderer='json')
 # def set_machine_tags(request):
 #     """
 #     Set tags on a machine
@@ -1310,7 +1349,8 @@ def machine_rdp(request):
 #         raise BadRequestError('tags should be list of tags')
 #
 #     auth_context = auth_context_from_request(request)
-#     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
+#     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner,
+#                                                   cloud_id)
 #     if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
 #         raise UnauthorizedError()
 #     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
@@ -1355,7 +1395,8 @@ def machine_rdp(request):
 #     machine_id = request.matchdict['machine']
 #     tag = request.matchdict['tag']
 #     auth_context = auth_context_from_request(request)
-#     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
+#     cloud_tags = \
+#                mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
 #     if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
 #         raise UnauthorizedError()
 #     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
@@ -1415,7 +1456,7 @@ def list_images(request):
 def star_image(request):
     """
     Star/unstar an image
-    Toggle image star (star/unstar)
+    Toggle image star
     EDIT permission required on cloud.
     ---
     cloud:
@@ -1460,15 +1501,16 @@ def list_sizes(request):
     return methods.list_sizes(auth_context.owner, cloud_id)
 
 
-@view_config(route_name='api_v1_locations', request_method='GET', renderer='json')
+@view_config(route_name='api_v1_locations', request_method='GET',
+             renderer='json')
 @view_config(route_name='locations', request_method='GET', renderer='json')
 def list_locations(request):
     """
     List locations of cloud
     List locations from each cloud. Locations mean different things in each cl-
-    oud. e.g. EC2 uses it as a datacenter in a given availability zone, where-
+    oud. e.g. EC2 uses it as a data center in a given availability zone, where-
     as Linode lists availability zones. However all responses share id, name
-    and country eventhough in some cases might be empty, e.g. Openstack. In E-
+    and country even though in some cases might be empty, e.g. Openstack. In E-
     C2 all locations by a provider have the same name, so the availability zo-
     nes are listed instead of name.
     READ permission required on cloud.
@@ -1487,7 +1529,8 @@ def list_locations(request):
     return methods.list_locations(auth_context.owner, cloud_id)
 
 
-@view_config(route_name='api_v1_networks', request_method='GET', renderer='json')
+@view_config(route_name='api_v1_networks', request_method='GET',
+             renderer='json')
 @view_config(route_name='networks', request_method='GET', renderer='json')
 def list_networks(request):
     """
@@ -1511,7 +1554,8 @@ def list_networks(request):
     return methods.list_networks(auth_context.owner, cloud_id)
 
 
-@view_config(route_name='api_v1_networks', request_method='POST', renderer='json')
+@view_config(route_name='api_v1_networks', request_method='POST',
+             renderer='json')
 @view_config(route_name='networks', request_method='POST', renderer='json')
 def create_network(request):
     """
@@ -1547,9 +1591,11 @@ def create_network(request):
     auth_context = auth_context_from_request(request)
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner,
                                                   cloud_id)
-    if not auth_context.has_perm("cloud", "create_resources", cloud_id, cloud_tags):
+    if not auth_context.has_perm("cloud", "create_resources", cloud_id,
+                                 cloud_tags):
         raise PolicyUnauthorizedError("To create_resources")
-    return methods.create_network(auth_context.owner, cloud_id, network, subnet, router)
+    return methods.create_network(auth_context.owner, cloud_id, network,
+                                  subnet, router)
 
 
 @view_config(route_name='api_v1_network', request_method='DELETE')
@@ -1575,7 +1621,8 @@ def delete_network(request):
     auth_context = auth_context_from_request(request)
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner,
                                                   cloud_id)
-    if not auth_context.has_perm("cloud", "create_resources", cloud_id, cloud_tags):
+    if not auth_context.has_perm("cloud", "create_resources", cloud_id,
+                                 cloud_tags):
         raise PolicyUnauthorizedError("To create_resources")
     methods.delete_network(auth_context.owner, cloud_id, network_id)
 
@@ -1629,8 +1676,8 @@ def associate_ip(request):
     if not auth_context.has_perm("machine", "edit", machine_uuid, machine_tags):
         raise PolicyUnauthorizedError("To edit machine")
 
-    ret = methods.associate_ip(auth_context.owner, cloud_id, network_id, ip, machine_id,
-                               assign)
+    ret = methods.associate_ip(auth_context.owner, cloud_id, network_id, ip,
+                               machine_id, assign)
     if ret:
         return OK
     else:
@@ -1660,7 +1707,7 @@ def probe(request):
       type: string
     ssh_user:
       default: ''
-      description: ' Optional. Give if you explicitly want a specific user'
+      description: Optional. Give if you explicitly want a specific user
       in: query
       required: false
       type: string
@@ -1693,7 +1740,8 @@ def probe(request):
     return ret
 
 
-@view_config(route_name='api_v1_monitoring', request_method='GET', renderer='json')
+@view_config(route_name='api_v1_monitoring', request_method='GET',
+             renderer='json')
 @view_config(route_name='monitoring', request_method='GET', renderer='json')
 def check_monitoring(request):
     """
@@ -1706,8 +1754,10 @@ def check_monitoring(request):
     return ret
 
 
-@view_config(route_name='api_v1_update_monitoring', request_method='POST', renderer='json')
-@view_config(route_name='update_monitoring', request_method='POST', renderer='json')
+@view_config(route_name='api_v1_update_monitoring', request_method='POST',
+             renderer='json')
+@view_config(route_name='update_monitoring', request_method='POST',
+             renderer='json')
 def update_monitoring(request):
     """
     Enable monitoring
@@ -1732,7 +1782,7 @@ def update_monitoring(request):
       default: false
       type: boolean
     name:
-      description: ' Name of the plugin'
+      description: Name of the plugin
       type: string
     no_ssh:
       default: false
@@ -1764,7 +1814,7 @@ def update_monitoring(request):
             user.email = email
             user.mist_api_token = ret_dict.pop('token', '')
             user.save()
-            log.info("succesfully check_authed")
+            log.info("successfully check_auth")
         elif ret.status_code in [400, 401]:
             user.email = ""
             user.mist_api_token = ""
@@ -1799,7 +1849,7 @@ def update_monitoring(request):
 def get_stats(request):
     """
     Get monitor data for a machine
-    Get all monitor data for this machine
+    Get all monitor data for a specific machine
     READ permission required on cloud.
     READ permission required on machine.
     ---
@@ -1812,19 +1862,21 @@ def get_stats(request):
       required: true
       type: string
     start:
-      description: ' Time formatted as integer, from when to fetch stats (default now)'
+      description: Time formatted as integer,
+                   from when to fetch stats (default now)
       in: query
       required: false
       type: string
     stop:
       default: ''
-      description: Time formatted as integer, until when to fetch stats (default +10 seconds)
+      description: Time formatted as integer,
+                   until when to fetch stats (default +10 seconds)
       in: query
       required: false
       type: string
     step:
       default: ''
-      description: ' Step to fetch stats (default 10 seconds)'
+      description: Step to fetch stats (default 10 seconds)
       in: query
       required: false
       type: string
@@ -1923,7 +1975,7 @@ def assoc_metric(request):
       required: true
       type: string
     metric_id:
-      description: ' Metric_id '
+      description: metric_id
       type: string
     """
     cloud_id = request.matchdict['cloud']
@@ -1943,13 +1995,15 @@ def assoc_metric(request):
         machine_uuid = machine.id
     except me.DoesNotExist:
         machine_uuid = ""
-    if not auth_context.has_perm("machine", "edit_graphs", machine_uuid, machine_tags):
+    if not auth_context.has_perm("machine", "edit_graphs", machine_uuid,
+                                 machine_tags):
         raise PolicyUnauthorizedError("To edit graphs")
     methods.assoc_metric(auth_context.owner, cloud_id, machine_id, metric_id)
     return {}
 
 
-@view_config(route_name='api_v1_metrics', request_method='DELETE', renderer='json')
+@view_config(route_name='api_v1_metrics', request_method='DELETE',
+             renderer='json')
 @view_config(route_name='metrics', request_method='DELETE', renderer='json')
 def disassoc_metric(request):
     """
@@ -1967,7 +2021,7 @@ def disassoc_metric(request):
       required: true
       type: string
     metric_id:
-      description: ' Metric_id '
+      description: metric_id
       type: string
     """
     cloud_id = request.matchdict['cloud']
@@ -1987,7 +2041,8 @@ def disassoc_metric(request):
         machine_uuid = machine.id
     except me.DoesNotExist:
         machine_uuid = ""
-    if not auth_context.has_perm("machine", "edit_graphs", machine_uuid, machine_tags):
+    if not auth_context.has_perm("machine", "edit_graphs", machine_uuid,
+                                 machine_tags):
         raise PolicyUnauthorizedError("To edit graphs")
     methods.disassoc_metric(auth_context.owner, cloud_id, machine_id, metric_id)
     return {}
@@ -2021,8 +2076,8 @@ def update_metric(request):
     plugin_type:
       type: string
     unit:
-      description: ' Optional. If given the new plugin will be measured according to this
-        unit'
+      description: Optional. If given the new plugin will be measured
+                   according to this unit
       type: string
     """
     metric_id = request.matchdict['metric']
@@ -2054,7 +2109,8 @@ def update_metric(request):
     return {}
 
 
-@view_config(route_name='api_v1_deploy_plugin', request_method='POST', renderer='json')
+@view_config(route_name='api_v1_deploy_plugin', request_method='POST',
+             renderer='json')
 @view_config(route_name='deploy_plugin', request_method='POST', renderer='json')
 def deploy_plugin(request):
     """
@@ -2136,8 +2192,10 @@ def deploy_plugin(request):
         raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
 
-@view_config(route_name='api_v1_deploy_plugin', request_method='DELETE', renderer='json')
-@view_config(route_name='deploy_plugin', request_method='DELETE', renderer='json')
+@view_config(route_name='api_v1_deploy_plugin', request_method='DELETE',
+             renderer='json')
+@view_config(route_name='deploy_plugin', request_method='DELETE',
+             renderer='json')
 def undeploy_plugin(request):
     """
     Undeploy a plugin on a machine.
@@ -2194,7 +2252,7 @@ def undeploy_plugin(request):
     else:
         raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
-
+# FIXME transfer or delete me?
 # @view_config(route_name='metric', request_method='DELETE', renderer='json')
 # def remove_metric(request):
     # user = user_from_request(request)
@@ -2249,7 +2307,7 @@ def delete_rule(request):
     Deletes a rule.
     ---
     rule:
-      description: ' Rule id '
+      description: Rule id
       in: path
       required: true
       type: string
@@ -2271,7 +2329,8 @@ def delete_rule(request):
     return OK
 
 
-@view_config(route_name='api_v1_providers', request_method='GET', renderer='json')
+@view_config(route_name='api_v1_providers', request_method='GET',
+             renderer='json')
 @view_config(route_name='providers', request_method='GET', renderer='json')
 def list_supported_providers(request):
     """
