@@ -188,6 +188,7 @@ def update_user_settings(request):
 def list_clouds(request):
     """
     Request a list of all added clouds.
+    READ permission requrired on cloud.
     ---
     """
     auth_context = auth_context_from_request(request)
@@ -201,7 +202,9 @@ def list_clouds(request):
 def add_cloud(request):
     """
     Add a new cloud
-     Adds a new cloud to the user and returns the cloud_id
+    Adds a new cloud to the user and returns the cloud_id
+    ADD permission required on cloud.
+
     ---
     api_key:
       type: string
@@ -336,6 +339,7 @@ def delete_cloud(request):
     """
     Delete a cloud
     Deletes cloud with given cloud_id.
+    REMOVE permission required on cloud.
     ---
     cloud:
       in: path
@@ -357,6 +361,7 @@ def rename_cloud(request):
     """
     Rename a cloud
     Renames cloud with given cloud_id.
+    EDIT permission required on cloud.
     ---
     cloud:
       in: path
@@ -386,6 +391,7 @@ def toggle_cloud(request):
     """
     Toggle a cloud
     Toggles cloud with given cloud_id.
+    EDIT permission required on cloud.
     ---
     cloud:
       in: path
@@ -424,6 +430,7 @@ def list_keys(request):
     """
     List keys
     Retrieves a list of all added Keys
+    READ permission required on key.
     ---
     """
     auth_context = auth_context_from_request(request)
@@ -436,6 +443,7 @@ def add_key(request):
     """
     Add key
     Add key with specific id
+    ADD permission required on key.
     ---
     id:
       description: ' The Key name (id)'
@@ -482,6 +490,7 @@ def delete_key(request):
     ed, it sets the next one as default, provided that at least another key e-
     xists. It returns the list of all keys after the deletion, excluding the
     private keys (check also list_keys).
+    REMOVE permission required on key.
     ---
     key:
       in: path
@@ -516,6 +525,7 @@ def delete_keys(request):
     whether or not it was deleted or not_found if the key id could not
     be located. If no key id was found then a 404(Not Found) response will
     be returned.
+    REMOVE permission required on each key.
     ---
     key_ids:
       required: true
@@ -575,6 +585,7 @@ def edit_key(request):
     """
     Edit a key
     Edits a given key's name from old_key -> new_key
+    EDIT permission required on key.
     ---
     new_id:
       description: The new Key name (id)
@@ -609,6 +620,7 @@ def set_default_key(request):
     """
     Set default key
     Sets a new default key
+    EDIT permission required on key.
     ---
     key:
       description: The key id
@@ -640,6 +652,7 @@ def get_private_key(request):
     Gets private key from keypair name.
     It is used in single key view when the user clicks the display private key
     button.
+    READ_PRIVATE permission required on key.
     ---
     key:
       description: ' The key id'
@@ -672,6 +685,7 @@ def get_public_key(request):
     """
     Get public key
     Gets public key from keypair name.
+    READ permission required on key.
     ---
     key:
       description: ' The key id'
@@ -717,6 +731,9 @@ def associate_key(request):
     Associates a key with a machine. If host is set it will also attempt to ac-
     tually deploy it to the machine. To do that it requires another keypair (-
     existing_key) that can connect to the machine.
+    READ permission required on cloud.
+    READ_PRIVATE permission required on key.
+    ASSOCIATE_KEY permission required on machine.
     ---
     cloud:
       in: path
@@ -791,7 +808,9 @@ def disassociate_key(request):
     """
     Disassociate a key from a machine
     Disassociates a key from a machine. If host is set it will also attempt to
-     actually remove it from the machine.
+    actually remove it from the machine.
+    READ permission required on cloud.
+    DISSASOCIATE_KEY permsion required on machine.
     ---
     key:
       in: path
@@ -849,6 +868,7 @@ def list_machines(request):
     """
     List machines on cloud
     Gets machines and their metadata from a cloud
+    READ permission required on machine.
     ---
     cloud:
       in: path
@@ -869,6 +889,12 @@ def create_machine(request):
     Create machine(s) on cloud
     Creates one or more machines on the specified cloud. If async is true, a
     jobId will be returned.
+    READ permission required on cloud.
+    CREATE_RESOURCES permissn required on cloud.
+    CREATE permission required on machine.
+    RUN permission required on script.
+    READ permission required on key.
+
     ---
     cloud:
       in: path
@@ -1111,6 +1137,9 @@ def machine_actions(request):
     """
     Call an action on machine
     Calls a machine action on clouds that support it
+    READ permission required on cloud.
+    ACTION permission required on machine(ACTION can be START,
+    STOP, DESTROY, REBOOT).
     ---
     cloud:
       in: path
@@ -1192,6 +1221,8 @@ def machine_rdp(request):
     """
     Rdp file for windows machines
     Generate and return an rdp file for windows machines
+    READ permission required on cloud.
+    READ permission required on machine.
     ---
     cloud:
       in: path
@@ -1355,7 +1386,8 @@ def list_images(request):
     List images of specified cloud
     List images from each cloud. Furthermore if a search_term is provided, we
     loop through each cloud and search for that term in the ids and the names
-     of the community images
+    of the community images
+    READ permission required on cloud.
     ---
     cloud:
       in: path
@@ -1384,6 +1416,7 @@ def star_image(request):
     """
     Star/unstar an image
     Toggle image star (star/unstar)
+    EDIT permission required on cloud.
     ---
     cloud:
       in: path
@@ -1411,6 +1444,7 @@ def list_sizes(request):
     """
     List sizes of a cloud
     List sizes (aka flavors) from each cloud.
+    READ permission required on cloud.
     ---
     cloud:
       in: path
@@ -1437,6 +1471,7 @@ def list_locations(request):
     and country eventhough in some cases might be empty, e.g. Openstack. In E-
     C2 all locations by a provider have the same name, so the availability zo-
     nes are listed instead of name.
+    READ permission required on cloud.
     ---
     cloud:
       in: path
@@ -1459,7 +1494,8 @@ def list_networks(request):
     List networks of a cloud
     List networks from each cloud.
     Currently NephoScale and Openstack networks
-     are supported. For other providers this returns an empty list.
+    are supported. For other providers this returns an empty list.
+    READ permission required on cloud.
     ---
     cloud:
       in: path
@@ -1482,6 +1518,7 @@ def create_network(request):
     Create network on a cloud
     Creates a new network. If subnet dict is specified, after creating the net-
     work it will use the new network's id to create a subnet
+    CREATE_RESOURCES permission required on cloud.
     ---
     cloud:
       in: path
@@ -1521,6 +1558,7 @@ def delete_network(request):
     """
     Delete a network
     Delete a network
+    CREATE_RESOURCES permission required on cloud.
     ---
     cloud:
       in: path
@@ -1550,6 +1588,8 @@ def associate_ip(request):
     """
     Associate ip
     Associate ip with the specific network and machine
+    READ permission required on cloud.
+    EDIT permission required on cloud.
     ---
     cloud:
       in: path
@@ -1603,6 +1643,8 @@ def probe(request):
     """
     Probe a machine
     Ping and SSH to machine and collect various metrics.
+    READ permission required on cloud.
+    READ permission required on machine.
     ---
     cloud:
       in: path
@@ -1758,6 +1800,8 @@ def get_stats(request):
     """
     Get monitor data for a machine
     Get all monitor data for this machine
+    READ permission required on cloud.
+    READ permission required on machine.
     ---
     cloud:
       in: path
@@ -1831,6 +1875,8 @@ def find_metrics(request):
     """
     Get metrics of a machine
     Get all metrics associated with specific machine
+    READ permission required on cloud.
+    READ permission required on machine.
     ---
     cloud:
       in: path
@@ -1865,6 +1911,8 @@ def assoc_metric(request):
     """
     Associate metric with machine
     Associate metric with specific machine
+    READ permission required on cloud.
+    EDIT_GRAPHS permission required on machine.
     ---
     cloud:
       in: path
@@ -1907,6 +1955,8 @@ def disassoc_metric(request):
     """
     Disassociate metric from machine
     Disassociate metric from specific machine
+    READ permission required on cloud.
+    EDIT_GRAPHS permission required on machine.
     ---
     cloud:
       in: path
@@ -1949,6 +1999,8 @@ def update_metric(request):
     """
     Update a metric configuration
     Update a metric configuration
+    READ permission required on cloud.
+    EDIT_CUSTOM_METRICS required on machine.
     ---
     metric:
       description: ' Metric_id (provided by self.get_stats() )'
@@ -2008,6 +2060,8 @@ def deploy_plugin(request):
     """
     Deploy a plugin on a machine.
     Deploy a plugin on the specific machine.
+    READ permission required on cloud.
+    EDIT_CUSTOM_METRICS required on machine.
     ---
     cloud:
       in: path
@@ -2088,6 +2142,8 @@ def undeploy_plugin(request):
     """
     Undeploy a plugin on a machine.
     Undeploy a plugin on the specific machine.
+    READ permission required on cloud.
+    EDIT_CUSTOM_METRICS required on machine.
     ---
     cloud:
       in: path
