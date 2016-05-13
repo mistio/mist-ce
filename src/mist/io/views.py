@@ -454,8 +454,8 @@ def add_key(request):
       type: string
     """
     params = params_from_request(request)
-    # TODO id must be name also for the ui
-    key_name = params.get('id', '')
+    # TODO next week, change this with name, and return id for ui
+    key_name = params.get('name', params.get('id', ''))
     private_key = params.get('priv', '')
 
     auth_context = auth_context_from_request(request)
@@ -479,6 +479,7 @@ def add_key(request):
 
     assoc_machines = transform_key_machine_associations(machines, key)
 
+    # TODO next week return id for the ui, not key_name
     return {'id': key_name,
             'machines': assoc_machines,
             'isDefault': key.default}
@@ -540,7 +541,8 @@ def delete_keys(request):
     auth_context = auth_context_from_request(request)
 
     params = params_from_request(request)
-    key_names = params.get('key_ids', [])  # TODO key_names
+    # TODO next week, change this with name, and return id for ui
+    key_names = params.get('names', params.get('key_ids', []))
     if type(key_names) != list or len(key_names) == 0:
         raise RequiredParameterMissingError('No key ids provided')
     # remove duplicate ids if there are any
@@ -601,7 +603,8 @@ def edit_key(request):
     """
     old_name = request.matchdict['key']  # TODO key to key_name
     params = params_from_request(request)
-    new_name = params.get('new_id')
+    # TODO next week, change this with name, and return id for ui
+    new_name = params.get('new_name', params.get('new_id', ''))
 
     validate_edit_key(new_name)
 
@@ -615,7 +618,7 @@ def edit_key(request):
     if not auth_context.has_perm('key', 'edit', key.id, key_tags):
         raise PolicyUnauthorizedError("To edit key")
     methods.edit_key(auth_context.owner, new_name, old_name)
-    return {'new_id': new_name}  # TODO new_id to new_name
+    return {'new_id': new_name}  # TODO return new_id and not new_name
 
 
 @view_config(route_name='api_v1_key_action', request_method='POST')
