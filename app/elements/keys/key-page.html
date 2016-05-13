@@ -312,7 +312,7 @@
                     },
                     key: {
                         type: Object,
-                        computed: '_computeKey(params)'
+                        computed: '_computeKey(params, model.keysArray.*)'
                     },
                     id: {
                         type: String,
@@ -374,8 +374,8 @@
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
-                _computeKey: function(params) {
-                    return this.model.keysArray.find(function(key) {
+                _computeKey: function(params, keys) {
+                    return keys.base.find(function(key) {
                         return key.id == params.id;
                     });
                 },

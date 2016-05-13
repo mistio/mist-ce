@@ -276,7 +276,7 @@
                 },
                 team: {
                     type: Object,
-                    computed: '_computeTeam(params)'
+                    computed: '_computeTeam(params, model.teamsArray.*)'
                 },
                 hasMembers: {
                     type: Boolean,
@@ -319,10 +319,10 @@
             _computeId: function(params) {
                 return params.id;
             },
-            _computeTeam: function(params) {
-                return this.model.teamsArray.find(function(team) {
+            _computeTeam: function(params, teams) {
+                return teams.base.find(function(team) {
                     return team.id == params.id;
-                }, this);
+                });
             },
             _computeTeamId: function(params) {
                 return params.id;

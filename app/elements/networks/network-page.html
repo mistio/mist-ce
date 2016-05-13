@@ -224,9 +224,8 @@
                 },
                 _computeNetwork: function(params, networks) {
                     return networks.base.find(function(network) {
-                        console.log(network);
                         return network.name == params.name;
-                    }, this);
+                    });
                 },
                 _computeNetworkId: function(params) {
                     return params.id;
