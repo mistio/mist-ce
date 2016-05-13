@@ -105,7 +105,7 @@
                 </div>
             </paper-header-panel>
         </paper-drawer-panel>
-        <iron-ajax id="addCloudAjax" url="/api/v1/clouds" method="POST" on-request="_addCloudRequest" on-response="_addCloudResponse"></iron-ajax>
+        <iron-ajax id="cloudAddAjaxRequest" url="/api/v1/clouds" method="POST" on-response="_cloudAddAjaxResponse" on-error="_cloudAddAjaxError"></iron-ajax>
     </template>
     <script>
         (function() {
@@ -1155,10 +1155,10 @@
                 },
                 _submitForm: function(e) {
                     console.log(this.cloud);
-                    // this.$.addCloudAjax.body = this.cloud;
-                    // this.$.addCloudAjax.generateRequest();
-                },
-                _addCloudRequest: function() {
+                    this.$.cloudAddAjaxRequest.body = this.cloud;
+                    this.$.cloudAddAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.cloudAddAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.cloudAddAjaxRequest.generateRequest();
                     this.set('sendingData', true);
                 },
                 _addCloudResponse: function(e) {
