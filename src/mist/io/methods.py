@@ -1014,7 +1014,11 @@ def delete_cloud(owner, cloud_id):
             log.warning("Couldn't disable monitoring before deleting cloud. "
                         "Error: %r", exc)
 
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    try:
+        cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
     machines = Machine.objects(cloud=cloud)
     for machine in machines:
         tags = Tag.objects(owner=owner, resource=machine)
