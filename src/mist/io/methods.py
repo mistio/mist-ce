@@ -1088,11 +1088,9 @@ def delete_key(user, key_id):
 
 def set_default_key(user, key_id):
     """Sets a new default key
-
-    @param user: The user
-    @param key_id: The id of the key we want to set as default
-    @return: Nothing. Raises only exceptions if needed.
-
+    :param user:
+    :param key_id:
+    :return:
     """
 
     log.info("Setting key with id '%s' as default.", key_id)
@@ -1102,11 +1100,11 @@ def set_default_key(user, key_id):
         default_key.default = False
         default_key.save()
 
-    key = Keypair.objects.get(owner=user, name=key_id)
+    key = Keypair.objects.get(owner=user, id=key_id)
     key.default = True
     key.save()
 
-    log.info("Succesfully set key with id '%s' as default.", key_id)
+    log.info("Successfully set key with id '%s' as default.", key_id)
     trigger_session_update(user, ['keys'])
 
 
