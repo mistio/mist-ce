@@ -1033,33 +1033,33 @@ def delete_cloud(owner, cloud_id):
     trigger_session_update(owner, ['clouds'])
 
 
-def add_key(user, key_id, private_key):
-    """Adds a new keypair and returns the new key_id."""
+def add_key(user, key_name, private_key):
+    """Adds a new key by name and returns the new key_name."""
 
-    log.info("Adding key with id '%s'.", key_id)
-    if not key_id:
-        raise KeypairParameterMissingError(key_id)
+    log.info("Adding key with name '%s'.", key_name)
+    if not key_name:
+        raise KeypairParameterMissingError(key_name)
     if not private_key:
         raise RequiredParameterMissingError("Private key is not provided")
-    key = Keypair.objects(owner=user, name=key_id)
+    key = Keypair.objects(owner=user, name=key_name)
     if key:
-        raise KeypairExistsError(key_id)
+        raise KeypairExistsError(key_name)
 
-    keypair = Keypair()
-    keypair.private = private_key
-    keypair.name = key_id
-    keypair.construct_public_from_private()
+    key = Keypair()
+    key.private = private_key
+    key.name = key_name
+    key.construct_public_from_private()
     if not Keypair.objects(owner=user, default=True):
-        keypair.default = True
+        key.default = True
 
-    if not keypair.isvalid():
+    if not key.isvalid():
         raise KeyValidationError()
-    keypair.owner = user
-    keypair.save()
+    key.owner = user
+    key.save()
 
-    log.info("Added key with id '%s'", key_id)
+    log.info("Added key with name '%s'", key_name)
     trigger_session_update(user, ['keys'])
-    return key_id
+    return key_name
 
 
 def delete_key(user, key_id):
