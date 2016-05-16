@@ -1108,28 +1108,28 @@ def set_default_key(user, key_id):
     trigger_session_update(user, ['keys'])
 
 
-def edit_key(user, new_key, old_key):
+def edit_key(user, new_name, key_id):
+    """Edit name of an existing key.
+    Means rename key.
+    :param user:
+    :param new_name: the new key's name
+    :param key_id: the key's id
+    :return:
     """
-    Edits a given key's name from old_key ---> new_key
-    @param user: The User
-    @param new_key: The new Key name (id)
-    @param old_key: The old key name (id)
-    @return: Nothing, only raises exceptions if needed
-
-    """
-
-    log.info("Renaming key '%s' to '%s'.", old_key, new_key)
-    if not new_key:
+    if not new_name:
         raise KeyParameterMissingError("new name")
 
-    if old_key == new_key:
-        log.warning("Same name provided, will not edit key. No reason")
+    key = Keypair.objects.get(owner=user, id=key_id)
+
+    log.info("Renaming key '%s' to '%s'.", key.name, new_name)
+
+    if key.name == new_name:
+        log.warning("Same name provided. No reason to edit this key")
         return
 
-    key = Keypair.objects.get(owner=user, name=old_key)
-    key.name = new_key
+    key.name = new_name
     key.save()
-    log.info("Renamed key '%s' to '%s'.", old_key, new_key)
+    log.info("Renamed key '%s' to '%s'.", key.name, new_name)
     trigger_session_update(user, ['keys'])
 
 
