@@ -1227,14 +1227,19 @@ def associate_key(user, key_id, cloud_id, machine_id,
 
 def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
     """Disassociates a key from a machine.
-
     If host is set it will also attempt to actually remove it from
     the machine.
 
+    :param user:
+    :param key_id:
+    :param cloud_id:
+    :param machine_id:
+    :param host:
+    :return:
     """
 
     log.info("Disassociating key, undeploy = %s" % host)
-    key = Keypair.objects.get(owner=user, name=key_id)
+    key = Keypair.objects.get(owner=user, id=key_id)
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     machine = Machine.objects.get(cloud=cloud,
                                   key_associations__keypair__exact=key,
