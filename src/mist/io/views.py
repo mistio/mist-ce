@@ -634,13 +634,12 @@ def set_default_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
-                                                      key_id)
-    if not auth_context.has_perm('key', 'edit', keypair.id, keypair_tags):
+    key_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    if not auth_context.has_perm('key', 'edit', key.id, key_tags):
         raise PolicyUnauthorizedError("To edit key")
 
     methods.set_default_key(auth_context.owner, key_id)
