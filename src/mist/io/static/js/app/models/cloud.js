@@ -275,15 +275,6 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
 
 
             //
-            //  Observers
-            //
-
-            enabledObserver: function () {
-                Ember.run.once(this, '_toggle');
-            }.observes('enabled'),
-
-
-            //
             //  Dynamic Observers
             //
 
