@@ -429,7 +429,7 @@ def toggle_cloud(request):
 def list_keys(request):
     """
     List keys
-    Retrieves a list of all added Keys
+    Retrieves a list of all added keys
     READ permission required on key.
     ---
     """
@@ -455,29 +455,30 @@ def add_key(request):
       type: string
     """
     params = params_from_request(request)
-    key_id = params.get('id', '')
+    key_name = params.get('name', '')
     private_key = params.get('priv', '')
 
     auth_context = auth_context_from_request(request)
     key_tags = auth_context.get_tags("key", "add")
     if key_tags is None:
         raise UnauthorizedError()
-    key_id = methods.add_key(auth_context.owner, key_id, private_key)
+    key_name = methods.add_key(auth_context.owner, key_name, private_key)
     if key_tags:
-        mist.core.methods.set_keypair_tags(auth_context.owner, key_tags, key_id)
-    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+        mist.core.methods.set_keypair_tags(auth_context.owner, key_tags, key_name)
+    key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
 
     # since its a new key machines fields should be an empty list
 
     clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
-                               key_associations__keypair__exact=keypair)
+                               key_associations__keypair__exact=key)
 
-    assoc_machines = transform_key_machine_associations(machines, keypair)
+    assoc_machines = transform_key_machine_associations(machines, key)
 
-    return {'id': key_id,
+    return {'id': key.id,
+            'name': key.name,
             'machines': assoc_machines,
-            'isDefault': keypair.default}
+            'isDefault': key.default}
 
 
 @view_config(route_name='api_v1_key_action', request_method='DELETE', renderer='json')
