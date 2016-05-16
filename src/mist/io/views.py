@@ -586,34 +586,34 @@ def delete_keys(request):
 def edit_key(request):
     """
     Edit a key
-    Edits a given key's name from old_key -> new_key
+    Edits a given key's name  to new_name
     EDIT permission required on key.
     ---
-    new_id:
-      description: The new Key name (id)
+    new_name:
+      description: The new key name
       type: string
-    key:
-      description: ' The old key name (id)'
+    key_id:
+      description: The key id
       in: path
       required: true
       type: string
     """
-    old_id = request.matchdict['key']
+    key_id = request.matchdict['key']
     params = params_from_request(request)
-    new_id = params.get('new_id')
-    if not new_id:
-        raise RequiredParameterMissingError("new_id")
+    new_name = params.get('new_name')
+    if not new_name:
+        raise RequiredParameterMissingError("new_name")
 
     auth_context = auth_context_from_request(request)
     try:
-        keypair = Keypair.objects.get(owner=auth_context.owner, name=old_id)
+        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key with that id does not exist')
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, old_id)
-    if not auth_context.has_perm('key', 'edit', keypair.id, keypair_tags):
+    key_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    if not auth_context.has_perm('key', 'edit', key.id, key_tags):
         raise PolicyUnauthorizedError("To edit key")
-    methods.edit_key(auth_context.owner, new_id, old_id)
-    return {'new_id': new_id}
+    methods.edit_key(auth_context.owner, new_name, key_id)
+    return {'new_name': new_name}
 
 
 @view_config(route_name='api_v1_key_action', request_method='POST')
