@@ -44,8 +44,8 @@ define('app/controllers/key_edit', ['ember'],
 
             save: function () {
                 if (this.formReady) {
-                    if (Mist.keysController.keyExists(this.newKeyName)) {
-                        Mist.notificationController.notify('Key name exists already');
+                    if (Mist.keysController.keyNameExists(this.newKeyName)) {
+                        Mist.notificationController.notify('Key name exists: ' + this.newKeyName);
                         this._giveCallback(false);
                         return;
                     }
