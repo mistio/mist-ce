@@ -482,16 +482,17 @@ def add_key(request):
             'isDefault': key.default}
 
 
-@view_config(route_name='api_v1_key_action', request_method='DELETE', renderer='json')
+@view_config(route_name='api_v1_key_action', request_method='DELETE',
+             renderer='json')
 @view_config(route_name='key_action', request_method='DELETE', renderer='json')
 def delete_key(request):
     """
     Delete key
-    Delete key. When a keypair gets deleted, it takes its asociations with it
-    so just need to remove from the server too. If the default key gets delet-
-    ed, it sets the next one as default, provided that at least another key e-
-    xists. It returns the list of all keys after the deletion, excluding the
-    private keys (check also list_keys).
+    Delete key. When a key gets deleted, it takes its associations with it
+    so just need to remove from the server too. If the default key gets deleted,
+    it sets the next one as default, provided that at least another key exists.
+    It returns the list of all keys after the deletion, excluding the private
+    keys (check also list_keys).
     REMOVE permission required on key.
     ---
     key:
@@ -505,13 +506,12 @@ def delete_key(request):
         raise KeypairParameterMissingError()
 
     try:
-        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
-                                                      key_id)
-    if not auth_context.has_perm('key', 'remove', keypair.id, keypair_tags):
+    key_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    if not auth_context.has_perm('key', 'remove', key.id, key_tags):
         raise PolicyUnauthorizedError("To remove key")
     methods.delete_key(auth_context.owner, key_id)
     return list_keys(request)
