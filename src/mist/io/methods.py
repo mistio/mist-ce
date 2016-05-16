@@ -1133,13 +1133,21 @@ def edit_key(user, new_key, old_key):
     trigger_session_update(user, ['keys'])
 
 
-def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, port=22):
+def associate_key(user, key_id, cloud_id, machine_id,
+                  host='', username=None, port=22):
     """Associates a key with a machine.
 
     If host is set it will also attempt to actually deploy it to the
-    machine. To do that it requires another keypair (existing_key) that can
+    machine. To do that it requires another key (existing_key) that can
     connect to the machine.
-
+    :param user:
+    :param key_id:
+    :param cloud_id:
+    :param machine_id:
+    :param host:
+    :param username:
+    :param port:
+    :return:
     """
 
     log.info("Associating key %s to host %s", key_id, host)
@@ -1147,12 +1155,12 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
         log.info("Host not given so will only create association without "
                  "actually deploying the key to the server.")
 
-    key = Keypair.objects.get(owner=user, name=key_id)
+    key = Keypair.objects.get(owner=user, id=key_id)
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     associated = False
     if Machine.objects(cloud=cloud, key_associations__keypair__exact=key,
                        machine_id=machine_id):
-        log.warning("Keypair '%s' already associated with machine '%s' "
+        log.warning("Key '%s' already associated with machine '%s' "
                     "in cloud '%s'", key_id, cloud_id, machine_id)
         associated = True
 
@@ -1160,7 +1168,7 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
     # if not already associated, create the association
     # this is only needed if association doesn't exist and host is not provided
     # associations will otherwise be created by shell.autoconfigure upon
-    # succesful connection
+    # successful connection
     if not host:
         if not associated:
             try:
@@ -1191,27 +1199,30 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
 
     try:
         # deploy key
-        ssh_command(user, cloud_id, machine_id, host, command, username=username, port=port)
+        ssh_command(user, cloud_id, machine_id, host,
+                    command, username=username, port=port)
     except MachineUnauthorizedError:
         # couldn't deploy key
         try:
             # maybe key was already deployed?
-            ssh_command(user, cloud_id, machine_id, host, 'uptime', key_id=key_id, username=username, port=port)
+            ssh_command(user, cloud_id, machine_id, host, 'uptime',
+                        key_id=key_id, username=username, port=port)
             log.info("Key was already deployed, local association created.")
         except MachineUnauthorizedError:
             # oh screw this
             raise MachineUnauthorizedError(
-                "Couldn't connect to deploy new SSH keypair."
+                "Couldn't connect to deploy new SSH key."
             )
     else:
         # deployment probably succeeded
-        # attemp to connect with new key
+        # attempt to connect with new key
         # if it fails to connect it'll raise exception
         # there is no need to manually set the association in keypair.machines
         # that is automatically handled by Shell, if it is configured by
         # shell.autoconfigure (which ssh_command does)
-        ssh_command(user, cloud_id, machine_id, host, 'uptime', key_id=key_id, username=username, port=port)
-        log.info("Key associated and deployed succesfully.")
+        ssh_command(user, cloud_id, machine_id, host, 'uptime',
+                    key_id=key_id, username=username, port=port)
+        log.info("Key associated and deployed successfully.")
 
 
 def disassociate_key(user, key_id, cloud_id, machine_id, host=None):

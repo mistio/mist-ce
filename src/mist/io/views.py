@@ -726,14 +726,16 @@ def generate_keypair(request):
     return {'priv': key.private, 'public': key.public}
 
 
-@view_config(route_name='api_v1_key_association', request_method='PUT', renderer='json')
-@view_config(route_name='key_association', request_method='PUT', renderer='json')
+@view_config(route_name='api_v1_key_association', request_method='PUT',
+             renderer='json')
+@view_config(route_name='key_association', request_method='PUT',
+             renderer='json')
 def associate_key(request):
     """
     Associate a key to a machine
-    Associates a key with a machine. If host is set it will also attempt to ac-
-    tually deploy it to the machine. To do that it requires another keypair (-
-    existing_key) that can connect to the machine.
+    Associates a key with a machine. If host is set it will also attempt to
+    actually deploy it to the machine. To do that it requires another key
+    (existing_key) that can connect to the machine.
     READ permission required on cloud.
     READ_PRIVATE permission required on key.
     ASSOCIATE_KEY permission required on machine.
@@ -778,9 +780,9 @@ def associate_key(request):
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
         raise UnauthorizedError()
-    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
-    if not auth_context.has_perm('key', 'read_private', keypair.id, keypair_tags):
+    key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+    key_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    if not auth_context.has_perm('key', 'read_private', key.id, key_tags):
         raise UnauthorizedError()
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
                                                       cloud_id, machine_id)
@@ -797,9 +799,9 @@ def associate_key(request):
                           username=ssh_user, port=ssh_port)
     clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
-                               key_associations__keypair__exact=keypair)
+                               key_associations__keypair__exact=key)
 
-    assoc_machines = transform_key_machine_associations(machines, keypair)
+    assoc_machines = transform_key_machine_associations(machines, key)
     # FIX filter machines based on auth_context
 
     return assoc_machines
