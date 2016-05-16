@@ -503,7 +503,7 @@ def delete_key(request):
     auth_context = auth_context_from_request(request)
     key_id = request.matchdict.get('key')
     if not key_id:
-        raise KeypairParameterMissingError()
+        raise KeyParameterMissingError()
 
     try:
         key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
@@ -1098,8 +1098,8 @@ def create_machine(request):
     if key_id:
         key_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
                                                       key_id)
-        keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
-        if not auth_context.has_perm("key", "read", keypair.id, key_tags):
+        key = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+        if not auth_context.has_perm("key", "read", key.id, key_tags):
             raise PolicyUnauthorizedError("To read key")
 
     import uuid
