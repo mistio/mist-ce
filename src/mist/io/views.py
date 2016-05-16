@@ -415,7 +415,7 @@ def toggle_cloud(request):
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
-        raise NotFoundError()
+        raise NotFoundError('Cloud does not exist')
 
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if not auth_context.has_perm('cloud', 'edit', cloud_id, cloud_tags):
