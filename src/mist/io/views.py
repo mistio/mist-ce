@@ -442,15 +442,15 @@ def list_keys(request):
 def add_key(request):
     """
     Add key
-    Add key with specific id
+    Add key with specific name
     ADD permission required on key.
     ---
     id:
-      description: ' The Key name (id)'
+      description: The key name
       required: true
       type: string
     priv:
-      description: ' The private key'
+      description: The private key
       required: true
       type: string
     """
@@ -464,7 +464,8 @@ def add_key(request):
         raise UnauthorizedError()
     key_name = methods.add_key(auth_context.owner, key_name, private_key)
     if key_tags:
-        mist.core.methods.set_keypair_tags(auth_context.owner, key_tags, key_name)
+        mist.core.methods.set_keypair_tags(auth_context.owner,
+                                           key_tags, key_name)
     key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
 
     # since its a new key machines fields should be an empty list
