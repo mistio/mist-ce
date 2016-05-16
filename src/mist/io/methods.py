@@ -2911,6 +2911,10 @@ def list_clouds(user):
 
 
 def list_keys(user):
+    """List user's keys
+    :param user:
+    :return:
+    """
     keys = Keypair.objects(owner=user).only("default", "name")
     clouds = Cloud.objects(owner=user)
     key_objects = []
@@ -2918,8 +2922,8 @@ def list_keys(user):
         key_object = {}
         machines = Machine.objects(cloud__in=clouds,
                                    key_associations__keypair__exact=key)
-        key_object["id"] = key.name # This is for backwards compatibility
-        key_object['_real_id'] = key.id  # Fuck backwards compatibility
+        key_object["id"] = key.id
+        key_object['name'] = key.name
         key_object["isDefault"] = key.default
         key_object["machines"] = transform_key_machine_associations(machines,
                                                                     key)
