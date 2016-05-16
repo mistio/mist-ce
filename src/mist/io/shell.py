@@ -17,7 +17,7 @@ import ssl
 import tempfile
 import mongoengine as me
 
-from mist.io.exceptions import CloudNotFoundError, KeypairNotFoundError
+from mist.io.exceptions import CloudNotFoundError, KeyNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import ServiceUnavailableError
