@@ -807,15 +807,17 @@ def associate_key(request):
     return assoc_machines
 
 
-@view_config(route_name='api_v1_key_association', request_method='DELETE', renderer='json')
-@view_config(route_name='key_association', request_method='DELETE', renderer='json')
+@view_config(route_name='api_v1_key_association', request_method='DELETE',
+             renderer='json')
+@view_config(route_name='key_association', request_method='DELETE',
+             renderer='json')
 def disassociate_key(request):
     """
     Disassociate a key from a machine
     Disassociates a key from a machine. If host is set it will also attempt to
     actually remove it from the machine.
     READ permission required on cloud.
-    DISSASOCIATE_KEY permsion required on machine.
+    DISASSOCIATE_KEY permission required on machine.
     ---
     key:
       in: path
@@ -855,13 +857,14 @@ def disassociate_key(request):
                                  machine_tags):
         raise UnauthorizedError()
 
-    methods.disassociate_key(auth_context.owner, key_id, cloud_id, machine_id, host)
-    keypair = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+    methods.disassociate_key(auth_context.owner, key_id,
+                             cloud_id, machine_id, host)
+    key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
     clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
-                               key_associations__keypair__exact=keypair)
+                               key_associations__keypair__exact=key)
 
-    assoc_machines = transform_key_machine_associations(machines, keypair)
+    assoc_machines = transform_key_machine_associations(machines, key)
     # FIX filter machines based on auth_context
 
     return assoc_machines
