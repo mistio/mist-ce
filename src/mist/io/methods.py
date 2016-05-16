@@ -1063,19 +1063,17 @@ def add_key(user, key_name, private_key):
 
 
 def delete_key(user, key_id):
-    """Deletes given keypair.
+    """Deletes given key.
+    If key was default, then it checks if there are still keys left
+    and assigns another one as default.
 
-    If key was default, then it checks
-    if there are still keys left and assignes another one as default.
-
-    @param user: The User
-    @param key_id: The key_id to be deleted
-    @return: Returns nothing
-
+    :param user:
+    :param key_id:
+    :return:
     """
 
     log.info("Deleting key with id '%s'.", key_id)
-    key = Keypair.objects.get(owner=user, name=key_id)
+    key = Keypair.objects.get(owner=user, id=key_id)
     default_key = key.default
     # if key.default:
     #     default_key = key.default
