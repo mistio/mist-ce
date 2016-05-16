@@ -37,14 +37,12 @@ try:  # Multi-user environment
     from mist.core.user.models import User, Owner
     from mist.core.cloud.models import Cloud, Machine, KeyAssociation
     from mist.core.keypair.models import Keypair
-    from mist.core.helpers import user_from_email
     from mist.core import config
 
     multi_user = True
     cert_path = "src/mist.io/cacert.pem"
     celery_cfg = 'mist.core.celery_config'
 except ImportError:  # Standalone mist.io
-    from mist.io.helpers import user_from_email
     from mist.io import config
     multi_user = False
     cert_path = "cacert.pem"
