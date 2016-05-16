@@ -721,9 +721,9 @@ def generate_keypair(request):
     Generate key pair
     ---
     """
-    keypair = Keypair()
-    keypair.generate()
-    return {'priv': keypair.private, 'public': keypair.public}
+    key = Keypair()
+    key.generate()
+    return {'priv': key.private, 'public': key.public}
 
 
 @view_config(route_name='api_v1_key_association', request_method='PUT', renderer='json')
