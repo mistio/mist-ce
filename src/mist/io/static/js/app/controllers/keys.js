@@ -106,15 +106,15 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
             },
 
 
-            renameKey: function(keyId, newKeyId, callback) {
+            renameKey: function(keyId, newKeyName, callback) {
                 var that = this;
                 this.set('renamingKey', true);
                 Mist.ajax
                     .PUT('/api/v1/keys/' + keyId, {
-                        'new_id': newKeyId
+                        'new_name': newKeyName
                     })
                     .success(function() {
-                        that._renameKey(keyId, newKeyId);
+                        that._renameKey(keyId, newKeyName);
                     })
                     .error(function(err) {
                         Mist.notificationController.notify(err);
@@ -335,10 +335,10 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
             },
 
 
-            _renameKey: function(keyId, newKeyId) {
+            _renameKey: function(keyId, newKeyName) {
                 Ember.run(this, function() {
                     if (this.keyExists(keyId))
-                        this.getKey(keyId).set('id', newKeyId);
+                        this.getKey(keyId).set('name', newKeyName);
                     this.trigger('onKeyRename');
                 });
             },
