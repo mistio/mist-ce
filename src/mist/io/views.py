@@ -412,12 +412,15 @@ def toggle_cloud(request):
 
     if new_state != "1" and new_state != "0":
         raise BadRequestError('Invalid cloud state')
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError()
 
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if not auth_context.has_perm('cloud', 'edit', cloud_id, cloud_tags):
         raise PolicyUnauthorizedError("To edit cloud")
 
-    cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     cloud.enabled=bool(int(new_state))
     cloud.save()
     trigger_session_update(auth_context.owner, ['clouds'])
