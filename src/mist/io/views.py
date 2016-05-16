@@ -553,18 +553,18 @@ def delete_keys(request):
     report = {}
     for key_id in key_ids:
         try:
-            keypair = Keypair.objects.get(owner=auth_context.owner,
+            key = Keypair.objects.get(owner=auth_context.owner,
                                           name=key_id)
         except me.DoesNotExist:
             report[key_id] = 'not_found'
         else:
-            keypair_tags = mist.core.methods.get_keypair_tags(
+            key_tags = mist.core.methods.get_keypair_tags(
                 auth_context.owner,
                 key_id)
             if not auth_context.has_perm('key',
                                          'remove',
-                                         keypair.id,
-                                         keypair_tags):
+                                         key.id,
+                                         key_tags):
                 report[key_id] = 'unauthorized'
             else:
                 methods.delete_key(auth_context.owner, key_id)
