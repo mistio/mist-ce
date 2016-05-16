@@ -1246,7 +1246,7 @@ def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
                                   machine_id=machine_id)
     # key not associated
     if not machine:
-        raise BadRequestError("Keypair '%s' is not associated with "
+        raise BadRequestError("Key '%s' is not associated with "
                               "machine '%s'" % (key_id, machine_id))
 
     if host:
