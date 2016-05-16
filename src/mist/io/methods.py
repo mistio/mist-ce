@@ -1038,12 +1038,12 @@ def add_key(user, key_name, private_key):
 
     log.info("Adding key with name '%s'.", key_name)
     if not key_name:
-        raise KeypairParameterMissingError(key_name)
+        raise KeyParameterMissingError(key_name)
     if not private_key:
         raise RequiredParameterMissingError("Private key is not provided")
     key = Keypair.objects(owner=user, name=key_name)
     if key:
-        raise KeypairExistsError(key_name)
+        raise KeyExistsError(key_name)
 
     key = Keypair()
     key.private = private_key
@@ -1120,7 +1120,7 @@ def edit_key(user, new_key, old_key):
 
     log.info("Renaming key '%s' to '%s'.", old_key, new_key)
     if not new_key:
-        raise KeypairParameterMissingError("new name")
+        raise KeyParameterMissingError("new name")
 
     if old_key == new_key:
         log.warning("Same name provided, will not edit key. No reason")
