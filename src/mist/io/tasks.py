@@ -260,7 +260,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                                 % machine_id, repr(e))
                     notify_admin('Enable monitoring on creation failed for '
                                  'user %s machine %s: %r'
-                                 % (owner.id, machine_id, e))
+                                 % (str(owner), machine_id, e))
                     log_event(action='enable_monitoring_failed', error=repr(e),
                               **log_dict)
 
@@ -304,7 +304,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             raise
         notify_user(owner, "Deployment script failed for machine %s" % machine_id)
         notify_admin("Deployment script failed for machine %s in cloud %s by "
-                     "user %s" % (machine_id, cloud_id, owner.id), repr(exc))
+                     "user %s" % (machine_id, cloud_id, str(owner)), repr(exc))
         log_event(
             owner.id,
             event_type='job',
