@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../app-rules/app-rules.html">
 <link rel="import" href="machine-edit.html">
+<link rel="import" href="machine-tag-item.html">
 <dom-module id="machine-tags">
     <template>
         <style is="custom-style" include="tags-and-labels"></style>
@@ -34,10 +35,6 @@
 
             .machine-ip {
                 margin: 0;
-            }
-
-            paper-material {
-                padding-bottom: 0;
             }
 
             paper-material > h2 {
@@ -108,17 +105,15 @@
                             <h2>Tags</h2>
                             <div class="card-content">
                                 <table class="info-table">
-                                    <template is="dom-repeat" items="[[machine.tags]]" as="tag">
-                                        <tr>
-                                            <td>
-                                                <paper-input value="{{tag.key}}"></paper-input>
-                                            </td>
-                                            <td>
-                                                <paper-input value="{{tag.value}}"></paper-input>
-                                            </td>
-                                        </tr>
+                                    <template is="dom-repeat" items="[[editableTags]]" as="tag">
+                                        <machine-tag-item tag="[[tag]]"></machine-tag-item>
                                     </template>
                                 </table>
+
+                                <div class="clearfix bottom-actions xs12">
+                                    <paper-button class="submit-btn pull-left" raised on-tap="_saveTags">Save Tags</paper-button>
+                                    <paper-button class="submit-btn pull-right" raised on-tap="_addTag">Add Tag</paper-button>
+                                </div>
                             </div>
                         </paper-material>
                     </div>
@@ -130,6 +125,7 @@
         </paper-drawer-panel>
         <dialog-element></dialog-element>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+        <iron-ajax id="machineTagsAjaxRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.uuid]]/tags" method="POST" on-response="_handleMachineTagsAjaxResponse" on-error="_handleMachineTagsAjaxError"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
     </template>
 </dom-module>
@@ -161,12 +157,26 @@
             tag: {
                 type: String,
                 value: ""
+            },
+            editableTags: {
+                type: Array,
+                computed: '_computeEditableTags(machine.tags.*)'
             }
         },
         _computeMachine: function(params, machines) {
             return machines.base.find(function(machine) {
                 return machine.uuid == params.uuid;
             }, this);
+        },
+        _computeEditableTags: function(tags) {
+            if (!tags.base.length) {
+                return [{
+                    key: '',
+                    value: ''
+                }];
+            }
+
+            return tags.base.slice();
         },
         _getHeaderStyle: function(color) {
             return 'background-color: ' + color + '; color: #fff;';
@@ -203,6 +213,35 @@
                 dialog[i] = info[i];
             }
             dialog._openDialog();
+        },
+        _addTag: function() {
+            var newTag = {
+                key: '',
+                value: ''
+            };
+            this.push('editableTags', newTag);
+        },
+        _saveTags: function() {
+            var tags = this.editableTags.filter(function(tag) {
+                return tag.key && tag.value;
+            }), payloadTags = {};
+
+            if (tags.length) {
+                this.set('machine.tags', tags);
+                tags.forEach(function(tag) {
+                    payloadTags[tag.key] = tag.value;
+                });
+                
+                this.$.machineTagsAjaxRequest.body = {
+                    tags: payloadTags
+                };
+                this.$.machineTagsAjaxRequest.headers["Content-Type"] = 'application/json';
+                this.$.machineTagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.machineTagsAjaxRequest.generateRequest();
+            }
+        },
+        _handleMachineTagsAjaxResponse: function(e) {
+            console.log(e);
         },
         _goBack: function() {
             history.back();
