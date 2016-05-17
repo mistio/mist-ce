@@ -36,18 +36,18 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
             //  Computed Properties
             //
 
-            sortById: Ember.computed('sortByTerm', function() {
-                return this.get('sortByTerm') == 'id';
+            sortByName: Ember.computed('sortByTerm', function() {
+                return this.get('sortByTerm') == 'name';
             }),
 
             sortByDefault: Ember.computed('sortByTerm', function() {
                 return this.get('sortByTerm') == 'default';
             }),
 
-            sortedKeys: Ember.computed('filteredKeys', 'filteredKeys.@each.id', 'filteredKeys.@each.isDefault', 'sortByTerm', function() {
+            sortedKeys: Ember.computed('filteredKeys', 'filteredKeys.@each.name', 'filteredKeys.@each.isDefault', 'sortByTerm', function() {
                 if (this.get('filteredKeys')) {
-                    if (this.get('sortById')) {
-                        return this.get('filteredKeys').sortBy('id');
+                    if (this.get('sortByName')) {
+                        return this.get('filteredKeys').sortBy('name');
                     }
 
                     if (this.get('sortByDefault')) {
@@ -416,7 +416,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                         this.model.forEach(function(key) {
                             var regex = new RegExp(that.searchTerm, 'i');
 
-                            if (regex.test(key.id)) {
+                            if (regex.test(key.name)) {
                                 keys.push(key);
                             } else {
                                 if (key.selected) {
@@ -452,7 +452,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
 
             filteredKeysObserver: function() {
                 Ember.run.once(this, '_updateFilteredKeys');
-            }.observes('model.@each.id', 'searchTerm', 'model.[]')
+            }.observes('model.@each.name', 'searchTerm', 'model.[]')
         });
     }
 );
