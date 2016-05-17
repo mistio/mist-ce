@@ -1037,6 +1037,7 @@ def add_key(user, key_name, private_key):
     """Adds a new key by name and returns the new key_name."""
 
     log.info("Adding key with name '%s'.", key_name)
+
     if not key_name:
         raise KeyParameterMissingError(key_name)
     if not private_key:
