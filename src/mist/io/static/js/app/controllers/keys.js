@@ -259,6 +259,11 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
             },
 
 
+            getKeyByName: function(keyName) {
+                return this.model.findBy('name', keyName);
+            },
+
+
             getRequestedKey: function() {
                 if (this.keyRequest) {
                     return this.getKey(this.keyRequest);
@@ -268,6 +273,11 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
 
             keyExists: function(keyId) {
                 return !!this.getKey(keyId);
+            },
+
+
+            keyNameExists: function(keyName) {
+                return !!this.getKeyByName(keyName);
             },
 
 

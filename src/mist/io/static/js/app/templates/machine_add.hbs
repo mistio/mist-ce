@@ -233,7 +233,7 @@
                      class="mist-select">
                     <h4>
                         {{#if Mist.machineAddController.newMachineKey.id}}
-                        {{Mist.machineAddController.newMachineKey.id}}
+                        {{Mist.machineAddController.newMachineKey.name}}
                         {{else}}
                         {{Mist.machineAddController.newMachineKey.title}}
                         {{/if}}
@@ -242,7 +242,7 @@
                     <ul data-role="listview">
                         {{#each Mist.keysController.model as |key|}}
                             <li data-icon="false">
-                                <a {{action "selectKey" key target=view}}>{{key.id}}</a>
+                                <a {{action "selectKey" key target=view}}>{{key.name}}</a>
                             </li>
                         {{/each}}
                         <li data-icon="false" data-theme="d">
