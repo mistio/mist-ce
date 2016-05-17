@@ -543,18 +543,12 @@ def delete_keys(request):
     if type(key_ids) != list or len(key_ids) == 0:
         raise RequiredParameterMissingError('No key ids provided')
     # remove duplicate ids if there are any
-    key_ids = sorted(key_ids)
-    i = 1
-    while i < len(key_ids):
-        if key_ids[i] == key_ids[i - 1]:
-            key_ids = key_ids[:i] + key_ids[i + 1:]
-        else:
-            i += 1
+    key_ids = set(key_ids)
+
     report = {}
     for key_id in key_ids:
         try:
-            key = Keypair.objects.get(owner=auth_context.owner,
-                                          name=key_id)
+            key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
         except me.DoesNotExist:
             report[key_id] = 'not_found'
         else:
@@ -575,7 +569,7 @@ def delete_keys(request):
                   report)) == len(key_ids):
         raise NotFoundError('No valid key id provided')
     # if user was unauthorized for all keys
-    if len(filter(lambda key_id: report[key_id] == 'deleted',
+    if len(filter(lambda key_id: report[key_id] == 'unauthorized',
                   report)) == len(key_ids):
         raise NotFoundError('Unauthorized to modify any of the keys')
     return report
