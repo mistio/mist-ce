@@ -92,16 +92,13 @@
                             <paper-icon-button id="editMachine" icon="icons:create" on-tap="_editMachine"></paper-icon-button>
                         </template>
                         <template is="dom-if" if="[[machine.can_destroy]]">
-                            <paper-tooltip for="deleteTemplate" position="top">Delete Machine</paper-tooltip>
-                            <paper-icon-button id="deleteTemplate" icon="icons:delete" on-tap="_deleteTemplate"></paper-icon-button>
+                            <paper-tooltip for="deleteMachine" position="top">Delete Machine</paper-tooltip>
+                            <paper-icon-button id="deleteMachine" icon="icons:delete" on-tap="_deleteMachine"></paper-icon-button>
                         </template>
                     </span>
                     <div class="subhead bottom">
                         <div class="label">
                             <span class$="[[machine.state]]" title="machine state">[[machine.state]]</span>
-                        </div>
-                        <div class="fab-top-right">
-                            <paper-fab icon="av:play-arrow" on-tap="_toggleQuickActions" id="runTemplateFab"></paper-fab>
                         </div>
                     </div>
                 </paper-toolbar>
@@ -132,6 +129,8 @@
             </paper-header-panel>
         </paper-drawer-panel>
         <dialog-element></dialog-element>
+        <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+        <machine-edit machine="[[machine]]"></machine-edit>
     </template>
 </dom-module>
 <script>
@@ -171,6 +170,39 @@
         },
         _getHeaderStyle: function(color) {
             return 'background-color: ' + color + '; color: #fff;';
+        },
+        _editMachine: function(e) {
+            var el = this.querySelector('machine-edit');
+            el._openEditMachineModal();
+        },
+        _deleteMachine: function(e) {
+            this._showDialog({
+                title: 'Delete Machine?',
+                body: "Deleting a machine can not be undone. You are about to delete machine '" + this.machine.name + "'.",
+                danger: true,
+                reason: "machine.delete"
+            });
+        },
+        _deleteMachineEventResponse: function(e) {
+            var reason = e.detail.reason,
+                response = e.detail.response;
+
+            if (response.confirmed && reason == "machine.delete") {
+                this.$.machineDeleteAjaxRequest.body = {};
+                this.$.machineDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                this.$.machineDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.machineDeleteAjaxRequest.generateRequest();
+            }
+        },
+        _handleMachineDeleteAjaxResponse: function(e) {
+            page.show('/machines');
+        },
+        _showDialog: function(info) {
+            var dialog = this.querySelector('dialog-element');
+            for (var i in info) {
+                dialog[i] = info[i];
+            }
+            dialog._openDialog();
         },
         _goBack: function() {
             history.back();

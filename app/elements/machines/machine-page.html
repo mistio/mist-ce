@@ -88,6 +88,8 @@
                     <app-user-menu email="[[model.email]]"></app-user-menu>
                     <span class="bottom title">Machine: [[machine.name]]</span>
                     <span class="bottom right-actions">
+                        <paper-tooltip for="editMachineTags" position="top">Machine's Tags</paper-tooltip>
+                        <paper-icon-button id="editMachineTags" icon="icons:label" on-tap="_editMachineTags"></paper-icon-button>
                         <template is="dom-if" if="[[machine.can_rename]]">
                             <paper-tooltip for="editMachine" position="top">Rename Machine</paper-tooltip>
                             <paper-icon-button id="editMachine" icon="icons:create" on-tap="_editMachine"></paper-icon-button>
@@ -229,6 +231,10 @@
                 return image.name;
             else
                 return "";
+        },
+        _editMachineTags: function() {
+            var url = '/machines/' + this.machine.uuid + '/tags';
+            page.show(url);
         },
         _editMachine: function(e) {
             var el = this.querySelector('machine-edit');
