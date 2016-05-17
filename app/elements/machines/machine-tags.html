@@ -1,8 +1,7 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../app-rules/app-rules.html">
-<link rel="import" href="../element-for-in/element-for-in.html">
 <link rel="import" href="machine-edit.html">
-<dom-module id="machine-page">
+<dom-module id="machine-tags">
     <template>
         <style is="custom-style" include="tags-and-labels"></style>
         <style is="custom-style" include="info-table-style"></style>
@@ -93,8 +92,8 @@
                             <paper-icon-button id="editMachine" icon="icons:create" on-tap="_editMachine"></paper-icon-button>
                         </template>
                         <template is="dom-if" if="[[machine.can_destroy]]">
-                            <paper-tooltip for="deleteMachine" position="top">Delete Machine</paper-tooltip>
-                            <paper-icon-button id="deleteMachine" icon="icons:delete" on-tap="_deleteMachine"></paper-icon-button>
+                            <paper-tooltip for="deleteTemplate" position="top">Delete Machine</paper-tooltip>
+                            <paper-icon-button id="deleteTemplate" icon="icons:delete" on-tap="_deleteTemplate"></paper-icon-button>
                         </template>
                     </span>
                     <div class="subhead bottom">
@@ -108,29 +107,17 @@
                 </paper-toolbar>
                 <div class="content">
                     <div class="page">
-                        <div class="flex-horizontal-with-ratios">
-                            <div class="page-block">
-                                <h3 class="smallcaps">Cloud</h3>
-                                <p>[[machine.cloud.title]] [[machineImage]]</p>
-                            </div>
-                            <div class="page-block">
-                                <h3 class="smallcaps">Created</h3>
-                                <p>[[machine.extra.created]] by <a href="/members/[[template.user]]" class="regular blue-link">mario olivarez</a></p>
-                            </div>
-                        </div>
                         <paper-material class="info-card">
-                            <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">Basic Info</h2>
+                            <h2>Tags</h2>
                             <div class="card-content">
                                 <table class="info-table">
-                                    <template is="dom-if" if="[[machine.public_ips]]">
+                                    <template is="dom-repeat" items="[[machine.tags]]" as="tag">
                                         <tr>
                                             <td>
-                                                Public IPs
+                                                <paper-input value="{{tag.key}}"></paper-input>
                                             </td>
                                             <td>
-                                                <template is="dom-repeat" items="[[machine.public_ips]]">
-                                                    <p class="machine-ip">[[item]]</p>
-                                                </template>
+                                                <paper-input value="{{tag.value}}"></paper-input>
                                             </td>
                                         </tr>
                                     </template>
@@ -145,13 +132,11 @@
             </paper-header-panel>
         </paper-drawer-panel>
         <dialog-element></dialog-element>
-        <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-        <machine-edit machine="[[machine]]"></machine-edit>
     </template>
 </dom-module>
 <script>
     Polymer({
-        is: 'machine-page',
+        is: 'machine-tags',
 
         properties: {
             model: {
@@ -177,91 +162,15 @@
             tag: {
                 type: String,
                 value: ""
-            },
-            machineImage: {
-                type: String,
-                computed: "_machineImage(machine.imageId)"
             }
-        },
-        listeners: {
-            'confirmation': '_deleteMachineEventResponse'
         },
         _computeMachine: function(params, machines) {
             return machines.base.find(function(machine) {
                 return machine.uuid == params.uuid;
             }, this);
         },
-        _isEqual: function(a, b) {
-            return a === b;
-        },
-        _getColor: function() {
-            return this.section && this.section.color ? this.section.color : '';
-        },
-        addKey: function(_, params) {
-            console.log("clicked addKey");
-        },
-        rename: function(_, params) {
-            console.log("clicked rename");
-        },
-        restart: function(_, params) {
-            console.log("clicked restart");
-        },
-        shutdown: function(_, params) {
-            console.log("clicked shutdown");
-        },
-        destroy: function(_, params) {
-            console.log("clicked destroy");
-        },
         _getHeaderStyle: function(color) {
             return 'background-color: ' + color + '; color: #fff;';
-        },
-        toggle: function() {
-            this.$.collapse.toggle();
-        },
-        togglefull: function() {
-            this.$.collapsefull.toggle();
-        },
-        _machineImage: function(id) {
-            var image = this.model.imagesArray.find(function(image) {
-                return image.id == id;
-            }, this);
-            if (image)
-                return image.name;
-            else
-                return "";
-        },
-        _editMachine: function(e) {
-            var el = this.querySelector('machine-edit');
-            el._openEditMachineModal();
-        },
-        _deleteMachine: function(e) {
-            this._showDialog({
-                title: 'Delete Machine?',
-                body: "Deleting a machine can not be undone. You are about to delete machine '" + this.machine.name + "'.",
-                danger: true,
-                reason: "machine.delete"
-            });
-        },
-        _deleteMachineEventResponse: function(e) {
-            var reason = e.detail.reason,
-                response = e.detail.response;
-
-            if (response.confirmed && reason == "machine.delete") {
-                this.$.machineDeleteAjaxRequest.body = {};
-                this.$.machineDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
-                this.$.machineDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                this.$.machineDeleteAjaxRequest.generateRequest();
-            }
-        },
-        _handleMachineDeleteAjaxResponse: function(e) {
-            page.show('/machines');
-        },
-        _showDialog: function(info) {
-            var dialog = this.querySelector('dialog-element');
-            for (var i in info) {
-                dialog[i] = info[i];
-            }
-            dialog._openDialog();
         },
         _goBack: function() {
             history.back();
