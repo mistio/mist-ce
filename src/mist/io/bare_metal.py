@@ -72,9 +72,10 @@ class BareMetalDriver(object):
                                                         'remote_desktop_port'):
                 extra['remote_desktop_port'] = machine.remote_desktop_port
 
-        node = Node(id=machine_id, name=machine.name, state=state,
-                    public_ips=machine.public_ips, private_ips=[],
+        node = Node(id=machine_id, name=machine.name,
+                    state=state, public_ips=machine.public_ips, private_ips=[],
                     driver=self, extra=extra)
+        node._uuid = machine.id
         return node
 
     def check_host(self, hostname, ssh_port=22):
