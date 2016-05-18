@@ -92,7 +92,7 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if remove_on_error:
             if not machine_key:
                 raise RequiredParameterMissingError('machine_key')
-            Keypair.objects.get(owner=user, name=machine_key)
+            Keypair.objects.get(owner=user, id=machine_key)
             if not machine_user:
                 machine_user = 'root'
 
@@ -348,7 +348,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
 
     use_ssh = remove_on_error and os_type == 'unix' and machine_key
     if use_ssh:
-        key = Keypair.objects.get(owner=user, name=machine_key)
+        key = Keypair.objects.get(owner=user, id=machine_key)
         if not machine_hostname:
             raise BadRequestError("You have specified an SSH key but machine "
                                   "hostname is empty.")
@@ -427,7 +427,7 @@ def _add_cloud_coreos(user, title, provider, params):
 
     use_ssh = remove_on_error and machine_key
     if use_ssh:
-        key = Keypair.objects.get(owner=user, name=machine_key)
+        key = Keypair.objects.get(owner=user, id=machine_key)
         if not machine_user:
             machine_user = 'root'
 
