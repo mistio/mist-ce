@@ -348,6 +348,10 @@ def delete_cloud(request):
     """
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
     if not auth_context.has_perm('cloud', 'remove', cloud_id, cloud_tags):
         raise PolicyUnauthorizedError("To remove cloud")
@@ -373,6 +377,11 @@ def rename_cloud(request):
     """
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
     params = params_from_request(request)
     new_name = params.get('new_name', '')
     if not new_name:
@@ -405,6 +414,11 @@ def toggle_cloud(request):
     """
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
     params = params_from_request(request)
     new_state = params.get('new_state', '')
     if not new_state:
@@ -417,7 +431,6 @@ def toggle_cloud(request):
     if not auth_context.has_perm('cloud', 'edit', cloud_id, cloud_tags):
         raise PolicyUnauthorizedError("To edit cloud")
 
-    cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     cloud.enabled=bool(int(new_state))
     cloud.save()
     trigger_session_update(auth_context.owner, ['clouds'])
