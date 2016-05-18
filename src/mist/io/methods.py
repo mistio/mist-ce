@@ -1663,7 +1663,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     machine_name = machine_name_validator(conn.type, machine_name)
     key = None
     if key_id:
-        key = Keypair.objects.get(owner=user, name=key_id)
+        key = Keypair.objects.get(owner=user, id=key_id)
 
     # if key_id not provided, search for default key
     if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
