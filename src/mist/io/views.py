@@ -1092,7 +1092,7 @@ def create_machine(request):
     if key_id:
         key_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
                                                       key_id)
-        key = Keypair.objects.get(owner=auth_context.owner, name=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
         if not auth_context.has_perm("key", "read", key.id, key_tags):
             raise PolicyUnauthorizedError("To read key")
 
