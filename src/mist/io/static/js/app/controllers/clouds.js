@@ -109,12 +109,12 @@ define('app/controllers/clouds', ['app/models/cloud', 'ember'],
             //
 
             addCloud: function(args) {
-                var key = Mist.keysController.keyExists(args.payload.machine_key.id) ? args.payload.machine_key : null,
-                that = this;
+                var keyId = Mist.keysController.keyExists(args.payload.machine_key.id) ? args.payload.machine_key.id : null, that = this;
+                args.payload.machine_key = keyId;
                 this.set('addingCloud', true);
                 Mist.ajax.POST('/api/v1/clouds', args.payload)
                     .success(function(cloud) {
-                        that._addCloud(cloud, key);
+                        that._addCloud(cloud, keyId);
                     }).error(function(message) {
                         Mist.notificationController.notify(
                             'Failed to add cloud: ' + message);
