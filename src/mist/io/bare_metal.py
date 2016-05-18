@@ -64,8 +64,6 @@ class BareMetalDriver(object):
         return result in VALID_RESPONSE_CODES
 
     def _to_node(self, machine_id, machine):
-        # import rpdb
-        # rpdb.set_trace()
         state = self.check_host(machine.dns_name, machine.ssh_port)
         extra = {}
         if hasattr(machine, 'os_type') and machine.os_type:
