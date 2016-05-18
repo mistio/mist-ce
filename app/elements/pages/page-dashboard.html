@@ -9,6 +9,7 @@
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../clouds/cloud-info.html">
 <dom-module id="page-dashboard">
     <template>
         <style is="custom-style" include="headings"></style>
@@ -229,7 +230,7 @@
                 <div class="clouds flexchild-wide-top">
                     <div class="flex">
                         <template is="dom-repeat" items="[[model.cloudsArray]]">
-                            <paper-button raised class$="link [[isOnline(item)]] [[isOffline(item)]]">
+                            <paper-button raised class$="link [[isOnline(item)]] [[isOffline(item)]]" on-tap="_showCloudInfoDialog" id$="[[item.id]]">
                                 <iron-icon src="[[_computeProviderLogo(item.provider)]]"></iron-icon>
                                 <span class="cloud-title">{{item.title}}</span>
                             </paper-button>
@@ -290,6 +291,7 @@
                 </div>
             </div>
         </paper-header-panel>
+        <cloud-info></cloud-info>
     </template>
 </dom-module>
 <script>
@@ -416,6 +418,15 @@ Polymer({
             ret[mIds[i]] = m ? m.name : 'unknown';
         }
         return ret;
+    },
+    _showCloudInfoDialog: function(e) {
+        var cloudId = e.currentTarget.getAttribute('id'),
+        dialog = this.querySelector('cloud-info'),
+        cloud = this.model.cloudsArray.find(function(cloud) {
+            return cloud.id == cloudId;
+        });
+        dialog.cloud = cloud;
+        dialog._openDialog();
     }
 });
 </script>

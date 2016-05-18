@@ -1,0 +1,118 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="cloud-info">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                width: 100%;
+            }
+        </style>
+
+        <paper-dialog entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>[[cloud.title]]</h2>
+            <paper-dialog-scrollable>
+                <p>
+                    <paper-input label="Title" value="{{cloud.title}}"></paper-input>
+                    <paper-button class="submit-btn" raised disabled$="[[!formReady]]" on-tap="_changeTitle">Save</paper-button>
+                </p>
+                <p>
+                    <iron-label>State</iron-label>
+                    <paper-toggle-button checked$="[[isEnabled]]" on-tap="_changeState">[[cloud.state]]</paper-toggle-button>
+                </p>
+                <p>
+                    <paper-input label="ID" value="[[cloud.id]]"></paper-input>
+                </p>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <iron-ajax id="cloudEditAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="PUT" on-response="_handleCloudEditAjaxResponse" on-error="_handleCloudEditAjaxError"></iron-ajax>
+        <iron-ajax id="cloudStateAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="POST" on-response="_handleCloudStateAjaxResponse" on-error="_handleCloudStateAjaxError"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'cloud-info',
+
+                properties: {
+                    cloud: {
+                        type: Object,
+                        value: {}
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(cloud.title, sendingData)'
+                    },
+                    isEnabled: {
+                        type: Boolean,
+                        computed: '_computeIsEnabled(cloud.state)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed'
+                },
+                _openDialog: function(e) {
+                    this.querySelector('paper-dialog').open();
+                },
+                _closeDialog: function(e) {
+                    this.querySelector('paper-dialog').close();
+                },
+                _modalClosed: function(e) {
+
+                },
+                _computeIsEnabled: function(state) {
+                    return state == 'online';
+                },
+                _computeFormReady: function(title, sendingData) {
+                    var formReady = false;
+
+                    if (title) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _changeTitle: function() {
+                    this.$.cloudEditAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.cloudEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.cloudEditAjaxRequest.body = {
+                        new_name: this.cloud.title
+                    };
+                    this.$.cloudEditAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _handleCloudEditAjaxResponse: function() {
+                    this.set('sendingData', false);
+                },
+                _changeState: function(e) {
+                    this.$.cloudStateAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.cloudStateAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.cloudStateAjaxRequest.body = {
+                        new_state: this.cloud.state == 'online' ? '0' : '1'
+                    };
+                    this.$.cloudStateAjaxRequest.generateRequest();
+                    console.log(this.cloud);
+                    this.set('sendingData', true);
+                },
+                _handleCloudStateAjaxResponse: function(e) {
+                    console.log(this.cloud);
+                    this.set('cloud.state', this.cloud.state == 'online' ? 'offline' : 'online');
+                }
+            });
+        })();
+    </script>
+</dom-module>
