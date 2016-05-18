@@ -5,6 +5,7 @@
 <link rel="import" href="../app-fab/app-fab.html">
 <link rel="import" href="../logs/log-list.html">
 <link rel="import" href="../onb-element/onb-element.html">
+<link rel="import" href="../app-header/app-header.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
@@ -218,13 +219,11 @@
             padding: 8px;
         }
         </style>
+
+        
         <paper-header-panel mode="standard" class="fit">
-            <paper-toolbar class="paper-header">
-                <app-logo white class="flex"></app-logo>
-                <app-bar class="horizontal layout center end-justified" no-search>
-                </app-bar>
-                <app-user-menu email="[[model.email]]"></app-user-menu>
-            </paper-toolbar>
+            <app-header model="[[model]]" title="Overview" class="paper-header"></app-header>
+
             <div class="content flex-horizontal-wide">
                 <div class="clouds flexchild-wide-top">
                     <div class="flex">
