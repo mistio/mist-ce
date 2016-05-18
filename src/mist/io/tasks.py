@@ -37,14 +37,12 @@ try:  # Multi-user environment
     from mist.core.user.models import User, Owner
     from mist.core.cloud.models import Cloud, Machine, KeyAssociation
     from mist.core.keypair.models import Keypair
-    from mist.core.helpers import user_from_email
     from mist.core import config
 
     multi_user = True
     cert_path = "src/mist.io/cacert.pem"
     celery_cfg = 'mist.core.celery_config'
 except ImportError:  # Standalone mist.io
-    from mist.io.helpers import user_from_email
     from mist.io import config
     multi_user = False
     cert_path = "cacert.pem"
@@ -260,7 +258,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                                 % machine_id, repr(e))
                     notify_admin('Enable monitoring on creation failed for '
                                  'user %s machine %s: %r'
-                                 % (owner.id, machine_id, e))
+                                 % (str(owner), machine_id, e))
                     log_event(action='enable_monitoring_failed', error=repr(e),
                               **log_dict)
 
@@ -304,7 +302,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             raise
         notify_user(owner, "Deployment script failed for machine %s" % machine_id)
         notify_admin("Deployment script failed for machine %s in cloud %s by "
-                     "user %s" % (machine_id, cloud_id, owner.id), repr(exc))
+                     "user %s" % (machine_id, cloud_id, str(owner)), repr(exc))
         log_event(
             owner.id,
             event_type='job',
@@ -328,7 +326,7 @@ def openstack_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
 
     from mist.io.methods import connect_provider
     if owner.find("@")!=-1:
-        owner = Owner.objects.get(email=email)
+        owner = Owner.objects.get(email=owner)
     else:
         owner = Owner.objects.get(id=owner)
 
