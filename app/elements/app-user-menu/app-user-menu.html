@@ -147,6 +147,11 @@
                             <iron-icon class="user-menu-icon" icon="account-circle"></iron-icon>Account
                         </a>
                     </paper-item>
+                    <paper-item>
+                        <a href="javascript:void(0)" on-tap="_toggleUI" class="flex">
+                            <iron-icon class="user-menu-icon" icon="hardware:laptop-mac"></iron-icon>Legacy UI
+                        </a>
+                    </paper-item>
                     <hr/>
                     <paper-item>
                         <a href="javascript:void(0)" on-tap="_logout" class="flex">
@@ -186,6 +191,9 @@ Polymer({
             url = 'http://www.gravatar.com/avatar/' + avatarString + '.jpg?s=' + size + '&d=' + placeholder;
 
         return url;
+    },
+    _toggleUI: function() {
+        window.location.href = '/toggle-ui/legacy';
     },
     _logout: function(e) {
         window.location.href = '/logout';
