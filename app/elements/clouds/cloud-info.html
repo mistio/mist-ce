@@ -52,7 +52,7 @@
                     },
                     formReady: {
                         type: Boolean,
-                        computed: '_computeFormReady(newCloud.title, sendingData)'
+                        computed: '_computeFormReady(cloud.title, newCloud.title, sendingData)'
                     },
                     isEnabled: {
                         type: Boolean,
@@ -70,10 +70,10 @@
                 _computeIsEnabled: function(enabled) {
                     return enabled;
                 },
-                _computeFormReady: function(title, sendingData) {
+                _computeFormReady: function(title, newTitle, sendingData) {
                     var formReady = false;
 
-                    if (title && title != this.cloud.title) {
+                    if (newTitle && newTitle != title) {
                         formReady = true;
                     }
 
@@ -89,9 +89,6 @@
                 _closeDialog: function(e) {
                     this.querySelector('paper-dialog').close();
                 },
-                _modalClosed: function(e) {
-
-                },
                 _changeTitle: function() {
                     this.$.cloudEditAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.cloudEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
@@ -103,8 +100,8 @@
                     this.set('sendingData', true);
                 },
                 _handleCloudEditAjaxResponse: function() {
-                    this.set('sendingData', false);
                     this.set('cloud.title', this.newCloud.title);
+                    this.set('sendingData', false);
                 },
                 _changeState: function(e) {
                     this.$.cloudStateAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -119,6 +116,7 @@
                 _handleCloudStateAjaxResponse: function(e) {
                     this.set('cloud.enabled', !this.cloud.enabled);
                     this.set('cloud.state', this.cloud.enabled ? 'online' : 'offline');
+                    this.set('sendingData', false);
                 },
                 _copyId: function() {
                     this.querySelector('#cloudId input').select();
