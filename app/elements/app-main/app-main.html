@@ -49,16 +49,23 @@
         background-color: #eee;
       }
       app-sidebar {
+        position: absolute;
+        top: 0;
         width: 210px;
-        float: left;
         margin-right: 24px; 
-        transition: margin-left 350ms ease-in-out;: 
+        left: 0;        
+        transition: left 350ms ease-in-out;
       }
       app-sidebar.close {
-        margin-left: -210px;
+        left: -210px;
       }
       iron-pages {
         padding: 24px;
+        margin-left: 210px;
+        transition: margin-left 350ms ease-in-out;
+      }
+      iron-pages.center {
+        margin-left: 0;
       }
     </style>
         <app-socket model="{{model}}"></app-socket>
@@ -112,7 +119,7 @@
         </iron-routes>
         
       <paper-header-panel mode="standard" class="fit">
-        <app-sidebar id="sidebar" model="{{model}}" tag="[[tag]]" sections="[[sections]]" current="{{current}}"></app-sidebar>
+        <app-sidebar id="sidebar" model="{{model}}" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer></app-sidebar>
         <app-header model="{{model}}" title="Overview" class="paper-header" style$="[[style]]"></app-header>
 
         <iron-pages id="app-main" main>
@@ -291,6 +298,7 @@ var app = Polymer({
     },
     toggleSidebar: function(){
         this.$.sidebar.toggleClass('close');
+        this.querySelector("#app-main").toggleClass('center');
     },
     subscribeLogEvents: function(searchFilter) {
         console.log('subscribeLogEvents', searchFilter.detail);
@@ -317,6 +325,7 @@ var app = Polymer({
     },
 
     updateCurrent: function(e) {
+        console.log(e.detail);
         this.current = e.detail.item.title;
     },
 

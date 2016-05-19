@@ -16,7 +16,7 @@
             height: 100%;
             box-sizing: border-box;
             z-index: 2;
-            background: #eee;
+            background: transparent;
             @apply(--layout);
             @apply(--layout-vertical);
             overflow-x: hidden;
@@ -119,13 +119,13 @@
             text-transform: capitalize;
             cursor: pointer;
             border-width: 1px 0 1px 4px;
-            /*border-left: 4px solid transparent;*/
+            border-left: 4px solid transparent;
             transition: 200ms border ease-in;
         }
 
         #section-list .section[active] {
             background: rgba(0,0,0,0.03);
-            border-left: 4px solid;
+            border-left: 6px solid;
             color: #444;
         }
 
