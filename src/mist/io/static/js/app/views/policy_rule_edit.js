@@ -20,19 +20,19 @@ define('app/views/policy_rule_edit', ['app/views/controlled'],
             operatorOptions: ['ALLOW', 'DENY'],
             resourceTypesOptions: [{
                 type: 'cloud',
-                actions: ['all', 'add', 'read', 'edit', 'remove', 'create_resources']
+                actions: ['all', 'add', 'read', 'edit', 'remove', 'create_resources', 'read_logs']
             }, {
                 type: 'machine',
-                actions: ['all', 'create', 'read', 'edit', 'edit_tags', 'edit_rules', 'edit_graphs', 'edit_custom_metrics', 'start', 'stop', 'reboot', 'destroy', 'run_script', 'open_shell', 'associate_key', 'disassociate_key']
+                actions: ['all', 'create', 'read', 'edit', 'edit_tags', 'edit_rules', 'edit_graphs', 'edit_custom_metrics', 'start', 'stop', 'reboot', 'destroy', 'run_script', 'open_shell', 'associate_key', 'disassociate_key', 'read_logs']
             }, {
                 type: 'script',
-                actions: ['all', 'add', 'read', 'edit', 'run', 'remove']
+                actions: ['all', 'add', 'read', 'edit', 'run', 'remove', 'read_logs']
             }, {
                 type: 'key',
-                actions: ['all', 'add', 'read', 'read_private', 'remove', 'edit']
+                actions: ['all', 'add', 'read', 'read_private', 'remove', 'edit', 'read_logs']
             }, {
                 type: 'all',
-                actions: ['all', 'read', 'edit']
+                actions: ['all', 'read', 'edit', 'read_logs']
             }],
             resourceIdentificationOptions: ['...', 'where id', 'where tags'],
             resourceActionsOptions: Ember.computed('rule.rtype', 'resourceTypesOptions', function() {
