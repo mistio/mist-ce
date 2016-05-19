@@ -37,6 +37,8 @@ from mist.io.amqp_tornado import Consumer
 from mist.io import methods
 from mist.core import methods as core_methods
 from mist.core.orchestration import methods as orchestration_methods
+from mist.core.rbac import methods as rbac_methods
+
 from mist.io import tasks
 from mist.io.hub.tornado_shell_client import ShellHubClient
 
@@ -226,8 +228,12 @@ class MainConnection(MistConnection):
                   orchestration_methods.filter_list_stacks(self.auth_context))
 
     def list_teams(self):
-        self.send('list_teams',
-                  rbac_methods.filter_list_teams(self.auth_context))
+        try:
+            teams = rbac_methods.filter_list_teams(self.auth_context)
+        except: # Forbidden
+            teams = None
+        if teams:
+            self.send('list_teams', teams)
 
     def list_clouds(self):
         self.send('list_clouds',
