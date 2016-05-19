@@ -1598,11 +1598,14 @@ def list_machines(user, cloud_id):
                    'public_ips': m.public_ips,
                    'tags': tags,
                    'extra': m.extra}
-
-        machine_cost = machine_cost_calculator(m)
-        indicative_cost_per_month = machine_cost.get('indicative_cost_per_month')
-        machine['indicative_cost_per_month'] = indicative_cost_per_month
+        try:
+            machine_cost = machine_cost_calculator(m)
+        except:
+            machine_cost = {}
+        indicative_cost_per_month = machine_cost.get('indicative_cost_per_month', 0)
+        indicative_cost_per_hour = machine_cost.get('indicative_cost_per_hour', 0)
         machine['extra']['indicative_cost_per_month'] = indicative_cost_per_month
+        machine['extra']['indicative_cost_per_hour'] = indicative_cost_per_hour
 
         # IDEA: allow to override this, if user wants to add a special tag
         # if tags.get('indicative_price_per_month'):
@@ -4304,18 +4307,45 @@ def machine_cost_calculator(m):
     straightforward way to get this info
 
     Supported providers:
-        Packet.net, DigitalOcean
-    TODO: GCE, AWS, RackSpace, SoftLayer
+        Packet.net, DigitalOcean, SoftLayer, AWS
+    TODO: GCE, RackSpace, Linode, Azure, NephoScale,
+    HostVirtual, Vultr
     """
-    cost = {'indicative_cost_per_hour': 0, 'indicative_cost_per_month': 0 }
+    cost = {'indicative_cost_per_hour': 0, 'indicative_cost_per_month': 0}
     if m.driver.type not in (Provider.PACKET, Provider.SOFTLAYER, Provider.DIGITAL_OCEAN,
-                     Provider.GCE, Provider.Rackspace) or conn.type not in config.EC2_PROVIDERS:
+                     Provider.GCE, Provider.Rackspace) or m.driver.type not in config.EC2_PROVIDERS:
         return cost
-    # FIXMEFIXMEFIXME: get values from memcache
-    try:
-        sizes = get_size_from_memcache()
-    except:
-        sizes = m.driver.list_sizes()
+    if m.driver.type in [Provider.PACKET, Provider.GCE, Provider.RACKSPACE] or m.driver.type in config.EC2_PROVIDERS:
+        # FIXME: get values from memcache
+        try:
+            sizes = get_size_from_memcache()
+        except:
+            sizes = m.driver.list_sizes()
+    if m.driver.type in config.EC2_PROVIDERS:
+        # Need to get image in order to specify the OS type
+        # out of the image id
+        # FIXME: get values from memcache
+        try:
+            images = get_images_from_memcache()
+        except:
+            pass #images = m.driver.list_images()
+        instance_type = m.extra.get('image_id')
+        # TODO: get_os_type_from_instance_type(instance_type, images)
+        os_type = 'linux'
+        # os_type can be one of ("linux", "rhel", "sles", mswin", "mswinSQL", "mswinSQLWeb", "vyatta")
+
+        size = m.extra.get('instance_type')
+        for node_size in sizes:
+            if node_size.id == size:
+                plan_price = node_size.price.get(os_type)
+                if not plan_price:
+                    # use the default which is linux
+                    plan_price = node_size.price.get('linux')
+                plan_price = float(plan_price.replace('/hour','').replace('$', ''))
+                # just need the float value
+                cost['indicative_cost_per_hour'] = plan_price
+                cost['indicative_cost_per_month'] = float(plan_price) * 24 * month_days
+                return cost
     now = datetime.now()
     month_days = calendar.monthrange(now.year, now.month)[1]
     if m.driver.type == Provider.PACKET:
