@@ -8,6 +8,7 @@ import base64
 import requests
 import subprocess
 import re
+import calendar
 import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError, DoesNotExist
 from time import sleep, time
@@ -1597,6 +1598,16 @@ def list_machines(user, cloud_id):
                    'public_ips': m.public_ips,
                    'tags': tags,
                    'extra': m.extra}
+
+        machine_cost = machine_cost_calculator(m)
+        indicative_cost_per_month = machine_cost.get('indicative_cost_per_month')
+        machine['indicative_cost_per_month'] = indicative_cost_per_month
+        machine['extra']['indicative_cost_per_month'] = indicative_cost_per_month
+
+        # IDEA: allow to override this, if user wants to add a special tag
+        # if tags.get('indicative_price_per_month'):
+        #     machine['indicative_price_per_month'] = tags.get('indicative_price_per_month')
+
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
     if conn.type == 'libvirt':
@@ -4284,6 +4295,44 @@ def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
 
 def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
     return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s -e COLLECTD_PORT=%s mist/collectd" % (uuid, password, monitor, port)
+
+
+def machine_cost_calculator(m):
+    """
+    Calculates and returns the cost for a VM.
+    Highly provider specific, since there is not a
+    straightforward way to get this info
+
+    Supported providers:
+        Packet.net, DigitalOcean
+    TODO: GCE, AWS, RackSpace, SoftLayer
+    """
+    cost = {'indicative_cost_per_hour': 0, 'indicative_cost_per_month': 0 }
+    if m.driver.type not in (Provider.PACKET, Provider.SOFTLAYER, Provider.DIGITAL_OCEAN,
+                     Provider.GCE, Provider.Rackspace) or conn.type not in config.EC2_PROVIDERS:
+        return cost
+    # FIXMEFIXMEFIXME: get values from memcache
+    try:
+        sizes = get_size_from_memcache()
+    except:
+        sizes = m.driver.list_sizes()
+    now = datetime.now()
+    month_days = calendar.monthrange(now.year, now.month)[1]
+    if m.driver.type == 'packet':
+        size = m.extra.get('plan')
+        if size:
+            for plan_size in sizes:
+                try:
+                    if plan_size.name.startswith(size):
+                        plan_price = plan_size.price.split(' ')[0]
+                        cost['indicative_cost_per_hour'] = plan_price
+                        cost['indicative_cost_per_month'] = float(plan_price) * 24 * month_days
+                except:
+                    pass
+    if m.driver.type == 'digitalocean':
+        cost['indicative_cost_per_month'] = m.extra.get('price_monthly')
+        cost['indicative_cost_per_hour'] = m.extra.get('price_hourly')
+    return cost
 
 
 def machine_name_validator(provider, name):
