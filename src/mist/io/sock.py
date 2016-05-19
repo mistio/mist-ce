@@ -36,6 +36,7 @@ from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
 from mist.core import methods as core_methods
+from mist.core.orchestration import methods as orchestration_methods
 from mist.io import tasks
 from mist.io.hub.tornado_shell_client import ShellHubClient
 
@@ -201,12 +202,32 @@ class MainConnection(MistConnection):
 
     def start(self):
         self.list_keys()
+        self.list_scripts()
+        self.list_templates()
+        self.list_stacks()
+        self.list_teams()
         self.list_clouds()
         self.check_monitoring()
 
     def list_keys(self):
         self.send('list_keys',
                   core_methods.filter_list_keys(self.auth_context))
+
+    def list_scripts(self):
+        self.send('list_scripts',
+                  core_methods.filter_list_scripts(self.auth_context))
+
+    def list_templates(self):
+        self.send('list_templates',
+                  orchestration_methods.filter_list_templates(self.auth_context))
+
+    def list_stacks(self):
+        self.send('list_stacks',
+                  orchestration_methods.filter_list_stacks(self.auth_context))
+
+    def list_teams(self):
+        self.send('list_teams',
+                  rbac_methods.filter_list_teams(self.auth_context))
 
     def list_clouds(self):
         self.send('list_clouds',
@@ -218,7 +239,8 @@ class MainConnection(MistConnection):
                           ('list_sizes', tasks.ListSizes()),
                           ('list_networks', tasks.ListNetworks()),
                           ('list_locations', tasks.ListLocations()),
-                          ('list_projects', tasks.ListProjects()),):
+                          ('list_projects', tasks.ListProjects()),
+                          ):
 
             for cloud in clouds:
                 cached = task.smart_delay(self.owner.id, cloud.id)
@@ -344,6 +366,14 @@ class MainConnection(MistConnection):
                 self.list_clouds()
             if 'keys' in sections:
                 self.list_keys()
+            if 'scripts' in sections:
+                self.list_scripts()
+            if 'templates' in sections:
+                self.list_templates()
+            if 'stacks' in sections:
+                self.list_stacks()
+            if 'teams' in sections:
+                self.list_teams()
             if 'monitoring' in sections:
                 self.check_monitoring()
 
