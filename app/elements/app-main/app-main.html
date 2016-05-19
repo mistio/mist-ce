@@ -62,6 +62,7 @@
       iron-pages {
         padding: 24px;
         margin-left: 210px;
+        overflow: hidden;
         transition: margin-left 350ms ease-in-out;
       }
       iron-pages.center {
@@ -72,61 +73,59 @@
 
         <iron-routes for="app-main" selected="[[section]]">
             <!-- dashboard -->
-            <iron-route path="/" title="dashboard"></iron-route>
-            <iron-route path="/add-cloud" title="add cloud" href="../clouds/cloud-add.html"></iron-route>
+            <iron-route path="/" title="dashboard" current="dashboard"></iron-route>
+            <iron-route path="/add-cloud" title="add cloud" href="../clouds/cloud-add.html" current="dashboard"></iron-route>
 
             <!-- machines -->
-            <iron-route path="/machines" title="machines" href="../pages/page-items.html"></iron-route>
-            <iron-route path="/machines/:uuid" title="machine" href="../machines/machine-page.html"></iron-route>
-            <iron-route path="/machines/:uuid/tags" title="machine" href="../machines/machine-tags.html"></iron-route>
+            <iron-route path="/machines" title="machines" current="machines" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/machines/:uuid" title="machine" current="machines" href="../machines/machine-page.html"></iron-route>
+            <iron-route path="/machines/:uuid/tags" title="machine" current="machines" href="../machines/machine-tags.html"></iron-route>
 
             <!-- images -->
-            <iron-route path="/images" title="images"  href="../pages/page-items.html"></iron-route>
-            <iron-route path="/images/:id" title="image" href="../images/image-page.html"></iron-route>
+            <iron-route path="/images" title="images" current="images" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/images/:id" title="image" current="images" href="../images/image-page.html"></iron-route>
 
             <!-- keys -->
-            <iron-route path="/keys" title="keys" href="../pages/page-items.html"></iron-route>
-            <iron-route path="/keys/:id" title="keys" href="../keys/key-page.html"></iron-route>
-            <iron-route path="/add-key" title="add key" href="../keys/key-add.html"></iron-route>
+            <iron-route path="/keys" title="keys" current="keys" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/keys/:id" title="keys" current="keys" href="../keys/key-page.html"></iron-route>
+            <iron-route path="/add-key" title="add key" current="keys" href="../keys/key-add.html"></iron-route>
 
             <!-- networks -->
-            <iron-route path="/networks" title="networks" href="../pages/page-items.html"></iron-route>
-            <iron-route path="/networks/:name" title="network" href="../networks/network-page.html"></iron-route>
-            <iron-route path="/add-network" title="add network" href="../networks/network-add.html"></iron-route>
+            <iron-route path="/networks" title="networks" current="networks" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/networks/:name" title="network" current="networks" href="../networks/network-page.html"></iron-route>
+            <iron-route path="/add-network" title="add network" current="networks" href="../networks/network-add.html"></iron-route>
 
             <!-- templates -->
-            <iron-route path="/templates" title="templates" href="../pages/page-items.html"></iron-route>
-            <iron-route path="/templates/:id" title="template" href="../templates/template-page.html"></iron-route>
-            <iron-route path="/add-template" title="add template" href="../templates/template-add.html"></iron-route>
+            <iron-route path="/templates" title="templates" current="templates" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/templates/:id" title="template" current="templates" href="../templates/template-page.html"></iron-route>
+            <iron-route path="/add-template" title="add template" current="templates" href="../templates/template-add.html"></iron-route>
             <!-- stacks -->
-            <iron-route path="/create-stack/:id" title="add template" href="../stacks/stack-create.html"></iron-route>
-            <iron-route path="/stacks" title="stacks"  href="../pages/page-items.html"></iron-route>
-            <iron-route path="/stacks/:id" title="stack" href="../stacks/stack-page.html"></iron-route>
+            <iron-route path="/create-stack/:id" title="add template" current="stacks" href="../stacks/stack-create.html"></iron-route>
+            <iron-route path="/stacks" title="stacks" current="stacks" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/stacks/:id" title="stack" current="stacks" href="../stacks/stack-page.html"></iron-route>
             <!-- teams -->
-            <iron-route path="/teams" title="scripts" href="../pages/page-items.html"></iron-route>
-            <iron-route path="/teams/:id" title="scripts" href="../teams/team-page.html"></iron-route>
-            <iron-route path="/members/:id" title="scripts" href="../teams/member-page.html"></iron-route>
+            <iron-route path="/teams" title="teams" current="teams" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/teams/:id" title="team" current="teams" href="../teams/team-page.html"></iron-route>
+            <iron-route path="/members/:id" title="member" current="teams" href="../teams/member-page.html"></iron-route>
             <!-- <iron-route path="/teams/:id" title="script" href="../teams/team-page.html"></iron-route>
             <iron-route path="/add-team" title="add script" href="../teams/team-add.html"></iron-route> -->
             <!-- scripts -->
-            <iron-route path="/scripts" title="scripts" href="../pages/page-items.html"></iron-route>
-            <iron-route path="/scripts/:id" title="script" href="../scripts/script-page.html"></iron-route>
-            <iron-route path="/add-script" title="add script" href="../scripts/script-add.html"></iron-route>
+            <iron-route path="/scripts" title="scripts" current="scripts" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/scripts/:id" title="script" current="scripts" href="../scripts/script-page.html"></iron-route>
+            <iron-route path="/add-script" title="add script" current="scripts" href="../scripts/script-add.html"></iron-route>
             <!-- other -->
-            <iron-route path="/elements" title="elements" href="../pages/page-elements.html"></iron-route>
-            <iron-route path="/account" title="account"></iron-route>
+            <iron-route path="/elements" title="elements" current="dashboard" href="../pages/page-elements.html"></iron-route>
+            <iron-route path="/account" title="account" current="account"></iron-route>
             <iron-route path="*"></iron-route>
         </iron-routes>
         
       <paper-header-panel mode="standard" class="fit">
         <app-sidebar id="sidebar" model="{{model}}" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer></app-sidebar>
-        <app-header model="{{model}}" title="Overview" class="paper-header" style$="[[style]]"></app-header>
+        <app-header model="{{model}}" title="{{title}}" class="paper-header" style$="[[style]]"></app-header>
 
         <iron-pages id="app-main" main>
             <!-- dashboard -->
-            <page-dashboard model="{{model}}" sections="[[sections]]" section="[[sections.dashboard]]">
-                <title>Dashboard</title>
-            </page-dashboard>
+            <page-dashboard model="{{model}}" sections="[[sections]]" section="[[sections.dashboard]]"><title>Dashboard</title></page-dashboard>
             <cloud-add model="{{model}}" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
             <!-- machines -->
             <page-items class="machines" model="{{model}}" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
@@ -188,6 +187,11 @@ var app = Polymer({
         },
         sectionsArray: {
             type: Array,
+            notify: true
+        },
+        title : {
+            type: String,
+            value: "",
             notify: true
         },
         current : {
@@ -325,8 +329,10 @@ var app = Polymer({
     },
 
     updateCurrent: function(e) {
-        console.log(e.detail);
-        this.current = e.detail.item.title;
+        // console.log(e.detail.item.attributes);
+        var el = e.detail.item;
+        this.current = el.getAttribute("current");
+        this.title = el.title;        
     },
 
     _style: function(current){
@@ -340,45 +346,6 @@ var app = Polymer({
         } else {
             document.title = "mist.io";
         }
-    },
-
-    getMachine: function(params) {
-        var ma = this.model.machinesArray;
-        var p = params.uuid;
-        var m = {};
-        for (var i = 0; i < ma.length; i++) {
-            if (ma[i].uuid == p)
-                return m = ma[i];
-        };
-        //return machine object with the right 'uuid' from model.machinesArray
-        return m;
-    },
-
-    getImage: function(params) {
-        var ima = this.model.imagesArray;
-        var p = params.id;
-        var im = {};
-        for (var i = 0; i < ima.length; i++) {
-            if (ima[i].id == p)
-                return im = ima[i];
-        };
-        //return image object with the right 'id' from model.imagesArray
-        return im;
-
-        // var index = params.id;
-        // return this.model.images.index;
-    },
-
-    getNetwork: function(params) {
-        var na = this.model.networksArray;
-        var p = params.name;
-        var n = {};
-        for (var i = 0; i < na.length; i++) {
-            if (na[i].name == p)
-                return n = na[i];
-        };
-        //return network object with the right 'name' from model.networksArray
-        return n;
     },
 
     updateDocTitle: function(e, details) {
