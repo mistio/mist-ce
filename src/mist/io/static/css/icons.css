@@ -259,6 +259,16 @@
     font-size: 14px;
     margin: -5px 0 0 8px;
 }
+#user-menu-popup .icon-machine {
+    color: #000 !important;
+}
+#user-menu-popup .icon-machine:hover {
+    color: #fff !important;
+}
+#user-menu-popup .icon-machine:after {
+    font-size: 18px;
+    margin: -11px 0 0 2px;
+}
 .ui-collapsible .ui-icon-minus:after, .ui-collapsible .ui-icon-plus:after {
     background-image: none;
     font-size: 26px;

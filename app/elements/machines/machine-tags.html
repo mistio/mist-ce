@@ -125,7 +125,7 @@
         </paper-drawer-panel>
         <dialog-element></dialog-element>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-        <iron-ajax id="machineTagsAjaxRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.uuid]]/tags" method="POST" on-response="_handleMachineTagsAjaxResponse" on-error="_handleMachineTagsAjaxError"></iron-ajax>
+        <iron-ajax id="machineTagsAjaxRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/tags" method="POST" on-response="_handleMachineTagsAjaxResponse" on-error="_handleMachineTagsAjaxError"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
     </template>
 </dom-module>
@@ -231,7 +231,7 @@
                 tags.forEach(function(tag) {
                     payloadTags[tag.key] = tag.value;
                 });
-                
+
                 this.$.machineTagsAjaxRequest.body = {
                     tags: payloadTags
                 };
