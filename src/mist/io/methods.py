@@ -4318,7 +4318,7 @@ def machine_cost_calculator(m):
         sizes = m.driver.list_sizes()
     now = datetime.now()
     month_days = calendar.monthrange(now.year, now.month)[1]
-    if m.driver.type == 'packet':
+    if m.driver.type == Provider.PACKET:
         size = m.extra.get('plan')
         if size:
             for plan_size in sizes:
@@ -4329,9 +4329,12 @@ def machine_cost_calculator(m):
                         cost['indicative_cost_per_month'] = float(plan_price) * 24 * month_days
                 except:
                     pass
-    if m.driver.type == 'digitalocean':
+    if m.driver.type == Provider.DIGITAL_OCEAN:
         cost['indicative_cost_per_month'] = m.extra.get('price_monthly')
         cost['indicative_cost_per_hour'] = m.extra.get('price_hourly')
+    if m.driver.type == Provider.SOFTLAYER:
+        cost['indicative_cost_per_month'] = m.extra.get('recurringFee')
+        cost['indicative_cost_per_hour'] = m.extra.get('hourlyRecurringFee')
     return cost
 
 
