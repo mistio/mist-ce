@@ -4307,15 +4307,14 @@ def machine_cost_calculator(m):
     straightforward way to get this info
 
     Supported providers:
-        Packet.net, DigitalOcean, SoftLayer, AWS
-    TODO: GCE, RackSpace, Linode, Azure, NephoScale,
+        Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode
+    TODO: GCE, Azure, NephoScale,
     HostVirtual, Vultr
     """
     cost = {'indicative_cost_per_hour': 0, 'indicative_cost_per_month': 0}
-    if m.driver.type not in (Provider.PACKET, Provider.SOFTLAYER, Provider.DIGITAL_OCEAN,
-                     Provider.GCE, Provider.Rackspace, Provider.RACKSPACE_FIRST_GEN) and m.driver.type not in config.EC2_PROVIDERS:
-        return cost
-    if m.driver.type in [Provider.PACKET, Provider.GCE, Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN] or m.driver.type in config.EC2_PROVIDERS:
+    if m.driver.type in [Provider.LINODE, Provider.PACKET, Provider.GCE, \
+        Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN] \
+        or m.driver.type in config.EC2_PROVIDERS:
         # FIXME: get values from memcache
         try:
             sizes = get_size_from_memcache()
@@ -4334,7 +4333,8 @@ def machine_cost_calculator(m):
         instance_image = m.extra.get('image_id')
         # TODO: get_os_type_from_instance_type(instance_image, images)
         os_type = 'linux'
-        # os_type can be one of ("linux", "rhel", "sles", mswin", "mswinSQL", "mswinSQLWeb", "vyatta")
+        # os_type can be one of ("linux", "rhel",
+        # "sles", mswin", "mswinSQL", "mswinSQLWeb", "vyatta")
         # TODO: update AWS pricing on libcloud
 
         size = m.extra.get('instance_type')
@@ -4348,7 +4348,6 @@ def machine_cost_calculator(m):
                 # just need the float value
                 cost['indicative_cost_per_hour'] = plan_price
                 cost['indicative_cost_per_month'] = float(plan_price) * 24 * month_days
-                return cost
     if m.driver.type in [Provider.Rackspace, Provider.RACKSPACE_FIRST_GEN]:
         # Need to get image in order to specify the OS type
         # out of the image id
@@ -4375,7 +4374,13 @@ def machine_cost_calculator(m):
                 # just need the float value
                 cost['indicative_cost_per_hour'] = plan_price
                 cost['indicative_cost_per_month'] = float(plan_price) * 24 * month_days
-                return cost
+    if m.driver.type == Provider.LINODE:
+        size = m.extra.get('PLANID')
+        if size:
+            for node_size in sizes:
+                if node_size.id == size:
+                    plan_price = node_size.price.replace('/month','').replace('$', '')
+                    cost['indicative_cost_per_month'] = plan_price
     if m.driver.type == Provider.PACKET:
         size = m.extra.get('plan')
         if size:
