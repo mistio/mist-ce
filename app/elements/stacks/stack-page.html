@@ -832,9 +832,7 @@
                 return (error || diff > 31146611) ? true: false;
             },
             _computeTemplate: function(stack) {
-                return this.model.templatesArray.find(function(template) {
-                    return template._id == stack.template_id;
-                }, this);
+                return this.model.templates[stack.template];
             },
             _runtimeProperties: function(stack){
                 var rtp = [];
