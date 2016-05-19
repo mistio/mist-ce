@@ -146,25 +146,13 @@
             color: rgba(0, 0, 0, .87);
         }
 
+        #section-list a:not([active]) ::content iron-icon {
+            opacity: 0.32;
+        }
+
         #section-list span.count {
             float: right;
             opacity: 0.54;
-        }
-
-        #section-list #dashboard {
-            background-color: var(--mist-dark-color);
-            color: #fff;
-            border-left: 4px solid var(--mist-dark-color);
-            padding: 14px 16px;
-        }
-
-        #section-list #dashboard span,
-        #section-list #dashboard iron-icon {
-            color: #fff;
-        }
-
-        #section-list .section:last-of-type {
-            border-bottom: 1px solid #ddd;
         }
 
         #current-tag {
