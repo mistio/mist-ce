@@ -9,6 +9,7 @@
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/iron-routes/iron-routes.html">
 <link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-drawer-panel/paper-drawer-panel.html">
@@ -37,19 +38,30 @@
 <link rel="import" href="../pages/page-not-found.html">
 
 <link rel="import" href="../templates/template-add.html">
-<!--link rel="import" href="../grid-list-element/grid-list-element.html"-->
+
 <dom-module id="app-main">
-    <style>
-    paper-toast {
-        z-index: 5;
-    }
-    </style>
     <template>
+    <style>
+      paper-toast {
+          z-index: 5;
+      }
+      paper-header-panel {
+        background-color: #eee;
+      }
+      app-sidebar {
+        width: 210px;
+        float: left;
+        margin-right: 24px; 
+      }
+      iron-pages {
+        padding: 24px;
+      }
+    </style>
         <app-socket model="{{model}}"></app-socket>
 
         <iron-routes for="app-main" selected="[[section]]">
             <!-- dashboard -->
-            <iron-route path="/" title=""></iron-route>
+            <iron-route path="/" title="dashboard"></iron-route>
             <iron-route path="/add-cloud" title="add cloud" href="../clouds/cloud-add.html"></iron-route>
 
             <!-- machines -->
@@ -94,52 +106,58 @@
             <iron-route path="/account" title="account"></iron-route>
             <iron-route path="*"></iron-route>
         </iron-routes>
-        <iron-pages id="app-main">
+        
+      <paper-header-panel mode="standard" class="fit">
+        <app-sidebar model="{{model}}" tag="[[tag]]" sections="[[sections]]" current="{{current}}"></app-sidebar>
+        <app-header model="{{model}}" title="Overview" class="paper-header" style$="[[style]]"></app-header>
+
+        <iron-pages id="app-main" main>
             <!-- dashboard -->
-            <page-dashboard model="[[model]]" sections="[[sections]]">
+            <page-dashboard model="{{model}}" sections="[[sections]]" section="[[sections.dashboard]]">
                 <title>Dashboard</title>
             </page-dashboard>
-            <cloud-add model="[[model]]" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
+            <cloud-add model="{{model}}" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
             <!-- machines -->
-            <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
-            <machine-page params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-page>
-            <machine-tags params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-tags>
+            <page-items class="machines" model="{{model}}" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
+            <machine-page params="[[params]]" model="{{model}}" sections="[[sections]]" section="[[sections.machines]]"></machine-page>
+            <machine-tags params="[[params]]" model="{{model}}" sections="[[sections]]" section="[[sections.machines]]"></machine-tags>
             <!-- images -->
-            <page-items class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
-            <image-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.images]]"></image-page>
+            <page-items class="images" model="{{model}}" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
+            <image-page model="{{model}}" params="[[params]]" sections="[[sections]]" section="[[sections.images]]"></image-page>
             <!-- keys -->
-            <page-items class="keys" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.keysArray]]"></page-items>
-            <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
+            <page-items class="keys" model="{{model}}" sections="[[sections]]" section="[[sections.keys]]" items="[[model.keysArray]]"></page-items>
+            <key-page model="{{model}}" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
             <key-add></key-add>
             <!-- networks -->
-            <!--networks-list class="networks" model="[[model]]" networks="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></networks-list-->
-            <page-items class="networks" model="[[model]]" sections="[[sections]]" section="[[sections.networks]]" items="[[model.networksArray]]"></page-items>
-            <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
-            <network-add model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
+            <!--networks-list class="networks" model="{{model}}" networks="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]"></networks-list-->
+            <page-items class="networks" model="{{model}}" sections="[[sections]]" section="[[sections.networks]]" items="[[model.networksArray]]"></page-items>
+            <network-page model="{{model}}" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
+            <network-add model="{{model}}" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
             <!-- templates -->
-            <page-items class="templates" model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" items="[[model.templatesArray]]"></page-items>
-            <!--templates-list model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" templates="[[model.templatesArray]]"></templates-list-->
-            <template-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.templates]]"></template-page>
-            <template-add model="[[model]]" sections="[[sections]]" section="[[sections.templates]]"></template-add>
+            <page-items class="templates" model="{{model}}" sections="[[sections]]" section="[[sections.templates]]" items="[[model.templatesArray]]"></page-items>
+            <!--templates-list model="{{model}}" sections="[[sections]]" section="[[sections.templates]]" templates="[[model.templatesArray]]"></templates-list-->
+            <template-page model="{{model}}" params="[[params]]" sections="[[sections]]" section="[[sections.templates]]"></template-page>
+            <template-add model="{{model}}" sections="[[sections]]" section="[[sections.templates]]"></template-add>
             <!-- stackss -->
-            <stack-create model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" params="[[params]]" restamp="true"></stack-create>
-            <page-items class="stacks" model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" items="[[model.stacksArray]]"></page-items>
-            <!--stacks-list model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" stacks="[[model.stacksArray]]"></stacks-list-->
-            <stack-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.stacks]]" restamp="true"></stack-page>
+            <stack-create model="{{model}}" sections="[[sections]]" section="[[sections.templates]]" params="[[params]]" restamp="true"></stack-create>
+            <page-items class="stacks" model="{{model}}" sections="[[sections]]" section="[[sections.stacks]]" items="[[model.stacksArray]]"></page-items>
+            <!--stacks-list model="{{model}}" sections="[[sections]]" section="[[sections.stacks]]" stacks="[[model.stacksArray]]"></stacks-list-->
+            <stack-page model="{{model}}" params="[[params]]" sections="[[sections]]" section="[[sections.stacks]]" restamp="true"></stack-page>
             <!-- teams -->
-            <page-items class="teams" model="[[model]]" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]"></page-items>
-            <team-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></team-page>
-            <member-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-page>
+            <page-items class="teams" model="{{model}}" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]"></page-items>
+            <team-page model="{{model}}" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></team-page>
+            <member-page model="{{model}}" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-page>
             <!-- scripts - leave scipts last due to editors highlighting problem -->
-            <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
-            <!--scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-->
-            <page-items model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
-            <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
+            <!-- <grid-list-element model="{{model}}" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
+            <!--scripts-list model="{{model}}" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-->
+            <page-items model="{{model}}" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
+            <script-page model="{{model}}" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
             <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
             <page-elements></page-elements>
             <page-account></page-account>
             <page-not-found></page-not-found>
         </iron-pages>
+      </paper-header-panel>
     </template>
 </dom-module>
 
@@ -160,7 +178,18 @@ var app = Polymer({
         sectionsArray: {
             type: Array,
             notify: true
-        }
+        },
+        current : {
+            type: String,
+            value: "",
+            notify: true
+        },
+        style: {
+          computed: "_style(current)",
+          value: "background-color: #424242;",
+          notify: true
+        },
+        tag: String
     },
     observers: [
 
@@ -168,6 +197,7 @@ var app = Polymer({
     listeners: {
         'iron-activate': 'updateDocTitle',
         'iron-activate': 'updateCount',
+        'iron-activate': 'updateCurrent',
         'iron-navigate': 'scrollToTop',
         'page-meta': 'updateTitle',
         'toast': 'showToast',
@@ -182,984 +212,21 @@ var app = Polymer({
             machinesArray: [],
             imagesArray: [],
             keysArray: [],
-            stacksArray:[
-                {
-                    name: "kubstack1",
-                    id: "1234567890",
-                    description: "1 machines, 2 keys, 1 network",
-                    template: "cloudmist ver.2",
-                    template_id: "56bb8e18e90e5b30cb3ab8eb",
-                    machines: ["b88bd0f0-672e-42be-94be-7614312e9f19"],
-                    keys: ["nto", "la"],
-                    networks: ["59889"],
-                    created_at: "1455132184879",
-                    user: "mario",
-                    state: [
-{'host_id': 'host_0c8cf',
-  'id': 'host_0c8cf',
-  'name': 'host',
-  'node_id': 'host',
-  'relationships': [{'target_id': 'key_9cc05',
-    'target_name': 'key',
-    'type': 'cloudify.mist.relationships.server_connected_to_keypair'}],
-  'runtime_properties': {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'version': 0},
-  'version': 0},
- {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'runtime_properties': {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'version': 0},
-  'version': 0},
- {'id': 'key_9cc05',
-  'name': 'key',
-  'node_id': 'key',
-  'relationships': [],
-  'runtime_properties': {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'version': 0},
-  'state': 'creating',
-  'version': 2},
- {'host_id': 'host_0c8cf',
-  'id': 'mongod_b1df1',
-  'name': 'mongod',
-  'node_id': 'mongod',
-  'relationships': [{'target_id': 'host_0c8cf',
-    'target_name': 'host',
-    'type': 'cloudify.relationships.contained_in'}],
-  'runtime_properties': {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'version': 0},
-  'version': 0},
- {'host_id': 'host_0c8cf',
-  'id': 'nodejs_3204b',
-  'name': 'nodejs',
-  'node_id': 'nodejs',
-  'relationships': [{'target_id': 'host_0c8cf',
-    'target_name': 'host',
-    'type': 'cloudify.relationships.contained_in'}],
-  'runtime_properties': {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'version': 0},
-  'version': 0}],
-  inputs: [{
-                        name: "name",
-                        isLead: true,
-                        default: "",
-                        value: "",
-                        type: "text",
-                        description: "Stack Name",
-                        errorMessage: "The stack must have a name",
-                        helptext: "",
-                        show: true,
-                        required: true,
-                    },
-                    {
-                        name: "cloud",
-                        default: '',
-                        value: "",
-                        description: "The mist.io cloud",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please enter cloud id",
-                        helptext: "You can choose cloud id is needed to...",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["cloudsArray"]
-                    },
-                    {
-                        name: "cloud_image",
-                        default: "",
-                        value: "",
-                        description: "The cloud image",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please choose an image",
-                        helptext: "You can choose cloud id is needed to...",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["clouds","$.cloud", "imagesArray"],
-                        showIf: {
-                                fieldName: "cloud",
-                                fieldExists: true
-                            }
-                    },
-                    {
-                        name: "cloud_size",
-                        default: "",
-                        value: "",
-                        description: "The cloud size",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please choose an image",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["clouds","$.cloud", "sizesArray"],
-                        showIf: {
-                                fieldName: "cloud",
-                                fieldExists: true
-                            }
-                    },
-                    {
-                        name: "misc_input",
-                        default: "",
-                        value: "",
-                        description: "Some input",
-                        errorMessage: "Please fill in ",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "text"
-                    }
-                ]},
-                {   name: "kubstack2",
-                    id: "0987654321",
-                    description: "1 machines, 3 keys, 2 network",
-                    template: "cloudmist ver.2",
-                    template_id: "56bb8e18e90e5b30cb3ab8eb",
-                    machines: ["b88bd0f0-672e-42be-94be-7614312e9f19"],
-                    keys: ["nto", "re", "mi"],
-                    networks: ["59887"],
-                    created_at: "1455132184879",
-                    user: "nik",
-                    state: [{'host_id': 'host_0c8cf',
-  'id': 'host_0c8cf',
-  'name': 'host',
-  'node_id': 'host',
-  'relationships': [{'target_id': 'key_9cc05',
-    'target_name': 'key',
-    'type': 'cloudify.mist.relationships.server_connected_to_keypair'}],
-  'runtime_properties': {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'version': 0},
-  'version': 0},
- {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'runtime_properties': {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'version': 0},
-  'version': 0},
- {'id': 'key_9cc05',
-  'name': 'key',
-  'node_id': 'key',
-  'relationships': [],
-  'runtime_properties': {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'version': 0},
-  'state': 'creating',
-  'version': 2},
- {'host_id': 'host_0c8cf',
-  'id': 'mongod_b1df1',
-  'name': 'mongod',
-  'node_id': 'mongod',
-  'relationships': [{'target_id': 'host_0c8cf',
-    'target_name': 'host',
-    'type': 'cloudify.relationships.contained_in'}],
-  'runtime_properties': {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'version': 0},
-  'version': 0},
- {'host_id': 'host_0c8cf',
-  'id': 'nodejs_3204b',
-  'name': 'nodejs',
-  'node_id': 'nodejs',
-  'relationships': [{'target_id': 'host_0c8cf',
-    'target_name': 'host',
-    'type': 'cloudify.relationships.contained_in'}],
-  'runtime_properties': {'host_id': 'host_0c8cf',
-  'id': 'nodecellar_42488',
-  'name': 'nodecellar',
-  'node_id': 'nodecellar',
-  'relationships': [{'target_id': 'mongod_b1df1',
-    'target_name': 'mongod',
-    'type': 'node_connected_to_mongo'},
-   {'target_id': 'nodejs_3204b',
-    'target_name': 'nodejs',
-    'type': 'node_contained_in_nodejs'}],
-  'version': 0},
-  'version': 0}],
-  inputs: [{
-                        name: "name",
-                        isLead: true,
-                        default: "",
-                        value: "",
-                        type: "text",
-                        description: "Stack Name",
-                        errorMessage: "The stack must have a name",
-                        helptext: "",
-                        show: true,
-                        required: true,
-                    },
-                    {
-                        name: "cloud",
-                        default: '',
-                        value: "",
-                        description: "The mist.io cloud",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please enter cloud id",
-                        helptext: "You can choose cloud id is needed to...",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["cloudsArray"]
-                    },
-                    {
-                        name: "cloud_image",
-                        default: "",
-                        value: "",
-                        description: "The cloud image",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please choose an image",
-                        helptext: "You can choose cloud id is needed to...",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["clouds","$.cloud", "imagesArray"],
-                        showIf: {
-                                fieldName: "cloud",
-                                fieldExists: true
-                            }
-                    },
-                    {
-                        name: "cloud_size",
-                        default: "",
-                        value: "",
-                        description: "The cloud size",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please choose an image",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["clouds","$.cloud", "sizesArray"],
-                        showIf: {
-                                fieldName: "cloud",
-                                fieldExists: true
-                            }
-                    },
-                    {
-                        name: "misc_input",
-                        default: "",
-                        value: "",
-                        description: "Some input",
-                        errorMessage: "Please fill in ",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "text"
-                    }
-                ],
-                }
-            ],
-            templatesArray: [{
-                _id: "56bb8e18e90e5b30cb3ab8ea",
-                created_at: "1455132184879",
-                description: "This template deploys a kubernettes stack",
-                entrypoint: "mist-blueprint.yaml",
-                exec_type: "cloudify",
-                location_type: "github",
-                name: "cloudmist",
-                stacks: [],
-                template: "https://github.com/mistio/mist-cloudify-example",
-                user: "Nick D.",
-                inputs: [{
-                        name: "name",
-                        isLead: true,
-                        default: "",
-                        value: "",
-                        type: "text",
-                        description: "Stack Name",
-                        errorMessage: "The stack must have a name",
-                        helptext: "",
-                        show: true,
-                        required: true,
-                    },
-                    {
-                        name: "cloud",
-                        default: '',
-                        value: "",
-                        description: "The mist.io cloud",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please enter cloud id",
-                        helptext: "You can choose cloud id is needed to...",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["cloudsArray"]
-                    },
-                    {
-                        name: "cloud_image",
-                        default: "",
-                        value: "",
-                        description: "The cloud image",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please choose an image",
-                        helptext: "You can choose cloud id is needed to...",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["clouds","$.cloud", "imagesArray"],
-                        showIf: {
-                                fieldName: "cloud",
-                                fieldExists: true
-                            }
-                    },
-                    {
-                        name: "cloud_size",
-                        default: "",
-                        value: "",
-                        description: "The cloud size",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please choose an image",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["clouds","$.cloud", "sizesArray"],
-                        showIf: {
-                                fieldName: "cloud",
-                                fieldExists: true
-                            }
-                    },
-                    {
-                        name: "misc_input",
-                        default: "",
-                        value: "",
-                        description: "Some input",
-                        errorMessage: "Please fill in ",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "text"
-                    }
-                ],
-                workflows: [{
-                    name: "create",
-                    actions: [{name:'some action 1'}],
-                    params: [{
-                        name: "misc_input",
-                        default: true,
-                        value: "",
-                        description: "Some input",
-                        errorMessage: "Please fill in ",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "toggle"
-                        // name: "cloud",
-                        // default: '',
-                        // value: "",
-                        // description: "create stack",
-                        // used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        // errorMessage: "Please enter cloud id",
-                        // helptext: "You can choose cloud id is needed to...",
-                        // show: true,
-                        // required: true,
-                        // type: "dropdown",
-                        // query: ["cloudsArray"]
-                    }]
-                },{
-                    name: "delete",
-                    actions: [{name:'some action 2'}],
-                    params: [{
-                        name: "misc_input",
-                        default: "",
-                        value: "",
-                        description: "Some input",
-                        errorMessage: "Please fill in ",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "text"
-                    }]
-                },
-                {
-                    name: "another action",
-                    actions: [{name:'some action 2'}],
-                    params: []
-                }]
-            },{
-                _id: "56bb8e18e90e5b30cb3ab8eb",
-                created_at: "1455132184879",
-                description: "This template deploys a kubernettes stack",
-                entrypoint: "mist-blueprint.yaml",
-                exec_type: "cloudify",
-                location_type: "github",
-                name: "cloudmist ver.2",
-                stacks: ["1234567890","0987654321"],
-                template: "https://github.com/mistio/mist-cloudify-example",
-                user: "Jane C.",
-                inputs: [{
-                        name: "name",
-                        isLead: true,
-                        default: "",
-                        value: "",
-                        type: "text",
-                        description: "Stack Name",
-                        errorMessage: "The stack must have a name",
-                        helptext: "",
-                        show: true,
-                        required: true,
-                    },
-                    {
-                        name: "cloud",
-                        default: '',
-                        value: "",
-                        description: "The mist.io cloud",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please enter cloud id",
-                        helptext: "You can choose cloud id is needed to...",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["cloudsArray"]
-                    },
-                    {
-                        name: "cloud_image",
-                        default: "",
-                        value: "",
-                        description: "The cloud image",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please choose an image",
-                        helptext: "You can choose cloud id is needed to...",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["clouds","$.cloud", "imagesArray"],
-                        showIf: {
-                                fieldName: "cloud",
-                                fieldExists: true
-                            }
-                    },
-                    {
-                        name: "cloud_size",
-                        default: "",
-                        value: "",
-                        description: "The cloud size",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please choose an image",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["clouds","$.cloud", "sizesArray"],
-                        showIf: {
-                                fieldName: "cloud",
-                                fieldExists: true
-                            }
-                    },
-                    {
-                        name: "misc_input",
-                        default: "",
-                        value: "",
-                        description: "Some input",
-                        errorMessage: "Please fill in ",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "text"
-                    }
-                ],
-                workflows: [{
-                    name: "create",
-                    actions: [{name:'some action 1'}],
-                    params: [{
-                        name: "cloud",
-                        default: '',
-                        value: "",
-                        description: "The mist.io cloud",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please enter cloud id",
-                        helptext: "You can choose cloud id is needed to...",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["cloudsArray"]
-                    },{
-                        name: "cloud_image",
-                        default: "",
-                        value: "",
-                        description: "The cloud image",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please choose an image",
-                        helptext: "You can choose cloud id is needed to...",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["clouds","$.cloud", "imagesArray"],
-                        showIf: {
-                                fieldName: "cloud",
-                                fieldExists: true
-                            }
-                    },{
-                        name: "cloud_size",
-                        default: "",
-                        value: "",
-                        description: "The cloud size",
-                        used_in: ["mongod", "nodecellar", "host", "key", "nodejs"],
-                        errorMessage: "Please choose an image",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "dropdown",
-                        query: ["clouds","$.cloud", "sizesArray"],
-                        showIf: {
-                                fieldName: "cloud",
-                                fieldExists: true
-                            }
-                    },
-                    {
-                        name: "deploy now",
-                        default: true,
-                        value: "",
-                        description: "Some input",
-                        errorMessage: "Please fill in ",
-                        helptext: "You can choose cloud size according to your cloud",
-                        show: true,
-                        required: true,
-                        type: "toggle"
-                    }]
-                },{
-                    name: "delete",
-                    actions: [{name:'some action 2'}]
-                },{
-                    name: "scale_up",
-                    actions: [{name:'some action 2'}]
-                },{
-                    name: "scale_down",
-                    actions: [{name:'some action 2'}]
-                }]
-            }],
-            teamsArray: [{
-                name: "python dev",
-                description: "python developers team",
-                id: "123",
-                created_at: 1455132184879,
-                members: [],
-                organisation: "mist.io",
-                policy: ''
-            },{
-                name: "qa",
-                description: "testing and qa team",
-                id: "321",
-                created_at: 1455132184879,
-                members: [{
-                  name: "Debbie D. Doe",
-                  email: "debbie@x.com",
-                  id: "654"
-                },{
-                  name: "John P. Pan",
-                  email: "john@x.com",
-                  id: "987"
-                }],
-                organisation: "mist.io",
-                policy: ''
-            },{
-                name: "front dev",
-                description: "front end developers",
-                id: "213",
-                created_at: 1455132184879,
-                members: [{
-                  name: "Xris Papakon",
-                  email: "xris@x.com",
-                  id: "456"
-                },{
-                  name: "Rik Rekveld",
-                  email: "rik@x.com",
-                  id: "789"
-                },{
-                  name: "John P. Pan",
-                  email: "john@x.com",
-                  id: "987"
-                }],
-                organisation: "mist.io",
-                policy: ''
-            }],
-            membersArray: [
-                {
-                  name: "Xris Papakon",
-                  email: "xris@x.com",
-                  id: "456",
-                  signed_in: 1455132184879,
-                  teams: [{
-                    name: "front dev",
-                    id: "213",
-                  }]
-                },{
-                  name: "Rik Rekveld",
-                  email: "rik@x.com",
-                  id: "789",
-                  signed_in: 1455132184879,
-                  teams: [{
-                    name: "front dev",
-                    id: "213",
-                  }]
-                },{
-                  name: "John P. Pan",
-                  email: "john@x.com",
-                  id: "987",
-                  signed_in: 1455132184879,
-                  teams: [{
-                    name: "front dev",
-                    id: "213",
-                  },{
-                    name: "qa",
-                    id: "321",
-                  }]
-                },
-                {
-                  name: "Debbie D. Doe",
-                  email: "debbie@x.com",
-                  id: "654",
-                  signed_in: 1455132184879,
-                  teams: [{
-                    name: "qa",
-                    id: "321",
-                  }]
-                }
-            ],
+            networksArray: [],
+            templatesArray: [],                
+            stacksArray:[],
+            teamsArray: [],
+            membersArray: [],
             pending: {
                 clouds: true,
                 monitoring: true
             },
-            networksArray: [{
-        domain_type: 0,
-        id: "59887",
-        is_default: true,
-        name: "default_public_network",
-        subnets: [{
-            announce_cidr: false,
-            cidr_str: "198.100.164.72/29",
-            id: 236649,
-            ip_type: 0,
-            ip_version: 4,
-            is_primary: true,
-            name: "198.100.164.72/29",
-            routing_prefix: "198.100.164.72",
-            uri: "https://api.nephoscale.com/network/cidr/236649/"
-        }, {
-            announce_cidr: false,
-            cidr_str: "198.100.164.72/28",
-            id: 254479,
-            ip_type: 0,
-            ip_version: 4,
-            is_primary: false,
-            name: "198.100.164.72/28",
-            routing_prefix: "198.100.161.224",
-            uri: "https://api.nephoscale.com/network/cidr/254479/"
-        }, {
-            announce_cidr: false,
-            cidr_str: "69.50.244.0/28",
-            id: 727453,
-            ip_type: 0,
-            ip_version: 4,
-            is_primary: false,
-            name: "69.50.244.0/28",
-            routing_prefix: "69.50.244.0",
-            uri: "https://api.nephoscale.com/network/cidr/727453/"
-        }, {
-            announce_cidr: false,
-            cidr_str: "69.50.244.192/28",
-            id: 738519,
-            ip_type: 0,
-            ip_version: 4,
-            is_primary: false,
-            name: "69.50.244.192/28",
-            routing_prefix: "69.50.244.192",
-            uri: "https://api.nephoscale.com/network/cidr/738519/"
-        }, {
-            announce_cidr: true,
-            cidr_str: "69.50.244.208/28",
-            id: 738521,
-            ip_type: 0,
-            ip_version: 4,
-            is_primary: false,
-            name: "69.50.244.208/28",
-            routing_prefix: "69.50.244.208",
-            uri: "https://api.nephoscale.com/network/cidr/738521/"
-        }],
-        cloud: {
-            id: "418XPpTRLsNEpJeJ62jnGs8z7VJu",
-            title: "Nephoscale",
-            provider: "nephoscale",
-            enabled: true
-        }
-    }, {
-        domain_type: 1,
-        id: "59889",
-        is_default: true,
-        name: "default_private_network",
-        subnets: [],
-        cloud: {
-            id: "418XPpTRLsNEpJeJ62jnGs8z7VJu",
-            title: "Nephoscale",
-            provider: "nephoscale",
-            enabled: true
-        }
-    }, {
-        dhcp_options_id: "dopt-3e35ea5b",
-        id: "vpc-c20824a7",
-        instance_tenancy: "default",
-        is_default: false,
-        name: "vpc-c20824a7",
-        state: "available",
-        subnets: [{
-            name: "172.30.0.0/16"
-        }],
-        cloud: {
-            id: "d98cBYrPqjpAcybzriwznme1a9d",
-            title: "EC2 Ireland",
-            provider: "ec2_eu_west",
-            enabled: true
-        }
-    }, {
-        id: "ad3da031-634c-4606-a790-524b0dfb5783",
-        name: "public",
-        public: true,
-        router_external: true,
-        subnets: [{
-            announce_cidr: false,
-            cidr_str: "198.100.164.72/29",
-            id: 236649,
-            ip_type: 0,
-            ip_version: 4,
-            is_primary: true,
-            name: "198.100.164.72/29",
-            routing_prefix: "198.100.164.72",
-            uri: "https://api.nephoscale.com/network/cidr/236649/"
-        }, {
-            announce_cidr: false,
-            cidr_str: "198.100.164.72/28",
-            id: 254479,
-            ip_type: 0,
-            ip_version: 4,
-            is_primary: false,
-            name: "198.100.164.72/28",
-            routing_prefix: "198.100.161.224",
-            uri: "https://api.nephoscale.com/network/cidr/254479/"
-        }, {
-            announce_cidr: false,
-            cidr_str: "69.50.244.0/28",
-            id: 727453,
-            ip_type: 0,
-            ip_version: 4,
-            is_primary: false,
-            name: "69.50.244.0/28",
-            routing_prefix: "69.50.244.0",
-            uri: "https://api.nephoscale.com/network/cidr/727453/"
-        }, {
-            announce_cidr: false,
-            cidr_str: "69.50.244.192/28",
-            id: 738519,
-            ip_type: 0,
-            ip_version: 4,
-            is_primary: false,
-            name: "69.50.244.192/28",
-            routing_prefix: "69.50.244.192",
-            uri: "https://api.nephoscale.com/network/cidr/738519/"
-        }, {
-            announce_cidr: true,
-            cidr_str: "69.50.244.208/28",
-            id: 738521,
-            ip_type: 0,
-            ip_version: 4,
-            is_primary: false,
-            name: "69.50.244.208/28",
-            routing_prefix: "69.50.244.208",
-            uri: "https://api.nephoscale.com/network/cidr/738521/"
-        }],
-        status: "ACTIVE",
-        extra: {
-            admin_state_up: true,
-            mtu: 0,
-            "provider:network_type": "vxlan",
-            "provider:physical_network": null,
-            "provider:segmentation_id": 72,
-            shared: false,
-            tenant_id: "45ebca827956466eb48499c4331825b8"
-        },
-        subnets: [{
-            id: "9db08cdc-97d5-43cc-b842-9abb910015cd",
-            name: "public_subnet",
-            cidr: "69.50.244.208/28",
-            dns_nameservers: [],
-            allocation_pools: [{
-                end: "69.50.244.222",
-                start: "69.50.244.217"
-            }],
-            enable_dhcp: false,
-            gateway_ip: "69.50.244.209",
-            ip_version: 4
-        }],
-        cloud: {
-            id: "Lyx7GdQXyLi7RqKb3vehY4Y3y2c",
-            title: "Openstack",
-            provider: "openstack",
-            enabled: true
-        }
-    }, {
-        id: "020a9a4d-fbf3-4a5c-862e-3dec9bc48341",
-        name: "test",
-        public: false,
-        router_external: false,
-        subnets: [],
-        status: "ACTIVE",
-        extra: {
-            admin_state_up: true,
-            mtu: 0,
-            "provider:network_type": "vxlan",
-            "provider:physical_network": null,
-            "provider:segmentation_id": 72,
-            shared: false,
-            tenant_id: "45ebca827956466eb48499c4331825b8"
-        },
-        subnets: [{
-            id: "9db08cdc-97d5-43cc-b842-9abb910015cd",
-            name: "public_subnet",
-            cidr: "69.50.244.208/28",
-            dns_nameservers: [],
-            allocation_pools: [{
-                end: "69.50.244.222",
-                start: "69.50.244.217"
-            }],
-            enable_dhcp: false,
-            gateway_ip: "69.50.244.209",
-            ip_version: 4
-        }],
-        cloud: {
-            id: "Lyx7GdQXyLi7RqKb3vehY4Y3y2c",
-            title: "Openstack",
-            provider: "openstack",
-            enabled: true
-        }
-    }, {
-        id: "20322be8-66e6-4669-af4c-2caefa0391bc",
-        name: "papaki",
-        public: false,
-        router_external: false,
-        subnets: [],
-        status: "ACTIVE",
-        extra: {
-            admin_state_up: true,
-            mtu: 0,
-            "provider:network_type": "vxlan",
-            "provider:physical_network": null,
-            "provider:segmentation_id": 72,
-            shared: false,
-            tenant_id: "45ebca827956466eb48499c4331825b8"
-        },
-        subnets: [{
-            id: "9db08cdc-97d5-43cc-b842-9abb910015cd",
-            name: "public_subnet",
-            cidr: "69.50.244.208/28",
-            dns_nameservers: [],
-            allocation_pools: [{
-                end: "69.50.244.222",
-                start: "69.50.244.217"
-            }],
-            enable_dhcp: false,
-            gateway_ip: "69.50.244.209",
-            ip_version: 4
-        }],
-        cloud: {
-            id: "Lyx7GdQXyLi7RqKb3vehY4Y3y2c",
-            title: "Openstack",
-            provider: "openstack",
-            enabled: true
-        }
-    }]
         };
+
         this.sectionsArray = [{
+            id: 'dashboard',
+            color: '#424242',
+        },{
             id: 'machines',
             color: '#8c76d1',
             icon: 'hardware:computer',
@@ -1240,6 +307,15 @@ var app = Polymer({
             // Notification required for binding to update!
             this.notifyPath(sec[i].count, c);
         }
+    },
+
+    updateCurrent: function(e) {
+        this.current = e.detail.item.title;
+    },
+
+    _style: function(current){
+      if (current)
+        return "background-color: "+ this.sections[current].color;
     },
 
     updateTitle: function(_, detail) {

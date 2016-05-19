@@ -12,7 +12,6 @@
             text-align: center;
             font-weight: 500;
             font-size: 18px;
-            color: #fff;
             outline: none;
         }
         
@@ -23,12 +22,12 @@
             font-size: 30px;
         }
         
-        iron-icon {
-            color: #fff;
+        :root [active] iron-icon {
+            color: inherit;
             opacity: .8;
         }
         </style>
-        <iron-icon icon="[[icon]]" style$="[[_getComputedStyle(color)]]"></iron-icon>
+        <iron-icon icon="[[icon]]"></iron-icon>
     </template>
 </dom-module>
 <script>
@@ -36,11 +35,7 @@ Polymer({
     is: 'section-symbol',
     properties: {
         icon: String,
-        color: String
+        color: String,
     },
-
-    _getComputedStyle: function(color) {
-        return 'color: ' + color + ';';
-    }
 });
 </script>

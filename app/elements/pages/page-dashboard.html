@@ -16,6 +16,8 @@
         <style>
         :host {
             --layout-margin: 0.5em;
+            float: left;
+            width: calc(100% - 196px);
         }
 
         paper-header-panel {
@@ -221,10 +223,7 @@
         </style>
 
         
-        <paper-header-panel mode="standard" class="fit">
-            <app-header model="[[model]]" title="Overview" class="paper-header"></app-header>
-
-            <div class="content flex-horizontal-wide">
+            <div class="content flex-horizontal-wide" main>
                 <div class="clouds flexchild-wide-top">
                     <div class="flex">
                         <template is="dom-repeat" items="[[model.cloudsArray]]">
@@ -288,7 +287,8 @@
                     </a>
                 </div>
             </div>
-        </paper-header-panel>
+
+
     </template>
 </dom-module>
 <script>

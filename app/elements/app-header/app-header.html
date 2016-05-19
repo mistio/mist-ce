@@ -10,7 +10,7 @@
 				pointer-events: all !important;
 			}
 			paper-toolbar.dark {
-			    --paper-toolbar-background: #424242;
+			    --paper-toolbar-background: inherit;
 				color: #fff;
 			}
 			paper-icon-button ::content iron-icon {
@@ -23,8 +23,15 @@
 				padding: 6px 0;
 				line-height: 36px;
 	    	}
+	    	a#logo-link {
+				line-height: 36px;
+				display: flex;
+			}
 	    	.logo {
 	    		cursor: pointer;
+	    	}
+	    	.logo:focus {
+	    		outline: none;
 	    	}
 	    	.page-title {	    		
 	    		font-weight: 500;
@@ -43,22 +50,22 @@
 	    	.container > paper-badge {
 				--paper-badge-margin-left: -40px;
 				--paper-badge-margin-bottom: -16px;
-			}
+			}			
 		</style>	
 		<paper-toolbar id="header" class="dark">
-		  	<paper-icon-button icon="menu"></paper-icon-button>
+		  	<paper-icon-button icon="menu" paper-drawer-toggle on-tap="toggleSidebar" tabindex="0"></paper-icon-button>
 			<div class="logo-and-title layout horizontal">
-				<img class="logo" src="/assets/logos/logo.svg" width="80" on-tap="goToDashboard" alt="Mist.io Logo">
+				<a id="logo-link" class="regular" href="/" is="pushstate-anchor"><img class="logo" src="/assets/logos/logo.svg" width="80" on-tap="goToDashboard" alt="Mist.io Logo" tabindex="2"></a>
 				<span class="page-title">[[title]]</span>
 			</div>
 		  	<span class="title layout horizontal">
-	  			<top-search></top-search>
+	  			<top-search tabindex="3"></top-search>
 			</span>
-			<div class="container" tabindex="0">
+			<div class="container" tabindex="4">
 				<paper-icon-button id="notifications" icon="social:notifications">notifications</paper-icon-button>
 				<paper-badge for="notifications" label="4"></paper-badge>
 			</div>
-		  <app-user-menu email="[[model.email]]"></app-user-menu>
+		  <app-user-menu email="[[model.email]]" tabindex="5"></app-user-menu>
 		</paper-toolbar>
 	</template>
 	<script>
@@ -70,8 +77,9 @@
 		toggleSidebar: function(){
 
 		},
-		goToDashboard:  function(){
-			this.page('/', show);
+		toggleSidebar: function(){
+			this.fire('toggle-sidebar');
+			console.log("toggle-sidebar")
 		}
     });		
 	</script>

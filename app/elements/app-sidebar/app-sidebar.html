@@ -16,60 +16,17 @@
             height: 100%;
             box-sizing: border-box;
             z-index: 2;
-            background: white;
-            border-right: 1px solid #e5e5e5;
+            background: #eee;
             @apply(--layout);
             @apply(--layout-vertical);
             overflow-x: hidden;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            padding-top: 16px;
         }
 
         ::content paper-toolbar {
             --paper-toolbar-background: white;
-        }
-
-        ::content .side-section {
-            margin-bottom: 20px;
-            opacity: 0;
-            transform: translate(0, 100px);
-            transition: var(--material-curve-320);
-        }
-
-        ::content .side-section:first-child {
-            transition-delay: 100ms;
-        }
-
-        ::content .side-section:nth-child(2) {
-            transition-delay: 200ms;
-        }
-
-        ::content .side-section:nth-child(3) {
-            transition-delay: 300ms;
-        }
-
-        ::content .side-section:nth-child(4) {
-            transition-delay: 400ms;
-        }
-
-        ::content .active .side-section {
-            transform: translate(0, 0);
-            opacity: 1;
-        }
-
-        ::content .side-section h5 {
-            @apply(--paper-font-body2);
-            border-top: 1px solid;
-            border-top-color: var(--divider-color);
-            margin: 24px 0 0 0;
-            padding: 16px 24px 12px 24px;
-        }
-
-        ::content .side-section p {
-            @apply(--paper-font-body1);
-            color: var(--secondary-text-color);
-            padding: 0 24px;
-            margin: 0;
         }
 
         ::content .content {
@@ -143,13 +100,6 @@
             margin-top: 0;
         }
 
-        .active #section-header section-symbol,
-        .active #section-title,
-        .active #section-tagline {
-            transform: translate(0, 0);
-            opacity: 1;
-        }
-
         #section-list {
             padding: 0 0 10px;
         }
@@ -163,18 +113,18 @@
 
         #section-list .section {
             display: block;
-            padding: 11px 16px;
+            padding: 8px 16px;
             font-weight: 500;
             color: rgba(0, 0, 0, .87);
             text-transform: capitalize;
             cursor: pointer;
             border-width: 1px 0 1px 4px;
-            border-left: 4px solid transparent;
+            /*border-left: 4px solid transparent;*/
         }
 
         #section-list .section[active] {
-            background: var(--paper-blue-grey-50);
-            border-left: 4px solid;
+            background: rgba(0,0,0,0.03);
+            /*border-left: 4px solid;*/
             color: #444;
         }
 
@@ -231,42 +181,23 @@
             display: none;
         }
 
-        app-logo {
-            margin-right: 12px;
-            margin-left: -2px;
-        }
-
-        #mist-side-head {
-            min-height: 48px;
-            padding: 2px;
+        a.section:focus {
+            outline: 0;
         }
         </style>
         <div class="content">
-            <!-- <div id="mist-side-head"> class="flex">
-
-            </div> -->
-            <div id="section-tag" hidden$="[[!tag]]">
-                <span>[[tag]]</span>
-                <iron-icon icon="clear" on-tap="clearTag"></iron-icon>
-            </div>
             <div id="section-list">
                 <nav>
-                    <a href="/" is="pushstate-anchor" id="dashboard" class="section" tabindex="1">
+                    <a id="machines" class="section" is="pushstate-anchor" href="/machines" active$="[[_isEqual(current, 'machines')]]" tabindex="1" style$="[[style(sections.machines.color)]]">
                         <div class="layout horizontal center">
-                            <app-logo solo></app-logo>
-                            <span class="title flex">dashboard</span>
-                        </div>
-                    </a>
-                    <a class="section" is="pushstate-anchor" href="/machines" active$="[[_isEqual(current, 'machines')]]" tabindex="1" style$="[[style(sections.machines.color)]];">
-                        <div class="layout horizontal center">
-                            <section-symbol aria-hidden="true" icon="[[sections.machines.icon]]" color="[[sections.machines.color]]"></section-symbol>
+                            <section-symbol aria-hidden="true" icon="[[sections.machines.icon]]" color="sections.machines.color]]"></section-symbol>
                             <span class="title flex">
                                 <span>machines</span>
                             <span class="count">[[model.machinesArray.length]]</span>
                             </span>
                         </div>
                     </a>
-                    <a class="section" is="pushstate-anchor" href="/images" active$="[[_isEqual(current, 'images')]]" tabindex="1" style$="[[style(sections.images.color)]]">
+                    <a id="images" class="section" is="pushstate-anchor" href="/images" active$="[[_isEqual(current, 'images')]]" tabindex="1" style$="[[style(sections.images.color)]]">
                         <div class="layout horizontal center">
                             <section-symbol aria-hidden="true" icon="[[sections.images.icon]]" color="[[sections.images.color]]"></section-symbol>
                             <span class="title flex">
@@ -275,7 +206,7 @@
                             </span>
                         </div>
                     </a>
-                    <a class="section" is="pushstate-anchor" href="/keys" active$="[[_isEqual(current, 'keys')]]" tabindex="1" style$="[[style(sections.keys.color)]];">
+                    <a id="keys" class="section" is="pushstate-anchor" href="/keys" active$="[[_isEqual(current, 'keys')]]" tabindex="1" style$="[[style(sections.keys.color)]]">
                         <div class="layout horizontal center">
                             <section-symbol aria-hidden="true" icon="[[sections.keys.icon]]" color="[[sections.keys.color]]"></section-symbol>
                             <span class="title flex">
@@ -284,7 +215,7 @@
                             </span>
                         </div>
                     </a>
-                    <a class="section" is="pushstate-anchor" href="/networks" active$="[[_isEqual(current, 'networks')]]" tabindex="1" style$="[[style(sections.networks.color)]]">
+                    <a id="networks" class="section" is="pushstate-anchor" href="/networks" active$="[[_isEqual(current, 'networks')]]" tabindex="1" style$="[[style(sections.networks.color)]]">
                         <div class="layout horizontal center">
                             <section-symbol aria-hidden="true" icon="[[sections.networks.icon]]" color="[[sections.networks.color]]"></section-symbol>
                             <span class="title flex">
@@ -293,7 +224,7 @@
                             </span>
                         </div>
                     </a>
-                    <a class="section" is="pushstate-anchor" href="/scripts" active$="[[_isEqual(current, 'scripts')]]" tabindex="1" style$="[[style(sections.scripts.color)]]">
+                    <a id="scripts" class="section" is="pushstate-anchor" href="/scripts" active$="[[_isEqual(current, 'scripts')]]" tabindex="1" style$="[[style(sections.scripts.color)]]">
                         <div class="layout horizontal center">
                             <section-symbol aria-hidden="true" icon="[[sections.scripts.icon]]" color="[[sections.scripts.color]]"></section-symbol>
                             <span class="title flex">
@@ -302,7 +233,7 @@
                             </span>
                         </div>
                     </a>
-                    <a class="section" is="pushstate-anchor" href="/templates" active$="[[_isEqual(current, 'templates')]]" tabindex="1" style$="[[style(sections.templates.color)]]">
+                    <a id="templates" class="section" is="pushstate-anchor" href="/templates" active$="[[_isEqual(current, 'templates')]]" tabindex="1" style$="[[style(sections.templates.color)]]">
                         <div class="layout horizontal center">
                             <section-symbol aria-hidden="true" icon="[[sections.templates.icon]]" color="[[sections.templates.color]]"></section-symbol>
                             <span class="title flex">
@@ -311,7 +242,7 @@
                             </span>
                         </div>
                     </a>
-                    <a class="section" is="pushstate-anchor" href="/stacks" active$="[[_isEqual(current, 'stacks')]]" tabindex="1" style$="[[style(sections.stacks.color)]]">
+                    <a id="stacks" class="section" is="pushstate-anchor" href="/stacks" active$="[[_isEqual(current, 'stacks')]]" tabindex="1" style$="[[style(sections.stacks.color)]]">
                         <div class="layout horizontal center">
                             <section-symbol aria-hidden="true" icon="[[sections.stacks.icon]]" color="[[sections.stacks.color]]"></section-symbol>
                             <span class="title flex">
@@ -320,7 +251,7 @@
                             </span>
                         </div>
                     </a>
-                    <a class="section" is="pushstate-anchor" href="/teams" active$="[[_isEqual(current, 'teams')]]" tabindex="1" style$="[[style(sections.teams.color)]]">
+                    <a id="teams" class="section" is="pushstate-anchor" href="/teams" active$="[[_isEqual(current, 'teams')]]" tabindex="1" style$="[[style(sections.teams.color)]]">
                         <div class="layout horizontal center">
                             <section-symbol aria-hidden="true" icon="[[sections.teams.icon]]" color="[[sections.teams.color]]"></section-symbol>
                             <span class="title flex">
@@ -330,14 +261,6 @@
                         </div>
                     </a>
                 </nav>
-                <!--a href="/elements" class="flex section">
-                    <div class="layout horizontal center">
-                        <div class="all-symbol" aria-hidden="true">
-                            <iron-icon icon="add-circle-outline"></iron-icon>
-                        </div>
-                        <span class="title flex">_elements</span>
-                    </div>
-                </a-->
             </div>
         </div>
     </template>
@@ -352,12 +275,12 @@ Polymer({
         },
         current: {
             type: String,
+            value: "",
             notify: true
         },
         sections: {
-            type: Array,
-            notify: true,
-            value: []
+            type: Object,
+            notify: true
         },
         tag: {
             type: String,
