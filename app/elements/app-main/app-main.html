@@ -52,6 +52,10 @@
         width: 210px;
         float: left;
         margin-right: 24px; 
+        transition: margin-left 350ms ease-in-out;: 
+      }
+      app-sidebar.close {
+        margin-left: -210px;
       }
       iron-pages {
         padding: 24px;
@@ -108,7 +112,7 @@
         </iron-routes>
         
       <paper-header-panel mode="standard" class="fit">
-        <app-sidebar model="{{model}}" tag="[[tag]]" sections="[[sections]]" current="{{current}}"></app-sidebar>
+        <app-sidebar id="sidebar" model="{{model}}" tag="[[tag]]" sections="[[sections]]" current="{{current}}"></app-sidebar>
         <app-header model="{{model}}" title="Overview" class="paper-header" style$="[[style]]"></app-header>
 
         <iron-pages id="app-main" main>
@@ -199,6 +203,7 @@ var app = Polymer({
         'iron-activate': 'updateCount',
         'iron-activate': 'updateCurrent',
         'iron-navigate': 'scrollToTop',
+        'toggle-sidebar': 'toggleSidebar',
         'page-meta': 'updateTitle',
         'toast': 'showToast',
         'subscribeLogEvents': 'subscribeLogEvents',
@@ -284,7 +289,9 @@ var app = Polymer({
                             console.debug('pages loaded');
                         });*/
     },
-
+    toggleSidebar: function(){
+        this.$.sidebar.toggleClass('close');
+    },
     subscribeLogEvents: function(searchFilter) {
         console.log('subscribeLogEvents', searchFilter.detail);
         var socket = this.querySelector('app-socket');
