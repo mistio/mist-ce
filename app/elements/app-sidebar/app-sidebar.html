@@ -115,17 +115,22 @@
             display: block;
             padding: 8px 16px;
             font-weight: 500;
-            color: rgba(0, 0, 0, .87);
+            /*color: rgba(0, 0, 0, .87);*/
             text-transform: capitalize;
             cursor: pointer;
             border-width: 1px 0 1px 4px;
             /*border-left: 4px solid transparent;*/
+            transition: 200ms border ease-in;
         }
 
         #section-list .section[active] {
             background: rgba(0,0,0,0.03);
-            /*border-left: 4px solid;*/
+            border-left: 4px solid;
             color: #444;
+        }
+
+        #section-list .section[active] ::content iron-icon {
+            color: inherit;
         }
 
         #section-list .section .all-symbol {
@@ -137,7 +142,7 @@
             margin-right: 12px;
         }
 
-        #section-list a span {
+        #section-list a:not([active]) span {
             color: rgba(0, 0, 0, .87);
         }
 
@@ -190,7 +195,7 @@
                 <nav>
                     <a id="machines" class="section" is="pushstate-anchor" href="/machines" active$="[[_isEqual(current, 'machines')]]" tabindex="1" style$="[[style(sections.machines.color)]]">
                         <div class="layout horizontal center">
-                            <section-symbol aria-hidden="true" icon="[[sections.machines.icon]]" color="sections.machines.color]]"></section-symbol>
+                            <section-symbol aria-hidden="true" icon="[[sections.machines.icon]]"></section-symbol>
                             <span class="title flex">
                                 <span>machines</span>
                             <span class="count">[[model.machinesArray.length]]</span>
@@ -199,7 +204,7 @@
                     </a>
                     <a id="images" class="section" is="pushstate-anchor" href="/images" active$="[[_isEqual(current, 'images')]]" tabindex="1" style$="[[style(sections.images.color)]]">
                         <div class="layout horizontal center">
-                            <section-symbol aria-hidden="true" icon="[[sections.images.icon]]" color="[[sections.images.color]]"></section-symbol>
+                            <section-symbol aria-hidden="true" icon="[[sections.images.icon]]"></section-symbol>
                             <span class="title flex">
                                 <span>images</span>
                             <span class="count">[[model.imagesArray.length]]</span>
