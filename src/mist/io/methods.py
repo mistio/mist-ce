@@ -1604,8 +1604,10 @@ def list_machines(user, cloud_id):
             machine_cost = {}
         indicative_cost_per_month = machine_cost.get('indicative_cost_per_month', 0)
         indicative_cost_per_hour = machine_cost.get('indicative_cost_per_hour', 0)
-        machine['extra']['indicative_cost_per_month'] = indicative_cost_per_month
-        machine['extra']['indicative_cost_per_hour'] = indicative_cost_per_hour
+        if indicative_cost_per_hour:
+            machine['extra']['indicative_cost_per_hour'] = indicative_cost_per_hour
+        if indicative_cost_per_month:
+            machine['extra']['indicative_cost_per_month'] = indicative_cost_per_month
 
         # IDEA: allow to override this, if user wants to add a special tag
         # if tags.get('indicative_price_per_month'):
