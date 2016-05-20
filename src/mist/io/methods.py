@@ -1476,23 +1476,30 @@ def list_machines(user, cloud_id):
         raise NotFoundError("Unknown cloud with id %s" % cloud_id)
     try:
         conn = connect_provider(cloud)
-        machines = conn.list_nodes()
+        machines_from_provider = sorted(conn.list_nodes(),
+                                        key=lambda node: node.id)
     except InvalidCredsError:
         raise CloudUnauthorizedError()
     except Exception as exc:
         log.error("Error while running list_nodes: %r", exc)
         raise CloudUnavailableError(exc=exc)
+    machines_from_db = sorted(Machine.objects(cloud=cloud),
+                              key=lambda ma: ma.machine_id, reverse=True)
     ret = []
-    for m in machines:
+    for m in machines_from_provider:
+
+        while len(machines_from_db) > 0 and m.id > machines_from_db[-1].machine_id:
+                machines_from_db.pop()
+
         if m.driver.type == 'gce':
-            #tags and metadata exist in GCE
+            # tags and metadata exist in GCE
             tags = m.extra.get('metadata', {}).get('items')
         else:
             tags = m.extra.get('tags') or m.extra.get('metadata') or {}
         # optimize for js
         if type(tags) == dict:
             tags = [{'key': key, 'value': value} for key, value in tags.iteritems() if key != 'Name']
-        #if m.extra.get('availability', None):
+        # if m.extra.get('availability', None):
         #    # for EC2
         #    tags.append({'key': 'availability', 'value': m.extra['availability']})
         if m.extra.get('DATACENTERID', None):
@@ -1591,7 +1598,7 @@ def list_machines(user, cloud_id):
             tags = []
 
         machine = {'id': m.id,
-                   'uuid': m.get_uuid(),
+                   'uuid': '',
                    'name': m.name,
                    'imageId': image_id,
                    'size': size,
@@ -1601,6 +1608,8 @@ def list_machines(user, cloud_id):
                    'tags': tags,
                    'extra': m.extra}
         machine.update(get_machine_actions(m, conn, m.extra))
+        if len(machines_from_db) > 0 and m.id == machines_from_db[-1].machine_id:
+            machine['uuid'] = machines_from_db.pop().id
         ret.append(machine)
     if conn.type == 'libvirt':
         # close connection with libvirt
