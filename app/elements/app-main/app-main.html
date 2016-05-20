@@ -166,7 +166,6 @@ var app = Polymer({
     ],
     listeners: {
         'iron-activate': 'updateDocTitle',
-        'iron-activate': 'updateCount',
         'iron-navigate': 'scrollToTop',
         'page-meta': 'updateTitle',
         'toast': 'showToast',
@@ -591,18 +590,6 @@ var app = Polymer({
 
     attributeChanged: function(attrName, oldVal, newVal) {
         console.warn('attrChanged', attrName, oldVal, newVal);
-    },
-
-    updateCount: function() {
-        var sec = this.sectionsArray;
-        var mod = this.model;
-        for (var i = 0; i < sec.length; i++) {
-            var c = mod[sec[i].id + 'Array'].length;
-            this.set('sectionsArray.' + i + '.count', c);
-
-            // Notification required for binding to update!
-            this.notifyPath(sec[i].count, c);
-        }
     },
 
     updateTitle: function(_, detail) {
