@@ -1566,7 +1566,6 @@ def list_machines(user, cloud_id):
 
         if m.driver.type == 'bare_metal':
             can_reboot = False
-            keys = Keypair.objects(owner=user)
             try:
                 machine = Machine.objects.get(cloud=cloud_id, machine_id=m.id)
                 if machine.key_associations:
