@@ -40,7 +40,7 @@ import ansible.constants
 # try:
 # from mist.core.user.models import User
 from mist.core.tag.models import Tag
-from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+from mist.core.cloud.models import Cloud, Machine, KeyAssociation, CloudSize, CloudImage
 from mist.core.keypair.models import Keypair
 from mist.core import config
 # except ImportError:
@@ -4317,24 +4317,17 @@ def machine_cost_calculator(m):
     if m.driver.type in [Provider.LINODE, Provider.PACKET, Provider.GCE, \
         Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN] \
         or m.driver.type in config.EC2_PROVIDERS:
-        # FIXME: get values from memcache
-        try:
-            sizes = get_size_from_memcache()
-        except:
-            sizes = m.driver.list_sizes()
+        sizes = CloudSize.objects.filter(cloud_provider=m.driver.type)
     now = datetime.now()
     month_days = calendar.monthrange(now.year, now.month)[1]
     if m.driver.type in config.EC2_PROVIDERS:
         # Need to get image in order to specify the OS type
         # out of the image id
-        # FIXME: get values from memcache
-        try:
-            images = get_images_from_memcache()
-        except:
-            pass #images = m.driver.list_images()
         instance_image = m.extra.get('image_id')
-        # TODO: get_os_type_from_instance_type(instance_image, images)
-        os_type = 'linux'
+        try:
+            os_type = CloudImage.objects.get(cloud_provider=m.driver.type, image_id=instance_image).os_type
+        except:
+            os_type = 'linux'
         # os_type can be one of ("linux", "rhel",
         # "sles", mswin", "mswinSQL", "mswinSQLWeb", "vyatta")
         # TODO: update AWS pricing on libcloud
@@ -4353,17 +4346,13 @@ def machine_cost_calculator(m):
     if m.driver.type in [Provider.Rackspace, Provider.RACKSPACE_FIRST_GEN]:
         # Need to get image in order to specify the OS type
         # out of the image id
-        # FIXME: get values from memcache
-        try:
-            images = get_images_from_memcache()
-        except:
-            pass #images = m.driver.list_images()
         instance_image = m.extra.get('imageId')
-        # TODO: get_os_type_from_instance_type(instance_image, images)
-        # image.extra.get('metadata', {}).get('os_type')
-        os_type = 'linux'
-        # os_type can be one of ("linux", "windows")
-        # TODO: research how pricing is done on Rackspace
+        try:
+            image = CloudImage.objects.get(cloud_provider=m.driver.type, image_id=instance_image).os_type
+            # TODO: further research how pricing is done on Rackspace
+        except:
+            os_type = 'linux'
+
         # TODO: update Rackspace pricing on libcloud
         size = m.extra.get('flavorId')
         for node_size in sizes:
