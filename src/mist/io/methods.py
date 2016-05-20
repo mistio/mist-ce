@@ -1565,14 +1565,10 @@ def list_machines(user, cloud_id):
                 m.extra['endpoints'] = json.dumps(m.extra.get('endpoints', {}))
 
         if m.driver.type == 'bare_metal':
-            can_reboot = False
-            try:
-                machine = Machine.objects.get(cloud=cloud_id, machine_id=m.id)
-                if machine.key_associations:
-                    can_reboot = True
-            except Machine.DoesNotExist:
-                pass
-            m.extra['can_reboot'] = can_reboot
+            m.extra['can_reboot'] = True
+            if len(machines_from_db) > 0:
+                if m.id == machines_from_db[-1].machine_id and machines_from_db[-1].key_associations:
+                    m.extra['can_reboot'] = True
 
         if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
             try:
