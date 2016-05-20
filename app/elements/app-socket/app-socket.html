@@ -61,6 +61,18 @@ Polymer({
                         // console.debug('list_scripts', data);
                     }, 250);
                 },
+                list_templates: function (data) {
+                    console.warn('got templates', data);
+                    that.debounce(that._updateTemplates(data), function(){
+                        console.debug('list_templates', data);
+                    }, 250);
+                },
+                list_stacks: function (data) {
+                    console.warn('got stacks', data);
+                    that.debounce(that._updateStacks(data), function(){
+                        console.debug('list_stacks', data);
+                    }, 250);
+                },
                 list_machines: function (data) {
                     that.debounce(that._updateMachines(data), function(){
                         // console.debug('list_machines', data);
@@ -156,12 +168,9 @@ Polymer({
             that.send('msg', 'logs', 'ready');
             that.set('initialized', true);
         };
-
-        this.getScripts();
-        this.getTemplates();
-        this.getStacks();
     },
 
+    // DEPRECATED
     getScripts: function () {
         var xhr = new XMLHttpRequest(), that = this;
         xhr.onreadystatechange = function() {
@@ -174,6 +183,8 @@ Polymer({
         xhr.open("GET", '/api/v1/scripts', true);
         xhr.send();
     },
+
+    // DEPRECATED
     getTemplates: function () {
         var xhr = new XMLHttpRequest(), that = this;
         xhr.onreadystatechange = function() {
@@ -186,6 +197,8 @@ Polymer({
         xhr.open("GET", '/api/v1/templates', true);
         xhr.send();
     },
+
+    // DEPRECATED
     getStacks: function () {
         var xhr = new XMLHttpRequest(), that = this;
         xhr.onreadystatechange = function() {
@@ -225,6 +238,7 @@ Polymer({
         xhr.open("GET", '/api/v1/stacks', true);
         xhr.send();
     },
+
     heartbeat: function() {
         console.debug('got heartbeat');
         this.send('h'); // reply with empty frame
@@ -366,8 +380,17 @@ Polymer({
     _updateKeys: function (data) {
         return this._updateModel('keys', data);
     },
+
+    _updateScripts: function (data) {
+        return this._updateModel('scripts', data);
+    },
+
     _updateTemplates: function (data) {
         return this._updateModel('templates', data);
+    },
+
+    _updateStacks: function (data) {
+        return this._updateModel('stacks', data);
     },
 
     _updateSizes: function (data) {

@@ -32,21 +32,16 @@ from mist.io.exceptions import MistError
 from mist.io.shell import Shell
 from mist.io.helpers import get_auth_header
 
+from mist.core.user.models import User, Owner
+from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+from mist.core.keypair.models import Keypair
+from mist.core.helpers import user_from_email
+#from mist.core.tasks import ListTeams
+from mist.core import config
 
-try:  # Multi-user environment
-    from mist.core.user.models import User, Owner
-    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
-    from mist.core.keypair.models import Keypair
-    from mist.core import config
+cert_path = "src/mist.io/cacert.pem"
+celery_cfg = 'mist.core.celery_config'
 
-    multi_user = True
-    cert_path = "src/mist.io/cacert.pem"
-    celery_cfg = 'mist.core.celery_config'
-except ImportError:  # Standalone mist.io
-    from mist.io import config
-    multi_user = False
-    cert_path = "cacert.pem"
-    celery_cfg = 'mist.io.celery_config'
 
 from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_owner_listening
@@ -76,8 +71,6 @@ def update_machine_count(owner, cloud_id, machine_count):
     :param machine_count:
     :return:
     """
-    if not multi_user:
-        return
     if owner.find("@")!=-1:
         owner = User.objects.get(email=owner)
     else:
@@ -124,13 +117,11 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
     from mist.io.methods import connect_provider, probe_ssh_only
     from mist.io.methods import notify_user, notify_admin
     from mist.io.methods import create_dns_a_record
-    if multi_user:
-        from mist.core.methods import enable_monitoring
-        from mist.core.tasks import run_script
-        from mist.core.helpers import log_event
-    else:
-        from mist.io.methods import enable_monitoring
-        log_event = lambda *args, **kwargs: None
+
+    from mist.core.methods import enable_monitoring
+    from mist.core.tasks import run_script
+    from mist.core.helpers import log_event
+
     job_id = job_id or uuid.uuid4().hex
     if owner.find("@") != -1:
         owner = User.objects.get(email=owner)
@@ -206,7 +197,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                               **log_dict)
 
             error = False
-            if script_id and multi_user:
+            if script_id:
                 tmp_log('will run script_id %s', script_id)
                 ret = run_script.run(
                     owner, script_id, cloud_id, machine_id,
@@ -262,7 +253,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                     log_event(action='enable_monitoring_failed', error=repr(e),
                               **log_dict)
 
-            if post_script_id and multi_user:
+            if post_script_id:
                 tmp_log('will run post_script_id %s', post_script_id)
                 ret = run_script.run(
                     owner, post_script_id, cloud_id, machine_id,
@@ -785,10 +776,7 @@ class ListMachines(UserTask):
     polling = True
     soft_time_limit = 60
 
-    if multi_user:
-        from mist.core.helpers import log_event
-    else:
-        log_event = lambda *args, **kwargs: None
+    from mist.core.helpers import log_event
 
     def execute(self, owner_id, cloud_id):
         from mist.io import methods
@@ -796,30 +784,30 @@ class ListMachines(UserTask):
         log.warn('Running list machines for user %s cloud %s',
                  owner.id, cloud_id)
         machines = methods.list_machines(owner, cloud_id)
-        if multi_user:
-            from mist.core.methods import get_machine_tags, set_machine_tags
-            for machine in machines:
-                # TODO tags tags tags
-                if machine.get("tags"):
-                    tags = {}
-                    for tag in machine["tags"]:
-                        tags[tag["key"]]= tag["value"]
-                    set_machine_tags(owner, tags, cloud_id, machine.get("id"))
-                try:
-                    mistio_tags = get_machine_tags(owner, cloud_id,
-                                                   machine.get("id"))
-                except:
-                    log.info("Machine has not tags in mist db")
-                else:
-                    machine["tags"] = []
-                    # optimized for js
-                    for tag in mistio_tags:
-                        key, value = tag.popitem()
-                        tag_dict = {'key': key, 'value': value}
-                        machine['tags'].append(tag_dict)
-                # FIXME: optimize!
+
+        from mist.core.methods import get_machine_tags, set_machine_tags
+        for machine in machines:
+            # TODO tags tags tags
+            if machine.get("tags"):
+                tags = {}
+                for tag in machine["tags"]:
+                    tags[tag["key"]]= tag["value"]
+                set_machine_tags(owner, tags, cloud_id, machine.get("id"))
+            try:
+                mistio_tags = get_machine_tags(owner, cloud_id,
+                                               machine.get("id"))
+            except:
+                log.info("Machine has not tags in mist db")
+            else:
+                machine["tags"] = []
+                # optimized for js
+                for tag in mistio_tags:
+                    key, value = tag.popitem()
+                    tag_dict = {'key': key, 'value': value}
+                    machine['tags'].append(tag_dict)
+        # FIXME: optimize!
         log.warn('Returning list machines for user %s cloud %s',
-                 owner.id, cloud_id)
+             owner.id, cloud_id)
         return {'cloud_id': cloud_id, 'machines': machines}
 
     def error_rerun_handler(self, exc, errors, owner_id, cloud_id):
@@ -926,10 +914,9 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
     from mist.io.methods import create_machine
     from mist.io.exceptions import MachineCreationError
     log.warn('MULTICREATE ASYNC %d' % quantity)
-    if multi_user:
-        from mist.core.helpers import log_event
-    else:
-        log_event = lambda *args, **kwargs: None
+
+    from mist.core.helpers import log_event
+
     job_id = job_id or uuid.uuid4().hex
 
 
