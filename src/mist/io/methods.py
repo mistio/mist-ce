@@ -1470,7 +1470,10 @@ def get_machine_actions(machine_from_api, conn, extra):
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    try:
+        cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError("Unknown cloud with id %s" % cloud_id)
     try:
         conn = connect_provider(cloud)
         machines = conn.list_nodes()
