@@ -1491,6 +1491,11 @@ def list_machines(user, cloud_id):
         while len(machines_from_db) > 0 and m.id > machines_from_db[-1].machine_id:
                 machines_from_db.pop()
 
+        if m.id == machines_from_db[-1].machine_id:
+            machine_entry = machines_from_db.pop()
+        else:
+            machine_entry = None
+
         if m.driver.type == 'gce':
             # tags and metadata exist in GCE
             tags = m.extra.get('metadata', {}).get('items')
@@ -1565,10 +1570,7 @@ def list_machines(user, cloud_id):
                 m.extra['endpoints'] = json.dumps(m.extra.get('endpoints', {}))
 
         if m.driver.type == 'bare_metal':
-            m.extra['can_reboot'] = True
-            if len(machines_from_db) > 0:
-                if m.id == machines_from_db[-1].machine_id and machines_from_db[-1].key_associations:
-                    m.extra['can_reboot'] = True
+            m.extra['can_reboot'] = machine_entry and machine_entry.key_associations
 
         if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
             try:
@@ -1593,7 +1595,7 @@ def list_machines(user, cloud_id):
             tags = []
 
         machine = {'id': m.id,
-                   'uuid': '',
+                   'uuid': machine_entry.id if machine_entry else '',
                    'name': m.name,
                    'imageId': image_id,
                    'size': size,
@@ -1603,8 +1605,6 @@ def list_machines(user, cloud_id):
                    'tags': tags,
                    'extra': m.extra}
         machine.update(get_machine_actions(m, conn, m.extra))
-        if len(machines_from_db) > 0 and m.id == machines_from_db[-1].machine_id:
-            machine['uuid'] = machines_from_db.pop().id
         ret.append(machine)
     if conn.type == 'libvirt':
         # close connection with libvirt
