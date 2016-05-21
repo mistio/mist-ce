@@ -680,7 +680,7 @@ def get_private_key(request):
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
-    keypair_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
+    keypair_tags = mist.core.methods.get_key_tags(auth_context.owner,
                                                       key_id)
     if not auth_context.has_perm('key', 'read_private', key.id,
                                  keypair_tags):
@@ -1103,7 +1103,7 @@ def create_machine(request):
         if not auth_context.has_perm("script", "run", script_id, script_tags):
             raise UnauthorizedError("Can't run script.")
     if key_id:
-        key_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
+        key_tags = mist.core.methods.get_key_tags(auth_context.owner,
                                                       key_id)
         key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
         if not auth_context.has_perm("key", "read", key.id, key_tags):
