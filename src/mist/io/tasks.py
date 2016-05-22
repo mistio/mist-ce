@@ -35,7 +35,6 @@ from mist.io.helpers import get_auth_header
 from mist.core.user.models import User, Owner
 from mist.core.cloud.models import Cloud, Machine, KeyAssociation
 from mist.core.keypair.models import Keypair
-from mist.core.helpers import user_from_email
 #from mist.core.tasks import ListTeams
 from mist.core import config
 
