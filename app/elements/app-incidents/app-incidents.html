@@ -38,6 +38,7 @@
         }
         .list-item .expression > iron-icon {
             color: rgba(0,0,0,0.32);
+            margin-right: 4px;
         }
 
         .list-item.red .expression > iron-icon {
@@ -83,12 +84,13 @@
             min-width: 150px;
         }
         </style>
-
-        <a href="/incidents" class="main-section flexchild" is="pushstate-anchor">
-            <section-tile name="incidents" color="#d96557" icon="icons:error-outline" count="[[model.incidents.length]]" incidents></section-tile>
-        </a>
+        <div class="flexchild">
+            <a href="/incidents" class="main-section" is="pushstate-anchor">
+                <section-tile name="incidents" color="#d96557" icon="icons:error-outline" count="[[model.incidents.length]]" incidents></section-tile>
+            </a>
+        </div>
         <paper-material class="flex3child">
-            <h3>Active Incidents</h3>
+            <h3>Happening Now</h3>
             <div class="block">
                 <template is="dom-repeat" items="[[model.incidents]]">
                     <!-- Only red incidents sould count and show. keep it temp/ly due to lacj of data -->
@@ -109,6 +111,16 @@
                         </div>
                     </a>
                 </template>
+                <a class="list-item layout horizontal wrap" href="/incidents">
+                    <div class="flexchild expression">
+                        <iron-icon icon="icons:report-problem"></iron-icon>
+                        <span class="flexchild">and 12 more incidents in the last hour</span>
+                    </div>
+                    <span class="time">view all</span>
+                    <div>
+                        <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                    </div>
+                </a>
             </div>
         </paper-material>
     </template>
