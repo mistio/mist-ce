@@ -255,9 +255,6 @@
 
         .page {
             display: block;
-            max-width: 900px;
-            padding: 0;
-            margin: 0 70px;
         }
 
         .page-block {
@@ -689,7 +686,13 @@
 </dom-module>
 <dom-module id="single-page">
     <template>
-        <style>
+        <style>         
+        #content {
+            -webkit-overflow-scrolling: touch;
+            max-width: 1500px;
+            margin: 0px auto;
+            padding: 36px 36px 80px 36px;
+        }
         .paper-toolbar .title {
             pointer-events: all;
         }
@@ -922,16 +925,9 @@
 
         .info-card {
             display: block;
-            max-width: 920px;
-            margin: 0 auto 20px;
         }
 
         .info-card .title-text {
-            /*color: #474747 !important;*/
-            /*            background: #eeedeb;
-            background: -moz-linear-gradient(top, #eeedeb 0%, #d4d4d4 100%);
-            background: -webkit-linear-gradient(top, #eeedeb 0%, #d4d4d4 100%);
-            background: linear-gradient(to bottom, #eeedeb 0%, #d4d4d4 100%);*/
             border-bottom: 2px solid #7f7f7f;
             font-size: 18px !important;
             text-transform: uppercase;

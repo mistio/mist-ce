@@ -7,13 +7,13 @@
         <style is="custom-style" include="shared-styles"></style>
         <style is="custom-style">
         :root {
-            --app-sidebar-width: 272px;
-            --app-sidebar-background: var(--primary-background-color);
+            --app-sidebar-width: 210px;
         }
         </style>
         <style>
         :host {
             height: 100%;
+            width: 210px;
             box-sizing: border-box;
             z-index: 2;
             background: transparent;
@@ -22,7 +22,16 @@
             overflow-x: hidden;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding-top: 16px;
+
+            position: fixed;
+            top: 80px;
+            margin-right: 24px; 
+            left: 0;        
+            transition: left 350ms ease-in-out;
+        }
+
+        :host.close {
+            left: -210px;
         }
 
         ::content paper-toolbar {

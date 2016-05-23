@@ -13,7 +13,6 @@
         <style include="shared-styles">
         :host {
             display: block;
-            background: #fafafa;
         }
 
         paper-material {
@@ -136,10 +135,6 @@
             z-index: 9;
             color: rgba(0,0,0,0.87);
         }
-        .content {
-            margin-top: 57px;
-            padding-bottom: 80px
-        }
         paper-header-panel ::content #dropShadow {
             top: 56px;
         }
@@ -186,172 +181,137 @@
             width: 100%;
         }
         </style>
-        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
-            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
-            <paper-header-panel id="container" mode="waterfall-tall" main>
-                <paper-toolbar class="tall" style$="[[color]]">
-                    <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
-                    <span class="title"></span>
-                    <app-user-menu email="[[model.email]]"></app-user-menu>
-                    <span class="bottom title">Template "[[template.name]]"</span>
 
-                    <span class="bottom right-actions">
-                        <paper-tooltip for="scheduleTemplate" position="top">Schedule Template</paper-tooltip>
-                        <paper-icon-button id="scheduleTemplate" icon="icons:schedule" on-tap="_scheduleTemplate"></paper-icon-button>
-                        <paper-tooltip for="editTemplate" position="top">Edit Template</paper-tooltip>
-                        <paper-icon-button id="editTemplate" icon="icons:create" on-tap="_editTemplate"></paper-icon-button>
-                        <paper-tooltip for="deleteTemplate" position="top">Delete Template</paper-tooltip>
-                        <paper-icon-button id="deleteTemplate" icon="icons:delete" on-tap="_deleteTemplate"></paper-icon-button>
-                    </span>
 
-                    <div class="subhead bottom">
-                        <span class="monospace" hidden$="[[!isInline]]">Inline template</span>
-                        <div hidden="[[isInline]]">
-                            <span class="pad-right micon-wrap"><img src="../../assets/icons/github-circle.svg" class="micon"/></span>
-                            <span class="pad-right">Template from Github </span>
-                            <a href="[[template.template]]" target="_blank">
-                                <iron-icon icon="icons:link" class="blue-link" id="link-to-template"></iron-icon>
-                                <paper-tooltip for="link-to-template" position="bottom">[[template.template]]</paper-tooltip>
-                            </a>
-                        </div>
-                        <div class="fab-top-right">
-                            <paper-fab icon="av:play-arrow" on-tap="_createStack" id="runTemplateFab"></paper-fab>
-                            <paper-tooltip for="runTemplateFab" position="bottom">Create Stacks from Template</paper-tooltip>
-                        </div>
+        <div id="content">
+            <div class="page">
+                <div class="parsing-loader" hidden$="[[hideprogress]]">
+                    <h3>Parsing template [[template.name]]</h3>
+                    <paper-progress id="progress" value="30"></paper-progress>
+                    <h4>Fetching template metadata may take a while.</h4>
+                    <a href="/add-template" class="regular blue-link">Cancel Task</a>
+                </div>
+
+                <div class="flex-horizontal-with-ratios section">
+                    <div class="page-block">
+                        <h3 class="smallcaps">Description</h3>
+                        <p>[[template.description]]</p>
                     </div>
-                </paper-toolbar>
-
-                <div class="content" style$="[[vpHeight]]">
-                    <div class="page">
-                        <div class="parsing-loader" hidden$="[[hideprogress]]">
-                            <h3>Parsing template [[template.name]]</h3>
-                            <paper-progress id="progress" value="30"></paper-progress>
-                            <h4>Fetching template metadata may take a while.</h4>
-                            <a href="/add-template" class="regular blue-link">Cancel Task</a>
-                        </div>
-
-                        <div class="flex-horizontal-with-ratios section">
-                            <div class="page-block">
-                                <h3 class="smallcaps">Description</h3>
-                                <p>[[template.description]]</p>
-                            </div>
-                            <div class="page-block">
-                                <h3 class="smallcaps">Created</h3>
-                                <p>[[timestamp]]
-                                <!-- <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a> -->
-                                </p>
-                            </div>
-                        </div>
+                    <div class="page-block">
+                        <h3 class="smallcaps">Created</h3>
+                        <p>[[timestamp]]
+                        <!-- <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a> -->
+                        </p>
                     </div>
-                    <div class="page section">
-                        <div class="flex-horizontal-with-ratios">
-                            <div class="width100">
-                                <template is="dom-if" if="[[hasStacks]]">
-                                    <paper-material class="no-pad">
-                                        <h3 class="smallcaps resource-head">stacks created from this template</h3>
-                                        <template is="dom-repeat" items="[[stacks]]">
-                                            <template-stack-item model="[[model]]" stack="[[item]]"></template-stack-item>
-                                        </template>
-                                    </paper-material>
+                </div>
+            </div>
+            <div class="page section">
+                <div class="flex-horizontal-with-ratios">
+                    <div class="width100">
+                        <template is="dom-if" if="[[hasStacks]]">
+                            <paper-material class="no-pad">
+                                <h3 class="smallcaps resource-head">stacks created from this template</h3>
+                                <template is="dom-repeat" items="[[stacks]]">
+                                    <template-stack-item model="[[model]]" stack="[[item]]"></template-stack-item>
                                 </template>
+                            </paper-material>
+                        </template>
 
-                                <template is="dom-if" if="[[!hasStacks]]">
-                                    <h3 class="smallcaps">Stacks</h3>
-                                    <p>
-                                        You have not yet created a stack from template [[template.name]].
-                                    </p>
-                                    <paper-button class="blue pad-left2 pad-right2" on-tap="_createStack"> Create <span hidden$="[[!hasStacks]]">new</span> Stack</paper-button>
-                                </template>
+                        <template is="dom-if" if="[[!hasStacks]]">
+                            <h3 class="smallcaps">Stacks</h3>
+                            <p>
+                                You have not yet created a stack from template [[template.name]].
+                            </p>
+                            <paper-button class="blue pad-left2 pad-right2" on-tap="_createStack"> Create <span hidden$="[[!hasStacks]]">new</span> Stack</paper-button>
+                        </template>
 
-                            </div>
-                        </div>
                     </div>
-                    <div class="page section">
-                        <h3 class="smallcaps">Metadata</h3>
-                        <paper-material>
-                            <div class="info-table">
-                                <div class="info-body info-group">
-                                    <template is="dom-if" if="[[template.description]]">
-                                        <div class="info-item flex-horizontal-with-ratios">
-                                            <div hidden$="[[!template.description]]" class="flexchild">Description</div>
-                                            <div class="flexchild">[[template.description]]</div>
-                                        </div>
-                                    </template>
-                                    <template is="dom-if" if="[[template.created_at]]">
-                                        <div class="info-item flex-horizontal-with-ratios">
-                                            <div class="flexchild">Created at</div>
-                                            <div class="flexchild">[[timestamp]]</div>
-                                        </div>
-                                    </template>
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Type</div>
-                                        <div class="flexchild">[[template.exec_type]]</div>
-                                    </div>
-                                    <template is="dom-if" if="[[template.location_type]]">
-                                        <div class="info-item flex-horizontal-with-ratios">
-                                            <div class="flexchild">Location</div>
-                                            <div class="flexchild">[[template.location_type]]</div>
-                                        </div>
-                                    </template>
-                                    <template is="dom-if" if="[[template.template]]">
-                                        <div class="info-item flex-horizontal-with-ratios">
-                                            <div class="flexchild">Template</div>
-                                            <div class$="flexchild [[class]]">
-                                                <a href="[[template.template]]" class="blue-link regular" target="_blank">
-                                                    [[template.template]]
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </template>
-                                    <template is="dom-if" if="[[template.entrypoint]]">
-                                        <div class="info-item flex-horizontal-with-ratios">
-                                            <div class="flexchild">Entrypoint</div>
-                                            <div class="flexchild">
-                                                [[template.entrypoint]]
-                                            </div>
-                                        </div>
-                                    </template>
+                </div>
+            </div>
+            <div class="page section">
+                <h3 class="smallcaps">Metadata</h3>
+                <paper-material>
+                    <div class="info-table">
+                        <div class="info-body info-group">
+                            <template is="dom-if" if="[[template.description]]">
+                                <div class="info-item flex-horizontal-with-ratios">
+                                    <div hidden$="[[!template.description]]" class="flexchild">Description</div>
+                                    <div class="flexchild">[[template.description]]</div>
                                 </div>
+                            </template>
+                            <template is="dom-if" if="[[template.created_at]]">
+                                <div class="info-item flex-horizontal-with-ratios">
+                                    <div class="flexchild">Created at</div>
+                                    <div class="flexchild">[[timestamp]]</div>
+                                </div>
+                            </template>
+                            <div class="info-item flex-horizontal-with-ratios">
+                                <div class="flexchild">Type</div>
+                                <div class="flexchild">[[template.exec_type]]</div>
                             </div>
+                            <template is="dom-if" if="[[template.location_type]]">
+                                <div class="info-item flex-horizontal-with-ratios">
+                                    <div class="flexchild">Location</div>
+                                    <div class="flexchild">[[template.location_type]]</div>
+                                </div>
+                            </template>
+                            <template is="dom-if" if="[[template.template]]">
+                                <div class="info-item flex-horizontal-with-ratios">
+                                    <div class="flexchild">Template</div>
+                                    <div class$="flexchild [[class]]">
+                                        <a href="[[template.template]]" class="blue-link regular" target="_blank">
+                                            [[template.template]]
+                                        </a>
+                                    </div>
+                                </div>
+                            </template>
+                            <template is="dom-if" if="[[template.entrypoint]]">
+                                <div class="info-item flex-horizontal-with-ratios">
+                                    <div class="flexchild">Entrypoint</div>
+                                    <div class="flexchild">
+                                        [[template.entrypoint]]
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </paper-material>
+            </div>
+            <template is="dom-if" if="[[template.inputs.length]]">
+                <div class="page">
+                    <div class="section">
+                        <h3 class="smallcaps">Template Inputs </h3>
+                        <p> The template will require you to insert the following inputs in order to create a stack from</p>
+                        <p class="required"><span class="red">*</span> required fields</p>
+                        <paper-material class="no-pad">
+                            <table class="info-table">
+                                <template is="dom-repeat" items="[[template.inputs]]">
+                                    <tr><td>[[item.name]] <span id="required" class="red" hidden="[[!item.required]]">*</span></td>
+                                    <td>
+                                    [[item.description]]</td></tr>
+                                </template>
+                            </table>
                         </paper-material>
                     </div>
-                    <template is="dom-if" if="[[template.inputs.length]]">
-                        <div class="page">
-                            <div class="section">
-                                <h3 class="smallcaps">Template Inputs </h3>
-                                <p> The template will require you to insert the following inputs in order to create a stack from</p>
-                                <p class="required"><span class="red">*</span> required fields</p>
-                                <paper-material class="no-pad">
-                                    <table class="info-table">
-                                        <template is="dom-repeat" items="[[template.inputs]]">
-                                            <tr><td>[[item.name]] <span id="required" class="red" hidden="[[!item.required]]">*</span></td>
-                                            <td>
-                                            [[item.description]]</td></tr>
-                                        </template>
-                                    </table>
-                                </paper-material>
-                            </div>
-                        </div>
-                    </template>
-                    <template is="dom-if" if="[[template.workflows.length]]">
-                        <div class="page section">
-                            <h3 class="smallcaps">Available Workflows </h3>
-                            <p> This template offers the following workflows to be run on stacks created form</p>
-                            <paper-material class="no-pad">
-                                <table class="info-table">
-                                    <template is="dom-repeat" items="[[template.workflows]]" as="[[item]]">
-                                        <tr>
-                                            <td>[[item.name]]</td>
-                                            <td>[[item.description]]</td>
-                                        </tr>
-                                    </template>
-                                </table>
-                            </paper-material>
-                        </div>
-                    </template>
                 </div>
-            </paper-header-panel>
-        </paper-drawer-panel>
+            </template>
+            <template is="dom-if" if="[[template.workflows.length]]">
+                <div class="page section">
+                    <h3 class="smallcaps">Available Workflows </h3>
+                    <p> This template offers the following workflows to be run on stacks created form</p>
+                    <paper-material class="no-pad">
+                        <table class="info-table">
+                            <template is="dom-repeat" items="[[template.workflows]]" as="[[item]]">
+                                <tr>
+                                    <td>[[item.name]]</td>
+                                    <td>[[item.description]]</td>
+                                </tr>
+                            </template>
+                        </table>
+                    </paper-material>
+                </div>
+            </template>
+        </div>
         <template-edit template="[[template]]"></template-edit>
         <dialog-element></dialog-element>
     </template>

@@ -10,13 +10,6 @@
         <style include="shared-styles">
             :host {
                 display: block;
-                background: #fafafa;
-            }
-
-            #content {
-                overflow: auto;
-                -webkit-overflow-scrolling: touch;
-                padding: 20px;
             }
 
             .flex-horizontal-with-ratios {
@@ -53,11 +46,7 @@
                 right: 0;
                 z-index: 9;
                 color: rgba(0, 0, 0, 0.87);
-            }
-
-            .content {
-                margin-top: 57px;
-            }
+            }            
 
             paper-header-panel::content #dropShadow {
                 top: 56px;
@@ -75,73 +64,43 @@
                 padding: 2px !important;
             }
         </style>
-        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe>
-            <app-sidebar tag="[[tag]]" sections="[[sections]]" current="machines" drawer></app-sidebar>
-            <paper-header-panel id="container" mode="waterfall-tall" main>
-                <paper-toolbar class="tall" style$="[[_getHeaderStyle(section.color)]]">
-                    <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
-                    <span class="title"></span>
-                    <app-user-menu email="[[model.email]]"></app-user-menu>
-                    <span class="bottom title">Machine: [[machine.name]]</span>
-                    <span class="bottom right-actions">
-                        <paper-tooltip for="editMachineTags" position="top">Machine's Tags</paper-tooltip>
-                        <paper-icon-button id="editMachineTags" icon="icons:label" on-tap="_editMachineTags"></paper-icon-button>
-                        <template is="dom-if" if="[[machine.can_rename]]">
-                            <paper-tooltip for="editMachine" position="top">Rename Machine</paper-tooltip>
-                            <paper-icon-button id="editMachine" icon="icons:create" on-tap="_editMachine"></paper-icon-button>
-                        </template>
-                        <template is="dom-if" if="[[machine.can_destroy]]">
-                            <paper-tooltip for="deleteMachine" position="top">Delete Machine</paper-tooltip>
-                            <paper-icon-button id="deleteMachine" icon="icons:delete" on-tap="_deleteMachine"></paper-icon-button>
-                        </template>
-                    </span>
-                    <div class="subhead bottom">
-                        <div class="label">
-                            <span class$="[[machine.state]]" title="machine state">[[machine.state]]</span>
-                        </div>
-                        <div class="fab-top-right">
-                            <paper-fab icon="av:play-arrow" on-tap="_toggleQuickActions" id="runTemplateFab"></paper-fab>
-                        </div>
+       
+        <div id="content">
+            <div class="page">
+                <div class="flex-horizontal-with-ratios">
+                    <div class="page-block">
+                        <h3 class="smallcaps">Cloud</h3>
+                        <p>[[machine.cloud.title]] [[machineImage]]</p>
                     </div>
-                </paper-toolbar>
-                <div class="content">
-                    <div class="page">
-                        <div class="flex-horizontal-with-ratios">
-                            <div class="page-block">
-                                <h3 class="smallcaps">Cloud</h3>
-                                <p>[[machine.cloud.title]] [[machineImage]]</p>
-                            </div>
-                            <div class="page-block">
-                                <h3 class="smallcaps">Created</h3>
-                                <p>[[machine.extra.created]] by <a href="/members/[[template.user]]" class="regular blue-link">mario olivarez</a></p>
-                            </div>
-                        </div>
-                        <paper-material class="info-card">
-                            <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">Basic Info</h2>
-                            <div class="card-content">
-                                <table class="info-table">
-                                    <template is="dom-if" if="[[machine.public_ips]]">
-                                        <tr>
-                                            <td>
-                                                Public IPs
-                                            </td>
-                                            <td>
-                                                <template is="dom-repeat" items="[[machine.public_ips]]">
-                                                    <p class="machine-ip">[[item]]</p>
-                                                </template>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </table>
-                            </div>
-                        </paper-material>
+                    <div class="page-block">
+                        <h3 class="smallcaps">Created</h3>
+                        <p>[[machine.extra.created]] by <a href="/members/[[template.user]]" class="regular blue-link">mario olivarez</a></p>
                     </div>
                 </div>
-                <div class="absolute-bottom-right">
-                    <app-fab></app-fab>
-                </div>
-            </paper-header-panel>
-        </paper-drawer-panel>
+                <paper-material class="info-card">
+                    <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">Basic Info</h2>
+                    <div class="card-content">
+                        <table class="info-table">
+                            <template is="dom-if" if="[[machine.public_ips]]">
+                                <tr>
+                                    <td>
+                                        Public IPs
+                                    </td>
+                                    <td>
+                                        <template is="dom-repeat" items="[[machine.public_ips]]">
+                                            <p class="machine-ip">[[item]]</p>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </table>
+                    </div>
+                </paper-material>
+            </div>
+        </div>
+        <div class="absolute-bottom-right">
+            <app-fab></app-fab>
+        </div>
         <dialog-element></dialog-element>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
