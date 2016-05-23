@@ -523,7 +523,7 @@ def delete_key(request):
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
-    key_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    key_tags = mist.core.methods.get_key_tags(auth_context.owner, key_id)
     if not auth_context.has_perm('key', 'remove', key.id, key_tags):
         raise PolicyUnauthorizedError("To remove key")
     methods.delete_key(auth_context.owner, key_id)
@@ -565,7 +565,7 @@ def delete_keys(request):
         except me.DoesNotExist:
             report[key_id] = 'not_found'
         else:
-            key_tags = mist.core.methods.get_keypair_tags(
+            key_tags = mist.core.methods.get_key_tags(
                 auth_context.owner,
                 key_id)
             if not auth_context.has_perm('key',
@@ -616,7 +616,7 @@ def edit_key(request):
         key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key with that id does not exist')
-    key_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    key_tags = mist.core.methods.get_key_tags(auth_context.owner, key_id)
     if not auth_context.has_perm('key', 'edit', key.id, key_tags):
         raise PolicyUnauthorizedError("To edit key")
     methods.edit_key(auth_context.owner, new_name, key_id)
@@ -645,7 +645,7 @@ def set_default_key(request):
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
-    key_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    key_tags = mist.core.methods.get_key_tags(auth_context.owner, key_id)
     if not auth_context.has_perm('key', 'edit', key.id, key_tags):
         raise PolicyUnauthorizedError("To edit key")
 
@@ -787,7 +787,7 @@ def associate_key(request):
     if not auth_context.has_perm("cloud", "read", cloud_id, cloud_tags):
         raise UnauthorizedError()
     key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
-    key_tags = mist.core.methods.get_keypair_tags(auth_context.owner, key_id)
+    key_tags = mist.core.methods.get_key_tags(auth_context.owner, key_id)
     if not auth_context.has_perm('key', 'read_private', key.id, key_tags):
         raise UnauthorizedError()
     machine_tags = mist.core.methods.get_machine_tags(auth_context.owner,
