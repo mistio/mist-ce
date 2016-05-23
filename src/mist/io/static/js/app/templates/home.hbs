@@ -17,20 +17,39 @@
         {{#if Mist.cloudsController.loading}}
             <!-- Loader !-->
         {{else}}
-            {{#if Mist.cloudsController.model}}
-                {{view "cloudAdd"}}
-            {{else}}
-            <div id="no-collection" class="ui-responsive">
-                <div id="no-collection-inner" class="ui-shadow">
-                    <span class="icon-cloud-check"></span>
-                    <h1>Welcome to mist.io</h1>
-                    <h2>Get started by adding your clouds.</h2>
+            {{#if view.hasOrg}}
+                {{#if Mist.cloudsController.model}}
                     {{view "cloudAdd"}}
-                    <p>
-                        Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM & bare metal hosts.
-                    </p>
+                {{else}}
+                    <!-- Add Cloud for first time -->
+                    <div id="no-collection" class="ui-responsive">
+                        <div id="no-collection-inner" class="ui-shadow">
+                            <span class="icon-cloud-check"></span>
+                            <h1>Welcome to mist.io</h1>
+                            <h2>Get started by adding your clouds.</h2>
+                            {{view "cloudAdd"}}
+                            <p>
+                                Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM &amp; bare metal hosts.
+                            </p>
+                        </div>
+                    </div>
+                {{/if}}
+            {{else}}
+                <!-- Add Organization for first time -->
+                <div id="no-collection" class="ui-responsive">
+                    <div id="no-collection-inner" class="ui-shadow">
+                        <span class="icon-cloud-check"></span>
+                        <h1>Welcome to mist.io</h1>
+                        <h2>GET STARTED BY ADDING AN ORGANISATION NAME.</h2>
+                        <form id="new-org">
+                            {{input value=Mist.imageSearchController.searchTerm placeholder="Organisation name" id="new-org-name"}}
+                            <button type="submit" class="ui-btn ui-btn-d ui-shadow ui-caps">Add</button>
+                        </form>
+                        <p>
+                            Organisations help you invite more people within context.<br>You can always add more organisations later.
+                        </p>
+                    </div>
                 </div>
-            </div>
             {{/if}}
         {{/if}}
 

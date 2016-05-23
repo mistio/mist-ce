@@ -1554,6 +1554,40 @@ ul.checkbox-list .ui-grid-b {
     margin: 30px auto !important;
 }
 
+#no-collection-inner #new-org .ui-input-text {
+    display: inline-block;
+    width: 250px;
+    margin: 20px 0;
+    vertical-align: middle;
+}
+
+#no-collection-inner #new-org .ui-input-text input {
+    padding-top: 11.2px;
+    padding-bottom: 11.2px;
+    line-height: 19.975px;
+}
+
+#no-collection-inner #new-org .ui-btn {
+    display: inline-block;
+    width: auto;
+    margin: 20px 0;
+    vertical-align: middle;
+}
+
+@media only screen and  (max-width: 500px) {
+    #no-collection-inner #new-org .ui-input-text {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    #no-collection-inner #new-org .ui-btn {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+    }
+}
+
 /* Dialog
 ------------------------------------------------------------------------------*/
 #dialog-popup .command-container {
