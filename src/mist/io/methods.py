@@ -1484,17 +1484,21 @@ def list_machines(user, cloud_id):
         log.error("Error while running list_nodes: %r", exc)
         raise CloudUnavailableError(exc=exc)
     machines_from_db = sorted(Machine.objects(cloud=cloud),
-                              key=lambda ma: ma.machine_id, reverse=True)
+                              key=lambda ma: ma.machine_id)
     ret = []
+    machine_entry_ptr = 0
     for m in machines_from_provider:
 
-        while len(machines_from_db) > 0 and m.id > machines_from_db[-1].machine_id:
-                machines_from_db.pop()
+        while machine_entry_ptr < len(machines_from_db) and \
+                        m.id > machines_from_db[machine_entry_ptr].machine_id:
+            machine_entry_ptr += 1
 
-        if m.id == machines_from_db[-1].machine_id:
-            machine_entry = machines_from_db.pop()
+        if machine_entry_ptr < len(machines_from_db) and \
+                        m.id == machines_from_db[machine_entry_ptr].machine_id:
+            machine_entry = machines_from_db[machine_entry_ptr]
         else:
             machine_entry = None
+            machine_entry_ptr += 1
 
         if m.driver.type == 'gce':
             # tags and metadata exist in GCE
