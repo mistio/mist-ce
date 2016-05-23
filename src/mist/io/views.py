@@ -713,8 +713,7 @@ def get_public_key(request):
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
-    key_tags = mist.core.methods.get_keypair_tags(auth_context.owner,
-                                                      key_id)
+    key_tags = mist.core.methods.get_key_tags(auth_context.owner, key_id)
     if not auth_context.has_perm('key', 'read', key.id, key_tags):
         raise PolicyUnauthorizedError("To read key")
     return key.public
