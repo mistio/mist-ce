@@ -23,6 +23,7 @@
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../../bower_components/sc-timeago/sc-timeago.html">
 <link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 
 <link rel="import" href="../app-bar/app-bar.html">
 <link rel="import" href="../app-socket/app-socket.html">
@@ -54,12 +55,16 @@
         overflow: hidden;
         transition: margin-left 350ms ease-in-out;
       }
+      iron-pages[smallscreen],
       iron-pages.center {
         margin-left: 0;
       }
+      iron-pages[smallscreen] ::content #content {
+        padding: 0;
+      }
     </style>
         <app-socket model="{{model}}"></app-socket>
-
+        <iron-media-query query="(max-width: 860px)" query-matches="{{smallscreen}}"></iron-media-query>
         <iron-routes for="app-main" selected="[[section]]">
             <!-- dashboard -->
             <iron-route path="/" title="dashboard" current="dashboard"></iron-route>
@@ -109,10 +114,10 @@
         </iron-routes>
         
       <paper-header-panel mode="standard" class="fit">
-        <app-sidebar id="sidebar" model="{{model}}" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer></app-sidebar>
+        <app-sidebar id="sidebar" model="{{model}}" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
         <app-header model="{{model}}" title="{{title}}" class="paper-header" style$="[[style]]"></app-header>
 
-        <iron-pages id="app-main" main>
+        <iron-pages id="app-main" main smallscreen$={{smallscreen}}>
             <!-- dashboard -->
             <page-dashboard model="{{model}}" sections="[[sections]]" section="[[sections.dashboard]]"><title>Dashboard</title></page-dashboard>
             <cloud-add model="{{model}}" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
@@ -316,7 +321,6 @@ var app = Polymer({
             this.notifyPath(sec[i].count, c);
         }
     },
-
     updateCurrent: function(e) {
         // console.log(e.detail.item.attributes);
         var el = e.detail.item;

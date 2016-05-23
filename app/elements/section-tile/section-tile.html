@@ -14,30 +14,11 @@
             opacity: 1;
         }
         
-        .content {
-            display: block;
-            position: relative;
-            width: 100%;
-            background: #fafafa;
-            border-radius: 2px;
-            box-sizing: border-box;
-            overflow: hidden;
-            cursor: pointer;
-            transition: box-shadow 200ms;
-            transition-timing-function: var(--material-curve);
-            color: #606060;
-            border: none;
-            padding: 16px;
-        }
-        
-        :host(:hover) #content {
-            box-shadow: 0 5px 10px rgba(0, 0, 0, .15);
-        }
-        
         h2 {
-            font-weight: 400;
+            font-weight: 300;
             font-size: 54px;
-            margin: 16px 0 5px 0;
+            padding: 36px 0;
+            margin: 0;
             transform: translate(-50px, 0);
             opacity: 0;
             transition: all 500ms 320ms;
@@ -57,67 +38,42 @@
             transition: all 600ms 320ms;
             transition-timing-function: var(--material-curve-320);
             text-transform: uppercase;
-            text-align: center;
-            margin: 5px 0 0 0;
+            margin-left: 48px;
+            display: inline;
+
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 36px;
         }
         
         :host(.active) h3 {
             transform: translate(0, 0);
             opacity: 1;
         }
-        
-        .title iron-icon {
+        iron-icon {
             width: 24px;
             height: 24px;
-            color: inherit;
-            opacity: .8;
-            vertical-align: text-top;
-            margin-left: 6px;
-        }
-        
-        :host(.active) .symbol {
-            transform: translate(0, 0);
-            opacity: 0.8;
-        }
-        
-        .title {
-            display: block;
-            font-size: 20px;
-            font-weight: 500;
-            line-height: 28px;
-        }
-        
-        .tagline {
-            transition: all 700ms 320ms;
-            transition-timing-function: var(--material-curve-320);
-            transform: translate(-50px, 0);
-            opacity: 0;
-            font-size: 13px;
-            margin: 10px 0 0 0;
-            line-height: 20px;
-            height: 40px;
-        }
-        
-        :host(.active) .tagline {
-            transform: translate(0, 0);
             opacity: 1;
+            vertical-align: text-top;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #424242;
+            color: #fff;
+            padding: 4px;
+            margin-right: 8px;
+
         }
 
         :host(.active) theme-color {
-            border-left: 4px solid;
+/*            border-left: 4px solid;*/
         }        
-        
-        @media (max-width: 439px) {
-            .sections {
-                @apply(--layout-vertical);
-            }
-        }
         </style>
         <paper-material>
-            <theme-color color="[[statecolor]]" class="vertical content layout" themed-reverse>
-                <h2 class="count">[[count]]</h2>
-                <h3 class="title">[[name]] <iron-icon icon="[[icon]]"></iron-icon></h3>
-            </theme-color>
+            <iron-icon icon="[[icon]]"></iron-icon><h3 class="title">[[name]]</h3>
+            <h2 class="count">[[count]]</h2>
+            <!-- <theme-color color="[[statecolor]]" class="vertical layout" themed-reverse>
+            </theme-color> -->
         </paper-material>
     </template>
 </dom-module>

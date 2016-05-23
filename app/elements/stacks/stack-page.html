@@ -254,7 +254,7 @@
         .grid-row .center {
             text-align: center;
         }
-
+        /*
         #quickActions {
             width: 100%;
             background-color: var(--mist-blue);
@@ -280,7 +280,7 @@
 
         #quickActions iron-icon {
             color: #fff;
-        }
+        }*/
 
         #quickActions.hidden {
             width: 0;
@@ -329,18 +329,18 @@
             background-color: var(--red-color);
         }
 
-        </style>
-        <paper-item id="quickActions" class="hidden">
-            <div class="flex-horizontal-with-ratios">
-                <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                        <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation">[[workflow.name]]</paper-button>
-                </template>
-                <paper-button>
-                    <iron-icon icon="icons:clear" on-tap="_toggleQuickActions"></iron-icon>
-                </paper-button>
-            </div>
-        </paper-item>
-        <div class="content">
+        </style>        
+        <div id="content">
+            <paper-item id="quickActions" class="hidden">
+                <div class="flex-horizontal-with-ratios">
+                    <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                            <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation">[[workflow.name]]</paper-button>
+                    </template>
+                    <paper-button>
+                        <iron-icon icon="icons:clear" on-tap="_toggleQuickActions"></iron-icon>
+                    </paper-button>
+                </div>
+            </paper-item>
             <div id="resources" class="page">
                 <template is="dom-if" if="[[runtimeProperties]]">
                     <div class="flex-horizontal-with-ratios section">
@@ -403,13 +403,13 @@
             </div>
             <div id="workflows">
                 <template is="dom-if" if="[[workflows.length]]">
-                    <paper-drawer-panel id="workflows-panel" responsiveWidth="900px">
-                        <paper-header-panel drawer id="workflowsNavigation">
+                    <div id="workflows-panel" responsiveWidth="900px">
+                        <div drawer id="workflowsNavigation">
                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
                                 <paper-item id$="[[workflow.name]]" on-tap="_workflowNavigation">[[workflow.name]]</paper-item>
                             </template>
-                        </paper-header-panel>
-                        <paper-header-panel main>
+                        </div>
+                        <div main>
                             <div id="workflowsView" class="pad">
                                 <template is="dom-repeat" items="[[workflows]]" as="workflow">
                                     <div id$="[[workflow.name]]show" class="m12 wf-item">
@@ -432,8 +432,8 @@
                                     </div>
                                 </template>
                             </div>
-                        </paper-header-panel>
-                    </paper-drawer-panel>
+                        </div>
+                    </div>
                 </template>
                 <template is="dom-if" if="[[!workflows.length]]">
                     <div class="no-data-message">
