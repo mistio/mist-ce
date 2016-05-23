@@ -5,7 +5,7 @@
         :host {
             display: block;
             transition: var(--material-curve-320);
-            transform: translate(0, 60px);
+            transform: translate(60px, 0);
             opacity: 0;
         }
         
@@ -13,7 +13,7 @@
             transform: translate(0, 0);
             opacity: 1;
         }
-        
+
         h2 {
             font-weight: 300;
             font-size: 54px;
@@ -39,9 +39,8 @@
             transition: all 600ms 320ms;
             transition-timing-function: var(--material-curve-320);
             text-transform: uppercase;
-            margin-left: 48px;
+            margin-left: 40px;
             display: inline;
-
             font-size: 16px;
             font-weight: 400;
             line-height: 36px;
@@ -66,9 +65,17 @@
 
         }
 
-        :host(.active) theme-color {
-/*            border-left: 4px solid;*/
-        }        
+        :host[incidents] paper-material {
+            background-color: var(--red-color);
+        }
+        :host[incidents] iron-icon {            
+            background-color: var(--red-color);
+            color: #fff;
+        }
+        :host[incidents] h2, 
+        :host[incidents] h3 {
+            color: #fff;
+        }
         </style>
         <paper-material>
             <iron-icon icon="[[icon]]"></iron-icon><h3 class="title">[[name]]</h3>

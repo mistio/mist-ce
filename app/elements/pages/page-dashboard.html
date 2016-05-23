@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
 <link rel="import" href="../section-tile/section-tile.html">
-<!--link rel="import" href="../app-incidents/app-incidents.html"-->
+<link rel="import" href="../app-incidents/app-incidents.html">
 <link rel="import" href="../app-forms/app-forms.html">
 <link rel="import" href="../app-fab/app-fab.html">
 <link rel="import" href="../logs/log-list.html">
@@ -62,11 +62,17 @@
 
         .sections {
             align-items: flex-start;
+            flex-basis: 25%;
             margin-bottom: 1em;
         }
-
+        .incidents {
+           margin-bottom: 1em;
+           display: block;
+           width: 100%;
+        }
         a.main-section {
-            min-width: 150px;            
+            min-width: 150px;
+            flex-basis: 25%;
         }
         .columns {
             @apply(--layout-horizontal);
@@ -141,12 +147,14 @@
             <!-- <template is="dom-if" if="[[onbstate]]">
                 <onb-element class="onb-area flex2child top right" onbstate="[[onbstate]]" model="[[model]]"></onb-element>
             </template> -->
-            <!--template is="dom-if" if="[[model.monitoring]]">
-                <app-incidents hidden$="[[onbstate]]" id="right" class="flex2child incidents top right" model="[[model]]">
-                </app-incidents>
-            </template-->
             <div class="columns">
                 <div id="leftcolumn" class="left">
+                    <!-- <template is="dom-if" if="[[model.monitoring]]"> -->
+                    <div class="incidents">
+                        <app-incidents model="[[model]]" sections="[[sections]]">
+                        </app-incidents>
+                    </div>
+                    <!-- </template> -->
                     <div class="sections layout horizontal wrap">
                         <a href="/machines" class="main-section flex" is="pushstate-anchor">
                             <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
@@ -199,7 +207,7 @@ Polymer({
     enableCustomStyleProperties: true,
     properties: {
         sections: {
-            type: Array
+            type: Object
         },
         model: {
             type: Object,
