@@ -23,18 +23,29 @@ define('app/controllers/organization_add', ['ember'],
 
 
             add: function() {
-                var that = this;
-                Mist.organizationsController.addOrganization({
-                    organization: that.get('newOrganization'),
-                    callback: function(success) {
-                        if (success) {
-                            that.close();
-                            Ember.run.next(function() {
-                                $('body').enhanceWithin();
-                            })
+                if (this.get('formReady')) {
+                    var that = this;
+                    Mist.organizationsController.addOrganization({
+                        organization: that.get('newOrganization'),
+                        callback: function(success) {
+                            if (success) {
+                                that.close();
+                                Ember.run.next(function() {
+                                    $('body').enhanceWithin();
+                                })
+                            }
                         }
-                    }
-                })
+                    })
+                }
+            },
+
+            addFirst: function() {
+                if (this.get('formReady')) {
+                    var that = this;
+                    Mist.organizationsController.addFirstOrganization({
+                        organization: that.get('newOrganization')
+                    });
+                }
             },
 
             close: function() {
@@ -60,6 +71,15 @@ define('app/controllers/organization_add', ['ember'],
             formObserver: function() {
                 Ember.run.once(this, '_updateFormReady');
             }.observes('newOrganization.name'),
+
+            teamsObserver: function() {
+                Ember.run.once(this, function() {
+                    // Organization is not set yet
+                    if (! Object.keys(Mist.organization).length) {
+                        this.set('newOrganization.name', FIRST_NAME.trim().toLowerCase() + '-' + LAST_NAME.trim().toLowerCase());
+                    }
+                });
+            }.observes('Mist.teamsController.model'),
         });
     }
 );

@@ -1554,20 +1554,20 @@ ul.checkbox-list .ui-grid-b {
     margin: 30px auto !important;
 }
 
-#no-collection-inner #new-org .ui-input-text {
+#no-collection-inner #first-org-form .ui-input-text {
     display: inline-block;
     width: 250px;
     margin: 20px 0;
     vertical-align: middle;
 }
 
-#no-collection-inner #new-org .ui-input-text input {
+#no-collection-inner #first-org-form .ui-input-text input {
     padding-top: 11.2px;
     padding-bottom: 11.2px;
     line-height: 19.975px;
 }
 
-#no-collection-inner #new-org .ui-btn {
+#no-collection-inner #first-org-form .ui-btn {
     display: inline-block;
     width: auto;
     margin: 20px 0;
@@ -1575,13 +1575,8 @@ ul.checkbox-list .ui-grid-b {
 }
 
 @media only screen and  (max-width: 500px) {
-    #no-collection-inner #new-org .ui-input-text {
-        display: block;
-        width: 100%;
-        margin: 10px 0;
-    }
-
-    #no-collection-inner #new-org .ui-btn {
+    #no-collection-inner #first-org-form .ui-input-text,
+    #no-collection-inner #first-org-form .ui-btn {
         display: block;
         width: 100%;
         margin: 10px 0;

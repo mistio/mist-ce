@@ -55,6 +55,24 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                     });
             },
 
+            addFirstOrganization: function(args) {
+                var that = this;
+                that.set('addingOrganization', true);
+                Mist.ajax
+                    .POST('/org', {
+                        'name': args.organization.name
+                    })
+                    .success(function(organization) {
+                        that._addFirstOrganization(organization);
+                    })
+                    .error(function(message) {
+                        Mist.notificationController.notify(message);
+                    })
+                    .complete(function(success) {
+                        that.set('addingOrganization', false);
+                    });
+            },
+
             _addOrganization: function(organization) {
                 Mist.orgs.pushObject({
                     id: organization.id,
@@ -75,6 +93,10 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                         }
                     });
                 }, 100);
+            },
+
+            _addFirstOrganization: function(organization) {
+                window.location.href = '/switch_context/' + organization.id;
             },
 
             _updateModel: function(organization) {

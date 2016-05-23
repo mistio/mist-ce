@@ -77,6 +77,10 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                     else
                         Mist.__container__.lookup('router:main').transitionTo('machine',
                             incident.get('machine'));
+                },
+
+                addFirstOrg: function() {
+                    Mist.organizationAddController.addFirst();
                 }
             },
 

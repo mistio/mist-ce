@@ -25,8 +25,8 @@
                     <div id="no-collection" class="ui-responsive">
                         <div id="no-collection-inner" class="ui-shadow">
                             <span class="icon-cloud-check"></span>
-                            <h1>Welcome to mist.io</h1>
-                            <h2>Get started by adding your clouds.</h2>
+                            <h1>GREAT! YOU ARE READY TO GO</h1>
+                            <h2>Add your clouds.</h2>
                             {{view "cloudAdd"}}
                             <p>
                                 Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM &amp; bare metal hosts.
@@ -41,9 +41,9 @@
                         <span class="icon-cloud-check"></span>
                         <h1>Welcome to mist.io</h1>
                         <h2>GET STARTED BY ADDING AN ORGANISATION NAME.</h2>
-                        <form id="new-org">
-                            {{input value=Mist.imageSearchController.searchTerm placeholder="Organisation name" id="new-org-name"}}
-                            <button type="submit" class="ui-btn ui-btn-d ui-shadow ui-caps">Add</button>
+                        <form id="first-org-form" {{action "addFirstOrg" on="submit" target=view}}>
+                            {{input value=Mist.organizationAddController.newOrganization.name placeholder="Organisation name"}}
+                            <button type="submit" class="ui-btn ui-btn-d ui-shadow ui-caps {{if Mist.organizationAddController.formReady '' 'ui-state-disabled'}}">Add</button>
                         </form>
                         <p>
                             Organisations help you invite more people within context.<br>You can always add more organisations later.
