@@ -58,7 +58,9 @@
                     this.querySelector('paper-dialog').close();
                 },
                 _modalClosed: function(e) {
-
+                    if (e.srcElement.id == 'tagsModal') {
+                        console.log(e);
+                    }
                 },
                 _computeTags: function(tags) {
                     if (!tags.base.length) {
@@ -84,17 +86,20 @@
                 _saveTags: function() {
                     var tags = this.tags.filter(function(tag) {
                         return tag.key && tag.value;
-                    }), payloadTags = {};
+                    }), payloadTags = {}, payload = {};
 
                     if (tags.length) {
                         tags.forEach(function(tag) {
                             payloadTags[tag.key] = tag.value;
                         });
 
-                        this.$.tagsAjaxRequest.body = {
-                            tags: payloadTags,
-                            resource: this.get('resource')
+                        payload = {
+                            tags: payloadTags
                         };
+
+                        payload[this.get('resource')] = ['machine', 'image', 'network'].indexOf(this.get('resource') >-1) ? [this.get('item.cloud.id'), this.get('item.id')] : [this.get('item.id')];
+
+                        this.$.tagsAjaxRequest.body = payload;
                         this.$.tagsAjaxRequest.url = '/api/v1/tag';
                         this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
                         this.$.tagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
