@@ -107,7 +107,7 @@
                     <template is="dom-if" if="[[btncontent.length]]">
                         [[btncontent]]
                     </template>
-                    <template is="dom-if" if="[[!btncontent.length]]">
+                    <template is="dom-if" if="[[!btncontent]]">
                         Add
                     </template>
                 </paper-button>
@@ -154,7 +154,8 @@
                     computed: '_getHeaderStyle(section)'
                 },
                 btncontent: {
-                    type: String
+                    type: String,
+                    value: false
                 },
                 form: {
                     type: Object,
@@ -218,7 +219,7 @@
                 }
                 if (!(field.showIf && !field.show)) {
                     if (field.type == "dropdown" && field.query) {
-                        
+
                         for (var prop in field.query){
                             var p = field.query[prop];
 
@@ -314,22 +315,20 @@
                 })
             },
             _submitForm: function() {
+                var payload;
 
                 if (this.workflow) {
-                    var body = {inputs: this.form};
-                    body["workflow"] = this.workflow;
-                }
-                else {
-                    var payload = this.form;
-                    this.$.formAjax.body = payload;
+                    payload = {inputs: this.form,
+                               workflow: this.workflow};
+                } else {
+                    payload = this.form;
                 }
 
                 this.$.formAjax.headers["Content-Type"] = 'application/json';
                 this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
-                this.$.formAjax.body = body;
+                this.$.formAjax.body = payload;
                 this.$.formAjax.generateRequest();
 
-                 console.log( 'payload: ',payload, 'formAjax: ', formAjax, "body ", body );
                 //test progress bar
                 this.hideprogress = false;
 

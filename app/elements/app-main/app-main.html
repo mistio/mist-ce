@@ -205,7 +205,6 @@ var app = Polymer({
     ],
     listeners: {
         'iron-activate': 'updateDocTitle',
-        'iron-activate': 'updateCount',
         'iron-activate': 'updateCurrent',
         'iron-navigate': 'scrollToTop',
         'toggle-sidebar': 'toggleSidebar',
@@ -223,10 +222,97 @@ var app = Polymer({
             imagesArray: [],
             keysArray: [],
             networksArray: [],
-            templatesArray: [],                
+            scriptsArray: [],
             stacksArray:[],
-            teamsArray: [],
-            membersArray: [],
+            templatesArray: [],
+            teamsArray: [{
+                name: "python dev",
+                description: "python developers team",
+                id: "123",
+                created_at: 1455132184879,
+                members: [],
+                organisation: "mist.io",
+                policy: ''
+            },{
+                name: "qa",
+                description: "testing and qa team",
+                id: "321",
+                created_at: 1455132184879,
+                members: [{
+                  name: "Debbie D. Doe",
+                  email: "debbie@x.com",
+                  id: "654"
+                },{
+                  name: "John P. Pan",
+                  email: "john@x.com",
+                  id: "987"
+                }],
+                organisation: "mist.io",
+                policy: ''
+            },{
+                name: "front dev",
+                description: "front end developers",
+                id: "213",
+                created_at: 1455132184879,
+                members: [{
+                  name: "Xris Papakon",
+                  email: "xris@x.com",
+                  id: "456"
+                },{
+                  name: "Rik Rekveld",
+                  email: "rik@x.com",
+                  id: "789"
+                },{
+                  name: "John P. Pan",
+                  email: "john@x.com",
+                  id: "987"
+                }],
+                organisation: "mist.io",
+                policy: ''
+            }],
+            membersArray: [
+                {
+                  name: "Xris Papakon",
+                  email: "xris@x.com",
+                  id: "456",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "front dev",
+                    id: "213",
+                  }]
+                },{
+                  name: "Rik Rekveld",
+                  email: "rik@x.com",
+                  id: "789",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "front dev",
+                    id: "213",
+                  }]
+                },{
+                  name: "John P. Pan",
+                  email: "john@x.com",
+                  id: "987",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "front dev",
+                    id: "213",
+                  },{
+                    name: "qa",
+                    id: "321",
+                  }]
+                },
+                {
+                  name: "Debbie D. Doe",
+                  email: "debbie@x.com",
+                  id: "654",
+                  signed_in: 1455132184879,
+                  teams: [{
+                    name: "qa",
+                    id: "321",
+                  }]
+                }
+            ],
             pending: {
                 clouds: true,
                 monitoring: true
@@ -309,18 +395,6 @@ var app = Polymer({
     attributeChanged: function(attrName, oldVal, newVal) {
         console.warn('attrChanged', attrName, oldVal, newVal);
     },
-
-    updateCount: function() {
-        var sec = this.sectionsArray;
-        var mod = this.model;
-        for (var i = 0; i < sec.length; i++) {
-            var c = mod[sec[i].id + 'Array'].length;
-            this.set('sectionsArray.' + i + '.count', c);
-
-            // Notification required for binding to update!
-            this.notifyPath(sec[i].count, c);
-        }
-    },
     updateCurrent: function(e) {
         // console.log(e.detail.item.attributes);
         var el = e.detail.item;
@@ -332,7 +406,6 @@ var app = Polymer({
       if (current)
         return "background-color: "+ this.sections[current].color;
     },
-
     updateTitle: function(_, detail) {
         if (detail.title && detail.title.length) {
             document.title = detail.title + " - mist.io";
