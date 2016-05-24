@@ -40,41 +40,16 @@
                 is: 'tags-list',
 
                 properties: {
-                    type: String,
-                    resource: Object,
+                    resource: String,
+                    item: Object,
                     tags: {
                         type: Array,
-                        computed: '_computeTags(resource.tags.*)'
-                    },
-                    url: {
-                        type: String,
-                        computed: '_computeUrl(type, resource)'
+                        computed: '_computeTags(item.tags.*)'
                     }
                 },
                 listeners: {
                     'iron-overlay-closed': '_modalClosed',
                     'tag-delete': '_tagDeleteHandler'
-                },
-                _computeUrl: function(type, resource) {
-                    switch (type) {
-                        case 'cloud':
-                            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/tags';
-                            break;
-                        case 'machine':
-                            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/tags';
-                            break;
-                        case 'network':
-                            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/tags';
-                            break;
-                        case 'key':
-                            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/tags';
-                            break;
-                        case 'script':
-                            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/tags';
-                            break;
-                        default:
-                            return '/api/v1/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/tags';
-                    }
                 },
                 _openDialog: function(e) {
                     this.querySelector('paper-dialog').open();
@@ -117,9 +92,10 @@
                         });
 
                         this.$.tagsAjaxRequest.body = {
-                            tags: payloadTags
+                            tags: payloadTags,
+                            resource: this.get('resource')
                         };
-                        this.$.tagsAjaxRequest.url = this.get('url');
+                        this.$.tagsAjaxRequest.url = '/api/v1/tag';
                         this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
                         this.$.tagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                         this.$.tagsAjaxRequest.generateRequest();
