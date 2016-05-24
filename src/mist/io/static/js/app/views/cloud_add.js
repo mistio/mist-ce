@@ -173,16 +173,18 @@ define('app/views/cloud_add', ['app/views/controlled'],
 
                 selectKey: function (key, field) {
                     $('#' + field.name).collapsible('collapse');
-                    field.set('value', key.id || key);
+                    field.set('value', key);
                     this.renderFields();
                 },
 
                 createKeyClicked: function (field) {
+                    var that = this;
                     Mist.keyAddController.open( function (success, key) {
                         if (success) {
                             $('#' + field.name).collapsible('collapse');
                             $('#' + field.name + ' .ui-listview').listview('refresh');
-                            field.set('value', key.id);
+                            field.set('value', key);
+                            that.renderFields();
                         }
                     });
                 },

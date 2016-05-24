@@ -36,18 +36,18 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
             //  Computed Properties
             //
 
-            sortById: Ember.computed('sortByTerm', function() {
-                return this.get('sortByTerm') == 'id';
+            sortByName: Ember.computed('sortByTerm', function() {
+                return this.get('sortByTerm') == 'name';
             }),
 
             sortByDefault: Ember.computed('sortByTerm', function() {
                 return this.get('sortByTerm') == 'default';
             }),
 
-            sortedKeys: Ember.computed('filteredKeys', 'filteredKeys.@each.id', 'filteredKeys.@each.isDefault', 'sortByTerm', function() {
+            sortedKeys: Ember.computed('filteredKeys', 'filteredKeys.@each.name', 'filteredKeys.@each.isDefault', 'sortByTerm', function() {
                 if (this.get('filteredKeys')) {
-                    if (this.get('sortById')) {
-                        return this.get('filteredKeys').sortBy('id');
+                    if (this.get('sortByName')) {
+                        return this.get('filteredKeys').sortBy('name');
                     }
 
                     if (this.get('sortByDefault')) {
@@ -89,7 +89,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                 this.set('addingKey', true);
                 Mist.ajax
                     .PUT('/api/v1/keys', {
-                        'id': args.keyId,
+                        'name': args.keyName,
                         'priv': args.keyPrivate
                     })
                     .success(function(key) {
@@ -106,15 +106,15 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
             },
 
 
-            renameKey: function(keyId, newKeyId, callback) {
+            renameKey: function(keyId, newKeyName, callback) {
                 var that = this;
                 this.set('renamingKey', true);
                 Mist.ajax
                     .PUT('/api/v1/keys/' + keyId, {
-                        'new_id': newKeyId
+                        'new_name': newKeyName
                     })
                     .success(function() {
-                        that._renameKey(keyId, newKeyId);
+                        that._renameKey(keyId, newKeyName);
                     })
                     .error(function(err) {
                         Mist.notificationController.notify(err);
@@ -259,6 +259,11 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
             },
 
 
+            getKeyByName: function(keyName) {
+                return this.model.findBy('name', keyName);
+            },
+
+
             getRequestedKey: function() {
                 if (this.keyRequest) {
                     return this.getKey(this.keyRequest);
@@ -268,6 +273,11 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
 
             keyExists: function(keyId) {
                 return !!this.getKey(keyId);
+            },
+
+
+            keyNameExists: function(keyName) {
+                return !!this.getKeyByName(keyName);
             },
 
 
@@ -335,10 +345,10 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
             },
 
 
-            _renameKey: function(keyId, newKeyId) {
+            _renameKey: function(keyId, newKeyName) {
                 Ember.run(this, function() {
                     if (this.keyExists(keyId))
-                        this.getKey(keyId).set('id', newKeyId);
+                        this.getKey(keyId).set('name', newKeyName);
                     this.trigger('onKeyRename');
                 });
             },
@@ -406,7 +416,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                         this.model.forEach(function(key) {
                             var regex = new RegExp(that.searchTerm, 'i');
 
-                            if (regex.test(key.id)) {
+                            if (regex.test(key.name)) {
                                 keys.push(key);
                             } else {
                                 if (key.selected) {
@@ -442,7 +452,7 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
 
             filteredKeysObserver: function() {
                 Ember.run.once(this, '_updateFilteredKeys');
-            }.observes('model.@each.id', 'searchTerm', 'model.[]')
+            }.observes('model.@each.name', 'searchTerm', 'model.[]')
         });
     }
 );
