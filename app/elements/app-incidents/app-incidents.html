@@ -115,7 +115,7 @@
                         </div>
                     </a>
                 </template>
-                <a class="list-item layout horizontal wrap" href="/incidents">
+                <a class="list-item layout horizontal wrap" href="/incidents" hidden$="{{!resolvedCount}}">
                     <div class="flexchild expression">
                         <iron-icon icon="icons:report-problem"></iron-icon>
                         <span class="flexchild">and {{resolvedCount}} more incidents in the last day</span>
