@@ -54,7 +54,6 @@
             <!-- machines -->
             <iron-route path="/machines" title="machines" href="../pages/page-items.html"></iron-route>
             <iron-route path="/machines/:uuid" title="machine" href="../machines/machine-page.html"></iron-route>
-            <iron-route path="/machines/:uuid/tags" title="machine" href="../machines/machine-tags.html"></iron-route>
 
             <!-- images -->
             <iron-route path="/images" title="images"  href="../pages/page-items.html"></iron-route>
@@ -102,7 +101,6 @@
             <!-- machines -->
             <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
             <machine-page params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-page>
-            <machine-tags params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-tags>
             <!-- images -->
             <page-items class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
             <image-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.images]]"></image-page>
