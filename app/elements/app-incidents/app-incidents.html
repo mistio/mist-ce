@@ -6,19 +6,17 @@
         <style is="custom-style" include="headings"></style>
         <style>
         :host {
-            display: block;
+            display: flex;
             transition: var(--material-curve-320);
             transform: translate(0, 60px);
             opacity: 0;
+            padding: 0;
+            margin: 0;            
         }
 
         :host(.active) {
             transform: translate(0, 0);
             opacity: 1;
-        }
-
-        :host paper-material {
-            min-width: 50%;
         }
 
         h3 {
@@ -34,13 +32,21 @@
             padding: 10px;
         }
 
-        .list-item.red {
-            background-color: #D96557;
-            color: #fff;
+        .list-item:last-child {
+            border-bottom: 0 none;
+            padding-top: 16px;
+        }
+
+        .list-item.red .machine {
+            color: var(--red-color);
+        }
+        .list-item .expression > iron-icon {
+            color: rgba(0,0,0,0.32);
+            margin-right: 4px;
         }
 
         .list-item.red .expression > iron-icon {
-            color: #fff;
+            color: var(--red-color);
         }
 
         .list-item.green .expression > iron-icon {
@@ -50,24 +56,25 @@
         .flexchild {
             @apply(--layout-flex);
         }
+        .flex3child {
+            @apply(--layout-flex-3);
+        }
 
         .block {
             transform: translate(0, 50px);
             opacity: 0;
-            transition: all 500ms 320ms;
+            transition: all 700ms 320ms;
             transition-timing-function: var(--material-curve-320);
+            display: flex;
+            flex-direction: column;
+            flex: 1 100%;
+            height: inherit;
         }
 
         :host(.active) .block {
             transform: translate(0, 0);
             opacity: 1;
-        }
-
-        @media (min-width: 869px) {
-            .content-area {
-                max-height: 390px;
-                overflow-y: scroll;
-            }
+            height: 100%;
         }
 
         span.rule-condition {
@@ -77,33 +84,47 @@
         span.time {
             float: right;
         }
+        a.main-section {
+            min-width: 150px;
+        }
         </style>
-        <paper-material>
-            <!-- title goes here, should change on stateChanged-->
-            <h2 class="app-title">{{title}}</h2>
-            <div class="content-area">
-                <content></content>
-                <div class="block">
-                    <template is="dom-repeat" items="[[model.incidents]]">
-                        <a class$="list-item layout horizontal wrap [[incidentColor(item)]]" href$="[[machineUri(item)]]">
-                            <div class="flexchild expression">
-                                <iron-icon icon="[[incidentIcon(item)]]"></iron-icon>
-                                <span class="machine">[[machineName(item)]]</span>: <span class="rule-condition">[[ruleCondition(item)]]</span>
-                                <span class="time">
-                                    <template is="dom-if" if="!item.finished_at">
-                                        <sc-timeago datetime="[[incidentDuration(item)]]"></sc-timeago>
-                                    </template>
-                                    [[incidentTime(item)]]
-                                </span>
-                            </div>
-                            <div>
-                                <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                            </div>
-                        </a>
-                    </template>
-                </div>
-                <!-- state MIDDLE : urge user to add rules -->
-                <!-- state ONBOARD : urge user to add machine monitoring -->
+        <div class="flexchild">
+            <a href="/incidents" class="main-section" is="pushstate-anchor">
+                <section-tile name="incidents" color="#d96557" icon="icons:error-outline" count="{{incidents.length}}" incidents></section-tile>
+            </a>
+        </div>
+        <paper-material class="flex3child">
+            <h3>Happening Now</h3>
+            <div class="block">
+                <template is="dom-repeat" items="{{incidents}}">
+                    <!-- Only red incidents sould count and show. keep it temp/ly due to lacj of data -->
+                    <!-- [[incidentColor(item)]] -->
+                    <a class="list-item red layout horizontal wrap" href$="[[machineUri(item)]]">
+                        <div class="flexchild expression">
+                            <iron-icon icon="[[sections.machines.icon]]"></iron-icon>
+                            <span class="machine flexchild">[[machineName(item)]]</span>: <span class="rule-condition">[[ruleCondition(item)]]</span>
+                        </div>
+                        <span class="time">
+                            <template is="dom-if" if="[[!item.finished_at]]">
+                                <sc-timeago datetime="[[incidentDuration(item)]]"></sc-timeago>
+                            </template>
+                            [[incidentTime(item)]]
+                        </span>
+                        <div>
+                            <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                        </div>
+                    </a>
+                </template>
+                <a class="list-item layout horizontal wrap" href="/incidents" hidden$="{{!resolvedCount}}">
+                    <div class="flexchild expression">
+                        <iron-icon icon="icons:report-problem"></iron-icon>
+                        <span class="flexchild">and {{resolvedCount}} more incidents in the last day</span>
+                    </div>
+                    <span class="time">view all</span>
+                    <div>
+                        <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                    </div>
+                </a>
             </div>
         </paper-material>
     </template>
@@ -116,10 +137,23 @@ Polymer({
             String, value: "Incidents"
         },
         model: {
-            type: Object
+            type: Object,            
+            notify: true
+        },
+        incidents: {
+            type: Array,
+            value: [],
+            notify: true
+        },
+        resolvedCount: {
+            type: Number,
+            notify: true
         },
         state: {
             String, value: "ONBOARD"
+        },
+        sections: {
+            type: Object
         },
         whatTriggeredIt: {
             String, value: "#"
@@ -128,18 +162,23 @@ Polymer({
             String, value: "red"
         } // alert > red, resolved > green
     },
-    stateChanged: function(newstate) {
-        //newstate ONBOARD > title Welcome
-        //newstate MIDDLE > title Add your rules
-        //newstate FULL > title Incidents
-        //default > title Incidents
-    },
+    observers: [
+        '_incidents(model.incidents.*)',
+        '_totalDuration(model.incidents.*)'
+    ],
     attached: function() {
         var rows = this.parentNode.querySelectorAll('block');
         var index = Array.prototype.indexOf.call(rows, this);
         setTimeout(function() {
             this.classList.add('active');
         }.bind(this), (index + 1) * 50);
+    },
+    _incidents: function (incidents){
+        var arr = incidents.base ? incidents.base : [];
+        this.incidents = arr.filter(function(inc){
+            return !inc.finished_at;
+        });
+        this.resolvedCount = incidents.base ? incidents.base.length - 1 : 0;
     },
     incidentColor: function(item){
         if (!item.finished_at)
@@ -157,7 +196,7 @@ Polymer({
         return this.model.clouds[item.cloud_id].machines[item.machine_id].name;
     },
     machineUri: function(item) {
-        console.log(this.model.clouds, item.cloud_id, this.model.incidents, this.model.monitoring);
+        // console.log(this.model.clouds, item.cloud_id, this.model.incidents, this.model.monitoring);
         return '/machines/'  + item.machine_id;
     },
     ruleCondition: function(item) {
@@ -173,6 +212,6 @@ Polymer({
         if (!item.finished_at)
             return 'for '
         return ''
-    }
+    },
 });
 </script>

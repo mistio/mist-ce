@@ -8,7 +8,6 @@
         <style include="shared-styles">
             :host {
                 display: block;
-                background: #fafafa;
             }
 
             paper-material {
@@ -70,10 +69,6 @@
 
             .paper-header .cartButton {
                 margin-right: 10px;
-            }
-
-            .content {
-                margin: 36px 36px 80px 36px;
             }
 
             paper-icon-button {
@@ -200,79 +195,62 @@
                 }
             }
         </style>
-        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
-            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
-            <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
-                <paper-toolbar class="tall" style$="[[color]]">
-                    <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
-                    <span class="title"></span>
-                    <app-user-menu email="[[model.email]]"></app-user-menu>
-                    <span class="bottom title">Key "[[key.id]]"</span>
-                    <paper-tooltip for="makedefault" position="top">Make key default</paper-tooltip>
-                    <paper-icon-button id="makedefault" hidden$="[[isDefault]]" on-tap="_makeDefaultKey" icon="star-border" class="bottom">Make Default</paper-icon-button>
-                    <paper-tooltip for="keyisdefaut" position="top">Key is default</paper-tooltip>
-                    <iron-icon id="keyisdefaut" hidden$="[[!isDefault]]" icon="star" class="bottom"></iron-icon>
-                    <paper-tooltip for="editKey" position="top">Edit Key</paper-tooltip>
-                    <paper-icon-button id="editKey" class="bottom" icon="icons:create" on-tap="_editKey"></paper-icon-button>
-                    <paper-tooltip for="deleteKey" position="top">Delete Key</paper-tooltip>
-                    <paper-icon-button id="deleteKey" class="bottom" icon="icons:delete" on-tap="_deleteKey"></paper-icon-button>
-                </paper-toolbar>
-                <div class="subhead">
-                    <div class="no-machines-list" hidden$="[[keyHasMachines]]">
-                        <h5>No machines are using this key</h5>
-                    </div>
-                    <div class="machines-list" hidden$="[[!keyHasMachines]]">
-                        <h5><span>[[keyMachines.length]]</span> machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key</h5>
-                    </div>
+        <div id="content">
+            <h2>[[key.id]]</h2>
+            <div class="subhead">
+                <div class="no-machines-list" hidden$="[[keyHasMachines]]">
+                    <h5>No machines are using this key</h5>
                 </div>
-                <div class="content">
-                    <paper-material>
-                        <div class="head">
-                            <h4 class="key">Public Key</h4>
-                            <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="right link">Copy <span class="wide">public key</span>
-                                <iron-icon icon="content-copy"></iron-icon>
-                            </paper-button>
-                        </div>
-                        <div id="keyPublicContainer">
-                            <textarea id="keyPublic">
-                                [[publicKey]]
-                            </textarea>
-                        </div>
-                    </paper-material>
-                    <paper-material>
-                        <div class="head">
-                            <h4 class="key">Private Key</h4>
-                            <paper-button hidden$="[[!visiblePrivateKey]]" id="hidePrivateKeybtn" on-tap="hidePrivateKey" class="right link">Hide <span class="wide">Private Key</span>
-                                <iron-icon icon="icons:visibility-off"></iron-icon>
-                            </paper-button>
-                            <paper-button hidden$="[[!visiblePrivateKey]]" on-tap="copyPrivateKey" class="right link">Copy <span class="wide">private key</span>
-                                <iron-icon icon="content-copy"></iron-icon>
-                            </paper-button>
-                        </div>
-                        <div id="keyPrivateContainer">
-                            <paper-button hidden$="[[visiblePrivateKey]]" id="showPrivateKeybtn" on-tap="showPrivateKey">
-                                <iron-icon icon="icons:visibility"></iron-icon> View Private Key</paper-button>
-                            <textarea hidden$="[[!visiblePrivateKey]]" id="keyPrivate">
-                                [[privateKey]]
-                            </textarea>
-                        </div>
-                    </paper-material>
-                    <br/>
-                    <paper-material class="machines-list" hidden$="[[!keyHasMachines]]">
-                        <h4 class="key">Machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s <span>([[keyMachines.length]])</span></span> associated with this key</h4>
-                        <ul>
-                            <template is="dom-repeat" items="[[key.machines]]" as="machine">
-                                <li>
-                                    <iron-icon icon='hardware:laptop'></iron-icon> <a href="[[getMachineUrl(machine)]]" class="machine">[[getMachineName(machine)]]</a>
-                                    <span class="machine-info">: id: [[machine.1]], image: [[machine.3]]</span>
-                                </li>
-                            </template>
-                        </ul>
-                    </paper-material>
+                <div class="machines-list" hidden$="[[!keyHasMachines]]">
+                    <h5><span>[[keyMachines.length]]</span> machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key</h5>
                 </div>
-            </paper-header-panel>
-        </paper-drawer-panel>
-
+            </div>
+            <div class="key-info">
+                <paper-material>
+                    <div class="head">
+                        <h4 class="key">Public Key</h4>
+                        <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="right link">Copy <span class="wide">public key</span>
+                            <iron-icon icon="content-copy"></iron-icon>
+                        </paper-button>
+                    </div>
+                    <div id="keyPublicContainer">
+                        <textarea id="keyPublic">
+                            [[publicKey]]
+                        </textarea>
+                    </div>
+                </paper-material>
+                <paper-material>
+                    <div class="head">
+                        <h4 class="key">Private Key</h4>
+                        <paper-button hidden$="[[!visiblePrivateKey]]" id="hidePrivateKeybtn" on-tap="hidePrivateKey" class="right link">Hide <span class="wide">Private Key</span>
+                            <iron-icon icon="icons:visibility-off"></iron-icon>
+                        </paper-button>
+                        <paper-button hidden$="[[!visiblePrivateKey]]" on-tap="copyPrivateKey" class="right link">Copy <span class="wide">private key</span>
+                            <iron-icon icon="content-copy"></iron-icon>
+                        </paper-button>
+                    </div>
+                    <div id="keyPrivateContainer">
+                        <paper-button hidden$="[[visiblePrivateKey]]" id="showPrivateKeybtn" on-tap="showPrivateKey">
+                            <iron-icon icon="icons:visibility"></iron-icon> View Private Key</paper-button>
+                        <textarea hidden$="[[!visiblePrivateKey]]" id="keyPrivate">
+                            [[privateKey]]
+                        </textarea>
+                    </div>
+                </paper-material>
+                <br/>
+                <paper-material class="machines-list" hidden$="[[!keyHasMachines]]">
+                    <h4 class="key">Machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s <span>([[keyMachines.length]])</span></span> associated with this key</h4>
+                    <ul>
+                        <template is="dom-repeat" items="[[key.machines]]" as="machine">
+                            <li>
+                                <iron-icon icon='hardware:laptop'></iron-icon> <a href="[[getMachineUrl(machine)]]" class="machine">[[getMachineName(machine)]]</a>
+                                <span class="machine-info">: id: [[machine.1]], image: [[machine.3]]</span>
+                            </li>
+                        </template>
+                    </ul>
+                </paper-material>
+            </div>
+        </div>
         <template is="dom-if" if="{{key.id}}">
             <iron-ajax auto id="keyPublicRequest" url="{{baseUrl}}/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
         </template>
