@@ -17,7 +17,7 @@
             <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
                 <table class="info-table">
-                    <template is="dom-repeat" items="[[editableTags]]" as="tag">
+                    <template is="dom-repeat" items="[[tags]]" as="tag">
                         <tag-item tag="[[tag]]"></tag-item>
                     </template>
                 </table>
@@ -29,7 +29,7 @@
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <iron-ajax id="tagsAjaxRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/tags" method="POST" on-response="_handleTagsAjaxResponse" on-error="_handleTagsAjaxError"></iron-ajax>
+        <iron-ajax id="tagsAjaxRequest" method="POST" on-response="_handleTagsAjaxResponse" on-error="_handleTagsAjaxError"></iron-ajax>
     </template>
 
     <script>
@@ -40,19 +40,41 @@
                 is: 'tags-list',
 
                 properties: {
+                    type: String,
+                    resource: Object,
                     tags: {
-                        type: Object
-                    },
-                    editableTags: {
                         type: Array,
-                        computed: '_computeEditableTags(tags.*)'
+                        computed: '_computeTags(resource.tags.*)'
+                    },
+                    url: {
+                        type: String,
+                        computed: '_computeUrl(type, resource)'
                     }
                 },
                 listeners: {
-                    'iron-overlay-closed': '_modalClosed'
+                    'iron-overlay-closed': '_modalClosed',
+                    'tag-delete': '_tagDeleteHandler'
                 },
-                ready: function() {
-
+                _computeUrl: function(type, resource) {
+                    switch (type) {
+                        case 'cloud':
+                            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/tags';
+                            break;
+                        case 'machine':
+                            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/tags';
+                            break;
+                        case 'network':
+                            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/tags';
+                            break;
+                        case 'key':
+                            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/tags';
+                            break;
+                        case 'script':
+                            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/tags';
+                            break;
+                        default:
+                            return '/api/v1/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/tags';
+                    }
                 },
                 _openDialog: function(e) {
                     this.querySelector('paper-dialog').open();
@@ -60,14 +82,16 @@
                 _closeDialog: function(e) {
                     this.querySelector('paper-dialog').close();
                 },
-                _computeEditableTags: function(tags) {
+                _modalClosed: function(e) {
+
+                },
+                _computeTags: function(tags) {
                     if (!tags.base.length) {
                         return [{
                             key: '',
                             value: ''
                         }];
                     }
-
                     return tags.base.slice();
                 },
                 _addTag: function() {
@@ -75,10 +99,15 @@
                         key: '',
                         value: ''
                     };
-                    this.push('editableTags', newTag);
+                    this.push('tags', newTag);
+                },
+                _tagDeleteHandler: function(e) {
+                    var tag = e.detail.tag,
+                    index = this.tags.indexOf(tag);
+                    this.splice('tags', index, 1);
                 },
                 _saveTags: function() {
-                    var tags = this.editableTags.filter(function(tag) {
+                    var tags = this.tags.filter(function(tag) {
                         return tag.key && tag.value;
                     }), payloadTags = {};
 
@@ -90,6 +119,7 @@
                         this.$.tagsAjaxRequest.body = {
                             tags: payloadTags
                         };
+                        this.$.tagsAjaxRequest.url = this.get('url');
                         this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
                         this.$.tagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                         this.$.tagsAjaxRequest.generateRequest();

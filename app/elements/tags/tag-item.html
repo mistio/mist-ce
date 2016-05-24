@@ -28,7 +28,9 @@
             }
         },
         _deleteTag: function(e) {
-            console.log(e);
+            this.fire('tag-delete', {
+                tag: this.tag
+            });
         }
     });
 </script>
