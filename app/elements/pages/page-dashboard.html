@@ -130,6 +130,30 @@
                 flex: 1 100%;
             }
         }
+        polyana-dashboard {
+            position: relative;
+        }
+        log-list ::content h3,
+        polyana-dashboard ::content h3 {
+            text-transform: uppercase;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 36px;
+            margin: 0 24px 0 0;
+        }
+        polyana-dashboard ::content timerange-picker {
+            position: absolute;
+            right: 0;
+            top: 12px;
+        }
+        polyana-dashboard ::content paper-button {
+            margin: 0;
+            min-width: 1px;
+        }
+        polyana-dashboard ::content paper-spinner {
+            display: block;
+            margin: 0 auto;
+        }
         </style>
         <div id="content" class="flex-horizontal-wide" main>
             <div class="clouds top flexchild-wide-top">
@@ -149,12 +173,12 @@
             </template> -->
             <div class="columns">
                 <div id="leftcolumn" class="left">
-                    <!-- <template is="dom-if" if="[[model.monitoring]]"> -->
-                    <div class="incidents">
-                        <app-incidents model="[[model]]" sections="[[sections]]">
-                        </app-incidents>
-                    </div>
-                    <!-- </template> -->
+                    <template is="dom-if" if="[[model.monitoring]]">
+                        <div class="incidents">
+                            <app-incidents model="[[model]]" sections="[[sections]]">
+                            </app-incidents>
+                        </div>
+                    </template>
                     <div class="sections layout horizontal wrap">
                         <a href="/machines" class="main-section flex" is="pushstate-anchor">
                             <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">

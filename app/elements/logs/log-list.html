@@ -4,13 +4,24 @@
     <template>
       <style>
           vaadin-combo-box {
-            margin: 0px auto 32px;
-            width: 96%;
-            text-align: center;
+            padding: 8px; 
+          }
+          .head {
+            padding: 0 16px 16px 24px;
+            align-items: flex-end;
+          }
+          vaadin-combo-box {
+            padding-top: 0;
+          }
+          vaadin-grid {
+            border-top: 1px solid #ddd;
           }
       </style>
       <paper-material>
-        <vaadin-combo-box label="Filter logs" items="[[logFilterSuggestions]]" allow-custom-value on-value-change="_updateFilter"></vaadin-combo-box>
+        <div class="head layout horizontal">
+          <h3 class="flex">LOGS</h3>
+          <vaadin-combo-box class="flex" label="Filter logs" items="[[logFilterSuggestions]]" allow-custom-value on-value-change="_updateFilter"></vaadin-combo-box>
+        </div>
         <vaadin-grid size="10000">
         </vaadin-grid>
       </paper-material>
