@@ -83,14 +83,14 @@
                                     data-collapsed-icon="noicon"
                                     data-expanded-icon="noicon"
                                     data-iconpos="right">
-                                    <h4>{{#if field.value}}{{field.value}}{{else}}Select SSH Key{{/if}}</h4>
+                                    <h4>{{#if field.value}}{{field.value.name}}{{else}}Select SSH Key{{/if}}</h4>
                                     <ul data-role="listview">
                                         <li data-icon="false">
                                             <a {{action "selectKey" "" field target=view}}>-- None --</a>
                                         </li>
                                         {{#each Mist.keysController.model as |key|}}
                                             <li data-icon="false">
-                                                <a {{action "selectKey" key field target=view}}>{{key.id}}</a>
+                                                <a {{action "selectKey" key field target=view}}>{{key.name}}</a>
                                             </li>
                                         {{/each}}
                                         <li data-icon="false" data-theme="d">

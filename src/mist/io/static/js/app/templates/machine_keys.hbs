@@ -43,7 +43,7 @@
     data-position-to="#machine-keys"
     data-theme="a">
     <div class="ui-header ui-caps">
-        <h1 class="ui-title">{{selectedKey.id}}</h1>
+        <h1 class="ui-title">{{selectedKey.name}}</h1>
 
         <a href="javascript:void(0)" class="close" data-rel="back">&#10005;</a>
     </div>
@@ -71,7 +71,7 @@
     <ul data-role="listview">
         {{#each Mist.machineKeysController.nonAssociatedKeys as |key|}}
         <li data-icon="false">
-            <a {{action "nonAssociatedKeyClicked" key target=view}}>{{key.id}}</a>
+            <a {{action "nonAssociatedKeyClicked" key target=view}}>{{key.name}}</a>
         </li>
         {{/each}}
         <li data-icon="false" data-theme="d">
