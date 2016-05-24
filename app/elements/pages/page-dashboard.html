@@ -149,12 +149,12 @@
             </template> -->
             <div class="columns">
                 <div id="leftcolumn" class="left">
-                    <!-- <template is="dom-if" if="[[model.monitoring]]"> -->
-                    <div class="incidents">
-                        <app-incidents model="[[model]]" sections="[[sections]]">
-                        </app-incidents>
-                    </div>
-                    <!-- </template> -->
+                    <template is="dom-if" if="[[model.monitoring]]">
+                        <div class="incidents">
+                            <app-incidents model="[[model]]" sections="[[sections]]">
+                            </app-incidents>
+                        </div>
+                    </template>
                     <div class="sections layout horizontal wrap">
                         <a href="/machines" class="main-section flex" is="pushstate-anchor">
                             <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
