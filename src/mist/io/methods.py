@@ -2943,11 +2943,16 @@ def list_sizes(user, cloud_id):
 
     try:
         if conn.type == Provider.GCE:
-            #have to get sizes for one location only, since list_sizes returns
-            #sizes for all zones (currently 88 sizes)
-            sizes = conn.list_sizes(location='us-central1-a')
-            sizes = [s for s in sizes if s.name and not s.name.endswith('-d')]
-            #deprecated sizes for GCE
+            initial_sizes = conn.list_sizes()
+            sizes = []
+            for size in initial_sizes:
+                zone = size.extra['zone']
+                size.extra['zone'] = {}
+                size.extra['zone']['id'] = zone.id
+                size.extra['zone']['name'] = zone.name
+                size.extra['zone']['status'] = zone.status
+                size.extra['zone']['country'] = zone.country
+                sizes.append(size)
         elif conn.type == Provider.NEPHOSCALE:
             sizes = conn.list_sizes(baremetal=False)
             dedicated = conn.list_sizes(baremetal=True)
