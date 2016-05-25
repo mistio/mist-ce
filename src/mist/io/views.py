@@ -600,8 +600,8 @@ def delete_keys(request):
     return report
 
 
-@view_config(route_name='api_v1_key', request_method='PUT', renderer='json')
-@view_config(route_name='key', request_method='PUT', renderer='json')
+@view_config(route_name='api_v1_key_action', request_method='PUT', renderer='json')
+@view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
     """
     Edit a key
@@ -635,8 +635,8 @@ def edit_key(request):
     return {'new_name': new_name}
 
 
-@view_config(route_name='api_v1_key', request_method='POST')
-@view_config(route_name='key', request_method='POST')
+@view_config(route_name='api_v1_key_action', request_method='POST')
+@view_config(route_name='key_action', request_method='POST')
 def set_default_key(request):
     """
     Set default key
@@ -1573,7 +1573,6 @@ def create_network(request):
 
 
 @view_config(route_name='api_v1_network', request_method='DELETE')
-@view_config(route_name='network', request_method='DELETE')
 def delete_network(request):
     """
     Delete a network
@@ -1603,7 +1602,6 @@ def delete_network(request):
 
 
 @view_config(route_name='api_v1_network', request_method='POST')
-@view_config(route_name='network', request_method='POST')
 def associate_ip(request):
     """
     Associate ip
