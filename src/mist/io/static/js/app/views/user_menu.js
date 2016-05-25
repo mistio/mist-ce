@@ -44,14 +44,6 @@ define('app/views/user_menu', ['ember', 'md5'],
 
                 return teamsText;
             }),
-            orgs: Ember.computed('Mist.orgs', function() {
-                var orgs = Mist.orgs.slice().addObject({
-                    id: '',
-                    name: 'Personal'
-                });
-
-                return orgs.sortBy('id');
-            }),
 
             //
             //  Actions
