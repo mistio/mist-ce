@@ -12,7 +12,7 @@
 
             paper-material {
                 display: block;
-                padding: 20px;
+                padding: 24px;
             }
 
             paper-menu-button paper-button {
@@ -189,6 +189,10 @@
                 display: none;
             }
 
+            .machines-list iron-icon {
+                opacity: 0.32;
+            }
+
             @media (min-width: 1339px) {
                 .wide {
                     display: inline;
@@ -196,15 +200,27 @@
             }
         </style>
         <div id="content">
-            <h2>[[key.id]]</h2>
-            <div class="subhead">
-                <div class="no-machines-list" hidden$="[[keyHasMachines]]">
-                    <h5>No machines are using this key</h5>
+            <div class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+                <a class="icon" href="/keys"><iron-icon icon="communication:vpn-key"></iron-icon></a>
+                <div class="title flex">
+                    <h2>
+                        [[key.id]] <iron-icon icon="star" hidden$="[[!isDefault]]"></iron-icon>
+                    </h2>
+                    <span class="subtitle" hidden$="[[keyHasMachines]]">
+                        No machines are using this key
+                    </span>
+                    <span class="subtitle" hidden$="[[!keyHasMachines]]">
+                        [[keyMachines.length]] machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key
+                    </span>
                 </div>
-                <div class="machines-list" hidden$="[[!keyHasMachines]]">
-                    <h5><span>[[keyMachines.length]]</span> machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key</h5>
+                <div class="item-actions">
+                    <paper-button on-tap="_makeDefaultKey" hidden$="[[isDefault]]">make default</paper-button>
+                    <paper-button on-tap="_deleteKey">delete <iron-icon icon="delete"></iron-icon></paper-button>
                 </div>
-            </div>
+            </div>            
+            <!-- <div class="subhead">
+                
+            </div> -->
             <div class="key-info">
                 <paper-material>
                     <div class="head">
@@ -244,7 +260,10 @@
                         <template is="dom-repeat" items="[[key.machines]]" as="machine">
                             <li>
                                 <iron-icon icon='hardware:laptop'></iron-icon> <a href="[[getMachineUrl(machine)]]" class="machine">[[getMachineName(machine)]]</a>
-                                <span class="machine-info">: id: [[machine.1]], image: [[machine.3]]</span>
+                                <span class="machine-info">
+                                    <span hidden="[[!machine.1]]">: id: [[machine.1]], </span>
+                                    <span hidden="[[!machine.3]]">image: [[machine.3]]</span>
+                                </span>
                             </li>
                         </template>
                     </ul>
@@ -374,7 +393,7 @@
                     var machine = this.model.machinesArray.find(function(machine) {
                         return machine.id == keymachine[1];
                     });
-                    url = "/machines/" + machine.uuid;
+                    url = machine ? "/machines/" + machine.uuid : ''; 
                     return url;
                 },
                 getMachineName: function(keymachine) {
@@ -382,7 +401,7 @@
                     var machine = this.model.machinesArray.find(function(machine) {
                         return machine.id == keymachine[1];
                     });
-                    name = machine.name;
+                    name = machine ? machine.name : 'missing';
                     return name;
                 },
                 _computeIsDefault: function(isDefault) {
