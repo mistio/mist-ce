@@ -227,6 +227,10 @@
             color: rgba(0,0,0,87);
         }
 
+        paper-material paper-button.simple {
+            color: inherit;
+            background-color: transparent;
+        }
         .notifications > * {
             color: #fff;
             padding: 8px;
@@ -711,7 +715,8 @@
             box-align: center;
             align-items: center;
             background-color: #424242;
-            background-image: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.46));
+            border-radius: 4px 4px 0 0;
+            /*background-image: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.46));*/
         }
         .single-head .icon iron-icon {
             border-radius: 50%;
@@ -736,7 +741,7 @@
         }
         .single-head .title h2 {
             font-size: 1.5em;
-            line-height: auto;
+            line-height: initial;
         }        
         .single-head .subtitle {
             margin-top: 4px;

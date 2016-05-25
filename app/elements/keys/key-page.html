@@ -200,27 +200,28 @@
             }
         </style>
         <div id="content">
-            <div class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+            
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
                 <a class="icon" href="/keys"><iron-icon icon="communication:vpn-key"></iron-icon></a>
                 <div class="title flex">
                     <h2>
                         [[key.id]] <iron-icon icon="star" hidden$="[[!isDefault]]"></iron-icon>
                     </h2>
-                    <span class="subtitle" hidden$="[[keyHasMachines]]">
-                        No machines are using this key
-                    </span>
-                    <span class="subtitle" hidden$="[[!keyHasMachines]]">
-                        [[keyMachines.length]] machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key
-                    </span>
+                    <div class="subtitle">
+                        <apan hidden$="[[keyHasMachines]]">
+                            No machines are using this key
+                        </apan>
+                        <span hidden$="[[!keyHasMachines]]">
+                            [[keyMachines.length]] machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key
+                        </span>
+                    </div>
                 </div>
                 <div class="item-actions">
-                    <paper-button on-tap="_makeDefaultKey" hidden$="[[isDefault]]">make default</paper-button>
-                    <paper-button on-tap="_deleteKey">delete <iron-icon icon="delete"></iron-icon></paper-button>
+                    <paper-button on-tap="_makeDefaultKey" hidden$="[[isDefault]]" class="simple">make default</paper-button>
+                    <paper-button on-tap="_deleteKey" class="simple">delete <iron-icon icon="delete"></iron-icon></paper-button>
                 </div>
-            </div>            
-            <!-- <div class="subhead">
-                
-            </div> -->
+            </paper-material>
+
             <div class="key-info">
                 <paper-material>
                     <div class="head">
