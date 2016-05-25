@@ -369,11 +369,11 @@ def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
                                           forbidden_subnets[str(cidr)]))
 
 
-def transform_key_machine_associations(machines, keypair):
+def transform_key_machine_associations(machines, key):
     key_associations = []
     for machine in machines:
         for key_assoc in machine.key_associations:
-            if key_assoc.keypair == keypair:
+            if key_assoc.keypair == key:
                 key_associations.append([machine.cloud.id,
                                         machine.machine_id,
                                         key_assoc.last_used,

@@ -22,7 +22,7 @@ define('app/controllers/key_add', ['ember'],
             callback: null,
             formReady: null,
 
-            keyId: null,
+            keyName: null,
             keyPrivate: null,
             keyPublic: null,
 
@@ -54,7 +54,7 @@ define('app/controllers/key_add', ['ember'],
             add: function () {
                 this.set('addingKey', true);
                 Mist.keysController.addKey({
-                    keyId: this.keyId,
+                    keyName: this.keyName,
                     keyPrivate: this.keyPrivate,
                     callback: this._add,
                 });
@@ -88,7 +88,7 @@ define('app/controllers/key_add', ['ember'],
             _clear: function () {
                 this.setProperties({
                     callback: null,
-                    keyId: null,
+                    keyName: null,
                     keyPrivate: null,
                     keyPublic: null
                 });
@@ -117,7 +117,7 @@ define('app/controllers/key_add', ['ember'],
                 info('generate key callback');
                 var that = Mist.keyAddController;
                 that.set('generatingKey', false);
-                if (success) {                    
+                if (success) {
                     that.setProperties({
                         'keyPrivate': keyPrivate,
                         'keyPublic': keyPublic
@@ -133,8 +133,8 @@ define('app/controllers/key_add', ['ember'],
             _sanitizeFields: function () {
 
                 // Remove non alphanumeric chars
-                if (this.keyId)
-                    this.set('keyId', this.keyId.replace(/\W/g, ''));
+                if (this.keyName)
+                    this.set('keyName', this.keyName.replace(/\W/g, ''));
 
                 // Remove extra spaces and new lines
                 if (this.keyPrivate)
@@ -143,7 +143,7 @@ define('app/controllers/key_add', ['ember'],
 
 
             _updateFormReady: function () {
-                this.set('formReady', this.keyId && this.keyPrivate);
+                this.set('formReady', this.keyName && this.keyPrivate);
             },
 
 
