@@ -63,7 +63,13 @@
                 right: 0;
                 z-index: 9;
                 color: rgba(0, 0, 0, 0.87);
-            }            
+            }
+
+            .status {
+                padding-left: 16px;
+                opacity: 0.54;
+                font-size: 0.9em;
+            }
 
             paper-header-panel::content #dropShadow {
                 top: 56px;
@@ -118,7 +124,7 @@
                         [[machine.name]]
                     </h2>
                     <div class="subtitle">
-                        [[machine.state]]
+                        [[machine.state]] <span class="status" hidden$="[[isState(machine)]]">[[machine.extra.status]]</span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -152,8 +158,8 @@
                 <div id="leftcolumn" class="left">                    
                     <paper-material>
                         <h3 class="smallcaps">Info:</h3>
-                        <span hidden$="[[!machine.cloud.title]]">[[machine.cloud.title]]</span>
-                        <span hidden$="[[!machineImage]]">, Image: [[machineImage]]</span>
+                        <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
+                        <span hidden$="[[!machine.extra.image]]">, Image: [[machine.extra.image]]</span>
                         <span hidden$="[[!machine.extra.created]]">, Created: [[machine.extra.created]]</span>
                     </paper-material>
                 </div>
@@ -230,7 +236,7 @@
         },
         listeners: {
             'confirmation': '_deleteMachineEventResponse'
-        },
+        },    
         _computeMachine: function(params, machines) {
             return machines.base.find(function(machine) {
                 return machine.uuid == params.uuid;
@@ -314,6 +320,9 @@
         },
         _goBack: function() {
             history.back();
-        }
+        },
+        isState: function(machine){
+            return machine.state == machine.extra.status ;
+        },
     });
 </script>
