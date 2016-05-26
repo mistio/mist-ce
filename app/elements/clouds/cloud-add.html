@@ -3,17 +3,20 @@
 <dom-module id="cloud-add">
     <template>
         <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
             :host {
                 display: block;
+                min-height: 1200px;
             }
 
             paper-material {
                 display: block;
-                padding: 20px;
-                margin: 36px;
+                padding: 24px;
             }
-
+            #content {
+                max-width: 900px;
+            }
             paper-card,
             paper-checkbox {
                 display: block;
@@ -42,19 +45,22 @@
                 opacity: 0.87;
             }
         </style>
-        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
-            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
-            <paper-header-panel id="container" view$="[[_actualView(view)]]" main>
-                <paper-toolbar style$="[[color]]">
-                    <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
-                    <span class="title"></span>
-                    <app-user-menu email="[[model.email]]"></app-user-menu>
-                    <span class="bottom title">Add Cloud</span>
-                </paper-toolbar>
+        
                 <div id="content">
+                    <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+                        <span class="icon"><iron-icon icon="cloud"></iron-icon></span>
+                        <div class="title flex">
+                            <h2>
+                                Add Cloud
+                            </h2>
+                            <div class="subtitle">
+                                Mist.io supports over 17 providers
+                            </div>
+                        </div>                        
+                    </paper-material>
                     <paper-material>
                         <div class="grid-row">
-                            <paper-dropdown-menu class="dropdown-block l6 xs12 dropdown-with-logos" label="Providers" horizontal-align="left">
+                            <paper-dropdown-menu class="dropdown-block l6 xs12 dropdown-with-logos" label="Choose Provider" horizontal-align="left">
                                 <paper-menu attr-for-selected="value" selected="{{selectedProvider}}" class="dropdown-content">
                                     <template is="dom-repeat" items="[[providersFields]]" as="provider">
                                         <paper-item value="[[provider.val]]"><img src="[[_computeProviderLogo(provider.className)]]" width="24px" />[[provider.title]]</paper-item>
@@ -103,8 +109,6 @@
                         </div>
                     </paper-material>
                 </div>
-            </paper-header-panel>
-        </paper-drawer-panel>
         <iron-ajax id="cloudAddAjaxRequest" url="/api/v1/clouds" method="POST" on-response="_cloudAddAjaxResponse" on-error="_cloudAddAjaxError"></iron-ajax>
     </template>
     <script>
