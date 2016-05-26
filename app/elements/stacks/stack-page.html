@@ -327,16 +327,13 @@
         }
         .parsing-loader.error paper-progress ::content #primaryProgress {
             background-color: var(--red-color);
-        }
-        .desc {
-            padding-left: 16px;
-            opacity: 0.54;
-            font-size: 0.9em;
-        }
+        }        
         #stack_actions paper-button {
             text-align: left !important;
         }
-
+        .delete, .retry {
+            cursor: pointer;
+        }
         </style>        
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
@@ -380,10 +377,10 @@
             </paper-item> -->
             <paper-material id="resources" class="page">
                 <template is="dom-if" if="[[runtimeProperties]]">
-                    <div class="flex-horizontal-with-ratios" hidden$="[[showLateError]]">
+                    <div class="flex-horizontal-with-ratios" hidden$="[[showLateError]] || [[!resourcelist]]">
                         <div class="page-block">
-                            <h3 class="smallcaps">Description</h3>
-                            <p>[[template.description]]</p>
+                            <h3 class="smallcaps">Stack Description</h3>
+                            <p>[[stack.description]]</p>
                         </div>
                         <div class="page-block">
                             <h3 class="smallcaps">Created</h3>
@@ -404,7 +401,7 @@
                                 <h3>There seems to be an error</h3>
                                 <paper-progress id="stackpageprogress" value="100"></paper-progress>
                                 <h4>The available stack state information has returned no resources after too long or the inputs are wrong.<br/>
-                                <a class="regular blue-link ">Delete Stack</a> or <a class="regular blue-link ">Retry</a>
+                                <span class="delete regular blue-link" id="uninstall" on-tap="_quickActionsNavigation">Delete Stack</span> or <a class="regular blue-link" href$="/create-stack/[[template.id]]">Retry </span>
                                 </h4>
                             </div>
                         </template>
@@ -440,7 +437,7 @@
                     </template>
                 </template>
             </paper-material>
-            <paper-material id="workflows">
+            <paper-material id="workflows" hidden$="[[showLateError]] || [[!resourcelist]]">
                 <template is="dom-if" if="[[workflows.length]]">
                     <div id="workflows-panel">
                         <div id="workflowsNavigation">
@@ -608,6 +605,7 @@
                 showLateError: {
                     type: Boolean,
                     computed: "_showLateError(stack)",
+                    // value: false,
                     notify: true
                 },
                 customScaleUp: {

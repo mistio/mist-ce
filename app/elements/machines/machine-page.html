@@ -65,12 +65,6 @@
                 color: rgba(0, 0, 0, 0.87);
             }
 
-            .status {
-                padding-left: 16px;
-                opacity: 0.54;
-                font-size: 0.9em;
-            }
-
             paper-header-panel::content #dropShadow {
                 top: 56px;
             }
@@ -145,7 +139,7 @@
                         [[machine.name]]
                     </h2>
                     <div class="subtitle">
-                        [[machine.state]] <span class="status" hidden$="[[isState(machine)]]">[[machine.extra.status]]</span>
+                        [[machine.state]] <span class="desc" hidden$="[[isState(machine)]]">[[machine.extra.status]]</span>
                     </div>
                 </div>
                 <div class="item-actions">
