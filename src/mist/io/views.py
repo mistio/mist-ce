@@ -465,11 +465,12 @@ def add_key(request):
     auth_context = auth_context_from_request(request)
     key_tags = auth_context.check_perm("key", "add", None)
     key_name = methods.add_key(auth_context.owner, key_name, private_key)
-    if key_tags:
-        mist.core.methods.set_keypair_tags(auth_context.owner,
-                                           key_tags, key_name)
+
     key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
 
+    if key_tags:
+        mist.core.methods.set_keypair_tags(auth_context.owner,
+                                           key_tags, key.id)
     # since its a new key machines fields should be an empty list
 
     clouds = Cloud.objects(owner=auth_context.owner)
