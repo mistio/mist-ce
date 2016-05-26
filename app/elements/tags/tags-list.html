@@ -1,0 +1,115 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="tag-item.html">
+
+<dom-module id="tags-list">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                width: 100%;
+            }
+        </style>
+
+        <paper-dialog id="tagsModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Tags</h2>
+            <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
+            <paper-dialog-scrollable>
+                <table class="info-table">
+                    <template is="dom-repeat" items="[[tags]]" as="tag">
+                        <tag-item tag="[[tag]]"></tag-item>
+                    </template>
+                </table>
+
+                <div class="clearfix bottom-actions xs12">
+                    <paper-button class="submit-btn pull-left" raised on-tap="_saveTags">Save Tags</paper-button>
+                    <paper-button class="submit-btn pull-right" raised on-tap="_addTag">Add Tag</paper-button>
+                </div>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <iron-ajax id="tagsAjaxRequest" method="POST" on-response="_handleTagsAjaxResponse" on-error="_handleTagsAjaxError"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'tags-list',
+
+                properties: {
+                    resource: String,
+                    item: Object,
+                    tags: {
+                        type: Array,
+                        computed: '_computeTags(item.tags.*)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed',
+                    'tag-delete': '_tagDeleteHandler'
+                },
+                _openDialog: function(e) {
+                    this.querySelector('paper-dialog').open();
+                },
+                _closeDialog: function(e) {
+                    this.querySelector('paper-dialog').close();
+                },
+                _modalClosed: function(e) {
+                    if (e.srcElement.id == 'tagsModal') {
+                        console.log(e);
+                    }
+                },
+                _computeTags: function(tags) {
+                    if (!tags.base.length) {
+                        return [{
+                            key: '',
+                            value: ''
+                        }];
+                    }
+                    return tags.base.slice();
+                },
+                _addTag: function() {
+                    var newTag = {
+                        key: '',
+                        value: ''
+                    };
+                    this.push('tags', newTag);
+                },
+                _tagDeleteHandler: function(e) {
+                    var tag = e.detail.tag,
+                    index = this.tags.indexOf(tag);
+                    this.splice('tags', index, 1);
+                },
+                _saveTags: function() {
+                    var tags = this.tags.filter(function(tag) {
+                        return tag.key && tag.value;
+                    }), payloadTags = {}, payload = {};
+
+                    if (tags.length) {
+                        tags.forEach(function(tag) {
+                            payloadTags[tag.key] = tag.value;
+                        });
+
+                        payload = {
+                            tags: payloadTags
+                        };
+
+                        payload[this.get('resource')] = ['machine', 'image', 'network'].indexOf(this.get('resource') >-1) ? [this.get('item.cloud.id'), this.get('item.id')] : [this.get('item.id')];
+
+                        this.$.tagsAjaxRequest.body = payload;
+                        this.$.tagsAjaxRequest.url = '/api/v1/tag';
+                        this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
+                        this.$.tagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.tagsAjaxRequest.generateRequest();
+                    }
+                },
+                _handleTagsAjaxResponse: function(e) {
+                    console.log(e);
+                }
+            });
+        })();
+    </script>
+</dom-module>

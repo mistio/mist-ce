@@ -1,0 +1,160 @@
+<dom-module id="app-bar">
+    <template>
+        <style>
+        :host * {
+            box-sizing: border-box;
+        }
+
+        :host(.search-on) {
+            left: 0;
+            background: inherit;
+            z-index: 1001;
+        }
+
+        :host::content iron-icon {
+            margin-right: 15px;
+            cursor: pointer;
+        }
+
+        #search {
+            position: absolute;
+            right: 90px;
+            top: 18px;
+        }
+
+        #search iron-icon {
+            margin-right: 0;
+            margin-left: 16px;
+            margin-top: -2px;
+        }
+
+        #search[show] {
+            position: absolute;
+            width: 100%;
+            height: 56px;
+            left: 0;
+            top: 2px;
+            padding: 0 32px;
+            background: #fff;
+            margin-top: 2px;
+        }
+
+        #search[show] iron-icon {
+            margin-left: 0px;
+        }
+
+        #search input {
+            display: none;
+            font-family: var(--primary-font-family);
+            font-size: 15px;
+            width: 100%;
+            padding: 10px;
+            border: 0;
+            border-radius: 2px;
+            -webkit-appearance: none;
+        }
+
+        #search[show] input {
+            display: block;
+        }
+
+        #search input:focus {
+            outline: 0;
+        }
+        </style>
+        <content></content>
+        <div id="search" class="horizontal layout center" show$="{{showingSearch}}" on-tap="toggleSearch">
+            <iron-icon icon="search" hidden$="[[noSearch]]"></iron-icon>
+            <form on-submit="performSearch" class="flex">
+                <input type="search" id="query" value="{{query::keyup}}" autocomplete="off" placeholder="Search" on-blur="clearSearch">
+            </form>
+        </div>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'app-bar',
+
+    properties: {
+        query: {
+            type: String,
+            notify: true
+        },
+        showingSearch: {
+            type: Boolean,
+            value: false,
+            notify: true,
+            reflectToAttribute: true
+        },
+        noSearch: {
+            type: Boolean,
+            value: false
+        }
+    },
+
+    observers: [
+        'updateSearchDisplay(showingSearch)',
+        '_queryChanged(query)'
+    ],
+
+    listeners: {
+        keyup: 'hotkeys'
+    },
+
+    toggleSearch: function(e) {
+        if (e) {
+            e.stopPropagation();
+        }
+        if (e.target === this.$.query) {
+            return;
+        }
+
+        this.showingSearch = !this.showingSearch;
+    },
+
+    clearSearch: function() {
+        //this.set('query', '');
+        this.showingSearch = false;
+    },
+
+    updateSearchDisplay: function(showingSearch) {
+        if (showingSearch) {
+            this.classList.add('search-on');
+            this.async(function() {
+                this.$.query.focus();
+            });
+        } else {
+            this.classList.remove('search-on');
+        }
+    },
+
+    hotkeys: function(e) {
+        // ESC
+        if (e.keyCode === 27 && Polymer.dom(e).rootTarget === this.$.query) {
+            this.showingSearch = false;
+            this.set('query', '');
+        }
+        if (e.keyCode === 13) {
+            this.showingSearch = false;
+        }
+    },
+
+    performSearch: function(e) {
+        e.preventDefault();
+        this.fire('nav', {
+            url: '?q=' + this.query
+        });
+    },
+
+    _queryChanged: function(q) {
+        if (q) {
+            this.async(function() {
+                this.$.query.focus();
+                // make sure to force the cursor to the end of the
+                // input. Only an issue in Firefox.
+                this.$.query.setSelectionRange(q.length, q.length);
+            });
+        }
+    },
+});
+</script>

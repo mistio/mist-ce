@@ -1,0 +1,372 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../app-form/app-form.html">
+<dom-module id="template-add">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                display: block;
+                padding: 20px;
+                margin: 36px;
+            }
+
+            paper-progress {
+                position: absolute;
+                bottom: 85px;
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
+
+            :host >::content paper-input-container {
+                padding-top: 16px;
+                padding-bottom: 16px;
+            }
+        </style>
+        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
+            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
+            <paper-header-panel id="container" view$="[[_actualView(view)]]" main>
+                <paper-toolbar style$="[[color]]">
+                    <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
+                    <span class="title"></span>
+                    <app-user-menu email="[[model.email]]"></app-user-menu>
+                    <span class="bottom title">Add Template {{typedName}}</span>
+                </paper-toolbar>
+                <div id="content">
+                    <app-form fields="[[fields]]" form="[[template]]" url="/api/v1/templates" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></app-form>
+                </div>
+            </paper-header-panel>
+        </paper-drawer-panel>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'template-add',
+
+                properties: {
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    template: {
+                        type: Object,
+                        value: function() {
+                            return {
+                                name: '',
+                                description: '',
+                                exec_type: '',
+                                location_type: '',
+                                template: '',
+                                entrypoint: ''
+                            }
+                        }
+                    },
+                    typedName: {
+                        type: String,
+                        value: '',
+                        notify: true
+                    },
+                    fields: {
+                        type: Array,
+                        value: [{
+                        name: "name",
+                        label: "Template Name *",
+                        type: "text",
+                        value: "",
+                        isLead: true,
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please enter template's name",
+                        show: true,
+                        required: true
+                    }, {
+                        name: "description",
+                        label: "Template Description",
+                        type: "textarea",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please enter template's description",
+                        helptext: "Please enter template's description",
+                        show: true,
+                        required: false
+                    }, {
+                        name: "exec_type",
+                        label: "Type *",
+                        type: "dropdown",
+                        value: "cloudify",
+                        defaultValue: "cloudify",
+                        errorMessage: "Please enter template's exec_type",
+                        helptext: "Please enter template's exec_type",
+                        show: true,
+                        required: true,
+                        options: [{
+                            title: "Cloudify Blueprint",
+                            val: "cloudify"
+                        }]
+                    }, {
+                        name: "location_type",
+                        label: "Source *",
+                        type: "radio",
+                        value: "",
+                        defaultValue: "",
+                        errorMessage: "Please enter template's source",
+                        helptext: "Please enter template's location_type",
+                        show: true,
+                        required: true,
+                        options: [{
+                            title: "Github",
+                            val: "github"
+                        }, {
+                            title: "URL",
+                            val: "url"
+                        }, {
+                            title: "Inline",
+                            val: "inline"
+                        }]
+                    }, {
+                        name: "template",
+                        label: "Url *",
+                        type: "text",
+                        value: "http://",
+                        defaultValue: "http://",
+                        placeholder: "",
+                        show: false,
+                        required: true,
+                        showIf: {
+                            fieldName: "location_type",
+                            fieldValues: ["url"]
+                        },
+                        errorMessage: "Please enter a url",
+                        helptext: "Please enter a url",
+                    }, {
+                        name: "template",
+                        label: "Github Repo *",
+                        type: "text",
+                        value: "https://github.com/owner/repo",
+                        defaultValue: "https://github.com/owner/repo",
+                        placeholder: "",
+                        show: false,
+                        required: true,
+                        showIf: {
+                            fieldName: "location_type",
+                            fieldValues: ["github"]
+                        },
+                        errorMessage: "Please enter a github repo",
+                        helptext: "Please enter a github repo"
+                    }, {
+                        name: "template",
+                        label: "Template *",
+                        type: "textarea",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        show: false,
+                        required: true,
+                        errorMessage: "Please enter inline template",
+                        helptext: "Please enter inline template",
+                        showIf: {
+                            fieldName: "location_type",
+                            fieldValues: ["inline"]
+                        },
+                        // placeholderIf: {
+                        //     fieldName: "location_type",
+                        //     fieldOptions: {
+                        //         "executable": "#!/bin/bash\necho 'hello world'",
+                        //         "ansible": "- name: Dummy ansible playbook\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug:\n\t\t\t\tmsg: 'Hello World'\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug: msg='Hello World'\n"
+                        //     }
+                        // }
+                    }, {
+                        name: "entrypoint",
+                        label: "Entry point",
+                        type: "text",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "location_type",
+                            fieldValues: ["github", "url"]
+                        },
+                        errorMessage: "Please enter entry point",
+                        helptext: "Please enter entry point"
+                    }],
+                    notify: true
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        value: false
+                    },
+                    hideprogress: {
+                        type: Boolean,
+                        value: true
+                    }
+                },
+                observers: [
+                    '_fieldsChanged(fields.*, sendingData)',
+                    '_updateTypedName(fields.#0.*)'
+                ],
+                _updateTypedName: function(t) {
+                    if (t.path == "fields.#0.value" && t.value) {
+                        this.typedName = '"' + t.value + '"';
+                    }
+                },
+                _getHeaderStyle: function(section) {
+                    return 'background-color: ' + section.color + '; color: #fff;';
+                },
+                _computeFieldType: function(field, value, show) {
+                    if (!(field.showIf && !field.show)) {
+                        return field.type == value;
+                    }
+                },
+                _fieldsChanged: function(fields, sendingData) {
+                    this.async(function() {
+                        var template = this.template,
+                            show = true,
+                            dependency;
+
+                        fields.base.forEach(function(el, index) {
+                            this.set('template.' + el.name, el.value);
+
+                            if (el.showIf) {
+                                if (el.showIf.fieldExists) {
+                                    dependency = template[el.showIf.fieldName],
+                                        show = dependency;
+                                    this.set('fields.' + index + '.show', show);
+                                } else {
+                                    dependency = template[el.showIf.fieldName],
+                                        show = el.showIf.fieldValues.indexOf(dependency) != -1;
+                                    this.set('fields.' + index + '.show', show);
+                                }
+
+                                if (!show) {
+                                    this._resetField(el, index);
+                                }
+                            }
+
+                            if (el.placeholderIf) {
+                                dependency = template[el.placeholderIf.fieldName];
+                                this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
+                            }
+                        }, this);
+
+                        var valid = fields.base.every(function(el, index) {
+                            return el.show && el.required ? el.value : true;
+                        }, this);
+
+                        this.set('template', template);
+
+                        this.set('formReady', valid && !sendingData);
+                    });
+                },
+                _submitForm: function() {
+                    var payload = this.template;
+                    console.log(payload);
+
+                    //   this.$.addTemplateAjax.body = payload;
+                    //   this.$.addTemplateAjax.addRequest();
+
+                    //test progress bar
+                    this.sendingData = true;
+                    // this.hideprogress = false;
+                },
+                _addTemplateAjaxRequest: function() {
+                    this.set('sendingData', true);
+                },
+                _addTemplateAjaxResponse: function(e) {
+                    this.set('sendingData', false);
+
+                    this.fire('addTemplate', {
+                        template: {
+                            name: this.template.name,
+                            description: this.template.description
+                        }
+                    });
+                },
+                _resetForm: function(e) {
+                    this.set('sendingData', false);
+                    // Reset template
+                    this.set('template.name', '');
+                    this.set('template.source', '');
+                    this.set('template.url', '');
+                    this.set('template.inline', '');
+
+                    // Reset Form Fields
+                    this.fields.forEach(function(el, index) {
+                        if (el.showIf) {
+                            this.set('fields.' + index + '.show', false);
+                        }
+
+                        // Reset Form Fields Validation
+                        this._resetField(el, index);
+                    }, this);
+                    this.typedName = "";
+                },
+                _resetField: function(el, index) {
+                    this.set('fields.' + index + '.value', el.defaultValue);
+
+                    var input = this.querySelector('#' + el.name);
+                    if (input) {
+                        input.invalid = false;
+                    }
+                },
+                _goBack: function(){
+                    history.back();
+                }
+            });
+        })();
+        // test progress bar, code from demo
+        // var progress, button, animationFrame;
+        // var repeat, maxRepeat = 1,
+        //     animating = false;
+        //
+        // function nextProgress() {
+        //     animating = true;
+        //     if (progress.value < progress.max) {
+        //         progress.value += (progress.step || 1);
+        //
+        //     } else {
+        //         if (++repeat >= maxRepeat) {
+        //             animating = false;
+        //             button.disabled = false;
+        //             return;
+        //         }
+        //         progress.value = progress.min;
+        //     }
+        //     var animationFrame = requestAnimationFrame(nextProgress);
+        // }
+        //
+        // function startProgress() {
+        //     repeat = 0;
+        //     progress.value = progress.min;
+        //     button.disabled = true;
+        //     if (!animating) {
+        //         nextProgress();
+        //     }
+        // }
+        // window.addEventListener('WebComponentsReady', function() {
+        //     progress = document.querySelector('paper-progress');
+        //     button = document.querySelector('paper-button#submit');
+        // });
+    </script>
+</dom-module>

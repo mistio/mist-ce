@@ -1,0 +1,320 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="script-run">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card,
+            paper-checkbox {
+                display: block;
+            }
+
+            paper-toggle-button,
+            paper-checkbox {
+                margin-top: 20px;
+            }
+        </style>
+
+        <paper-card heading="[[cardTitleText]]">
+            <div class="card-content">
+                <div hidden$=[[!hasMachines]]>
+
+                    <template is="dom-repeat" items="{{fields}}" as="field">
+                        <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
+                            <paper-input id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                        </template>
+
+                        <template is="dom-if" if="[[_computeFieldType(field, 'number', field.show)]]">
+                            <paper-input id="[[field.name]]" type="number" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                        </template>
+
+                        <template is="dom-if" class="datetime" if="[[_computeFieldType(field, 'datetime', field.show)]]">
+                            <paper-input id="[[field.name]]" type="datetime" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                        </template>
+
+                        <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
+                            <paper-textarea id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
+                        </template>
+
+                        <div class="grid-row">
+                        <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
+
+                                <paper-dropdown-menu class="dropdown-block xs12 l6" label="[[field.label]]" horizontal-align="left">
+                                    <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                        <template is="dom-repeat" items="[[field.options]]" as="option">
+                                            <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                        </template>
+                                    </paper-menu>
+                                </paper-dropdown-menu>
+                        </template>
+                        </div>
+
+                        <template is="dom-if" if="[[_computeFieldType(field, 'switch', field.show)]]">
+                            <paper-toggle-button checked="{{field.value}}">[[field.label]]</paper-toggle-button>
+                        </template>
+                    </template>
+                    <hr/>
+                    <div class="clearfix">
+                        <paper-button class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
+                        <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
+                    </div>
+                </div>
+                <div hidden$=[[hasMachines]]>
+                    <p>Please add some machines first!</p>
+                </div>
+            </div>
+
+            <iron-ajax id="runScriptAjax" url="/scripts/[[script.id]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'script-run',
+
+                properties: {
+                    script: {
+                        type: Object,
+                        computed: '_computeScript(id)'
+                    },
+                    runScript: {
+                        type: Object,
+                        value: function() {
+                            return {
+                                machine: '',
+                                parameters: '',
+                                schedulerUse: '',
+                                schedulerName: '',
+                                schedulerDescription: '',
+                                schedulerRunImmediately: '',
+                                schedulerAction: '',
+                                schedulerExpires: '',
+                                schedulerType: '',
+                                scedulerOneOffEntry: '',
+                                scedulerCrontabEntry: '',
+                                scedulerIntervalEveryEntry: '',
+                                scedulerIntervalPeriodEntry: ''
+                            }
+                        }
+                    },
+                    fields: {
+                        type: Array,
+                        value: function() {
+                            return SCRIPT_RUN_FORM_FIELDS;
+                        },
+                        notify: true
+                    },
+                    parameters: {
+                        type: String,
+                        value: null
+                    },
+                    clouds: {
+                        type: Array,
+                        value: function() {
+                            return Mist.clouds.filter(function(cloud) {
+                                return cloud.enabled;
+                            });
+                        }
+                    },
+                    machinesOptions: {
+                        type: Array,
+                        value: []
+                    },
+                    hasMachines: {
+                        type: Boolean,
+                        computed: '_computeHasMachines(machinesOptions.*)'
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        value: false
+                    },
+                    cardTitleText: {
+                        type: String,
+                        computed: '_computeCardTitleText(script.name, runScript.machine)'
+                    }
+                },
+                observers: [
+                    '_fieldsChanged(fields.*, sendingData)',
+                    '_cloudsChanged(clouds.*)'
+                ],
+                _computeScript: function(id) {
+                    return Mist.scripts.find(function(script) {
+                        return script.id == id;
+                    });
+                },
+                _computeMachinesOptions: function(clouds) {
+                    return clouds
+                        .filter(function(cloud) {
+                            return cloud.enabled;
+                        })
+                        .map(function(cloud) {
+                            return cloud.machines;
+                        })
+                        .reduce(function(a, b) {
+                            return a.concat(b);
+                        }, []);
+                },
+                _computeHasMachines: function(machinesOptions) {
+                    return machinesOptions.base.length > 0;
+                },
+                _computeFieldType: function(field, value, show) {
+                    if (!(field.showIf && !field.show)) {
+                        return field.type == value;
+                    }
+                },
+                _computeCardTitleText: function(name, machine) {
+                    return machine ? 'Run Script "' + name + '" on "' + machine.name + '"' : 'Run Script "' + name + '"';
+                },
+                _fieldsChanged: function(fields, sendingData) {
+                    var runScript = this.runScript,
+                        show = true,
+                        dependency;
+
+                    fields.base.forEach(function(el, index) {
+                        this.set('runScript.' + el.name, el.value);
+
+                        if (el.showIf) {
+                            if (el.showIf.fieldExists) {
+                                dependency = runScript[el.showIf.fieldName],
+                                    show = dependency;
+                                this.set('fields.' + index + '.show', show);
+                            } else {
+                                dependency = runScript[el.showIf.fieldName],
+                                    show = el.showIf.fieldValues.indexOf(dependency) != -1;
+                                this.set('fields.' + index + '.show', show);
+                            }
+
+                            if (!show) {
+                                this._resetField(el, index);
+                            }
+                        }
+
+                        if (el.placeholderIf) {
+                            dependency = runScript[el.placeholderIf.fieldName];
+                            this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
+                        }
+                    }, this);
+
+                    var valid = fields.base.every(function(el, index) {
+                        return el.show && el.required ? el.value : true;
+                    }, this);
+
+                    this.set('runScript', runScript);
+
+                    this.set('formReady', valid && !sendingData);
+                },
+                _cloudsChanged: function(clouds) {
+                    var index = this.fields.findIndex(function(field) {
+                        return field.name == "machine";
+                    }, this);
+
+                    var machinesOptions = clouds.base
+                        .filter(function(cloud) {
+                            return cloud.enabled;
+                        })
+                        .map(function(cloud) {
+                            return cloud.machines;
+                        })
+                        .reduce(function(a, b) {
+                            return a.concat(b);
+                        }, [])
+                        .map(function(machine) {
+                            var obj = {};
+                            obj['title'] = machine.name;
+                            obj['val'] = machine;
+                            return obj;
+                        });
+
+                    this.set('machinesOptions', machinesOptions);
+                    this.set('fields.' + index + '.options', machinesOptions);
+                    this.set('fields.' + index + '.value', '');
+                },
+                _submitForm: function(e) {
+                    var payload = {
+                        description: this.runScript.schedulerDescription,
+                        run_immediately: this.runScript.schedulerRunImmediately,
+                        script_id: this.script.id,
+                        action: this.runScript.schedulerAction,
+                        machines_per_cloud: [
+                            [this.runScript.machine.cloud.id, this.runScript.machine.id]
+                        ],
+                        enabled: this.runScript.schedulerEnabled,
+                        expires: this.runScript.schedulerExpires,
+                        schedulerUse: this.runScript.schedulerUse,
+                        cronjob_type: this.runScript.schedulerType,
+                        cronjob_entry: null
+                    };
+
+                    if (this.runScript.schedulerType == "one_off") {
+                        payload.cronjob_entry = this.runScript.scedulerOneOffEntry;
+                    }
+                    if (this.runScript.schedulerType == "interval") {
+                        payload.cronjob_entry = {
+                            every: this.runScript.scedulerIntervalEveryEntry,
+                            period: this.runScript.scedulerIntervalPeriodEntry
+                        };
+                    }
+                    if (this.runScript.schedulerType == "crontab") {
+                        payload.cronjob_entry = this.runScript.scedulerCrontabEntry
+                    }
+
+                    console.log(payload);
+
+                    //   this.$.runScriptAjax.body = payload;
+                    //   this.$.runScriptAjax.generateRequest();
+                },
+                _runScriptRequest: function() {
+                    this.set('sendingData', true);
+                },
+                _runScriptResponse: function(e) {
+                    this.set('sendingData', false);
+                },
+                _resetForm: function(e) {
+                    // Reset runScript
+                    this.set('machine', '');
+                    this.set('parameters', '');
+                    this.set('schedulerUse', '');
+                    this.set('schedulerName', '');
+                    this.set('schedulerDescription', '');
+                    this.set('schedulerRunImmediately', '');
+                    this.set('schedulerAction', '');
+                    this.set('schedulerExpires', '');
+                    this.set('schedulerType', '');
+                    this.set('scedulerOneOffEntry', '');
+                    this.set('scedulerCrontabEntry', '');
+                    this.set('scedulerIntervalEveryEntry', '');
+                    this.set('scedulerIntervalPeriodEntry', '');
+
+                    // Reset Form Fields
+                    this.fields.forEach(function(el, index) {
+                        if (el.showIf) {
+                            this.set('fields.' + index + '.show', false);
+                        }
+
+                        // Reset Form Fields Validation
+                        this._resetField(el, index);
+                    }, this);
+                },
+                _resetField: function(el, index) {
+                    this.set('fields.' + index + '.value', el.defaultValue);
+
+                    var input = this.querySelector('#' + el.name);
+                    if (input) {
+                        input.invalid = false;
+                    }
+                }
+            });
+        })();
+    </script>
+</dom-module>

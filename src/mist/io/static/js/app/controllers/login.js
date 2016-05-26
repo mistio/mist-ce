@@ -40,7 +40,7 @@ define('app/controllers/login', ['ember'],
             login: function() {
                 var that = this;
                 this.set('loggingIn', true);
-                Mist.ajax.POST('/auth', {
+                Mist.ajax.POST('/api/v1/auth', {
                     'email': this.email,
                     'password': this.password
                 }).success(function(data) {

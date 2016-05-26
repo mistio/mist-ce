@@ -1,0 +1,78 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+
+<dom-module id="app-fab">
+	<template>
+		<style>
+			#fabmenuoptions {
+				position: absolute;
+			    bottom: 80px;
+			    right: -2px;
+			}
+			.item {
+				opacity: 0;
+				display: block;
+				position: relative;
+				transition: all 200ms;
+				transform: translate3d(0, 10px, 0);
+			}
+			.item paper-tooltip { /*fixes tooltip disalignment*/
+				top: 20px !important;
+			}
+			.item.active {
+				opacity: 1;
+				display: block;
+				transform: translate3d(0, 0, 0);
+			}
+			.item paper-icon-button {
+				box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+                  0 1px 10px 0 rgba(0, 0, 0, 0.12),
+                  0 2px 4px -1px rgba(0, 0, 0, 0.4);
+				background-color: #ddd;
+				display: inline-block;
+				width: 44px;
+				height: 44px;
+				border-radius: 50px;
+				margin: 16px 8px;
+			}
+			paper-fab {
+				transition: all 200ms;
+			}
+			paper-fab.active {
+				transform: rotate(45deg);
+			}
+		</style>
+		<div id="fab-menu">
+			<div id="fabmenuoptions">
+				<content></content>
+			</div>
+			<paper-fab icon="add" class="dropdown-trigger" alt="bottom align" on-tap="togglemenu">Actions</paper-fab>
+		</div>
+	</template>
+</dom-module>
+<script>
+	Polymer({
+	    is: 'app-fab',
+	    properties: {
+	    },
+	    togglemenu: function(){
+	    	var options = this.querySelectorAll('.item');
+
+	    	[].forEach.call(options, function(item){	    		
+		        item.classList.toggle('active');
+	    	});
+
+	    	this.querySelector('paper-fab').classList.toggle('active');
+	    },
+	    addcloud: function() {
+	    	//open add cloud form
+	    },
+	    addmachine: function() {
+	    	//open add machine form	
+	    },
+	    addscript: function() {
+	    	//open add scritp form
+	    }
+	});
+</script>

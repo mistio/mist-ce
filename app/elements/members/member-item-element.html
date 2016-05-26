@@ -1,0 +1,85 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<dom-module id="member-item-element">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-item:hover {
+                cursor: pointer;
+            }
+
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+            }
+
+            .flexchild {
+                @apply(--layout-flex);
+            }
+        </style>
+        <paper-item on-tap="_viewMember" class$="info-item flex-horizontal-with-ratios [[indexClass]]">
+            <div class="flexchild">
+                <paper-checkbox checked="{{selected}}" on-tap="_selectMember"></paper-checkbox> <span class="name">[[member.name]]</span>
+            </div>
+            <div class="flexchild">[[member.role]]</div>
+            <content></content>
+        </paper-item>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'member-item-element',
+
+                properties: {
+                    member: {
+                        type: Object
+                    },
+                    selected: {
+                        type: Boolean,
+                        value: false,
+                        notify: true
+                    },
+                    index: {
+                        type: Number
+                    },
+                    count: {
+                        type: Number
+                    },
+                    indexClass: {
+                        type: String,
+                        computed: '_computeIsIndexClass(index, count)'
+                    }
+                },
+                listeners: {
+                    'selected-changed': '_selectMemberChanged'
+                },
+                _computeIsIndexClass: function(index, count) {
+                    var classes = [];
+                    classes.push(
+                        (index + 1) % 2 == 0 ? 'even' : 'odd',
+                        index + 1 == count ? 'last' : null
+                    );
+                    return classes.join(' ');
+                },
+                _selectMemberChanged: function(e) {
+                    var selected = e.detail.value;
+                    this.fire('toggleSelectedMember', {
+                        member: this.member,
+                        selected: selected
+                    });
+                },
+                _viewMember: function(e) {
+                    page.show('/members/' + this.member.id);
+                },
+                _selectMember: function(e) {
+                    // This is used to prevent event bubbling
+                    e.stopPropagation();
+                }
+            });
+        })();
+    </script>
+</dom-module>

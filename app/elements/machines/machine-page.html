@@ -1,0 +1,233 @@
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../app-rules/app-rules.html">
+<link rel="import" href="../element-for-in/element-for-in.html">
+<link rel="import" href="../tags/tags-list.html">
+<dom-module id="machine-page">
+    <template>
+        <style is="custom-style" include="tags-and-labels"></style>
+        <style is="custom-style" include="info-table-style"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+                align-content: stretch;
+                flex: 100%;
+            }
+
+            .flexchild {
+                @apply(--layout-flex);
+            }
+
+            .paper-header h2 {
+                @apply(--layout-flex-none);
+            }
+
+            .machine-ip {
+                margin: 0;
+            }
+
+            paper-material > h2 {
+                line-height: initial !important;
+                margin-bottom: 0;
+                cursor: pointer;
+            }
+
+            .subhead {
+                box-sizing: border-box;
+                position: absolute;
+                width: 100%;
+                left: 0;
+                height: 57px;
+                bottom: -57px;
+                right: 0;
+                z-index: 9;
+                color: rgba(0, 0, 0, 0.87);
+            }            
+
+            paper-header-panel::content #dropShadow {
+                top: 56px;
+            }
+
+            paper-toolbar::content #bottomBar .right-actions {
+                transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
+            }
+
+            paper-toolbar:not(.tall)::content #bottomBar .right-actions {
+                margin-right: 70px;
+            }
+
+            .label {
+                padding: 2px !important;
+            }
+        </style>
+       
+        <div id="content">
+            <h2>[[machine.name]]</h2>
+            <div class="page">
+                <div class="flex-horizontal-with-ratios">
+                    <div class="page-block">
+                        <h3 class="smallcaps">Cloud</h3>
+                        <p>[[machine.cloud.title]] [[machineImage]]</p>
+                    </div>
+                    <div class="page-block">
+                        <h3 class="smallcaps">Created</h3>
+                        <p>[[machine.extra.created]] by <a href="/members/[[template.user]]" class="regular blue-link">mario olivarez</a></p>
+                    </div>
+                </div>
+                <paper-material class="info-card">
+                    <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">Basic Info</h2>
+                    <div class="card-content">
+                        <table class="info-table">
+                            <template is="dom-if" if="[[machine.public_ips]]">
+                                <tr>
+                                    <td>
+                                        Public IPs
+                                    </td>
+                                    <td>
+                                        <template is="dom-repeat" items="[[machine.public_ips]]">
+                                            <p class="machine-ip">[[item]]</p>
+                                        </template>
+                                    </td>
+                                </tr>
+                            </template>
+                        </table>
+                    </div>
+                </paper-material>
+            </div>
+        </div>
+        <div class="absolute-bottom-right">
+            <app-fab></app-fab>
+        </div>
+        <dialog-element></dialog-element>
+        <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+        <machine-edit machine="[[machine]]"></machine-edit>
+        <tags-list resource="machine" item="[[machine]]"></tags-list>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'machine-page',
+
+        properties: {
+            model: {
+                type: Object,
+                notify: true
+            },
+            router: Object,
+            params: {
+                type: Object,
+                notify: true
+            },
+            machine: {
+                type: Object,
+                computed: '_computeMachine(params, model.machinesArray.*)'
+            },
+            sections: {
+                type: Array,
+                notify: true
+            },
+            section: {
+                type: Object
+            },
+            tag: {
+                type: String,
+                value: ""
+            },
+            machineImage: {
+                type: String,
+                computed: "_machineImage(machine.imageId)"
+            }
+        },
+        listeners: {
+            'confirmation': '_deleteMachineEventResponse'
+        },
+        _computeMachine: function(params, machines) {
+            return machines.base.find(function(machine) {
+                return machine.uuid == params.uuid;
+            }, this);
+        },
+        _isEqual: function(a, b) {
+            return a === b;
+        },
+        _getColor: function() {
+            return this.section && this.section.color ? this.section.color : '';
+        },
+        addKey: function(_, params) {
+            console.log("clicked addKey");
+        },
+        rename: function(_, params) {
+            console.log("clicked rename");
+        },
+        restart: function(_, params) {
+            console.log("clicked restart");
+        },
+        shutdown: function(_, params) {
+            console.log("clicked shutdown");
+        },
+        destroy: function(_, params) {
+            console.log("clicked destroy");
+        },
+        _getHeaderStyle: function(color) {
+            return 'background-color: ' + color + '; color: #fff;';
+        },
+        toggle: function() {
+            this.$.collapse.toggle();
+        },
+        togglefull: function() {
+            this.$.collapsefull.toggle();
+        },
+        _machineImage: function(id) {
+            var image = this.model.imagesArray.find(function(image) {
+                return image.id == id;
+            }, this);
+            if (image)
+                return image.name;
+            else
+                return "";
+        },
+        _editMachineTags: function() {
+            var el = this.querySelector('tags-list');
+            el._openDialog();
+        },
+        _editMachine: function(e) {
+            var el = this.querySelector('machine-edit');
+            el._openEditMachineModal();
+        },
+        _deleteMachine: function(e) {
+            this._showDialog({
+                title: 'Delete Machine?',
+                body: "Deleting a machine can not be undone. You are about to delete machine '" + this.machine.name + "'.",
+                danger: true,
+                reason: "machine.delete"
+            });
+        },
+        _deleteMachineEventResponse: function(e) {
+            var reason = e.detail.reason,
+                response = e.detail.response;
+
+            if (response.confirmed && reason == "machine.delete") {
+                this.$.machineDeleteAjaxRequest.body = {};
+                this.$.machineDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                this.$.machineDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.machineDeleteAjaxRequest.generateRequest();
+            }
+        },
+        _handleMachineDeleteAjaxResponse: function(e) {
+            page.show('/machines');
+        },
+        _showDialog: function(info) {
+            var dialog = this.querySelector('dialog-element');
+            for (var i in info) {
+                dialog[i] = info[i];
+            }
+            dialog._openDialog();
+        },
+        _goBack: function() {
+            history.back();
+        }
+    });
+</script>

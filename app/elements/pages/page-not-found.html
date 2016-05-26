@@ -1,0 +1,40 @@
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="../app-sidebar/app-sidebar.html">
+
+<dom-module id="page-not-found">
+<title>Page not found</title>
+  <template>
+    <style>
+      paper-toolbar {
+        background-color: white;
+      }
+      section {
+        background-color: #fafafa;
+        padding: 40px;
+      }
+    </style>
+    <paper-drawer-panel id="drawerPanel" responsive-width="900px" drawer-width="272px" disable-edge-swipe>
+      <app-sidebar drawer>
+        <paper-toolbar>
+          <app-logo class="flex"></app-logo>
+          <app-bar class="horizontal layout center end-justified" query="{{q}}"></app-bar>
+        </paper-toolbar>
+      </app-sidebar>
+      <section main class="fit">
+        <h1>There is no such page yet</h1>
+        <p>It seems like you may have misspelled that URL...</p>
+        <a href="/?poly=1">Take me to the front page</a>
+      </section>
+    </paper-drawer-panel>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'page-not-found',
+    attached: function() {
+      // this.fire('page-meta', { title: 'Page not found' });
+    }
+  });
+</script>

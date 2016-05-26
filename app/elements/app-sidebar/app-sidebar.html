@@ -1,0 +1,313 @@
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../section-symbol/section-symbol.html">
+<link rel="import" href="../tag-link/tag-link.html">
+<link rel="import" href="../theme-color/theme-color.html">
+<dom-module id="app-sidebar">
+    <template>
+        <style is="custom-style" include="shared-styles"></style>
+        <style is="custom-style">
+        :root {
+            --app-sidebar-width: 210px;
+        }
+        </style>
+        <style>
+        :host {
+            height: 100%;
+            width: 210px;
+            box-sizing: border-box;
+            z-index: 2;
+            background: transparent;
+            @apply(--layout);
+            @apply(--layout-vertical);
+            overflow-x: hidden;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+
+            position: fixed;
+            top: 80px;
+            margin-right: 24px; 
+            left: 0;        
+            transition: left 350ms ease-in-out;
+        }
+        :host[smallscreen],
+        :host.close {
+            left: -210px;
+        }
+
+        ::content paper-toolbar {
+            --paper-toolbar-background: white;
+        }
+
+        ::content .content {
+            @apply(--layout-vertical);
+        }
+
+        app-sidebar paper-toolbar {
+            --paper-toolbar-background: white;
+            --paper-toolbar: {
+                box-sizing: border-box;
+            }
+        }
+
+        #section-tag {
+            display: none;
+        }
+
+        #section-info {
+            position: relative;
+        }
+
+        #section-header {
+            position: relative;
+            padding: 16px 24px 0 24px;
+            overflow: hidden;
+        }
+
+        #section-header iron-icon {
+            cursor: pointer;
+        }
+
+        #section-header section-symbol {
+            display: inline-block;
+            margin: 0;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: var(--material-curve-320);
+        }
+
+        #section-title {
+            @apply(--paper-font-title);
+            margin: 0 0 20px;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: var(--material-curve-320);
+        }
+
+        #section-tagline {
+            margin: 0;
+            padding-right: 80px;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: var(--material-curve-320);
+            font-size: 13px;
+            line-height: 20px;
+        }
+
+        #section-desc {
+            margin: 0;
+        }
+
+        [size=xs] #section-title {
+            margin-bottom: 0;
+        }
+
+        [size=xs] #section-tagline {
+            display: none;
+        }
+
+        [size=xs] #section-tagline {
+            margin-top: 0;
+        }
+
+        #section-list {
+            padding: 0 0 10px;
+        }
+
+        #section-list h5 {
+            margin: 10px 0;
+            padding: 0 16px;
+            color: rgba(0, 0, 0, .54);
+            font-weight: 500;
+        }
+
+        #section-list .section {
+            display: block;
+            padding: 8px 16px;
+            font-weight: 500;
+            /*color: rgba(0, 0, 0, .87);*/
+            text-transform: capitalize;
+            cursor: pointer;
+            border-width: 1px 0 1px 4px;
+            border-left: 4px solid transparent;
+            transition: 200ms border ease-in;
+        }
+
+        #section-list .section[active] {
+            background: rgba(0,0,0,0.03);
+            border-left: 6px solid;
+            color: #444;
+        }
+
+        #section-list .section[active] ::content iron-icon {
+            color: inherit;
+        }
+
+        #section-list .section .all-symbol {
+            padding: 5px;
+        }
+
+        #section-list .section section-symbol,
+        #section-list .section .all-symbol {
+            margin-right: 12px;
+        }
+
+        #section-list a:not([active]) span {
+            color: rgba(0, 0, 0, .87);
+        }
+
+        #section-list a:not([active]) ::content iron-icon {
+            opacity: 0.32;
+        }
+
+        #section-list span.count {
+            float: right;
+            opacity: 0.54;
+        }
+
+        #current-tag {
+            background: #2196F3;
+            color: rgba(255, 255, 255, 0.87);
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        #current-tag b {
+            margin-right: 6px;
+        }
+
+        #current-tag span {
+            text-transform: uppercase;
+        }
+
+        .tags tag-link:last-of-type + span {
+            display: none;
+        }
+
+        a.section:focus {
+            outline: 0;
+        }
+        </style>
+        <div class="content">
+            <div id="section-list">
+                <nav>
+                    <a id="machines" class="section" is="pushstate-anchor" href="/machines" active$="[[_isEqual(current, 'machines')]]" tabindex="1" style$="[[style(sections.machines.color)]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.machines.icon]]"></section-symbol>
+                            <span class="title flex">
+                                <span>machines</span>
+                            <span class="count">[[model.machinesArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a id="images" class="section" is="pushstate-anchor" href="/images" active$="[[_isEqual(current, 'images')]]" tabindex="1" style$="[[style(sections.images.color)]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.images.icon]]"></section-symbol>
+                            <span class="title flex">
+                                <span>images</span>
+                            <span class="count">[[model.imagesArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a id="keys" class="section" is="pushstate-anchor" href="/keys" active$="[[_isEqual(current, 'keys')]]" tabindex="1" style$="[[style(sections.keys.color)]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.keys.icon]]" color="[[sections.keys.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>keys</span>
+                            <span class="count">[[model.keysArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a id="networks" class="section" is="pushstate-anchor" href="/networks" active$="[[_isEqual(current, 'networks')]]" tabindex="1" style$="[[style(sections.networks.color)]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.networks.icon]]" color="[[sections.networks.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>networks</span>
+                            <span class="count">[[model.networksArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a id="scripts" class="section" is="pushstate-anchor" href="/scripts" active$="[[_isEqual(current, 'scripts')]]" tabindex="1" style$="[[style(sections.scripts.color)]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.scripts.icon]]" color="[[sections.scripts.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>scripts</span>
+                            <span class="count">[[model.scriptsArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a id="templates" class="section" is="pushstate-anchor" href="/templates" active$="[[_isEqual(current, 'templates')]]" tabindex="1" style$="[[style(sections.templates.color)]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.templates.icon]]" color="[[sections.templates.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>templates</span>
+                            <span class="count">[[model.templatesArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a id="stacks" class="section" is="pushstate-anchor" href="/stacks" active$="[[_isEqual(current, 'stacks')]]" tabindex="1" style$="[[style(sections.stacks.color)]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.stacks.icon]]" color="[[sections.stacks.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>stacks</span>
+                            <span class="count">[[model.stacksArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a id="teams" class="section" is="pushstate-anchor" href="/teams" active$="[[_isEqual(current, 'teams')]]" tabindex="1" style$="[[style(sections.teams.color)]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.teams.icon]]" color="[[sections.teams.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>teams</span>
+                            <span class="count">[[model.teamsArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'app-sidebar',
+    enableCustomStyleProperties: true,
+    properties: {
+        model: {
+            type: Object
+        },
+        current: {
+            type: String,
+            value: "",
+            notify: true
+        },
+        sections: {
+            type: Object,
+            notify: true
+        },
+        tag: {
+            type: String,
+            value: ""
+        }
+    },
+    style: function(color) {
+        return "color: " + color + ";"
+    },
+    observers: [],
+    listeners: {},
+    ready: function() {
+
+    },
+    attached: function() {
+
+    },
+    _itemCount: function(item) {
+        return this.get('this.model.' + item + 'Array.length');
+    },
+    _sectionLink: function(name) {
+        return '/' + name;
+    },
+    _isEqual: function(a, b) {
+        return a === b;
+    }
+});
+</script>

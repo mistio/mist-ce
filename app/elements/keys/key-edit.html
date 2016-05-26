@@ -1,0 +1,120 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="key-edit">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+            }
+
+            paper-dialog {
+                width: 300px;
+            }
+            .submit-btn {
+                background-color: var(--mist-blue);
+                color: #fff;
+            }
+        </style>
+
+        <paper-dialog id="editKeyModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Rename Key</h2>
+            <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
+            <paper-dialog-scrollable>
+                <p>
+                    <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{newKey.name}}"></paper-input>
+                </p>
+                <div class="clearfix btn-group">
+                <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                </div>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <iron-ajax id="keyEditAjaxRequest" url="/api/v1/keys/[[key.id]]" method="PUT" on-response="_handleKeyEditAjaxResponse" on-error="_handleKeyEditAjaxError"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'key-edit',
+
+                properties: {
+                    key: {
+                        type: Object
+                    },
+                    newKey: {
+                        type: Object,
+                        computed: '_computeNewKey(key)',
+                        notify: true
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(key.name, newKey.name, sendingData)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed'
+                },
+                _computeNewKey: function(key) {
+                    return {
+                        name: key.name
+                    };
+                },
+                _computeFormReady: function(name, newName, sendingData) {
+                    var formReady = false;
+
+                    if (newName && name != newName) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _openEditKeyModal: function(e) {
+                    this.$.editKeyModal.open();
+                },
+                _closeEditKeyModal: function(e) {
+                    this.$.editKeyModal.close();
+                },
+                _modalClosed: function() {
+                    this._formReset();
+                },
+                _submitForm: function(e) {
+                    // this.fire('updateSelectedKey', {
+                    //     key: this.key
+                    // });
+
+                    this.$.keyEditAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyEditAjaxRequest.body = {
+                        new_name: this.newKey.name
+                    };
+                    this.$.keyEditAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _formReset: function() {
+                    //   this.set('key.name', '');
+                },
+                _handleKeyEditAjaxResponse: function(e) {
+                    this.set('sendingData', false);
+                    this._closeEditKeyModal();
+                }
+            });
+        })();
+    </script>
+</dom-module>

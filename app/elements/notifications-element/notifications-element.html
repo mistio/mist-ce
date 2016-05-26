@@ -1,0 +1,121 @@
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+<!-- <link rel="import" href="../../bower_components/neon-animated-pages/neon-animated-pages.html">
+<link rel="import" href="../../bower_components/neon-animatable/neon-animatable.html">
+<link rel="import" href="../../bower_components/neon-animations/neon-animations.html"> -->
+
+
+
+
+<dom-module id="notifications-element">
+  <template>
+    <style>
+      h2{
+        display:inline-block;
+        position: absolute;
+        top: 20px;
+        right:145px;
+
+      }
+      #settings{
+        width: 18px;
+        height: 20px;
+        top: 18px;
+        left: -12px;
+        background-color: #bdbdbd;
+        box-shadow: none;
+      }
+      .showall{
+        border-radius: 3px 3px 0 0;
+        background: #ebebeb;
+        cursor: pointer;
+        line-height: 14px;
+        margin: 0 0 0 20px;
+        padding: 17px 0;
+        text-align: center;
+        width: 360px;
+        right:5%;
+      }
+      paper-item{
+        border-bottom: solid;
+        border-width: 1px;
+        border-color: grey;
+      }
+      #header{
+        background-color: #bdbdbd;
+        width: auto;
+        line-height: 80px;
+        height: 70px;
+        position: relative;
+        top: -24px;
+      }
+      paper-dialog{
+        position: absolute;
+        right: -40px;
+        top: 30px;
+        z-index: 1;
+      }
+      #notfab{
+        background-color: rgba(0,0,0,.55);
+        color: #fff;
+        font-size: 40px;
+        font-weight: bold;
+        line-height: 20px;
+        margin: 5px;
+        padding: 0 2px;
+        text-align: center;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        -webkit-border-radius: 100%;
+        border-radius: 100%;
+        height: 40px;
+        width: 40px;
+      }
+      #bullet{
+        color: #ff0000;
+        width: 15px;
+        margin-right: 5px;
+      }
+      .red {
+        --paper-badge-background: var(--paper-red-300);
+      }
+    </style>
+
+    <paper-fab id="notfab" icon="social:notifications" toggles active="{{mainDialogOpen}}"></paper-fab>
+    <paper-badge for="notfab" label="3" class="red"></paper-badge>
+    <paper-dialog opened="{{mainDialogOpen}}">
+      <div id="header">
+        <paper-fab id="settings" icon="icons:settings"></paper-fab>
+        <h2>Notifications</h2>
+      </div>
+      <paper-dialog-scrollable>
+        <paper-item id="notif"><iron-icon id="bullet" icon="image:lens"></iron-icon>Server down-time</paper-item>
+        <paper-item id="notif"><iron-icon id="bullet" icon="image:lens"></iron-icon>Machine stopped working</paper-item>
+        <paper-item id="notif"><iron-icon id="bullet" icon="image:lens"></iron-icon>Server over-consumes resources</paper-item>
+      </paper-dialog-scrollable>
+      <div class="buttons">
+        <paper-button class="showall">Show all</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+  <script>
+    Polymer({
+      is: 'notifications-element',
+
+      properties: {
+        mainDialogOpen: Boolean,
+
+
+
+      },
+
+
+      _is: function(){
+
+      }
+
+
+    });
+  </script>
+</dom-module>
