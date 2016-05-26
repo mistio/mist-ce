@@ -453,10 +453,10 @@ Polymer({
             return ['name', 'exec_type', 'location_type'];
         }
         if (this.isStacks(this.section)) {
-            return ['name', 'template', 'description']
+            return ['name', 'template', 'description', 'stack state']
         }
         if (this.isTeams(this.section)) {
-            return ['name', 'description', 'organisation']
+            return ['name', 'description', 'organisation', 'members']
         }
         if (this.isIncidents(this.section)) {
             return ['incident_id', 'machine_id', 'cloud_id', 'rule_id', 'started_at', 'finished_at']

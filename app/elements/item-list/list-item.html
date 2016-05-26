@@ -119,6 +119,8 @@ Polymer({
     },
 
     itemField: function(item, field) {
+        console.log(item, field);
+
         var ret = item[field];
 
         // return cloud title
@@ -168,6 +170,27 @@ Polymer({
         }
         if (field == 'machine_id') {
             return document.querySelector('app-main').model.clouds[item.cloud_id].machines[item.machine_id].name;
+        }
+
+        if (field == 'stack state') {
+            var status = document.querySelector('app-main').model.stacks[item.id].status;
+            if (status && status.startsWith('Error')){
+                return 'Error'
+            }
+
+        }
+
+        if (field == 'members') {
+
+            var num = document.querySelector('app-main').model.teams[item.id].members.length;
+            return num ;
+            
+            // if (num == 0)
+            //     return "No members yet";
+            // if (num == 1)
+            //     return "1 member: "+document.querySelector('app-main').model.teams[item.id].members[0].email;
+            // if (num > 1)
+            //     return num+" members: "+document.querySelector('app-main').model.teams[item.id].members[0].email+', '+document.querySelector('app-main').model.teams[item.id].members[1].email+', ...';
         }
 
         return ret;
