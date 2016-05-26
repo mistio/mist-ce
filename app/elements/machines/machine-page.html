@@ -161,7 +161,7 @@
                     <paper-button on-tap="restart" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
                     <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
                     <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button>                    
-                    <paper-menu-button>
+                    <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
                             <paper-button on-tap="suspend" class="simple" hidden$="[[!machine.can_suspend]]">suspend</paper-button>
