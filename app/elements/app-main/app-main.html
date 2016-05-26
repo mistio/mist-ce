@@ -193,6 +193,7 @@ var app = Polymer({
         current : {
             type: String,
             value: "",
+            observer: '_currentChanged',
             notify: true
         },
         style: {
@@ -215,7 +216,9 @@ var app = Polymer({
         'subscribeLogEvents': 'subscribeLogEvents',
     },
     _toast: null,
-
+    _currentChanged: function(){
+        console.log('current: ',this.current);
+    },
     ready: function() {
         this.model = {
             email: EMAIL,
@@ -447,10 +450,13 @@ var app = Polymer({
         console.warn('attrChanged', attrName, oldVal, newVal);
     },
     updateCurrent: function(e) {
-        // console.log(e.detail.item.attributes);
+        // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
         var el = e.detail.item;
-        this.current = el.getAttribute("current");
-        this.title = el.title;        
+        console.log("el",e.detail);
+        if (el.nodeName == 'IRON-ROUTE') {
+            this.current = el.getAttribute("current");
+            this.title = el.title;
+        }
     },
 
     _style: function(current){

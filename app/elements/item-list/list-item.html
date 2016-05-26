@@ -119,8 +119,6 @@ Polymer({
     },
 
     itemField: function(item, field) {
-        console.log(item, field);
-
         var ret = item[field];
 
         // return cloud title
@@ -178,7 +176,7 @@ Polymer({
                 return 'Error'
             }
         }
-        
+
         if (field == 'members') {
 
             var num = document.querySelector('app-main').model.teams[item.id].members.length;
