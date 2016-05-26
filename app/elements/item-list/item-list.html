@@ -487,17 +487,17 @@ Polymer({
     },
 
     _computeItemImage: function (item) {
-        if (!item.cloud || !item.cloud.provider)
+        if (this.isImages ==  true) {
+            return item.star ? 'star' : 'star-border';
+        }
+
+        if (!item.cloud || !item.cloud.provider){
             return ''
-
-        if (this.isImages && item.star)
-            return 'star';
-
-        if (this.isImages && !item.star)
-            return 'star-border';
-
-        var provider = item.cloud.provider.split('_')[0];
-        return '../assets/providers/provider-' + provider + '.png';
+        }
+        else {
+            var provider = item.cloud.provider.split('_')[0];
+            return '../assets/providers/provider-' + provider + '.png';
+        }        
     },
 
     _selectItem: function(e, g) {
