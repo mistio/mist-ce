@@ -359,6 +359,19 @@ Polymer({
 
     itemsChanged: function (changeRecord) {
         var that = this;
+        // update height of list depending on number of items
+        var topOfset = 142;
+        var wh = window.innerHeight - topOfset;
+        var itemHeight = 64;
+        var criticalNumofItems = Math.floor(wh/itemHeight) ;
+
+        if (that.items.length > criticalNumofItems){
+            this.vpHeight = 'height:'+ wh +'px;';
+        }
+        else {
+            this.vpHeight = 'height:'+ itemHeight * this.items.length +'px;';
+        }
+        
         this.debounce('itemsChanged', function () {
             // If some selectedItems are no longer in the items list, unselect them
             console.debug('itemsChanged');
@@ -379,20 +392,6 @@ Polymer({
             }
             if (that.get('items.length') != that.get('selectedItems.length'))
                 that.set('allselected', false);
-
-
-            // update height of list depending on number of items
-            var topOfset = 142;
-            var wh = window.innerHeight - topOfset;
-            var itemHeight = 65;
-            var criticalNumofItems = Math.floor(wh/itemHeight) + 1 ;
-
-            if (that.items.length > criticalNumofItems){
-                that.vpHeight = 'height:'+ wh +'px;';
-            }
-            else {
-                that.vpHeight = 'height:'+ itemHeight * that.items.length +'px;';
-            }
 
         }, 300);
     },
