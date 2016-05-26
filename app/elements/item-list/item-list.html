@@ -218,7 +218,7 @@
         <div class="row no-data" hidden$="[[items.length]]">
             no data yet
         </div>
-        <iron-list items="[[items]]" as="item" style$="[[vpHeight]]">
+        <iron-list items="[[items]]" as="item" style$="{{vpHeight}}">
             <template>
                 <div class="row" data-index$="[[index]]">
                     <list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]" uri$="[[_itemLink(item)]]">
@@ -310,7 +310,10 @@ Polymer({
             type: Array,
             computed: "displayedFields(section, narrowViewport, mediumViewport, wideViewport, xwideViewport, xxwideViewport)"
         },
-        vpHeight: String
+        vpHeight: {
+            type: String,
+            notify: true
+        }
     },
 
     listeners: {
@@ -322,11 +325,25 @@ Polymer({
     ],
 
     ready: function() {
-        var wh = window.innerHeight - 187;
-        this.vpHeight = 'height:'+ wh +'px;';
+        var topOfset = 142;        
+        var wh = window.innerHeight - topOfset;
+        var itemHeight = 65;
+        var criticalNumofItems = Math.floor(wh/itemHeight) + 1 ;
+
+        console.log('HEHEHEHE',criticalNumofItems,' , ', this.items.length);
+
+        this.vpHeight = 'height:65px;';
+
+        // if (this.items.length > criticalNumofItems){
+        //     this.vpHeight = 'height:'+ wh +'px;';
+        // }
+        // else{
+        //     this.vpHeight = 'height:'+ itemHeight*this.items.length +'px;';
+        // }
     },
 
     attached: function() {
+
         // Re-render iron-list a few times in case the items don't change
         // Prevents empty iron-list when reloading from the list page
         var that = this,
@@ -362,6 +379,20 @@ Polymer({
             }
             if (that.get('items.length') != that.get('selectedItems.length'))
                 that.set('allselected', false);
+
+
+            // update height of list depending on number of items
+            var topOfset = 142;
+            var wh = window.innerHeight - topOfset;
+            var itemHeight = 65;
+            var criticalNumofItems = Math.floor(wh/itemHeight) + 1 ;
+
+            if (that.items.length > criticalNumofItems){
+                that.vpHeight = 'height:'+ wh +'px;';
+            }
+            else {
+                that.vpHeight = 'height:'+ itemHeight * that.items.length +'px;';
+            }
 
         }, 300);
     },
