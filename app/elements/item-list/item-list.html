@@ -189,6 +189,11 @@
                     </template>
                 </app-check>
             </template>
+            <template is="dom-if" if="[[isimages]]">
+                <app-check class="check-all">
+                    <iron-icon icon="star"></iron-icon>
+                </app-check>
+            </template>
             <template is="dom-if" if="[[!selectedItems.length]]">
               <template is="dom-repeat" items="[[fields]]">
                   <div class$="[[item]] field field[[index]] [[_isSortedBy(item, sortBy, sortOrder)]]" on-tap="_changeSortOrder">
@@ -222,6 +227,11 @@
                                 <iron-icon src="[[_computeItemImage(item)]]">M</iron-icon>
                             </app-check>
                             <paper-tooltip for="check" position="right">Select item</paper-tooltip>
+                        </template>
+                        <template is="dom-if" if="[[isimages]]">
+                            <app-check id="check" allselected="{{allselected}}" selected$="{{isSelected(item, selectedItems.splices)}}" item="[[item]]" on-tap="_selectItem">
+                                <iron-icon icon="[[_computeItemImage(item)]]"></iron-icon>
+                            </app-check>
                         </template>
                     </list-item>
                     <paper-button class="more" on-tap="_openItemActions"><iron-icon icon="more-vert"></iron-icon></paper-button>
@@ -479,6 +489,12 @@ Polymer({
     _computeItemImage: function (item) {
         if (!item.cloud || !item.cloud.provider)
             return ''
+
+        if (this.isImages && item.star)
+            return 'star';
+
+        if (this.isImages && !item.star)
+            return 'star-border';
 
         var provider = item.cloud.provider.split('_')[0];
         return '../assets/providers/provider-' + provider + '.png';
