@@ -195,7 +195,7 @@ class Keypair(OODict):
 class Keypairs(FieldsDict):
 
     _item_type = make_field(Keypair)
-    _key_error = exceptions.KeypairNotFoundError
+    _key_error = exceptions.KeyNotFoundError
 
 
 class User(DalUser):

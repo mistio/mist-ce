@@ -7,13 +7,11 @@
         <style include="shared-styles">
             :host {
                 display: block;
-                background: #fafafa;
             }
 
             paper-material {
                 display: block;
                 padding: 20px;
-                margin: 36px;
             }
 
             paper-menu-button paper-button {
@@ -38,10 +36,6 @@
             a {
                 color: black;
                 text-decoration: none;
-            }
-
-            #container {
-                background: #fafafa;
             }
 
             .paper-header [paper-drawer-toggle] {
@@ -81,12 +75,6 @@
                 margin-right: 10px;
             }
 
-            #content {
-                overflow: auto;
-                -webkit-overflow-scrolling: touch;
-                padding: 0 10px;
-            }
-
             paper-icon-button {
                 transition: all 200ms;
             }
@@ -116,46 +104,34 @@
                 padding-right: 8px;
             }
         </style>
-        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
-            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
-            <paper-header-panel id="container" mode="waterfall-tall" view$="[[_actualView(view)]]" main>
-                <paper-toolbar class="tall" style$="[[color]]">
-                    <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
-                    <span class="title"></span>
-                    <app-user-menu email="[[model.email]]"></app-user-menu>
-                    <template is="dom-if" if="[[image]]">
-                        <span class="bottom title">Image "[[image.name]]"</span>
-                    </template>
-                </paper-toolbar>
-                <div class="content">
-                    <template is="dom-if" if="[[image]]">
-                        <paper-material>
-                            <div class="info-table">
-                                <div class="info-body info-group">
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">ID</div>
-                                        <div class="flexchild">[[image.id]]</div>
-                                    </div>
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Name</div>
-                                        <div class="flexchild">[[image.name]]</div>
-                                    </div>
-                                    <div class="info-item flex-horizontal-with-ratios">
-                                        <div class="flexchild">Provider</div>
-                                        <div class="flexchild">[[image.cloud.title]]</div>
-                                    </div>
-                                    <element-for-in content="[[image.extra]]"></element-for-in>
-                                </div>
+        <div id="content">
+            <h2>[[image.name]]</h2>
+            <template is="dom-if" if="[[image]]">
+                <paper-material>
+                    <div class="info-table">
+                        <div class="info-body info-group">
+                            <div class="info-item flex-horizontal-with-ratios">
+                                <div class="flexchild">ID</div>
+                                <div class="flexchild">[[image.id]]</div>
                             </div>
-                        </paper-material>
-                    </template>
-
-                    <div class="absolute-bottom-right">
-                        <paper-fab icon="star" on-tap="_starImage" id="starImageFab"></paper-fab>
+                            <div class="info-item flex-horizontal-with-ratios">
+                                <div class="flexchild">Name</div>
+                                <div class="flexchild">[[image.name]]</div>
+                            </div>
+                            <div class="info-item flex-horizontal-with-ratios">
+                                <div class="flexchild">Provider</div>
+                                <div class="flexchild">[[image.cloud.title]]</div>
+                            </div>
+                            <element-for-in content="[[image.extra]]"></element-for-in>
+                        </div>
                     </div>
-                </div>
-            </paper-header-panel>
-        </paper-drawer-panel>
+                </paper-material>
+            </template>
+
+            <div class="absolute-bottom-right">
+                <paper-fab icon="star" on-tap="_starImage" id="starImageFab"></paper-fab>
+            </div>
+        </div>
         <iron-ajax id="imageStarRequest" url="/api/v1/clouds/{{image.cloud.id}}/images/{{image.id}}" method="POST" on-response="handleStarResponse" on-error="handleStarError"></iron-ajax>
     </template>
     <script>

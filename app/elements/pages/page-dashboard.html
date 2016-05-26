@@ -1,14 +1,15 @@
 <link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
 <link rel="import" href="../section-tile/section-tile.html">
-<!--link rel="import" href="../app-incidents/app-incidents.html"-->
+<link rel="import" href="../app-incidents/app-incidents.html">
 <link rel="import" href="../app-forms/app-forms.html">
 <link rel="import" href="../app-fab/app-fab.html">
 <link rel="import" href="../logs/log-list.html">
 <link rel="import" href="../onb-element/onb-element.html">
+<link rel="import" href="../app-header/app-header.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
-<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-chip/paper-chip.html">
 <link rel="import" href="../clouds/cloud-info.html">
 <dom-module id="page-dashboard">
     <template>
@@ -17,23 +18,13 @@
         :host {
             --layout-margin: 0.5em;
         }
-
-        paper-header-panel {
-            background: rgb(245, 245, 245);
-        }
-
-        paper-header-panel {
-            --paper-header-panel-shadow: {
-                height: 6px;
-                bottom: -6px;
-                box-shadow: inset 0 2px 2px 0 rgba(0, 0, 0, 0.14), inset 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-            }
+        paper-material {
+            overflow: auto !important;
         }
         /* layout helper classes */
-
-        .flex-horizontal-with-ratios {
-            @apply(--layout-horizontal);
-            justify-content: stretch;
+        #content {
+            -webkit-overflow-scrolling: touch;
+            padding: 0 36px 80px 36px;
         }
 
         .flexchild {
@@ -42,125 +33,72 @@
 
         .flex2child {
             @apply(--layout-flex-2);
-            order: 2;
         }
-
-        .flex3child {
-            @apply(--layout-flex-2);
-            order: 1;
-        }
-
-        .pad {
-            padding: 8px;
-        }
-
-        .spacer {
-            padding: 4px 0;
-        }
-        /* header */
-
-        paper-toolbar {
-            background-color: var(--mist-dark-color);
-            color: rgba(255, 255, 255, 0.84);
-        }
-
-        paper-toolbar a {
-            color: rgba(255, 255, 255, 0.84);
-        }
-
-        paper-toolbar::content #topBar.paper-toolbar {
-            margin: 0 auto;
-        }
-
+    
         .search.active {
             left: 15px;
         }
-        /* clouds */
-
         .clouds {
-            display: flex;
-            overflow: hidden;
-            padding: 16px 16px 8px 16px;
-            background-color: #eee;
-            margin: var(--layout-margin);
-            margin-bottom: 16px;
-            background-color: #dedede;
-            box-shadow: 1px 1px 1px 0px rgba(0, 0, 0, 0.1) inset;
-            transition: all 100ms ease;
-            font-size: 14px;
+            min-height: 48px;
+            transition: all 200ms ease-in;
+        }
+        .clouds paper-chip {
+            cursor: pointer;
+        }
+        .clouds paper-chip ::content #chip {
+            background-color: #ddd;
+        }
+        .clouds paper-chip.online .icon {
+            background-color: var(--green-color) !important;
         }
 
-        .clouds span.cloud-title {
-            bottom: -2px;
-            position: relative;
-        }
-
-        .clouds paper-button.online {
-            border-color: green !important;
-        }
-
-        .clouds paper-button.offline {
-            border-color: #D96557 !important;
-        }
-
-        .clouds paper-button:not(#addcoud) {
-            background-color: #fff;
-            color: inherit;
-            border-left: 4px solid #757575;
-            margin-bottom: 8px;
-            padding: 0.7em 0.57em;
-        }
-
-        paper-button:not(#addcoud)::content iron-icon {
-            border-radius: 2em;
-            background-color: #eee;
-            padding: 3px;
-        }
-
-        paper-button:not(#addcoud)::content iron-icon[icon='check'] {
-            color: green;
-        }
-
-        paper-button:not(#addcoud)::content iron-icon[icon='clear'] {
-            color: #fff;
-            background-color: #D96557;
+        .clouds paper-chip.offline .icon {
+            background-color: var(--red-color) !important;
         }
 
         paper-button.blue {
             line-height: 30px;
         }
 
-        paper-menu-button {
-            padding: 0;
-        }
-
-        paper-item {
-            font-size: 14px;
-        }
-        /* sections */
-
         .sections {
-            align-items: stretch;
+            align-items: flex-start;
+            flex-basis: 25%;
+            margin-bottom: 1em;
         }
-
-        a.main-section {
-            min-width: 200px;
-            margin: var(--layout-margin);
-        }
-        /* incidents */
-
         .incidents {
-            margin: var(--layout-margin);
+           margin-bottom: 1em;
+           display: block;
+           width: 100%;
+        }
+        a.main-section {
+            min-width: 150px;
+            flex-basis: 25%;
+        }
+        .columns {
             @apply(--layout-horizontal);
-            align-items: stretch;
+            flex: 1 100%;
         }
-        /* graphs */
-
-        .graphs, .logs {
+        .left,
+        .right,
+        .top {
             margin: var(--layout-margin);
+
         }
+        .left, .right {
+            @apply(--layout-vertical);
+            min-width: 400px;
+            align-items: flex-start;
+            flex-direction: column;
+            flex: 1 50%;
+        }
+        log-list,
         .graphs {
             margin-bottom: 1em;
+            width: 100%;
+            overflow: hidden;
+        }
+        log-list {
+            display: block;
         }
 
         @media (max-width: 489px) {
@@ -175,123 +113,115 @@
             }
         }
 
-        @media (max-width: 639px) {
-            .flex-horizontal-with-ratios {
+        @media (max-width: 1400px) {
+            .columns {
                 @apply(--layout-vertical);
-            }
-            .flex2child {
-                order: 1;
-            }
-            .flex3child {
-                order: 2;
-            }
-        }
-        .content {
-            padding: 50px 16px;
-            margin: 0 auto;
-        }
-        @media (max-width: 1899px) {
-            .content {
-                display: block;
-                max-width: 1100px;
             }
         }
         @media (min-width: 1900px) {
             paper-toolbar::content #topBar {
                 max-width: auto;
             }
-            .content {
-                max-width: auto !important;
-            }
             .flex-horizontal-wide {
                 @apply(--layout-horizontal);
                 flex-wrap: wrap;
-            }
-            .flexchild-wide {
-                @apply(--layout-flex);
             }
             .flexchild-wide-top {
                 flex: 1 100%;
             }
         }
-
-        .onb-area {
-            padding: 8px;
+        polyana-dashboard {
+            position: relative;
+        }
+        log-list ::content h3,
+        polyana-dashboard ::content h3 {
+            text-transform: uppercase;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 36px;
+            margin: 0 24px 0 0;
+        }
+        polyana-dashboard ::content timerange-picker {
+            position: absolute;
+            right: 0;
+            top: 12px;
+        }
+        polyana-dashboard ::content paper-button {
+            margin: 0;
+            min-width: 1px;
+        }
+        polyana-dashboard ::content paper-spinner {
+            display: block;
+            margin: 0 auto;
         }
         </style>
-        <paper-header-panel mode="standard" class="fit">
-            <paper-toolbar class="paper-header">
-                <app-logo white class="flex"></app-logo>
-                <app-bar class="horizontal layout center end-justified" no-search>
-                </app-bar>
-                <app-user-menu email="[[model.email]]"></app-user-menu>
-            </paper-toolbar>
-            <div class="content flex-horizontal-wide">
-                <div class="clouds flexchild-wide-top">
-                    <div class="flex">
-                        <template is="dom-repeat" items="[[model.cloudsArray]]">
-                            <paper-button raised class$="link [[isOnline(item)]] [[isOffline(item)]]" on-tap="_showCloudInfoDialog" id$="[[item.id]]">
-                                <iron-icon src="[[_computeProviderLogo(item.provider)]]"></iron-icon>
-                                <span class="cloud-title">{{item.title}}</span>
-                            </paper-button>
-                        </template>
-                    </div>
-                </div>
-                <div class="container flex-horizontal-with-ratios flexchild-wide">
-                    <!-- FIXME: dom-if needs to be here but gives error -->
-                    <template is="dom-if" if="[[onbstate]]">
-                        <onb-element class="onb-area flex2child top right" onbstate="[[onbstate]]" model="[[model]]"></onb-element>
+        <div id="content" class="flex-horizontal-wide" main>
+            <div class="clouds top flexchild-wide-top">
+                <div class="flex">
+                    <template is="dom-repeat" items="[[model.cloudsArray]]">
+                        <paper-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" on-tap="_showCloudInfoDialog" id$="[[item.id]]" animated>
+                            <div class="icon"></div>  
+                            <!-- src="[[_computeProviderLogo(item.provider)]]" -->
+                            <h1 class="cloud-title">{{item.title}}</h1>
+                        </paper-chip>
                     </template>
-                    <!--template is="dom-if" if="[[model.monitoring]]">
-                        <app-incidents hidden$="[[onbstate]]" id="right" class="flex2child incidents top right" model="[[model]]">
-                        </app-incidents>
-                    </template-->
-                    <div id="left" class="flex3child top left">
-                        <div class="sections layout horizontal wrap">
-                            <a href="/machines" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
-                                </section-tile>
-                            </a>
-                            <a href="/images" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="[[model.imagesArray.length]]"></section-tile>
-                            </a>
-                            <a href="/keys" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="[[model.keysArray.length]]"></section-tile>
-                            </a>
-                            <a href="/networks" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="[[model.networksArray.length]]"></section-tile>
-                            </a>
-                            <a href="/scripts" class="main-section flex" is=" pushstate-anchor">
-                                <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="[[model.scriptsArray.length]]"></section-tile>
-                            </a>
-                            <a href="/templates" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="templates" color="[[sections.templates.color]]" icon="[[sections.templates.icon]]" count="[[model.templatesArray.length]]"></section-tile>
-                            </a>
-                            <a href="/stacks" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="stacks" color="[[sections.stacks.color]]" icon="[[sections.stacks.icon]]" count="[[model.stacksArray.length]]"></section-tile>
-                            </a>
-                            <a href="/teams" class="main-section flex" is="pushstate-anchor">
-                                <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
-                            </a>
+                </div>
+                <cloud-info></cloud-info>
+            </div>                
+            <!-- <template is="dom-if" if="[[onbstate]]">
+                <onb-element class="onb-area flex2child top right" onbstate="[[onbstate]]" model="[[model]]"></onb-element>
+            </template> -->
+            <div class="columns">
+                <div id="leftcolumn" class="left">
+                    <template is="dom-if" if="[[model.monitoring]]">
+                        <div class="incidents">
+                            <app-incidents model="[[model]]" sections="[[sections]]">
+                            </app-incidents>
                         </div>
-                    </div>
-                </div>
-                <div class="bottom full flexchild-wide">
-                    <div class="graphs">
+                    </template>
+                    <div class="sections layout horizontal wrap">
+                        <a href="/machines" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
+                            </section-tile>
+                        </a>
+                        <a href="/images" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="[[model.imagesArray.length]]"></section-tile>
+                        </a>
+                        <a href="/keys" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="[[model.keysArray.length]]"></section-tile>
+                        </a>
+                        <a href="/networks" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="[[model.networksArray.length]]"></section-tile>
+                        </a>
+                        <a href="/scripts" class="main-section flex" is=" pushstate-anchor">
+                            <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="[[model.scriptsArray.length]]"></section-tile>
+                        </a>
+                        <a href="/templates" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="templates" color="[[sections.templates.color]]" icon="[[sections.templates.icon]]" count="[[model.templatesArray.length]]"></section-tile>
+                        </a>
+                        <a href="/stacks" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="stacks" color="[[sections.stacks.color]]" icon="[[sections.stacks.icon]]" count="[[model.stacksArray.length]]"></section-tile>
+                        </a>
+                        <a href="/teams" class="main-section flex" is="pushstate-anchor">
+                            <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
+                        </a>                        
+                    </div>  
+                    <paper-material class="graphs">
                         <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
-                    </div>
-                    <div class="logs">
-                        <log-list></log-list>
-                    </div>
+                    </paper-material>
                 </div>
-                <div class="absolute-bottom-right">
-                    <a href="/add-cloud">
-                        <paper-fab id="addBtn" icon="add"></paper-fab>
-                    </a>
-                </div>
+                <paper-material id="rightcolumn" class="left logs">
+                    <log-list></log-list>
+                </paper-material>
             </div>
-        </paper-header-panel>
-        <cloud-info></cloud-info>
+
+            <div class="absolute-bottom-right">
+                <a href="/add-cloud">
+                    <paper-fab id="addBtn" icon="add"></paper-fab>
+                </a>
+            </div>
+        </div>
+    
     </template>
 </dom-module>
 <script>
@@ -301,7 +231,7 @@ Polymer({
     enableCustomStyleProperties: true,
     properties: {
         sections: {
-            type: Array
+            type: Object
         },
         model: {
             type: Object,

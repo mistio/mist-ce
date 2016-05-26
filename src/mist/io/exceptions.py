@@ -61,8 +61,8 @@ class RequiredParameterMissingError(BadRequestError):
     msg = "Required parameter not provided"
 
 
-class KeypairParameterMissingError(RequiredParameterMissingError):
-    msg = "Keypair id parameter missing"
+class KeyParameterMissingError(RequiredParameterMissingError):
+    msg = "Key id parameter missing"
 
 
 class KeyValidationError(BadRequestError):
@@ -118,8 +118,8 @@ class NetworkError(NotFoundError, KeyError):
     msg = "Error on network action"
 
 
-class KeypairNotFoundError(NotFoundError, KeyError):
-    msg = "Keypair not found"
+class KeyNotFoundError(NotFoundError, KeyError):
+    msg = "Key not found"
 
 
 class MachineNotFoundError(NotFoundError, KeyError):
@@ -146,7 +146,7 @@ class CloudNameExistsError(ConflictError):
     msg = "Cloud name exists"
 
 
-class KeypairExistsError(ConflictError):
+class KeyExistsError(ConflictError):
     msg = "Key name exists"
 
 

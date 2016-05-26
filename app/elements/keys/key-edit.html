@@ -27,7 +27,7 @@
             <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
                 <p>
-                    <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{newKey.id}}"></paper-input>
+                    <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{newKey.name}}"></paper-input>
                 </p>
                 <div class="clearfix btn-group">
                 <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
@@ -60,7 +60,7 @@
                     },
                     formReady: {
                         type: Boolean,
-                        computed: '_computeFormReady(newKey.id, sendingData)'
+                        computed: '_computeFormReady(key.name, newKey.name, sendingData)'
                     }
                 },
                 listeners: {
@@ -68,13 +68,13 @@
                 },
                 _computeNewKey: function(key) {
                     return {
-                        id: key.id
+                        name: key.name
                     };
                 },
-                _computeFormReady: function(id, sendingData) {
+                _computeFormReady: function(name, newName, sendingData) {
                     var formReady = false;
 
-                    if (id) {
+                    if (newName && name != newName) {
                         formReady = true;
                     }
 
@@ -101,14 +101,14 @@
                     this.$.keyEditAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.keyEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.keyEditAjaxRequest.body = {
-                        new_id: this.newKey.id
+                        new_name: this.newKey.name
                     };
                     this.$.keyEditAjaxRequest.generateRequest();
 
                     this.set('sendingData', true);
                 },
                 _formReset: function() {
-                    //   this.set('key.id', '');
+                    //   this.set('key.name', '');
                 },
                 _handleKeyEditAjaxResponse: function(e) {
                     this.set('sendingData', false);

@@ -416,6 +416,10 @@ Polymer({
         return section && section.id == "teams";
     },
 
+    isIncidents: function(section) {
+        return section && section.id == "incidents";
+    },
+
     isSelected: function(item, selectedItems, items) {
         return this.selectedItems.indexOf(this.itemUid(item)) > -1;
     },
@@ -437,7 +441,7 @@ Polymer({
             return ['name', 'cloud', 'id']
         }
         if (this.isKeys(this.section)) {
-            return ['id', 'machines', 'default']
+            return ['name', 'machines', 'default']
         }
         if (this.isNetworks(this.section)) {
             return ['name', 'cloud', 'state', 'id', 'public']
@@ -453,6 +457,9 @@ Polymer({
         }
         if (this.isTeams(this.section)) {
             return ['name', 'description', 'organisation']
+        }
+        if (this.isIncidents(this.section)) {
+            return ['incident_id', 'machine_id', 'cloud_id', 'rule_id', 'started_at', 'finished_at']
         }
         return ['id'];
 
@@ -551,10 +558,16 @@ Polymer({
             p = item.name
         else if (s == "scripts")
             p = item.script_id
+        else if (s == "incidents")
+            p = item.machine_id
         else
             p = item.id
 
-        return "/" + this.section.id + "/" + p;
+
+        if (s != "incidents")
+            return "/" + this.section.id + "/" + p;
+        else
+            return "/machines/" + p;
     },
 
     _getHeaderStyle: function(color, selectedItemsLength) {

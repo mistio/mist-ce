@@ -167,85 +167,61 @@
             width: 100%;
         }
         </style>
-        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
-            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
-            <paper-header-panel id="container" mode="waterfall-tall" main>
-                <paper-toolbar class="tall" style$="[[color]]">
-                    <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
-                    <span class="title"></span>
-                    <app-user-menu email="[[model.email]]"></app-user-menu>
-                    <span class="bottom title"><span class="up">[[team.name]]</span> Team</span>
 
-                    <span class="bottom right-actions">
-                        <paper-tooltip for="editTeam" position="top">Edit Team</paper-tooltip>
-                        <paper-icon-button id="editTeam" icon="icons:create" on-tap="_editTeam"></paper-icon-button>
-                        <paper-tooltip for="deleteTeam" position="top">Delete Team</paper-tooltip>
-                        <paper-icon-button id="deleteTeam" icon="icons:delete" on-tap="_deleteTeam"></paper-icon-button>
-                    </span>
 
-                    <div class="subhead bottom">
-                        <span>Organisation: [[team.organisation]]</span>
-                        <div class="fab-top-right">
-                            <paper-fab icon="add" on-tap="_addMember" id="addMemberTeamFab"></paper-fab>
-                            <paper-tooltip for="runTeamFab" position="bottom">Add Member to Team</paper-tooltip>
-                        </div>
+        <div id="content">
+            <div class="page section">
+                <h2>[[team.name]]</h2>
+                <div class="flex-horizontal-with-ratios section">
+                    <div class="page-block">
+                        <h3 class="smallcaps">Description</h3>
+                        <p>[[team.description]]</p>
                     </div>
-                </paper-toolbar>
-
-                <div class="content">
-                    <div class="page section">
-                        <div class="flex-horizontal-with-ratios section">
-                            <div class="page-block">
-                                <h3 class="smallcaps">Description</h3>
-                                <p>[[team.description]]</p>
-                            </div>
-                            <div class="page-block">
-                                <h3 class="smallcaps">Created at</h3>
-                                <p>[[timestamp]] </p>
-                            </div>
-                        </div>
-                        <div class="flex-horizontal-with-ratios section">
-                            <div class="width100">
-                                <template is="dom-if" if="[[hasMembers]]">
-                                    <paper-material class="no-pad">
-                                        <h3 class="smallcaps resource-head">Members in [[team.name]] team</h3>
-                                        <template is="dom-repeat" items="[[team.members]]">
-                                            <paper-item>
-                                                <a href="/members/[[item.id]]"  class="flex-horizontal-with-ratios width100">
-                                                    <span class="flexchild">[[item.name]] </span>
-                                                    <span class="flexchild">[[item.email]]</span>
-                                                </a>
-                                            </paper-item>
-                                        </template>
-                                    </paper-material>
-                                </template>
-
-                                <template is="dom-if" if="[[!hasMembers]]">
-                                    <h3 class="smallcaps">Members</h3>
-                                    <p>
-                                        You have not yet added members in [[team.name]] team.
-                                    </p>
-                                    <paper-button class="blue pad-left2 pad-right2" on-tap="_addMember"> Add Member </paper-button>
-                                </template>
-                            </div>
-                        </div>
-                        <div class="flex-horizontal-with-ratios section">
-                            <div class="width100">
-                                <paper-material class="no-pad">
-                                    <!-- TODO: make interactive add edit of rules -->
-                                    <h3 class="smallcaps resource-head">Team Policy</h3>
-                                    <paper-item>ALLOW add cloud</paper-item>
-                                    <paper-item>ALLOW create machines</paper-item>
-                                    <paper-item>ALLOW read machines</paper-item>
-                                    <paper-item>ALLOW reboot machines</paper-item>
-                                    <paper-item>ALLOW monitor machines</paper-item>
-                                </paper-material>
-                            </div>
-                        </div>
+                    <div class="page-block">
+                        <h3 class="smallcaps">Created at</h3>
+                        <p>[[timestamp]] </p>
                     </div>
                 </div>
-            </paper-header-panel>
-        </paper-drawer-panel>
+                <div class="flex-horizontal-with-ratios section">
+                    <div class="width100">
+                        <template is="dom-if" if="[[hasMembers]]">
+                            <paper-material class="no-pad">
+                                <h3 class="smallcaps resource-head">Members in [[team.name]] team</h3>
+                                <template is="dom-repeat" items="[[team.members]]">
+                                    <paper-item>
+                                        <a href="/members/[[item.id]]"  class="flex-horizontal-with-ratios width100">
+                                            <span class="flexchild">[[item.name]] </span>
+                                            <span class="flexchild">[[item.email]]</span>
+                                        </a>
+                                    </paper-item>
+                                </template>
+                            </paper-material>
+                        </template>
+
+                        <template is="dom-if" if="[[!hasMembers]]">
+                            <h3 class="smallcaps">Members</h3>
+                            <p>
+                                You have not yet added members in [[team.name]] team.
+                            </p>
+                            <paper-button class="blue pad-left2 pad-right2" on-tap="_addMember"> Add Member </paper-button>
+                        </template>
+                    </div>
+                </div>
+                <div class="flex-horizontal-with-ratios section">
+                    <div class="width100">
+                        <paper-material class="no-pad">
+                            <!-- TODO: make interactive add edit of rules -->
+                            <h3 class="smallcaps resource-head">Team Policy</h3>
+                            <paper-item>ALLOW add cloud</paper-item>
+                            <paper-item>ALLOW create machines</paper-item>
+                            <paper-item>ALLOW read machines</paper-item>
+                            <paper-item>ALLOW reboot machines</paper-item>
+                            <paper-item>ALLOW monitor machines</paper-item>
+                        </paper-material>
+                    </div>
+                </div>
+            </div>
+        </div>
         <team-edit team="[[team]]"></team-edit>
         <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[team.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
         <dialog-element></dialog-element>

@@ -17,7 +17,7 @@ import ssl
 import tempfile
 import mongoengine as me
 
-from mist.io.exceptions import CloudNotFoundError, KeypairNotFoundError
+from mist.io.exceptions import CloudNotFoundError, KeyNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import ServiceUnavailableError
@@ -218,10 +218,10 @@ class ParamikoShell(object):
                       key_id=None, username=None, password=None, port=22):
         """Autoconfigure SSH client.
 
-        This will do its best effort to find a suitable keypair and username
+        This will do its best effort to find a suitable key and username
         and will try to connect. If it fails it raises
         MachineUnauthorizedError, otherwise it initializes self and returns a
-        (key_id, ssh_user) tupple. If connection succeeds, it updates the
+        (key_id, ssh_user) tuple. If connection succeeds, it updates the
         association information in the key with the current timestamp and the
         username used to connect.
 
@@ -236,7 +236,7 @@ class ParamikoShell(object):
             machine = Machine(cloud=cloud, machine_id=machine_id)
 
         if key_id:
-            keys = [Keypair.objects.get(owner=user, name=key_id)]
+            keys = [Keypair.objects.get(owner=user, id=key_id)]
         else:
             keys = [key_assoc.keypair
                     for key_assoc in machine.key_associations

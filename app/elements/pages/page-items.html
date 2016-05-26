@@ -149,33 +149,18 @@
             display: none;
         }
         </style>
-        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
-            <app-sidebar model="[[model]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
-            <paper-header-panel id="container" mode="[[_getMode(narrowMode)]]" view$="[[_actualView(view)]]" main>
-                <paper-toolbar class="medium-tall" style$="color: fff; background-color: [[section.color]]">
-                    <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
-                    <span class="title"></span>
-
-                    <app-user-menu email="[[model.email]]"></app-user-menu>
-                    <span class="paper-header bottom">
-                        <h2 class="flex" on-tap="toggleSearch">[[filteredItems.length]] [[pageTitle]]</h2>
-                        <app-bar class="horizontal layout center end-justified" showingSearch="{{showingSearch}}" query="{{q}}"></app-bar>
-                        <paper-icon-button class="toggleViewButton" icon="[[viewIcon]]" on-tap="toggleView"></paper-icon-button>
-                    </span>
-                </paper-toolbar>
-                <div id="content">
-                    <div id="section-heading" hidden$="[[!section]]">
-                        <div class="description">[[section.description]]</div>
-                    </div>
-                    <template is="dom-if" if="[[_stampCards(view)]]">
-                        <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>
-                    </template>
-                    <template is="dom-if" if="[[_stampTable(view)]]">
-                        <item-list sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-list>
-                    </template>
-                </div>
-            </paper-header-panel>
-        </paper-drawer-panel>
+        
+        <div id="content">
+            <div id="section-heading" hidden$="[[!section]]">
+                <div class="description">[[section.description]]</div>
+            </div>
+            <template is="dom-if" if="[[_stampCards(view)]]">
+                <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>
+            </template>
+            <template is="dom-if" if="[[_stampTable(view)]]">
+                <item-list sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-list>
+            </template>
+        </div>
 
         <div class="absolute-bottom-right">
             <paper-fab icon="add" on-tap="_fabAction" hidden$="[[!section.add]]"></paper-fab>
@@ -228,7 +213,6 @@
 
         observers: [
             'sortingObserver(items.*, sortBy, sortOrder, q)',
-            'scrollToTop(section)'
         ],
 
         ready: function() {
@@ -244,6 +228,8 @@
                 this.set('sortBy', 'name');
             else if (this.section.id == 'teams')
                 this.set('sortBy', 'name');
+            else if (this.section.id == 'incidents')
+                this.set('sortBy', 'started_at');
             else
                 this.set('sortBy', 'id');
         },
@@ -258,7 +244,6 @@
             } else {
                 this.pageTitle = "All";
             }
-            this.$.drawerPanel.closeDrawer();
         },
 
         toggleView: function() {
@@ -275,14 +260,6 @@
             } else {
                 return 'view-list';
             }
-        },
-
-        closeDrawer: function() {
-            this.$.drawerPanel.closeDrawer();
-        },
-
-        scrollToTop: function() {
-            this.$.container.scroller.scrollTop = 0;
         },
 
         toggleSearch: function (e) {
