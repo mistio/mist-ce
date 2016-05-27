@@ -93,7 +93,7 @@ catalog-app {
     -khtml-user-select: all;    /* Konqueror */
     -moz-user-select: all;      /* Firefox */
     -ms-user-select: all;       /* Internet Explorer/Edge */
-    user-select: all;    
+    user-select: all;
 }
 .logdetailswrapper table {
     background-color: #f5f5f5;
@@ -108,10 +108,10 @@ catalog-app {
     border-bottom: 1px solid #ddd;
 }
 .logdetailswrapper table td:first-child {
-    font-weight: 500; 
+    font-weight: 500;
     width: 190px;
     text-transform: capitalize;
-    padding-left: 24px;    
+    padding-left: 24px;
 }
 .logdetailswrapper table tr:last-child td {
     border-bottom: 0 none;
@@ -311,7 +311,7 @@ iron-dropdown paper-material {
     font-size: 14px;
     overflow: hidden !important;
     word-break: break-all !important;
-    word-wrap: break-word !important; 
+    word-wrap: break-word !important;
     white-space: normal !important;
 }
 

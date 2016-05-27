@@ -207,13 +207,14 @@
                         [[key.name]] - [[key.id]] <iron-icon icon="star" hidden$="[[!isDefault]]"></iron-icon>
                     </h2>
                     <div class="subtitle">
-                        <apan hidden$="[[keyHasMachines]]">
+                        <span hidden$="[[keyHasMachines]]">
                             No machines are using this key
-                        </apan>
+                        </span>
                         <span hidden$="[[!keyHasMachines]]">
                             [[keyMachines.length]] machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key
                         </span>
                     </div>
+
                 </div>
                 <div class="item-actions">
                     <paper-button on-tap="_makeDefaultKey" hidden$="[[isDefault]]" class="simple">make default</paper-button>

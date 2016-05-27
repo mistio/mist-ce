@@ -25,6 +25,7 @@
 <link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
 <link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 
+
 <link rel="import" href="../app-bar/app-bar.html">
 <link rel="import" href="../app-socket/app-socket.html">
 <link rel="import" href="../app-styles/app-styles.html">
@@ -35,6 +36,7 @@
 <link rel="import" href="../app-check/app-check.html">
 <link rel="import" href="../pages/page-dashboard.html">
 <link rel="import" href="../pages/page-items.html">
+<link rel="import" href="../notifications-element/notifications-element.html">
 
 <link rel="import" href="../pages/page-not-found.html">
 
@@ -48,7 +50,7 @@
       }
       paper-header-panel {
         background-color: #eee;
-      }    
+      }
       iron-pages {
         padding: 24px;
         margin-left: 210px;
@@ -113,7 +115,7 @@
             <iron-route path="/account" title="account" current="account"></iron-route>
             <iron-route path="*"></iron-route>
         </iron-routes>
-        
+
       <paper-header-panel mode="standard" class="fit">
         <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
         <app-header model="[[model]]" title="{{title}}" class="paper-header" style$="[[style]]"></app-header>
@@ -452,11 +454,15 @@ var app = Polymer({
     updateCurrent: function(e) {
         // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
         var el = e.detail.item;
+
+        this.current = el.getAttribute("current");
+        this.title = el.title;
         console.log("el",e.detail);
         if (el.nodeName == 'IRON-ROUTE') {
             this.current = el.getAttribute("current");
             this.title = el.title;
         }
+
     },
 
     _style: function(current){
