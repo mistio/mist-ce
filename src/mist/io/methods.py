@@ -1496,22 +1496,18 @@ def list_machines(user, cloud_id):
     except Exception as exc:
         log.error("Error while running list_nodes: %r", exc)
         raise CloudUnavailableError(exc=exc)
-    machines_from_db = sorted(Machine.objects(cloud=cloud),
-                              key=lambda ma: ma.machine_id)
+
+    # create a dict with the machines from the db with key the machine_id
+    machines_from_db = {machine.machine_id: machine
+                        for machine in Machine.objects(cloud=cloud)}
+    now = datetime.utcnow()
     ret = []
-    machine_entry_ptr = 0
+
     for m in machines_from_provider:
 
-        while machine_entry_ptr < len(machines_from_db) and \
-                        m.id > machines_from_db[machine_entry_ptr].machine_id:
-            machine_entry_ptr += 1
-
-        if machine_entry_ptr < len(machines_from_db) and \
-                        m.id == machines_from_db[machine_entry_ptr].machine_id:
-            machine_entry = machines_from_db[machine_entry_ptr]
-        else:
-            machine_entry = None
-            machine_entry_ptr += 1
+        machine_entry = machines_from_db.pop(m.id, None)
+        if machine_entry:
+            machine_entry.update(set__last_seen=now, set__missing_since=None)
 
         if m.driver.type == 'gce':
             # tags and metadata exist in GCE
@@ -1620,12 +1616,23 @@ def list_machines(user, cloud_id):
                    'private_ips': m.private_ips,
                    'public_ips': m.public_ips,
                    'tags': tags,
+                   # this lines have been commented out temporarily to ensure
+                   # that there will be no issue with the frontend
+                   # 'missing_since': machine_entry.missing_since
+                   # if machine_entry and machine_entry.missing_since else '',
+                   # 'last_seen': machine_entry.last_seen
+                   # if machine_entry and machine_entry.last_seen else '',
                    'extra': m.extra}
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
     if conn.type == 'libvirt':
         # close connection with libvirt
         conn.disconnect()
+
+    # mark machines that are no longer available in list_nodes as missing
+    for machine_entry in machines_from_db.values():
+        if not machine_entry.missing_since:
+            machine_entry.update(set__missing_since=now)
     return ret
 
 
