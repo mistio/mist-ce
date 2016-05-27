@@ -54,12 +54,6 @@
         border-bottom: 1px solid #ddd;
       }
       .header{
-        background-color: #bdbdbd;
-        width: auto;
-        line-height: 80px;
-        height: 70px;
-
-      #header{
         background-color: #cacaca;
         margin-top: 0;
         height: 64px;
@@ -129,7 +123,7 @@
         <paper-dialog opened="{{mainDialogOpen}}">
           <div class="header">
             <iron-icon id="settings" icon="icons:settings" on-click="_onNextClick" active="{{mainDialogOpen}}"></iron-icon>
-            <h2>Notifications</h2>
+            <h2 class="flex">Notifications</h2>
           </div>
           <paper-dialog-scrollable>
             <template is="dom-repeat" items="[[notifications]]">
@@ -157,6 +151,7 @@
 
     </neon-animated-pages>
 
+
   </template>
   <script>
     Polymer({
@@ -169,22 +164,9 @@
           type: Number,
           value: 0
         },
-
-      },
-
-      _onPrevClick: function() {
-        this.entryAnimation = 'slide-from-left-animation';
-        this.exitAnimation = 'slide-right-animation';
-        this.selected = this.selected === 0 ? 4 : (this.selected - 1);
-      },
-      _onNextClick: function() {
-        this.entryAnimation = 'slide-from-right-animation';
-        this.exitAnimation = 'slide-left-animation';
-        this.selected = this.selected === 4 ? 0 : (this.selected + 1);
-
         notifications: {
           type: Array,
-          value= [
+          value: [
             {
               text: 'Server down-time',
               type: 'red'
@@ -203,6 +185,21 @@
             }
           ]
         }
+
+
+
+      },
+
+      _onPrevClick: function() {
+        this.entryAnimation = 'slide-from-left-animation';
+        this.exitAnimation = 'slide-right-animation';
+        this.selected = this.selected === 0 ? 4 : (this.selected - 1);
+      },
+      _onNextClick: function() {
+        this.entryAnimation = 'slide-from-right-animation';
+        this.exitAnimation = 'slide-left-animation';
+        this.selected = this.selected === 4 ? 0 : (this.selected + 1);
+
       },
 
     });
