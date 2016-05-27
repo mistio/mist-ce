@@ -155,6 +155,14 @@
                 font-weight: 700;
             }
 
+            h4.id {
+                display: inline-block;
+                text-transform: uppercase;
+                font-size: 0.9rem;
+                font-weight: 700;
+                margin-right: 16px;
+            }
+
             .head paper-button {
                 flex: none !important;
                 display: inline-block;
@@ -200,22 +208,16 @@
             }
         </style>
         <div id="content">
-
-            <h2>[[key.name]]</h2>
-            <div class="subhead">
-                <div class="no-machines-list" hidden$="[[keyHasMachines]]">
-                    <h5>No machines are using this key</h5>
-
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <a class="icon" href="/keys"><iron-icon icon="[[section.icon]]"></iron-icon></a>
                 <div class="title flex">
                     <h2>
-                        [[key.id]] <iron-icon icon="star" hidden$="[[!isDefault]]"></iron-icon>
+                        [[key.name]] <iron-icon icon="star" hidden$="[[!isDefault]]"></iron-icon>
                     </h2>
-                    <div class="subtitle">
-                        <apan hidden$="[[keyHasMachines]]">
+                    <div class="subtitle">                        
+                        <span hidden$="[[keyHasMachines]]">
                             No machines are using this key
-                        </apan>
+                        </span>
                         <span hidden$="[[!keyHasMachines]]">
                             [[keyMachines.length]] machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key
                         </span>
@@ -229,7 +231,9 @@
             </paper-material>
 
             <div class="key-info">
+                <!-- <paper-material></paper-material> -->
                 <paper-material>
+                    <h4 class="id">Key ID:</h4><span class="id">[[key.id]]</span> 
                     <div class="head">
                         <h4 class="key">Public Key</h4>
                         <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="right link">Copy <span class="wide">public key</span>
@@ -283,7 +287,7 @@
         <template is="dom-if" if="{{key.id}}">
             <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         </template>
-        <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/{{key.id}}" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
+        <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/[[key.id]]" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
         <iron-ajax id="keyDeleteAjaxRequest" url="/api/v1/keys/[[key.id]]" method="DELETE" on-response="_handleKeyDeleteAjaxResponse" on-error="_handleKeyDeleteAjaxError"></iron-ajax>
         <key-edit key="[[key]]"></key-edit>
         <dialog-element></dialog-element>
@@ -450,7 +454,7 @@
                         }
                     }
                     this.set('key.isDefault', true);
-                    this.$.toast.text = this.key.id + ' has become your default Key!';
+                    this.$.toast.text = this.key.name + ' has become your default Key!';
                     this.$.toast.open();
                 },
                 _editKey: function(e) {
@@ -474,7 +478,7 @@
                 _deleteKey: function(e) {
                     this._showDialog({
                         title: 'Delete Key?',
-                        body: "Deleting a key can not be undone. You are about to delete key '" + this.key.id + "'.",
+                        body: "Deleting a key can not be undone. You are about to delete key '" + this.key.name + "'.",
                         danger: true,
                         reason: "key.delete"
                     });
