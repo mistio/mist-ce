@@ -3,50 +3,50 @@
 
 <dom-module id="key-add">
     <template>
-        <style is="custom-style" include="dialogs"></style>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
             :host {
                 display: block;
             }
 
-            paper-card {
-                display: block;
+            paper-material {
+                padding: 24px;
             }
-
-            paper-dialog {
-                width: 100%;
-                max-width: 800px;
-            }
-            .btn-block {
-
-            }
-            .submit-btn:not([disabled]) {
-                background-color: var(--mist-blue);
-                color: #fff;
+            #content {
+                max-width: 900px;
             }
 
         </style>
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Add Key
+                    </h2>
+                    <div class="subtitle">
+                        You can generate or upload a key.
+                    </div>
+                </div>                        
+            </paper-material>
+            <paper-material>
+                <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{key.name}}"></paper-input>
 
-        <paper-dialog id="addKeyModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
-            <h2>Add Key</h2>
-            <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
-            <paper-dialog-scrollable>
-                <p>
-                    <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{key.name}}"></paper-input>
+                <paper-textarea id="privateKey" label="Private Key" rows="5" required error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
 
-                    <paper-textarea id="privateKey" label="Private Key" rows="5" required error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
-
-                    <paper-textarea id="publicKey" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
-                </p>
+                <paper-textarea id="publicKey" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
                 <div class="clearfix btn-group">
-                    <paper-button class="purple" raised on-tap="_generateKeyAjax">Generate</paper-button>
-                    <paper-button class="purple" raised on-tap="_uploadKey">Upload</paper-button>
-                    <input type="file" name="file" value="{{key.file}}" on-change="_uploadFile" hidden id="keyUpload" />
-
-                    <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
+                    <hr class="xs12" />                    
+                    <div class="clearfix bottom-actions xs12">
+                        <paper-button class="purple" raised on-tap="_generateKeyAjax">Generate</paper-button>
+                        <paper-button class="purple" raised on-tap="_uploadKey">Upload</paper-button>
+                        <input type="file" name="file" value="{{key.file}}" on-change="_uploadFile" hidden id="keyUpload" />
+                        <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
+                    </div>
                 </div>
-            </paper-dialog-scrollable>
-        </paper-dialog>
+            </paper-material>
+        </div>
 
         <iron-ajax id="generateKeyAjax" url="/keys" method="POST" on-request="_generateKeyAjaxRequest" on-response="_generateKeyAjaxResponse"></iron-ajax>
         <iron-ajax id="addKeyAjax" url="/keys" method="POST" on-request="_addKeyAjaxRequest" on-response="_addKeyAjaxResponse"></iron-ajax>
@@ -71,6 +71,9 @@
                             }
                         },
                         notify: true
+                    },
+                    section: {
+                        type: Object
                     },
                     showPublicKey: {
                         type: Boolean,

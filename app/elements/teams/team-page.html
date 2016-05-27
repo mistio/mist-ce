@@ -10,12 +10,11 @@
         <style include="shared-styles">
         :host {
             display: block;
-            background: #fafafa;
         }
 
         paper-material {
             display: block;
-            padding: 8px;
+            padding: 24px;
         }
 
         paper-material.no-pad {
@@ -38,10 +37,6 @@
         a {
             color: black;
             text-decoration: none;
-        }
-
-        #container {
-            background: #fafafa;
         }
 
         .paper-header [paper-drawer-toggle] {
@@ -79,12 +74,6 @@
 
         .paper-header .cartButton {
             margin-right: 10px;
-        }
-
-        #content {
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 0 10px;
         }
 
         paper-icon-button {
@@ -156,7 +145,6 @@
             font-weight: 500;
             padding: 8px 16px;
             opacity: 0.87;
-            background-color: #fff;
             border-bottom: 1px solid #ddd;
             margin-bottom: 0;
         }
@@ -170,19 +158,35 @@
 
 
         <div id="content">
-            <div class="page section">
-                <h2>[[team.name]]</h2>
-                <div class="flex-horizontal-with-ratios section">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        [[team.name]]
+                    </h2>
+                    <div class="subtitle">
+                        <span hidden$="[[!team.description]]">[[team.description]] </span> 
+                        <span class="desc" hidden$="[[!team.members.length]]"> ([[team.members.length]] members)</span>
+                    </div>
+                </div>
+                <div class="item-actions">                    
+                    <paper-button on-tap="_addMember" class="simple white" style$="color: [[section.color]]">Invite Members <iron-icon icon="add" style$="color: [[section.color]]"></iron-icon></paper-button>  
+                </div>
+            </paper-material>
+            <paper-material hidden$="[[!team.description]] && [[!timestamp]]">
+                <div class="flex-horizontal-with-ratios">
                     <div class="page-block">
-                        <h3 class="smallcaps">Description</h3>
+                        <h3 class="smallcaps">Team Description</h3>
                         <p>[[team.description]]</p>
                     </div>
                     <div class="page-block">
-                        <h3 class="smallcaps">Created at</h3>
-                        <p>[[timestamp]] </p>
+                        <h3 class="smallcaps">Created</h3>
+                        <p>[[timestamp]]
+                        </p>
                     </div>
                 </div>
-                <div class="flex-horizontal-with-ratios section">
+            </paper-material>
+            <div class="flex-horizontal-with-ratios section">
                     <div class="width100">
                         <template is="dom-if" if="[[hasMembers]]">
                             <paper-material class="no-pad">
@@ -199,11 +203,11 @@
                         </template>
 
                         <template is="dom-if" if="[[!hasMembers]]">
-                            <h3 class="smallcaps">Members</h3>
-                            <p>
-                                You have not yet added members in [[team.name]] team.
-                            </p>
-                            <paper-button class="blue pad-left2 pad-right2" on-tap="_addMember"> Add Member </paper-button>
+                            <div class="text-center">
+                                <h3 class="smallcaps">Members</h3>
+                                <p>You have not yet added members in [[team.name]] team.</p>
+                                <paper-button class="blue pad-left2 pad-right2" on-tap="_addMember"> Add Member </paper-button>
+                            </div>
                         </template>
                     </div>
                 </div>
@@ -225,6 +229,9 @@
         <team-edit team="[[team]]"></team-edit>
         <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[team.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
         <dialog-element></dialog-element>
+        <div class="absolute-bottom-right">
+            <paper-fab icon="add" on-tap="_addMember"></paper-fab>
+        </div>
     </template>
     <script>
     (function() {

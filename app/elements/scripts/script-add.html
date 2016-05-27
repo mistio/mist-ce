@@ -4,15 +4,17 @@
 <dom-module id="script-add">
     <template>
         <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
         :host {
             display: block;
         }
-
+        #content {
+            max-width: 900px;
+        }
         paper-material {
             display: block;
-            padding: 20px;
-            margin: 36px;
+            padding: 24px;
         }
 
         paper-progress {
@@ -29,20 +31,22 @@
         }
 
         </style>
-        <paper-drawer-panel id="drawerPanel" responsive-width="900px" narrow="{{narrowMode}}" drawer-width="272px" disable-edge-swipe selected="[[section]]">
-            <app-sidebar model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="[[section.id]]" drawer></app-sidebar>
-            <paper-header-panel id="container" view$="[[_actualView(view)]]" main>
-                <paper-toolbar style$="[[color]]">
-                    <paper-icon-button icon="icons:arrow-back"></paper-icon-button>
-                    <span class="title"></span>
-                    <app-user-menu email="[[model.email]]"></app-user-menu>
-                    <span class="bottom title">Add Script {{typedName}}</span>
-                </paper-toolbar>
+        
                 <div id="content">
+                    <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+                        <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                        <div class="title flex">
+                            <h2>
+                                Add Script
+                            </h2>
+                            <div class="subtitle">
+                                You can add scripts inline or from a url. You will soon be able to schedule your scripts to run.
+                            </div>
+                        </div>                        
+                    </paper-material>
                     <app-form fields="[[fields]]" form="[[script]]" url="/api/v1/scripts" on-request="_addScriptAjaxRequest" on-response="_addScriptAjaxResponse" on-leadchange="_updateTypedName"></app-form>
                 </div>
-            </paper-header-panel>
-        </paper-drawer-panel>
+            
 
     </template>
     <script>
