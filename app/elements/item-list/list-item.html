@@ -37,8 +37,9 @@
             font-weight: 400;
             /*overflow: scroll;*/
             margin-right: 24px;
-            white-space: nowrap;
             padding: 14px 0;
+            text-overflow: ellipsis;
+            white-space: nowrap;
             overflow: hidden;
         }
 
@@ -170,6 +171,13 @@ Polymer({
             return document.querySelector('app-main').model.clouds[item.cloud_id].machines[item.machine_id].name;
         }
 
+        if (field == 'default') {
+            return document.querySelector('app-main').model.keys[item.id].isDefault ? 'Default' : '';
+        }
+
+        if (field == 'machines') {
+            return document.querySelector('app-main').model.keys[item.id].machines.length;
+        }
 
         if (field == 'stack state') {
             var status = document.querySelector('app-main').model.stacks[item.id].status;

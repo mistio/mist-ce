@@ -155,6 +155,14 @@
                 font-weight: 700;
             }
 
+            h4.id {
+                display: inline-block;
+                text-transform: uppercase;
+                font-size: 0.9rem;
+                font-weight: 700;
+                margin-right: 16px;
+            }
+
             .head paper-button {
                 flex: none !important;
                 display: inline-block;
@@ -204,9 +212,9 @@
                 <a class="icon" href="/keys"><iron-icon icon="[[section.icon]]"></iron-icon></a>
                 <div class="title flex">
                     <h2>
-                        [[key.name]] - [[key.id]] <iron-icon icon="star" hidden$="[[!isDefault]]"></iron-icon>
+                        [[key.name]] <iron-icon icon="star" hidden$="[[!isDefault]]"></iron-icon>
                     </h2>
-                    <div class="subtitle">
+                    <div class="subtitle">                        
                         <span hidden$="[[keyHasMachines]]">
                             No machines are using this key
                         </span>
@@ -223,7 +231,9 @@
             </paper-material>
 
             <div class="key-info">
+                <!-- <paper-material></paper-material> -->
                 <paper-material>
+                    <h4 class="id">Key ID:</h4><span class="id">[[key.id]]</span> 
                     <div class="head">
                         <h4 class="key">Public Key</h4>
                         <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="right link">Copy <span class="wide">public key</span>
