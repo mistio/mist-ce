@@ -2955,11 +2955,16 @@ def list_sizes(user, cloud_id):
 
     try:
         if conn.type == Provider.GCE:
-            #have to get sizes for one location only, since list_sizes returns
-            #sizes for all zones (currently 88 sizes)
-            sizes = conn.list_sizes(location='us-central1-a')
-            sizes = [s for s in sizes if s.name and not s.name.endswith('-d')]
-            #deprecated sizes for GCE
+            initial_sizes = conn.list_sizes()
+            sizes = []
+            for size in initial_sizes:
+                zone = size.extra['zone']
+                size.extra['zone'] = {}
+                size.extra['zone']['id'] = zone.id
+                size.extra['zone']['name'] = zone.name
+                size.extra['zone']['status'] = zone.status
+                size.extra['zone']['country'] = zone.country
+                sizes.append(size)
         elif conn.type == Provider.NEPHOSCALE:
             sizes = conn.list_sizes(baremetal=False)
             dedicated = conn.list_sizes(baremetal=True)
@@ -3080,8 +3085,13 @@ def list_networks(user, cloud_id):
             ret['routers'].append(openstack_router_to_dict(router))
     elif conn.type in [Provider.GCE]:
         networks = conn.ex_list_networks()
+        all_subnets = conn.ex_list_subnets()
+        subnets = []
+        for region in all_subnets:
+            subnets += all_subnets[region]['subnetworks']
         for network in networks:
-            ret['public'].append(gce_network_to_dict(network))
+            ret['public'].append(gce_network_to_dict(network,
+                                 subnets=[s for s in subnets if s['network'].endswith(network.name)]))
     elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST, Provider.EC2_AP_NORTHEAST1, Provider.EC2_AP_NORTHEAST2,
                        Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2,
                        Provider.EC2_EU, Provider.EC2_EU_WEST,
@@ -3148,14 +3158,34 @@ def nephoscale_network_to_dict(network):
     return net
 
 
-def gce_network_to_dict(network):
+def gce_network_to_dict(network, subnets=[]):
     net = {}
     net['name'] = network.name
     net['id'] = network.id
     net['extra'] = network.extra
-    net['subnets'] = [{'name': network.cidr,
-                       'gateway_ip': network.extra.get('gatewayIPv4')}]
+    net['subnets'] = [gce_subnet_to_dict(s) for s in subnets]
     return net
+
+
+def gce_subnet_to_dict(subnet):
+    # In case network is empty
+    if not subnet:
+        return {}
+    # Network and region come in URL form, so we have to split it
+    # and use the last element of the splited list
+    network = subnet['network'].split("/")[-1]
+    region = subnet['region'].split("/")[-1]
+
+    ret = {
+        'id': subnet['id'],
+        'name': subnet['name'],
+        'network': network,
+        'region': region,
+        'cidr': subnet['ipCidrRange'],
+        'gateway_ip': subnet['gatewayAddress'],
+        'creation_timestamp': subnet['creationTimestamp']
+    }
+    return ret
 
 
 def openstack_network_to_dict(network, subnets=[], floating_ips=[], nodes=[]):

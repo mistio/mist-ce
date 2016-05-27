@@ -189,6 +189,11 @@
                     </template>
                 </app-check>
             </template>
+            <template is="dom-if" if="[[isimages]]">
+                <app-check class="check-all">
+                    <iron-icon icon="star"></iron-icon>
+                </app-check>
+            </template>
             <template is="dom-if" if="[[!selectedItems.length]]">
               <template is="dom-repeat" items="[[fields]]">
                   <div class$="[[item]] field field[[index]] [[_isSortedBy(item, sortBy, sortOrder)]]" on-tap="_changeSortOrder">
@@ -213,7 +218,7 @@
         <div class="row no-data" hidden$="[[items.length]]">
             no data yet
         </div>
-        <iron-list items="[[items]]" as="item" style$="[[vpHeight]]">
+        <iron-list items="[[items]]" as="item" style$="{{vpHeight}}">
             <template>
                 <div class="row" data-index$="[[index]]">
                     <list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]" uri$="[[_itemLink(item)]]">
@@ -222,6 +227,11 @@
                                 <iron-icon src="[[_computeItemImage(item)]]">M</iron-icon>
                             </app-check>
                             <paper-tooltip for="check" position="right">Select item</paper-tooltip>
+                        </template>
+                        <template is="dom-if" if="[[isimages]]">
+                            <app-check id="check" allselected="{{allselected}}" selected$="{{isSelected(item, selectedItems.splices)}}" item="[[item]]" on-tap="_selectItem">
+                                <iron-icon icon="[[_computeItemImage(item)]]"></iron-icon>
+                            </app-check>
                         </template>
                     </list-item>
                     <paper-button class="more" on-tap="_openItemActions"><iron-icon icon="more-vert"></iron-icon></paper-button>
@@ -300,7 +310,10 @@ Polymer({
             type: Array,
             computed: "displayedFields(section, narrowViewport, mediumViewport, wideViewport, xwideViewport, xxwideViewport)"
         },
-        vpHeight: String
+        vpHeight: {
+            type: String,
+            notify: true
+        }
     },
 
     listeners: {
@@ -312,11 +325,25 @@ Polymer({
     ],
 
     ready: function() {
-        var wh = window.innerHeight - 187;
-        this.vpHeight = 'height:'+ wh +'px;';
+        var topOfset = 142;
+        var wh = window.innerHeight - topOfset;
+        var itemHeight = 65;
+        var criticalNumofItems = Math.floor(wh/itemHeight) + 1 ;
+
+        console.log('HEHEHEHE',criticalNumofItems,' , ', this.items.length);
+
+        this.vpHeight = 'height:65px;';
+
+        // if (this.items.length > criticalNumofItems){
+        //     this.vpHeight = 'height:'+ wh +'px;';
+        // }
+        // else{
+        //     this.vpHeight = 'height:'+ itemHeight*this.items.length +'px;';
+        // }
     },
 
     attached: function() {
+
         // Re-render iron-list a few times in case the items don't change
         // Prevents empty iron-list when reloading from the list page
         var that = this,
@@ -332,6 +359,19 @@ Polymer({
 
     itemsChanged: function (changeRecord) {
         var that = this;
+        // update height of list depending on number of items
+        var topOfset = 142;
+        var wh = window.innerHeight - topOfset;
+        var itemHeight = 64;
+        var criticalNumofItems = Math.floor(wh/itemHeight) ;
+
+        if (that.items.length > criticalNumofItems){
+            this.vpHeight = 'height:'+ wh +'px;';
+        }
+        else {
+            this.vpHeight = 'height:'+ itemHeight * this.items.length +'px;';
+        }
+
         this.debounce('itemsChanged', function () {
             // If some selectedItems are no longer in the items list, unselect them
             console.debug('itemsChanged');
@@ -453,10 +493,13 @@ Polymer({
             return ['name', 'exec_type', 'location_type'];
         }
         if (this.isStacks(this.section)) {
-            return ['name', 'template', 'description']
+            return ['name', 'template', 'description', 'stack state']
         }
         if (this.isTeams(this.section)) {
-            return ['name', 'description', 'organisation']
+            return ['name', 'description', 'organisation', 'members']
+        }
+        if (this.isIncidents(this.section)) {
+            return ['incident_id', 'machine_id', 'cloud_id', 'rule_id', 'started_at', 'finished_at']
         }
         if (this.isIncidents(this.section)) {
             return ['incident_id', 'machine_id', 'cloud_id', 'rule_id', 'started_at', 'finished_at']
@@ -477,11 +520,17 @@ Polymer({
     },
 
     _computeItemImage: function (item) {
-        if (!item.cloud || !item.cloud.provider)
-            return ''
+        if (this.section.id ==  'images') {
+            return item.star ? 'star' : 'star-border';
+        }
 
-        var provider = item.cloud.provider.split('_')[0];
-        return '../assets/providers/provider-' + provider + '.png';
+        if (!item.cloud || !item.cloud.provider){
+            return ''
+        }
+        else {
+            var provider = item.cloud.provider.split('_')[0];
+            return '../assets/providers/provider-' + provider + '.png';
+        }
     },
 
     _selectItem: function(e, g) {
