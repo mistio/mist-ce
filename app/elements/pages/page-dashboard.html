@@ -34,7 +34,7 @@
         .flex2child {
             @apply(--layout-flex-2);
         }
-    
+
         .search.active {
             left: 15px;
         }
@@ -160,14 +160,14 @@
                 <div class="flex">
                     <template is="dom-repeat" items="[[model.cloudsArray]]">
                         <paper-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" on-tap="_showCloudInfoDialog" id$="[[item.id]]" animated>
-                            <div class="icon"></div>  
+                            <div class="icon"></div>
                             <!-- src="[[_computeProviderLogo(item.provider)]]" -->
                             <h1 class="cloud-title">{{item.title}}</h1>
                         </paper-chip>
                     </template>
                 </div>
                 <cloud-info></cloud-info>
-            </div>                
+            </div>
             <!-- <template is="dom-if" if="[[onbstate]]">
                 <onb-element class="onb-area flex2child top right" onbstate="[[onbstate]]" model="[[model]]"></onb-element>
             </template> -->
@@ -204,8 +204,8 @@
                         </a>
                         <a href="/teams" class="main-section flex" is="pushstate-anchor">
                             <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
-                        </a>                        
-                    </div>  
+                        </a>
+                    </div>
                     <paper-material class="graphs">
                         <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                     </paper-material>
@@ -221,7 +221,7 @@
                 </a>
             </div>
         </div>
-    
+
     </template>
 </dom-module>
 <script>
