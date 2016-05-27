@@ -73,13 +73,20 @@
       paper-icon-button ::content iron-icon {
         color: inherit;
       }
-      #bullet{
+      .bullet{
         color: var(--red-color);
         width: 16px;
         margin-right: 8px;
       }
       .red {
         --paper-badge-background: var(--red-color);
+        color: var(--red-color);        
+      }
+      .green {
+        color: var(--green-color);        
+      }
+      .orange {
+        color: var(--orange-color);        
       }
       paper-badge {
         --paper-badge-margin-left: -40px;
@@ -99,9 +106,9 @@
         <h2 class="flex">Notifications</h2>
       </div>
       <paper-dialog-scrollable>
-        <paper-item id="notif"><iron-icon id="bullet" icon="image:lens"></iron-icon>Server down-time</paper-item>
-        <paper-item id="notif"><iron-icon id="bullet" icon="image:lens"></iron-icon>Machine stopped working</paper-item>
-        <paper-item id="notif"><iron-icon id="bullet" icon="image:lens"></iron-icon>Server over-consumes resources</paper-item>
+        <template is="dom-repeat" items="[[notifications]]">
+          <paper-item><iron-icon class$="bullet [[item.type]]" icon="image:lens"></iron-icon>[[item.text]]</paper-item>
+        </template>
       </paper-dialog-scrollable>
       <div class="buttons">
         <paper-button class="showall">Show all</paper-button>
@@ -114,17 +121,31 @@
 
       properties: {
         mainDialogOpen: Boolean,
-
-
-
+        notifications: {
+          type: Array,
+          value: [
+            {
+              text: 'Server down-time',
+              type: 'red'
+            },
+            {
+              text: 'Machine stopped working',
+              type: 'red'
+            },
+            {
+              text: 'Server down-time',
+              type: 'orange'
+            },
+            {
+              text: 'Collectd installed successfully',
+              type: 'green'
+            }
+          ]
+        }
       },
-
-
       _is: function(){
 
       }
-
-
     });
   </script>
 </dom-module>
