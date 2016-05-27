@@ -227,6 +227,17 @@
             color: rgba(0,0,0,87);
         }
 
+        paper-material paper-button.simple {
+            color: inherit;
+            background-color: transparent;
+        }
+        paper-material paper-button.simple.white {
+            color: inherit;
+            background-color: #fff;
+            padding-left: 24px;
+            padding-right: 24px;
+            margin-left: 8px;
+        }
         .notifications > * {
             color: #fff;
             padding: 8px;
@@ -307,6 +318,10 @@
 
         .blue-link {
             color: var(--mist-blue);
+        }
+
+        .text-center {
+            text-align: center;
         }
 
         .opaque54,
@@ -427,7 +442,7 @@
         }
 
         .tag {
-            display: inline;
+            display: inline-block;
             background-color: #888;
             color: #fff;
             font-size: 14px;
@@ -705,12 +720,72 @@
             border-bottom: 1px solid #7f7f7f;
         }
 
+        .single-head {
+            height: 108px;
+            padding: 24px;
+            box-align: center;
+            align-items: center;
+            background-color: #424242;
+            border-radius: 4px 4px 0 0;
+            box-sizing: border-box;
+            /*background-image: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.46));*/
+        }
+        .single-head .icon {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.018em;
+            line-height: 24px;
+        }
+        .single-head .icon iron-icon {
+            border-radius: 50%;
+            box-sizing: border-box;
+            margin-top: 0;
+            position: relative;
+            flex: 0 0 auto;
+            height: 60px;
+            width: 60px;
+            background-color: rgba(255,255,255,0.15);
+            padding: 8px;
+        }
+        .single-head iron-icon {
+            color: #fff;
+        }
+        .single-head .title {
+            text-align: left;
+            margin-left: 24px;
+            overflow: hidden;
+            flex: 1;
+            color: #fff;
+        }
+        .single-head .title h2 {
+            font-size: 1.5em;
+            line-height: initial;
+        }        
+        .single-head .subtitle {
+            margin-top: 4px;
+        }
+
+        .subtitle .desc {
+            padding-left: 16px;
+            opacity: 0.54;
+            font-size: 0.9em;
+        }
+        .single-head .item-actions {
+            display: inline-block;
+            flex: 0 0 auto;
+            color: #fff;
+        }
+        .single-head .item-actions ::content iron-icon{
+            color: #fff;
+            display: inline-block;
+            vertical-align: bottom;
+        }
         .subhead {
             background-color: #dedede;
             border-bottom: 1px solid #e5e5e5;
             display: flex;
             align-items: baseline;
-            padding: 16px 70px;
+            padding: 16px 24px;
             line-height: 20px;
             font-size: 13px;
             position: relative;
