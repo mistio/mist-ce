@@ -421,14 +421,12 @@
                 copyPublicKey: function() {
                     this.$.keyPublic.select();
                     document.execCommand('copy');
-                    this.$.toast.text = 'The Public Key was copied to clipboard!';
-                    this.$.toast.open();
+                    this._showToast('The Public Key was copied to clipboard!');
                 },
                 copyPrivateKey: function() {
                     this.$.keyPrivate.select();
                     document.execCommand('copy');
-                    this.$.toast.text = 'The Private Key was copied to clipboard!';
-                    this.$.toast.open();
+                    this._showToast('The Private Key was copied to clipboard!');
                 },
                 handlePublicResponse: function(data) {
                     this.publicKey = data.detail.response;
@@ -459,9 +457,7 @@
                     this.$.keyMakeDefaultAjaxRequest.generateRequest();
                 },
                 _handleKeyMakeDefaultAjaxResponse: function(e) {
-                    var toast = this.querySelector('paper-toast');
-                    toast.text = this.key.name + ' has become your default Key!';
-                    toast.show();
+                    this._showToast(this.key.name + ' has become your default Key!');
                 },
                 _deleteKey: function(e) {
                     this._showDialog({
@@ -491,6 +487,11 @@
                         dialog[i] = info[i];
                     }
                     dialog._openDialog();
+                },
+                _showToast: function(msg) {
+                    var toast = this.querySelector('paper-toast');
+                    toast.text = msg;
+                    toast.show();
                 },
                 _goBack: function() {
                     history.back();

@@ -106,11 +106,11 @@
             }
         </style>
         <div id="content">
-            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <a class="icon" href="/keys"><iron-icon icon="[[section.icon]]"></iron-icon></a>
                 <div class="title flex">
                     <h2>
-                        [[image.name]] 
+                        [[image.name]]
                         <iron-icon icon="star" hidden$="{{!isStarred}}"></iron-icon>
                     </h2>
                     <div class="subtitle">
@@ -211,25 +211,25 @@
                 _starImage: function(e) {
                     console.log(e);
                     var starred = this.image.star;
-                    this.isStarred = !this.isStarred; 
+                    this.isStarred = !this.isStarred;
 
                     this.$.imageStarRequest.headers["Content-Type"] = 'application/json';
                     this.$.imageStarRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.imageStarRequest.body = {};
                     this.$.imageStarRequest.generateRequest();
                 },
-                _isStarred: function(image, star){                    
+                _isStarred: function(image, star){
                     this.isStarred = star.base;
                 },
                 handleStarResponse: function(e) {
-                    // TODO: Show a toast after request response. Toast text: 
+                    // TODO: Show a toast after request response. Toast text:
                     // "Image is starred. It will now appear as an option when creating machines"
                     // or
                     // "Image unstarred. It will no longer appear as an option when creating machines"
                     console.log(e);
                 },
                 handleStarError: function(e) {
-                    // TODO: Show a toast after request response. Toast text: 
+                    // TODO: Show a toast after request response. Toast text:
                     // "There was a problem starring image IMAGE_NAME. It can not yet appear as an option when creating machines"
                     // or
                     // "There was a problem unstarring image IMAGE_NAME. It will still appear as an option when creating machines"
