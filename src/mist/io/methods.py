@@ -1615,18 +1615,18 @@ def list_machines(user, cloud_id):
                    'private_ips': m.private_ips,
                    'public_ips': m.public_ips,
                    'tags': tags,
-                   # this lines have been commented out temporarily to ensure
-                   # that there will be no issue with the frontend
-                   # 'missing_since': machine_entry.missing_since
-                   # if machine_entry and machine_entry.missing_since else '',
-                   # 'last_seen': machine_entry.last_seen
-                   # if machine_entry and machine_entry.last_seen else '',
+                   'missing_since': str(machine_entry.missing_since)
+                        if machine_entry and machine_entry.missing_since else '',
+                   'last_seen': str(machine_entry.last_seen)
+                        if machine_entry and machine_entry.last_seen else '',
                    'extra': m.extra}
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
     if conn.type == 'libvirt':
         # close connection with libvirt
         conn.disconnect()
+
+    # import rpdb; rpdb.set_trace()
 
     # mark machines that are no longer available in list_nodes as missing
     for machine_entry in machines_from_db.values():
