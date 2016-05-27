@@ -325,7 +325,7 @@ Polymer({
     ],
 
     ready: function() {
-        var topOfset = 142;        
+        var topOfset = 142;
         var wh = window.innerHeight - topOfset;
         var itemHeight = 65;
         var criticalNumofItems = Math.floor(wh/itemHeight) + 1 ;
@@ -371,7 +371,7 @@ Polymer({
         else {
             this.vpHeight = 'height:'+ itemHeight * this.items.length +'px;';
         }
-        
+
         this.debounce('itemsChanged', function () {
             // If some selectedItems are no longer in the items list, unselect them
             console.debug('itemsChanged');
@@ -481,7 +481,7 @@ Polymer({
             return ['name', 'cloud', 'id']
         }
         if (this.isKeys(this.section)) {
-            return ['id', 'machines', 'default']
+            return ['name', 'machines', 'default']
         }
         if (this.isNetworks(this.section)) {
             return ['name', 'cloud', 'state', 'id', 'public']
@@ -527,7 +527,7 @@ Polymer({
         else {
             var provider = item.cloud.provider.split('_')[0];
             return '../assets/providers/provider-' + provider + '.png';
-        }        
+        }
     },
 
     _selectItem: function(e, g) {
