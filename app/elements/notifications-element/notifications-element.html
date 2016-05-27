@@ -132,9 +132,9 @@
             <h2>Notifications</h2>
           </div>
           <paper-dialog-scrollable>
-            <paper-item id="notif"><iron-icon id="bullet" icon="image:lens"></iron-icon>Server down-time</paper-item>
-            <paper-item id="notif"><iron-icon id="bullet" icon="image:lens"></iron-icon>Machine stopped working</paper-item>
-            <paper-item id="notif"><iron-icon id="bullet" icon="image:lens"></iron-icon>Server over-consumes resources</paper-item>
+            <template is="dom-repeat" items="[[notifications]]">
+              <paper-item><iron-icon class$="bullet [[item.type]]" icon="image:lens"></iron-icon>[[item.text]]</paper-item>
+            </template>
           </paper-dialog-scrollable>
           <div class="buttons">
             <paper-button class="showall" href="url">Show all</paper-button>
@@ -156,21 +156,6 @@
       </neon-animatable>
 
     </neon-animated-pages>
-
-    <paper-dialog opened="{{mainDialogOpen}}">
-      <div id="header">
-        <paper-icon-button id="settings" icon="settings"></paper-icon-button>
-        <h2 class="flex">Notifications </h2>
-      </div>
-      <paper-dialog-scrollable>
-        <template is="dom-repeat" items="[[notifications]]">
-          <paper-item><iron-icon class$="bullet [[item.type]]" icon="image:lens"></iron-icon>[[item.text]]</paper-item>
-        </template>
-      </paper-dialog-scrollable>
-      <div class="buttons">
-        <paper-button class="showall">Show all</paper-button>
-      </div>
-    </paper-dialog>
 
   </template>
   <script>
@@ -199,7 +184,7 @@
 
         notifications: {
           type: Array,
-          value: [
+          value= [
             {
               text: 'Server down-time',
               type: 'red'
@@ -219,7 +204,7 @@
           ]
         }
       },
-    
+
     });
   </script>
 </dom-module>
