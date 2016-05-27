@@ -71,6 +71,7 @@
             <!-- dashboard -->
             <iron-route path="/" title="dashboard" current="dashboard"></iron-route>
             <iron-route path="/add-cloud" title="add cloud" href="../clouds/cloud-add.html" current="dashboard"></iron-route>
+            <iron-route path="/incidents" title="incidents" href="../pages/page-items.html" current="incidents"></iron-route>
 
             <!-- machines -->
             <iron-route path="/machines" title="machines" current="machines" href="../pages/page-items.html"></iron-route>
@@ -123,6 +124,7 @@
             <!-- dashboard -->
             <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]"><title>Dashboard</title></page-dashboard>
             <cloud-add model="[[model]]" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
+            <page-items class="incidents" model="[[model]]" items="[[model.incidents]]" sections="[[sections]]" section="[[sections.incidents]]"></page-items>
             <!-- machines -->
             <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
             <machine-page params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-page>
@@ -324,6 +326,9 @@ var app = Polymer({
         this.sectionsArray = [{
             id: 'dashboard',
             color: '#424242',
+        },{
+            id: 'incidents',
+            color: '#d96557',
         },{
             id: 'machines',
             color: '#8c76d1',

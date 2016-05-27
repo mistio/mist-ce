@@ -161,6 +161,14 @@ Polymer({
             if (item.extra && item.extra.service_type)
                 return item.extra.service_type;
         }
+
+        if (field == 'cloud_id') {
+            return document.querySelector('app-main').model.clouds[ret].title;
+        }
+        if (field == 'machine_id') {
+            return document.querySelector('app-main').model.clouds[item.cloud_id].machines[item.machine_id].name;
+        }
+
         return ret;
     },
 
