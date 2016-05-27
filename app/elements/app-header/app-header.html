@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../notifications-element/notifications-element.html">
 <link rel="import" href="top-search.html">
 
 <dom-module id="app-header">
@@ -64,8 +65,9 @@
 	  			<top-search tabindex="3"></top-search>
 			</span>
 			<div class="container" tabindex="4">
-				<paper-icon-button id="notifications" icon="social:notifications">notifications</paper-icon-button>
-				<paper-badge for="notifications" label="4"></paper-badge>
+				<!-- <paper-icon-button id="notifications" icon="social:notifications">notifications</paper-icon-button>
+				<paper-badge for="notifications" label="4"></paper-badge> -->
+				<notifications-element></notifications-element>
 			</div>
 		  <app-user-menu email="[[model.email]]" tabindex="5"></app-user-menu>
 		</paper-toolbar>
