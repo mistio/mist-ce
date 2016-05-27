@@ -1489,8 +1489,7 @@ def list_machines(user, cloud_id):
         raise NotFoundError("Unknown cloud with id %s" % cloud_id)
     try:
         conn = connect_provider(cloud)
-        machines_from_provider = sorted(conn.list_nodes(),
-                                        key=lambda node: node.id)
+        machines_from_provider = conn.list_nodes()
     except InvalidCredsError:
         raise CloudUnauthorizedError()
     except Exception as exc:
