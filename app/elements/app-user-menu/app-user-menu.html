@@ -113,7 +113,7 @@
             <div class="dropdown-content">
                 <div class="grid-row current context">
                     <div class="logo xs4">
-                        <iron-icon class="user-menu-icon" icon="circle"></iron-icon>
+                        <iron-icon class="user-menu-icon" icon="social:person"></iron-icon>
                     </div>
                     <div class="org xs8">
                         <h4>Organisation X</h4>
@@ -123,7 +123,7 @@
                 <paper-menu>
                     <paper-item class="context">
                         <a href="/" class="grid-row">
-                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon>
+                            <iron-icon class="user-menu-icon" icon="social:group"></iron-icon>
                             <div>Mist.io
                                 <span class="teams">Dev</span>
                             </div>
@@ -131,7 +131,7 @@
                     </paper-item>
                     <paper-item class="context">
                         <a href="/" class="grid-row">
-                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon>
+                            <iron-icon class="user-menu-icon" icon="social:group"></iron-icon>
                             <div>Organisation
                                 <span class="teams">QA, Dev</span>
                             </div>
@@ -139,14 +139,14 @@
                     </paper-item>
                     <paper-item class="context">
                         <a href="/" class="grid-row">
-                            <iron-icon class="user-menu-icon" icon="circle"></iron-icon>
+                            <iron-icon class="user-menu-icon" icon="social:person"></iron-icon>
                             <div>[[email]]
                                 <span class="teams">Personal account</span>
                             </div>
                         </a>
                     </paper-item>
-                    <paper-item class="noborder add-org">
-                        <a href="/" class="grid-row">
+                    <paper-item class="noborder add-org" hidden$="[[!canCreateOrg]]">
+                        <a href="javascript:void(0)" class="grid-row" on-tap="_createOrg">
                             <iron-icon icon="icons:add-circle-outline"></iron-icon>Add Organisation
                         </a>
                     </paper-item>
@@ -203,6 +203,24 @@
             gravatar: {
                 type: String,
                 computed: '_computeGravatar(email, size, placeholder)'
+            },
+            organization: function() {
+                type: Object,
+                value: function() {
+                    return ORGANIZATION;
+                }
+            },
+            orgs: function() {
+                type: Array,
+                value: function() {
+                    return ORGS;
+                }
+            },
+            canCreateOrg: {
+                type: Boolean,
+                value: function() {
+                    return CAN_CREATE_ORG;
+                }
             }
         },
         _computeGravatar: function(email, size, placeholder) {
@@ -210,6 +228,9 @@
                 url = 'http://www.gravatar.com/avatar/' + avatarString + '.jpg?s=' + size + '&d=' + placeholder;
 
             return url;
+        },
+        _createOrg: function(e) {
+            console.log(e);
         },
         _toggleUI: function() {
             window.location.href = '/toggle-ui/legacy';
