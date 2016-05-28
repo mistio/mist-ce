@@ -214,7 +214,7 @@
                     <h2>
                         [[key.name]] <iron-icon icon="star" hidden$="[[!isDefault]]"></iron-icon>
                     </h2>
-                    <div class="subtitle">                        
+                    <div class="subtitle">
                         <span hidden$="[[keyHasMachines]]">
                             No machines are using this key
                         </span>
@@ -233,7 +233,7 @@
             <div class="key-info">
                 <!-- <paper-material></paper-material> -->
                 <paper-material>
-                    <h4 class="id">Key ID:</h4><span class="id">[[key.id]]</span> 
+                    <h4 class="id">Key ID:</h4><span class="id">[[key.id]]</span>
                     <div class="head">
                         <h4 class="key">Public Key</h4>
                         <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="right link">Copy <span class="wide">public key</span>
@@ -421,14 +421,12 @@
                 copyPublicKey: function() {
                     this.$.keyPublic.select();
                     document.execCommand('copy');
-                    this.$.toast.text = 'The Public Key was copied to clipboard!';
-                    this.$.toast.open();
+                    this._showToast('The Public Key was copied to clipboard!');
                 },
                 copyPrivateKey: function() {
                     this.$.keyPrivate.select();
                     document.execCommand('copy');
-                    this.$.toast.text = 'The Private Key was copied to clipboard!';
-                    this.$.toast.open();
+                    this._showToast('The Private Key was copied to clipboard!');
                 },
                 handlePublicResponse: function(data) {
                     this.publicKey = data.detail.response;
@@ -444,19 +442,6 @@
                 handlePrivateResponse: function(data) {
                     this.privateKey = data.detail.response;
                 },
-                handleDefaultResponse: function(data) {
-                    //needs to update the previous default key that it's not the default key anymore
-                    var k = this.model.keysArray;
-                    for (var i = 0, len = k.length; i < len; i++) {
-                        if (k[i].isDefault) {
-                            k[i].isDefault = false;
-                            break;
-                        }
-                    }
-                    this.set('key.isDefault', true);
-                    this.$.toast.text = this.key.name + ' has become your default Key!';
-                    this.$.toast.open();
-                },
                 _editKey: function(e) {
                     var el = this.querySelector('key-edit');
                     el._openEditKeyModal();
@@ -466,14 +451,13 @@
                     this.set('key.id', key.id);
                 },
                 _makeDefaultKey: function(e) {
-                    var isDefault = this.key.isDefault;
                     this.$.keyMakeDefaultAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.keyMakeDefaultAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.keyMakeDefaultAjaxRequest.body = {};
                     this.$.keyMakeDefaultAjaxRequest.generateRequest();
                 },
                 _handleKeyMakeDefaultAjaxResponse: function(e) {
-                    this.set('key.isDefault', true);
+                    this._showToast(this.key.name + ' has become your default Key!');
                 },
                 _deleteKey: function(e) {
                     this._showDialog({
@@ -503,6 +487,11 @@
                         dialog[i] = info[i];
                     }
                     dialog._openDialog();
+                },
+                _showToast: function(msg) {
+                    var toast = this.querySelector('paper-toast');
+                    toast.text = msg;
+                    toast.show();
                 },
                 _goBack: function() {
                     history.back();
