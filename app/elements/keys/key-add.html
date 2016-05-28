@@ -66,13 +66,11 @@
                             return {
                                 name: '',
                                 publicKey: '',
-                                privateKey: '',
-                                file: ''
+                                privateKey: ''
                             }
                         },
                         notify: true
                     },
-                    file: String,
                     section: {
                         type: Object
                     },
@@ -137,6 +135,21 @@
                 _modalClosed: function() {
                     this._formReset();
                 },
+                _submitForm: function() {
+                    this.$.keyAddAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyAddAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyAddAjaxRequest.body = {
+                        name: this.key.name,
+                        priv: this.key.privateKey
+                    };
+                    this.$.keyAddAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _handleKeyAddAjaxResponse: function(e) {
+                    this.set('sendingData', false);
+                    this._formReset();
+                },
                 _formReset: function() {
                     this.set('key.name', '');
                     this.set('key.publicKey', '');
@@ -162,22 +175,6 @@
                     this.set('key.privateKey', response.priv);
                     this.set('sendingData', false);
                     this.set('showPublicKey', true);
-                },
-                _addKeyAjax: function(e) {
-                    //   this.$.addKeyAjax.addRequest();
-                },
-                _addKeyAjaxRequest: function() {
-                    this.set('sendingData', true);
-                },
-                _addKeyAjaxResponse: function(e) {
-                    this.set('sendingData', false);
-
-                    this.fire('addKey', {
-                        key: {
-                            id: this.key.id,
-                            isDefault: false
-                        }
-                    });
                 }
             });
         })();
