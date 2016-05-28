@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../organizations/organization-add.html">
 <dom-module id="app-user-menu">
     <template>
         <style>
@@ -116,37 +117,23 @@
                         <iron-icon class="user-menu-icon" icon="social:person"></iron-icon>
                     </div>
                     <div class="org xs8">
-                        <h4>Organisation X</h4>
-                        <span>Dev, QA</span>
+                        <h4>[[organization.title]]</h4>
+                        <span>Faki fix teams</span>
                     </div>
                 </div>
                 <paper-menu>
-                    <paper-item class="context">
-                        <a href="/" class="grid-row">
-                            <iron-icon class="user-menu-icon" icon="social:group"></iron-icon>
-                            <div>Mist.io
-                                <span class="teams">Dev</span>
-                            </div>
-                        </a>
-                    </paper-item>
-                    <paper-item class="context">
-                        <a href="/" class="grid-row">
-                            <iron-icon class="user-menu-icon" icon="social:group"></iron-icon>
-                            <div>Organisation
-                                <span class="teams">QA, Dev</span>
-                            </div>
-                        </a>
-                    </paper-item>
-                    <paper-item class="context">
-                        <a href="/" class="grid-row">
-                            <iron-icon class="user-menu-icon" icon="social:person"></iron-icon>
-                            <div>[[email]]
-                                <span class="teams">Personal account</span>
-                            </div>
-                        </a>
-                    </paper-item>
-                    <paper-item class="noborder add-org" hidden$="[[!canCreateOrg]]">
-                        <a href="javascript:void(0)" class="grid-row" on-tap="_createOrg">
+                    <template is="dom-repeat" items="[[orgsList]]" as="organization">
+                        <paper-item class="context">
+                            <a href="javascript:void(0)" on-tap="_goToOrg" id="[[organization.id]]" class="grid-row">
+                                <iron-icon class="user-menu-icon" icon="social:group"></iron-icon>
+                                <div>[[organization.name]]
+                                    <span class="teams">Faki fix teams</span>
+                                </div>
+                            </a>
+                        </paper-item>
+                    </template>
+                    <paper-item class="noborder add-org">
+                        <a href="javascript:void(0)" on-tap="_addOrg" class="grid-row">
                             <iron-icon icon="icons:add-circle-outline"></iron-icon>Add Organisation
                         </a>
                     </paper-item>
@@ -180,6 +167,8 @@
                 </paper-menu>
             </div>
         </paper-menu-button>
+
+        <organization-add></organization-add>
     </template>
 </dom-module>
 <script type="text/javascript" src="../../bower_components/md5/build/md5.min.js"></script>
@@ -204,23 +193,31 @@
                 type: String,
                 computed: '_computeGravatar(email, size, placeholder)'
             },
-            organization: function() {
+            organization: {
                 type: Object,
                 value: function() {
                     return ORGANIZATION;
                 }
             },
-            orgs: function() {
+            orgs: {
                 type: Array,
                 value: function() {
                     return ORGS;
                 }
+            },
+            orgsList: {
+                type: Array,
+                computed: '_computeOrgsList(orgs)'
             },
             canCreateOrg: {
                 type: Boolean,
                 value: function() {
                     return CAN_CREATE_ORG;
                 }
+            },
+            isPersonalContext: {
+                type: Boolean,
+                computed: '_computeIsPersonalContext(organization)'
             }
         },
         _computeGravatar: function(email, size, placeholder) {
@@ -229,8 +226,27 @@
 
             return url;
         },
-        _createOrg: function(e) {
-            console.log(e);
+        _computeOrgsList: function(orgs) {
+            var orgs = orgs.slice();
+            orgs.push({
+                id: null,
+                name: 'Personal'
+            });
+
+            return orgs;
+        },
+        _computeIsPersonalContext: function(organization) {
+            return Object.keys(organization).length === 0;
+        },
+        _addOrg: function(e) {
+            var dialog = this.querySelector('organization-add');
+            dialog.openDialog();
+        },
+        _goToOrg: function(e) {
+            if (! this.isPersonalContext) {
+                var orgId = e.currentTarget.getAttribute('id');
+                window.location.href = orgId ? '/orgs/' + orgId : '/orgs';
+            }
         },
         _toggleUI: function() {
             window.location.href = '/toggle-ui/legacy';
