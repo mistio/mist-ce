@@ -1058,15 +1058,13 @@
                 var workflow = this.workflows.find(function(workflow) {
                     return workflow.name == action;
                 });
-                else if (workflow.params == null || workflow.params == undefined || !workflow.params.length) {
-                    this.$.workflowRequest.url = "/api/v1/stacks/" + this.stack.id;
-                    this.$.workflowRequest.headers = {"csrf-token": CSRF_TOKEN, "Content-Type": "application/json"};
-                    this.$.workflowRequest.body = {"workflow": action};
-                    if (action == 'install'){
-                        this.$.workflowRequest.inputs = this.stack.inputs;
-                    }
-                    this.$.workflowRequest.generateRequest();
+                this.$.workflowRequest.url = "/api/v1/stacks/" + this.stack.id;
+                this.$.workflowRequest.headers = {"csrf-token": CSRF_TOKEN, "Content-Type": "application/json"};
+                this.$.workflowRequest.body = {"workflow": action};
+                if (action == 'install'){
+                    this.$.workflowRequest.inputs = this.stack.inputs;
                 }
+                this.$.workflowRequest.generateRequest();
             },
             handleWorkflowRequest: function(e) {
                 this.$.spinner.setAttribute('active',true);
