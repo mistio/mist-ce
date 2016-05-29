@@ -313,6 +313,9 @@
             border-radius: 50%;
             @apply(--shadow-elevation-8dp);
         }
+        paper-button[disabled] {
+            opacity: 0.32;
+        }
         </style>        
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
@@ -328,17 +331,17 @@
                 </div>
                 <div class="item-actions">
                     <!-- buttons to show normally-->
-                    <paper-button id="[[workflows.0.name]]" on-tap="_quickActionsNavigation" class="simple">[[workflows.0.name]]</paper-button>
-                    <paper-button id="[[workflows.1.name]]" on-tap="_quickActionsNavigation" class="simple">[[workflows.1.name]]</paper-button>
+                    <paper-button id="[[workflows.0.name]]" on-tap="_quickActionsNavigation" class="simple" disabled="[[disabled]]">[[workflows.0.name]]</paper-button>
+                    <paper-button id="[[workflows.1.name]]" on-tap="_quickActionsNavigation" class="simple" disabled="[[disabled]]">[[workflows.1.name]]</paper-button>
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="stack_actions" class="dropdown-content">
                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation" class="simple">[[workflow.name]]</paper-button>
+                                <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation" class="simple" disabled="[[disabled]]">[[workflow.name]]</paper-button>
                             </template>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button id="install" on-tap="_quickActionsNavigation" class="simple white" style$="color: [[section.color]]" hidden$="[[ok]]">Deploy <iron-icon style$="color: [[section.color]]"  icon="av:play-arrow"></iron-icon></paper-button>
+                    <paper-button id="install" on-tap="_quickActionsNavigation" class="simple white" style$="color: [[section.color]]" hidden$="[[ok]]" disabled="[[disabled]]">Deploy <iron-icon style$="color: [[section.color]]"  icon="av:play-arrow"></iron-icon></paper-button>
                 </div>
             </paper-material>
 
@@ -498,7 +501,7 @@
                 <p> has Errors? {{hasErrors}} status: {{stack.status}}</p>
             </div> -->
             <div class="absolute-bottom-right">
-                <paper-fab id="install" icon="av:play-arrow" on-tap="_quickActionsNavigation" hidden$="[[ok]]"></paper-fab>
+                <paper-fab id="install" icon="av:play-arrow" on-tap="_quickActionsNavigation" hidden$="[[ok]]" disabled="[[disabled]]"></paper-fab>
             </div>
         </div>
         <dialog-element></dialog-element>
@@ -520,6 +523,10 @@
                     type: Number,
                     value: 0,
                     notify: true
+                },
+                disabled: {
+                    type: Boolean,
+                    computed: '_disabledButtons(stack)'
                 },
                 sections: {
                     type: Object
@@ -816,6 +823,9 @@
             },
             is_ok: function(stack){
                 return stack.status == 'ok';
+            },
+            _disabledButtons: function(){
+                return stack.status == 'workflow_started' || stack.status == 'start_creation';
             },
             _computeStackId: function(params) {
                 return params.id;
