@@ -338,7 +338,7 @@
                             </template>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button id="install" on-tap="_quickActionsNavigation" class="simple white" style$="color: [[section.color]]" hidden$="[[ok]]">Deploy <iron-icon icon="av:play-arrow"></iron-icon></paper-button>
+                    <paper-button id="install" on-tap="_quickActionsNavigation" class="simple white" style$="color: [[section.color]]" hidden$="[[ok]]">Deploy <iron-icon style$="color: [[section.color]]"  icon="av:play-arrow"></iron-icon></paper-button>
                 </div>
             </paper-material>
 
@@ -766,22 +766,22 @@
                 start_creation: {
                     type: Boolean,
                     value: false,
-                    notify: true
+                    computed: 'is_start_creation(stack)'
                 },
                 error: {
                     type: Boolean,
                     value: false,
-                    notify: true
+                    computed: 'is_error(stack)'
                 },
                 workflow_started: {
                     type: Boolean,
                     value: false,
-                    notify: true
+                    computed: 'is_workflow_started(stack)'
                 },
                 ok: {
                     type: Boolean,
                     value: true,
-                    notify: true
+                    computed: 'is_ok(stack)'
                 }
             },
             observers: [
@@ -797,21 +797,6 @@
                     return stack.id == params.id;
                 }, this);                
                 if (stack) {
-                    if (stack.status) {
-                        var st = stack.status
-                        if (st == "start_creation") {
-                            this.start_creation = true;
-                        }
-                        if (st == "error") {
-                            this.error = true;
-                        }
-                        if (st == "workflow_started") {
-                            this.workflow_started = true;
-                        }
-                        if (st == "ok") {
-                            this.ok = true;
-                        }
-                    }
                     return stack;
                 }
                 else {
@@ -819,6 +804,18 @@
                         name: "Stack is missing"
                     }
                 }
+            },
+            is_start_creation: function(stack){
+                return stack.status == 'start_creation';
+            },
+            is_error: function(stack){
+                return stack.status == 'error';
+            },
+            is_workflow_started: function(stack){
+                return stack.status == 'workflow_started';
+            },
+            is_ok: function(stack){
+                return stack.status == 'ok';
             },
             _computeStackId: function(params) {
                 return params.id;
