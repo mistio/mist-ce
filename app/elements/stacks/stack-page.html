@@ -523,12 +523,16 @@
                 },
                 selected: {
                     type: Number,
-                    value: 0,
+                    value: 1,
                     notify: true
                 },
                 disabled: {
                     type: Boolean,
                     computed: '_disabledButtons(stack)'
+                },
+                hideWorkflows: {
+                    type: Boolean,
+                    computed: '_hideWorkflows(stack)'
                 },
                 sections: {
                     type: Object
@@ -826,8 +830,8 @@
             is_ok: function(stack){
                 return stack.status == 'ok';
             },
-            hideWorkflows: function(){
-                return !this.stack.deploy || this.disabled;
+            _hideWorkflows: function(stack){
+                return !stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
             },
             _disabledButtons: function(stack){
                 return stack.status == 'workflow_started' || stack.status == 'start_creation';
