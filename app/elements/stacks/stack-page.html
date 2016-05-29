@@ -314,7 +314,7 @@
             @apply(--shadow-elevation-8dp);
         }
         paper-button[disabled] {
-            opacity: 0.32;
+            opacity: 0.54;
         }
         </style>        
         <div id="content">
@@ -425,7 +425,7 @@
                 </paper-material>
             </template>
 
-            <div hidden="[[!stack.deploy || disabled]]">
+            <div hidden="[[hideWorkflows]]">
                 <h3 class="smallcaps" hidden$="[[!workflows.length]]">Workflows</h3>
                 <paper-material id="workflows" hidden$="[[!workflows.length]]">
                     <div id="workflows-panel">
@@ -825,6 +825,9 @@
             },
             is_ok: function(stack){
                 return stack.status == 'ok';
+            },
+            hideWorkflows: function(){
+                return !this.stack.deploy || this.disabled;
             },
             _disabledButtons: function(stack){
                 return stack.status == 'workflow_started' || stack.status == 'start_creation';
