@@ -341,7 +341,7 @@
                             </template>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button id="install" on-tap="_quickActionsNavigation" class="simple white" style$="color: [[section.color]]" hidden$="[[ok]]" disabled="[[disabled]]">Deploy <iron-icon style$="color: [[section.color]]"  icon="av:play-arrow"></iron-icon></paper-button>
+                    <paper-button id="install" on-tap="doWorkflow" class="simple white" style$="color: [[section.color]]" hidden$="[[ok]]" disabled="[[disabled]]">Deploy <iron-icon style$="color: [[section.color]]"  icon="av:play-arrow"></iron-icon></paper-button>
                 </div>
             </paper-material>
 
@@ -1062,19 +1062,19 @@
                 this.$.workflowRequest.headers = {"csrf-token": CSRF_TOKEN, "Content-Type": "application/json"};
                 this.$.workflowRequest.body = {"workflow": action};
                 if (action == 'install'){
-                    this.$.workflowRequest.inputs = this.stack.inputs;
+                    this.$.workflowRequest.body["inputs"] = this.stack.inputs;
                 }
                 this.$.workflowRequest.generateRequest();
             },
             handleWorkflowRequest: function(e) {
-                this.$.spinner.setAttribute('active',true);
+                // this.$.spinner.setAttribute('active',true);
             },
             handleWorkflowResponse: function(e) {
-                this.$.spinner.removeAttribute('active');
+                // this.$.spinner.removeAttribute('active');
             },
             handleWorkflowError: function(e) {
-                this.$.spinner.removeAttribute('active');
-                this.$.messages.textContent = e.detail.error.message;
+                // this.$.spinner.removeAttribute('active');
+                // this.$.messages.textContent = e.detail.error.message;
             },
             toggle: function() {
               this.$.collapse.toggle();
