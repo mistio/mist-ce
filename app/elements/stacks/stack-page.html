@@ -316,6 +316,12 @@
         paper-button[disabled] {
             opacity: 0.54;
         }
+        #deploynow.hidden {
+            display: none;
+        }
+        .blue-link {
+            color: var(--mist-blue);
+        }
         </style>        
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
@@ -362,7 +368,7 @@
             </paper-material>
 
             <!-- If status undefined or ok -->
-            <paper-material class="marg-b" hidden$="[[stack.deploy]]">
+            <paper-material id="deploynow" class="marg-b" hidden$="[[hideWorkflows]]">
                 <div class="parsing-loader">
                     <h4>Stack is saved and ready to deploy</h4>
                     <paper-button id="install" on-tap="doWorkflow">Deploy Now</paper-button>
@@ -390,6 +396,17 @@
                         <h3>Creating stack [[stack.name]]</h3>
                         <paper-progress id="stackpageprogress" value="30" indeterminate></paper-progress>
                         <h4>This may take a while.</h4>
+                        <paper-button class="blue-link" on-tap="cancelWorkflow">Cancel</paper-button>
+                    </div>
+                </paper-material>
+            </template>
+
+            <template is="dom-if" if="[[workflow_started]]">
+                <paper-material>
+                    <div class="parsing-loader">
+                        <h3>Started workflow</h3>
+                        <paper-progress id="stackpageprogress" value="30" indeterminate></paper-progress>
+                        <paper-button class="blue-link" on-tap="cancelWorkflow">Cancel</paper-button>
                     </div>
                 </paper-material>
             </template>
@@ -508,6 +525,7 @@
         </div>
         <dialog-element></dialog-element>
         <iron-ajax id="workflowRequest" method="POST" url="" on-response="handleWorkflowResponse" on-error="handleWorkflowError"></iron-ajax>
+        <iron-ajax id="cancelJob" method="DELETE" url="/api/v1/jobs/[[stack.job_id]]" on-response="handleCanceled" on-error=""></iron-ajax>
     </template>
     <script>
     (function() {
@@ -1062,22 +1080,21 @@
                 this.$.workflowRequest.headers = {"csrf-token": CSRF_TOKEN, "Content-Type": "application/json"};
                 this.$.workflowRequest.body = {"workflow": action};
                 if (action == 'install'){
+                    this.$.deploynow.classList.add('hidden');
                     this.$.workflowRequest.body["inputs"] = this.stack.inputs;
                 }
                 this.$.workflowRequest.generateRequest();
             },
+            cancelWorkflow: function(e){                
+                this.$.cancelJob.generateRequest();
+            },
+            handleCanceled: function(e){                
+            },
             handleWorkflowRequest: function(e) {
-                // this.$.spinner.setAttribute('active',true);
             },
             handleWorkflowResponse: function(e) {
-                // this.$.spinner.removeAttribute('active');
             },
             handleWorkflowError: function(e) {
-                // this.$.spinner.removeAttribute('active');
-                // this.$.messages.textContent = e.detail.error.message;
-            },
-            toggle: function() {
-              this.$.collapse.toggle();
             },
         });
     })();
