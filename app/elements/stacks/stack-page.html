@@ -422,8 +422,10 @@
                             </template>
                         </paper-material>
                     </template>
-                </paper-material>            
-
+                </paper-material>
+            </template>
+            
+            <div hidden="[[!stack.deploy]]">
                 <h3 class="smallcaps" hidden$="[[!workflows.length]]">Workflows</h3>
                 <paper-material id="workflows" hidden$="[[!workflows.length]]">
                     <div id="workflows-panel">
@@ -491,7 +493,7 @@
                         </template>
                     </div>
                 </div>
-            </template>
+            </div>
             <!-- test show properties -->
             <!-- <div class="text-center">
                 <template is="dom-if" if=[[stack.deploy]]> deploy? true </template>
