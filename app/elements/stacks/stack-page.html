@@ -35,8 +35,10 @@
         }
 
         paper-material.form-view,
+        .app-form-title,
         app-form {
             max-width: 900px;
+            box-sizing: border-box;
         }
 
         paper-material.form-view h2 {
@@ -188,7 +190,16 @@
         paper-toolbar:not(.tall)::content #bottomBar .right-actions {
             margin-right: 70px;
         }
+        #workflows-panel {
+            @apply(--layout-horizontal);
+        }
+        #workflowsNavigation {
 
+        }
+        #workflowsView {
+            display: flex;
+            flex: 100%; 
+        }
         .resource-head {
             font-weight: 500;
             padding: 8px 16px;
@@ -206,8 +217,7 @@
         }
 
         .wf-item {
-            margin-bottom: 40px;
-            margin-top: 40px;
+            margin: 40px auto;
             display: none;
         }
 
@@ -227,23 +237,6 @@
             padding-top: 36px;
         }
 
-        paper-drawer-panel#workflows-panel {
-            top: 57px;
-            overflow: auto;
-        }
-
-        paper-drawer-panel#workflows-panel::content #dropShadow {
-            top: 0;
-        }
-
-        paper-drawer-panel#workflows-panel paper-header-panel[drawer] {
-            /*border-right: 1px solid #ddd;*/
-            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12) inset;
-        }
-
-        paper-drawer-panel#workflows-panel::content #drawer {
-            background-color: #f0f0f0;
-        }
 
         #workflows-navigation paper-item {
             text-transform: capitalize;
@@ -253,35 +246,7 @@
 
         .grid-row .center {
             text-align: center;
-        }
-        /*
-        #quickActions {
-            width: 100%;
-            background-color: var(--mist-blue);
-            color: #fff;
-            height: 57px;
-            position: absolute;
-            bottom: -1px;
-            right: 0;
-            border-bottom: 1px;
-            padding-left: 49px;
-            box-sizing: border-box;
-            transition: all 0.18s ease-in;
-            overflow: hidden;
-            opacity: 1;
-        }
-
-        #quickActions paper-button {
-            padding: 0 8px !important;
-            height: 57px;
-            line-height: 57px;
-            font-weight: 500;
-        }
-
-        #quickActions iron-icon {
-            color: #fff;
-        }*/
-
+        }        
         #quickActions.hidden {
             width: 0;
             padding: 0;
@@ -363,38 +328,21 @@
                 </div>
                 <div class="item-actions">
                     <!-- buttons to show normally-->
-                    <span>
-                        <paper-button id="scale_cluster_up" on-tap="_quickActionsNavigation" class="simple">scale up</paper-button>
-                        <paper-button id="scale_cluster_down" on-tap="_quickActionsNavigation" class="simple">scale down</paper-button>
-                        <paper-menu-button horizontal-align="right">
-                            <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
-                            <paper-menu id="stack_actions" class="dropdown-content">
-                                <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                    <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation" class="simple">[[workflow.name]]</paper-button>
-                                </template>
-                            </paper-menu>
-                        </paper-menu-button>
-                    </span>
-                    <!-- buttons to show if status undefined or status error-->
-                    <span>
-                        <paper-button id="uninstall" on-tap="_quickActionsNavigation" class="simple">Delete Stack <iron-icon icon="delete"></iron-icon></paper-button>
-                        <paper-button id="install" on-tap="_quickActionsNavigation" class="simple">Deploy Stack <iron-icon icon="av:play-arrow"></iron-icon></paper-button>
-                    </span>
+                    <paper-button id="[[workflows.0.name]]" on-tap="_quickActionsNavigation" class="simple">[[workflows.0.name]]</paper-button>
+                    <paper-button id="[[workflows.1.name]]" on-tap="_quickActionsNavigation" class="simple">[[workflows.1.name]]</paper-button>
+                    <paper-menu-button horizontal-align="right">
+                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu id="stack_actions" class="dropdown-content">
+                            <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation" class="simple">[[workflow.name]]</paper-button>
+                            </template>
+                        </paper-menu>
+                    </paper-menu-button>
+                    <paper-button id="install" on-tap="_quickActionsNavigation" class="simple white" style$="color: [[section.color]]" hidden$="[[ok]]">Deploy <iron-icon icon="av:play-arrow"></iron-icon></paper-button>
                 </div>
             </paper-material>
 
-            <!-- <paper-item id="quickActions" class="hidden">
-            <paper-item id="quickActions" class="hidden"> 
-                <div class="flex-horizontal-with-ratios">
-                    <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                            <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation">[[workflow.name]]</paper-button>
-                    </template>
-                    <paper-button>
-                        <iron-icon icon="icons:clear" on-tap="_toggleQuickActions"></iron-icon>
-                    </paper-button>
-                </div>
-            </paper-item>   
-            <paper-spinner id="spinner"></paper-spinner>-->
+            <!-- <paper-spinner id="spinner"></paper-spinner>-->
 
             <paper-material class="marg-b">
                 <div class="flex-horizontal-with-ratios">
@@ -410,104 +358,71 @@
                 </div>
             </paper-material>
 
-            <!-- If status undefined -->
-            <paper-material class="marg-b">
+            <!-- If status undefined or ok -->
+            <paper-material class="marg-b" hidden$="[[stack.deploy]]">
                 <div class="parsing-loader">
                     <h4>Stack is saved and ready to deploy</h4>
                     <paper-button>Deploy Now</paper-button>
                 </div>
             </paper-material>
 
-            <!-- If stack has errors-->
-            <paper-material>
-                <div class="parsing-loader error">
-                    <h3>There was an error</h3>
-                    <paper-progress id="stackpageprogress" value="100"></paper-progress>
-                    <h4>The creation process failed.<br/>
-                    <span class="retry regular blue-link" id="install" on-tap="doWorkflow">Try again </span>
-                    <p id="messages"></p>
-                    </h4>
-                </div>
-            </paper-material>
-
-            <!-- If stack status star start_creation-->
-            <paper-material>
-                <div class="parsing-loader">
-                    <h3>Creating stack [[stack.name]]</h3>
-                    <paper-progress id="stackpageprogress" value="30" indeterminate></paper-progress>
-                    <h4>This may take a while.</h4>
-                </div>
-            </paper-material>
-            <!-- Screen when user has asked to deploy: Has JobId + Job has not finished + has errors-->
-            <!-- Screen when user has asked to deploy: Has JobId + Job has finished + has errors-->
-            <!-- error cases -->
-
-            <!-- Screen when user has asked to deploy: Has JobId + Job has finished + has no errors-->
-
-            <paper-material id="resources" class="page">
-                <template is="dom-if" if="[[runtimeProperties]]">
-                    <div class="flex-horizontal-with-ratios" hidden$="[[showLateError]] || [[!resourcelist]]">
-                        <div class="page-block">
-                            <h3 class="smallcaps">Stack Description</h3>
-                            <p>[[stack.description]]</p>
-                        </div>
-                        <div class="page-block">
-                            <h3 class="smallcaps">Created</h3>
-                            <p>[[timestamp]]
-                            </p>
-                        </div>
+            <!-- If stack status error-->
+            <template is="dom-if" if="[[error]]">
+                <paper-material>
+                    <div class="parsing-loader error">
+                        <h3>There seems to be an error</h3>
+                        <paper-progress id="stackpageprogress" value="100"></paper-progress>
+                        <h4>The process failed.<br/>
+                        <!-- <span class="retry regular blue-link" id="install" on-tap="doWorkflow">Try again </span>
+                        <p id="messages"></p> -->
+                        </h4>
                     </div>
-                    <template is="dom-if" if="{{!resourcelist}}">
-                        <template is="dom-if" if="{{!showLateError}}">
-                            <div class="parsing-loader">
-                                <h3>Creating stack [[stack.name]]</h3>
-                                <paper-progress id="stackpageprogress" value="30" indeterminate></paper-progress>
-                                <h4>This may take a while.</h4>
-                            </div>
-                        </template>
-                        <template is="dom-if" if="{{hasErrors}}">
-                            <div class="parsing-loader error">
-                                <h3>There was an error</h3>
-                                <paper-progress id="stackpageprogress" value="100"></paper-progress>
-                                <h4>The creation process failed.<br/>
-                                <span class="delete regular blue-link" id="uninstall" on-tap="_quickActionsNavigation">Delete Stack</span> or <a class="regular blue-link" href$="/create-stack/[[template.id]]">Retry </span>
-                                </h4>
-                            </div>
-                        </template>
+                </paper-material>
+            </template>
+
+            <!-- If stack status start_creation-->
+            <template is="dom-if" if="[[start_creation]]">
+                <paper-material>
+                    <div class="parsing-loader">
+                        <h3>Creating stack [[stack.name]]</h3>
+                        <paper-progress id="stackpageprogress" value="30" indeterminate></paper-progress>
+                        <h4>This may take a while.</h4>
+                    </div>
+                </paper-material>
+            </template>
+
+            <template is="dom-if" if="[[ok]]">
+            <!-- If stack has resources -->
+                <paper-material hidden$="{{!resourcelist}}">
+                    <h3 class="smallcaps">Resources list</h3>
+                    <template is="dom-if" if="{{listMachines.length}}">
+                        <paper-material class="no-pad resources-list">
+                            <h3 class="smallcaps resource-head">machines {{listMachines.length}}</h3>
+                            <template is="dom-repeat" items="{{listMachines}}" as="machine">
+                                <stack-machine-item model="[[model]]" machine="[[machine]]"></stack-machine-item>
+                            </template>
+                        </paper-material>
                     </template>
-                    <template is="dom-if" if="{{resourcelist}}">
-                        <div class="resources-list">
-                            <h3 class="smallcaps">Resources list</h3>
-                            <template is="dom-if" if="{{listMachines.length}}">
-                                <paper-material class="no-pad resources-list">
-                                    <h3 class="smallcaps resource-head">machines {{listMachines.length}}</h3>
-                                    <template is="dom-repeat" items="{{listMachines}}" as="machine">
-                                        <stack-machine-item model="[[model]]" machine="[[machine]]"></stack-machine-item>
-                                    </template>
-                                </paper-material>
+                    <template is="dom-if" if="[[networks.length]]">
+                        <paper-material class="no-pad resources-list">
+                            <h3 class="smallcaps resource-head">networks</h3>
+                            <template is="dom-repeat" items="[[networks]]" as="network">
+                                <stack-network-item model="[[model]]" network="[[network]]"></stack-network-item>
                             </template>
-                            <template is="dom-if" if="[[networks.length]]">
-                                <paper-material class="no-pad resources-list">
-                                    <h3 class="smallcaps resource-head">networks</h3>
-                                    <template is="dom-repeat" items="[[networks]]" as="network">
-                                        <stack-network-item model="[[model]]" network="[[network]]"></stack-network-item>
-                                    </template>
-                                </paper-material>
-                            </template>
-                            <template is="dom-if" if="{{keys.length}}">
-                                <paper-material class="no-pad resources-list">
-                                    <h3 class="smallcaps resource-head">keys {{keys.length}}</h3>
-                                    <template is="dom-repeat" items="{{keys}}" as="key">
-                                        <stack-key-item model="[[model]]" key="[[key]]"></stack-key-item>
-                                    </template>
-                                </paper-material>
-                            </template>
-                        </div>
+                        </paper-material>
                     </template>
-                </template>
-            </paper-material>
-            <paper-material id="workflows" hidden$="[[showLateError]] || [[!resourcelist]]">
-                <template is="dom-if" if="[[workflows.length]]">
+                    <template is="dom-if" if="{{keys.length}}">
+                        <paper-material class="no-pad resources-list">
+                            <h3 class="smallcaps resource-head">keys {{keys.length}}</h3>
+                            <template is="dom-repeat" items="{{keys}}" as="key">
+                                <stack-key-item model="[[model]]" key="[[key]]"></stack-key-item>
+                            </template>
+                        </paper-material>
+                    </template>
+                </paper-material>            
+
+                <h3 class="smallcaps" hidden$="[[!workflows.length]]">Workflows</h3>
+                <paper-material id="workflows" hidden$="[[!workflows.length]]">
                     <div id="workflows-panel">
                         <div id="workflowsNavigation">
                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
@@ -517,78 +432,77 @@
 
                         <div id="workflowsView" class="pad">
                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                <div id$="[[workflow.name]]show" class="m12 wf-item">
+                                <div id$="[[workflow.name]]show" class="wf-item">
 
                                     <template is="dom-if" if=[[workflow.params.length]]>
+                                        <paper-material class="app-form-title">[[workflow.name]]</paper-material>
                                         <app-form model=[[model]] fields="[[workflow.params]]" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[params.id]]" on-request="handleWorkflowRequest" on-response="handleWorkflowResponse" on-error="handleWorkflowError" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
                                     </template>
 
                                     <template is="dom-if" if=[[!workflow.params.length]]>
-                                        <paper-material class="form-view grid-row">
-                                            <h2 class="xs12">[[workflow.name]]</h2>
-                                            <p hidden$="[[!workflow.description]]">[[workflow.description]]</p>
-                                            <p class="xs12 center">
+                                        <!-- <paper-material class="form-view grid-row"> -->
+                                            <h2 class="text-center">[[workflow.name]]</h2>
+                                            <p class="text-center" hidden$="[[!workflow.description]]">[[workflow.description]]</p>
+                                            <p class="text-center">
                                                 <paper-button id="[[workflow.name]]" on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
                                             </p>
-                                            <h5>*no paremetres required</h5>
-                                        </paper-material>
+                                            <h5 class="text-center">*no paremetres required</h5>
+                                        <!-- </paper-material> -->
                                     </template>
 
                                 </div>
                             </template>
                         </div>
-
                     </div>
-                </template>
-                <template is="dom-if" if="[[!workflows.length]]">
+                </paper-material>
+                <paper-material hidden$="[[workflows.length]]">
                     <div class="no-data-message">
                         <p>
                             The stack has no workflows.
                         </p>
                     </div>
-                </template>
-            </paper-material>
-            <div id="state" class="page">
-                <div class="section">
-                    <template is="dom-if" if="[[runtimeProperties.length]]">
-                        <h3 class="smallcaps">Runtime properties</h3>
-                        <template is="dom-repeat" items="[[runtimeProperties]]">
-                            <paper-material class="no-pad info-card">
-                                <h2 class="info-title" style$="[[color]]">[[item.name]]</h2>
-                                <element-for-in content="[[item]]"></element-for-in>
+                </paper-material>
+
+                <div id="state" class="page">
+                    <div class="section">
+                        <template is="dom-if" if="[[runtimeProperties.length]]">
+                            <h3 class="smallcaps">Runtime properties</h3>
+                            <template is="dom-repeat" items="[[runtimeProperties]]">
+                                <paper-material class="no-pad info-card">
+                                    <h2 class="info-title" style$="[[color]]">[[item.name]]</h2>
+                                    <element-for-in content="[[item]]"></element-for-in>
+                                </paper-material>
+                            </template>
+                        </template>
+                    </div>
+                    <div class="section">
+                        <template is="dom-if" if="[[stack.inputs.length]]">
+                            <h3 class="smallcaps">Stack Parameters </h3>
+                            <paper-material class="no-pad">
+                                <table class="info-table">
+                                    <template is="dom-repeat" items="[[stack.inputs]]">
+                                            <tr><td>[[item.name]]</td><td>[[item.value]]</td></tr>
+                                    </template>
+                                </table>
                             </paper-material>
                         </template>
-                    </template>
+                    </div>
                 </div>
-                <div class="section">
-                    <template is="dom-if" if="[[stack.inputs.length]]">
-                        <h3 class="smallcaps">Stack Parameters </h3>
-                        <paper-material class="no-pad">
-                            <table class="info-table">
-                                <template is="dom-repeat" items="[[stack.inputs]]">
-                                        <tr><td>[[item.name]]</td><td>[[item.value]]</td></tr>
-                                </template>
-                            </table>
-                        </paper-material>
-                    </template>
-                </div>
-            </div>
+            </template>
             <!-- test show properties -->
-            <div class="text-center">
+            <!-- <div class="text-center">
                 <template is="dom-if" if=[[stack.deploy]]> deploy? true </template>
                 <template is="dom-if" if=[[!stack.deploy]]> deploy? false </template>
-                <p> jobId: {{jobId}}</p>
+                <p> jobId: {{stack.job_id}}</p>
                 <p> in Progress? {{inProgress}}</p>
-                <p> has Errors? {{hasErrors}} {{stack.status}}</p>
-            </div>
+                <p> has Errors? {{hasErrors}} status: {{stack.status}}</p>
+            </div> -->
             <div class="absolute-bottom-right">
-                <paper-fab icon="delete" on-tap="uninstall" id="runScriptFab"></paper-fab>
-                <paper-tooltip for="runScriptFab" position="top">Run Script</paper-tooltip>
+                <paper-fab id="install" icon="av:play-arrow" on-tap="_quickActionsNavigation" hidden$="[[ok]]"></paper-fab>
             </div>
         </div>
         <dialog-element></dialog-element>
         <iron-ajax id="workflowRequest" url="" on-response="handleWorkflowResponse" on-error="handleWorkflowError"></iron-ajax>
-        <iron-ajax id="hasErrorsCheck" url="/api/v1/jobs/{{jobId}}" on-response="handleErrorsResponse" on-error="handleErrorsError"></iron-ajax>
     </template>
     <script>
     (function() {
@@ -849,13 +763,29 @@
                         }]
                     }
                 },
-
+                start_creation: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                },
+                error: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                },
+                workflow_started: {
+                    type: Boolean,
+                    value: false,
+                    notify: true
+                },
+                ok: {
+                    type: Boolean,
+                    value: true,
+                    notify: true
+                }
             },
             observers: [
-                  '_runtimePropertiesChanged(stack.*,runtimeProperties.*)',
-                  '_inProgress(jobId, hasErrors)'
-                  // 'stackChanged(stack)'
-                  // '_paramsChanged(params)'
+                  '_runtimePropertiesChanged(stack.*,runtimeProperties.*)'
             ],
             listeners: {
                 // 'confirmation': '_deleteStackResponse',
@@ -865,8 +795,23 @@
             _computeStack: function(params) {
                 var stack =  this.model.stacksArray.find(function(stack) {
                     return stack.id == params.id;
-                }, this);
+                }, this);                
                 if (stack) {
+                    if (stack.status) {
+                        var st = stack.status
+                        if (st == "start_creation") {
+                            this.start_creation = true;
+                        }
+                        if (st == "error") {
+                            this.error = true;
+                        }
+                        if (st == "workflow_started") {
+                            this.workflow_started = true;
+                        }
+                        if (st == "ok") {
+                            this.ok = true;
+                        }
+                    }
                     return stack;
                 }
                 else {
@@ -877,31 +822,6 @@
             },
             _computeStackId: function(params) {
                 return params.id;
-            },
-            _hasErrors: function(jobId, stack){
-                if (this.stack && this.stack.status && this.stack.status.startsWith("Error")){
-                    return true;
-                } 
-                else if (jobId) {
-                    //generate a single request and get response for errors
-                    this.$.hasErrorsCheck.generateRequest();
-                    return false;
-                }
-            },
-            _inProgress: function(jobId, hasErrors){
-                if (jobId && !hasErrors) {
-                    return true
-                    // start polling and assess
-                    // finished_at 0 + no errors  = in progress             -> keep polling        inProgress !hasErrors
-                    // finished_at X + no errors  = deployed successfully   -> stops polling      !inProgress !hasErrors
-                    // finished_at X + errors  = has errors                 -> stops polling      !inProgress  hasErrors
-                }        
-
-                "undefined"
-                "start_creation"
-                "error"
-                "workflow_started"
-                "ok"
             },
             handleErrorsResponse: function(e){
                 console.log("handleErrorsResponse: ",e.detail);
@@ -957,15 +877,6 @@
                 return rtp;
             },
             _runtimePropertiesChanged: function(stack,changerecord){
-                // var rtp = [];
-                // var state = this.stack.state;
-                // for (var i = 0; i < state.length; i++) {
-                //     rtp.push(state[i].runtime_properties);
-                // }
-                // this.runtimeProperties = [];
-                // this.runtimeProperties = rtp;
-
-                //console.log("_runtimePropertiesChanged", changerecord);
                 this.updateResources(this.runtimeProperties);
             },
             _machines: function(stack){
@@ -1040,33 +951,24 @@
                 return keys;
             },
             _computeWorkflows: function(template) {
-                var workflows = [];
+                // var workflows = [];
                 // var removeThese = ["scale", "install", "scale_cluster_up"];
-                var removeThese = [];
-                if (this.stack && template && template.workflows.length>0){
-                    template.workflows.forEach(function(workflow) {
-                        // use custom workflow fields with dropdowns
-                        if (workflow.name == "scale_cluster_up") {
-                            workflows.push(this.customScaleUp);
-                        }
-                        if (removeThese.indexOf(workflow.name) == -1) {
-                            workflows.push(workflow);
-                        }
-                    }, this);
-                }
-                return workflows;
-            },
-            _stackChanged: function(changerecord) {
-                // var stack = this.stack;
-                // this._computeMachines(this.machines);
-                // this._computeKeys(this.runtimeProperties);
-                // this._computeNetworks(this.runtimeProperties);
-
-                // this.querySelector('#workflowsView').children[0].setAttribute("show", true);
-                // this.querySelector('#workflowsNavigation').children[0].setAttribute("focused", true);
+                // var removeThese = [];
+                // if (this.stack && template && template.workflows.length>0){
+                //     template.workflows.forEach(function(workflow) {
+                //         // use custom workflow fields with dropdowns
+                //         if (workflow.name == "scale_cluster_up") {
+                //             workflows.push(this.customScaleUp);
+                //         }
+                //         if (removeThese.indexOf(workflow.name) == -1) {
+                //             workflows.push(workflow);
+                //         }
+                //     }, this);
+                // }
+                // return workflows;
+                return template.workflows;
             },
             _getFormattedTimestamp: function (stack) {
-                //var timestamp = parseInt();
                 return new Date(this.stack.created_at).toLocaleString('en-US', {timeZoneName: 'short'});
             },
             _showDialog: function(info) {
@@ -1081,8 +983,8 @@
                 history.back();
             },
             _toggleQuickActions: function(e) {
-                this.$.runTemplateFab.toggleClass("hidden");
-                this.$.quickActions.toggleClass("hidden");
+                // this.$.runTemplateFab.toggleClass("hidden");
+                // this.$.quickActions.toggleClass("hidden");
             },
             _workflowNavigation: function(e) {
                 var action = e.target.id;
