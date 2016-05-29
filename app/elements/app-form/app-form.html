@@ -74,7 +74,7 @@
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'toggle', field.show)]]">
                         <div class="xs12 m6">
-                            <paper-toggle-button checked="{{field.defaultValue}}" disabled="[[field.disabled]]">[[field.name]]</paper-toggle-button>
+                            <paper-toggle-button checked="{{field.value}}" disabled="[[field.disabled]]">[[field.name]]</paper-toggle-button>
                         </div>
                         <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                     </template>

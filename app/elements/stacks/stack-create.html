@@ -14,7 +14,7 @@
 
             paper-material {
                 display: block;
-                padding: 24px;                
+                padding: 24px;
             }
 
             #content {
@@ -57,19 +57,19 @@
             }
         </style>
 
-                
+
                 <div id="content">
-                    <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+                    <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                         <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
                         <div class="title flex">
                             <h2>
                                 Create Stack
                             </h2>
                             <div class="subtitle">
-                                from [[template.name]] <a href$="/templates/[[template.id]]"> <iron-icon icon="icons:link"></iron-icon></a> 
+                                from [[template.name]] <a href$="/templates/[[template.id]]"> <iron-icon icon="icons:link"></iron-icon></a>
                                 <span class="desc" hidden$="[[!template.description]]">([[template.description]])</span>
                             </div>
-                        </div>                        
+                        </div>
                     </paper-material>
                     <paper-material>
                         <div class="grid-row">
@@ -104,7 +104,7 @@
                                 <template is="dom-if" if="[[_computeFieldType(field, 'toggle', field.show)]]">
                                     <div class="xs12 m6">
                                         <div class="spacer" hidden$="[[field.disabled]]"></div>
-                                        <paper-toggle-button checked="{{field.defaultValue}}" disabled="[[field.disabled]]">[[field.label]]</paper-toggle-button>
+                                        <paper-toggle-button checked="{{field.value}}" disabled="[[field.disabled]]">[[field.label]]</paper-toggle-button>
                                         <div class="spacer" hidden$="[[field.disabled]]"></div>
                                     </div>
                                     <div class="field-helptext xs12 m6">[[field.helptext]]</div>
@@ -181,7 +181,7 @@
                     template: {
                         type: Object,
                         value: {},
-                        computed: '_fromTemplate(params)'
+                        computed: '_fromTemplate(params,model.templates.*)'
                     },
                     fields: {
                     type: Array,
@@ -510,7 +510,7 @@
                             helptext: "Enable this option to deploy your stack now",
                             errorMessage: "",
                             show: true,
-                            required: true
+                            required: false
                     }],
                     notify: true
                     },
@@ -554,7 +554,7 @@
                 observers: [
                     '_fieldsChanged(fields.*, sendingData)',
                 ],
-                _fromTemplate: function(params){
+                _fromTemplate: function(params, templates){
                     if (params.id) {
                         var pid = params.id;
                         var template = this.model.templatesArray.find(function(template) {
@@ -632,24 +632,8 @@
             _handleResponse: function(e){
                 this.fire("stack-create-response", e.detail)
                 this.sid = e.detail.__data__.response.stack.id;
-                setTimeout(this.delayed.bind(this),2000);
-
-            },
-            delayed: function(){
-                window.location.href = '/stacks/'+this.sid;
-            },
-            waittoredirect: function(sid){
-                var stack = parent.model.stacksArray.find(function(stack){
-                    return stack.id == sid;
-                });
-                console.log("response",new_stack);
-                if (stack){
-                    page.show('/stacks/'+ sid);
-                }
-                else {
-                    this.waittoredirect(sid);
-                }
-
+                console.warn('redirect to /stacks/'+ this.sid);
+                page.show('/stacks/'+ this.sid);
             },
             _fieldsChanged: function(fields, sendingData) {
                 this.async(function() {

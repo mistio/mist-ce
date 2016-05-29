@@ -327,23 +327,23 @@
         }
         .parsing-loader.error paper-progress ::content #primaryProgress {
             background-color: var(--red-color);
-        }        
+        }
         #stack_actions paper-button {
             text-align: left !important;
         }
         .delete, .retry {
             cursor: pointer;
         }
-        </style>        
+        </style>
         <div id="content">
-            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
                 <div class="title flex">
                     <h2>
-                        [[stack.name]] 
+                        [[stack.name]]
                     </h2>
                     <div class="subtitle">
-                        Created from [[template.name]] <a href$="/templates/[[template.id]]"> <iron-icon icon="icons:link"></iron-icon></a> 
+                        Created from [[template.name]] <a href$="/templates/[[template.id]]"> <iron-icon icon="icons:link"></iron-icon></a>
                         <span class="desc" hidden$="[[!template.description]]">([[template.description]])</span>
                     </div>
                 </div>
@@ -358,14 +358,14 @@
                                     <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation" class="simple">[[workflow.name]]</paper-button>
                                 </template>
                             </paper-menu>
-                        </paper-menu-button>    
+                        </paper-menu-button>
                     </span>
                     <span hidden$="[[!showLateError]]">
                         <paper-button id="uninstall" on-tap="_quickActionsNavigation" class="simple">Delete Stack <iron-icon icon="delete"></iron-icon></paper-button>
                     </span>
                 </div>
             </paper-material>
-            <!-- <paper-item id="quickActions" class="hidden"> 
+            <!-- <paper-item id="quickActions" class="hidden">
                 <div class="flex-horizontal-with-ratios">
                     <template is="dom-repeat" items="[[workflows]]" as="workflow">
                             <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation">[[workflow.name]]</paper-button>
@@ -545,13 +545,9 @@
                 },
                 stack: {
                     type: Object,
-                    computed: '_computeStack(params)',
+                    computed: '_computeStack(params, model.stacks.*)',
                     // observer: "_stackChanged",
                     notify: true
-                },
-                stackId: {
-                    type: String,
-                    computed: '_computeStackId(params)'
                 },
                 template: {
                     type: Object,
@@ -821,6 +817,7 @@
                 return sum > 0 ? true : false;
             },
             _showLateError: function(stack){
+                return false;
                 var now = Date.now();
                 var crat = new Date(this.stack.created_at);
                 var diff = Math.abs(now-crat);
