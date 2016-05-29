@@ -824,7 +824,7 @@
             is_ok: function(stack){
                 return stack.status == 'ok';
             },
-            _disabledButtons: function(){
+            _disabledButtons: function(stack){
                 return stack.status == 'workflow_started' || stack.status == 'start_creation';
             },
             _computeStackId: function(params) {
