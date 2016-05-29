@@ -424,8 +424,8 @@
                     </template>
                 </paper-material>
             </template>
-            
-            <div hidden="[[!stack.deploy]]">
+
+            <div hidden="[[!stack.deploy || disabled]]">
                 <h3 class="smallcaps" hidden$="[[!workflows.length]]">Workflows</h3>
                 <paper-material id="workflows" hidden$="[[!workflows.length]]">
                     <div id="workflows-panel">
