@@ -18,12 +18,15 @@
 
         paper-material {
             display: block;
-            padding: 24px;
-            margin-bottom: 24px;
+            padding: 24px;            
         }
 
         paper-material.no-pad {
             padding: 0;
+        }
+
+        paper-material.marg-b {
+            margin-bottom: 24px;
         }
 
         paper-material.form-view {
@@ -67,10 +70,6 @@
             text-decoration: none;
         }
 
-        #container {
-            background: #fafafa;
-        }
-
         .paper-header [paper-drawer-toggle] {
             margin-left: 10px;
         }
@@ -109,6 +108,7 @@
         }
 
         #content {
+            position: relative;            
             overflow: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -334,7 +334,21 @@
         .delete, .retry {
             cursor: pointer;
         }
-        </style>
+        paper-spinner {
+            display: none;
+        }
+        paper-spinner[active] {
+            display: block;
+            position: absolute;
+            left: calc(50% - 28px);
+            top: 120px;
+            z-index: 999;
+            background-color: #fff;
+            padding: 8px;
+            border-radius: 50%;
+            @apply(--shadow-elevation-8dp);
+        }
+        </style>        
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
@@ -348,7 +362,8 @@
                     </div>
                 </div>
                 <div class="item-actions">
-                    <span hidden$="[[showLateError]]">
+                    <!-- buttons to show normally-->
+                    <span>
                         <paper-button id="scale_cluster_up" on-tap="_quickActionsNavigation" class="simple">scale up</paper-button>
                         <paper-button id="scale_cluster_down" on-tap="_quickActionsNavigation" class="simple">scale down</paper-button>
                         <paper-menu-button horizontal-align="right">
@@ -360,12 +375,16 @@
                             </paper-menu>
                         </paper-menu-button>
                     </span>
-                    <span hidden$="[[!showLateError]]">
+                    <!-- buttons to show if status undefined or status error-->
+                    <span>
                         <paper-button id="uninstall" on-tap="_quickActionsNavigation" class="simple">Delete Stack <iron-icon icon="delete"></iron-icon></paper-button>
+                        <paper-button id="install" on-tap="_quickActionsNavigation" class="simple">Deploy Stack <iron-icon icon="av:play-arrow"></iron-icon></paper-button>
                     </span>
                 </div>
             </paper-material>
+
             <!-- <paper-item id="quickActions" class="hidden">
+            <paper-item id="quickActions" class="hidden"> 
                 <div class="flex-horizontal-with-ratios">
                     <template is="dom-repeat" items="[[workflows]]" as="workflow">
                             <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation">[[workflow.name]]</paper-button>
@@ -374,7 +393,57 @@
                         <iron-icon icon="icons:clear" on-tap="_toggleQuickActions"></iron-icon>
                     </paper-button>
                 </div>
-            </paper-item> -->
+            </paper-item>   
+            <paper-spinner id="spinner"></paper-spinner>-->
+
+            <paper-material class="marg-b">
+                <div class="flex-horizontal-with-ratios">
+                    <div class="page-block">
+                        <h3 class="smallcaps">Stack Description</h3>
+                        <p>[[stack.description]]</p>
+                    </div>
+                    <div class="page-block">
+                        <h3 class="smallcaps">Created</h3>
+                        <p>[[timestamp]]
+                        </p>
+                    </div>
+                </div>
+            </paper-material>
+
+            <!-- If status undefined -->
+            <paper-material class="marg-b">
+                <div class="parsing-loader">
+                    <h4>Stack is saved and ready to deploy</h4>
+                    <paper-button>Deploy Now</paper-button>
+                </div>
+            </paper-material>
+
+            <!-- If stack has errors-->
+            <paper-material>
+                <div class="parsing-loader error">
+                    <h3>There was an error</h3>
+                    <paper-progress id="stackpageprogress" value="100"></paper-progress>
+                    <h4>The creation process failed.<br/>
+                    <span class="retry regular blue-link" id="install" on-tap="doWorkflow">Try again </span>
+                    <p id="messages"></p>
+                    </h4>
+                </div>
+            </paper-material>
+
+            <!-- If stack status star start_creation-->
+            <paper-material>
+                <div class="parsing-loader">
+                    <h3>Creating stack [[stack.name]]</h3>
+                    <paper-progress id="stackpageprogress" value="30" indeterminate></paper-progress>
+                    <h4>This may take a while.</h4>
+                </div>
+            </paper-material>
+            <!-- Screen when user has asked to deploy: Has JobId + Job has not finished + has errors-->
+            <!-- Screen when user has asked to deploy: Has JobId + Job has finished + has errors-->
+            <!-- error cases -->
+
+            <!-- Screen when user has asked to deploy: Has JobId + Job has finished + has no errors-->
+
             <paper-material id="resources" class="page">
                 <template is="dom-if" if="[[runtimeProperties]]">
                     <div class="flex-horizontal-with-ratios" hidden$="[[showLateError]] || [[!resourcelist]]">
@@ -396,11 +465,11 @@
                                 <h4>This may take a while.</h4>
                             </div>
                         </template>
-                        <template is="dom-if" if="{{showLateError}}">
+                        <template is="dom-if" if="{{hasErrors}}">
                             <div class="parsing-loader error">
-                                <h3>There seems to be an error</h3>
+                                <h3>There was an error</h3>
                                 <paper-progress id="stackpageprogress" value="100"></paper-progress>
-                                <h4>The available stack state information has returned no resources after too long or the inputs are wrong.<br/>
+                                <h4>The creation process failed.<br/>
                                 <span class="delete regular blue-link" id="uninstall" on-tap="_quickActionsNavigation">Delete Stack</span> or <a class="regular blue-link" href$="/create-stack/[[template.id]]">Retry </span>
                                 </h4>
                             </div>
@@ -451,7 +520,7 @@
                                 <div id$="[[workflow.name]]show" class="m12 wf-item">
 
                                     <template is="dom-if" if=[[workflow.params.length]]>
-                                        <app-form model=[[model]] fields="[[workflow.params]]" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[params.id]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
+                                        <app-form model=[[model]] fields="[[workflow.params]]" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[params.id]]" on-request="handleWorkflowRequest" on-response="handleWorkflowResponse" on-error="handleWorkflowError" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
                                     </template>
 
                                     <template is="dom-if" if=[[!workflow.params.length]]>
@@ -504,6 +573,14 @@
                     </template>
                 </div>
             </div>
+            <!-- test show properties -->
+            <div class="text-center">
+                <template is="dom-if" if=[[stack.deploy]]> deploy? true </template>
+                <template is="dom-if" if=[[!stack.deploy]]> deploy? false </template>
+                <p> jobId: {{jobId}}</p>
+                <p> in Progress? {{inProgress}}</p>
+                <p> has Errors? {{hasErrors}} {{stack.status}}</p>
+            </div>
             <div class="absolute-bottom-right">
                 <paper-fab icon="delete" on-tap="uninstall" id="runScriptFab"></paper-fab>
                 <paper-tooltip for="runScriptFab" position="top">Run Script</paper-tooltip>
@@ -511,6 +588,7 @@
         </div>
         <dialog-element></dialog-element>
         <iron-ajax id="workflowRequest" url="" on-response="handleWorkflowResponse" on-error="handleWorkflowError"></iron-ajax>
+        <iron-ajax id="hasErrorsCheck" url="/api/v1/jobs/{{jobId}}" on-response="handleErrorsResponse" on-error="handleErrorsError"></iron-ajax>
     </template>
     <script>
     (function() {
@@ -535,19 +613,26 @@
                 section: {
                     type: Object
                 },
-                color: {
-                    type: String,
-                    computed: '_getHeaderStyle(section)'
-                },
                 params: {
-                    type: Object,
-                    observer: "_paramsChanged"
+                    type: Object
                 },
                 stack: {
                     type: Object,
                     computed: '_computeStack(params, model.stacks.*)',
-                    // observer: "_stackChanged",
                     notify: true
+                },
+                inProgress: {
+                    type: Boolean,
+                    value: false
+                },
+                hasErrors: {
+                    type: Boolean,
+                    value: false,
+                    computed: '_hasErrors(jobId, stack, model.stacks.*)'
+                },
+                stackId: {
+                    type: String,
+                    computed: '_computeStackId(params)'
                 },
                 template: {
                     type: Object,
@@ -564,11 +649,6 @@
                 listMachines: {
                     type: Array,
                     computed: '_listMachines(runtimeProperties)',
-                    notify:true
-                },
-                listMachines2: {
-                    type: Array,
-                    computed: '_listMachines2(stack)',
                     notify:true
                 },
                 networks: {
@@ -773,6 +853,7 @@
             },
             observers: [
                   '_runtimePropertiesChanged(stack.*,runtimeProperties.*)',
+                  '_inProgress(jobId, hasErrors)'
                   // 'stackChanged(stack)'
                   // '_paramsChanged(params)'
             ],
@@ -780,12 +861,6 @@
                 // 'confirmation': '_deleteStackResponse',
                 // 'updateSelectedStack': '_updateStack',
                 // 'stackChanged': '_stackChanged's
-            },
-            _getHeaderStyle: function(section) {
-                return 'background-color: ' + section.color + '; color: #fff;';
-            },
-            _paramsChanged: function(params, old) {
-
             },
             _computeStack: function(params) {
                 var stack =  this.model.stacksArray.find(function(stack) {
@@ -803,6 +878,40 @@
             _computeStackId: function(params) {
                 return params.id;
             },
+            _hasErrors: function(jobId, stack){
+                if (this.stack && this.stack.status && this.stack.status.startsWith("Error")){
+                    return true;
+                } 
+                else if (jobId) {
+                    //generate a single request and get response for errors
+                    this.$.hasErrorsCheck.generateRequest();
+                    return false;
+                }
+            },
+            _inProgress: function(jobId, hasErrors){
+                if (jobId && !hasErrors) {
+                    return true
+                    // start polling and assess
+                    // finished_at 0 + no errors  = in progress             -> keep polling        inProgress !hasErrors
+                    // finished_at X + no errors  = deployed successfully   -> stops polling      !inProgress !hasErrors
+                    // finished_at X + errors  = has errors                 -> stops polling      !inProgress  hasErrors
+                }        
+
+                "undefined"
+                "start_creation"
+                "error"
+                "workflow_started"
+                "ok"
+            },
+            handleErrorsResponse: function(e){
+                console.log("handleErrorsResponse: ",e.detail);
+                // get error 
+            },
+            handleErrorsError: function(e){
+                console.log("handleErrorsResponse: ",e.detail);
+                // could not do the request
+                this.hasErrors = true;
+            },
             _resourcelist: function(runtimeProperties) {
                 var sum = 0;
                 if (this.keys)
@@ -811,8 +920,6 @@
                     sum += this.keys.length;
                 if (this.listMachines)
                     sum += this.listMachines.length;
-
-
 
                 return sum > 0 ? true : false;
             },
@@ -832,6 +939,9 @@
             _computeTemplate: function(stack) {
                 return this.model.templates[stack.template];
             },
+            _computeJobID: function(stack){
+                return stack.job_id ? stack.job_id : false;
+            },
             _runtimeProperties: function(stack){
                 var rtp = [];
                 var state = stack.state;
@@ -846,7 +956,7 @@
                 }
                 return rtp;
             },
-            _runtimePropertiesChanged: function(satck,changerecord){
+            _runtimePropertiesChanged: function(stack,changerecord){
                 // var rtp = [];
                 // var state = this.stack.state;
                 // for (var i = 0; i < state.length; i++) {
@@ -886,14 +996,6 @@
                         }
                     }, this);
                 }
-                return machines;
-            },
-            _listMachines2: function(stack){
-                var machines = [];
-                this.model.machinesArray.forEach(function(machine) {
-                    if (this.stack.machines.indexOf(machine.uuid) != -1)
-                        machines.push(machine)
-                }, this);
                 return machines;
             },
             _computeNetworks: function(runtimeProperties) {
@@ -939,7 +1041,8 @@
             },
             _computeWorkflows: function(template) {
                 var workflows = [];
-                var removeThese = ["scale", "install", "scale_cluster_up"];
+                // var removeThese = ["scale", "install", "scale_cluster_up"];
+                var removeThese = [];
                 if (this.stack && template && template.workflows.length>0){
                     template.workflows.forEach(function(workflow) {
                         // use custom workflow fields with dropdowns
@@ -1037,15 +1140,22 @@
                 var workflow = this.workflows.find(function(workflow) {
                     return workflow.name == action;
                 });
-                if (workflow.params == null || workflow.params == undefined) {
+                if (workflow.params == null || workflow.params == undefined || !workflow.params.length) {
                     this.$.workflowRequest.url = "/api/v1/stacks/" + this.stack.id;
-                    this.$.workflowRequest.headers = {"csrf": CSRF};
+                    this.$.workflowRequest.headers = {"csrf-token": CSRF_TOKEN};
                     this.$.workflowRequest.params = {"workflow":action};
                     this.$.workflowRequest.generateRequest();
                 }
             },
-            handleWorkflowResponse: function() {
-                // handle workflow response
+            handleWorkflowRequest: function(e) {
+                this.$.spinner.setAttribute('active',true);
+            },
+            handleWorkflowResponse: function(e) {
+                this.$.spinner.removeAttribute('active');
+            },
+            handleWorkflowError: function(e) {
+                this.$.spinner.removeAttribute('active');
+                this.$.messages.textContent = e.detail.error.message;
             },
             toggle: function() {
               this.$.collapse.toggle();

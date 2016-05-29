@@ -181,8 +181,8 @@
                     template: {
                         type: Object,
                         value: {},
-                        computed: '_fromTemplate(params,model.templates.*)'
-                    },
+                        computed: '_fromTemplate(params, model.templates.*)'
+                    },                    
                     fields: {
                     type: Array,
                     value: [{
@@ -549,6 +549,9 @@
                     },
                     sid: {
                         type: String
+                    },
+                    jobId: {
+                        type: String
                     }
                 },
                 observers: [
@@ -627,9 +630,10 @@
             },
             _handleRequest: function(e){
                 this.fire("request", e.detail)
-                console.log("request",e.detail);
+                console.log("deploy",this.form.deploy, "request", e.detail);
             },
             _handleResponse: function(e){
+                // console.log('LOGGG',e.detail.__data__.response);
                 this.fire("stack-create-response", e.detail)
                 this.sid = e.detail.__data__.response.stack.id;
                 console.warn('redirect to /stacks/'+ this.sid);
@@ -748,7 +752,6 @@
                 this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.formAjax.body = body;
 
-                //console.log(body);
                 this.$.formAjax.generateRequest();
 
                 //test progress bar

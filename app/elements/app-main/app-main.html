@@ -454,11 +454,8 @@ var app = Polymer({
     updateCurrent: function(e) {
         // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
         var el = e.detail.item;
-
-        this.current = el.getAttribute("current");
-        this.title = el.title;
-        console.log("el",e.detail);
-        if (el.nodeName == 'IRON-ROUTE') {
+        //console.log("el",e.detail);
+        if (el.nodeName == 'IRON-ROUTE' && el.title && el.getAttribute("current")) {
             this.current = el.getAttribute("current");
             this.title = el.title;
         }
