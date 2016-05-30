@@ -17,6 +17,14 @@
             #content {
                 max-width: 900px;
             }
+
+            paper-progress {
+                position: absolute;
+                bottom: 85px;
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
         </style>
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
@@ -37,6 +45,7 @@
 
                 <paper-textarea id="publicKey" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
                 <div class="clearfix btn-group">
+                    <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
                     <hr class="xs12" />
                     <div class="clearfix bottom-actions xs12">
                         <paper-button class="purple" raised on-tap="_generateKey">Generate</paper-button>
@@ -49,7 +58,7 @@
         </div>
 
         <iron-ajax id="keyGenerateAjaxRequest" url="/api/v1/keys" method="POST" on-response="_handleKeyGenerateAjaxResponse" on-error="_handleKeyGenerateAjaxError"></iron-ajax>
-        <iron-ajax id="keyAddAjaxRequest" url="/api/v1/keys" method="POST" on-response="_handleKeyAddAjaxResponse" on-error="_handleKeyAddAjaxError"></iron-ajax>
+        <iron-ajax id="keyAddAjaxRequest" url="/api/v1/keys" method="PUT" on-response="_handleKeyAddAjaxResponse" on-error="_handleKeyAddAjaxError"></iron-ajax>
     </template>
 
     <script>
@@ -85,6 +94,10 @@
                     formReady: {
                         type: Boolean,
                         computed: '_computeFormReady(key.name, key.privateKey, sendingData)'
+                    },
+                    showProgress: {
+                        type: Boolean,
+                        computed: '_computeShowProgress(sendingData)'
                     }
                 },
                 listeners: {
@@ -105,6 +118,9 @@
                     }
 
                     return formReady;
+                },
+                _computeShowProgress: function(sendingData) {
+                    return sendingData;
                 },
                 _openAddKeyModal: function(e) {
                     this.$.addKeyModal.open();
@@ -150,6 +166,9 @@
                     this.set('sendingData', false);
                     this._formReset();
                 },
+                _handleKeyAddAjaxError: function(e) {
+                    this.set('sendingData', false);
+                },
                 _formReset: function() {
                     this.set('key.name', '');
                     this.set('key.publicKey', '');
@@ -168,13 +187,15 @@
                     this.set('sendingData', true);
                 },
                 _handleKeyGenerateAjaxResponse: function(e) {
-                    console.log(e);
                     this.set('sendingData', false);
                     var response = e.detail.response;
                     this.set('key.publicKey', response.public);
                     this.set('key.privateKey', response.priv);
                     this.set('sendingData', false);
                     this.set('showPublicKey', true);
+                },
+                _handleKeyGenerateAjaxError: function(e) {
+                    this.set('sendingData', false);
                 }
             });
         })();
