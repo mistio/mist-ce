@@ -20,7 +20,8 @@ regions = {}
 with open(csv_file, 'rb') as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
     for row in reader:
-        if row[1] == 'ec2':
+        instance_type = row[0]
+        if row[1] == 'ec2' and instance_type == 'ondemand':
             region = row[2]
             size = row[3]
             os = row[6]
