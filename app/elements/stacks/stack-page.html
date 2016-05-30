@@ -368,7 +368,7 @@
             </paper-material>
 
             <!-- If status undefined or ok -->
-            <paper-material id="deploynow" class="marg-b" hidden$="[[hideWorkflows]]">
+            <paper-material id="deploynow" class="marg-b" hidden$="[[hideDeployNow]]">
                 <div class="parsing-loader">
                     <h4>Stack is saved and ready to deploy</h4>
                     <paper-button id="install" on-tap="doWorkflow">Deploy Now</paper-button>
@@ -551,6 +551,10 @@
                 hideWorkflows: {
                     type: Boolean,
                     computed: '_hideWorkflows(stack)'
+                },
+                hideDeployNow: {
+                    type: Boolean,
+                    computed: '_hideDeployNow(stack)'
                 },
                 sections: {
                     type: Object
@@ -850,6 +854,9 @@
             },
             _hideWorkflows: function(stack){
                 return !stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
+            },
+            _hideDeployNow: function(stack){
+                return stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
             },
             _disabledButtons: function(stack){
                 return stack.status == 'workflow_started' || stack.status == 'start_creation';
