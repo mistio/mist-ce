@@ -22,7 +22,7 @@
 
     <ul class="ui-listview orgs-list">
         {{#if Mist.orgs}}
-            {{#each organization in view.orgs}}
+            {{#each organization in Mist.orgs}}
                 {{component "organization-item" organization=organization}}
             {{/each}}
         {{/if}}

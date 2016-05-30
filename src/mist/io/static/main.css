@@ -1305,6 +1305,7 @@ ul.checkbox-list .ui-grid-b {
 .ui-popup ul.ui-listview li.organization-item.org-active a:hover:after {
     background-color: #009688 !important;
     color: #fff;
+    cursor: default;
 }
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {
