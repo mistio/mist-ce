@@ -55,21 +55,21 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                     });
             },
 
-            addFirstOrganization: function(args) {
+            renameOrganization: function(args) {
                 var that = this;
-                that.set('addingOrganization', true);
+                that.set('renamingOrganization', true);
                 Mist.ajax
-                    .POST('/org', {
-                        'name': args.organization.name
+                    .PUT('/org/' + args.organization.id, {
+                        'new_name': args.newName
                     })
                     .success(function(organization) {
-                        that._addFirstOrganization(organization);
+                        that._renameOrganization(organization);
                     })
                     .error(function(message) {
                         Mist.notificationController.notify(message);
                     })
                     .complete(function(success) {
-                        that.set('addingOrganization', false);
+                        that.set('renamingOrganization', false);
                     });
             },
 
@@ -95,8 +95,8 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                 }, 100);
             },
 
-            _addFirstOrganization: function(organization) {
-                window.location.href = '/switch_context/' + organization.id;
+            _renameOrganization: function(organization) {
+
             },
 
             _updateModel: function(organization) {

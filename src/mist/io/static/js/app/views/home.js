@@ -79,8 +79,8 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                             incident.get('machine'));
                 },
 
-                addFirstOrg: function() {
-                    Mist.organizationAddController.addFirst();
+                editOrg: function() {
+                    Mist.organizationEditController.save();
                 }
             },
 

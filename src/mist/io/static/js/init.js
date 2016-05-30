@@ -43,6 +43,7 @@ var loadApp = function(
     TeamAddController,
     OrganizationsController,
     OrganizationAddController,
+    OrganizationEditController,
     MemberAddController,
     PolicyRuleEditController,
     PolicyOperatorEditController,
@@ -149,6 +150,7 @@ var loadApp = function(
     App.set('teamAddController', TeamAddController.create());
     App.set('organizationsController', OrganizationsController.create());
     App.set('organizationAddController', OrganizationAddController.create());
+    App.set('organizationEditController', OrganizationEditController.create());
     App.set('memberAddController', MemberAddController.create());
     App.set('policyRuleEditController', PolicyRuleEditController.create());
     App.set('policyOperatorEditController', PolicyOperatorEditController.create());

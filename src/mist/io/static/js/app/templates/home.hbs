@@ -41,9 +41,9 @@
                         <span class="icon-teams"></span>
                         <h1>Welcome to mist.io</h1>
                         <h2>GET STARTED BY ADDING AN ORGANISATION NAME.</h2>
-                        <form id="first-org-form" {{action "addFirstOrg" on="submit" target=view}}>
-                            {{input value=Mist.organizationAddController.newOrganization.name placeholder="Organisation name"}}
-                            <button type="submit" class="ui-btn ui-btn-d ui-shadow ui-caps {{if Mist.organizationAddController.formReady '' 'ui-state-disabled'}}">Add</button>
+                        <form id="edit-org-form" {{action "editOrg" on="submit" target=view}}>
+                            {{input value=Mist.organizationEditController.organization.newName placeholder="Organisation name"}}
+                            <button type="submit" class="ui-btn ui-btn-d ui-shadow ui-caps {{if Mist.organizationEditController.formReady '' 'ui-state-disabled'}}">Edit</button>
                         </form>
                         <p>
                             Organisations help you invite more people within context.<br>You can always add more organisations later.
