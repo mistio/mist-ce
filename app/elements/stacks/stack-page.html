@@ -765,16 +765,16 @@
             },
             _runtimeProperties: function(stack){
                 var rtp = [];
-                // var state = stack.node_instances;
-                // if(state) {
-                //     for (var i = 0; i < state.length; i++) {
-                //         var rtpObj = YAML.parse(state[i].runtime_properties);
-                //         if (rtpObj) {
-                //             rtpObj.name = state[i].name;
-                //             rtp.push(rtpObj);
-                //         }
-                //     }
-                // }
+                var state = stack.node_instances;
+                if(state) {
+                    for (var i = 0; i < state.length; i++) {
+                        var rtpObj = state[i].runtime_properties;
+                        if (rtpObj) {
+                            rtpObj.name = state[i].name;
+                            rtp.push(rtpObj);
+                        }
+                    }
+                }
                 return rtp;
             },
             // _runtimePropertiesChanged: function(stack,changerecord){
