@@ -1505,7 +1505,8 @@ ul.checkbox-list .ui-grid-b {
     background-color: #FFF;
 }
 
-#no-collection-inner .icon-cloud-check:after {
+#no-collection-inner .icon-cloud-check:after,
+#no-collection-inner .icon-teams:after {
     color: #A5A4A1;
     font-size: 150px;
     opacity: 0.3;
