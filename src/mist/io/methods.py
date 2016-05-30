@@ -4328,9 +4328,6 @@ def machine_cost_calculator(m):
             os_type = CloudImage.objects.get(cloud_provider=m.driver.type, image_id=instance_image).os_type
         except:
             os_type = 'linux'
-        # os_type can be one of ("linux", "rhel",
-        # "sles", mswin", "mswinSQL", "mswinSQLWeb", "vyatta")
-        # TODO: update AWS pricing on libcloud
 
         size = m.extra.get('instance_type')
         for node_size in sizes:
