@@ -1,0 +1,116 @@
+<link rel="import" href="../../bower_components/toast-er/toast-er.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+
+
+<dom-module id="toast-element">
+  <template is="dom-bind">
+    <style>
+      .yellow-button {
+      text-transform: none;
+      color: #eeff41;
+      }
+      paper-toast{
+        position: absolute;
+      }
+      /*toast-er{
+        display: inline-block;
+        position: absolute;
+        background: #323232;
+        color: #ffffff;
+        min-height: 48px;
+        min-width: 288px;
+        padding: 16px 24px 12px;
+        box-sizing: border-box;
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+        border-radius: 2px;
+        bottom: 12px;
+        left: 12px;
+        font-size: 14px;
+        cursor: default;
+        -webkit-transition: visibility 0.3s, -webkit-transform 0.3s;
+        transition: visibility 0.3s, transform 0.3s;
+        -webkit-transform: translateY(100px);
+        transform: translateY(100px);
+      }*/
+    </style>
+
+    <paper-button raised on-click="someMethod">1</paper-button>
+    <paper-button raised on-click="someOtherMethod">2</paper-button>
+    <!-- <template is="dom-repeat" items="[[notifications]]">
+      <paper-toast id="toast1" duration="5000" text="[[item.text]]">
+        [[item.text]]
+        <paper-button on-click="hideToast" class="yellow-button">Close now!</paper-button>
+      </paper-toast>
+    </template> -->
+    <template is="dom-repeat" items="[[notifications]]">
+      <toast-er type="[[item.type]]">[[text.item]]</toast-er>
+    </template>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'toast-element',
+
+      properties: {
+
+        notifications: {
+          type: Array,
+          value: [
+            {
+              text: 'Server down-time',
+            },
+            {
+              text: 'Machine stopped working',
+            },
+            {
+              text: 'Server down-time',
+            },
+            {
+              text: 'Collectd installed successfully',
+            }
+          ]
+        },
+
+
+      },
+      // showToast: function(e) {
+      //   var el =  document.getElementById('toast1')
+      //   el.style.visibility='visible';
+      // },
+      // hideToast: function(e){
+      //   var el =  document.getElementById('toast1')
+      //   el.style.visibility='hidden';
+      //
+      // },
+      someMethod: function() {
+         this.fire('iron-signal',{
+           name: 'toaster-bake',
+           data: {
+             text: 'You are not allowed to do this.',
+             type: 'error',
+             duration: 5000,
+             heat: 'high',
+             shelf: 'bottom-left'
+           }
+         });
+      },
+
+      someOtherMethod: function() {
+         this.fire('iron-signal',{
+           name: 'toaster-bake',
+           data: {
+             text: 'Yozxcvzx zdvzdfsdf .',
+             type: 'error',
+             duration: 5000,
+             heat: 'high',
+             shelf: 'bottom-left'
+           }
+         });
+      }
+
+
+
+    });
+  </script>
+</dom-module>

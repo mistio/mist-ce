@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/neon-animation/neon-animatable.html">
 <link rel="import" href="../../bower_components/neon-animation/neon-animations.html">
 
+
 <dom-module id="notifications-element">
   <template is="dom-bind">
     <style>
@@ -124,6 +125,7 @@
           <div class="header">
             <iron-icon id="settings" icon="icons:settings" on-click="_onNextClick" active="{{mainDialogOpen}}"></iron-icon>
             <h2 class="flex">Notifications</h2>
+            <toast-element style="z-index: 1"></toast-element>
           </div>
           <paper-dialog-scrollable>
             <template is="dom-repeat" items="[[notifications]]">

@@ -288,6 +288,7 @@
         <key-edit key="[[key]]"></key-edit>
         <dialog-element></dialog-element>
         <paper-toast></paper-toast>
+        <toast-er></toast-er>
     </template>
     <script>
         (function() {
@@ -450,8 +451,15 @@
                         }
                     }
                     this.set('key.isDefault', true);
-                    this.$.toast.text = this.key.id + ' has become your default Key!';
-                    this.$.toast.open();
+                    // this.$.toast.text = this.key.id + ' has become your default Key!';
+                    // this.$.toast.open();
+
+                     this.fire('iron-signal',{
+                       name: 'toaster-bake',
+                       data: {
+                         text: this.key.id + ' has become your default Key!'
+                       }
+                     });
                 },
                 _editKey: function(e) {
                     var el = this.querySelector('key-edit');
