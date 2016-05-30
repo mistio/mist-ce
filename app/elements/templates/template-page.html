@@ -179,6 +179,7 @@
         .width100 {
             width: 100%;
         }
+        
         </style>
 
 
@@ -191,7 +192,9 @@
                         </h2>
                         <div class="subtitle">
                             <span hidden$="[[!isInline]]">Inline Script</span>
-                            <span hidden$="[[isInline]]">Script source [[template.template]]<a href$="[[template.template]]" target="_blank"> <iron-icon icon="icons:link"></iron-icon></a></span>
+                            <span hidden$="[[isInline]]">Script source <a href$="[[template.template]]" target="_blank" class="regular"> [[template.template]] <iron-icon icon="icons:link"></iron-icon>
+                                </a>
+                            </span>
                         </div>
                     </div>
                     <div class="item-actions">
