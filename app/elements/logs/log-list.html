@@ -134,7 +134,7 @@ Polymer({
                         // Display non special fields only
                         if (['time','$H'].indexOf(keys[i]) > -1)
                             continue
-                      rows += "<tr><td>" + keys[i] + "</td><td>" + item[keys[i]] + "</td>";
+                      rows += "<tr><td>" + keys[i] + "</td><td>" + YAML.dump(item[keys[i]]) + "</td>";
                   }
                   elem.innerHTML = "<table style='width: 100%'>" + rows + "</table>";
               }
