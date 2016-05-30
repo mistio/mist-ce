@@ -4315,8 +4315,7 @@ def machine_cost_calculator(m):
     """
     cost = {'indicative_cost_per_hour': 0, 'indicative_cost_per_month': 0}
     if m.driver.type in [Provider.LINODE, Provider.PACKET, Provider.GCE, \
-        Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN] \
-        or m.driver.type in config.EC2_PROVIDERS:
+        Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
         sizes = CloudSize.objects.filter(cloud_provider=m.driver.type)
     now = datetime.now()
     month_days = calendar.monthrange(now.year, now.month)[1]
@@ -4328,7 +4327,7 @@ def machine_cost_calculator(m):
             os_type = CloudImage.objects.get(cloud_provider=m.driver.type, image_id=instance_image).os_type
         except:
             os_type = 'linux'
-
+        sizes = m.driver.list_sizes()
         size = m.extra.get('instance_type')
         for node_size in sizes:
             if node_size.id == size:
@@ -4340,7 +4339,7 @@ def machine_cost_calculator(m):
                 # just need the float value
                 cost['indicative_cost_per_hour'] = plan_price
                 cost['indicative_cost_per_month'] = float(plan_price) * 24 * month_days
-    if m.driver.type in [Provider.Rackspace, Provider.RACKSPACE_FIRST_GEN]:
+    if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
         # Need to get image in order to specify the OS type
         # out of the image id
         instance_image = m.extra.get('imageId')
