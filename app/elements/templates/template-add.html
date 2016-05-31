@@ -43,7 +43,7 @@
                         Add Template
                     </h2>
                     <div class="subtitle">
-                        Only TOSCA based teplates are currently supported.
+                        Only TOSCA based templates are currently supported.
                     </div>
                 </div>
             </paper-material>
@@ -206,22 +206,15 @@
                             helptext: "Please enter entry point"
                         }],
                         notify: true
-                    },
-                    sendingData: {
-                        type: Boolean,
-                        value: false
                     }
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
                 _addTemplateAjaxRequest: function() {
-                    console.log(1);
                     this.set('sendingData', true);
                 },
                 _addTemplateAjaxResponse: function(e) {
-                    this.set('sendingData', false);
-
                     this.fire('addTemplate', {
                         template: {
                             name: this.template.name,
@@ -231,11 +224,7 @@
 
                     page.show('/templates/' + e.detail.response.template.id);
                 },
-                _addTemplateAjaxError: function(e) {
-                    this.set('sendingData', false);
-                },
                 _resetForm: function(e) {
-                    this.set('sendingData', false);
                     // Reset template
                     this.set('template.name', '');
                     this.set('template.source', '');

@@ -114,7 +114,7 @@
         </div>
         </paper-material>
 
-        <iron-ajax id="formAjax" url="[[url]]" contentType="application/json" method="[[method]]" on-request="_handleRequest" on-response="_handleResponse"></iron-ajax>
+        <iron-ajax id="formAjax" url="[[url]]" contentType="application/json" method="[[method]]" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
     </template>
     <script>
     (function() {
@@ -270,7 +270,9 @@
             _handleResponse: function(e){
                 this.fire("response", e.detail);
                 this.set('sendingData', false);
-                console.log(e);
+            },
+            _handleError: function(e){
+                this.set('sendingData', false);
             },
             _fieldsChanged: function(fields, sendingData) {
                 this.async(function() {
