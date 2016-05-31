@@ -9,7 +9,7 @@
 <link rel="import" href="../element-for-in/element-for-in.html">
 <dom-module id="stack-page">
     <template>
-        <style is="custom-style" include="lists"></style>
+        <style is="custom-style" include="lists"></style>        
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
         :host {
@@ -259,7 +259,12 @@
         }*/
 
         .resources-list {
-            margin-bottom: 36px;
+            margin-bottom: 0;
+        }
+
+        .resources-list h3 {
+            margin-top: 0;
+            background-color: #f2f2f2;
         }
 
         .section {
@@ -353,6 +358,11 @@
         }
         .blue-link {
             color: var(--mist-blue);
+        }
+        .info-title-id {
+            color: rgba(0,0,0,0.54);
+            font-size: 0.9em;
+            padding-left: 8px;
         }
         </style>        
         <div id="content">
@@ -476,32 +486,6 @@
                 </div>
             </paper-material>
 
-            <div id="state" class="page" hidden$="[[!runtimeProperties.length]]">
-                
-                    <template is="dom-if" if="[[runtimeProperties.length]]">
-                        <h3 class="smallcaps">Runtime properties</h3>
-                        <template is="dom-repeat" items="[[runtimeProperties]]">
-                            <paper-material class="no-pad info-card">
-                                <h2 class="info-title" style$="[[color]]">[[item.name]]</h2>
-                                <element-for-in content="[[item]]"></element-for-in>
-                            </paper-material>
-                        </template>
-                    </template>
-                
-                    <template is="dom-if" if="[[stack.inputs.length]]">
-                        <h3 class="smallcaps">Stack Parameters </h3>
-                        <paper-material class="no-pad">
-                            <table class="info-table">
-                                <template is="dom-repeat" items="[[stack.inputs]]">
-                                        <tr><td>[[item.name]]</td><td>[[item.value]]</td></tr>
-                                </template>
-                            </table>
-                        </paper-material>
-                    </template>
-                
-            </div>
-
-
             <template is="dom-if" if="[[ok]]">
             <!-- If stack has resources -->
                 <div hidden$="[[!resourcelist]]">
@@ -532,6 +516,32 @@
                     </template>
                 </div>
             </template>
+
+
+            <div id="state" class="page" hidden$="[[!nodeInstances]]">
+                
+                    <!-- <template is="dom-if" if="[[runtimeProperties.length]]"> -->
+                        <h3 class="smallcaps">Runtime properties</h3>
+                        <template is="dom-repeat" items="[[nodeInstances]]">
+                            <paper-material class="no-pad info-card">
+                                <h2 class="info-title">[[item.name]] <span class="info-title-id">id: [[item.id]]</span></h2>
+                                <element-for-in content="[[item.runtime_properties]]"></element-for-in>
+                            </paper-material>
+                        </template>
+                    <!-- </template> -->
+                
+                    <template is="dom-if" if="[[stack.inputs.length]]">
+                        <h3 class="smallcaps">Stack Parameters </h3>
+                        <paper-material class="no-pad">
+                            <table class="info-table">
+                                <template is="dom-repeat" items="[[stack.inputs]]">
+                                        <tr><td>[[item.name]]</td><td>[[item.value]]</td></tr>
+                                </template>
+                            </table>
+                        </paper-material>
+                    </template>
+                
+            </div>
             
             <!-- test show properties -->
             <!-- <div class="text-center">
@@ -600,10 +610,10 @@
                     type: Array,
                     computed: '_machines(stack)',
                 },
-                runtimeProperties: {
-                    type: Array,
-                    computed: '_runtimeProperties(stack)'
-                },
+                // runtimeProperties: {
+                //     type: Array,
+                //     computed: '_runtimeProperties(stack)'
+                // },
                 nodeInstances: {
                     type: Array,
                     computed: '_nodeInstances(stack.node_instances.*)',
@@ -611,17 +621,17 @@
                 },
                 listMachines: {
                     type: Array,
-                    computed: '_listMachines(nodeInstances)',
+                    computed: '_listMachines(stack.node_instances.*, model.machinesArray.*)',
                     notify: true
                 },
                 networks: {
                     type: Array,
-                    computed: '_listNetworks(nodeInstances)',
+                    computed: '_listNetworks(stack.node_instances.*, model.networksArray.*)',
                     notify: true
                 },
                 keys: {
                     type: Array,
-                    computed: '_listKeys(nodeInstances)',
+                    computed: '_listKeys(stack.node_instances.*), model.keys.*',
                     notify: true
                 },
                 workflows: {
@@ -712,7 +722,7 @@
                 }
             },
             _nodeInstances: function(stack){
-                return this.stack.node_instances ? this.stack.node_instances : {};
+                return this.stack.node_instances ? this.stack.node_instances : [];
             },
             // _nodeInstancesChanged: function(){
             //     console.log("_nodeInstancesChanged");
@@ -780,20 +790,20 @@
             _computeJobID: function(stack){
                 return stack.job_id ? stack.job_id : false;
             },
-            _runtimeProperties: function(stack){
-                var rtp = [];
-                var state = stack.node_instances;
-                if(state) {
-                    for (var i = 0; i < state.length; i++) {
-                        var rtpObj = state[i].runtime_properties;
-                        if (rtpObj) {
-                            rtpObj.name = state[i].name;
-                            rtp.push(rtpObj);
-                        }
-                    }
-                }
-                return rtp;
-            },
+            // _runtimeProperties: function(stack){
+            //     var rtp = [];
+            //     var state = stack.node_instances;
+            //     if(state) {
+            //         for (var i = 0; i < state.length; i++) {
+            //             var rtpObj = state[i].runtime_properties;
+            //             if (rtpObj) {
+            //                 rtpObj.name = state[i].name;
+            //                 rtp.push(rtpObj);
+            //             }
+            //         }
+            //     }
+            //     return rtp;
+            // },
             // _runtimePropertiesChanged: function(stack,changerecord){
             //     this.updateResources(this.runtimeProperties);
             // },
@@ -802,22 +812,24 @@
             },
             _listMachines: function(nis){
                 var machines = [];
-                // var nis = this.nodeInstances;
                 if (nis) {
-                    nis.forEach(function(rtpy) {
-                        if (rtpy.mist_type == 'machine'){
+                    nis.base.forEach(function(rtpy) {
+                        if (rtpy.runtime_properties.mist_type == 'machine'){
+                            console.log('thing', rtpy.runtime_properties)
+                            
                             var mac = this.model.machinesArray.find(function(mach){
-                                return mach.id == rtpy.info.id
-                            }, this);
+                                return mach.uuid == rtpy.runtime_properties.info.uuid;
+                            });
+
                             if (mac){
                                 machines.push(mac);
                             }
                             else {
                                 var deadMachine = {
-                                    name: rtpy.info.name,
+                                    name: rtpy.runtime_properties.info.name,
                                     state: 'missing',
                                     cloud: {
-                                        provider: 'machine_id: '+rtpy.info.id
+                                        provider: 'machine_id: '+rtpy.runtime_properties.info.id
                                     },
                                     isDead : true
                                 };
@@ -830,12 +842,11 @@
             },
             _listNetworks: function(nis) {
                 var networks = [];
-                // var nis = this.nodeInstances;
                 if (nis) {
-                    nis.forEach(function(rtpy) {
-                        if (rtpy.mist_type == 'network'){
+                    nis.base.forEach(function(rtpy) {
+                        if (rtpy.runtime_properties.mist_type == 'network'){
                             var net = this.model.networksArray.find(function(net){
-                                return net.id == rtpy.info.id
+                                return net.id == rtpy.runtime_properties.info.id
                             }, this);
                             if (net)
                                 networks.push(net);
@@ -846,13 +857,11 @@
             },
             _listKeys: function(nis) {
                 var keys = [];
-                // var nis = this.nodeInstances;
                 if (nis) {
-                    nis.forEach(function(rtpy) {
-                        if (rtpy.mist_type == 'keypair'){
-                            var key = this.model.keysArray.find(function(key){
-                                return key.id == rtpy.info.id
-                            }, this);
+                    nis.base.forEach(function(rtpy) {
+                        if (rtpy.runtime_properties.mist_type == 'keypair'){
+                            var key = this.model.keys[rtpy.runtime_properties.mist_resource_id];
+
                             if (key){
                                 keys.push(key);
                             }
