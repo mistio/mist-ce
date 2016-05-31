@@ -71,7 +71,7 @@
                             </div>
                         </div>
                     </paper-material>
-                    <paper-material>
+                  <!--  <paper-material>
                         <div class="grid-row">
                         <h2 class="xs12 title"><content></content></h2>
                         <template is="dom-repeat" items="{{fields}}" as="field">
@@ -117,21 +117,8 @@
 
                         <paper-progress id="satckprogress" value="0" hidden$="[[hideprogress]]"></paper-progress>
                         <hr class="xs12" />
-                        <!-- <div class="notifications xs12">
-                            <div class="red">
-                                <iron-icon icon="icons:error-outline"></iron-icon> Error message from server
-                                <div class="info-code">
-                                    <code>test code</code>
-                                </div>
-                            </div>
-                            <div class="green">
-                                <iron-icon icon="check"></iron-icon> Success message from server
-                            </div>
-                            <div class="blue">
-                                Info message from server
-                            </div>
-                        </div> -->
-                        <div class="clearfix bottom-actions xs12">
+                        
+                         <div class="clearfix bottom-actions xs12">
                             <paper-button id="submit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm" onclick="startProgress();">
                                 Create stack
                             </paper-button>
@@ -140,7 +127,12 @@
                     </div>
                     </paper-material>
 
+
                     <iron-ajax id="formAjax" url="/api/v1/stacks" contentType="application/json" method="POST" on-request="_handleRequest" on-response="_handleResponse"></iron-ajax>
+
+ -->
+
+                    <app-form model=[[model]] fields="[[fields]]" workflow="install" url="/api/v1/stacks" on-request="handleCreate" on-response="onResponseCreate" on-error="onErrorCreate" btncontent="create stack"></app-form>
 
                 </div>
 
@@ -219,26 +211,24 @@
                     type: String,
                     computed: "_uri(model)"
                 },
-                sid: {
-                    type: String
-                }
             },
 
             observers: [
                 '_fieldsChanged(fields.*, sendingData)',
-                '_computeFields(template)',
+                '_computeFields(template,model.templates.*)',
             ],
 
             _fromTemplate: function(params, templates){
                 if (params.id) {
-                    var pid = params.id;
-                    var template = this.model.templatesArray.find(function(template) {
-                        return template._id == pid;
-                    });
-                    return template;
+                    return this.model.templates[params.id]
                 }
+                else {
+                    return {
+                        name: "Template is missing"
+                    }   
+                }
+                // console.log("template: ",template);
             },
-
             _uri: function(model){
                 return window.location.protocol+"//"+window.location.hostname+"/";
             },
@@ -253,13 +243,14 @@
 
             _computeFields: function(template) {
                 var yaml_inputs = '';
-                if (this.template.inputs)
+                if (this.template.inputs) {
                     for (var i=0; i<this.template.inputs.length; i++){
                         if (['mist_uri', 'api_token'].indexOf(this.template.inputs[i].name) == -1 ) {
                             yaml_inputs += this.template.inputs[i].name + ': ';
                             yaml_inputs += this.template.inputs[i].default + '\n';
                         }
                     }
+                }
 
                 var ret = [
                     {
@@ -324,6 +315,22 @@
 
                 console.warn('yaml', yaml_inputs);
 
+                if (template && template.inputs){
+                    template.inputs.forEach(function(inp){
+                        var ifForm = {
+                            fieldName: "yaml_or_form",
+                            fieldValues: ["form"]
+                        };
+                        Object.defineProperty(inp, 'showIf', {
+                            value: {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                        });
+                        ret.push(inp);
+                    });
+                }
+
                 ret.push({
                     name: "deploy",
                     label: "Deploy Now",
@@ -336,7 +343,10 @@
                     show: true,
                     required: false
                 });
+
                 this.set('fields', ret);
+
+
                 //return ret;
                 /*
                     {
@@ -654,12 +664,13 @@
             _handleResponse: function(e){
                 // console.log('LOGGG',e.detail.__data__.response);
                 this.fire("stack-create-response", e.detail)
-                this.sid = e.detail.__data__.response.stack.id;
-                console.warn('redirect to /stacks/'+ this.sid);
-                page.show('/stacks/'+ this.sid);
+                sid = e.detail.__data__.response.stack.id;
+                console.warn('redirect to /stacks/'+ sid);
+                page.show('/stacks/'+ sid);
             },
 
             _fieldsChanged: function(fields, sendingData) {
+                console.log('_fieldsChanged')
                 this.async(function() {
                     var form = this.form,
                         show = true,

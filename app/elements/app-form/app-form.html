@@ -174,6 +174,7 @@
                 fields: {
                     type: Array,
                     value: [],
+                    reflectToAttribute: true,
                     notify: true
                 },
                 method: {
@@ -214,6 +215,9 @@
                 }
                 if (!field.label && field.name){
                     field.label = field.name
+                }
+                if (!field.defaultValue && field.default){
+                    field.defaultValue = field.default
                 }
                 if (!(field.showIf && !field.show)) {
                     if (field.type == "dropdown" && field.query) {
@@ -315,17 +319,26 @@
             _submitForm: function() {
                 var payload;
 
-                if (this.workflow) {
-                    payload = {inputs: this.form,
-                               workflow: this.workflow};
-                } else {
-                    payload = this.form;
+                // if (this.workflow) {
+                //     payload = {inputs: this.form,
+                //                workflow: this.workflow};
+                // } else {
+                //     payload = this.form;
+                // }
+
+                payload = this.form;
+                    if (this.workflow) {
+                        var w = this.workflow;
+                        payload['workflow'] = w;
+                        payload['inputs'] = { w: this.form }
                 }
 
                 this.$.formAjax.headers["Content-Type"] = 'application/json';
                 this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.formAjax.body = payload;
                 this.$.formAjax.generateRequest();
+
+                console.log(payload);
 
                 //test progress bar
                 this.hideprogress = false;

@@ -179,7 +179,7 @@
         .width100 {
             width: 100%;
         }
-        
+
         </style>
 
 
@@ -350,7 +350,7 @@
                 },
                 template: {
                     type: Object,
-                    computed: '_computeTemplate(params)'
+                    computed: '_computeTemplate(params, model.templates.*)'
                 },
                 hasStacks: {
                     type: Boolean,
@@ -417,9 +417,9 @@
                 return params.id;
             },
             _computeTemplate: function(params) {
-                return this.model.templatesArray.find(function(template) {
-                    return template._id == params.id;
-                }, this);
+                if (params.id) {
+                    return this.model.templates[params.id];
+                }
             },
             _computeTemplateId: function(params) {
                 return params.id;
