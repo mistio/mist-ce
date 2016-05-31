@@ -281,16 +281,14 @@
                     this.async(function() {
                         var form = this.form,
                             show = true,
-                            dependency;
+                            dependency, reset = true;
                         var isLead = this.get(fields.path.replace("value", "isLead"))
                         if (isLead == true) {
-                            console.log(fields.path)
                             this.fire("leadchange", {
                                 leadValue: this.get(fields.path)
-                            })
+                            });
                         }
                         fields.base.forEach(function(el, index) {
-
                             if (el.showIf) {
                                 if (el.showIf.fieldExists) {
                                     dependency = form[el.showIf.fieldName],
@@ -300,9 +298,34 @@
                                     dependency = form[el.showIf.fieldName],
                                         show = el.showIf.fieldValues.indexOf(dependency) != -1;
                                     this.set('fields.' + index + '.show', show);
+
+                                    if (el.showIf.fieldName == "yaml_or_form") {
+                                        reset = false;
+                                        if (el.value != el.defaultValue && el.type == 'text') {
+                                            var yamlFields = fields.base
+                                                .filter(function(ele) {
+                                                    return ele.showIf && ele.showIf.fieldName == 'yaml_or_form';
+                                                }),
+                                                yamlField = yamlFields
+                                                .find(function(ele) {
+                                                    return ele.type == 'textarea';
+                                                }),
+                                                yamlText = yamlFields
+                                                .filter(function(ele) {
+                                                    return ele.type == 'text';
+                                                })
+                                                .map(function(ele) {
+                                                    return ele.name + ': ' + ele.value;
+                                                })
+                                                .join('\n');
+
+                                            this.set('fields.' + this.fields.indexOf(yamlField) + '.value', yamlText);
+                                        }
+                                    }
                                 }
 
-                                if (!show) {
+
+                                if (!show && reset) {
                                     this._resetField(el, index);
                                 } else {
                                     this.set('form.' + el.name, el.value);
@@ -367,7 +390,6 @@
                 },
                 _resetField: function(el, index) {
                     this.set('fields.' + index + '.value', el.defaultValue);
-
                     var input = this.querySelector('#' + el.name);
                     if (input) {
                         input.invalid = false;
