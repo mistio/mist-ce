@@ -18,7 +18,7 @@
 
         paper-material {
             display: block;
-            padding: 24px;            
+            padding: 24px;
         }
 
         paper-material.no-pad {
@@ -48,7 +48,7 @@
         .app-form-title {
             background-color: #eee;
             font-size: 24px;
-            text-transform: capitalize; 
+            text-transform: capitalize;
         }
 
         paper-material.form-view h2 {
@@ -120,7 +120,7 @@
         }
 
         #content {
-            position: relative;            
+            position: relative;
             overflow: auto;
             -webkit-overflow-scrolling: touch;
         }
@@ -221,7 +221,7 @@
         }
         #workflowsView {
             display: flex;
-            flex: 100%; 
+            flex: 100%;
         }
         .resource-head {
             font-weight: 500;
@@ -275,7 +275,7 @@
 
         .grid-row .center {
             text-align: center;
-        }        
+        }
         #quickActions.hidden {
             width: 0;
             padding: 0;
@@ -354,7 +354,7 @@
         .blue-link {
             color: var(--mist-blue);
         }
-        </style>        
+        </style>
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
@@ -477,7 +477,7 @@
             </paper-material>
 
             <div id="state" class="page" hidden$="[[!runtimeProperties.length]]">
-                
+
                     <template is="dom-if" if="[[runtimeProperties.length]]">
                         <h3 class="smallcaps">Runtime properties</h3>
                         <template is="dom-repeat" items="[[runtimeProperties]]">
@@ -487,7 +487,7 @@
                             </paper-material>
                         </template>
                     </template>
-                
+
                     <template is="dom-if" if="[[stack.inputs.length]]">
                         <h3 class="smallcaps">Stack Parameters </h3>
                         <paper-material class="no-pad">
@@ -498,7 +498,7 @@
                             </table>
                         </paper-material>
                     </template>
-                
+
             </div>
 
 
@@ -532,7 +532,7 @@
                     </template>
                 </div>
             </template>
-            
+
             <!-- test show properties -->
             <!-- <div class="text-center">
                 <template is="dom-if" if=[[stack.deploy]]> deploy? true </template>
@@ -641,7 +641,7 @@
                     type: Boolean,
                     computed: '_resourcelist(keys, networks, machines)',
                     notify: true
-                },                
+                },
                 start_creation: {
                     type: Boolean,
                     value: false,
@@ -685,7 +685,7 @@
                 var stack = {};
                 if (params.id)
                     stack =  this.model.stacks[params.id];
-                
+
                 if (stack) {
                     // REMEMBER TO REMOVE V
                     // stack.status = 'ok';
@@ -743,7 +743,7 @@
             },
             openWorkflows: function(){
                 this.$.workflows.classList.toggle('open');
-                
+
                 var pages = this.querySelector('#workflowsView').children;
                 [].forEach.call(pages, function(p, index) {
                     if (index != 0){
@@ -756,7 +756,7 @@
             },
             handleErrorsResponse: function(e){
                 console.log("handleErrorsResponse: ",e.detail);
-                // get error 
+                // get error
             },
             handleErrorsError: function(e){
                 console.log("handleErrorsResponse: ",e.detail);
@@ -955,10 +955,10 @@
                 }
                 this.$.workflowRequest.generateRequest();
             },
-            cancelWorkflow: function(e){                
+            cancelWorkflow: function(e){
                 this.$.cancelJob.generateRequest();
             },
-            handleCanceled: function(e){                
+            handleCanceled: function(e){
             },
             handleWorkflowRequest: function(e) {
             },
