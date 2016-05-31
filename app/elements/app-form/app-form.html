@@ -155,6 +155,9 @@
                     type: String,
                     value: false
                 },
+                templateid: {
+                    type: String
+                },
                 form: {
                     type: Object,
                     value: function(){
@@ -319,26 +322,31 @@
             _submitForm: function() {
                 var payload;
 
-                // if (this.workflow) {
-                //     payload = {inputs: this.form,
-                //                workflow: this.workflow};
-                // } else {
-                //     payload = this.form;
-                // }
-
-                payload = this.form;
-                    if (this.workflow) {
-                        var w = this.workflow;
-                        payload['workflow'] = w;
-                        payload['inputs'] = { w: this.form }
+                if (this.workflow) {
+                    payload = { deploy: this.form.deploy,
+                                name: this.form.name,
+                                template_id: this.templateid,
+                                description: this.form.description,
+                                workflow: this.workflow,
+                                inputs: YAML.parse(this.form.stackinputs)
+                            }
+                } else {
+                    payload = this.form;
                 }
+
+                // payload = this.form;
+                //     if (this.workflow) {
+                //         var w = this.workflow;
+                //         payload['workflow'] = w;
+                //         payload['inputs'] = { w: this.form }
+                // }
 
                 this.$.formAjax.headers["Content-Type"] = 'application/json';
                 this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.formAjax.body = payload;
                 this.$.formAjax.generateRequest();
 
-                console.log(payload);
+                console.log('payload: ',payload);
 
                 //test progress bar
                 this.hideprogress = false;

@@ -132,7 +132,7 @@
 
  -->
 
-                    <app-form model=[[model]] fields="[[fields]]" workflow="install" url="/api/v1/stacks" on-request="handleCreate" on-response="onResponseCreate" on-error="onErrorCreate" btncontent="create stack"></app-form>
+                    <app-form model=[[model]] fields="[[fields]]" templateid="[[template.id]]" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleResponse" btncontent="create stack"></app-form>
 
                 </div>
 
