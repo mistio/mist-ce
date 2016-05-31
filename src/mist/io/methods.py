@@ -4352,7 +4352,7 @@ def machine_cost_calculator(m):
         # TODO: update Rackspace pricing on libcloud
         size = m.extra.get('flavorId')
         for node_size in sizes:
-            if node_size.id == size:
+            if node_size.size_id == size:
                 plan_price = node_size.price.get(os_type)
                 if not plan_price:
                     # use the default which is linux
@@ -4365,7 +4365,7 @@ def machine_cost_calculator(m):
         size = m.extra.get('PLANID')
         if size:
             for node_size in sizes:
-                if node_size.id == size:
+                if node_size.size_id == size:
                     plan_price = node_size.price.replace('/month','').replace('$', '')
                     cost['indicative_cost_per_month'] = plan_price
     if m.driver.type == Provider.PACKET:
@@ -4380,11 +4380,18 @@ def machine_cost_calculator(m):
                 except:
                     pass
     if m.driver.type == Provider.DIGITAL_OCEAN:
-        cost['indicative_cost_per_month'] = m.extra.get('price_monthly')
-        cost['indicative_cost_per_hour'] = m.extra.get('price_hourly')
+        size = m.extra.get('size', {})
+        cost['indicative_cost_per_month'] = size.get('price_monthly')
+        cost['indicative_cost_per_hour'] = size.get('price_hourly')
     if m.driver.type == Provider.SOFTLAYER:
-        cost['indicative_cost_per_month'] = m.extra.get('recurringFee')
-        cost['indicative_cost_per_hour'] = m.extra.get('hourlyRecurringFee')
+        if not m.extra.get('hourlyRecurringFee'):
+            cost['indicative_cost_per_month'] = m.extra.get('recurringFee')
+        else:
+            # m.extra.get('recurringFee') here will show what it has
+            # cost for the current month, up to now
+            cost_per_hour = m.extra.get('hourlyRecurringFee')
+            cost['indicative_cost_per_hour'] = cost_per_hour
+            cost['indicative_cost_per_month'] = float(cost_per_hour) * 24 * month_days
     return cost
 
 
