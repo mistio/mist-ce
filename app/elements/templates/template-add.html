@@ -223,6 +223,10 @@
                     });
 
                     page.show('/templates/' + e.detail.response.template.id);
+
+                    this.debounce('resetForm', function() {
+                        this._resetForm();
+                    }, 500);
                 },
                 _resetForm: function(e) {
                     // Reset template
