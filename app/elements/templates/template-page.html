@@ -11,215 +11,224 @@
         <style is="custom-style" include="lists"></style>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
-        :host {
-            display: block;
-        }
+            :host {
+                display: block;
+            }
 
-        paper-material {
-            display: block;
-            padding: 24px;
-        }
+            paper-material {
+                display: block;
+                padding: 24px;
+            }
 
-        paper-material.no-pad {
-            padding: 0;
-        }
+            paper-material.no-pad {
+                padding: 0;
+            }
 
-        paper-menu-button paper-button {
-            display: block;
-        }
+            paper-menu-button paper-button {
+                display: block;
+            }
 
-        .flex-horizontal-with-ratios {
-            @apply(--layout-horizontal);
-            align-content: stretch;
-        }
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+                align-content: stretch;
+            }
 
-        .flexchild {
-            @apply(--layout-flex);
-        }
+            .flexchild {
+                @apply(--layout-flex);
+            }
 
-        .command-container {
-            background-color: #444;
-            color: #fff;
-            font-family: monospace;
-            padding: 10px;
-        }
+            .command-container {
+                background-color: #444;
+                color: #fff;
+                font-family: monospace;
+                padding: 10px;
+            }
 
-        a {
-            color: black;
-            text-decoration: none;
-        }
+            a {
+                color: black;
+                text-decoration: none;
+            }
 
-        #container {
-            background: #fafafa;
-        }
+            #container {
+                background: #fafafa;
+            }
 
-        .paper-header [paper-drawer-toggle] {
-            margin-left: 10px;
-        }
+            .paper-header [paper-drawer-toggle] {
+                margin-left: 10px;
+            }
 
-        .paper-header {
-            @apply(--layout-horizontal);
-        }
+            .paper-header {
+                @apply(--layout-horizontal);
+            }
 
-        .paper-header {
-            height: 60px;
-            font-size: 24px;
-            line-height: 60px;
-            padding: 0 10px;
-            color: white;
-            transition: height 0.2s;
-            transition: font-size 0.2s;
-        }
+            .paper-header {
+                height: 60px;
+                font-size: 24px;
+                line-height: 60px;
+                padding: 0 10px;
+                color: white;
+                transition: height 0.2s;
+                transition: font-size 0.2s;
+            }
 
-        .paper-header.tall {
-            height: 320px;
-            font-size: 16px;
-        }
+            .paper-header.tall {
+                height: 320px;
+                font-size: 16px;
+            }
 
-        .paper-header h2 {
-            margin-left: 20px;
-            @apply(--layout-flex);
-            text-transform: capitalize;
-        }
+            .paper-header h2 {
+                margin-left: 20px;
+                @apply(--layout-flex);
+                text-transform: capitalize;
+            }
 
-        .paper-header .toggleViewButton {
-            --paper-icon-button-ink-color: transparent;
-        }
+            .paper-header .toggleViewButton {
+                --paper-icon-button-ink-color: transparent;
+            }
 
-        .paper-header .cartButton {
-            margin-right: 10px;
-        }
+            .paper-header .cartButton {
+                margin-right: 10px;
+            }
 
-        #content {
-            overflow: auto;
-            -webkit-overflow-scrolling: touch;
-        }
+            #content {
+                overflow: auto;
+                -webkit-overflow-scrolling: touch;
+            }
 
-        paper-icon-button {
-            transition: all 200ms;
-        }
+            paper-icon-button {
+                transition: all 200ms;
+            }
 
-        paper-icon-button.active-sort {
-            transform: rotate(180deg);
-        }
+            paper-icon-button.active-sort {
+                transform: rotate(180deg);
+            }
 
-        paper-icon-button.active-sort::content iron-icon {
-            color: #D48900 !important;
-        }
+            paper-icon-button.active-sort::content iron-icon {
+                color: #D48900 !important;
+            }
 
-        app-bar .menu-icon {
-            margin-right: 15px;
-        }
+            app-bar .menu-icon {
+                margin-right: 15px;
+            }
 
-        [size=xs] > * {
-            display: none;
-        }
+            [size=xs] > * {
+                display: none;
+            }
 
-        [size=xs] app-sidebar {
-            min-width: 100%;
-            height: auto;
-        }
+            [size=xs] app-sidebar {
+                min-width: 100%;
+                height: auto;
+            }
 
-        paper-icon-bottom.bottom {
-            padding-right: 8px;
-        }
-        .subhead {
-            box-sizing: border-box;
-            position: absolute;
-            width: 100%;
-            left: 0;
-            height: 57px;
-            bottom: -57px;
-            right: 0;
-            z-index: 9;
-            color: rgba(0,0,0,0.87);
-        }
-        paper-header-panel ::content #dropShadow {
-            top: 56px;
-        }
-        paper-toolbar ::content #bottomBar .right-actions{
-            transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
-        }
-        paper-toolbar:not(.tall) ::content #bottomBar .right-actions{
-            margin-right: 70px;
-        }
-        .parsing-loader {
-            text-align: center;
-            padding: 36px;
-        }
-        .parsing-loader paper-progress {
-            width: 100%;
-        }
-        .parsing-loader.error paper-progress ::content #primaryProgress {
-            background-color: var(--red-color);
-        }
+            paper-icon-bottom.bottom {
+                padding-right: 8px;
+            }
 
-        .section {
-            margin-top: 24px;
-            margin-bottom: 24px;
-        }
-        .red {
-            color: var(--red-color);
-            background-color: transparent;
-        }
-        .required {
-            font-size: 0.9em;
-        }
+            .subhead {
+                box-sizing: border-box;
+                position: absolute;
+                width: 100%;
+                left: 0;
+                height: 57px;
+                bottom: -57px;
+                right: 0;
+                z-index: 9;
+                color: rgba(0, 0, 0, 0.87);
+            }
 
+            paper-header-panel::content #dropShadow {
+                top: 56px;
+            }
 
-        .resource-head {
-            font-weight: 500;
-            padding: 8px 16px;
-            opacity: 0.87;
-            background-color: #fff;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 0;
-        }
+            paper-toolbar::content #bottomBar .right-actions {
+                transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
+            }
 
-        .width100 {
-            width: 100%;
-        }
+            paper-toolbar:not(.tall)::content #bottomBar .right-actions {
+                margin-right: 70px;
+            }
 
+            .parsing-loader {
+                text-align: center;
+                padding: 36px;
+            }
+
+            .parsing-loader paper-progress {
+                width: 100%;
+            }
+
+            .parsing-loader.error paper-progress::content #primaryProgress {
+                background-color: var(--red-color);
+            }
+
+            .section {
+                margin-top: 24px;
+                margin-bottom: 24px;
+            }
+
+            .red {
+                color: var(--red-color);
+                background-color: transparent;
+            }
+
+            .required {
+                font-size: 0.9em;
+            }
+
+            .resource-head {
+                font-weight: 500;
+                padding: 8px 16px;
+                opacity: 0.87;
+                background-color: #fff;
+                border-bottom: 1px solid #ddd;
+                margin-bottom: 0;
+            }
+
+            .width100 {
+                width: 100%;
+            }
         </style>
 
 
         <div id="content">
-                <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
-                    <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
-                    <div class="title flex">
-                        <h2>
-                            [[template.name]] 
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                            [[template.name]]
                         </h2>
-                        <div class="subtitle">
-                            <span hidden$="[[!isInline]]">Inline Script</span>
-                            <span hidden$="[[isInline]]">Script source <a href$="[[template.template]]" target="_blank" class="regular"> [[template.template]] <iron-icon icon="icons:link"></iron-icon>
+                    <div class="subtitle">
+                        <span hidden$="[[!isInline]]">Inline Script</span>
+                        <span hidden$="[[isInline]]">Script source <a href$="[[template.template]]" target="_blank" class="regular"> [[template.template]] <iron-icon icon="icons:link"></iron-icon>
                                 </a>
                             </span>
-                        </div>
                     </div>
-                    <div class="item-actions">
-                        <paper-button on-tap="_createStack" class="simple"> Create Stack <iron-icon icon="av:play-arrow"></iron-icon></paper-button>
-                    </div>
-                </paper-material>
-                <paper-material class="parsing-loader" hidden$="[[hideprogress]]">
-                    <h3>Parsing template [[template.name]]</h3>
-                    <paper-progress id="progress" value="30"></paper-progress>
-                    <h4>Fetching template metadata may take a while.</h4>
-                    <a href="/add-template" class="regular blue-link">Cancel Task</a>
-                </paper-material>
+                </div>
+                <div class="item-actions">
+                    <paper-button on-tap="_createStack" class="simple"> Create Stack
+                        <iron-icon icon="av:play-arrow"></iron-icon>
+                    </paper-button>
+                </div>
+            </paper-material>
+            <paper-material class="parsing-loader" hidden$="[[hideprogress]]">
+                <h3>Parsing template [[template.name]]</h3>
+                <paper-progress id="progress" value="30"></paper-progress>
+                <h4>Fetching template metadata may take a while.</h4>
+                <a href="/add-template" class="regular blue-link">Cancel Task</a>
+            </paper-material>
 
-                <paper-material class="flex-horizontal-with-ratios">
-                    <div class="page-block" hidden="[[!template.description]]">
-                        <h3 class="smallcaps">Description</h3>
-                        <p>[[template.description]]</p>
-                    </div>
-                    <div class="page-block" hidden="[[!template.timestamp]]">
-                        <h3 class="smallcaps">Created</h3>
-                        <p>[[timestamp]]
+            <paper-material class="flex-horizontal-with-ratios">
+                <div class="page-block" hidden="[[!template.description]]">
+                    <h3 class="smallcaps">Description</h3>
+                    <p>[[template.description]]</p>
+                </div>
+                <div class="page-block" hidden="[[!template.timestamp]]">
+                    <h3 class="smallcaps">Created</h3>
+                    <p>[[timestamp]]
                         <!-- <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a> -->
-                        </p>
-                    </div>
-                </paper-material>
+                    </p>
+                </div>
+            </paper-material>
             <div class="section">
                 <div class="flex-horizontal-with-ratios">
                     <div class="width100">
@@ -292,9 +301,11 @@
                         <paper-material class="no-pad">
                             <table class="info-table">
                                 <template is="dom-repeat" items="[[template.inputs]]">
-                                    <tr><td>[[item.name]] <span id="required" class="red" hidden="[[!item.required]]">*</span></td>
-                                    <td>
-                                    [[item.description]]</td></tr>
+                                    <tr>
+                                        <td>[[item.name]] <span id="required" class="red" hidden="[[!item.required]]">*</span></td>
+                                        <td>
+                                            [[item.description]]</td>
+                                    </tr>
                                 </template>
                             </table>
                         </paper-material>
@@ -325,169 +336,170 @@
         <dialog-element></dialog-element>
     </template>
     <script>
-    (function() {
-        'use strict';
+        (function() {
+            'use strict';
 
-        Polymer({
-            is: 'template-page',
+            Polymer({
+                is: 'template-page',
 
-            properties: {
-                sections: {
-                    type: Object
+                properties: {
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    params: {
+                        type: Object
+                    },
+                    model: {
+                        type: Object
+                    },
+                    template: {
+                        type: Object,
+                        computed: '_computeTemplate(params, model.templates.*)'
+                    },
+                    hasStacks: {
+                        type: Boolean,
+                        value: false,
+                        computed: '_hasStacks(template)'
+                    },
+                    stacks: {
+                        type: Array,
+                        computed: '_computeStacks(template)'
+                    },
+                    templateid: {
+                        type: String,
+                        computed: '_computeTemplateId(params)'
+                    },
+                    isInline: {
+                        type: Boolean,
+                        computed: '_computeIsInline(template.source)'
+                    },
+                    class: {
+                        type: String,
+                            computed: '_class(isInline)'
+                    },
+                    timestamp: {
+                        type: String,
+                        computed: '_getFormattedTimestamp(template)'
+                    },
+                    hideprogress: {
+                        type: Boolean,
+                        value: true
+                    },
+                    vpHeight: String
                 },
-                section: {
-                    type: Object
+                listeners: {
+                    'confirmation': '_deleteTemplateResponse',
+                    'updateSelectedTemplate': '_updateTemplate'
                 },
-                color: {
-                    type: String,
-                    computed: '_getHeaderStyle(section)'
+                ready: function() {
+                    var wh = window.innerHeight;
+                    this.vpHeight = 'height:' + wh + 'px; overflow: auto;';
                 },
-                params: {
-                    type: Object
+                _getFormattedTimestamp: function(template) {
+                    //var timestamp = parseInt(template.created_at);
+                    return new Date(template.created_at).toLocaleString('en-US', {
+                        timeZoneName: 'short'
+                    });
                 },
-                model: {
-                    type: Object
+                _getHeaderStyle: function(section) {
+                    return 'background-color: ' + section.color + '; color: #fff;';
                 },
-                template: {
-                    type: Object,
-                    computed: '_computeTemplate(params, model.templates.*)'
+                _hasStacks: function(template) {
+                    var stacks = [];
+                    if (this.model.stacksArray) {
+                        this.model.stacksArray.find(function(stack) {
+                            if (stack.template == template.id)
+                                stacks.push(stack)
+                        }, this);
+
+                        return stacks.length > 0 ? true : false;
+                    } else {
+                        return false
+                    }
+
                 },
-                hasStacks: {
-                    type: Boolean,
-                    value: false,
-                    computed: '_hasStacks(template)'
+                _computeId: function(params) {
+                    return params.id;
                 },
-                stacks: {
-                    type: Array,
-                    computed: '_computeStacks(template)'
+                _computeTemplate: function(params) {
+                    if (params.id) {
+                        return this.model.templates[params.id];
+                    }
                 },
-                templateid: {
-                    type: String,
-                    computed: '_computeTemplateId(params)'
+                _computeTemplateId: function(params) {
+                    return params.id;
                 },
-                isInline: {
-                    type: Boolean,
-                    computed: '_computeIsInline(template.source)'
+                _computeIsInline: function(source) {
+                    return source == 'inline';
                 },
-                class: {
-                    type: String,
-                    computed: '_class(isInline)'
-                },
-                timestamp: {
-                    type: String,
-                    computed: '_getFormattedTimestamp(template)'
-                },
-                hideprogress: {
-                    type: Boolean,
-                    value: true
-                },
-                vpHeight: String
-            },
-            listeners: {
-                'confirmation': '_deleteTemplateResponse',
-                'updateSelectedTemplate': '_updateTemplate'
-            },
-            ready: function() {
-                var wh = window.innerHeight;
-                this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
-            },
-            _getFormattedTimestamp: function (template) {
-                //var timestamp = parseInt(template.created_at);
-                return new Date(template.created_at).toLocaleString('en-US', {timeZoneName: 'short'});
-            },
-            _getHeaderStyle: function(section) {
-                return 'background-color: ' + section.color + '; color: #fff;';
-            },
-            _hasStacks: function(template){
-                var stacks =[];
-                if (this.model.stacksArray){
+                _computeStacks: function(template) {
+                    var stacks = [];
                     this.model.stacksArray.find(function(stack) {
                         if (stack.template == template.id)
-                            stacks.push(stack)
-                    }, this);
+                            stacks.push(stack);
+                    });
+                    return stacks;
+                },
+                _class: function(isinline) {
+                    return isinline ? "command-container" : "";
+                },
+                _createStack: function(e) {
+                    page.show('/create-stack/' + this.template._id);
+                },
+                _editTemplate: function(e) {
+                    var el = this.querySelector('template-edit');
+                    el._openEditTemplateModal();
+                },
+                _updateTemplate: function(e) {
+                    var template = e.detail.template;
+                    this.set('template.name', template.name);
+                    this.set('template.description', template.description);
+                },
+                _deleteTemplate: function(e) {
+                    this._showDialog({
+                        title: 'Delete Template?',
+                        body: "Deleting templates cannot be undone. You are about to delete template: " + this.template.name,
+                        danger: true,
+                        reason: "delete_template"
+                    });
+                },
+                _deleteTemplateResponse: function(e) {
+                    var reason = e.detail.reason,
+                        response = e.detail.response;
 
-                    return stacks.length > 0 ? true : false;
-                }
-                else {
-                    return false
-                }
-
-            },
-            _computeId: function(params) {
-                return params.id;
-            },
-            _computeTemplate: function(params) {
-                if (params.id) {
-                    return this.model.templates[params.id];
-                }
-            },
-            _computeTemplateId: function(params) {
-                return params.id;
-            },
-            _computeIsInline: function(source) {
-                return source == 'inline';
-            },
-            _computeStacks: function(template){
-                var stacks = [];
-                this.model.stacksArray.find(function(stack) {
-                    if (stack.template == template.id)
-                        stacks.push(stack);
-                });
-                return stacks;
-            },
-            _class: function(isinline){
-                return isinline ? "command-container" : "";
-            },
-            _createStack: function(e) {
-                page.show('/create-stack/' + this.template._id);
-            },
-            _editTemplate: function(e) {
-                var el = this.querySelector('template-edit');
-                el._openEditTemplateModal();
-            },
-            _updateTemplate: function(e) {
-                var template = e.detail.template;
-                this.set('template.name', template.name);
-                this.set('template.description', template.description);
-            },
-            _deleteTemplate: function(e) {
-                this._showDialog({
-                    title: 'Delete Template?',
-                    body: "Deleting templates cannot be undone. You are about to delete template: " + this.template.name ,
-                    danger: true,
-                    reason: "delete_template"
-                });
-            },
-            _deleteTemplateResponse: function(e) {
-                var reason = e.detail.reason,
-                    response = e.detail.response;
-
-                if (response.confirmed && reason == "delete_template") {
-                    console.log('i ll delete the template');
-                    page.show('/templates');
-                }
-            },
-            _showDialog: function(info) {
-                var dialog = this.querySelector('dialog-element'),
-                    i;
-                for (i in info) {
-                    dialog[i] = info[i];
-                }
-                dialog._openDialog();
-            },
-            _goBack: function(){
-                history.back();
-            },
-            toggleAll: function(e){
-                var t = e.target;
+                    if (response.confirmed && reason == "delete_template") {
+                        console.log('i ll delete the template');
+                        page.show('/templates');
+                    }
+                },
+                _showDialog: function(info) {
+                    var dialog = this.querySelector('dialog-element'),
+                        i;
+                    for (i in info) {
+                        dialog[i] = info[i];
+                    }
+                    dialog._openDialog();
+                },
+                _goBack: function() {
+                    history.back();
+                },
+                toggleAll: function(e) {
+                    var t = e.target;
 
 
-                var els = this.querySelectorAll('app-togglable');
-                [].forEach.call(els, function(el, index) {
+                    var els = this.querySelectorAll('app-togglable');
+                    [].forEach.call(els, function(el, index) {
                         el.open = true;
-                });
-            }
-        });
-    })();
+                    });
+                }
+            });
+        })();
     </script>
 </dom-module>
