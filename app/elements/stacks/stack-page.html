@@ -304,11 +304,14 @@
             margin-bottom: 68px;
         }
         h2.info-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 400;
             line-height: 24px;
             margin: 0;
             padding: 8px 16px;
+            font-weight: 500;
+            background-color: #f2f2f2;
+            border-bottom: 1px solid #ddd;
         }
         #selectworkflow {
             padding: 36px;
@@ -520,15 +523,14 @@
 
             <div id="state" class="page" hidden$="[[!nodeInstances]]">
                 
-                    <!-- <template is="dom-if" if="[[runtimeProperties.length]]"> -->
                         <h3 class="smallcaps">Runtime properties</h3>
                         <template is="dom-repeat" items="[[nodeInstances]]">
                             <paper-material class="no-pad info-card">
                                 <h2 class="info-title">[[item.name]] <span class="info-title-id">id: [[item.id]]</span></h2>
                                 <element-for-in content="[[item.runtime_properties]]"></element-for-in>
+                                <element-for-in content="[[item]]"></element-for-in>
                             </paper-material>
                         </template>
-                    <!-- </template> -->
                 
                     <template is="dom-if" if="[[stack.inputs.length]]">
                         <h3 class="smallcaps">Stack Parameters </h3>

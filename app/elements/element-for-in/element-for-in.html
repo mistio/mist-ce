@@ -1,14 +1,23 @@
 <dom-module id="element-for-in">
-    <template></template>
-    <style include="shared-styles">
-        .flex-horizontal-with-ratios {
-            @apply(--layout-horizontal);
-        }
+    <template>
+        <style is="custom-style" include="shared-styles">
+            :host ::content .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+            }
 
-        .flexchild {
-            @apply(--layout-flex);
-        }
-    </style>
+            :host ::content .flexchild {
+                @apply(--layout-flex);
+                padding: 16px;
+                border-bottom: 1px solid #ddd;
+            }
+            :host ::content .flexchild.key {
+                font-weight: 500;
+            }
+            :host ::content .flex-horizontal-with-ratios:nth-child(even){
+                background-color: #fafafa;
+            }
+        </style>
+    </template>
 </dom-module>
 
 <script>
@@ -58,7 +67,7 @@
 
             for (var i = 0, len = content.length; i < len; i++) {
                 tpl += "<div class='info-item flex-horizontal-with-ratios'>";
-                tpl += "<div class='flexchild'>" + this.processKeys(content[i].key) + "</div>";
+                tpl += "<div class='flexchild key'>" + this.processKeys(content[i].key) + "</div>";
                 tpl += "<div class='flexchild'>" + content[i].value + "</div>";
                 tpl += "</div>";
             }
