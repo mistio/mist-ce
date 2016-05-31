@@ -15,7 +15,7 @@
 
         paper-progress {
             position: absolute;
-            bottom: 80px;
+            bottom: 82px;
             width: 100%;
             left: 0;
             right: 0;
@@ -84,7 +84,7 @@
 
             </template>
 
-            <paper-progress id="appformprogresselement" value="100" hidden$="[[hideprogress]]"></paper-progress>
+            <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
             <hr class="xs12" />
             <!-- <div class="notifications xs12">
                 <div class="red">
@@ -101,7 +101,7 @@
                 </div>
             </div> -->
             <div class="clearfix bottom-actions xs12">
-                <paper-button id="appformsubmit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm" onclick="startProgress();">
+                <paper-button id="appformsubmit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">
                     <template is="dom-if" if="[[btncontent.length]]">
                         [[btncontent]]
                     </template>
@@ -174,7 +174,6 @@
                 fields: {
                     type: Array,
                     value: [],
-                    reflectToAttribute: true,
                     notify: true
                 },
                 method: {
@@ -196,9 +195,9 @@
                     type: Boolean,
                     value: false
                 },
-                hideprogress: {
+                showProgress: {
                     type: Boolean,
-                    value: true
+                    computed: '_computeShowProgress(sendingData)'
                 },
                 workflow: {
                     type: String
@@ -207,6 +206,9 @@
             observers: [
                 '_fieldsChanged(fields.*, sendingData)',
             ],
+            _computeShowProgress: function(sendingData) {
+                return sendingData;
+            },
             _computeFieldType: function(field, value, show) {
                 var inputModel = this.model;
 
@@ -215,9 +217,6 @@
                 }
                 if (!field.label && field.name){
                     field.label = field.name
-                }
-                if (!field.defaultValue && field.default){
-                    field.defaultValue = field.default
                 }
                 if (!(field.showIf && !field.show)) {
                     if (field.type == "dropdown" && field.query) {
@@ -266,7 +265,8 @@
                 this.fire("request", e.detail)
             },
             _handleResponse: function(e){
-                this.fire("response", e.detail)
+                this.fire("response", e.detail);
+                this.set('sendingData', false);
                 console.log(e);
             },
             _fieldsChanged: function(fields, sendingData) {
@@ -312,25 +312,17 @@
                     }, this);
 
                     this.set('form', form);
-
                     this.set('formReady', valid && !sendingData);
-                })
+                });
             },
             _submitForm: function() {
                 var payload;
 
-                // if (this.workflow) {
-                //     payload = {inputs: this.form,
-                //                workflow: this.workflow};
-                // } else {
-                //     payload = this.form;
-                // }
-
-                payload = this.form;
-                    if (this.workflow) {
-                        var w = this.workflow;
-                        payload['workflow'] = w;
-                        payload['inputs'] = { w: this.form }
+                if (this.workflow) {
+                    payload = {inputs: this.form,
+                               workflow: this.workflow};
+                } else {
+                    payload = this.form;
                 }
 
                 this.$.formAjax.headers["Content-Type"] = 'application/json';
@@ -338,15 +330,11 @@
                 this.$.formAjax.body = payload;
                 this.$.formAjax.generateRequest();
 
-                console.log(payload);
-
-                //test progress bar
-                this.hideprogress = false;
-
+                this.set('sendingData', true);
             },
             _resetForm: function(e) {
                 // Reset script
-                for (var attr in this.form){
+                for (var attr in this.form) {
                     this.set('form.' + attr, '');
                 }
 
@@ -390,37 +378,5 @@
             },
         });
     })();
-    // test progress bar, code from demo
-    var progress = document.querySelector('paper-progress#appformprogresselement');
-    var button = document.querySelector('paper-button#appformsubmit');
-    var animationFrame;
-    var repeat, maxRepeat = 1,
-        animating = false;
-
-    function nextProgress() {
-        animating = true;
-        if (progress.value < progress.max) {
-            progress.value += (progress.step || 1);
-
-        } else {
-            if (++repeat >= maxRepeat) {
-                animating = false;
-                button.disabled = false;
-                return;
-            }
-            progress.value = progress.min;
-        }
-        var animationFrame = requestAnimationFrame(nextProgress);
-    }
-
-    function startProgress() {
-        repeat = 0;
-        progress.value = progress.min;
-        button.disabled = true;
-        if (!animating) {
-            nextProgress();
-        }
-    }
-
     </script>
 </dom-module>

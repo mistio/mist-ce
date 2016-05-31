@@ -117,7 +117,7 @@
 
                         <paper-progress id="satckprogress" value="0" hidden$="[[hideprogress]]"></paper-progress>
                         <hr class="xs12" />
-                        
+
                          <div class="clearfix bottom-actions xs12">
                             <paper-button id="submit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm" onclick="startProgress();">
                                 Create stack
@@ -225,7 +225,7 @@
                 else {
                     return {
                         name: "Template is missing"
-                    }   
+                    }
                 }
                 // console.log("template: ",template);
             },
@@ -815,38 +815,6 @@
 
         });
     })();
-
-    // test progress bar, code from demo
-    var progress = document.querySelector('paper-progress#satckprogress');
-    var button = document.querySelector('paper-button#submit');
-    var animationFrame;
-    var repeat, maxRepeat = 1,
-        animating = false;
-
-    function nextProgress() {
-        animating = true;
-        if (progress.value < progress.max) {
-            progress.value += (progress.step || 1);
-
-        } else {
-            if (++repeat >= maxRepeat) {
-                animating = false;
-                button.disabled = false;
-                return;
-            }
-            progress.value = progress.min;
-        }
-        var animationFrame = requestAnimationFrame(nextProgress);
-    }
-
-    function startProgress() {
-        repeat = 0;
-        progress.value = progress.min;
-        button.disabled = true;
-        if (!animating) {
-            nextProgress();
-        }
-    }
 
     </script>
 </dom-module>
