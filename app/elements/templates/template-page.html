@@ -386,7 +386,7 @@
                     },
                     timestamp: {
                         type: String,
-                        computed: '_getFormattedTimestamp(template)'
+                        computed: '_getFormattedTimestamp(template.created_at)'
                     },
                     hideprogress: {
                         type: Boolean,
@@ -402,9 +402,8 @@
                     var wh = window.innerHeight;
                     this.vpHeight = 'height:' + wh + 'px; overflow: auto;';
                 },
-                _getFormattedTimestamp: function(template) {
-                    //var timestamp = parseInt(template.created_at);
-                    return new Date(template.created_at).toLocaleString('en-US', {
+                _getFormattedTimestamp: function(created_at) {
+                    return new Date(created_at).toLocaleString('en-US', {
                         timeZoneName: 'short'
                     });
                 },
