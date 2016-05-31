@@ -664,7 +664,7 @@
             _handleResponse: function(e){
                 // console.log('LOGGG',e.detail.__data__.response);
                 this.fire("stack-create-response", e.detail)
-                sid = e.detail.__data__.response.stack.id;
+                var sid = e.detail.__data__.response.stack.id;
                 console.warn('redirect to /stacks/'+ sid);
                 page.show('/stacks/'+ sid);
             },
