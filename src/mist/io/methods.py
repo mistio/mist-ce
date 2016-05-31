@@ -1506,7 +1506,9 @@ def list_machines(user, cloud_id):
 
         machine_entry = machines_from_db.pop(m.id, None)
         if machine_entry:
-            machine_entry.update(set__last_seen=now, set__missing_since=None)
+            machine_entry.last_seen = now
+            machine_entry.missing_since = None
+            machine_entry.save()
 
         if m.driver.type == 'gce':
             # tags and metadata exist in GCE
@@ -1626,12 +1628,11 @@ def list_machines(user, cloud_id):
         # close connection with libvirt
         conn.disconnect()
 
-    # import rpdb; rpdb.set_trace()
-
     # mark machines that are no longer available in list_nodes as missing
     for machine_entry in machines_from_db.values():
         if not machine_entry.missing_since:
-            machine_entry.update(set__missing_since=now)
+            machine_entry.missing_since = now
+            machine_entry.save()
     return ret
 
 
