@@ -682,9 +682,10 @@
                 console.log(newmach, this.stack.node_instances);
             },
             _computeStack: function(params) {
-                var stack =  this.model.stacksArray.find(function(stack) {
-                    return stack.id == params.id;
-                }, this);
+                var stack = {};
+                if (params.id)
+                    stack =  this.model.stacks[params.id];
+                
                 if (stack) {
                     // REMEMBER TO REMOVE V
                     // stack.status = 'ok';
