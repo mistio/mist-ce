@@ -798,7 +798,7 @@ def _add_cloud_libvirt(user, title, provider, params):
     images_location = params.get('images_location', '/var/lib/libvirt/images')
 
     if apisecret:
-        apisecret = Keypair.objects.get(owner=user, name=apisecret).private
+        apisecret = Keypair.objects.get(owner=user, id=apisecret).private
 
     try:
         port = int(params.get('ssh_port', 22))
