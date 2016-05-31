@@ -252,17 +252,19 @@
                 },
 
                 _computeFields: function(template) {
-                    var yaml_inputs = '';
+                    var yaml_inputs = '', yaml_array = [];
                     if (this.template.inputs) {
                         for (var i = 0; i < this.template.inputs.length; i++) {
                             if (['mist_uri', 'api_token'].indexOf(this.template.inputs[i].name) == -1) {
                                 yaml_inputs += this.template.inputs[i].name + ': ';
                                 yaml_inputs += this.template.inputs[i].default+'\n';
+
+                                yaml_array[this.template.inputs[i].name] = this.template.inputs[i].default;
                             }
                         }
                     }
 
-                    console.log(yaml_inputs);
+                    console.log(yaml_inputs, yaml_array);
 
                     var ret = [{
                         name: "name",
@@ -329,6 +331,8 @@
                                 fieldName: "yaml_or_form",
                                 fieldValues: ["form"]
                             }
+                            inp['value'] = yaml_array[inp.name];
+                            inp['defaultValue'] = yaml_array[inp.name];
                             ret.push(inp);
                         });
                     }

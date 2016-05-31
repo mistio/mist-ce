@@ -287,7 +287,7 @@
 
         .grid-row .center {
             text-align: center;
-        }        
+        }
         #quickActions.hidden {
             width: 0;
             padding: 0;
@@ -374,7 +374,7 @@
             font-size: 0.9em;
             padding-left: 8px;
         }
-        </style>    
+        </style>
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
@@ -529,18 +529,16 @@
                 </div>
             </template>
 
-
-            <div id="state" class="page" hidden$="[[!nodeInstances.length]]">
-                
+            <div id="state" class="page" hidden$="[[!hasNodeInstances]]">
                 <h3 class="smallcaps">Runtime properties</h3>
-                <template is="dom-repeat" items="[[nodeInstances]]">
+                <template is="dom-repeat" items="[[stack.node_instances]]">
                     <paper-material class="no-pad info-card">
                         <h2 class="info-title">[[item.name]] <span class="info-title-id">id: [[item.id]]</span></h2>
                         <element-for-in content="[[item.runtime_properties]]"></element-for-in>
                         <element-for-in content="[[item]]"></element-for-in>
                     </paper-material>
                 </template>
-            
+
                 <!-- <template is="dom-if" if="[[stack.inputs]]">
                     <h3 class="smallcaps">Stack Inputs </h3>
                     <paper-material class="no-pad">
@@ -624,9 +622,9 @@
                     //     type: Array,
                     //     computed: '_runtimeProperties(stack)'
                     // },
-                    nodeInstances: {
-                        type: Array,
-                        computed: '_nodeInstances(stack.node_instances.*)',
+                    hasNodeInstances: {
+                        type: Boolean,
+                        computed: '_computeHasNodeInstances(stack.node_instances.*)',
                         notify: true
                     },
                     listMachines: {
@@ -685,13 +683,13 @@
                 },
                 observers: [
                     // '_runtimePropertiesChanged(stack.*,runtimeProperties.*)'
-                    // 'nodeInstancesChanged(stack)'
+                    // 'hasNodeInstancesChanged(stack)'
                 ],
                 listeners: {
                     // 'confirmation': '_deleteStackResponse',
                     // 'updateSelectedStack': '_updateStack',
                     // 'stackChanged': '_stackChanged'
-                    // 'nodeInstancesChanged' : '_nodeInstancesChanged'
+                    // 'hasNodeInstancesChanged' : '_hasNodeInstancesChanged'
                 },
                 test: function() {
                     var newmach = {
@@ -730,11 +728,11 @@
                         }
                     }
                 },
-                _nodeInstances: function(stack) {
-                    return this.stack.node_instances ? this.stack.node_instances : [];
+                _computeHasNodeInstances: function(node_instances) {
+                    return node_instances.base.length;
                 },
-                // _nodeInstancesChanged: function(){
-                //     console.log("_nodeInstancesChanged");
+                // _hasNodeInstancesChanged: function(){
+                //     console.log("_hasNodeInstancesChanged");
                 // },
                 is_start_creation: function(stack) {
                     return stack.status == 'start_creation';
