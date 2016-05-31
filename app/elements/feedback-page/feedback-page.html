@@ -1,0 +1,522 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<dom-module id="feedback-page">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="stepper"></style>
+        <style include="shared-styles">
+        :host {
+            display: block;
+            position: relative;
+            z-index: 0;
+        }
+
+        h2 span {
+            @apply(--paper-font-caption);
+        }
+
+        paper-card,
+        paper-material {
+            display: block;
+        }
+
+        iron-label {
+            display: block;
+            margin-top: 20px;
+        }
+
+        paper-checkbox {
+            display: block;
+            margin-top: 20px;
+        }
+
+        .stepper {
+            /* may break */
+            max-width: 988px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @media all and (max-width: 960px) {
+            .step-number {
+                display: block;
+                margin: 0 auto;
+            }
+        }
+
+        @media all and (max-width: 860px) {
+            .step-title {
+                display: none;
+            }
+        }
+        </style>
+        <paper-material class="stepper">
+            <div class="step">
+                <a class="container active completed" href="#" on-tap="_pageChange" page="first" id="firstpage">
+                    <span class="step-number">1</span>
+                    <span class="step-title">Demographics</span>
+                </a>
+            </div>
+            <div class="step">
+                <a class="container error" href="#" on-tap="_pageChange" page="second" id="secondpage">
+                    <span class="step-number">2</span>
+                    <span class="step-title">Server details</span>
+                </a>
+            </div>
+            <div class="step">
+                <a class="container" href="#" on-tap="_pageChange" page="third" id="thirdpage">
+                    <span class="step-number">3</span>
+                    <span class="step-title">General feedback</span>
+                </a>
+            </div>
+        </paper-material>
+        <paper-material class="form">
+            <h2>Feedback <span>* All fields are mandatory</span></h2>
+            <template is="dom-if" if="[[pageFirst]]">
+                <div class="grid-row">
+                    <paper-input class="xs12 l6" label="What's your first name?" required error-message="Please enter your first name" value="{{user.firstName}}"></paper-input>
+                    <paper-input class="xs12 l6" label="What's your last name?" required error-message="Please enter your last name" value="{{user.lastName}}"></paper-input>
+                    <paper-input class="xs12 l6" label="What's your company's name?" required error-message="Please enter your company's name" value="{{user.companyName}}"></paper-input>
+                    <paper-dropdown-menu class="dropdown-block xs12 l6" label="Where is your business located?" horizontal-align="left">
+                        <paper-menu attr-for-selected="value" selected="{{user.country}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[countriesOptions]]" as="country">
+                                <paper-item value="[[country]]">[[country]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+                    <paper-dropdown-menu class="dropdown-block xs12 l6" label="How many people work there?" horizontal-align="left">
+                        <paper-menu attr-for-selected="value" selected="{{user.numberOfPeople}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[numberOfPeopleOptions]]" as="people">
+                                <paper-item value="[[people]]">[[people]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+                    <paper-dropdown-menu class="dropdown-block xs12 l6" label="How many servers do you have?" horizontal-align="left">
+                        <paper-menu attr-for-selected="value" selected="{{user.numberOfServers}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[numberOfServersOptions]]" as="servers">
+                                <paper-item value="[[servers]]">[[servers]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+                    <hr class="xs12"/>
+                    <div class="bottom-actions clearfix xs12">
+                        <paper-button class="pull-right" disabled$="[[!firstFormReady]]" raised on-tap="_pageChange" page="second">Next</paper-button>
+                    </div>
+                </div>
+            </template>
+            <template is="dom-if" if="[[pageSecond]]">
+                <div class="grid-row">
+                    <iron-label class="xs12">Where do you host your servers?</iron-label>
+                    <template is="dom-repeat" items="[[hostedOptions]]" as="host">
+                        <paper-checkbox class="xs12 l6" value="[[host.val]]" on-change="_toggleChecked">[[host.title]]</paper-checkbox>
+                    </template>
+                    <paper-input hidden$="[[!user.hasExtraHosted]]" label="Please specify where do you host your servers?" value="{{user.extraHosted}}"></paper-input>
+                    <hr class="xs12"/>
+                    <div class="bottom-actions clearfix xs12">
+                        <paper-button class="pull-right" disabled$="[[!secondFormReady]]" raised on-tap="_pageChange" page="third">Next</paper-button>
+                    </div>
+                </div>
+            </template>
+            <template is="dom-if" if="[[pageThird]]">
+                <div class="grid-row">
+                    <paper-dropdown-menu class="xs12" label="How did you discover mist.io?" horizontal-align="left">
+                        <paper-menu attr-for-selected="value" selected="{{user.discover}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[discoverOptions]]" as="discover">
+                                <paper-item value="[[discover.val]]">[[discover.title]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+                    <paper-input class="xs12" hidden$="[[!user.hasExtraDiscover]]" label="Please specify how you discover mist.io?" required error-message="Please specify how you discover mist.io" value="{{user.extraDiscover}}"></paper-input>
+                    <paper-dropdown-menu class="dropdown-block xs12 l6" label="How satisfied are you with mist.io?" horizontal-align="left">
+                        <paper-menu attr-for-selected="value" selected="{{user.satisfaction}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[satisfactionOptions]]" as="satisfaction">
+                                <paper-item value="[[satisfaction.val]]">[[satisfaction.title]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+                    <paper-dropdown-menu class="dropdown-block  xs12 l6" label="Have you considered using similar services?" horizontal-align="left">
+                        <paper-menu attr-for-selected="value" selected="{{user.alternative}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[alternativeOptions]]" as="alternative">
+                                <paper-item value="[[alternative.val]]">[[alternative.title]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+                    <paper-input hidden$="[[!user.hasExtraAlternative]]" class="xs12" label="Please specify which service would you use?" required error-message="Please specify which service would you use" value="{{user.extraAlternative}}"></paper-input>
+                    <paper-textarea class="xs12" label="How can we improve mist.io to better meet your needs?" rows="5" value="{{user.improve}}"></paper-textarea>
+                    <hr class="xs12"/>
+                    <div class="clearfix bottom-actions xs12">
+                        <paper-button class="pull-left" raised on-tap="_pageChange" page="first">Previous</paper-button>
+                        <paper-button class="pull-right" disabled$="[[!secondFormReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                    </div>
+                </div>
+        </paper-material>
+        </template>
+        <iron-ajax id="ajax" url="/account" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+        <iron-signals on-iron-signal-user-menu="_updateUser"></iron-signals>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+        Polymer({
+            is: 'feedback-page',
+            properties: {
+                user: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            firstName: FIRST_NAME,
+                            lastName: LAST_NAME,
+                            country: COUNTRY,
+                            companyName: COMPANY_NAME,
+                            numberOfPeople: NUMBER_OF_PEOPLE,
+                            numberOfServers: NUMBER_OF_SERVERS,
+                            discover: null,
+                            hosted: [],
+                            hasExtraHosted: false,
+                            extraHosted: null,
+                            hasExtraDiscover: false,
+                            extraDiscover: null,
+                            satisfaction: null,
+                            alternative: null,
+                            hasExtraAlternative: false,
+                            extraAlternative: null,
+                            improve: null
+                        };
+                    },
+                    notify: true
+                },
+                pageFirst: {
+                    type: Boolean,
+                    value: true
+                },
+                pageSecond: {
+                    type: Boolean,
+                    value: false
+                },
+                pageThird: {
+                    type: Boolean,
+                    value: false
+                },
+                countriesOptions: {
+                    type: Array,
+                    value: ["Afghanistan", "Åland Islands", "Albania", "Algeria",
+                        "American Samoa", "Andorra", "Angola", "Anguilla",
+                        "Antarctica", "Antigua and Barbuda", "Argentina",
+                        "Armenia", "Aruba", "Australia", "Austria",
+                        "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
+                        "Barbados", "Belarus", "Belgium", "Belize", "Benin",
+                        "Bermuda", "Bhutan", "Bolivia",
+                        "Bosnia and Herzegovina", "Botswana", "Bouvet Island",
+                        "Brazil", "British Indian Ocean Territory",
+                        "Brunei Darussalam", "Bulgaria", "Burkina Faso",
+                        "Burundi", "Cambodia", "Cameroon", "Canada",
+                        "Cape Verde", "Cayman Islands",
+                        "Central African Republic", "Chad", "Chile", "China",
+                        "Christmas Island", "Cocos (Keeling) Islands",
+                        "Colombia", "Comoros", "Congo",
+                        "Congo, The Democratic Republic of the",
+                        "Cook Islands", "Costa Rica", "Cote D'Ivoire",
+                        "Croatia", "Cuba", "Cyprus", "Czech Republic",
+                        "Denmark", "Djibouti", "Dominica",
+                        "Dominican Republic", "Ecuador", "Egypt",
+                        "El Salvador", "Equatorial Guinea", "Eritrea",
+                        "Estonia", "Ethiopia", "Falkland Islands (Malvinas)",
+                        "Faroe Islands", "Fiji", "Finland", "France",
+                        "French Guiana", "French Polynesia",
+                        "French Southern Territories", "Gabon", "Gambia",
+                        "Georgia", "Germany", "Ghana", "Gibraltar", "Greece",
+                        "Greenland", "Grenada", "Guadeloupe", "Guam",
+                        "Guatemala", "Guernsey", "Guinea", "Guinea-Bissau",
+                        "Guyana", "Haiti", "Heard Island and Mcdonald Islands",
+                        "Holy See (Vatican City State)", "Honduras",
+                        "Hong Kong", "Hungary", "Iceland", "India",
+                        "Indonesia", "Iran, Islamic Republic Of", "Iraq",
+                        "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica",
+                        "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya",
+                        "Kiribati", "Korea, Democratic People'S Republic of",
+                        "Korea, Republic of", "Kuwait", "Kyrgyzstan",
+                        "Lao People'S Democratic Republic", "Latvia", "Lebanon",
+                        "Lesotho", "Liberia", "Libyan Arab Jamahiriya",
+                        "Liechtenstein", "Lithuania", "Luxembourg", "Macao",
+                        "Macedonia, The Former Yugoslav Republic of",
+                        "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali",
+                        "Malta", "Marshall Islands", "Martinique", "Mauritania",
+                        "Mauritius", "Mayotte", "Mexico",
+                        "Micronesia, Federated States of",
+                        "Moldova, Republic of", "Monaco", "Mongolia",
+                        "Montserrat", "Morocco", "Mozambique", "Myanmar",
+                        "Namibia", "Nauru", "Nepal", "Netherlands",
+                        "Netherlands Antilles", "New Caledonia", "New Zealand",
+                        "Nicaragua", "Niger", "Nigeria", "Niue",
+                        "Norfolk Island", "Northern Mariana Islands", "Norway",
+                        "Oman", "Pakistan", "Palau",
+                        "Palestinian Territory, Occupied", "Panama",
+                        "Papua New Guinea", "Paraguay", "Peru", "Philippines",
+                        "Pitcairn", "Poland", "Portugal", "Puerto Rico",
+                        "Qatar", "Reunion", "Romania", "Russian Federation",
+                        "RWANDA", "Saint Helena", "Saint Kitts and Nevis",
+                        "Saint Lucia", "Saint Pierre and Miquelon",
+                        "Saint Vincent and the Grenadines", "Samoa",
+                        "San Marino", "Sao Tome and Principe", "Saudi Arabia",
+                        "Senegal", "Serbia and Montenegro", "Seychelles",
+                        "Sierra Leone", "Singapore", "Slovakia", "Slovenia",
+                        "Solomon Islands", "Somalia", "South Africa",
+                        "South Georgia and the South Sandwich Islands",
+                        "Spain", "Sri Lanka", "Sudan", "Suriname",
+                        "Svalbard and Jan Mayen", "Swaziland", "Sweden",
+                        "Switzerland", "Syrian Arab Republic",
+                        "Taiwan, Province of China", "Tajikistan",
+                        "Tanzania, United Republic of", "Thailand",
+                        "Timor-Leste", "Togo", "Tokelau", "Tonga",
+                        "Trinidad and Tobago", "Tunisia", "Turkey",
+                        "Turkmenistan", "Turks and Caicos Islands", "Tuvalu",
+                        "Uganda", "Ukraine", "United Arab Emirates",
+                        "United Kingdom", "United States",
+                        "United States Minor Outlying Islands", "Uruguay",
+                        "Uzbekistan", "Vanuatu", "Venezuela", "Viet Nam",
+                        "Virgin Islands, British", "Virgin Islands, U.S.",
+                        "Wallis and Futuna", "Western Sahara", "Yemen",
+                        "Zambia", "Zimbabwe"
+                    ]
+                },
+                numberOfPeopleOptions: {
+                    type: Array,
+                    value: ['1-5', '6-20', '21-100', '100+']
+                },
+                numberOfServersOptions: {
+                    type: Array,
+                    value: ['1-5', '6-20', '21-100', '100+']
+                },
+                hostedOptions: {
+                    type: Array,
+                    value: [{
+                        title: 'AWS',
+                        val: 'AWS'
+                    }, {
+                        title: 'Google Compute Engine',
+                        val: 'Compute'
+                    }, {
+                        title: 'Azure',
+                        val: 'Azure'
+                    }, {
+                        title: 'SoftLayer',
+                        val: 'SoftLayer'
+                    }, {
+                        title: 'Rackspace',
+                        val: 'Rackspace'
+                    }, {
+                        title: 'Digital Ocean',
+                        val: 'Ocean'
+                    }, {
+                        title: 'Linode',
+                        val: 'Linode'
+                    }, {
+                        title: 'Private Data Center',
+                        val: 'Private'
+                    }, {
+                        title: 'Other',
+                        val: 'other'
+                    }]
+                },
+                discoverOptions: {
+                    type: Array,
+                    value: [{
+                        title: "Blog",
+                        val: "blog"
+                    }, {
+                        title: "Friend or colleague",
+                        val: "friend"
+                    }, {
+                        title: "Search engine (e.g. Google, Yahoo!)",
+                        val: "search"
+                    }, {
+                        title: "Facebook",
+                        val: "facebook"
+                    }, {
+                        title: "Twitter",
+                        val: "twitter"
+                    }, {
+                        title: "Other",
+                        val: "other"
+                    }]
+                },
+                satisfactionOptions: {
+                    type: Array,
+                    value: [{
+                        title: "Excited!",
+                        val: "excited"
+                    }, {
+                        title: "It works",
+                        val: "itworks"
+                    }, {
+                        title: "Not sure yet",
+                        val: "notsureyet"
+                    }, {
+                        title: "Disappointed",
+                        val: "disappointed"
+                    }, {
+                        title: "Very disappointed - I no longer use mist.io",
+                        val: "verydissapointed"
+                    }]
+                },
+                alternativeOptions: {
+                    type: Array,
+                    value: [{
+                        title: "No",
+                        val: "none"
+                    }, {
+                        title: "Yes",
+                        val: "other"
+                    }]
+                },
+                firstFormReady: {
+                    type: Boolean,
+                    computed: '_computeFirstFormReady(user.firstName, user.lastName, user.country, user.companyName, user.numberOfPeople, user.numberOfServers)'
+                },
+                secondFormReady: {
+                    type: Boolean,
+                    computed: '_computeSecondFormReady(user.hosted.*, user.hasExtraHosted, user.extraHosted)'
+                },
+                thirdFormReady: {
+                    type: Boolean,
+                    computed: '_computeThirdFormReady(user.discover, user.hasExtraDiscover, user.extraDiscover, user.satisfaction, user.alternative, user.hasExtraAlternative, user.extraAlternative, user.improve, sendingData)'
+                },
+                sendingData: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+            observers: [
+                '_hostedChanged(user.hosted.*)',
+                '_discoverChanged(user.discover)',
+                '_alternativeChanged(user.alternative)'
+            ],
+            ready: function() {},
+            _computeFirstFormReady: function(firstName, lastName, country, companyName, numberOfPeople, numberOfServers) {
+                var formReady = false;
+                if (firstName && lastName && country && companyName && numberOfPeople && numberOfServers) {
+                    formReady = true;
+                }
+                return formReady;
+            },
+            _computeSecondFormReady: function(hosted, hasExtraHosted, extraHosted) {
+                var formReady = false;
+                if (hosted.base.length) {
+                    formReady = true;
+                }
+                if (hasExtraHosted && !extraHosted) {
+                    formReady = false;
+                }
+                return formReady;
+            },
+            _computeThirdFormReady: function(discover, hasExtraDiscover, extraDiscover, satisfaction, alternative, hasExtraAlternative, extraAlternative, improve, sendingData) {
+                var formReady = false;
+                if (discover && satisfaction && alternative && improve) {
+                    formReady = true;
+                }
+                if (hasExtraDiscover && !extraDiscover) {
+                    formReady = false;
+                }
+                if (hasExtraAlternative && !extraAlternative) {
+                    formReady = false;
+                }
+                if (sendingData) {
+                    formReady = false;
+                }
+                return formReady;
+            },
+            _hostedChanged: function(changeRecord) {
+                var hasExtraHosted = changeRecord.base.indexOf('other') != -1;
+                if (hasExtraHosted) {
+                    this.set('user.extraHosted', null);
+                }
+                this.set('user.hasExtraHosted', hasExtraHosted);
+            },
+            _discoverChanged: function(discover) {
+                this.set('user.extraDiscover', null);
+                this.set('user.hasExtraDiscover', discover == 'other');
+            },
+            _alternativeChanged: function(alternative) {
+                this.set('user.extraAlternative', null);
+                this.set('user.hasExtraAlternative', alternative == 'other');
+            },
+            _pageChange: function(e) {
+                e.preventDefault();
+                var step;
+                var page = e.currentTarget.getAttribute('page');
+                if (page == 'first') {
+                    this.set('pageFirst', true);
+                    this.set('pageSecond', false);
+                    this.set('pageThird', false);
+                    step = Polymer.dom(this.root).querySelector('#firstpage');
+                }
+                if (page == 'second') {
+                    this.set('pageFirst', false);
+                    this.set('pageSecond', true);
+                    this.set('pageThird', false);
+                    step = Polymer.dom(this.root).querySelector('#secondpage');
+                }
+                if (page == 'third') {
+                    this.set('pageFirst', false);
+                    this.set('pageSecond', false);
+                    this.set('pageThird', true);
+                    step = Polymer.dom(this.root).querySelector('#thirdpage');
+                }
+                this.toggleClass('active', true, step);
+                // this.set('pageSecond', page == 'second');
+            },
+            _toggleChecked: function(e) {
+                var checkbox = e.currentTarget,
+                    checked = checkbox.checked,
+                    val = checkbox.value;
+                if (checked) {
+                    this.push('user.hosted', val);
+                } else {
+                    var index = this.user.hosted.indexOf(val);
+                    this.splice('user.hosted', index, 1);
+                }
+            },
+            _submitForm: function() {
+                console.log(this.user);
+                var hosted = this.user.hosted,
+                    index = hosted.indexOf('other');
+                if (index > -1) {
+                    hosted.splice(index, 1);
+                    hosted.push(this.user.extraHosted);
+                }
+                var discover = this.user.hasExtraDiscover ? this.user.extraDiscover : this.user.discover,
+                    alternatives = this.user.hasExtraAlternative ? this.user.extraAlternative : this.user.alternative;
+                var payload = {
+                    action: 'update_details',
+                    first_name: this.user.firstName,
+                    last_name: this.user.lastName,
+                    company_name: this.user.companyName,
+                    country: this.user.country,
+                    number_of_servers: this.user.numberOfServers,
+                    number_of_people: this.user.numberOfPeople,
+                    hosted: hosted,
+                    discover: discover,
+                    satisfied: this.user.satisfaction,
+                    alternatives: alternatives,
+                    improve: this.user.improve,
+                    feedback: true
+                };
+                console.log(payload)
+                    //   this.$.ajax.body = payload;
+                    //   this.$.ajax.generateRequest();
+            },
+            _ajaxRequest: function() {
+                this.set('sendingData', true);
+            },
+            _ajaxResponse: function() {
+                this.set('sendingData', false);
+            },
+            _updateUser: function(e) {
+                this.set('user.firstName', e.detail.firstName);
+                this.set('user.lastName', e.detail.lastName);
+            }
+        });
+    })();
+    </script>
+</dom-module>
+</dom-module>

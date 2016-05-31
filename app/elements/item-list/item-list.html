@@ -134,7 +134,7 @@
         .field {
             min-width: 150px;
             margin-right: 17px;
-            margin-left: 7px;
+            margin-left: 7px;            
         }
 
         .tag {
@@ -481,7 +481,7 @@ Polymer({
             return ['name', 'cloud', 'id']
         }
         if (this.isKeys(this.section)) {
-            return ['name', 'machines', 'default']
+            return ['name', 'machines', 'id', 'default']
         }
         if (this.isNetworks(this.section)) {
             return ['name', 'cloud', 'state', 'id', 'public']

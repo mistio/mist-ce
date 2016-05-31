@@ -31,6 +31,7 @@
 
         <iron-ajax id="cloudEditAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="PUT" on-response="_handleCloudEditAjaxResponse" on-error="_handleCloudEditAjaxError"></iron-ajax>
         <iron-ajax id="cloudStateAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="POST" on-response="_handleCloudStateAjaxResponse" on-error="_handleCloudStateAjaxError"></iron-ajax>
+        <paper-toast></paper-toast>
     </template>
 
     <script>
@@ -117,10 +118,20 @@
                     this.set('cloud.enabled', !this.cloud.enabled);
                     this.set('cloud.state', this.cloud.enabled ? 'online' : 'offline');
                     this.set('sendingData', false);
+                    console.log(this.cloud);
+                    var msg = this.cloud.enabled ? 'Cloud ' + this.cloud.title + ' was enabled!' :
+                    'Cloud ' + this.cloud.title + ' was disabled!';
+                    this._showToast(msg);
                 },
                 _copyId: function() {
                     this.querySelector('#cloudId input').select();
                     document.execCommand('copy');
+                    this._showToast('Cloud\'s ID was copied to clipboard!');
+                },
+                _showToast: function(msg) {
+                    var toast = this.querySelector('paper-toast');
+                    toast.text = msg;
+                    toast.show();
                 }
             });
         })();
