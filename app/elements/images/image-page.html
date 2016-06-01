@@ -104,6 +104,16 @@
             paper-icon-bottom.bottom {
                 padding-right: 8px;
             }
+            h4.id {
+                display: inline-block;
+                text-transform: uppercase;
+                font-size: 0.9rem;
+                font-weight: 700;
+                margin-right: 16px;
+            }
+            paper-material.no-pad {
+                padding: 0;
+            }
         </style>
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
@@ -126,20 +136,11 @@
             </paper-material>
             <template is="dom-if" if="[[image]]">
                 <paper-material>
+                    <h4 class="id">Image ID:</h4><span class="id">[[image.id]]</span>
+                </paper-material>
+                <paper-material class="no-pad">
                     <div class="info-table">
                         <div class="info-body info-group">
-                            <div class="info-item flex-horizontal-with-ratios">
-                                <div class="flexchild">ID</div>
-                                <div class="flexchild">[[image.id]]</div>
-                            </div>
-                            <div class="info-item flex-horizontal-with-ratios">
-                                <div class="flexchild">Name</div>
-                                <div class="flexchild">[[image.name]]</div>
-                            </div>
-                            <div class="info-item flex-horizontal-with-ratios">
-                                <div class="flexchild">Provider</div>
-                                <div class="flexchild">[[image.cloud.title]]</div>
-                            </div>
                             <element-for-in content="[[image.extra]]"></element-for-in>
                         </div>
                     </div>
