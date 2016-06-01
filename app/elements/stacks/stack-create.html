@@ -803,7 +803,10 @@
 
                 _handleResponse: function(e) {
                     var sid = e.detail.response.stack.id;
-                    page.show('/stacks/' + sid);
+
+                    this.async(function() {
+                        page.show('/stacks/' + sid);
+                    }, 2000);
 
                     this.debounce('resetForm', function() {
                         this._resetForm();

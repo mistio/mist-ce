@@ -205,7 +205,8 @@
                     },
                     showProgress: {
                         type: Boolean,
-                        computed: '_computeShowProgress(sendingData)'
+                        value: false,
+                        // computed: '_computeShowProgress(sendingData)'
                     },
                     workflow: {
                         type: String
@@ -402,6 +403,10 @@
                     this.$.formAjax.body = payload;
                     this.$.formAjax.generateRequest();
 
+                    this.set('showProgress', true);
+                    this.async(function(){
+                        this.set('showProgress', false);
+                    }, 2000);
                     this.set('sendingData', true);
                 },
                 _resetForm: function(e) {
