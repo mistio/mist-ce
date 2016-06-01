@@ -894,7 +894,7 @@
                         var yaml_inputs;
                         
                         wf.params.forEach(function(wp){
-                            yaml_inputs += wp.name+': '+ wp.defaultValue;
+                            yaml_inputs += wp.name+': '+ wp.defaultValue + '\n';
                             Object.defineProperty( wp, "showIf", {
                                 value: {
                                     fieldName: "yaml_or_form",

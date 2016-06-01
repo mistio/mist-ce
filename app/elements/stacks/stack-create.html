@@ -332,8 +332,27 @@
                             // make key dropdown
                             if(inp.name == "key") {
                                 inp.type = 'dropdown';
-                                inp.query = ["keysArray"]
+                                inp.query = ["keysArray"];
                             }
+
+                            // make cloud dropdown
+                            if(inp.name == "cloud_id") {
+                                inp.type = 'dropdown';
+                                inp.query = ["cloudsArray"];
+                            }
+
+                            // make image dropdown & dependent on cloud
+                            if(inp.name == "image_id") {
+                                inp.show = false;
+                                inp.type = 'dropdown';
+                                inp.query = ["clouds","$.cloud_id", "imagesArray"],
+                                inp.andshowIf = {
+                                    fieldName: "cloud_id",
+                                    fieldExists: true
+                                }
+                            }
+
+                        
                             ret.push(inp);
                         });
                     }
