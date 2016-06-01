@@ -40,6 +40,8 @@ ALLOW_CONNECT_LOCALHOST = settings.get('ALLOW_CONNECT_LOCALHOST', True)
 ALLOW_CONNECT_PRIVATE = settings.get('ALLOW_CONNECT_PRIVATE', True)
 # allow mist.io to connect to KVM hypervisor running on the same server
 ALLOW_LIBVIRT_LOCALHOST = settings.get('ALLOW_LIBVIRT_LOCALHOST', False)
+# mist.io interface to the OpenVPN server
+VPN_SERVER_API_ADDRESS = settings.get('VPN_SERVER_API_ADDRESS', '')
 
 # celery settings
 CELERY_SETTINGS = {
