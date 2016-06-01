@@ -639,12 +639,12 @@
                     },
                     keys: {
                         type: Array,
-                        computed: '_listKeys(stack.node_instances.*), model.keys.*',
+                        computed: '_listKeys(stack.node_instances.*, model.keys.*)',
                         notify: true
                     },
                     workflows: {
                         type: Array,
-                        computed: '_computeWorkflows(template)'
+                        computed: '_computeWorkflows(template.workflows.*)'
                     },
                     timestamp: {
                         type: String,
@@ -729,7 +729,7 @@
                     }
                 },
                 _computeHasNodeInstances: function(node_instances) {
-                    return node_instances.base.length;
+                    return node_instances.base && node_instances.base.length;
                 },
                 // _hasNodeInstancesChanged: function(){
                 //     console.log("_hasNodeInstancesChanged");
@@ -889,8 +889,8 @@
                 //     var stack = this.stack;
                 //     this._listMachines(stack);
                 // },
-                _computeWorkflows: function(template) {
-                    return template.workflows;
+                _computeWorkflows: function(workflows) {
+                    return workflows.base;
                 },
                 _getFormattedTimestamp: function(stack) {
                     return new Date(this.stack.created_at).toLocaleString('en-US', {

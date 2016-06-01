@@ -264,8 +264,6 @@
                         }
                     }
 
-                    console.log(yaml_inputs, yaml_array);
-
                     var ret = [{
                         name: "name",
                         label: "Stack Name",
@@ -322,11 +320,8 @@
                         }
                     }];
 
-                    console.warn('yaml', yaml_inputs);
-                    console.log(template.inputs);
                     if (template && template.inputs) {
                         template.inputs.forEach(function(inp) {
-                            console.log(inp);
                             inp['showIf'] = {
                                 fieldName: "yaml_or_form",
                                 fieldValues: ["form"]
@@ -351,7 +346,6 @@
                     });
 
                     this.set('fields', ret);
-
 
                     //return ret;
                     /*
@@ -661,7 +655,7 @@
                 },
 
                 _fieldsChanged: function(fields, sendingData) {
-                    console.log('_fieldsChanged')
+                    console.log('_fieldsChanged');
                     this.async(function() {
                         var form = this.form,
                             show = true,
@@ -784,7 +778,6 @@
 
                 _handleResponse: function(e) {
                     var sid = e.detail.response.stack.id;
-                    console.warn('redirect to /stacks/' + sid);
                     page.show('/stacks/' + sid);
 
                     this.debounce('resetForm', function() {
@@ -815,12 +808,12 @@
                 },
 
                 _resetField: function(el, index) {
-                    this.set('fields.' + index + '.value', el.defaultValue);
-
-                    var input = this.querySelector('#' + el.name);
-                    if (input) {
-                        input.invalid = false;
-                    }
+                    // this.set('fields.' + index + '.value', el.defaultValue);
+                    // console.log(11);
+                    // var input = this.querySelector('#' + el.name);
+                    // if (input) {
+                    //     input.invalid = false;
+                    // }
                 },
 
             });
