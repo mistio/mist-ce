@@ -278,6 +278,7 @@
                     this.set('sendingData', false);
                 },
                 _fieldsChanged: function(fields, sendingData) {
+                    console.log(fields);
                     this.async(function() {
                         var form = this.form,
                             show = true,
@@ -299,18 +300,19 @@
                                         show = el.showIf.fieldValues.indexOf(dependency) != -1;
                                     this.set('fields.' + index + '.show', show);
 
-                                    if (el.showIf.fieldName == "yaml_or_form") {
+                                    console.log('>>>');
+                                    if (el.showIf.fieldName == "yaml_or_form" && el.value != el.defaultValue) {
                                         reset = false;
-                                        if (el.value != el.defaultValue && el.type == 'text') {
-                                            var yamlFields = fields.base
-                                                .filter(function(ele) {
-                                                    return ele.showIf && ele.showIf.fieldName == 'yaml_or_form';
-                                                }),
-                                                yamlField = yamlFields
+                                        var yamlFields = fields.base
+                                            .filter(function(ele) {
+                                                return ele.showIf && ele.showIf.fieldName == 'yaml_or_form';
+                                            });
+                                        if (el.type == 'text') {
+                                            var yamlField = yamlFields
                                                 .find(function(ele) {
                                                     return ele.type == 'textarea';
                                                 }),
-                                                yamlText = yamlFields
+                                                newYamlText = yamlFields
                                                 .filter(function(ele) {
                                                     return ele.type == 'text';
                                                 })
@@ -319,9 +321,41 @@
                                                 })
                                                 .join('\n');
 
-                                            this.set('fields.' + this.fields.indexOf(yamlField) + '.value', yamlText);
+                                            this.set('fields.' + this.fields.indexOf(yamlField) + '.value', newYamlText);
+                                        } else {
+                                            var formFieldsArray = yamlFields
+                                                .filter(function(ele) {
+                                                    return ele.type == 'text';
+                                                })
+                                                .map(function(ele) {
+                                                    return ele.name;
+                                                }),
+                                                formFieldsPairs = el.value
+                                                .split('\n')
+                                                .filter(function(ele) {
+                                                    return ele != '';
+                                                })
+                                                .map(function(ele) {
+                                                    var obj = {};
+                                                    obj[ele.split(':')[0].trim()] = ele.split(':')[1].trim();
+                                                    return obj;
+                                                })
+                                                .reduce(function(acc, x) {
+                                                    for (var key in x) {
+                                                        acc[key] = x[key];
+                                                    }
+                                                    return acc;
+                                                }, {});
+
+                                            fields.base
+                                                .forEach(function(ele, index) {
+                                                    if (formFieldsArray.indexOf(ele.name) > -1) {
+                                                        this.set('fields.' + index + '.value', formFieldsPairs[ele.name]);
+                                                    }
+                                                }, this);
                                         }
                                     }
+                                    console.log('<<<');
                                 }
 
 
