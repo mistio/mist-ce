@@ -891,10 +891,10 @@
                 _computeWorkflows: function(workflows, templates) {
                     var workflows = workflows.base;
                     workflows.forEach(function(wf){
-                        var yaml_inputs;
+                        var yaml_inputs = '';
                         
                         wf.params.forEach(function(wp){
-                            yaml_inputs += wp.name+': '+ wp.defaultValue + '\n';
+                            yaml_inputs += wp.name+': '+ wp.default + '\n';
                             Object.defineProperty( wp, "showIf", {
                                 value: {
                                     fieldName: "yaml_or_form",
