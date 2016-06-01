@@ -121,6 +121,22 @@
         paper-icon-bottom.bottom {
             padding-right: 8px;
         }
+        h4.id {
+            display: inline-block;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-right: 16px;
+        }
+        .id {
+            display: inline-block;
+        }
+        paper-material.no-pad {
+            padding: 0;
+        }
+        .info-table {
+            border-top: 1px solid #ddd;
+        }
         </style>
 
         <div id="content">
@@ -132,7 +148,8 @@
                     </h2>
                     <div class="subtitle">
                         <span hidden$="[[!isInline]]">Inline Script</span>
-                        <span hidden$="[[isInline]]">Script source [[script.script]]</span>
+                        <span hidden$="[[isInline]]">Script source <a class="regular" href$="[[script.script]]" target="_blank"> [[script.script]] <iron-icon icon="icons:link"></iron-icon></a>
+                        </span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -148,6 +165,9 @@
                     </div>
                 </div>
                 <paper-material id="rightcolumn" class="right">
+                    <!-- <div>
+                        <h4 class="id">Script ID: </h4><span class="id">[[script.script_id]]</span>
+                    </div> -->
                 <div class="info-table">
                     <div class="info-body info-group">
                         <div class="info-item flex-horizontal-with-ratios">
@@ -173,7 +193,7 @@
                         <template is="dom-if" if="[[!isInline]]">
                             <div class="info-item flex-horizontal-with-ratios">
                                 <div class="flexchild">Url</div>
-                                <div class="flexchild">[[script.script]]</div>
+                                <div class="flexchild"><a class="regular" href$="[[script.script]]" target="_blank"> [[script.script]] <iron-icon icon="icons:link"></iron-icon></a></div>
                             </div>
                         </template>
                     </div>
