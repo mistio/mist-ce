@@ -1033,13 +1033,13 @@
                         "csrf-token": CSRF_TOKEN,
                         "Content-Type": "application/json"
                     };
+
                     this.$.workflowRequest.body = {
-                        "workflow": action
+                        "workflow": action,
+                        "inputs": this.stack.inputs.install
                     };
-                    if (action == 'install') {
-                        this.$.deploynow.classList.add('hidden');
-                        this.$.workflowRequest.body["inputs"] = this.stack.inputs.install.install.install;
-                    }
+                    
+                    this.$.deploynow.classList.add('hidden');
                     this.$.workflowRequest.generateRequest();
                 },
                 cancelWorkflow: function(e) {
