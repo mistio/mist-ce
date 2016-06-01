@@ -620,7 +620,6 @@ def _add_cloud_nephoscale(user, title, provider, params):
     return cloud.id, cloud
 
 
-
 def _add_cloud_softlayer(user, title, provider, params):
     username = params.get('username', '')
     if not username:
@@ -641,7 +640,6 @@ def _add_cloud_softlayer(user, title, provider, params):
     return cloud.id, cloud
 
 
-
 def _add_cloud_digitalocean(user, title, provider, params):
     token = params.get('token', '')
     if not token:
@@ -656,7 +654,6 @@ def _add_cloud_digitalocean(user, title, provider, params):
     cloud.owner = user
     cloud.save()
     return cloud.id, cloud
-
 
 
 def _add_cloud_gce(user, title, provider, params):
@@ -692,7 +689,6 @@ def _add_cloud_gce(user, title, provider, params):
     return cloud.id, cloud
 
 
-
 def _add_cloud_azure(user, title, provider, params):
     subscription_id = params.get('subscription_id', '')
     if not subscription_id:
@@ -720,7 +716,6 @@ def _add_cloud_azure(user, title, provider, params):
     return cloud.id, cloud
 
 
-
 def _add_cloud_linode(user, title, provider, params):
     api_key = params.get('api_key', '')
     if not api_key:
@@ -742,7 +737,6 @@ def _add_cloud_linode(user, title, provider, params):
         raise CloudExistsError()
 
     return cloud.id, cloud
-
 
 
 def _add_cloud_docker(user, title, provider, params):
@@ -786,7 +780,6 @@ def _add_cloud_docker(user, title, provider, params):
     return cloud.id, cloud
 
 
-
 def _add_cloud_libvirt(user, title, provider, params):
     machine_hostname = params.get('machine_hostname', '')
     if not machine_hostname:
@@ -798,8 +791,10 @@ def _add_cloud_libvirt(user, title, provider, params):
     images_location = params.get('images_location', '/var/lib/libvirt/images')
 
     if apisecret:
-        apisecret = Keypair.objects.get(owner=user, name=apisecret).private
-
+        try:
+            apisecret = Keypair.objects.get(owner=user, id=apisecret).private
+        except KeyNotFoundError:
+            raise NotFoundError('Keypair does not exist')
     try:
         port = int(params.get('ssh_port', 22))
     except:
