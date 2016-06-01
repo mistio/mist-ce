@@ -398,7 +398,7 @@
                             </template>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button id="install" on-tap="doWorkflow" class="simple white" style$="color: [[section.color]]" hidden$="[[ok]]" disabled$="[[disabled]]">Deploy
+                    <paper-button on-tap="deployNowWork" class="simple white" style$="color: [[section.color]]" hidden$="[[ok]]" disabled$="[[disabled]]">Deploy
                         <iron-icon style$="color: [[section.color]]" icon="av:play-arrow"></iron-icon>
                     </paper-button>
                     <paper-button on-tap="openWorkflows" class="simple white" style$="color: [[section.color]]" hidden$="[[hideWorkflows]]" disabled$="[[disabled]]">Workflows</paper-button>
@@ -425,7 +425,7 @@
             <paper-material id="deploynow" class="marg-b marg-t" hidden$="[[hideDeployNow]]">
                 <div class="parsing-loader">
                     <h4>Stack is saved and ready to deploy</h4>
-                    <paper-button id="install" on-tap="doWorkflow">Deploy Now</paper-button>
+                    <paper-button on-tap="deployNowWork">Deploy Now</paper-button>
                 </div>
             </paper-material>
 
@@ -1019,6 +1019,26 @@
                     if (action == 'install') {
                         this.$.deploynow.classList.add('hidden');
                         this.$.workflowRequest.body["inputs"] = this.stack.inputs;
+                    }
+                    this.$.workflowRequest.generateRequest();
+                },
+                deployNowWork: function(){
+                    var action = 'install';
+
+                    var workflow = this.workflows.find(function(workflow) {
+                        return workflow.name == action;
+                    });
+                    this.$.workflowRequest.url = "/api/v1/stacks/" + this.stack.id;
+                    this.$.workflowRequest.headers = {
+                        "csrf-token": CSRF_TOKEN,
+                        "Content-Type": "application/json"
+                    };
+                    this.$.workflowRequest.body = {
+                        "workflow": action
+                    };
+                    if (action == 'install') {
+                        this.$.deploynow.classList.add('hidden');
+                        this.$.workflowRequest.body["inputs"] = this.stack.inputs.install.install.install;
                     }
                     this.$.workflowRequest.generateRequest();
                 },
