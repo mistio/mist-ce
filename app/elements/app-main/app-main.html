@@ -37,6 +37,12 @@
 <link rel="import" href="../pages/page-dashboard.html">
 <link rel="import" href="../pages/page-items.html">
 <link rel="import" href="../notifications-element/notifications-element.html">
+<link rel="import" href="../pages/page-account.html">
+<link rel="import" href="../details-page/details-page.html">
+<link rel="import" href="../password-page/password-page.html">
+<link rel="import" href="../feedback-page/feedback-page.html">
+
+
 
 <link rel="import" href="../pages/page-not-found.html">
 
@@ -112,7 +118,7 @@
             <iron-route path="/add-script" title="add script" current="scripts" href="../scripts/script-add.html"></iron-route>
             <!-- other -->
             <iron-route path="/elements" title="elements" current="dashboard" href="../pages/page-elements.html"></iron-route>
-            <iron-route path="/account" title="account" current="account"></iron-route>
+            <iron-route path="/account" title="account" current="account" href="../pages/page-account.html"></iron-route>
             <iron-route path="*"></iron-route>
         </iron-routes>
 
@@ -514,4 +520,11 @@ var app = Polymer({
         // document.querySelector('#mainContainer').scrollTop();
     }
 });
+
+var COUNTRY = "Greece";
+var COMPANY_NAME = "mist.io";
+var NUMBER_OF_PEOPLE = "6-20";
+var NUMBER_OF_SERVERS = "1-5";
+var EMAIL = "fakiolasmarios@gmail.com";
+var HAS_PASS = true;
 </script>

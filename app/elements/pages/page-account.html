@@ -1,13 +1,48 @@
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+
+
 <dom-module id="page-account">
+    <style>
+      #container {
+        max-width: 600px;
+      }
+      paper-tabs, paper-toolbar {
+        background-color: #d3d3d3;
+        color: #000;
+        --paper-tabs-selection-bar-color: #2196F3;
+      }
+      paper-material {
+          display: block;
+      }
+    </style>
     <template>
-        <h1>Hello account</h1>
+
+        <paper-tabs attr-for-selected="data-route" selected="{{selected}}">
+          <paper-tab data-route="0">PROFILE</paper-tab>
+          <paper-tab data-route="1">PASSWORD</paper-tab>
+          <paper-tab data-route="2">BILLING</paper-tab>
+          <paper-tab data-route="3">ACTIVE SESSIONS</paper-tab>
+          <paper-tab data-route="4">API TOKENS</paper-tab>
+        </paper-tabs>
+
+      <iron-pages selected="{{selected}}">
+        <details-page data-route="0"></details-page>
+        <password-page data-route="1"></password-page>
+        <feedback-page data-route="2"></feedback-page>
+      </iron-pages>
+
     </template>
 </dom-module>
 <script>
 Polymer({
     is: 'page-account',
     properties: {
+      selected: {
+            value:0
+        }
 
-    }
+    },
+
 });
 </script>
