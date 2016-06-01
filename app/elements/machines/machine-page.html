@@ -194,20 +194,35 @@
                 <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">Basic Info</h2>
                 <div class="card-content">
                     <table class="info-table">
-                        <element-for-in content="[[machine.extra]]"></element-for-in>
-                        <!-- <template is="dom-if" if="[[machine.public_ips]]">
+                        <template is="dom-if" if="[[machine.public_ips]]">
                             <tr>
-                                <td>
-                                    Public IPs
-                                </td>
-                                <td>
-                                    <template is="dom-repeat" items="[[machine.public_ips]]">
-                                        <p class="machine-ip">[[item]]</p>
+                                <td>Machine ID</td>
+                                <td>[[machine.id]]</td>
+                            </tr>
+                            <tr>
+                                <td>UUID</td>
+                                <td>[[machine.uuid]]</td>
+                            </tr>
+                            <tr><td>Public IPs</td>
+                                <td><template is="dom-repeat" items="[[machine.public_ips]]">
+                                        [[item]]
                                     </template>
                                 </td>
                             </tr>
-                        </template> -->
+                            <tr><td>Private IPs</td>
+                                <td><template is="dom-repeat" items="[[machine.private_ips]]">
+                                        [[item]]
+                                    </template>
+                                </td>
+                            </tr>
+                        </template>
                     </table>
+                </div>
+            </paper-material>
+            <paper-material class="info-card">
+                <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">More Info</h2>
+                <div class="card-content">
+                    <element-for-in content="[[machine.extra]]"></element-for-in>
                 </div>
             </paper-material>
         </div>

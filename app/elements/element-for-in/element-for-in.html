@@ -1,6 +1,9 @@
 <dom-module id="element-for-in">
     <template>
         <style is="custom-style" include="shared-styles">
+            :host {
+                font-size: 15px;
+            }
             :host ::content .flex-horizontal-with-ratios {
                 @apply(--layout-horizontal);
             }
@@ -8,13 +11,12 @@
             :host ::content .flexchild {
                 @apply(--layout-flex);
                 padding: 16px;
-                border-bottom: 1px solid #ddd;
             }
             :host ::content .flexchild.key {
                 font-weight: 500;
             }
             :host ::content .flex-horizontal-with-ratios:nth-child(even){
-                background-color: #fafafa;
+                background-color: #f2f2f2;
             }
         </style>
     </template>
