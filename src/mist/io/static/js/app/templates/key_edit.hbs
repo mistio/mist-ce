@@ -13,14 +13,14 @@
     <div data-role="content">
 
         <form {{action "saveClicked" on="submit" target=view}}>
-            <div id="new-key-name-wrapper" class="required {{if Mist.keyEditController.newKeyId 'filled' 'empty'}}">
+            <div id="new-key-name-wrapper" class="required {{if Mist.keyEditController.newKeyName 'filled' 'empty'}}">
                 <label for="new-key-name">New name</label>
-                {{view Mist.TextField id="new-key-name" value=Mist.keyEditController.newKeyId}}
+                {{view Mist.TextField id="new-key-name" value=Mist.keyEditController.newKeyName}}
             </div>
 
             {{#if Mist.keysController.renamingKey}}
                 <div class="ajax-loader"></div>
-            {{/if}}      
+            {{/if}}
 
             <div class="ok-cancel" data-role="controlgroup" data-type="horizontal">
                 <button type="submit" id="rename-key-ok" class="ui-btn ui-btn-d ui-caps">Save</button>

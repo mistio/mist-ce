@@ -93,7 +93,7 @@ def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
         if remove_on_error:
             if not machine_key:
                 raise RequiredParameterMissingError('machine_key')
-            Keypair.objects.get(owner=user, name=machine_key)
+            Keypair.objects.get(owner=user, id=machine_key)
             if not machine_user:
                 machine_user = 'root'
 
@@ -349,7 +349,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
 
     use_ssh = remove_on_error and os_type == 'unix' and machine_key
     if use_ssh:
-        key = Keypair.objects.get(owner=user, name=machine_key)
+        key = Keypair.objects.get(owner=user, id=machine_key)
         if not machine_hostname:
             raise BadRequestError("You have specified an SSH key but machine "
                                   "hostname is empty.")
@@ -428,7 +428,7 @@ def _add_cloud_coreos(user, title, provider, params):
 
     use_ssh = remove_on_error and machine_key
     if use_ssh:
-        key = Keypair.objects.get(owner=user, name=machine_key)
+        key = Keypair.objects.get(owner=user, id=machine_key)
         if not machine_user:
             machine_user = 'root'
 
@@ -621,7 +621,6 @@ def _add_cloud_nephoscale(user, title, provider, params):
     return cloud.id, cloud
 
 
-
 def _add_cloud_softlayer(user, title, provider, params):
     username = params.get('username', '')
     if not username:
@@ -642,7 +641,6 @@ def _add_cloud_softlayer(user, title, provider, params):
     return cloud.id, cloud
 
 
-
 def _add_cloud_digitalocean(user, title, provider, params):
     token = params.get('token', '')
     if not token:
@@ -657,7 +655,6 @@ def _add_cloud_digitalocean(user, title, provider, params):
     cloud.owner = user
     cloud.save()
     return cloud.id, cloud
-
 
 
 def _add_cloud_gce(user, title, provider, params):
@@ -693,7 +690,6 @@ def _add_cloud_gce(user, title, provider, params):
     return cloud.id, cloud
 
 
-
 def _add_cloud_azure(user, title, provider, params):
     subscription_id = params.get('subscription_id', '')
     if not subscription_id:
@@ -721,7 +717,6 @@ def _add_cloud_azure(user, title, provider, params):
     return cloud.id, cloud
 
 
-
 def _add_cloud_linode(user, title, provider, params):
     api_key = params.get('api_key', '')
     if not api_key:
@@ -743,7 +738,6 @@ def _add_cloud_linode(user, title, provider, params):
         raise CloudExistsError()
 
     return cloud.id, cloud
-
 
 
 def _add_cloud_docker(user, title, provider, params):
@@ -787,7 +781,6 @@ def _add_cloud_docker(user, title, provider, params):
     return cloud.id, cloud
 
 
-
 def _add_cloud_libvirt(user, title, provider, params):
     machine_hostname = params.get('machine_hostname', '')
     if not machine_hostname:
@@ -799,8 +792,10 @@ def _add_cloud_libvirt(user, title, provider, params):
     images_location = params.get('images_location', '/var/lib/libvirt/images')
 
     if apisecret:
-        apisecret = Keypair.objects.get(owner=user, name=apisecret).private
-
+        try:
+            apisecret = Keypair.objects.get(owner=user, id=apisecret).private
+        except KeyNotFoundError:
+            raise NotFoundError('Keypair does not exist')
     try:
         port = int(params.get('ssh_port', 22))
     except:
@@ -1038,49 +1033,48 @@ def delete_cloud(owner, cloud_id):
     trigger_session_update(owner, ['clouds'])
 
 
-def add_key(user, key_id, private_key):
-    """Adds a new keypair and returns the new key_id."""
+def add_key(user, key_name, private_key):
+    """Adds a new key by name and returns the new key_name."""
 
-    log.info("Adding key with id '%s'.", key_id)
-    if not key_id:
-        raise KeypairParameterMissingError(key_id)
+    log.info("Adding key with name '%s'.", key_name)
+
+    if not key_name:
+        raise KeyParameterMissingError(key_name)
     if not private_key:
         raise RequiredParameterMissingError("Private key is not provided")
-    key = Keypair.objects(owner=user, name=key_id)
+    key = Keypair.objects(owner=user, name=key_name)
     if key:
-        raise KeypairExistsError(key_id)
+        raise KeyExistsError(key_name)
 
-    keypair = Keypair()
-    keypair.private = private_key
-    keypair.name = key_id
-    keypair.construct_public_from_private()
+    key = Keypair()
+    key.private = private_key
+    key.name = key_name
+    key.construct_public_from_private()
     if not Keypair.objects(owner=user, default=True):
-        keypair.default = True
+        key.default = True
 
-    if not keypair.isvalid():
+    if not key.isvalid():
         raise KeyValidationError()
-    keypair.owner = user
-    keypair.save()
+    key.owner = user
+    key.save()
 
-    log.info("Added key with id '%s'", key_id)
+    log.info("Added key with name '%s'", key_name)
     trigger_session_update(user, ['keys'])
-    return key_id
+    return key_name
 
 
 def delete_key(user, key_id):
-    """Deletes given keypair.
+    """Deletes given key.
+    If key was default, then it checks if there are still keys left
+    and assigns another one as default.
 
-    If key was default, then it checks
-    if there are still keys left and assignes another one as default.
-
-    @param user: The User
-    @param key_id: The key_id to be deleted
-    @return: Returns nothing
-
+    :param user:
+    :param key_id:
+    :return:
     """
 
     log.info("Deleting key with id '%s'.", key_id)
-    key = Keypair.objects.get(owner=user, name=key_id)
+    key = Keypair.objects.get(owner=user, id=key_id)
     default_key = key.default
     # if key.default:
     #     default_key = key.default
@@ -1095,11 +1089,9 @@ def delete_key(user, key_id):
 
 def set_default_key(user, key_id):
     """Sets a new default key
-
-    @param user: The user
-    @param key_id: The id of the key we want to set as default
-    @return: Nothing. Raises only exceptions if needed.
-
+    :param user:
+    :param key_id:
+    :return:
     """
 
     log.info("Setting key with id '%s' as default.", key_id)
@@ -1109,46 +1101,54 @@ def set_default_key(user, key_id):
         default_key.default = False
         default_key.save()
 
-    key = Keypair.objects.get(owner=user, name=key_id)
+    key = Keypair.objects.get(owner=user, id=key_id)
     key.default = True
     key.save()
 
-    log.info("Succesfully set key with id '%s' as default.", key_id)
+    log.info("Successfully set key with id '%s' as default.", key_id)
     trigger_session_update(user, ['keys'])
 
 
-def edit_key(user, new_key, old_key):
+def edit_key(user, new_name, key_id):
+    """Edit name of an existing key.
+    Means rename key.
+    :param user:
+    :param new_name: the new key's name
+    :param key_id: the key's id
+    :return:
     """
-    Edits a given key's name from old_key ---> new_key
-    @param user: The User
-    @param new_key: The new Key name (id)
-    @param old_key: The old key name (id)
-    @return: Nothing, only raises exceptions if needed
+    if not new_name:
+        raise KeyParameterMissingError("new name")
 
-    """
+    key = Keypair.objects.get(owner=user, id=key_id)
 
-    log.info("Renaming key '%s' to '%s'.", old_key, new_key)
-    if not new_key:
-        raise KeypairParameterMissingError("new name")
+    log.info("Renaming key '%s' to '%s'.", key.name, new_name)
 
-    if old_key == new_key:
-        log.warning("Same name provided, will not edit key. No reason")
+    if key.name == new_name:
+        log.warning("Same name provided. No reason to edit this key")
         return
 
-    key = Keypair.objects.get(owner=user, name=old_key)
-    key.name = new_key
+    key.name = new_name
     key.save()
-    log.info("Renamed key '%s' to '%s'.", old_key, new_key)
+    log.info("Renamed key '%s' to '%s'.", key.name, new_name)
     trigger_session_update(user, ['keys'])
 
 
-def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, port=22):
+def associate_key(user, key_id, cloud_id, machine_id,
+                  host='', username=None, port=22):
     """Associates a key with a machine.
 
     If host is set it will also attempt to actually deploy it to the
-    machine. To do that it requires another keypair (existing_key) that can
+    machine. To do that it requires another key (existing_key) that can
     connect to the machine.
-
+    :param user:
+    :param key_id:
+    :param cloud_id:
+    :param machine_id:
+    :param host:
+    :param username:
+    :param port:
+    :return:
     """
 
     log.info("Associating key %s to host %s", key_id, host)
@@ -1156,12 +1156,12 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
         log.info("Host not given so will only create association without "
                  "actually deploying the key to the server.")
 
-    key = Keypair.objects.get(owner=user, name=key_id)
+    key = Keypair.objects.get(owner=user, id=key_id)
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     associated = False
     if Machine.objects(cloud=cloud, key_associations__keypair__exact=key,
                        machine_id=machine_id):
-        log.warning("Keypair '%s' already associated with machine '%s' "
+        log.warning("Key '%s' already associated with machine '%s' "
                     "in cloud '%s'", key_id, cloud_id, machine_id)
         associated = True
 
@@ -1169,7 +1169,7 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
     # if not already associated, create the association
     # this is only needed if association doesn't exist and host is not provided
     # associations will otherwise be created by shell.autoconfigure upon
-    # succesful connection
+    # successful connection
     if not host:
         if not associated:
             try:
@@ -1200,46 +1200,54 @@ def associate_key(user, key_id, cloud_id, machine_id, host='', username=None, po
 
     try:
         # deploy key
-        ssh_command(user, cloud_id, machine_id, host, command, username=username, port=port)
+        ssh_command(user, cloud_id, machine_id, host,
+                    command, username=username, port=port)
     except MachineUnauthorizedError:
         # couldn't deploy key
         try:
             # maybe key was already deployed?
-            ssh_command(user, cloud_id, machine_id, host, 'uptime', key_id=key_id, username=username, port=port)
+            ssh_command(user, cloud_id, machine_id, host, 'uptime',
+                        key_id=key_id, username=username, port=port)
             log.info("Key was already deployed, local association created.")
         except MachineUnauthorizedError:
             # oh screw this
             raise MachineUnauthorizedError(
-                "Couldn't connect to deploy new SSH keypair."
+                "Couldn't connect to deploy new SSH key."
             )
     else:
         # deployment probably succeeded
-        # attemp to connect with new key
+        # attempt to connect with new key
         # if it fails to connect it'll raise exception
         # there is no need to manually set the association in keypair.machines
         # that is automatically handled by Shell, if it is configured by
         # shell.autoconfigure (which ssh_command does)
-        ssh_command(user, cloud_id, machine_id, host, 'uptime', key_id=key_id, username=username, port=port)
-        log.info("Key associated and deployed succesfully.")
+        ssh_command(user, cloud_id, machine_id, host, 'uptime',
+                    key_id=key_id, username=username, port=port)
+        log.info("Key associated and deployed successfully.")
 
 
 def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
     """Disassociates a key from a machine.
-
     If host is set it will also attempt to actually remove it from
     the machine.
 
+    :param user:
+    :param key_id:
+    :param cloud_id:
+    :param machine_id:
+    :param host:
+    :return:
     """
 
     log.info("Disassociating key, undeploy = %s" % host)
-    key = Keypair.objects.get(owner=user, name=key_id)
+    key = Keypair.objects.get(owner=user, id=key_id)
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     machine = Machine.objects.get(cloud=cloud,
                                   key_associations__keypair__exact=key,
                                   machine_id=machine_id)
     # key not associated
     if not machine:
-        raise BadRequestError("Keypair '%s' is not associated with "
+        raise BadRequestError("Key '%s' is not associated with "
                               "machine '%s'" % (key_id, machine_id))
 
     if host:
@@ -1670,7 +1678,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     machine_name = machine_name_validator(conn.type, machine_name)
     key = None
     if key_id:
-        key = Keypair.objects.get(owner=user, name=key_id)
+        key = Keypair.objects.get(owner=user, id=key_id)
 
     # if key_id not provided, search for default key
     if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
@@ -2919,6 +2927,10 @@ def list_clouds(user):
 
 
 def list_keys(user):
+    """List user's keys
+    :param user:
+    :return:
+    """
     keys = Keypair.objects(owner=user).only("default", "name")
     clouds = Cloud.objects(owner=user)
     key_objects = []
@@ -2926,8 +2938,8 @@ def list_keys(user):
         key_object = {}
         machines = Machine.objects(cloud__in=clouds,
                                    key_associations__keypair__exact=key)
-        key_object["id"] = key.name # This is for backwards compatibility
-        key_object['_real_id'] = key.id  # Fuck backwards compatibility
+        key_object["id"] = key.id
+        key_object['name'] = key.name
         key_object["isDefault"] = key.default
         key_object["machines"] = transform_key_machine_associations(machines,
                                                                     key)
@@ -2942,11 +2954,16 @@ def list_sizes(user, cloud_id):
 
     try:
         if conn.type == Provider.GCE:
-            #have to get sizes for one location only, since list_sizes returns
-            #sizes for all zones (currently 88 sizes)
-            sizes = conn.list_sizes(location='us-central1-a')
-            sizes = [s for s in sizes if s.name and not s.name.endswith('-d')]
-            #deprecated sizes for GCE
+            initial_sizes = conn.list_sizes()
+            sizes = []
+            for size in initial_sizes:
+                zone = size.extra['zone']
+                size.extra['zone'] = {}
+                size.extra['zone']['id'] = zone.id
+                size.extra['zone']['name'] = zone.name
+                size.extra['zone']['status'] = zone.status
+                size.extra['zone']['country'] = zone.country
+                sizes.append(size)
         elif conn.type == Provider.NEPHOSCALE:
             sizes = conn.list_sizes(baremetal=False)
             dedicated = conn.list_sizes(baremetal=True)
@@ -3067,8 +3084,13 @@ def list_networks(user, cloud_id):
             ret['routers'].append(openstack_router_to_dict(router))
     elif conn.type in [Provider.GCE]:
         networks = conn.ex_list_networks()
+        all_subnets = conn.ex_list_subnets()
+        subnets = []
+        for region in all_subnets:
+            subnets += all_subnets[region]['subnetworks']
         for network in networks:
-            ret['public'].append(gce_network_to_dict(network))
+            ret['public'].append(gce_network_to_dict(network,
+                                 subnets=[s for s in subnets if s['network'].endswith(network.name)]))
     elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST, Provider.EC2_AP_NORTHEAST1, Provider.EC2_AP_NORTHEAST2,
                        Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2,
                        Provider.EC2_EU, Provider.EC2_EU_WEST,
@@ -3135,14 +3157,34 @@ def nephoscale_network_to_dict(network):
     return net
 
 
-def gce_network_to_dict(network):
+def gce_network_to_dict(network, subnets=[]):
     net = {}
     net['name'] = network.name
     net['id'] = network.id
     net['extra'] = network.extra
-    net['subnets'] = [{'name': network.cidr,
-                       'gateway_ip': network.extra.get('gatewayIPv4')}]
+    net['subnets'] = [gce_subnet_to_dict(s) for s in subnets]
     return net
+
+
+def gce_subnet_to_dict(subnet):
+    # In case network is empty
+    if not subnet:
+        return {}
+    # Network and region come in URL form, so we have to split it
+    # and use the last element of the splited list
+    network = subnet['network'].split("/")[-1]
+    region = subnet['region'].split("/")[-1]
+
+    ret = {
+        'id': subnet['id'],
+        'name': subnet['name'],
+        'network': network,
+        'region': region,
+        'cidr': subnet['ipCidrRange'],
+        'gateway_ip': subnet['gatewayAddress'],
+        'creation_timestamp': subnet['creationTimestamp']
+    }
+    return ret
 
 
 def openstack_network_to_dict(network, subnets=[], floating_ips=[], nodes=[]):
