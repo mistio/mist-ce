@@ -230,7 +230,7 @@
                 ],
 
                 _fromTemplate: function(params, templates) {
-                    if (params.id) {
+                    if (params.id && this.model.templates) {
                         return this.model.templates[params.id]
                     } else {
                         return {
