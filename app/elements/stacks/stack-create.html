@@ -328,6 +328,12 @@
                             }
                             inp['value'] = yaml_array[inp.name];
                             inp['defaultValue'] = yaml_array[inp.name];
+
+                            // make key dropdown
+                            if(inp.name == "key") {
+                                inp.type = 'dropdown';
+                                inp.query = ["keysArray"]
+                            }
                             ret.push(inp);
                         });
                     }
