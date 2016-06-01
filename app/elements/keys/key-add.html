@@ -39,9 +39,10 @@
                 </div>
             </paper-material>
             <paper-material>
-                <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{key.name}}"></paper-input>
+                <custom-validator validator-name="isUniqueValidator"></custom-validator>
+                <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" validator="isUniqueValidator" auto-validate error-message="Please enter a unique key's name" value="{{key.name}}"></paper-input>
 
-                <paper-textarea id="privateKey" label="Private Key" rows="5" required error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
+                <paper-textarea id="privateKey" label="Private Key" rows="5" required auto-validate error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
 
                 <paper-textarea id="publicKey" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
                 <div class="clearfix btn-group">
@@ -80,6 +81,9 @@
                         },
                         notify: true
                     },
+                    model: {
+                        type: Object
+                    },
                     section: {
                         type: Object
                     },
@@ -93,31 +97,40 @@
                     },
                     formReady: {
                         type: Boolean,
-                        computed: '_computeFormReady(key.name, key.privateKey, sendingData)'
+                        value: false
                     },
                     showProgress: {
                         type: Boolean,
                         computed: '_computeShowProgress(sendingData)'
                     }
                 },
+                ready: function() {
+                    this.querySelector('custom-validator').validate = this.isUniqueValidator.bind(this);
+                },
                 listeners: {
                     'iron-overlay-closed': '_modalClosed'
                 },
-                _computeFormReady: function(name, privateKey, sendingData) {
-                    var formReady = false;
+                observers: [
+                    '_filedsChanged(key.*, sendingData)'
+                ],
+                _filedsChanged: function(key, sendingData) {
+                    this.async(function() {
+                        var inputs = this.querySelectorAll("paper-input, paper-textarea"),
+                            valid = [].every.call(inputs, function(el) {
+                                return (el.required && !el.value) || el.invalid ? false : true;
+                            });
 
-                    if (name && privateKey) {
-                        formReady = true;
-                    }
-
-                    if (sendingData) {
-                        formReady = false;
-                    }
-
-                    return formReady;
+                        this.set('formReady', valid && !sendingData);
+                    });
                 },
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
+                },
+                isUniqueValidator: function(value) {
+                    var isUnique = this.model.keysArray.every(function(key) {
+                        return key.name != value;
+                    });
+                    return isUnique;
                 },
                 _openAddKeyModal: function(e) {
                     this.$.addKeyModal.open();
@@ -130,10 +143,10 @@
                 },
                 _uploadFile: function(e) {
                     var that = this,
-                    reader = new FileReader(),
-                    file = e.currentTarget.files[0];
+                        reader = new FileReader(),
+                        file = e.currentTarget.files[0];
 
-                    reader.onloadend = function (e) {
+                    reader.onloadend = function(e) {
                         var success;
                         if (e.target.readyState == FileReader.DONE) {
                             that.set('key.privateKey', e.target.result);
