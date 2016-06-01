@@ -191,7 +191,8 @@
                 <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">Basic Info</h2>
                 <div class="card-content">
                     <table class="info-table">
-                        <template is="dom-if" if="[[machine.public_ips]]">
+                        <element-for-in content="[[machine.extra]]"></element-for-in>
+                        <!-- <template is="dom-if" if="[[machine.public_ips]]">
                             <tr>
                                 <td>
                                     Public IPs
@@ -202,7 +203,7 @@
                                     </template>
                                 </td>
                             </tr>
-                        </template>
+                        </template> -->
                     </table>
                 </div>
             </paper-material>
