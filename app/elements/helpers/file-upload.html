@@ -1,0 +1,39 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<script>
+    Polymer({
+        is: 'file-upload',
+
+        properties: {
+            element: Object,
+            file: {
+                type: String,
+                value: '',
+                observer: '_fileChanged'
+            },
+        },
+        _fileChanged: function(newValue, oldValue) {
+            this.fire('file-uploaded', {
+                file: newValue
+            });
+        },
+        upload: function(e) {
+            var that = this,
+                reader = new FileReader(),
+                file = e.currentTarget.files[0];
+
+            reader.onloadend = function(e) {
+                var fileVal;
+                if (e.currentTarget.readyState == FileReader.DONE) {
+                    fileVal = e.currentTarget.result;
+                } else {
+                    fileVal = '';
+                }
+
+                that.set('file', fileVal);
+            };
+
+            reader.readAsText(file, 'UTF-8');
+        }
+    });
+</script>

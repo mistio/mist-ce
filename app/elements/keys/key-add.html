@@ -58,6 +58,8 @@
             </paper-material>
         </div>
 
+        <file-upload></file-upload>
+
         <iron-ajax id="keyGenerateAjaxRequest" url="/api/v1/keys" method="POST" on-response="_handleKeyGenerateAjaxResponse" on-error="_handleKeyGenerateAjaxError"></iron-ajax>
         <iron-ajax id="keyAddAjaxRequest" url="/api/v1/keys" method="PUT" on-response="_handleKeyAddAjaxResponse" on-error="_handleKeyAddAjaxError"></iron-ajax>
     </template>
@@ -108,7 +110,8 @@
                     this.querySelector('custom-validator').validate = this.isUniqueValidator.bind(this);
                 },
                 listeners: {
-                    'iron-overlay-closed': '_modalClosed'
+                    'iron-overlay-closed': '_modalClosed',
+                    'file-uploaded': '_fileUploadedResponse'
                 },
                 observers: [
                     '_filedsChanged(key.*, sendingData)'
@@ -142,21 +145,10 @@
                     this.$.keyUpload.click();
                 },
                 _uploadFile: function(e) {
-                    var that = this,
-                        reader = new FileReader(),
-                        file = e.currentTarget.files[0];
-
-                    reader.onloadend = function(e) {
-                        var success;
-                        if (e.target.readyState == FileReader.DONE) {
-                            that.set('key.privateKey', e.target.result);
-                            success = true;
-                        } else {
-                            success = false
-                        }
-                    };
-
-                    reader.readAsText(file, 'UTF-8');
+                    this.querySelector('file-upload').upload(e);
+                },
+                _fileUploadedResponse: function(e) {
+                    this.set('key.privateKey', e.detail.file);
                 },
                 _modalClosed: function() {
                     this._formReset();
