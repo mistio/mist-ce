@@ -80,28 +80,39 @@ define('app/views/team', ['app/views/page'],
                 },
 
                 deleteClicked: function() {
-                    var team = this.get('team');
+                    var team = this.get('team'),
+                    hasMembers = team.members.length > 0;
 
-                    Mist.dialogController.open({
-                        type: DIALOG_TYPES.YES_NO,
-                        head: 'Delete team',
-                        body: [{
-                            paragraph: 'Are you sure you want to delete team "' +
-                                team.name + '" ?'
-                        }],
-                        callback: function(didConfirm) {
-                            if (didConfirm) {
-                                Mist.teamsController.deleteTeam({
-                                    team: team,
-                                    callback: function(success) {
-                                        if (success) {
-                                            Mist.__container__.lookup('router:main').transitionTo('teams');
+                    if (hasMembers) {
+                        Mist.dialogController.open({
+                            type: DIALOG_TYPES.OK,
+                            head: 'Delete team',
+                            body: [{
+                                paragraph: 'Team ' + team.name + ' cannot be deleted. Remove its members first and try again!'
+                            }]
+                        });
+                    } else {
+                        Mist.dialogController.open({
+                            type: DIALOG_TYPES.YES_NO,
+                            head: 'Delete team',
+                            body: [{
+                                paragraph: 'Are you sure you want to delete team "' +
+                                    team.name + '" ?'
+                            }],
+                            callback: function(didConfirm) {
+                                if (didConfirm) {
+                                    Mist.teamsController.deleteTeam({
+                                        team: team,
+                                        callback: function(success) {
+                                            if (success) {
+                                                Mist.__container__.lookup('router:main').transitionTo('teams');
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             },
 
