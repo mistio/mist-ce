@@ -88,7 +88,7 @@ define('app/views/team', ['app/views/page'],
                             type: DIALOG_TYPES.OK,
                             head: 'Delete team',
                             body: [{
-                                paragraph: 'Team ' + team.name + ' cannot be deleted. Remove its members first and try again!'
+                                paragraph: 'Team "' + team.name + '" cannot be deleted. Remove its members first and try again!'
                             }]
                         });
                     } else {
