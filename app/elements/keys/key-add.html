@@ -145,10 +145,16 @@
                     this.$.keyUpload.click();
                 },
                 _uploadFile: function(e) {
-                    this.querySelector('file-upload').upload(e);
+                    this.querySelector('file-upload').upload({
+                        e: e,
+                        type: 'ssh_key'
+                    });
                 },
                 _fileUploadedResponse: function(e) {
-                    this.set('key.privateKey', e.detail.file);
+                    var file = e.detail.file;
+                    if (file.type == 'ssh_key') {
+                        this.set('key.privateKey', file.value);
+                    }
                 },
                 _modalClosed: function() {
                     this._formReset();

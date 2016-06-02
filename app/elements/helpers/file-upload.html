@@ -6,30 +6,35 @@
 
         properties: {
             file: {
-                type: String,
-                value: '',
-                observer: '_fileChanged'
-            },
+                type: Object,
+                value: function() {
+                    return {
+                        type: '',
+                        value: ''
+                    }
+                }
+            }
         },
-        _fileChanged: function(newValue, oldValue) {
-            this.fire('file-uploaded', {
-                file: newValue
-            });
-        },
-        upload: function(e) {
+        upload: function(args) {
             var that = this,
+                e = args.e,
                 reader = new FileReader(),
                 file = e.currentTarget.files[0];
 
             reader.onloadend = function(e) {
-                var fileVal;
+                var fileValue;
                 if (e.currentTarget.readyState == FileReader.DONE) {
-                    fileVal = e.currentTarget.result;
+                    fileValue = e.currentTarget.result;
                 } else {
-                    fileVal = '';
+                    fileValue = '';
                 }
 
-                that.set('file', fileVal);
+                that.set('file.type', args.type);
+                that.set('file.value', fileValue);
+
+                that.fire('file-uploaded', {
+                    file: that.file
+                });
             };
 
             reader.readAsText(file, 'UTF-8');
