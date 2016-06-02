@@ -12,9 +12,6 @@
         color: #000;
         --paper-tabs-selection-bar-color: #2196F3;
       }
-      paper-material {
-          display: block;
-      }
     </style>
     <template>
 
@@ -24,12 +21,16 @@
           <paper-tab data-route="2">BILLING</paper-tab>
           <paper-tab data-route="3">ACTIVE SESSIONS</paper-tab>
           <paper-tab data-route="4">API TOKENS</paper-tab>
+          <paper-tab data-route="5">FEEDBACK</paper-tab>
         </paper-tabs>
 
       <iron-pages selected="{{selected}}">
         <details-page data-route="0"></details-page>
         <password-page data-route="1"></password-page>
-        <feedback-page data-route="2"></feedback-page>
+        <div data-route="2"></div>
+        <div data-route="3"></div>
+        <div data-route="4"></div>
+        <feedback-page data-route="5"></feedback-page>
       </iron-pages>
 
     </template>

@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+
 <dom-module id="details-page">
     <template>
         <style is="custom-style" include="forms"></style>
@@ -11,17 +13,33 @@
         paper-material {
             display: block;
         }
+
+        label{
+          color: rgba(0, 0, 0, 0.54) !important;
+          font-size: 12px;
+        }
+        #numberOfPeople{
+          padding-top: 6px;
+        }
+        #numberOfServers{
+          padding-top: 6px;
+        }
+        paper-radio-button{
+          --paper-radio-button-checked-color: var(--paper-light-blue-500);
+          --paper-radio-button-checked-ink-color: var(--paper-light-blue-500);
+          --paper-radio-button-unchecked-ink-color: var(--paper-light-blue-900);
+        }
         </style>
         <paper-material class="form">
             <h2>Account Details</h2>
             <div class="grid-row">
-                <paper-input class="xs12 l6" id="firstName" label="What's your first name?" required error-message="Please enter your first name" value="{{user.firstName}}" auto-validate></paper-input>
+                <paper-input class="xs12 l6" id="firstName" label="NAME" required error-message="Please enter your first name" value="{{user.firstName}}" auto-validate always-float-label></paper-input>
 
-                <paper-input class="xs12 l6" id="lastName" label="What's your last name?" required error-message="Please enter your last name" value="{{user.lastName}}" auto-validate></paper-input>
+                <paper-input class="xs12 l6" id="lastName" label="SURNAME" required error-message="Please enter your last name" value="{{user.lastName}}" auto-validate always-float-label></paper-input>
 
-                <paper-input class="xs12 l6" id="companyName" label="What's your company's name?" required error-message="Please enter your company's name" value="{{user.companyName}}" auto-validate></paper-input>
+                <paper-input class="xs12 l6" id="companyName" label="COMPAMY NAME" required error-message="Please enter your company's name" value="{{user.companyName}}" auto-validate always-float-label></paper-input>
 
-                <paper-dropdown-menu class="dropdown-block xs12 l6" id="country" label="Where is your business located?" horizontal-align="left">
+                <paper-dropdown-menu class="dropdown-block xs12 l6" id="country" label="COMPANY LOCATION" horizontal-align="left" always-float-label>
                     <paper-menu attr-for-selected="value" selected="{{user.country}}" class="dropdown-content">
                         <template is="dom-repeat" items="[[countriesOptions]]" as="country">
                             <paper-item value="[[country]]">[[country]]</paper-item>
@@ -29,24 +47,47 @@
                     </paper-menu>
                 </paper-dropdown-menu>
 
-                <paper-dropdown-menu class="dropdown-block xs12 l6" id="numberOfPeople" label="How many people work there?" horizontal-align="left">
+                <!-- <paper-dropdown-menu class="dropdown-block xs12 l6" id="numberOfPeople" label="NUMBER OF EMPLOYEES" horizontal-align="left">
                     <paper-menu attr-for-selected="value" selected="{{user.numberOfPeople}}" class="dropdown-content">
                         <template is="dom-repeat" items="[[numberOfPeopleOptions]]" as="people">
                             <paper-item value="[[people]]">[[people]]</paper-item>
                         </template>
                     </paper-menu>
-                </paper-dropdown-menu>
+                </paper-dropdown-menu> -->
 
-                <paper-dropdown-menu class="dropdown-block xs12 l6" id="numberOfServers" label="How many servers do you have?" horizontal-align="left">
+                <div class="dropdown-block xs12 l6" id="numberOfPeople" horizontal-align="left">
+                  <label id="label1">NUMBER OF EMPLOYEES</label>
+                  <paper-radio-group attr-for-selected="value" selected="{{user.numberOfPeople}}" aria-labelledby="label1">
+                    <template is="dom-repeat" items="[[numberOfPeopleOptions]]" as="people">
+                      <paper-radio-button value="[[people]]">[[people]]</paper-radio-button>
+                    </template>
+                  </paper-radio-group>
+                </div>
+
+                <!-- <paper-dropdown-menu class="dropdown-block xs12 l6" id="numberOfServers" label="NUMBER OF SERVERS" horizontal-align="left">
                     <paper-menu attr-for-selected="value" selected="{{user.numberOfServers}}" class="dropdown-content">
                         <template is="dom-repeat" items="[[numberOfServersOptions]]" as="servers">
                             <paper-item value="[[servers]]">[[servers]]</paper-item>
                         </template>
                     </paper-menu>
-                </paper-dropdown-menu>
-                <hr class="xs12"/>
+                </paper-dropdown-menu> -->
+
+                <div class="dropdown-block xs12 l6" id="numberOfServers" horizontal-align="left">
+                  <label id="label2">NUMBER OF SERVERS</label>
+                  <paper-radio-group attr-for-selected="value" selected="{{user.numberOfServers}}" aria-labelledby="label2">
+                    <template is="dom-repeat" items="[[numberOfServersOptions]]" as="servers">
+                      <paper-radio-button value="[[servers]]">[[servers]]</paper-radio-button>
+                    </template>
+                  </paper-radio-group>
+                </div>
+
+                <!-- <hr class="xs12"/>
                 <div class="bottom-actions xs12">
                     <paper-button disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                </div> -->
+                <hr class="xs12"/>
+                <div class="bottom-actions clearfix xs12">
+                    <paper-button class="pull-right" disabled$="[[!FormReady]]" raised on-tap="_pageChange" page="second">Submit</paper-button>
                 </div>
             </div>
         </paper-material>
@@ -73,6 +114,10 @@
                         }
                     },
                     notify: true
+                },
+                FormReady: {
+                    type: Boolean,
+                    computed: '_computeFormReady(user.firstName, user.lastName, user.country, user.companyName, user.numberOfPeople, user.numberOfServers)'
                 },
                 countriesOptions: {
                     type: Array,
@@ -175,6 +220,13 @@
             },
             ready: function() {
 
+            },
+            _computeFormReady: function(firstName, lastName, country, companyName, numberOfPeople, numberOfServers) {
+                var formReady = false;
+                if (firstName && lastName && country && companyName && numberOfPeople && numberOfServers) {
+                    formReady = true;
+                }
+                return formReady;
             },
             observers: [
                 '_fieldsChanged(user.*, sendingData)'
