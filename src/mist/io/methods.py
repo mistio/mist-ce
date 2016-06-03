@@ -4387,11 +4387,9 @@ def machine_cost_calculator(m):
         instance_image = m.extra.get('imageId')
         try:
             image = CloudImage.objects.get(cloud_provider=m.driver.type, image_id=instance_image).os_type
-            # TODO: further research how pricing is done on Rackspace
         except:
             os_type = 'linux'
 
-        # TODO: update Rackspace pricing on libcloud
         size = m.extra.get('flavorId')
         for node_size in sizes:
             if node_size.size_id == size:
