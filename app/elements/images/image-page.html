@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../element-for-in/element-for-in.html">
 
 <dom-module id="image-page">
     <template>
@@ -105,7 +106,24 @@
             }
         </style>
         <div id="content">
-            <h2>[[image.name]]</h2>
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <a class="icon" href="/keys"><iron-icon icon="[[section.icon]]"></iron-icon></a>
+                <div class="title flex">
+                    <h2>
+                        [[image.name]]
+                        <iron-icon icon="star" hidden$="{{!isStarred}}"></iron-icon>
+                    </h2>
+                    <div class="subtitle">
+                        on [[image.cloud.title]]
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <paper-button on-tap="_starImage" class="simple">
+                        <span hidden$="{{!isStarred}}"> unstar </span>
+                        <span hidden$="{{isStarred}}"> star <iron-icon icon="star"></iron-icon> </span>
+                    </paper-button>
+                </div>
+            </paper-material>
             <template is="dom-if" if="[[image]]">
                 <paper-material>
                     <div class="info-table">
@@ -129,10 +147,12 @@
             </template>
 
             <div class="absolute-bottom-right">
-                <paper-fab icon="star" on-tap="_starImage" id="starImageFab"></paper-fab>
+                <paper-fab icon="star-border" on-tap="_starImage" id="starImageFab" hidden$={{!isStarred}}></paper-fab>
+                <paper-fab icon="star" on-tap="_starImage" id="starImageFab" hidden$={{isStarred}}></paper-fab>
             </div>
         </div>
-        <iron-ajax id="imageStarRequest" url="/api/v1/clouds/{{image.cloud.id}}/images/{{image.id}}" method="POST" on-response="handleStarResponse" on-error="handleStarError"></iron-ajax>
+        <iron-ajax id="imageStarAjaxRequest" url="/api/v1/clouds/{{image.cloud.id}}/images/{{image.id}}" method="POST" on-response="_handleImageStarAjaxResponse" on-error="_handleImageStarAjaxError"></iron-ajax>
+        <paper-toast></paper-toast>
     </template>
     <script>
         (function() {
@@ -160,11 +180,16 @@
                     },
                     image: {
                         type: Object,
-                        computed: '_computeImage(params, model.imagesArray.*)'
+                        computed: '_computeImage(params, model.imagesArray.*)',
+                        notify: true
                     },
                     imageid: {
                         type: String,
                         computed: '_computeImageId(params)'
+                    },
+                    isStarred: {
+                        type: Boolean,
+                        computed: '_computeIsStarred(image.star)'
                     }
                 },
                 ready: function() {
@@ -181,19 +206,34 @@
                 _computeImageId: function(params) {
                     return params.id;
                 },
+                _computeIsStarred: function(star) {
+                    return star;
+                },
                 _starImage: function(e) {
-                    console.log(e);
-                    var starred = this.image.star;
-                    this.$.imageStarRequest.headers["Content-Type"] = 'application/json';
-                    this.$.imageStarRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.imageStarRequest.body = {};
-                    this.$.imageStarRequest.generateRequest();
+                    this.$.imageStarAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.imageStarAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.imageStarAjaxRequest.body = {};
+                    this.$.imageStarAjaxRequest.generateRequest();
                 },
-                handleStarResponse: function(e) {
-                    console.log(e);
-                },
-                handleStarError: function(e) {
+                _handleImageStarAjaxResponse: function(e) {
+                    var starred = !this.image.star,
+                    msg = starred ? 'Image is starred. It will now appear as an option when creating machines' :
+                    'Image unstarred. It will no longer appear as an option when creating machines';
+                    this.set('image.star', starred);
 
+                    this._showToast(msg);
+                },
+                _handleImageStarAjaxError: function(e) {
+                    // TODO: Show a toast after request response. Toast text:
+                    // "There was a problem starring image IMAGE_NAME. It can not yet appear as an option when creating machines"
+                    // or
+                    // "There was a problem unstarring image IMAGE_NAME. It will still appear as an option when creating machines"
+                    this._showToast('There was a problem unstarring image ' + this.image.name + '. It will still appear as an option when creating machines');
+                },
+                _showToast: function(msg) {
+                    var toast = this.querySelector('paper-toast');
+                    toast.text = msg;
+                    toast.show();
                 },
                 _goBack: function() {
                     history.back();

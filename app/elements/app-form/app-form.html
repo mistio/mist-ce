@@ -10,8 +10,7 @@
 
         paper-material {
             display: block;
-            padding: 20px !important;
-            margin: 36px !important;
+            padding: 24px;
         }
 
         paper-progress {
@@ -44,9 +43,8 @@
         }
         </style>
 
-        <paper-material class="page">
+        <paper-material>
             <div class="grid-row">
-            <h2 class="xs12 title"><content></content></h2>
             <template is="dom-repeat" items="{{fields}}" as="field">
                     <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
                         <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-input>

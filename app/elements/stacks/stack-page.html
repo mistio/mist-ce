@@ -18,7 +18,8 @@
 
         paper-material {
             display: block;
-            padding: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
         }
 
         paper-material.no-pad {
@@ -110,7 +111,6 @@
         #content {
             overflow: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 0 10px;
         }
 
         paper-icon-button {
@@ -319,20 +319,53 @@
         }
         .parsing-loader {
             text-align: center;
-            margin: 36px 36px 0 0;
-            padding: 36px 36px 0 0;
+            margin: 0 auto;
+            width: 70%;
         }
         .parsing-loader paper-progress {
             width: 100%;
         }
         .parsing-loader.error paper-progress ::content #primaryProgress {
             background-color: var(--red-color);
+        }        
+        #stack_actions paper-button {
+            text-align: left !important;
         }
-
+        .delete, .retry {
+            cursor: pointer;
+        }
         </style>        
         <div id="content">
-            <h2>[[stack.name]]</h2>
-            <paper-item id="quickActions" class="hidden">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        [[stack.name]] 
+                    </h2>
+                    <div class="subtitle">
+                        Created from [[template.name]] <a href$="/templates/[[template.id]]"> <iron-icon icon="icons:link"></iron-icon></a> 
+                        <span class="desc" hidden$="[[!template.description]]">([[template.description]])</span>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <span hidden$="[[showLateError]]">
+                        <paper-button id="scale_cluster_up" on-tap="_quickActionsNavigation" class="simple">scale up</paper-button>
+                        <paper-button id="scale_cluster_down" on-tap="_quickActionsNavigation" class="simple">scale down</paper-button>
+                        <paper-menu-button horizontal-align="right">
+                            <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                            <paper-menu id="stack_actions" class="dropdown-content">
+                                <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                    <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation" class="simple">[[workflow.name]]</paper-button>
+                                </template>
+                            </paper-menu>
+                        </paper-menu-button>    
+                    </span>
+                    <span hidden$="[[!showLateError]]">
+                        <paper-button id="uninstall" on-tap="_quickActionsNavigation" class="simple">Delete Stack <iron-icon icon="delete"></iron-icon></paper-button>
+                    </span>
+                </div>
+            </paper-material>
+            <!-- <paper-item id="quickActions" class="hidden"> 
                 <div class="flex-horizontal-with-ratios">
                     <template is="dom-repeat" items="[[workflows]]" as="workflow">
                             <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation">[[workflow.name]]</paper-button>
@@ -341,13 +374,13 @@
                         <iron-icon icon="icons:clear" on-tap="_toggleQuickActions"></iron-icon>
                     </paper-button>
                 </div>
-            </paper-item>
-            <div id="resources" class="page">
+            </paper-item> -->
+            <paper-material id="resources" class="page">
                 <template is="dom-if" if="[[runtimeProperties]]">
-                    <div class="flex-horizontal-with-ratios section">
+                    <div class="flex-horizontal-with-ratios" hidden$="[[showLateError]] || [[!resourcelist]]">
                         <div class="page-block">
-                            <h3 class="smallcaps">Created from template</h3>
-                            <p><a href$="/templates/[[template.id]]" class="regular blue-link"> [[template.name]]</a> [[template.description]]</p>
+                            <h3 class="smallcaps">Stack Description</h3>
+                            <p>[[stack.description]]</p>
                         </div>
                         <div class="page-block">
                             <h3 class="smallcaps">Created</h3>
@@ -367,7 +400,9 @@
                             <div class="parsing-loader error">
                                 <h3>There seems to be an error</h3>
                                 <paper-progress id="stackpageprogress" value="100"></paper-progress>
-                                <h4>The available stack state information has returned no resources after too long or the inputs are wrong.</h4>
+                                <h4>The available stack state information has returned no resources after too long or the inputs are wrong.<br/>
+                                <span class="delete regular blue-link" id="uninstall" on-tap="_quickActionsNavigation">Delete Stack</span> or <a class="regular blue-link" href$="/create-stack/[[template.id]]">Retry </span>
+                                </h4>
                             </div>
                         </template>
                     </template>
@@ -401,39 +436,39 @@
                         </div>
                     </template>
                 </template>
-            </div>
-            <div id="workflows">
+            </paper-material>
+            <paper-material id="workflows" hidden$="[[showLateError]] || [[!resourcelist]]">
                 <template is="dom-if" if="[[workflows.length]]">
-                    <div id="workflows-panel" responsiveWidth="900px">
-                        <div drawer id="workflowsNavigation">
+                    <div id="workflows-panel">
+                        <div id="workflowsNavigation">
                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
                                 <paper-item id$="[[workflow.name]]" on-tap="_workflowNavigation">[[workflow.name]]</paper-item>
                             </template>
                         </div>
-                        <div main>
-                            <div id="workflowsView" class="pad">
-                                <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                    <div id$="[[workflow.name]]show" class="m12 wf-item">
 
-                                        <template is="dom-if" if=[[workflow.params.length]]>
-                                            <app-form model=[[model]] fields="[[workflow.params]]" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[params.id]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
-                                        </template>
+                        <div id="workflowsView" class="pad">
+                            <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                <div id$="[[workflow.name]]show" class="m12 wf-item">
 
-                                        <template is="dom-if" if=[[!workflow.params.length]]>
-                                            <paper-material class="form-view grid-row">
-                                                <h2 class="xs12">[[workflow.name]]</h2>
-                                                <p hidden$="[[!workflow.description]]">[[workflow.description]]</p>
-                                                <p class="xs12 center">
-                                                    <paper-button id="[[workflow.name]]" on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
-                                                </p>
-                                                <h5>*no paremetres required</h5>
-                                            </paper-material>
-                                        </template>
+                                    <template is="dom-if" if=[[workflow.params.length]]>
+                                        <app-form model=[[model]] fields="[[workflow.params]]" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[params.id]]" on-request="handleWorkflowResponse" on-response="handleWorkflowResponse" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
+                                    </template>
 
-                                    </div>
-                                </template>
-                            </div>
+                                    <template is="dom-if" if=[[!workflow.params.length]]>
+                                        <paper-material class="form-view grid-row">
+                                            <h2 class="xs12">[[workflow.name]]</h2>
+                                            <p hidden$="[[!workflow.description]]">[[workflow.description]]</p>
+                                            <p class="xs12 center">
+                                                <paper-button id="[[workflow.name]]" on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
+                                            </p>
+                                            <h5>*no paremetres required</h5>
+                                        </paper-material>
+                                    </template>
+
+                                </div>
+                            </template>
                         </div>
+
                     </div>
                 </template>
                 <template is="dom-if" if="[[!workflows.length]]">
@@ -443,13 +478,8 @@
                         </p>
                     </div>
                 </template>
-            </div>
+            </paper-material>
             <div id="state" class="page">
-                <template is="dom-if" if="[[!stack.state.length]]">
-                    <div class="section">
-                        <h4>Stack State seems to be empty</h4>
-                    </div>
-                </template>
                 <div class="section">
                     <template is="dom-if" if="[[runtimeProperties.length]]">
                         <h3 class="smallcaps">Runtime properties</h3>
@@ -473,6 +503,10 @@
                         </paper-material>
                     </template>
                 </div>
+            </div>
+            <div class="absolute-bottom-right">
+                <paper-fab icon="delete" on-tap="uninstall" id="runScriptFab"></paper-fab>
+                <paper-tooltip for="runScriptFab" position="top">Run Script</paper-tooltip>
             </div>
         </div>
         <dialog-element></dialog-element>
@@ -571,6 +605,7 @@
                 showLateError: {
                     type: Boolean,
                     computed: "_showLateError(stack)",
+                    // value: false,
                     notify: true
                 },
                 customScaleUp: {

@@ -12,7 +12,7 @@
 
             paper-material {
                 display: block;
-                padding: 20px;
+                padding: 24px;
             }
 
             paper-menu-button paper-button {
@@ -155,6 +155,14 @@
                 font-weight: 700;
             }
 
+            h4.id {
+                display: inline-block;
+                text-transform: uppercase;
+                font-size: 0.9rem;
+                font-weight: 700;
+                margin-right: 16px;
+            }
+
             .head paper-button {
                 flex: none !important;
                 display: inline-block;
@@ -189,6 +197,10 @@
                 display: none;
             }
 
+            .machines-list iron-icon {
+                opacity: 0.32;
+            }
+
             @media (min-width: 1339px) {
                 .wide {
                     display: inline;
@@ -196,17 +208,32 @@
             }
         </style>
         <div id="content">
-            <h2>[[key.name]]</h2>
-            <div class="subhead">
-                <div class="no-machines-list" hidden$="[[keyHasMachines]]">
-                    <h5>No machines are using this key</h5>
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <a class="icon" href="/keys"><iron-icon icon="[[section.icon]]"></iron-icon></a>
+                <div class="title flex">
+                    <h2>
+                        [[key.name]] <iron-icon icon="star" hidden$="[[!isDefault]]"></iron-icon>
+                    </h2>
+                    <div class="subtitle">
+                        <span hidden$="[[keyHasMachines]]">
+                            No machines are using this key
+                        </span>
+                        <span hidden$="[[!keyHasMachines]]">
+                            [[keyMachines.length]] machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key
+                        </span>
+                    </div>
+
                 </div>
-                <div class="machines-list" hidden$="[[!keyHasMachines]]">
-                    <h5><span>[[keyMachines.length]]</span> machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key</h5>
+                <div class="item-actions">
+                    <paper-button on-tap="_makeDefaultKey" hidden$="[[isDefault]]" class="simple">make default</paper-button>
+                    <paper-button on-tap="_deleteKey" class="simple">delete <iron-icon icon="delete"></iron-icon></paper-button>
                 </div>
-            </div>
+            </paper-material>
+
             <div class="key-info">
+                <!-- <paper-material></paper-material> -->
                 <paper-material>
+                    <h4 class="id">Key ID:</h4><span class="id">[[key.id]]</span>
                     <div class="head">
                         <h4 class="key">Public Key</h4>
                         <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="right link">Copy <span class="wide">public key</span>
@@ -244,7 +271,10 @@
                         <template is="dom-repeat" items="[[key.machines]]" as="machine">
                             <li>
                                 <iron-icon icon='hardware:laptop'></iron-icon> <a href="[[getMachineUrl(machine)]]" class="machine">[[getMachineName(machine)]]</a>
-                                <span class="machine-info">: id: [[machine.1]], image: [[machine.3]]</span>
+                                <span class="machine-info">
+                                    <span hidden="[[!machine.1]]">: id: [[machine.1]], </span>
+                                    <span hidden="[[!machine.3]]">image: [[machine.3]]</span>
+                                </span>
                             </li>
                         </template>
                     </ul>
@@ -257,11 +287,12 @@
         <template is="dom-if" if="{{key.id}}">
             <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         </template>
-        <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/{{key.id}}" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
+        <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/[[key.id]]" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
         <iron-ajax id="keyDeleteAjaxRequest" url="/api/v1/keys/[[key.id]]" method="DELETE" on-response="_handleKeyDeleteAjaxResponse" on-error="_handleKeyDeleteAjaxError"></iron-ajax>
         <key-edit key="[[key]]"></key-edit>
         <dialog-element></dialog-element>
         <paper-toast></paper-toast>
+        <toast-er></toast-er>
     </template>
     <script>
         (function() {
@@ -374,7 +405,7 @@
                     var machine = this.model.machinesArray.find(function(machine) {
                         return machine.id == keymachine[1];
                     });
-                    url = "/machines/" + machine.uuid;
+                    url = machine ? "/machines/" + machine.uuid : '';
                     return url;
                 },
                 getMachineName: function(keymachine) {
@@ -382,7 +413,7 @@
                     var machine = this.model.machinesArray.find(function(machine) {
                         return machine.id == keymachine[1];
                     });
-                    name = machine.name;
+                    name = machine ? machine.name : 'missing';
                     return name;
                 },
                 _computeIsDefault: function(isDefault) {
@@ -391,14 +422,12 @@
                 copyPublicKey: function() {
                     this.$.keyPublic.select();
                     document.execCommand('copy');
-                    this.$.toast.text = 'The Public Key was copied to clipboard!';
-                    this.$.toast.open();
+                    this._showToast('The Public Key was copied to clipboard!');
                 },
                 copyPrivateKey: function() {
                     this.$.keyPrivate.select();
                     document.execCommand('copy');
-                    this.$.toast.text = 'The Private Key was copied to clipboard!';
-                    this.$.toast.open();
+                    this._showToast('The Private Key was copied to clipboard!');
                 },
                 handlePublicResponse: function(data) {
                     this.publicKey = data.detail.response;
@@ -414,19 +443,26 @@
                 handlePrivateResponse: function(data) {
                     this.privateKey = data.detail.response;
                 },
-                handleDefaultResponse: function(data) {
-                    //needs to update the previous default key that it's not the default key anymore
-                    var k = this.model.keysArray;
-                    for (var i = 0, len = k.length; i < len; i++) {
-                        if (k[i].isDefault) {
-                            k[i].isDefault = false;
-                            break;
-                        }
-                    }
-                    this.set('key.isDefault', true);
-                    this.$.toast.text = this.key.id + ' has become your default Key!';
-                    this.$.toast.open();
-                },
+                // handleDefaultResponse: function(data) {
+                //     //needs to update the previous default key that it's not the default key anymore
+                //     var k = this.model.keysArray;
+                //     for (var i = 0, len = k.length; i < len; i++) {
+                //         if (k[i].isDefault) {
+                //             k[i].isDefault = false;
+                //             break;
+                //         }
+                //     }
+                //     this.set('key.isDefault', true);
+                //     // this.$.toast.text = this.key.id + ' has become your default Key!';
+                //     // this.$.toast.open();
+                //
+                //      this.fire('iron-signal',{
+                //        name: 'toaster-bake',
+                //        data: {
+                //          text: this.key.id + ' has become your default Key!'
+                //        }
+                //      });
+                // },
                 _editKey: function(e) {
                     var el = this.querySelector('key-edit');
                     el._openEditKeyModal();
@@ -436,19 +472,18 @@
                     this.set('key.id', key.id);
                 },
                 _makeDefaultKey: function(e) {
-                    var isDefault = this.key.isDefault;
                     this.$.keyMakeDefaultAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.keyMakeDefaultAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.keyMakeDefaultAjaxRequest.body = {};
                     this.$.keyMakeDefaultAjaxRequest.generateRequest();
                 },
                 _handleKeyMakeDefaultAjaxResponse: function(e) {
-                    this.set('key.isDefault', true);
+                    this._showToast(this.key.name + ' has become your default Key!');
                 },
                 _deleteKey: function(e) {
                     this._showDialog({
                         title: 'Delete Key?',
-                        body: "Deleting a key can not be undone. You are about to delete key '" + this.key.id + "'.",
+                        body: "Deleting a key can not be undone. You are about to delete key '" + this.key.name + "'.",
                         danger: true,
                         reason: "key.delete"
                     });
@@ -473,6 +508,15 @@
                         dialog[i] = info[i];
                     }
                     dialog._openDialog();
+                },
+                _showToast: function(msg) {
+                    var toast = this.querySelector('paper-toast');
+                    toast.text = msg;
+                    toast.show();
+                    var newnot = {};
+                    newnot["text"] = msg;
+                    newnot["type"] = 'green';
+                    document.querySelector("notifications-element").notifications.push(newnot);
                 },
                 _goBack: function() {
                     history.back();
