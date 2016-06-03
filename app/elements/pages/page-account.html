@@ -1,7 +1,6 @@
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 
-
 <dom-module id="page-account">
     <style>
         #container {
@@ -15,15 +14,15 @@
             --paper-tabs-selection-bar-color: #2196F3;
         }
     </style>
-    <template>
 
+    <template>
         <paper-tabs attr-for-selected="data-route" selected="{{selected}}">
-            <paper-tab data-route="0">PROFILE</paper-tab>
-            <paper-tab data-route="1">PASSWORD</paper-tab>
-            <paper-tab data-route="2">BILLING</paper-tab>
-            <paper-tab data-route="3">ACTIVE SESSIONS</paper-tab>
-            <paper-tab data-route="4">API TOKENS</paper-tab>
-            <paper-tab data-route="5">FEEDBACK</paper-tab>
+            <paper-tab data-route="0" current="account" title="Account">PROFILE</paper-tab>
+            <paper-tab data-route="1" current="account" title="Account">PASSWORD</paper-tab>
+            <paper-tab data-route="2" current="account" title="Account">BILLING</paper-tab>
+            <paper-tab data-route="3" current="account" title="Account">ACTIVE SESSIONS</paper-tab>
+            <paper-tab data-route="4" current="account" title="Account">API TOKENS</paper-tab>
+            <paper-tab data-route="5" current="account" title="Account">FEEDBACK</paper-tab>
         </paper-tabs>
 
         <iron-pages selected="{{selected}}">
@@ -37,6 +36,7 @@
 
     </template>
 </dom-module>
+
 <script>
     Polymer({
         is: 'page-account',
@@ -44,8 +44,6 @@
             selected: {
                 value: 0
             }
-
-        },
-
+        }
     });
 </script>
