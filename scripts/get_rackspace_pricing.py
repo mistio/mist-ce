@@ -41,10 +41,6 @@ flavor_type_mapping = {
     'iov1-61440': 'io1-60',
     'iov1-92160': 'io1-90',
     'iov1-122880': 'io1-120',
-    'genv1-1024': 'general1-1',
-    'general1-2048': 'general1-2',
-    'genv1-4096': 'general1-4',
-    'general1-8192': 'general1-8',
 }
 
 
