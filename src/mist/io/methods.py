@@ -51,7 +51,8 @@ from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
 from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver, CoreOSDriver
-from mist.io.helpers import check_host, sanitize_host, transform_key_machine_associations
+from mist.io.helpers import check_host, sanitize_host, extract_port
+from mist.io.helpers import transform_key_machine_associations
 from mist.io.exceptions import *
 
 
@@ -62,6 +63,7 @@ from mist.io.helpers import StdStreamCapture
 import mist.io.tasks
 import mist.io.inventory
 
+import mist.core.vpn.methods
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -1302,11 +1304,18 @@ def connect_provider(cloud):
         temp_key_file.close()
         conn = driver(cloud.apikey, temp_key_file.name)
     elif cloud.provider == Provider.OPENSTACK:
+        if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))):
+            host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
+                                                               sanitize_host(cloud.apiurl),
+                                                               extract_port(cloud.apiurl))
+            auth_url = '%s:%d' % (host, port)
+        else:
+            auth_url = cloud.apiurl
         conn = driver(
             cloud.apikey,
             cloud.apisecret,
             ex_force_auth_version=cloud.auth_version or '2.0_password',
-            ex_force_auth_url=cloud.apiurl,
+            ex_force_auth_url=auth_url,
             ex_tenant_name=cloud.tenant_name,
             ex_force_service_region=cloud.region,
             ex_force_base_url=cloud.compute_endpoint,
@@ -1321,6 +1330,14 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.GCE:
         conn = driver(cloud.apikey, cloud.apisecret, project=cloud.tenant_name)
     elif cloud.provider == Provider.DOCKER:
+        if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))) \
+                and os.system('ping -c 3 172.17.0.1') != 0:
+                # the above ping is for dev purposes for the time being
+                # in order for mist to discover the docker-dev
+            docker_host, docker_port = mist.core.vpn.methods.destination_nat(
+                cloud.owner, cloud.apiurl, cloud.docker_port)
+        else:
+            docker_host, docker_port = cloud.apiurl, cloud.docker_port
         libcloud.security.VERIFY_SSL_CERT = False;
         if cloud.key_file and cloud.cert_file:
             # tls auth, needs to pass the key and cert as files
@@ -1331,24 +1348,29 @@ def connect_provider(cloud):
             cert_temp_file.write(cloud.cert_file)
             cert_temp_file.close()
             if cloud.ca_cert_file:
-                # docker started with tlsverify
+                # docker started with tls verify
                 ca_cert_temp_file = NamedTemporaryFile(delete=False)
                 ca_cert_temp_file.write(cloud.ca_cert_file)
                 ca_cert_temp_file.close()
                 libcloud.security.VERIFY_SSL_CERT = True
                 libcloud.security.CA_CERTS_PATH.insert(0,ca_cert_temp_file.name)
-            conn = driver(host=cloud.apiurl, port=cloud.docker_port, key_file=key_temp_file.name, cert_file=cert_temp_file.name)
+            conn = driver(host=docker_host, port=docker_port,
+                          key_file=key_temp_file.name, cert_file=cert_temp_file.name)
         else:
-            conn = driver(cloud.apikey, cloud.apisecret, cloud.apiurl, cloud.docker_port)
-    elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN,
-                              Provider.RACKSPACE]:
-        conn = driver(cloud.apikey, cloud.apisecret,
-                      region=cloud.region)
+            conn = driver(cloud.apikey, cloud.apisecret, docker_host, docker_port)
+    elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
+        conn = driver(cloud.apikey, cloud.apisecret, region=cloud.region)
     elif cloud.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         libcloud.security.VERIFY_SSL_CERT = False
-        conn = driver(cloud.apikey, cloud.apisecret, host=cloud.apiurl)
+        if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))):
+            host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
+                                                               cloud.apiurl, 443)
+            api_url = '%s:%d' % (host, port)
+        else:
+            api_url = cloud.apiurl
+        conn = driver(cloud.apikey, cloud.apisecret, host=api_url)
     elif cloud.provider == Provider.DIGITAL_OCEAN:
         if cloud.apikey == cloud.apisecret:  # API v2
             conn = driver(cloud.apisecret)
@@ -1356,7 +1378,13 @@ def connect_provider(cloud):
             driver = get_driver('digitalocean_first_gen')
             conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider == Provider.VSPHERE:
-        conn = driver(host=cloud.apiurl, username=cloud.apikey, password=cloud.apisecret)
+        if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))):
+            host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
+                                                               cloud.apiurl, 443)
+            api_url = '%s:%d' % (host, port)
+        else:
+            api_url = cloud.apiurl
+        conn = driver(host=api_url, username=cloud.apikey, password=cloud.apisecret)
     elif cloud.provider == 'bare_metal':
         conn = BareMetalDriver(Machine.objects(cloud=cloud))
     elif cloud.provider == 'coreos':
@@ -1364,9 +1392,22 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if cloud.apisecret:
-           conn = driver(cloud.apiurl, user=cloud.apikey, ssh_key=cloud.apisecret, ssh_port=cloud.ssh_port)
+            if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))):
+                host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
+                                                                   cloud.apiurl,
+                                                                   cloud.ssh_port)
+            else:
+                host, port = cloud.apiurl, cloud.ssh_port
+            conn = driver(host, user=cloud.apikey, ssh_key=cloud.apisecret, ssh_port=port)
         else:
-            conn = driver(cloud.apiurl, user=cloud.apikey)
+            if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))):
+                host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
+                                                                   cloud.apiurl,
+                                                                   5000)
+                api_url = '%s:%d' % (host, port)
+            else:
+                api_url = cloud.apiurl
+            conn = driver(api_url, user=cloud.apikey)
     else:
         # ec2
         conn = driver(cloud.apikey, cloud.apisecret)
@@ -2767,6 +2808,9 @@ def ssh_command(user, cloud_id, machine_id, host, command,
     """
     # check if cloud exists
     Cloud.objects.get(owner=user, id=cloud_id)
+
+    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
+        host, port = mist.core.vpn.methods.destination_nat(user, host, port)
 
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id,
