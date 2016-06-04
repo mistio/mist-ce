@@ -877,7 +877,7 @@ class Ping(UserTask):
 
     def execute(self, owner_id, cloud_id, machine_id, host):
         from mist.io import methods
-        res = methods.ping(host)
+        res = methods.ping(host, owner_id)
         return {'cloud_id': cloud_id,
                 'machine_id': machine_id,
                 'host': host,

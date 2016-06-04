@@ -3860,14 +3860,19 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
     }
 
 
-def ping(host):
-    ping = subprocess.Popen(
-        ["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host],
-        stdout=subprocess.PIPE
-    )
-    ping_out = ping.stdout.read()
-    ping.wait()
-    return parse_ping(ping_out)
+def ping(host, user=None):
+    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
+        ping = mist.core.vpn.methods.ping_vpn_host(user, host=host)
+        ping_out = ping.content
+    else:
+        ping = subprocess.Popen(
+                ["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host],
+                stdout=subprocess.PIPE
+            )
+        ping_out = ping.stdout.read()
+        ping.wait()
+        ping_out = parse_ping(ping_out)
+    return ping_out
 
 
 def find_public_ips(ips):
