@@ -81,7 +81,7 @@ class BareMetalDriver(object):
                 extra['remote_desktop_port'] = machine.remote_desktop_port
 
         node = Node(id=machine_id, name=machine.name, state=state,
-                    public_ips=machine.public_ips, private_ips=[],
+                    public_ips=machine.public_ips, private_ips=machine.private_ips,
                     driver=self, extra=extra)
         return node
 
