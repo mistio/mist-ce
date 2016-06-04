@@ -2641,6 +2641,8 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
         elif action is 'reboot':
             if bare_metal:
                 try:
+                    # TODO: insert a private_ips field in Machine model
+                    # for now the public_ips list holds both public & priv ips
                     hostname = Machine.objects.get(cloud=cloud, machine_id=machine_id).public_ips[0]
                     command = '$(command -v sudo) shutdown -r now'
                     ssh_command(user, cloud_id, machine_id, hostname, command)
@@ -2650,9 +2652,12 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
             else:
                 if conn.type == 'libvirt':
                     if machine.extra.get('tags', {}).get('type', None) == 'hypervisor':
-                         # issue an ssh command for the libvirt hypervisor
+                        # issue an ssh command for the libvirt hypervisor
                         try:
                             hostname = machine.public_ips[0]
+                            # private network
+                            if not hostname:
+                                hostname = machine.private_ips[0]
                             command = '$(command -v sudo) shutdown -r now'
                             ssh_command(user, cloud_id, machine_id, hostname, command)
                             return True
@@ -3751,12 +3756,15 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
     if not host:
         raise RequiredParameterMissingError('host')
 
-    # start pinging the machine in the background
-    log.info("Starting ping in the background for host %s", host)
-    ping = subprocess.Popen(
-        ["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host],
-        stdout=subprocess.PIPE
-    )
+    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
+        ping = mist.core.vpn.methods.ping_vpn_host(owner=user, host=host)
+    else:
+        # start pinging the machine in the background
+        log.info("Starting ping in the background for host %s", host)
+        ping = subprocess.Popen(
+            ["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host],
+            stdout=subprocess.PIPE
+        )
     try:
         ret = probe_ssh_only(user, cloud_id, machine_id, host,
                              key_id=key_id, ssh_user=ssh_user)
@@ -3764,10 +3772,18 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
         log.error(exc)
         log.warning("SSH failed when probing, let's see what ping has to say.")
         ret = {}
-    ping_out = ping.stdout.read()
-    ping.wait()
-    log.info("ping output: %s" % ping_out)
-    ret.update(parse_ping(ping_out))
+    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
+        ping_out = json.loads(ping.content)
+        log.info("Ping output over VPN: %s packets transmitted, %s received, "
+                 "%s packet loss\nrtt min/avg/max = %s/%s/%s"
+                 % (ping_out['packets_tx'], ping_out['packets_rx'], ping_out['packets_loss'],
+                    ping_out['rtt_min'], ping_out['rtt_avg'], ping_out['rtt_max']))
+    else:
+        ping_out = ping.stdout.read()
+        ping.wait()
+        log.info("ping output: %s" % ping_out)
+        ping_out = parse_ping(ping_out)
+    ret.update(ping_out)
     return ret
 
 
