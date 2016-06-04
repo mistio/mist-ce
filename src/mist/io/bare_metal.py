@@ -71,7 +71,8 @@ class BareMetalDriver(object):
         return result in VALID_RESPONSE_CODES
 
     def _to_node(self, machine_id, machine):
-        state = self.check_host(machine.cloud.owner, machine.dns_name, machine.ssh_port)
+        hostname = machine.dns_name if machine.dns_name else machine.private_ips[0]
+        state = self.check_host(machine.cloud.owner, hostname, machine.ssh_port)
         extra = {}
         if hasattr(machine, 'os_type') and machine.os_type:
             extra['os_type'] = machine.os_type
