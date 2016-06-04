@@ -376,8 +376,11 @@ def _add_cloud_bare_metal(user, title, provider, params):
     machine.ssh_port = port
     machine.remote_desktop_port = rdp_port
     if machine_hostname:
-        machine.dns_name = machine_hostname
-        machine.public_ips = [machine_hostname]
+        if is_private_subnet(socket.gethostbyname(sanitize_host(machine_hostname))):
+            machine.private_ips = [machine_hostname]
+        else:
+            machine.dns_name = machine_hostname
+            machine.public_ips = [machine_hostname]
     machine.machine_id = title.replace('.', '').replace(' ', '')
     machine.name = title
     machine.os_type = os_type
@@ -449,8 +452,11 @@ def _add_cloud_coreos(user, title, provider, params):
     machine = Machine()
     machine.ssh_port = port
     if machine_hostname:
-        machine.dns_name = machine_hostname
-        machine.public_ips = [machine_hostname]
+        if is_private_subnet(socket.gethostbyname(sanitize_host(machine_hostname))):
+            machine.private_ips = [machine_hostname]
+        else:
+            machine.dns_name = machine_hostname
+            machine.public_ips = [machine_hostname]
     machine.machine_id = machine_hostname.replace('.', '').replace(' ', '')
     machine.name = title
     machine.os_type = os_type
