@@ -10,6 +10,7 @@ be performed inside the corresponding method functions.
 """
 
 import re
+import socket
 import requests
 import json
 import mongoengine as me
@@ -38,6 +39,9 @@ import pyramid.httpexceptions
 
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, transform_key_machine_associations
+from mist.io.helpers import sanitize_host
+
+from libcloud.utils.networking import is_private_subnet
 
 from mist.core.auth.methods import auth_context_from_request
 
@@ -1216,6 +1220,10 @@ def machine_rdp(request):
     except:
         rdp_port = 3389
 
+    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
+        from mist.core.vpn.methods import destination_nat
+        host, rdp_port = destination_nat(auth_context.owner, host, rdp_port)
+
     rdp_content = 'full address:s:%s:%s\nprompt for credentials:i:1' % \
                   (host, rdp_port)
     return Response(content_type='application/octet-stream',
@@ -1693,7 +1701,7 @@ def update_monitoring(request):
 
     action = params.get('action') or 'enable'
     name = params.get('name', '')
-    public_ips = params.get('public_ips', [])
+    public_ips = params.get('public_ips', [])  # TODO priv IPs?
     dns_name = params.get('dns_name', '')
     no_ssh = bool(params.get('no_ssh', False))
     dry = bool(params.get('dry', False))
