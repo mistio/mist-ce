@@ -2639,7 +2639,6 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
         elif action is 'resume':
             if conn.type == 'libvirt':
                 conn.ex_resume_node(machine)
-
         elif action is 'resize':
             conn.ex_resize_node(node, plan_id)
         elif action is 'rename':
@@ -2647,9 +2646,8 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
         elif action is 'reboot':
             if bare_metal:
                 try:
-                    # TODO: insert a private_ips field in Machine model
-                    # for now the public_ips list holds both public & priv ips
-                    hostname = Machine.objects.get(cloud=cloud, machine_id=machine_id).public_ips[0]
+                    machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
+                    hostname = machine.public_ips[0] if machine.public_ips else machine.private_ips[0]
                     command = '$(command -v sudo) shutdown -r now'
                     ssh_command(user, cloud_id, machine_id, hostname, command)
                     return True
@@ -2660,10 +2658,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                     if machine.extra.get('tags', {}).get('type', None) == 'hypervisor':
                         # issue an ssh command for the libvirt hypervisor
                         try:
-                            hostname = machine.public_ips[0]
-                            # private network
-                            if not hostname:
-                                hostname = machine.private_ips[0]
+                            hostname = machine.public_ips[0] if machine.public_ips else machine.private_ips[0]
                             command = '$(command -v sudo) shutdown -r now'
                             ssh_command(user, cloud_id, machine_id, hostname, command)
                             return True
