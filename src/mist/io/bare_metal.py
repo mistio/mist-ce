@@ -2,6 +2,7 @@ import os
 import socket
 import httplib
 import requests
+import json
 
 from libcloud.compute.types import NodeState
 from libcloud.compute.base import Node
@@ -28,6 +29,7 @@ except ImportError:
     from mist.io import config
 
 import logging
+
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
@@ -95,21 +97,21 @@ class BareMetalDriver(object):
         Still needs to be improved to perform more robust checks.
 
         """
-
+        # keep original hostname in case of private host address translation
+        real_hostname = hostname
         state = NODE_STATE_MAP['unknown']
         if not hostname:
             return state
-        socket.setdefaulttimeout(5)
+        socket.setdefaulttimeout(10)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-        if is_private_subnet(socket.gethostbyname(sanitize_host(hostname))):
-            hostname, ssh_port = destination_nat(user, hostname, ssh_port)
 
         ports_list = [22, 80, 443, 3389]
         if ssh_port not in ports_list:
             ports_list.insert(0, ssh_port, )
         for port in ports_list:
             try:
+                if is_private_subnet(socket.gethostbyname(sanitize_host(hostname))):
+                    hostname, port = destination_nat(user, hostname, port)
                 s.connect((hostname, port))
                 s.shutdown(2)
                 state = NODE_STATE_MAP['on']
@@ -117,7 +119,7 @@ class BareMetalDriver(object):
             except:
                 pass
             if state == NODE_STATE_MAP['unknown']:
-                ping_response = self.ping_host(user, hostname)
+                ping_response = self.ping_host(user, real_hostname)
                 if ping_response == 0:
                     state = NODE_STATE_MAP['on']
         return state
@@ -133,11 +135,11 @@ class BareMetalDriver(object):
         if not hostname:
             return 256
         if is_private_subnet(socket.gethostbyname(sanitize_host(hostname))):
-                ping = ping_vpn_host(owner=user, host=hostname)
-                if ping.status_code == 200:
-                    response = 0
-                else:
-                    response = 256
+            ping = ping_vpn_host(owner=user, host=hostname)
+            if ping.status_code == 200 and int(json.loads(ping.content)['packets_rx']) > 0:
+                response = 0
+            else:
+                response = 256
         else:
             try:
                 response = os.system("ping -c 1 -w5 " + hostname + " > /dev/null 2>&1")
