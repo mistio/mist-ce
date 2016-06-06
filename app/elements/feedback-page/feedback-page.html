@@ -83,24 +83,24 @@
         </style>
         <paper-material class="form">
           <paper-steps initial-step="0">
-            <template is="dom-if" if="[[pageFirst]]">
 
               <paper-step label="Demographics" editable>
+
                 <h2>Feedback<span>* All fields are mandatory</span></h2>
-                <!-- <form is="iron-form" action="http://posttestserver.com/post.php?dir=paper-steps&amp;dump" method="post"> -->
 
-                  <div>
-                      <paper-input class="xs12 l6" label="NAME" required error-message="Please enter your first name" value="{{user.firstName}}" always-float-label></paper-input>
-                      <paper-input class="xs12 l6" label="SURNAME" required error-message="Please enter your last name" value="{{user.lastName}}" always-float-label></paper-input>
-                      <paper-input class="xs12 l6" label="COMPANY NAME" required error-message="Please enter your company's name" value="{{user.companyName}}" always-float-label></paper-input>
+                <form is="iron-form" action="http://posttestserver.com/post.php?dir=paper-steps&amp;dump" method="post">
 
-                      <paper-dropdown-menu class="dropdown-block xs12 l6" label="COMPANY LOCATION" horizontal-align="left" always-float-label>
-                          <paper-menu attr-for-selected="value" selected="{{user.country}}" class="dropdown-content">
-                              <template is="dom-repeat" items="[[countriesOptions]]" as="country">
-                                  <paper-item value="[[country]]">[[country]]</paper-item>
-                              </template>
-                          </paper-menu>
-                      </paper-dropdown-menu>
+                    <paper-input class="xs12 l6" label="NAME" required error-message="Please enter your first name" value="{{user.firstName}}" always-float-label></paper-input>
+                    <paper-input class="xs12 l6" label="SURNAME" required error-message="Please enter your last name" value="{{user.lastName}}" always-float-label></paper-input>
+                    <paper-input class="xs12 l6" label="COMPANY NAME" required error-message="Please enter your company's name" value="{{user.companyName}}" always-float-label></paper-input>
+
+                    <paper-dropdown-menu class="dropdown-block xs12 l6" label="COMPANY LOCATION" horizontal-align="left" always-float-label>
+                        <paper-menu attr-for-selected="value" selected="{{user.country}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[countriesOptions]]" as="country">
+                                <paper-item value="[[country]]">[[country]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
 
                     <div class="dropdown-block xs12 l6" id="numberOfPeople" horizontal-align="left">
                       <label id="label1">NUMBER OF EMPLOYEES</label>
@@ -120,9 +120,7 @@
                       </paper-radio-group>
                     </div>
 
-                <!-- </form> -->
-
-              </template>
+                </form>
 
             </paper-step>
 

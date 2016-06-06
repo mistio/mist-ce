@@ -1,0 +1,100 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="plan-item">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+                width: 25%;
+                float: left;
+                text-align: center;
+                margin-top: 22px;
+            }
+
+            hr {
+                border: none;
+                border-bottom: 1px solid #ccc;
+            }
+            h4{
+              font-weight: bold;
+            }
+        </style>
+
+        <paper-card>
+            <div class="card-content">
+                <h4>[[plan.title]]</h4>
+                <hr>
+                <p>[[priceText]]</p>
+                <p>[[descriptionText]]</p>
+                <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
+                <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
+                <paper-button class="btn-block submit-btn" hidden$="[[!plan.promo.notUsed]]" raised on-tap="_selectPlan">Select</paper-button>
+        </paper-card>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'plan-item',
+
+                properties: {
+                    plan: {
+                        type: Object
+                    },
+                    priceText: {
+                        type: String,
+                        computed: '_computePriceText(plan.price)'
+                    },
+                    descriptionText: {
+                        type: String,
+                        computed: '_computeDescriptionText(plan.description, plan.machine_limit)'
+                    },
+                    discountedPriceText: {
+                        type: String,
+                        computed: '_computeDiscountedPriceText(plan.promo)'
+                    },
+                    expirationDate: {
+                        type: String,
+                        computed: '_computeExpirationDate(plan.expiration)'
+                    },
+                },
+                ready: function() {
+
+                },
+                _computePriceText: function(price) {
+                    return price != null ? '$' + price + '/month' : '';
+                },
+                _computeDescriptionText: function(description, machineLimit) {
+                    return description ? description : machineLimit + ' monitored servers';
+                },
+                _computeDiscountedPriceText: function(promo) {
+                    if (promo) {
+                        var newPrice = Math.round(price * (1 - (promo.discount / 100)));
+                        return '$' + newPrice + '/month';
+                    }
+                    return '';
+                },
+                _computeExpirationDate: function(expiration) {
+                    if (expiration) {
+                        var d = new Date(expiration * 1000);
+                        return d.getMonthName() + " " + d.getDate() + ", " + d.getFullYear();
+                    }
+                    return '';
+                },
+                _selectPlan: function(e) {
+                    console.log(this.plan);
+                },
+                _triggerInfo: function() {
+                    console.log('info popup');
+                }
+            });
+        })();
+    </script>
+</dom-module>

@@ -1,0 +1,48 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../plan-item/plan-item.html">
+
+
+<dom-module id="plans-list">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+                height: 620px;
+            }
+        </style>
+
+        <paper-card class="form">
+          <h2>Billing</h2>
+          <div class="card-content clearfix">
+              <template is="dom-repeat" items=[[plans]] as="plan">
+                  <plan-item plan="[[plan]]"></plan-item>
+              </template>
+          </div>
+        </paper-card>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'plans-list',
+
+                properties: {
+                    plans: {
+                        type: Array,
+                        value: []
+                    }
+                },
+                ready: function() {
+                    this.set('plans', PLANS);
+                }
+            });
+        })();
+    </script>
+</dom-module>
