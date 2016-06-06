@@ -103,7 +103,7 @@
             <iron-route path="/templates/:id" title="template" current="templates" href="../templates/template-page.html"></iron-route>
             <iron-route path="/add-template" title="add template" current="templates" href="../templates/template-add.html"></iron-route>
             <!-- stacks -->
-            <iron-route path="/create-stack/:id" title="add template" current="stacks" href="../stacks/stack-create.html"></iron-route>
+            <iron-route path="/create-stack/:id" title="create stack" current="stacks" href="../stacks/stack-create.html"></iron-route>
             <iron-route path="/stacks" title="stacks" current="stacks" href="../pages/page-items.html"></iron-route>
             <iron-route path="/stacks/:id" title="stack" current="stacks" href="../stacks/stack-page.html"></iron-route>
             <!-- teams -->
@@ -460,11 +460,8 @@ var app = Polymer({
     updateCurrent: function(e) {
         // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
         var el = e.detail.item;
-
-        this.current = el.getAttribute("current");
-        this.title = el.title;
-        console.log("el",e.detail);
-        if (el.nodeName == 'IRON-ROUTE') {
+        //console.log("el",e.detail);
+        if (el.nodeName == 'IRON-ROUTE' && el.title && el.getAttribute("current")) {
             this.current = el.getAttribute("current");
             this.title = el.title;
         }
