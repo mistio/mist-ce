@@ -1478,26 +1478,42 @@ def get_machine_actions(machine_from_api, conn, extra):
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    try:
+        cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError("Unknown cloud with id %s" % cloud_id)
     try:
         conn = connect_provider(cloud)
-        machines = conn.list_nodes()
+        machines_from_provider = conn.list_nodes()
     except InvalidCredsError:
         raise CloudUnauthorizedError()
     except Exception as exc:
         log.error("Error while running list_nodes: %r", exc)
         raise CloudUnavailableError(exc=exc)
+
+    # create a dict with the machines from the db with key the machine_id
+    machines_from_db = {machine.machine_id: machine
+                        for machine in Machine.objects(cloud=cloud)}
+    now = datetime.utcnow()
     ret = []
-    for m in machines:
+
+    for m in machines_from_provider:
+
+        machine_entry = machines_from_db.pop(m.id, None)
+        if machine_entry:
+            machine_entry.last_seen = now
+            machine_entry.missing_since = None
+            machine_entry.save()
+
         if m.driver.type == 'gce':
-            #tags and metadata exist in GCE
+            # tags and metadata exist in GCE
             tags = m.extra.get('metadata', {}).get('items')
         else:
             tags = m.extra.get('tags') or m.extra.get('metadata') or {}
         # optimize for js
         if type(tags) == dict:
             tags = [{'key': key, 'value': value} for key, value in tags.iteritems() if key != 'Name']
-        #if m.extra.get('availability', None):
+        # if m.extra.get('availability', None):
         #    # for EC2
         #    tags.append({'key': 'availability', 'value': m.extra['availability']})
         if m.extra.get('DATACENTERID', None):
@@ -1563,15 +1579,7 @@ def list_machines(user, cloud_id):
                 m.extra['endpoints'] = json.dumps(m.extra.get('endpoints', {}))
 
         if m.driver.type == 'bare_metal':
-            can_reboot = False
-            keys = Keypair.objects(owner=user)
-            try:
-                machine = Machine.objects.get(cloud=cloud_id, machine_id=m.id)
-                if machine.key_associations:
-                    can_reboot = True
-            except Machine.DoesNotExist:
-                pass
-            m.extra['can_reboot'] = can_reboot
+            m.extra['can_reboot'] = machine_entry and machine_entry.key_associations
 
         if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
             try:
@@ -1596,7 +1604,7 @@ def list_machines(user, cloud_id):
             tags = []
 
         machine = {'id': m.id,
-                   'uuid': m.get_uuid(),
+                   'uuid': machine_entry.id if machine_entry else '',
                    'name': m.name,
                    'imageId': image_id,
                    'size': size,
@@ -1604,12 +1612,22 @@ def list_machines(user, cloud_id):
                    'private_ips': m.private_ips,
                    'public_ips': m.public_ips,
                    'tags': tags,
+                   'missing_since': str(machine_entry.missing_since)
+                        if machine_entry and machine_entry.missing_since else '',
+                   'last_seen': str(machine_entry.last_seen)
+                        if machine_entry and machine_entry.last_seen else '',
                    'extra': m.extra}
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
     if conn.type == 'libvirt':
         # close connection with libvirt
         conn.disconnect()
+
+    # mark machines that are no longer available in list_nodes as missing
+    for machine_entry in machines_from_db.values():
+        if not machine_entry.missing_since:
+            machine_entry.missing_since = now
+            machine_entry.save()
     return ret
 
 
