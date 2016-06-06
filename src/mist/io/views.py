@@ -41,7 +41,7 @@ from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, transform_key_machine_associations
 from mist.io.helpers import sanitize_host
 
-from libcloud.utils.networking import is_private_subnet
+from mist.core.vpn.methods import is_private
 
 from mist.core.auth.methods import auth_context_from_request
 
@@ -1220,7 +1220,7 @@ def machine_rdp(request):
     except:
         rdp_port = 3389
 
-    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
+    if is_private(host):
         from mist.core.vpn.methods import destination_nat
         host, rdp_port = destination_nat(auth_context.owner, host, rdp_port)
 

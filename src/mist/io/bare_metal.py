@@ -6,13 +6,8 @@ import json
 
 from libcloud.compute.types import NodeState
 from libcloud.compute.base import Node
-from libcloud.utils.networking import is_private_subnet
 
-from mist.io.helpers import sanitize_host
-
-from mist.core.vpn.methods import destination_nat, ping_vpn_host
-
-from mist.io.config import VPN_SERVER_API_ADDRESS
+from mist.core.vpn.methods import destination_nat, ping_vpn_host, is_private
 
 VALID_RESPONSE_CODES = [httplib.OK, httplib.ACCEPTED, httplib.CREATED,
                         httplib.NO_CONTENT]
@@ -110,7 +105,7 @@ class BareMetalDriver(object):
             ports_list.insert(0, ssh_port, )
         for port in ports_list:
             try:
-                if is_private_subnet(socket.gethostbyname(sanitize_host(hostname))):
+                if is_private(hostname):
                     hostname, port = destination_nat(user, hostname, port)
                 s.connect((hostname, port))
                 s.shutdown(2)
@@ -134,7 +129,7 @@ class BareMetalDriver(object):
         """
         if not hostname:
             return 256
-        if is_private_subnet(socket.gethostbyname(sanitize_host(hostname))):
+        if is_private(hostname):
             ping = ping_vpn_host(owner=user, host=hostname)
             if ping.status_code == 200 and int(json.loads(ping.content)['packets_rx']) > 0:
                 response = 0

@@ -33,9 +33,7 @@ try:
 except ImportError:
     from mist.io import config
 
-from mist.core.vpn.methods import destination_nat
-
-from libcloud.utils.networking import is_private_subnet
+from mist.core.vpn.methods import is_private, destination_nat
 
 import logging
 
@@ -235,7 +233,7 @@ class ParamikoShell(object):
         log.info("autoconfiguring Shell for machine %s:%s",
                  cloud_id, machine_id)
 
-        if is_private_subnet(socket.gethostbyname(sanitize_host(self.host))):
+        if is_private(self.host):
             self.host, port = destination_nat(user, self.host, port)
 
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
@@ -344,7 +342,7 @@ class DockerShell(object):
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
         docker_port = cloud.docker_port
 
-        if is_private_subnet(socket.gethostbyname(sanitize_host(self.host))):
+        if is_private(self.host):
             self.host, docker_port = destination_nat(user, self.host, docker_port)
 
         # For basic auth

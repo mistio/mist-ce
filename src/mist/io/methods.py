@@ -64,6 +64,7 @@ import mist.io.tasks
 import mist.io.inventory
 
 import mist.core.vpn.methods
+from mist.core.vpn.methods import is_private
 
 ## # add curl ca-bundle default path to prevent libcloud certificate error
 import libcloud.security
@@ -376,7 +377,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
     machine.ssh_port = port
     machine.remote_desktop_port = rdp_port
     if machine_hostname:
-        if is_private_subnet(socket.gethostbyname(sanitize_host(machine_hostname))):
+        if is_private(machine_hostname):
             machine.private_ips = [machine_hostname]
         else:
             machine.dns_name = machine_hostname
@@ -452,7 +453,7 @@ def _add_cloud_coreos(user, title, provider, params):
     machine = Machine()
     machine.ssh_port = port
     if machine_hostname:
-        if is_private_subnet(socket.gethostbyname(sanitize_host(machine_hostname))):
+        if is_private(machine_hostname):
             machine.private_ips = [machine_hostname]
         else:
             machine.dns_name = machine_hostname
@@ -1310,7 +1311,7 @@ def connect_provider(cloud):
         temp_key_file.close()
         conn = driver(cloud.apikey, temp_key_file.name)
     elif cloud.provider == Provider.OPENSTACK:
-        if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))):
+        if is_private(cloud.apiurl):
             host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                sanitize_host(cloud.apiurl),
                                                                extract_port(cloud.apiurl))
@@ -1336,10 +1337,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.GCE:
         conn = driver(cloud.apikey, cloud.apisecret, project=cloud.tenant_name)
     elif cloud.provider == Provider.DOCKER:
-        if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))) \
-                and os.system('ping -c 3 172.17.0.1') != 0:
-                # the above ping is for dev purposes for the time being
-                # in order for mist to discover the docker-dev
+        if is_private(cloud.apiurl):
             docker_host, docker_port = mist.core.vpn.methods.destination_nat(
                 cloud.owner, cloud.apiurl, cloud.docker_port)
         else:
@@ -1370,7 +1368,7 @@ def connect_provider(cloud):
         conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         libcloud.security.VERIFY_SSL_CERT = False
-        if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))):
+        if is_private(cloud.apiurl):
             host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                cloud.apiurl, 443)
             api_url = '%s:%d' % (host, port)
@@ -1384,7 +1382,7 @@ def connect_provider(cloud):
             driver = get_driver('digitalocean_first_gen')
             conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider == Provider.VSPHERE:
-        if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))):
+        if is_private(cloud.apiurl):
             host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                cloud.apiurl, 443)
             api_url = '%s:%d' % (host, port)
@@ -1398,7 +1396,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if cloud.apisecret:
-            if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))):
+            if is_private(cloud.apiurl):
                 host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                    cloud.apiurl,
                                                                    cloud.ssh_port)
@@ -1406,7 +1404,7 @@ def connect_provider(cloud):
                 host, port = cloud.apiurl, cloud.ssh_port
             conn = driver(host, user=cloud.apikey, ssh_key=cloud.apisecret, ssh_port=port)
         else:
-            if is_private_subnet(socket.gethostbyname(sanitize_host(cloud.apiurl))):
+            if is_private(cloud.apiurl):
                 host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                    cloud.apiurl,
                                                                    5000)
@@ -3754,7 +3752,7 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
     if not host:
         raise RequiredParameterMissingError('host')
 
-    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
+    if is_private(host):
         ping = mist.core.vpn.methods.ping_vpn_host(owner=user, host=host)
     else:
         # start pinging the machine in the background
@@ -3770,7 +3768,7 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
         log.error(exc)
         log.warning("SSH failed when probing, let's see what ping has to say.")
         ret = {}
-    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
+    if is_private(host):
         ping_out = json.loads(ping.content)
         log.info("Ping output over VPN: %s packets transmitted, %s received, "
                  "%s packet loss\nrtt min/avg/max = %s/%s/%s"
@@ -3853,7 +3851,7 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
 
 
 def ping(host, user=None):
-    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
+    if is_private(host):
         ping = mist.core.vpn.methods.ping_vpn_host(user, host=host)
         ping_out = json.loads(ping.content)
     else:
