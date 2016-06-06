@@ -3,36 +3,41 @@
 
 <dom-module id="page-account">
     <template>
+        <style is="custom-style" include="single-page"></style>
         <style>
             #container {
                 max-width: 600px;
             }
-
             paper-tabs,
             paper-toolbar {
                 background-color: #d3d3d3;
                 color: #000;
                 --paper-tabs-selection-bar-color: #2196F3;
             }
+            iron-pages > * ::content paper-material {
+                padding: 24px;
+                display: block; 
+            }
         </style>
-        <paper-tabs attr-for-selected="data-route" selected="{{selected}}">
-            <paper-tab data-route="0" current="account" title="Account">PROFILE</paper-tab>
-            <paper-tab data-route="1" current="account" title="Account">PASSWORD</paper-tab>
-            <paper-tab data-route="2" current="account" title="Account">BILLING</paper-tab>
-            <paper-tab data-route="3" current="account" title="Account">ACTIVE SESSIONS</paper-tab>
-            <paper-tab data-route="4" current="account" title="Account">API TOKENS</paper-tab>
-            <paper-tab data-route="5" current="account" title="Account">FEEDBACK</paper-tab>
-        </paper-tabs>
+        <div id="content">
+            <paper-tabs attr-for-selected="data-route" selected="{{selected}}">
+                <paper-tab data-route="0" current="account" title="Account">PROFILE</paper-tab>
+                <paper-tab data-route="1" current="account" title="Account">PASSWORD</paper-tab>
+                <paper-tab data-route="2" current="account" title="Account">BILLING</paper-tab>
+                <paper-tab data-route="3" current="account" title="Account">ACTIVE SESSIONS</paper-tab>
+                <paper-tab data-route="4" current="account" title="Account">API TOKENS</paper-tab>
+                <paper-tab data-route="5" current="account" title="Account">FEEDBACK</paper-tab>
+            </paper-tabs>
 
-        <iron-pages selected="{{selected}}">
-            <details-page data-route="0"></details-page>
-            <password-page data-route="1"></password-page>
-            <plans-list data-route="2"></plans-list>
-            <div data-route="3"></div>
-            <div data-route="4"></div>
-            <feedback-page data-route="5"></feedback-page>
-        </iron-pages>
-
+            <iron-pages selected="{{selected}}">
+                <details-page data-route="0"></details-page>
+                <password-page data-route="1"></password-page>
+                <plans-list data-route="2"></plans-list>
+                <div data-route="3"></div>
+                <div data-route="4"></div>
+                <feedback-page data-route="5"></feedback-page>
+            </iron-pages>
+        </div>
     </template>
 </dom-module>
 

@@ -6,9 +6,13 @@
         <style include="shared-styles">
             :host {
                 display: block;
+                margin: 16px;
+                padding: 16px;
+                width: 31%;
+                box-sizing: border-box;
             }
 
-            paper-card {
+            paper-material {
                 display: block;
                 width: 25%;
                 float: left;
@@ -25,16 +29,15 @@
             }
         </style>
 
-        <paper-card>
-            <div class="card-content">
-                <h4>[[plan.title]]</h4>
-                <hr>
-                <p>[[priceText]]</p>
-                <p>[[descriptionText]]</p>
-                <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
-                <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
-                <paper-button class="btn-block submit-btn" hidden$="[[!plan.promo.notUsed]]" raised on-tap="_selectPlan">Select</paper-button>
-        </paper-card>
+        <!-- <paper-material> -->
+            <h4>[[plan.title]]</h4>
+            <hr>
+            <p>[[priceText]]</p>
+            <p>[[descriptionText]]</p>
+            <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
+            <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
+            <paper-button class="btn-block submit-btn" hidden$="[[!plan.promo.notUsed]]" raised on-tap="_selectPlan">Select</paper-button>
+        <!-- </paper-material> -->
     </template>
 
     <script>
