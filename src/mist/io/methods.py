@@ -2815,9 +2815,6 @@ def ssh_command(user, cloud_id, machine_id, host, command,
     # check if cloud exists
     Cloud.objects.get(owner=user, id=cloud_id)
 
-    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
-        host, port = mist.core.vpn.methods.destination_nat(user, host, port)
-
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id,
                                            key_id, username, password, port)
@@ -4054,13 +4051,9 @@ def deploy_python_plugin(user, cloud_id, machine_id, plugin_id,
         raise BadRequestError("Invalid value_type '%s'. Must be 'gauge' or "
                               "'derive'." % value_type)
 
-    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
-        host, port = mist.core.vpn.methods.destination_nat(user, host, 22)
-    else:
-        port = 22
     # Initialize SSH connection
     shell = Shell(host)
-    key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id, port=port)
+    key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id)
     sftp = shell.ssh.open_sftp()
 
     tmp_dir = "/tmp/mist-python-plugin-%d" % random.randrange(2 ** 20)
@@ -4202,13 +4195,9 @@ def undeploy_python_plugin(user, cloud_id, machine_id, plugin_id, host):
     if not host:
         raise RequiredParameterMissingError('host')
 
-    if is_private_subnet(socket.gethostbyname(sanitize_host(host))):
-        host, port = mist.core.vpn.methods.destination_nat(user, host, 22)
-    else:
-        port = 22
     # Iniatilize SSH connection
     shell = Shell(host)
-    key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id, port=port)
+    key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id)
 
     # Prepare collectd.conf
     script = """

@@ -23,6 +23,7 @@ from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import ServiceUnavailableError
 
 from mist.io.helpers import trigger_session_update
+from mist.io.helpers import sanitize_host
 
 try:
     from mist.core.user.models import User
@@ -32,7 +33,12 @@ try:
 except ImportError:
     from mist.io import config
 
+from mist.core.vpn.methods import destination_nat
+
+from libcloud.utils.networking import is_private_subnet
+
 import logging
+
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
@@ -226,15 +232,17 @@ class ParamikoShell(object):
         username used to connect.
 
         """
-
         log.info("autoconfiguring Shell for machine %s:%s",
                  cloud_id, machine_id)
+
+        if is_private_subnet(socket.gethostbyname(sanitize_host(self.host))):
+            self.host, port = destination_nat(user, self.host, port)
+
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
         try:
             machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
         except me.DoesNotExist:
             machine = Machine(cloud=cloud, machine_id=machine_id)
-
         if key_id:
             keys = [Keypair.objects.get(owner=user, id=key_id)]
         else:
@@ -335,6 +343,9 @@ class DockerShell(object):
                  cloud_id, machine_id)
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
         docker_port = cloud.docker_port
+
+        if is_private_subnet(socket.gethostbyname(sanitize_host(self.host))):
+            self.host, docker_port = destination_nat(user, self.host, docker_port)
 
         # For basic auth
         if cloud.apikey and cloud.apisecret:
