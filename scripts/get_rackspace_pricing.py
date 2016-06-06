@@ -6,6 +6,7 @@
 import requests, json
 
 prices_url = 'https://www.rackspace.com/profiles/www/modules/custom/rs/json/prices.json'
+GBP_TO_DOLLAR_RATE  = 1.45 # For conversion of Rackspace London prices to dollar
 
 all_prices = requests.get(prices_url).json().get('geo')
 us_prices = all_prices.get('USA').get('rates').get('cloud-servers')
@@ -53,11 +54,14 @@ def get_size_per_region(prices, region):
                     size = flavor_type_mapping[size]
                     if not sizes[region].get(size):
                         sizes[region][size] = {}
-                    if region != 'rackspacenovalon':
-                        sizes[region][size][flavor_os] = prices[flavor_type][flavor_os][flavor_size]['infrastructure']['managed-inf']['USD']
+                    if region == 'rackspacenovalon':
+                        infrastructure = prices[flavor_type][flavor_os][flavor_size]['infrastructure']['managed-inf']['GBP']
+                        support = prices[flavor_type][flavor_os][flavor_size]['support']['managed-inf']['GBP']
+                        sizes[region][size][flavor_os] = (infrastructure + support) * GBP_TO_DOLLAR_RATE
                     else:
-                        sizes[region][size][flavor_os] = prices[flavor_type][flavor_os][flavor_size]['infrastructure']['managed-inf']['GBP']
-
+                        infrastructure = prices[flavor_type][flavor_os][flavor_size]['infrastructure']['managed-inf']['USD']
+                        support = prices[flavor_type][flavor_os][flavor_size]['support']['managed-inf']['USD']
+                        sizes[region][size][flavor_os] = infrastructure + support
 
 get_size_per_region(us_prices, region='rackspacenovadfw')
 sizes['rackspacenovaord'] = sizes['rackspacenovadfw']

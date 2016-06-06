@@ -4356,9 +4356,10 @@ def machine_cost_calculator(m):
     HostVirtual, Vultr
     """
     cost = {'indicative_cost_per_hour': 0, 'indicative_cost_per_month': 0}
-    if m.driver.type in [Provider.LINODE, Provider.PACKET, Provider.GCE, \
-        Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
+    if m.driver.type in [Provider.LINODE, Provider.PACKET, Provider.GCE]:
         sizes = CloudSize.objects.filter(cloud_provider=m.driver.type)
+    if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
+        sizes = CloudSize.objects.filter(cloud_provider=m.driver.type, cloud_region=m.driver.region)
     now = datetime.now()
     month_days = calendar.monthrange(now.year, now.month)[1]
     if m.driver.type in config.EC2_PROVIDERS:
@@ -4393,14 +4394,15 @@ def machine_cost_calculator(m):
         size = m.extra.get('flavorId')
         for node_size in sizes:
             if node_size.size_id == size:
-                plan_price = node_size.price.get(os_type)
+                plan_price = json.loads(node_size.price).get('os_type')
                 if not plan_price:
                     # use the default which is linux
-                    plan_price = node_size.price.get('linux')
-                plan_price = float(plan_price.replace('/hour','').replace('$', '').replace('GBP', ''))
+                    plan_price = json.loads(node_size.price).get('linux')
                 # just need the float value
                 cost['indicative_cost_per_hour'] = plan_price
-                cost['indicative_cost_per_month'] = float(plan_price) * 24 * month_days
+                cost['indicative_cost_per_month'] = float(plan_price) * 730 + 50
+                # RackSpace mentions on https://www.rackspace.com/cloud/public-pricing
+                # there's a minimum service charge of $50/mo across all Cloud Servers
     if m.driver.type == Provider.LINODE:
         size = m.extra.get('PLANID')
         if size:
