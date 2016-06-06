@@ -266,6 +266,11 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                         };
                     }, this);
 
+                if (!this._validateRTags(payloadRules)) {
+                    Mist.notificationController.timeNotify('You can use only these chars to declare tags: a-z, 0-9, _, -', 2000);
+                    return;
+                }
+
                 console.log(payloadRules);
 
                 var that = this;
@@ -375,6 +380,25 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 });
 
                 return rtags;
+            },
+
+            _validateRTags: function(payloadRules) {
+                var regex = new RegExp('^[a-z0-9\_-]+$'),
+                    isValid = true;
+
+                if (Object.keys(payloadRules).length) {
+                    payloadRules.forEach(function(rule) {
+                        for (var tag in rule.rtags) {
+                            if ((tag && !regex.test(tag)) || (rule.rtags[tag] && !regex.test(rule.rtags[tag]))) {
+                                isValid = false;
+                                break;
+                            }
+                            console.log(tag);
+                        }
+                    });
+                }
+
+                return isValid;
             }
         });
     }
