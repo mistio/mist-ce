@@ -2,7 +2,8 @@
 <dom-module id="item-actions">
     <template>
         <style include="paper-dialog-shared-styles"></style>
-        <style>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
             :host {
                 margin: 0;
                 background-color: transparent;
@@ -11,7 +12,14 @@
             }
 
             #select-action {
-
+                width: 130px;
+            }
+            #select-action paper-listbox {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+            #select-action paper-listbox ::content iron-icon {
+                vertical-align: top;
             }
             #select-action paper-button {width: 100%; text-align: left;}
             #select-action paper-item {padding: 0; margin: 0; width: 130px;}
@@ -37,8 +45,20 @@
                 padding: 16px 16px;
                 margin-left: 16px;
             }
+            paper-dialog {
+                padding: 0;
+            }
+            paper-dialog > h2 {
+                text-transform: capitalize;
+                margin-top: 24px;
+            }
+            paper-dialog > p {
+                margin: 0 24px 0 24px
+            }
+            paper-dialog > .btn-group {
+                margin-bottom: 16px;
+            }
 
-            paper-dialog > h2 { text-transform: capitalize;}
         </style>
         <content>
           <div class="actions">
@@ -64,23 +84,28 @@
             <template is="dom-if" if="[[!multi]]">
               <h2>[[selectedAction.name]] [[selectedItem.type]] ?</h2>
               <paper-dialog-scrollable>
-                [[selectedItem.name]]
+                <p>
+                    [[selectedItem.name]]
+                </p>
               </paper-dialog-scrollable>
             </template>
 
             <template is="dom-if" if="[[multi]]">
               <h2>[[selectedAction.name]] [[selectedItems.length]] {{selectedItemsType(selectedItems.length, items.length)}} ?</h2>
               <paper-dialog-scrollable>
-                <template is="dom-repeat" items="{{selectedItemsDetails(selectedItems.length)}}">
-                  [[item.name]]
-                </template>
+                <p>
+                    <template is="dom-repeat" items="{{selectedItemsDetails(selectedItems.length)}}">
+                      [[item.name]]
+                    </template>
+                </p>
               </paper-dialog-scrollable>
             </template>
-            <div class="buttons">
+            <div class="buttons clearfix btn-group">
               <paper-button dialog-dismiss>Cancel</paper-button>
-              <paper-button dialog-confirm on-tap="_confirmAction">Accept</paper-button>
+              <paper-button dialog-confirm class="red" on-tap="_confirmAction">Accept</paper-button>
             </div>
           </paper-dialog>
+          <dialog-element></dialog-element>
         </content>
     </template>
 </dom-module>
