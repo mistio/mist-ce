@@ -233,9 +233,6 @@ class ParamikoShell(object):
         log.info("autoconfiguring Shell for machine %s:%s",
                  cloud_id, machine_id)
 
-        if is_private(self.host):
-            self.host, port = destination_nat(user, self.host, port)
-
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
         try:
             machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
@@ -269,6 +266,12 @@ class ParamikoShell(object):
             for ssh_user in users:
                 for port in ports:
                     try:
+                        # store the original ssh port in case of NAT
+                        # by the OpenVPN server
+                        ssh_port = port
+                        if is_private(self.host):
+                            self.host, port = destination_nat(user, self.host, port)
+                            log.info("Port forwarding SSH over VPN")
                         log.info("ssh -i %s %s@%s:%s",
                                  key.name, ssh_user, self.host, port)
                         self.connect(username=ssh_user,
@@ -296,7 +299,7 @@ class ParamikoShell(object):
                             ssh_user = new_ssh_user
                         except MachineUnauthorizedError:
                             continue
-                    # we managed to connect succesfully, return
+                    # we managed to connect successfully, return
                     # but first update key
                     updated = False
                     for key_assoc in machine.key_associations:
@@ -307,9 +310,12 @@ class ParamikoShell(object):
                             break
                     if not updated:
                         trigger_session_update_flag = True
+                        # in case of a private host do NOT update the key
+                        # associations with the port allocated by the OpenVPN
+                        # server, instead use the original ssh_port
                         key_assoc = KeyAssociation(keypair=key,
                                                    ssh_user=ssh_user,
-                                                   port=port,
+                                                   port=ssh_port,
                                                    sudo=self.check_sudo())
                         machine.key_associations.append(key_assoc)
                     machine.save()
