@@ -262,6 +262,8 @@ class ParamikoShell(object):
                               for key_assoc in machine.key_associations]))
         if 22 not in ports:
             ports.append(22)
+        # store the original destination IP to prevent rewriting it when NATing
+        ssh_host = self.host
         for key in keys:
             for ssh_user in users:
                 for port in ports:
@@ -270,7 +272,7 @@ class ParamikoShell(object):
                         # by the OpenVPN server
                         ssh_port = port
                         if is_private(self.host):
-                            self.host, port = destination_nat(user, self.host, port)
+                            self.host, port = destination_nat(user, ssh_host, port)
                             log.info("Port forwarding SSH over VPN")
                         log.info("ssh -i %s %s@%s:%s",
                                  key.name, ssh_user, self.host, port)
