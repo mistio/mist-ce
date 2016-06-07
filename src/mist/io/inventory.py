@@ -10,9 +10,6 @@ except ImportError:
 
 import mist.io.methods
 import mist.core.vpn.methods
-from mist.io.helpers import sanitize_host
-
-from libcloud.utils.networking import is_private_subnet
 
 
 class MistInventory(object):
@@ -37,7 +34,7 @@ class MistInventory(object):
             except Exception as exc:
                 print exc
                 continue
-            if is_private_subnet(socket.gethostbyname(sanitize_host(ip_addr))):
+            if mist.core.vpn.methods.is_private(ip_addr):
                 ip_addr, port = mist.core.vpn.methods.destination_nat(self.user,
                                                                       ip_addr,
                                                                       port)
