@@ -1,8 +1,8 @@
 <a id="me-btn" {{action "meClicked" target=view}}>
     {{#if Mist.authenticated}}
-        <span class="owner {{if view.hasName 'name'}} {{if view.hasOrganization 'org'}}">{{view.gravatarName}}
-        {{#if view.hasOrganization}}
-            <br/><span class="org-name">{{Mist.organizationsController.model.name}}</span> &middot; <span class="org-team-name">{{view.memberTeam}}</span>
+        <span class="owner {{if view.hasName 'name'}} {{if view.showCurrentOrganization 'org'}}">{{view.gravatarName}}
+        {{#if view.showCurrentOrganization}}
+            <br/><span class="org-name">{{view.organization.name}}</span> &middot; <span class="org-team-name">{{view.memberTeam}}</span>
         {{/if}}
         </span>
     {{/if}}
@@ -21,13 +21,13 @@
     {{/if}}
 
     <ul class="ui-listview orgs-list">
-        {{#if Mist.orgs}}
-            {{#each organization in Mist.orgs}}
+        {{#if view.organizations.length}}
+            {{#each organization in view.organizations}}
                 {{component "organization-item" organization=organization}}
             {{/each}}
         {{/if}}
 
-        {{#if Mist.can_create_org}}
+        {{#if view.showCreateOrganization}}
         <li class="text-center" id="add-org"><a {{action "addOrganizationClicked" target=view}} class="ui-btn ui-btn-d ui-caps ui-shadow">Add Organization</a></li>
         {{/if}}
     </ul>

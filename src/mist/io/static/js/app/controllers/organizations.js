@@ -63,7 +63,7 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                         'new_name': args.newName
                     })
                     .success(function(organization) {
-                        that._renameOrganization(organization);
+                        that._renameOrganization(args.newName);
                     })
                     .error(function(message) {
                         Mist.notificationController.notify(message);
@@ -95,8 +95,14 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                 }, 100);
             },
 
-            _renameOrganization: function(organization) {
+            _renameOrganization: function(newName) {
+                Ember.set(Mist.organization, 'name', newName);
 
+                Mist.orgs.forEach(function(org) {
+                    if (org.id == Mist.organization.id) {
+                        Ember.set(org, 'name', newName);
+                    }
+                })
             },
 
             _updateModel: function(organization) {

@@ -33,6 +33,10 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                 return !!Object.keys(Mist.organization).length;
             }),
 
+            firstOrg: Ember.computed('Mist.organization.name', 'hasOrg', function() {
+                return this.get('hasOrg') && !Mist.organization.name;
+            }),
+
             isOrgOwner: Ember.computed('hasOrg', 'Mist.teamsController.model', function() {
                 if (this.get('hasOrg')) {
                     return Mist.teamsController.model.some(function(team) {

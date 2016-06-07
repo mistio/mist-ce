@@ -17,7 +17,23 @@
         {{#if Mist.cloudsController.loading}}
             <!-- Loader !-->
         {{else}}
-            {{#if view.hasOrg}}
+            {{#if view.firstOrg}}
+                <div id="no-collection" class="ui-responsive">
+                    <div id="no-collection-inner" class="ui-shadow">
+                        <span class="icon-teams"></span>
+                        <h1>Welcome to mist.io</h1>
+                        <h2>GET STARTED BY ADDING AN ORGANISATION NAME.</h2>
+                        <form id="edit-org-form" {{action "editOrg" on="submit" target=view}}>
+                            {{input value=Mist.organizationEditController.newName placeholder="Organisation name"}}
+                            <button type="submit" class="ui-btn ui-btn-d ui-shadow ui-caps {{if Mist.organizationEditController.formReady '' 'ui-state-disabled'}}">Edit</button>
+                        </form>
+                        <p>
+                            Organisations help you invite more people within context.<br>You can always add more organisations later.
+                        </p>
+                    </div>
+                </div>
+            {{else}}
+                <!-- Edit Organization's name which was created during sign up -->
                 {{#if Mist.cloudsController.model}}
                     {{view "cloudAdd"}}
                 {{else}}
@@ -34,22 +50,6 @@
                         </div>
                     </div>
                 {{/if}}
-            {{else}}
-                <!-- Add Organization for first time -->
-                <div id="no-collection" class="ui-responsive">
-                    <div id="no-collection-inner" class="ui-shadow">
-                        <span class="icon-teams"></span>
-                        <h1>Welcome to mist.io</h1>
-                        <h2>GET STARTED BY ADDING AN ORGANISATION NAME.</h2>
-                        <form id="edit-org-form" {{action "editOrg" on="submit" target=view}}>
-                            {{input value=Mist.organizationEditController.organization.newName placeholder="Organisation name"}}
-                            <button type="submit" class="ui-btn ui-btn-d ui-shadow ui-caps {{if Mist.organizationEditController.formReady '' 'ui-state-disabled'}}">Edit</button>
-                        </form>
-                        <p>
-                            Organisations help you invite more people within context.<br>You can always add more organisations later.
-                        </p>
-                    </div>
-                </div>
             {{/if}}
         {{/if}}
 
