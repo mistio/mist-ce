@@ -1,6 +1,5 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../app-rules/app-rules.html">
-<link rel="import" href="../element-for-in/element-for-in.html">
 <link rel="import" href="../tags/tags-list.html">
 <dom-module id="machine-page">
     <template>
@@ -232,7 +231,7 @@
         <dialog-element></dialog-element>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
-        <tags-list resource="machine" item="[[machine]]"></tags-list>
+        <tags-list resource="machine"></tags-list>
     </template>
 </dom-module>
 <script>
@@ -419,7 +418,10 @@
                 return "";
         },
         _editTags: function() {
-            var el = this.querySelector('tags-list');
+            var el = this.querySelector('tags-list'),
+            items = [];
+            items.push(this.machine);
+            el.items = items;
             el._openDialog();
         },
         _editMachine: function(e) {
