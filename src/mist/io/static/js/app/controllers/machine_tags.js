@@ -155,7 +155,11 @@ define('app/controllers/machine_tags', ['ember'],
             },
 
             _updateFormReady: function() {
-                var formReady = false, tagsKeys = [], error = false;
+                var formReady = true,
+                tagsKeys = [],
+                hasError = false,
+                regex = new RegExp('^[a-z0-9\_-]+$');
+
                 if (this.newTags) {
                     for (var i = 0, len = this.newTags.length; i < len; i++) {
                         var tag = this.newTags[i];
@@ -164,27 +168,28 @@ define('app/controllers/machine_tags', ['ember'],
                             if (tagsKeys.indexOf(tag.key) == -1) {
                                 tagsKeys.push(tag.key);
                             } else {
-                                error = true;
-                                Mist.notificationController.notify('You cannot add tags with the same key!');
+                                hasError = true;
+                                Mist.notificationController.timeNotify('You cannot add tags with the same key!', 2000);
                                 break;
                             }
                         }
 
                         // check if pair with just value and without key exists
                         if (!tag.key && tag.value) {
-                            error = true;
-                            Mist.notificationController.notify('You cannot add tags without key!');
+                            hasError = true;
+                            Mist.notificationController.timeNotify('You cannot add tags without key!', 2000);
+                            break;
+                        }
+
+                        // regex validation for a-z,0-9,_,- chars
+                        if ((tag.key && !regex.test(tag.key)) || (tag.value && !regex.test(tag.value))) {
+                            hasError = true;
+                            Mist.notificationController.timeNotify('These chars are allowed: a-z, 0-9, _, -', 2000);
                             break;
                         }
                     }
 
-                    if (error) {
-                        formReady = false;
-                    } else {
-                        formReady = true;
-                    }
-
-                    if (formReady && this.addingTag) {
+                    if (hasError || this.addingTag) {
                         formReady = false;
                     }
                 }
