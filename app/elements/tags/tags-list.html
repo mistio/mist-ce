@@ -95,11 +95,15 @@
                     var tags = [];
 
                     items.forEach(function(item) {
-                        item.tags.forEach(function(tag) {
-                            if (tags.indexOf(tag) == -1) {
-                                tags.push(tag);
-                            }
-                        });
+                        if (item.tags) {
+                            item.tags.forEach(function(tag) {
+                                if (tags.indexOf(tag) == -1) {
+                                    tags.push(tag);
+                                }
+                            });
+                        } else {
+                            item.tags = [];
+                        }
                     });
 
                     return tags;
@@ -129,7 +133,7 @@
                             newItem.resource = {
                                 type: this.resource,
                                 item_id: item.id,
-                                cloud_id: ['machine', 'image', 'network'].indexOf(this.get('resource') != -1) ? item.cloud.id : ''
+                                cloud_id: ['machine', 'image', 'network'].indexOf(this.resource) != -1 ? item.cloud.id : ''
                             };
                             newItem.tags = item.tags.concat(newTags);
 
