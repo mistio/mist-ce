@@ -83,20 +83,6 @@
             --paper-radio-button-checked-ink-color: var(--paper-light-blue-500);
             --paper-radio-button-unchecked-ink-color: var(--paper-light-blue-900);
         }
-        .step{
-          display: inline;
-          position: relative;
-          left: 246px;
-        }
-        .step-number{
-          border-radius: 50%;
-          width: 36px;
-          height: 36px;
-          padding: 8px;
-          background: #2F2F3E;
-          color: #ffffff;
-          text-align: center;
-        }
         </style>
         <!-- <paper-material>
             <paper-steps initial-step="0">
@@ -172,7 +158,7 @@
                 </paper-step>
             </paper-steps>
           </paper-material> -->
-          <paper-material class="stepper">
+          <paper-material>
             <div class="step">
                 <a class="container active completed" href="#" on-tap="_pageChange" page="first" id="firstpage">
                     <span class="step-number">1</span>
@@ -191,8 +177,6 @@
                     <span class="step-title">General feedback</span>
                 </a>
             </div>
-        </paper-material>
-        <paper-material class="form">
             <h2>Feedback <span>* All fields are mandatory</span></h2>
             <template is="dom-if" if="[[pageFirst]]">
               <h2>Demographics</h2>
