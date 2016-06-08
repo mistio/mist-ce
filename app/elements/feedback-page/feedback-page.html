@@ -159,7 +159,7 @@
             </paper-steps>
           </paper-material> -->
 
-          <paper-material>
+        <paper-material>
             <div class="step">
                 <a class="container active completed" href="#" on-tap="_pageChange" page="first" id="firstpage">
                     <span class="step-number">1</span>
@@ -222,6 +222,7 @@
                     <paper-input hidden$="[[!user.hasExtraHosted]]" label="Please specify where do you host your servers?" value="{{user.extraHosted}}"></paper-input>
                     <hr class="xs12" />
                     <div class="bottom-actions clearfix xs12">
+                        <paper-button class="pull-left" raised on-tap="_pageChange" page="first">Previous</paper-button>
                         <paper-button class="pull-right" disabled$="[[!secondFormReady]]" raised on-tap="_pageChange" page="third">Next</paper-button>
                     </div>
                 </div>
@@ -255,13 +256,13 @@
                     <paper-textarea class="xs12" label="How can we improve mist.io to better meet your needs?" rows="5" value="{{user.improve}}"></paper-textarea>
                     <hr class="xs12" />
                     <div class="clearfix bottom-actions xs12">
-                        <paper-button class="pull-left" raised on-tap="_pageChange" page="first">Previous</paper-button>
-                        <paper-button class="pull-right" disabled$="[[!secondFormReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                        <paper-button class="pull-left" raised on-tap="_pageChange" page="second">Previous</paper-button>
+                        <paper-button class="pull-right" disabled$="[[!thirdFormReady]]" raised on-tap="_submitForm">Submit</paper-button>
                     </div>
                 </div>
+            </template>
         </paper-material>
-        </template>
-        <iron-ajax id="ajax" url="/account" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+        <iron-ajax id="feedbackAjaxRequest" url="/account" method="POST" on-response="_feedbackAjaxResponse" on-error="_feedbackAjaxError"></iron-ajax>
         <iron-signals on-iron-signal-user-menu="_updateUser"></iron-signals>
     </template>
     <script>
@@ -611,14 +612,18 @@
                         improve: this.user.improve,
                         feedback: true
                     };
-                    console.log(payload)
-                        //   this.$.ajax.body = payload;
-                        //   this.$.ajax.generateRequest();
-                },
-                _ajaxRequest: function() {
+
                     this.set('sendingData', true);
+
+                    this.$.feedbackAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.feedbackAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.feedbackAjaxRequest.body = payload;
+                    this.$.feedbackAjaxRequest.generateRequest();
                 },
-                _ajaxResponse: function() {
+                _feedbackAjaxResponse: function() {
+                    this.set('sendingData', false);
+                },
+                _feedbackAjaxError: function() {
                     this.set('sendingData', false);
                 },
                 _updateUser: function(e) {
