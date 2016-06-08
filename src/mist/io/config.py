@@ -44,6 +44,8 @@ ALLOW_LIBVIRT_LOCALHOST = settings.get('ALLOW_LIBVIRT_LOCALHOST', False)
 VPN_SERVER_API_ADDRESS = settings.get('VPN_SERVER_API_ADDRESS', '')
 ALLOWED_PRIVATE_NETWORKS = settings.get('ALLOWED_PRIVATE_NETWORKS', '')
 EXCLUDED_PRIVATE_ADDRESSES = settings.get('EXCLUDED_PRIVATE_ADDRESSES', '')
+# allow public address to be routed over VPN
+ALLOW_PUBLIC_VPN = settings.get('ALLOW_PUBLIC_VPN', True)
 
 # celery settings
 CELERY_SETTINGS = {
