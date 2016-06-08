@@ -29,7 +29,7 @@
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <iron-ajax id="tagsAjaxRequest" method="POST" on-response="_handleTagsAjaxResponse" on-error="_handleTagsAjaxError"></iron-ajax>
+        <iron-ajax id="tagsAjaxRequest" url="/api/v1/tags" method="POST" on-response="_handleTagsAjaxResponse" on-error="_handleTagsAjaxError"></iron-ajax>
     </template>
 
     <script>
@@ -135,11 +135,10 @@
                         }, this);
                         console.log(payload);
 
-                        // this.$.tagsAjaxRequest.body = payload;
-                        // this.$.tagsAjaxRequest.url = '/api/v1/tag';
-                        // this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
-                        // this.$.tagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                        // this.$.tagsAjaxRequest.generateRequest();
+                        this.$.tagsAjaxRequest.body = payload;
+                        this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
+                        this.$.tagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.tagsAjaxRequest.generateRequest();
                     }
                 },
                 _handleTagsAjaxResponse: function(e) {
