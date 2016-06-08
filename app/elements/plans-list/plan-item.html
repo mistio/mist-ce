@@ -24,19 +24,20 @@
                 border: none;
                 border-bottom: 1px solid #ccc;
             }
-            h4{
-              font-weight: bold;
+
+            h4 {
+                font-weight: bold;
             }
         </style>
 
         <!-- <paper-material> -->
-            <h4>[[plan.title]]</h4>
-            <hr>
-            <p>[[priceText]]</p>
-            <p>[[descriptionText]]</p>
-            <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
-            <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
-            <paper-button class="btn-block submit-btn" hidden$="[[!plan.promo.notUsed]]" raised on-tap="_selectPlan">Select</paper-button>
+        <h4>[[plan.title]]</h4>
+        <hr>
+        <p>[[priceText]]</p>
+        <p>[[descriptionText]]</p>
+        <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
+        <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
+        <paper-button class="btn-block submit-btn" hidden$="[[!plan.promo.notUsed]]" raised on-tap="_selectPlan">Select</paper-button>
         <!-- </paper-material> -->
     </template>
 
@@ -67,9 +68,6 @@
                         type: String,
                         computed: '_computeExpirationDate(plan.expiration)'
                     },
-                },
-                ready: function() {
-
                 },
                 _computePriceText: function(price) {
                     return price != null ? '$' + price + '/month' : '';

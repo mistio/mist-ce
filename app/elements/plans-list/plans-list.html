@@ -1,6 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<link rel="import" href="../plan-item/plan-item.html">
 
 
 <dom-module id="plans-list">
@@ -9,12 +8,15 @@
             :host {
                 display: block;
             }
+
             .plans {
                 @apply(--layout-horizontal);
-                flex-wrap: wrap;
-                align-items: stretch;
+                /*flex-wrap: wrap;
+                align-items: stretch;*/
             }
+
             .plan {
+                @apply(--layout-flex);
                 @apply(--shadow-elevation-2dp);
                 text-align: center;
                 /*min-width: 226px;*/
@@ -22,12 +24,12 @@
         </style>
 
         <paper-material>
-          <h2>Billing</h2>
-          <div class="plans">
-              <template is="dom-repeat" items=[[plans]] as="plan">
-                  <plan-item plan="[[plan]]" class="plan"></plan-item>
-              </template>
-          </div>
+            <h2>Billing</h2>
+            <div class="plans">
+                <template is="dom-repeat" items=[[plans]] as="plan">
+                    <plan-item plan="[[plan]]" class="plan"></plan-item>
+                </template>
+            </div>
         </paper-material>
     </template>
 
@@ -41,11 +43,12 @@
                 properties: {
                     plans: {
                         type: Array,
-                        value: []
+                        value: function() {
+                            return PLANS.filter(function(plan) {
+                                return plan.visible;
+                            });
+                        }
                     }
-                },
-                ready: function() {
-                    this.set('plans', PLANS);
                 }
             });
         })();

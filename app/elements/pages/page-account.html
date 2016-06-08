@@ -26,7 +26,8 @@
                 <paper-tab data-route="2" current="account" title="Account">BILLING</paper-tab>
                 <paper-tab data-route="3" current="account" title="Account">ACTIVE SESSIONS</paper-tab>
                 <paper-tab data-route="4" current="account" title="Account">API TOKENS</paper-tab>
-                <paper-tab data-route="5" current="account" title="Account">FEEDBACK</paper-tab>
+                <paper-tab data-route="5" current="account" title="Account">SUBSCRIPTION HISTORY</paper-tab>
+                <paper-tab data-route="6" current="account" title="Account">FEEDBACK</paper-tab>
             </paper-tabs>
 
             <iron-pages selected="{{selected}}">
@@ -35,7 +36,8 @@
                 <plans-list data-route="2"></plans-list>
                 <div data-route="3"></div>
                 <div data-route="4"></div>
-                <feedback-page data-route="5"></feedback-page>
+                <subscriptions-list data-route="5"></subscriptions-list>
+                <feedback-page data-route="6"></feedback-page>
             </iron-pages>
 
         </div>
