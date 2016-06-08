@@ -1220,7 +1220,7 @@ def machine_rdp(request):
     except:
         rdp_port = 3389
 
-    if is_private(host):
+    if is_private(auth_context.owner, host):
         from mist.core.vpn.methods import destination_nat
         host, rdp_port = destination_nat(auth_context.owner, host, rdp_port)
 

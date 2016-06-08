@@ -271,7 +271,7 @@ class ParamikoShell(object):
                         # store the original ssh port in case of NAT
                         # by the OpenVPN server
                         ssh_port = port
-                        if is_private(self.host):
+                        if is_private(user, self.host):
                             self.host, port = destination_nat(user, ssh_host, port)
                             log.info("Port forwarding SSH over VPN")
                         log.info("ssh -i %s %s@%s:%s",
@@ -350,7 +350,7 @@ class DockerShell(object):
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
         docker_port = cloud.docker_port
 
-        if is_private(self.host):
+        if is_private(user, self.host):
             self.host, docker_port = destination_nat(user, self.host, docker_port)
 
         # For basic auth

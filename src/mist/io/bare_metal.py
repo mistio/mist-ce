@@ -105,7 +105,7 @@ class BareMetalDriver(object):
             ports_list.insert(0, ssh_port, )
         for port in ports_list:
             try:
-                if is_private(hostname):
+                if is_private(user, hostname):
                     hostname, port = destination_nat(user, hostname, port)
                 s.connect((hostname, port))
                 s.shutdown(2)
@@ -129,7 +129,7 @@ class BareMetalDriver(object):
         """
         if not hostname:
             return 256
-        if is_private(hostname):
+        if is_private(user, hostname):
             ping = ping_vpn_host(owner=user, host=hostname)
             if ping.status_code == 200 and int(json.loads(ping.content)['packets_rx']) > 0:
                 response = 0

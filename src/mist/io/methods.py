@@ -3772,7 +3772,7 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
     if not host:
         raise RequiredParameterMissingError('host')
 
-    if is_private(host):
+    if is_private(user, host):
         ping = mist.core.vpn.methods.ping_vpn_host(owner=user, host=host)
     else:
         # start pinging the machine in the background
@@ -3788,7 +3788,7 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
         log.error(exc)
         log.warning("SSH failed when probing, let's see what ping has to say.")
         ret = {}
-    if is_private(host):
+    if is_private(user, host):
         ping_out = json.loads(ping.content)
         log.info("Ping output over VPN: %s packets transmitted, %s received, "
                  "%s packet loss\nrtt min/avg/max = %s/%s/%s"
@@ -3871,7 +3871,7 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
 
 
 def ping(host, user=None):
-    if is_private(host):
+    if is_private(user, host):
         ping = mist.core.vpn.methods.ping_vpn_host(user, host=host)
         ping_out = json.loads(ping.content)
     else:
