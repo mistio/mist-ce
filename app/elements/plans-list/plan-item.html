@@ -28,17 +28,20 @@
             h4 {
                 font-weight: bold;
             }
+            #select {
+              color: #ffffff;
+              background-color: #039BE5;
+            }
         </style>
 
-        <!-- <paper-material> -->
         <h4>[[plan.title]]</h4>
         <hr>
         <p>[[priceText]]</p>
         <p>[[descriptionText]]</p>
         <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
         <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
-        <paper-button class="btn-block submit-btn" hidden$="[[!plan.promo.notUsed]]" raised on-tap="_selectPlan">Select</paper-button>
-        <!-- </paper-material> -->
+        <paper-button id="select" class="btn-block submit-btn" disabled$="[[plan.promo.notUsed]]" raised on-tap="_selectPlan">Select</paper-button>
+
     </template>
 
     <script>
