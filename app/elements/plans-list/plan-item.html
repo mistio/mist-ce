@@ -32,6 +32,9 @@
               color: #ffffff;
               background-color: #039BE5;
             }
+            #select[disabled] {
+              background-color: #ACDEF6;
+            }
         </style>
 
         <h4>[[plan.title]]</h4>
@@ -40,7 +43,7 @@
         <p>[[descriptionText]]</p>
         <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
         <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
-        <paper-button id="select" class="btn-block submit-btn" disabled$="[[plan.promo.notUsed]]" raised on-tap="_selectPlan">Select</paper-button>
+        <paper-button id="select" class="btn-block submit-btn" disabled$="[[_disabledChanged]]" raised on-tap="_selectPlan">Select</paper-button>
 
     </template>
 
@@ -54,6 +57,10 @@
                 properties: {
                     plan: {
                         type: Object
+                    },
+                    disabled: {
+                      type: Boolean,
+                      value: false
                     },
                     priceText: {
                         type: String,
@@ -71,6 +78,10 @@
                         type: String,
                         computed: '_computeExpirationDate(plan.expiration)'
                     },
+                },
+                _disabledChanged: function() {
+
+                    return disabled;
                 },
                 _computePriceText: function(price) {
                     return price != null ? '$' + price + '/month' : '';

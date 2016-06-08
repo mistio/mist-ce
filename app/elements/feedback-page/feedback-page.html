@@ -3,6 +3,8 @@
 <link rel="import" href="../../bower_components/paper-steps/paper-steps.html">
 <link rel="import" href="../../bower_components/paper-steps/paper-step.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+
 <dom-module id="feedback-page">
     <template>
         <style is="custom-style" include="forms"></style>
@@ -83,6 +85,23 @@
                 --paper-radio-button-checked-ink-color: var(--paper-light-blue-500);
                 --paper-radio-button-unchecked-ink-color: var(--paper-light-blue-900);
             }
+            #stepper{
+                @apply(--layout-horizontal);
+            }
+            .step{
+              @apply(--layout-flex);
+              text-align: center;
+            }
+            .step-number{
+              border-radius: 50%;
+              width: 36px;
+              height: 36px;
+              padding: 8px;
+
+              background: #2F2F3E;
+              color: #fff;
+              text-align: center;
+            }
         </style>
         <!-- <paper-material>
             <paper-steps initial-step="0">
@@ -160,6 +179,7 @@
           </paper-material> -->
 
         <paper-material>
+          <div id="stepper">
             <div class="step">
                 <a class="container active completed" href="#" on-tap="_pageChange" page="first" id="firstpage">
                     <span class="step-number">1</span>
@@ -178,6 +198,7 @@
                     <span class="step-title">General feedback</span>
                 </a>
             </div>
+          </div>
             <h2>Feedback <span>* All fields are mandatory</span></h2>
             <template is="dom-if" if="[[pageFirst]]">
                 <h2>Demographics</h2>
@@ -206,10 +227,12 @@
                             </template>
                         </paper-menu>
                     </paper-dropdown-menu>
-                    <hr class="xs12" />
-                    <div class="bottom-actions clearfix xs12">
-                        <paper-button class="pull-right" disabled$="[[!firstFormReady]]" raised on-tap="_pageChange" page="second">Next</paper-button>
-                    </div>
+                      <hr class="xs12" />
+                      <div class="bottom-actions clearfix xs12">
+                          <paper-button class="pull-right" disabled$="[[!firstFormReady]]" raised on-tap="_pageChange" page="second">Next</paper-button>
+                          <paper-progress value="10" indeterminate="true" style="width:100%;"></paper-progress>
+                      </div>
+
                 </div>
             </template>
             <template is="dom-if" if="[[pageSecond]]">
@@ -224,7 +247,9 @@
                     <div class="bottom-actions clearfix xs12">
                         <paper-button class="pull-left" raised on-tap="_pageChange" page="first">Previous</paper-button>
                         <paper-button class="pull-right" disabled$="[[!secondFormReady]]" raised on-tap="_pageChange" page="third">Next</paper-button>
+                        <paper-progress value="10" indeterminate="true" style="width:100%;"></paper-progress>
                     </div>
+
                 </div>
             </template>
             <template is="dom-if" if="[[pageThird]]">
@@ -258,11 +283,13 @@
                     <div class="clearfix bottom-actions xs12">
                         <paper-button class="pull-left" raised on-tap="_pageChange" page="second">Previous</paper-button>
                         <paper-button class="pull-right" disabled$="[[!thirdFormReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                        <paper-progress value="10" indeterminate="true" style="width:100%;"></paper-progress>
                     </div>
+
                 </div>
             </template>
         </paper-material>
-        <iron-ajax id="feedbackAjaxRequest" url="/account" method="POST" on-response="_feedbackAjaxResponse" on-error="_feedbackAjaxError"></iron-ajax>
+        <iron-ajax id="feedbackAjaxRequest" url="/account" method="POST" loading="{{loading}}" on-response="_feedbackAjaxResponse" on-error="_feedbackAjaxError"></iron-ajax>
         <iron-signals on-iron-signal-user-menu="_updateUser"></iron-signals>
     </template>
     <script>
@@ -271,6 +298,12 @@
             Polymer({
                 is: 'feedback-page',
                 properties: {
+                  loading: {
+                      type: Boolean,
+                      readOnly: true,
+                      notify: true,
+                      value: false
+                    },
                     user: {
                         type: Object,
                         value: function() {
