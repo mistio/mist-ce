@@ -28,7 +28,7 @@
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
-
+        <paper-toast></paper-toast>
         <iron-ajax id="tagsAjaxRequest" url="/api/v1/tags" method="POST" on-response="_handleTagsAjaxResponse" on-error="_handleTagsAjaxError"></iron-ajax>
     </template>
 
@@ -58,7 +58,7 @@
                 _openDialog: function(e) {
                     this.querySelector('paper-dialog').open();
                 },
-                _closeDialog: function(e) {
+                _closeDialog: function() {
                     this.querySelector('paper-dialog').close();
                 },
                 _modalClosed: function(e) {
@@ -126,9 +126,11 @@
                         payload = this.newItems.map(function(item) {
                             var newItem = {};
 
-                            newItem.item_id = item.id;
-                            newItem.resource = this.resource;
-                            newItem.cloud_id = ['machine', 'image', 'network'].indexOf(this.get('resource') != -1) ? item.cloud.id : null;
+                            newItem.resource = {
+                                type: this.resource,
+                                item_id: item.id,
+                                cloud_id: ['machine', 'image', 'network'].indexOf(this.get('resource') != -1) ? item.cloud.id : ''
+                            };
                             newItem.tags = item.tags.concat(newTags);
 
                             return newItem;
@@ -142,7 +144,13 @@
                     }
                 },
                 _handleTagsAjaxResponse: function(e) {
-                    console.log(e);
+                    this._closeDialog();
+                    this._showToast('Tags were updated!');
+                },
+                _showToast: function(msg) {
+                    var toast = this.querySelector('paper-toast');
+                    toast.text = msg;
+                    toast.show();
                 }
             });
         })();
