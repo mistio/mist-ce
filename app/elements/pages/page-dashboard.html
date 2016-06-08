@@ -1,4 +1,9 @@
 <link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-chip/paper-chip.html">
+
 <link rel="import" href="../section-tile/section-tile.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
 <link rel="import" href="../app-forms/app-forms.html">
@@ -6,10 +11,6 @@
 <link rel="import" href="../logs/log-list.html">
 <link rel="import" href="../onb-element/onb-element.html">
 <link rel="import" href="../app-header/app-header.html">
-<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
-<link rel="import" href="../../bower_components/paper-chip/paper-chip.html">
 <link rel="import" href="../clouds/cloud-info.html">
 <dom-module id="page-dashboard">
     <template>
@@ -159,7 +160,7 @@
             <div class="clouds top flexchild-wide-top">
                 <div class="flex">
                     <template is="dom-repeat" items="[[model.cloudsArray]]">
-                        <paper-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" on-tap="_showCloudInfoDialog" id$="[[item.id]]" animated>
+                        <paper-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]] paper-chip-0" on-tap="_showCloudInfoDialog" id$="[[item.id]]" animated>
                             <div class="icon"></div>
                             <!-- src="[[_computeProviderLogo(item.provider)]]" -->
                             <h1 class="cloud-title">{{item.title}}</h1>
