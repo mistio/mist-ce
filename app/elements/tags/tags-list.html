@@ -80,7 +80,7 @@
                     return newItems;
                 },
                 _computeTags: function(items) {
-                    var tags = this._commonTags(items);
+                    var tags = this._computeCommonTags(items);
 
                     if (!tags.length) {
                         return [{
@@ -91,7 +91,7 @@
 
                     return tags;
                 },
-                _commonTags: function(items) {
+                _computeCommonTags: function(items) {
                     var tags = [];
 
                     items.forEach(function(item) {
@@ -120,21 +120,20 @@
                     var newTags = this.tags.filter(function(tag) {
                             return tag.key;
                         }),
-                        payloadTags = {},
-                        payload = {};
+                        payload = [];
 
                     if (newTags.length) {
-                        var newItems = this.newItems.map(function(item) {
-                            item.tags = item.tags.concat(newTags);
-                            return item;
-                        });
-                        console.log(newItems);
+                        payload = this.newItems.map(function(item) {
+                            var newItem = {};
 
-                        newTags.forEach(function(tag) {
-                            payloadTags[tag.key] = tag.value;
-                        });
+                            newItem.item_id = item.id;
+                            newItem.resource = this.resource;
+                            newItem.cloud_id = ['machine', 'image', 'network'].indexOf(this.get('resource') != -1) ? item.cloud.id : null;
+                            newItem.tags = item.tags.concat(newTags);
 
-                        payload[this.get('resource')] = ['machine', 'image', 'network'].indexOf(this.get('resource') > -1) ? [this.get('item.cloud.id'), this.get('item.id')] : [this.get('item.id')];
+                            return newItem;
+                        }, this);
+                        console.log(payload);
 
                         // this.$.tagsAjaxRequest.body = payload;
                         // this.$.tagsAjaxRequest.url = '/api/v1/tag';
