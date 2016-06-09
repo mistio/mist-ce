@@ -4351,9 +4351,9 @@ def machine_cost_calculator(m):
     straightforward way to get this info
 
     Supported providers:
-        Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode
+        Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr
     TODO: GCE, Azure, NephoScale,
-    HostVirtual, Vultr
+    HostVirtual
     """
     cost = {'indicative_cost_per_hour': 0, 'indicative_cost_per_month': 0}
     if m.driver.type in [Provider.LINODE, Provider.PACKET, Provider.GCE]:
@@ -4425,6 +4425,8 @@ def machine_cost_calculator(m):
         size = m.extra.get('size', {})
         cost['indicative_cost_per_month'] = size.get('price_monthly')
         cost['indicative_cost_per_hour'] = size.get('price_hourly')
+    if m.driver.type == Provider.VULTR:
+        cost['indicative_cost_per_month'] = m.extra.get('cost_per_month')
     if m.driver.type == Provider.SOFTLAYER:
         if not m.extra.get('hourlyRecurringFee'):
             cost['indicative_cost_per_month'] = m.extra.get('recurringFee')
