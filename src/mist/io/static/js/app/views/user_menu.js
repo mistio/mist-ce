@@ -55,8 +55,8 @@ define('app/views/user_menu', ['ember', 'md5'],
             showCurrentOrganization: Ember.computed('organization', function() {
                 return !!this.get('organization.name');
             }),
-            showEditOrganization: Ember.computed('showCurrentOrganization', function() {
-                return this.get('showCurrentOrganization') && Mist.can_create_org;
+            showCreateOrganization: Ember.computed('showCurrentOrganization', function() {
+                return (this.get('showCurrentOrganization') || Mist.personal) && Mist.can_create_org;
             }),
             memberTeam: Ember.computed('showCurrentOrganization', 'Mist.teamsController.model', function() {
                 var teams = [],
