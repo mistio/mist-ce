@@ -29,9 +29,28 @@ define('app/views/user_menu', ['ember', 'md5'],
                 return Mist.organization;
             }),
             organizations: Ember.computed('Mist.orgs', 'Mist.orgs.@each.name', function() {
-                return Mist.orgs.filter(function(org) {
-                    return org.name;
-                });
+                var organizations = Mist.orgs
+                    .filter(function(org) {
+                        return org.name;
+                    })
+                    .sort(function(a, b) {
+                        if (a.name > b.name) {
+                            return 1;
+                        }
+                        if (a.name < b.name) {
+                            return -1;
+                        }
+                        return 0;
+                    });
+
+                if (Mist.personal) {
+                    organizations.unshift({
+                        id: null,
+                        name: EMAIL
+                    });
+                }
+
+                return organizations;
             }),
             showCurrentOrganization: Ember.computed('organization', function() {
                 return !!this.get('organization.name');
@@ -40,7 +59,8 @@ define('app/views/user_menu', ['ember', 'md5'],
                 return this.get('showCurrentOrganization') && Mist.can_create_org;
             }),
             memberTeam: Ember.computed('showCurrentOrganization', 'Mist.teamsController.model', function() {
-                var teams = [], teamsText = '';
+                var teams = [],
+                    teamsText = '';
                 if (this.get('showCurrentOrganization')) {
                     Mist.teamsController.model.forEach(function(team) {
                         team.members.forEach(function(member) {
