@@ -46,7 +46,7 @@ define('app/views/user_menu', ['ember', 'md5'],
                 if (Mist.personal) {
                     organizations.unshift({
                         id: null,
-                        name: EMAIL
+                        name: 'Personal'
                     });
                 }
 
