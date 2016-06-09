@@ -4400,8 +4400,8 @@ def machine_cost_calculator(m):
                     plan_price = json.loads(node_size.price).get('linux')
                 # just need the float value
                 cost['indicative_cost_per_hour'] = plan_price
-                cost['indicative_cost_per_month'] = float(plan_price) * 730 + 50
-                # RackSpace mentions on https://www.rackspace.com/cloud/public-pricing
+                cost['indicative_cost_per_month'] = float(plan_price) * 730 
+                # TODO: RackSpace mentions on https://www.rackspace.com/cloud/public-pricing
                 # there's a minimum service charge of $50/mo across all Cloud Servers
     if m.driver.type == Provider.LINODE:
         size = m.extra.get('PLANID')
