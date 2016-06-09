@@ -1515,6 +1515,11 @@ def list_machines(user, cloud_id):
             machine_entry.last_seen = now
             machine_entry.missing_since = None
             machine_entry.save()
+        else:
+            machine_entry = Machine(cloud=cloud, machine_id=m.id)
+            machine_entry.last_seen = now
+            machine_entry.missing_since = None
+            machine_entry.save()
 
         if m.driver.type == 'gce':
             # tags and metadata exist in GCE
@@ -1590,7 +1595,9 @@ def list_machines(user, cloud_id):
                 m.extra['endpoints'] = json.dumps(m.extra.get('endpoints', {}))
 
         if m.driver.type == 'bare_metal':
-            m.extra['can_reboot'] = machine_entry and machine_entry.key_associations
+            m.extra['can_reboot'] = False
+            if machine_entry.key_associations:
+                m.extra['can_reboot'] = True
 
         if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
             try:
