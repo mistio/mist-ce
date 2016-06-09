@@ -167,32 +167,32 @@
           type: Number,
           value: 0
         },
-        notifications: {
-					type: Array,
-					value: [],
-					notify: true
-				}
         // notifications: {
-        //   type: Array,
-        //   // value: [
-        //   //   {
-        //   //     text: 'Server down-time',
-        //   //     type: 'red'
-        //   //   },
-        //   //   {
-        //   //     text: 'Machine stopped working',
-        //   //     type: 'red'
-        //   //   },
-        //   //   {
-        //   //     text: 'Server down-time',
-        //   //     type: 'orange'
-        //   //   },
-        //   //   {
-        //   //     text: 'Collectd installed successfully',
-        //   //     type: 'green'
-        //   //   }
-        //   // ]
-        // }
+				// 	type: Array,
+				// 	value: [],
+				// 	notify: true
+				// },
+        notifications: {
+          type: Array,
+          value: [
+            {
+              text: 'Server down-time',
+              type: 'red'
+            },
+            {
+              text: 'Machine stopped working',
+              type: 'red'
+            },
+            {
+              text: 'Server down-time',
+              type: 'orange'
+            },
+            {
+              text: 'Collectd installed successfully',
+              type: 'green'
+            }
+          ]
+        }
 
 
 

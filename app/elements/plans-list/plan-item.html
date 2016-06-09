@@ -43,7 +43,7 @@
         <p>[[descriptionText]]</p>
         <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
         <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
-        <paper-button id="select" class="btn-block submit-btn" disabled$="[[_disabledChanged()]]" raised on-tap="_selectPlan">Select</paper-button>
+        <paper-button id="select" class="btn-block submit-btn" disabled$={{disabled}} raised on-tap="_selectPlan">Select</paper-button>
 
     </template>
 
@@ -60,8 +60,9 @@
                     },
                     disabled: {
                       type: Boolean,
-                      value:false,
-                      computed: '_disabledChanged(plan)'
+                      value: false,
+                      notify: true,
+                      observer: '_disabledChanged'
                     },
                     priceText: {
                         type: String,
@@ -80,13 +81,11 @@
                         computed: '_computeExpirationDate(plan.expiration)'
                     },
                 },
-                _disabledChanged: function(plan){
-                  var change = this.disabled;
-                  if(plan){
-                    change = true;
-                  }
-                  return change
-                },
+                // _disabledChanged: function(){
+                //
+                //   document.getElementById('select').disabled = true;
+                //
+                // },
                 _computePriceText: function(price) {
                     return price != null ? '$' + price + '/month' : '';
                 },
@@ -108,7 +107,7 @@
                     return '';
                 },
                 _selectPlan: function(e) {
-
+                    document.getElementById('select').disabled = true;
                     console.log(this.plan);
                 },
                 _triggerInfo: function() {
