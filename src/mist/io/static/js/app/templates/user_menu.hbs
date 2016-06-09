@@ -27,7 +27,7 @@
             {{/each}}
         {{/if}}
 
-        {{#if view.showCreateOrganization}}
+        {{#if view.showEditOrganization}}
         <li class="text-center" id="add-org"><a {{action "addOrganizationClicked" target=view}} class="ui-btn ui-btn-d ui-caps ui-shadow">Add Organization</a></li>
         {{/if}}
     </ul>
@@ -37,7 +37,9 @@
         <li><a href="http://docs.mist.io/" target="_blank" class="ui-btn ui-btn-icon-left ui-mini icon-docs">Docs</a></li>
 
         {{#if Mist.authenticated}}
+            {{#if view.showEditOrganization}}
             <li><a class="ui-btn ui-btn-icon-left ui-mini icon-user" href={{view.accountUrl}} target={{view.isNotCore}}>Account</a></li>
+            {{/if}}
             {{#if Mist.isCore}}
                 <li><a class="ui-btn ui-btn-icon-left ui-mini icon-x" {{action "logoutClicked" target=view}}>Logout</a></li>
             {{/if}}
