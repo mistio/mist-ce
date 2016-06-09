@@ -96,87 +96,12 @@
               border-radius: 50%;
               width: 36px;
               height: 36px;
-              padding: 8px;
-
               background: #2F2F3E;
               color: #fff;
-              text-align: center;
+              line-height: 36px;
+              display: inline-block;
             }
         </style>
-        <!-- <paper-material>
-            <paper-steps initial-step="0">
-                <paper-step id="first" label="Demographics" editable>
-                    <h2>Feedback<span>* All fields are mandatory</span></h2>
-                    <form is="iron-form" action="http://posttestserver.com/post.php?dir=paper-steps&amp;dump" method="post">
-                        <paper-input class="xs12 l6" label="NAME" required error-message="Please enter your first name" value="{{user.firstName}}" always-float-label></paper-input>
-                        <paper-input class="xs12 l6" label="SURNAME" required error-message="Please enter your last name" value="{{user.lastName}}" always-float-label></paper-input>
-                        <paper-input class="xs12 l6" label="COMPANY NAME" required error-message="Please enter your company's name" value="{{user.companyName}}" always-float-label></paper-input>
-                        <paper-dropdown-menu class="dropdown-block xs12 l6" label="COMPANY LOCATION" horizontal-align="left" always-float-label>
-                            <paper-menu attr-for-selected="value" selected="{{user.country}}" class="dropdown-content">
-                                <template is="dom-repeat" items="[[countriesOptions]]" as="country">
-                                    <paper-item value="[[country]]">[[country]]</paper-item>
-                                </template>
-                            </paper-menu>
-                        </paper-dropdown-menu>
-                        <div class="dropdown-block xs12 l6" id="numberOfPeople" horizontal-align="left">
-                            <label id="label1">NUMBER OF EMPLOYEES</label>
-                            <paper-radio-group attr-for-selected="value" selected="{{user.numberOfPeople}}" aria-labelledby="label1">
-                                <template is="dom-repeat" items="[[numberOfPeopleOptions]]" as="people">
-                                    <paper-radio-button value="[[people]]">[[people]]</paper-radio-button>
-                                </template>
-                            </paper-radio-group>
-                        </div>
-                        <div class="dropdown-block xs12 l6" id="numberOfServers" horizontal-align="left">
-                            <label id="label2">NUMBER OF SERVERS</label>
-                            <paper-radio-group attr-for-selected="value" selected="{{user.numberOfServers}}" aria-labelledby="label2">
-                                <template is="dom-repeat" items="[[numberOfServersOptions]]" as="servers">
-                                    <paper-radio-button value="[[servers]]">[[servers]]</paper-radio-button>
-                                </template>
-                            </paper-radio-group>
-                        </div>
-                    </form>
-                </paper-step>
-                <paper-step label="Server details">
-                    <h2>Feedback<span>* All fields are mandatory</span></h2>
-                    <form is="iron-form" action="http://posttestserver.com/post.php?dir=paper-steps&amp;dump" method="post">
-                        <label>Where do you host your servers?</label>
-                        <template is="dom-repeat" items="[[hostedOptions]]" as="host">
-                            <paper-checkbox class="xs12 l6" value="[[host.val]]" on-change="_toggleChecked">[[host.title]]</paper-checkbox>
-                        </template>
-                        <paper-input hidden$="[[!user.hasExtraHosted]]" label="Please specify where do you host your servers?" value="{{user.extraHosted}}"></paper-input>
-                    </form>
-                </paper-step>
-                <paper-step label="General feedback">
-                    <h2>Feedback<span>* All fields are mandatory</span></h2>
-                    <form is="iron-form" action="http://posttestserver.com/post.php?dir=paper-steps&amp;dump" method="post">
-                        <paper-dropdown-menu class="xs12" label="How did you discover mist.io?" horizontal-align="left">
-                            <paper-menu attr-for-selected="value" selected="{{user.discover}}" class="dropdown-content">
-                                <template is="dom-repeat" items="[[discoverOptions]]" as="discover">
-                                    <paper-item value="[[discover.val]]">[[discover.title]]</paper-item>
-                                </template>
-                            </paper-menu>
-                        </paper-dropdown-menu>
-                        <paper-input class="xs12" hidden$="[[!user.hasExtraDiscover]]" label="Please specify how you discover mist.io?" required error-message="Please specify how you discover mist.io" value="{{user.extraDiscover}}"></paper-input>
-                        <paper-dropdown-menu class="dropdown-block xs12 l6" label="How satisfied are you with mist.io?" horizontal-align="left">
-                            <paper-menu attr-for-selected="value" selected="{{user.satisfaction}}" class="dropdown-content">
-                                <template is="dom-repeat" items="[[satisfactionOptions]]" as="satisfaction">
-                                    <paper-item value="[[satisfaction.val]]">[[satisfaction.title]]</paper-item>
-                                </template>
-                            </paper-menu>
-                        </paper-dropdown-menu>
-                        <paper-dropdown-menu class="dropdown-block  xs12 l6" label="Have you considered using similar services?" horizontal-align="left">
-                            <paper-menu attr-for-selected="value" selected="{{user.alternative}}" class="dropdown-content">
-                                <template is="dom-repeat" items="[[alternativeOptions]]" as="alternative">
-                                    <paper-item value="[[alternative.val]]">[[alternative.title]]</paper-item>
-                                </template>
-                            </paper-menu>
-                        </paper-dropdown-menu>
-                        <paper-input hidden$="[[!user.hasExtraAlternative]]" class="xs12" label="Please specify which service would you use?" required error-message="Please specify which service would you use" value="{{user.extraAlternative}}"></paper-input>
-                        <paper-textarea class="xs12" label="How can we improve mist.io to better meet your needs?" rows="5" value="{{user.improve}}"></paper-textarea>
-                    </form>
-                </paper-step>
-            </paper-steps>
-          </paper-material> -->
 
         <paper-material>
           <div id="stepper">
@@ -230,7 +155,6 @@
                       <hr class="xs12" />
                       <div class="bottom-actions clearfix xs12">
                           <paper-button class="pull-right" disabled$="[[!firstFormReady]]" raised on-tap="_pageChange" page="second">Next</paper-button>
-                          <paper-progress value="10" indeterminate="true" style="width:100%;"></paper-progress>
                       </div>
 
                 </div>
@@ -247,7 +171,6 @@
                     <div class="bottom-actions clearfix xs12">
                         <paper-button class="pull-left" raised on-tap="_pageChange" page="first">Previous</paper-button>
                         <paper-button class="pull-right" disabled$="[[!secondFormReady]]" raised on-tap="_pageChange" page="third">Next</paper-button>
-                        <paper-progress value="10" indeterminate="true" style="width:100%;"></paper-progress>
                     </div>
 
                 </div>
@@ -279,11 +202,11 @@
                     </paper-dropdown-menu>
                     <paper-input hidden$="[[!user.hasExtraAlternative]]" class="xs12" label="Please specify which service would you use?" required error-message="Please specify which service would you use" value="{{user.extraAlternative}}"></paper-input>
                     <paper-textarea class="xs12" label="How can we improve mist.io to better meet your needs?" rows="5" value="{{user.improve}}"></paper-textarea>
+                    <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
                     <hr class="xs12" />
                     <div class="clearfix bottom-actions xs12">
                         <paper-button class="pull-left" raised on-tap="_pageChange" page="second">Previous</paper-button>
                         <paper-button class="pull-right" disabled$="[[!thirdFormReady]]" raised on-tap="_submitForm">Submit</paper-button>
-                        <paper-progress value="10" indeterminate="true" style="width:100%;"></paper-progress>
                     </div>
 
                 </div>
@@ -528,6 +451,10 @@
                     sendingData: {
                         type: Boolean,
                         value: false
+                    },
+                    showProgress: {
+                        type: Boolean,
+                        computed: '_computeShowProgress(sendingData)'
                     }
                 },
                 observers: [
@@ -536,6 +463,9 @@
                     '_alternativeChanged(user.alternative)'
                 ],
                 ready: function() {},
+                _computeShowProgress: function(sendingData) {
+                    return sendingData;
+                },
                 _computeFirstFormReady: function(firstName, lastName, country, companyName, numberOfPeople, numberOfServers) {
                     var formReady = false;
                     if (firstName && lastName && country && companyName && numberOfPeople && numberOfServers) {
