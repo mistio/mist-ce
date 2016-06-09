@@ -129,6 +129,9 @@
                 display: block;
                 margin: 0 auto;
             }
+            .item-actions > * {
+                vertical-align: middle;
+            }
         </style>
        
         <div id="content">
@@ -154,14 +157,13 @@
                     can_undefine:false -->                    
                     <paper-button on-tap="restart" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
                     <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
-                    <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button>                    
+                    <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="tag" class="simple" hidden$="[[!machine.can_tag]]">tag</paper-button>                    
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
                             <paper-button on-tap="suspend" class="simple" hidden$="[[!machine.can_suspend]]">suspend</paper-button>
                             <paper-button on-tap="destroy" class="simple" hidden$="[[!machine.can_destroy]]">destroy</paper-button>
-                            <paper-button on-tap="rename" class="simple" hidden$="[[!machine.can_rename]]">rename</paper-button>
-                            <paper-button on-tap="tag" class="simple" hidden$="[[!machine.can_tag]]">tag</paper-button>
+                            <paper-button on-tap="rename" class="simple" hidden$="[[!machine.can_rename]]">rename</paper-button>                            
                             <paper-button on-tap="undefine" class="simple" hidden$="[[!machine.can_undefine]]">undefine</paper-button>
                         </paper-menu>
                     </paper-menu-button>
@@ -194,17 +196,33 @@
                     <table class="info-table">
                         <template is="dom-if" if="[[machine.public_ips]]">
                             <tr>
-                                <td>
-                                    Public IPs
+                                <td>Machine ID</td>
+                                <td>[[machine.id]]</td>
+                            </tr>
+                            <tr>
+                                <td>UUID</td>
+                                <td>[[machine.uuid]]</td>
+                            </tr>
+                            <tr><td>Public IPs</td>
+                                <td><template is="dom-repeat" items="[[machine.public_ips]]">
+                                        [[item]]
+                                    </template>
                                 </td>
-                                <td>
-                                    <template is="dom-repeat" items="[[machine.public_ips]]">
-                                        <p class="machine-ip">[[item]]</p>
+                            </tr>
+                            <tr><td>Private IPs</td>
+                                <td><template is="dom-repeat" items="[[machine.private_ips]]">
+                                        [[item]]
                                     </template>
                                 </td>
                             </tr>
                         </template>
                     </table>
+                </div>
+            </paper-material>
+            <paper-material class="info-card">
+                <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">More Info</h2>
+                <div class="card-content">
+                    <element-for-in content="[[machine.extra]]"></element-for-in>
                 </div>
             </paper-material>
         </div>
