@@ -17,6 +17,14 @@
             #content {
                 max-width: 900px;
             }
+
+            paper-progress {
+                position: absolute;
+                bottom: 85px;
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
         </style>
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
@@ -31,25 +39,29 @@
                 </div>
             </paper-material>
             <paper-material>
-                <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter key's name" value="{{key.name}}"></paper-input>
+                <custom-validator validator-name="isUniqueValidator"></custom-validator>
+                <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" validator="isUniqueValidator" auto-validate error-message="Please enter a unique key's name" value="{{key.name}}"></paper-input>
 
-                <paper-textarea id="privateKey" label="Private Key" rows="5" required error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
+                <paper-textarea id="privateKey" label="Private Key" rows="5" required auto-validate error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
 
                 <paper-textarea id="publicKey" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
                 <div class="clearfix btn-group">
+                    <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
                     <hr class="xs12" />
                     <div class="clearfix bottom-actions xs12">
-                        <paper-button class="purple" raised on-tap="_generateKey">Generate</paper-button>
-                        <paper-button class="purple" raised on-tap="_uploadKey">Upload</paper-button>
+                        <paper-button class="submit-btn pull-left" raised on-tap="_generateKey">Generate</paper-button>
+                        <paper-button class="submit-btn pull-left" raised on-tap="_uploadKey">Upload</paper-button>
                         <input type="file" name="file" value="{{key.file}}" on-change="_uploadFile" hidden id="keyUpload" />
-                        <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
+                        <paper-button class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
                     </div>
                 </div>
             </paper-material>
         </div>
 
+        <file-upload></file-upload>
+
         <iron-ajax id="keyGenerateAjaxRequest" url="/api/v1/keys" method="POST" on-response="_handleKeyGenerateAjaxResponse" on-error="_handleKeyGenerateAjaxError"></iron-ajax>
-        <iron-ajax id="keyAddAjaxRequest" url="/api/v1/keys" method="POST" on-response="_handleKeyAddAjaxResponse" on-error="_handleKeyAddAjaxError"></iron-ajax>
+        <iron-ajax id="keyAddAjaxRequest" url="/api/v1/keys" method="PUT" on-response="_handleKeyAddAjaxResponse" on-error="_handleKeyAddAjaxError"></iron-ajax>
     </template>
 
     <script>
@@ -71,6 +83,9 @@
                         },
                         notify: true
                     },
+                    model: {
+                        type: Object
+                    },
                     section: {
                         type: Object
                     },
@@ -84,27 +99,41 @@
                     },
                     formReady: {
                         type: Boolean,
-                        computed: '_computeFormReady(key.name, key.privateKey, sendingData)'
+                        value: false
+                    },
+                    showProgress: {
+                        type: Boolean,
+                        computed: '_computeShowProgress(sendingData)'
                     }
-                },
-                listeners: {
-                    'iron-overlay-closed': '_modalClosed'
                 },
                 ready: function() {
-
+                    this.querySelector('custom-validator').validate = this.isUniqueValidator.bind(this);
                 },
-                _computeFormReady: function(name, privateKey, sendingData) {
-                    var formReady = false;
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed',
+                    'file-uploaded': '_fileUploadedResponse'
+                },
+                observers: [
+                    '_filedsChanged(key.*, sendingData)'
+                ],
+                _filedsChanged: function(key, sendingData) {
+                    this.async(function() {
+                        var inputs = this.querySelectorAll("paper-input, paper-textarea"),
+                            valid = [].every.call(inputs, function(el) {
+                                return (el.required && !el.value) || el.invalid ? false : true;
+                            });
 
-                    if (name && privateKey) {
-                        formReady = true;
-                    }
-
-                    if (sendingData) {
-                        formReady = false;
-                    }
-
-                    return formReady;
+                        this.set('formReady', valid && !sendingData);
+                    });
+                },
+                _computeShowProgress: function(sendingData) {
+                    return sendingData;
+                },
+                isUniqueValidator: function(value) {
+                    var isUnique = this.model.keysArray.every(function(key) {
+                        return key.name != value;
+                    });
+                    return isUnique;
                 },
                 _openAddKeyModal: function(e) {
                     this.$.addKeyModal.open();
@@ -116,21 +145,16 @@
                     this.$.keyUpload.click();
                 },
                 _uploadFile: function(e) {
-                    var that = this,
-                    reader = new FileReader(),
-                    file = e.currentTarget.files[0];
-
-                    reader.onloadend = function (e) {
-                        var success;
-                        if (e.target.readyState == FileReader.DONE) {
-                            that.set('key.privateKey', e.target.result);
-                            success = true;
-                        } else {
-                            success = false
-                        }
-                    };
-
-                    reader.readAsText(file, 'UTF-8');
+                    this.querySelector('file-upload').upload({
+                        e: e,
+                        type: 'ssh_key'
+                    });
+                },
+                _fileUploadedResponse: function(e) {
+                    var file = e.detail.file;
+                    if (file.type == 'ssh_key') {
+                        this.set('key.privateKey', file.value);
+                    }
                 },
                 _modalClosed: function() {
                     this._formReset();
@@ -148,7 +172,16 @@
                 },
                 _handleKeyAddAjaxResponse: function(e) {
                     this.set('sendingData', false);
-                    this._formReset();
+
+                    var keyID = e.detail.response.id;
+                    page('/keys/' + keyID);
+
+                    this.debounce('formReset', function() {
+                        this._formReset();
+                    }, 500);
+                },
+                _handleKeyAddAjaxError: function(e) {
+                    this.set('sendingData', false);
                 },
                 _formReset: function() {
                     this.set('key.name', '');
@@ -168,13 +201,15 @@
                     this.set('sendingData', true);
                 },
                 _handleKeyGenerateAjaxResponse: function(e) {
-                    console.log(e);
                     this.set('sendingData', false);
                     var response = e.detail.response;
                     this.set('key.publicKey', response.public);
                     this.set('key.privateKey', response.priv);
                     this.set('sendingData', false);
                     this.set('showPublicKey', true);
+                },
+                _handleKeyGenerateAjaxError: function(e) {
+                    this.set('sendingData', false);
                 }
             });
         })();
