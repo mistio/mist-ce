@@ -531,12 +531,11 @@
                 },
                 _pageChange: function(e) {
                     e.preventDefault();
-                    console.log(e.currentTarget.getAttribute('disabled'));
+
                     var steps = this.querySelectorAll('.step a'),
                         page = e.currentTarget.getAttribute('page');
 
                     [].forEach.call(steps, function(step) {
-                        console.log(step);
                         step.classList.remove('active');
                     });
 
@@ -573,7 +572,6 @@
                     }
                 },
                 _submitForm: function() {
-                    console.log(this.user);
                     var hosted = this.user.hosted,
                         index = hosted.indexOf('other');
                     if (index > -1) {
