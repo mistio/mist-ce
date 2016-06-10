@@ -57,7 +57,9 @@
 
 
       },
-
+      notificationsQueue: function(item){
+        var queue = new Queue();
+      },
       someMethod: function() {
          this.fire('iron-signal',{
            name: 'toaster-bake',
@@ -70,8 +72,6 @@
            }
          });
       },
-
-
 
       someOtherMethod: function() {
          this.fire('iron-signal',{
