@@ -25,7 +25,6 @@
 <link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
 <link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 
-
 <link rel="import" href="../app-bar/app-bar.html">
 <link rel="import" href="../app-socket/app-socket.html">
 <link rel="import" href="../app-styles/app-styles.html">
@@ -38,8 +37,6 @@
 <link rel="import" href="../pages/page-items.html">
 <link rel="import" href="../notifications-element/notifications-element.html">
 <link rel="import" href="../pages/page-account.html">
-
-
 
 <link rel="import" href="../pages/page-not-found.html">
 
@@ -214,9 +211,6 @@
             },
             tag: String
         },
-        observers: [
-
-        ],
         listeners: {
             'iron-activate': 'updateDocTitle',
             'iron-activate': 'updateCurrent',
@@ -378,7 +372,7 @@
                 pending: {
                     clouds: true,
                     monitoring: true
-                },
+                }
             };
 
             this.sectionsArray = [{
@@ -441,36 +435,39 @@
 
             this.sections = _generateMap(this.sectionsArray);
         },
-    toggleSidebar: function(){
-        this.$.sidebar.toggleClass('close');
-        this.querySelector("#app-main").toggleClass('center');
-    },
-    subscribeLogEvents: function(searchFilter) {
-        console.log('subscribeLogEvents', searchFilter.detail);
-        var socket = this.querySelector('app-socket');
-        socket.send('sub', 'logs');
-        socket.send('msg', 'logs', 'ready');
-        socket.send('msg', 'logs', 'get_logs', searchFilter.detail);
-    },
 
-    attributeChanged: function(attrName, oldVal, newVal) {
-        console.warn('attrChanged', attrName, oldVal, newVal);
-    },
-    updateCurrent: function(e) {
-        // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
-        var el = e.detail.item;
-        //console.log("el",e.detail);
-        if (el.nodeName == 'IRON-ROUTE' && el.title && el.getAttribute("current")) {
-            this.current = el.getAttribute("current");
-            this.title = el.title;
-            console.log("el", e.detail);
-            if (el.nodeName == 'IRON-ROUTE') {
+        toggleSidebar: function() {
+            this.$.sidebar.toggleClass('close');
+            this.querySelector("#app-main").toggleClass('center');
+        },
+        subscribeLogEvents: function(searchFilter) {
+            console.log('subscribeLogEvents', searchFilter.detail);
+            var socket = this.querySelector('app-socket');
+            socket.send('sub', 'logs');
+            socket.send('msg', 'logs', 'ready');
+            socket.send('msg', 'logs', 'get_logs', searchFilter.detail);
+        },
+
+        attributeChanged: function(attrName, oldVal, newVal) {
+            console.warn('attrChanged', attrName, oldVal, newVal);
+        },
+
+        updateCurrent: function(e) {
+            // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
+            var el = e.detail.item;
+            //console.log("el",e.detail);
+            if (el.nodeName == 'IRON-ROUTE' && el.title && el.getAttribute("current")) {
                 this.current = el.getAttribute("current");
                 this.title = el.title;
-            }
+                console.log("el", e.detail);
+                if (el.nodeName == 'IRON-ROUTE') {
+                    this.current = el.getAttribute("current");
+                    this.title = el.title;
+                }
 
-        }
-      },
+
+            }
+        },
 
         _style: function(current, sections) {
             if (current) {
@@ -523,4 +520,12 @@
             // document.querySelector('#mainContainer').scrollTop();
         }
     });
+    var COUNTRY = "Greece";
+    var COMPANY_NAME = "mist.io";
+    var NUMBER_OF_PEOPLE = "6-20";
+    var NUMBER_OF_SERVERS = "1-5";
+    var EMAIL = "fakiolasmarios@gmail.com";
+    var HAS_PASS = true;
+    var PLANS = [];
+    var USER_PLANS = [];
 </script>
