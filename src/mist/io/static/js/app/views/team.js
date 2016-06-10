@@ -17,9 +17,13 @@ define('app/views/team', ['app/views/page'],
             // Computed Properties
             //
 
-            model: function () {
+            model: function() {
                 return this.get('controller').get('model');
             }.property('controller.model'),
+
+            hasMembers: Ember.computed('team.members.[]', function() {
+                return !!(this.get('team.members') && this.get('team.members').length);
+            }),
 
             //
             // Initialization
@@ -68,7 +72,9 @@ define('app/views/team', ['app/views/page'],
                 },
 
                 saveRulesClicked: function() {
-                    Mist.teamsController.saveRules({team: this.get('team')});
+                    Mist.teamsController.saveRules({
+                        team: this.get('team')
+                    });
                 },
 
                 addRulesClicked: function() {
@@ -80,39 +86,28 @@ define('app/views/team', ['app/views/page'],
                 },
 
                 deleteClicked: function() {
-                    var team = this.get('team'),
-                    hasMembers = team.members.length > 0;
+                    var team = this.get('team');
 
-                    if (hasMembers) {
-                        Mist.dialogController.open({
-                            type: DIALOG_TYPES.OK,
-                            head: 'Delete team',
-                            body: [{
-                                paragraph: 'Team "' + team.name + '" cannot be deleted. Remove its members first and try again!'
-                            }]
-                        });
-                    } else {
-                        Mist.dialogController.open({
-                            type: DIALOG_TYPES.YES_NO,
-                            head: 'Delete team',
-                            body: [{
-                                paragraph: 'Are you sure you want to delete team "' +
-                                    team.name + '" ?'
-                            }],
-                            callback: function(didConfirm) {
-                                if (didConfirm) {
-                                    Mist.teamsController.deleteTeam({
-                                        team: team,
-                                        callback: function(success) {
-                                            if (success) {
-                                                Mist.__container__.lookup('router:main').transitionTo('teams');
-                                            }
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Delete team',
+                        body: [{
+                            paragraph: 'Are you sure you want to delete team "' +
+                                team.name + '" ?'
+                        }],
+                        callback: function(didConfirm) {
+                            if (didConfirm) {
+                                Mist.teamsController.deleteTeam({
+                                    team: team,
+                                    callback: function(success) {
+                                        if (success) {
+                                            Mist.__container__.lookup('router:main').transitionTo('teams');
                                         }
-                                    });
-                                }
+                                    }
+                                });
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             },
 
