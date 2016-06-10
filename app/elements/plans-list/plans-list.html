@@ -1,0 +1,53 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+
+<dom-module id="plans-list">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            .plans {
+                @apply(--layout-horizontal);
+            }
+
+            .plan {
+                @apply(--layout-flex);
+                @apply(--shadow-elevation-2dp);
+                text-align: center;
+            }
+        </style>
+
+        <paper-material>
+            <h2>Billing</h2>
+            <div class="plans">
+                <template is="dom-repeat" items=[[plans]] as="plan">
+                    <plan-item plan="[[plan]]" class="plan"></plan-item>
+                </template>
+            </div>
+        </paper-material>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'plans-list',
+
+                properties: {
+                    plans: {
+                        type: Array,
+                        value: function() {
+                            return PLANS.filter(function(plan) {
+                                return plan.visible;
+                            });
+                        }
+                    }
+                }
+            });
+        })();
+    </script>
+</dom-module>
