@@ -292,6 +292,7 @@
         <key-edit key="[[key]]"></key-edit>
         <dialog-element></dialog-element>
         <paper-toast></paper-toast>
+        <toast-er></toast-er>
     </template>
     <script>
         (function() {
@@ -442,6 +443,26 @@
                 handlePrivateResponse: function(data) {
                     this.privateKey = data.detail.response;
                 },
+                // handleDefaultResponse: function(data) {
+                //     //needs to update the previous default key that it's not the default key anymore
+                //     var k = this.model.keysArray;
+                //     for (var i = 0, len = k.length; i < len; i++) {
+                //         if (k[i].isDefault) {
+                //             k[i].isDefault = false;
+                //             break;
+                //         }
+                //     }
+                //     this.set('key.isDefault', true);
+                //     // this.$.toast.text = this.key.id + ' has become your default Key!';
+                //     // this.$.toast.open();
+                //
+                //      this.fire('iron-signal',{
+                //        name: 'toaster-bake',
+                //        data: {
+                //          text: this.key.id + ' has become your default Key!'
+                //        }
+                //      });
+                // },
                 _editKey: function(e) {
                     var el = this.querySelector('key-edit');
                     el._openEditKeyModal();
@@ -492,6 +513,10 @@
                     var toast = this.querySelector('paper-toast');
                     toast.text = msg;
                     toast.show();
+                    var newnot = {};
+                    newnot["text"] = msg;
+                    newnot["type"] = 'green';
+                    document.querySelector("notifications-element").notifications.push(newnot);
                 },
                 _goBack: function() {
                     history.back();
