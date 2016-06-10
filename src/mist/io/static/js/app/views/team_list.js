@@ -30,7 +30,9 @@ define('app/views/team_list', ['app/views/page'],
             }),
 
             canDelete: Ember.computed('Mist.teamsController.model.@each.selected', function() {
-                return Mist.teamsController.get('selectedObjects').length;
+                return Mist.teamsController.get('selectedObjects').every(function(team) {
+                    return team.members && !team.members.length;
+                });
             }),
 
             //
