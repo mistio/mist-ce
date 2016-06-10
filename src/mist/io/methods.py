@@ -377,7 +377,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
     machine.ssh_port = port
     machine.remote_desktop_port = rdp_port
     if machine_hostname:
-        if is_private(machine_hostname):
+        if is_private(user, machine_hostname):
             machine.private_ips = [machine_hostname]
         else:
             machine.dns_name = machine_hostname
@@ -453,7 +453,7 @@ def _add_cloud_coreos(user, title, provider, params):
     machine = Machine()
     machine.ssh_port = port
     if machine_hostname:
-        if is_private(machine_hostname):
+        if is_private(user, machine_hostname):
             machine.private_ips = [machine_hostname]
         else:
             machine.dns_name = machine_hostname
@@ -1306,7 +1306,7 @@ def connect_provider(cloud):
         temp_key_file.close()
         conn = driver(cloud.apikey, temp_key_file.name)
     elif cloud.provider == Provider.OPENSTACK:
-        if is_private(cloud.apiurl):
+        if is_private(cloud.owner, cloud.apiurl):
             host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                sanitize_host(cloud.apiurl),
                                                                extract_port(cloud.apiurl))
@@ -1332,7 +1332,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.GCE:
         conn = driver(cloud.apikey, cloud.apisecret, project=cloud.tenant_name)
     elif cloud.provider == Provider.DOCKER:
-        if is_private(cloud.apiurl):
+        if is_private(cloud.owner, cloud.apiurl):
             docker_host, docker_port = mist.core.vpn.methods.destination_nat(
                 cloud.owner, cloud.apiurl, cloud.docker_port)
         else:
@@ -1363,7 +1363,7 @@ def connect_provider(cloud):
         conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         libcloud.security.VERIFY_SSL_CERT = False
-        if is_private(cloud.apiurl):
+        if is_private(cloud.owner, cloud.apiurl):
             host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                cloud.apiurl, 443)
             api_url = '%s:%d' % (host, port)
@@ -1377,7 +1377,7 @@ def connect_provider(cloud):
             driver = get_driver('digitalocean_first_gen')
             conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider == Provider.VSPHERE:
-        if is_private(cloud.apiurl):
+        if is_private(cloud.owner, cloud.apiurl):
             host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                cloud.apiurl, 443)
             api_url = '%s:%d' % (host, port)
@@ -1391,7 +1391,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if cloud.apisecret:
-            if is_private(cloud.apiurl):
+            if is_private(cloud.owner, cloud.apiurl):
                 host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                    cloud.apiurl,
                                                                    cloud.ssh_port)
@@ -1399,7 +1399,7 @@ def connect_provider(cloud):
                 host, port = cloud.apiurl, cloud.ssh_port
             conn = driver(host, user=cloud.apikey, ssh_key=cloud.apisecret, ssh_port=port)
         else:
-            if is_private(cloud.apiurl):
+            if is_private(cloud.owner, cloud.apiurl):
                 host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                    cloud.apiurl,
                                                                    5000)
