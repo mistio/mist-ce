@@ -203,6 +203,7 @@ class MainConnection(MistConnection):
             log.error("It seems we have received 'on_ready' more than once.")
 
     def start(self):
+        self.update_user()
         self.list_keys()
         self.list_scripts()
         self.list_templates()
@@ -210,6 +211,9 @@ class MainConnection(MistConnection):
         self.list_teams()
         self.list_clouds()
         self.check_monitoring()
+
+    def update_user(self):
+        self.send('user', core_methods.get_user_data(self.auth_context))
 
     def list_keys(self):
         self.send('list_keys',
@@ -382,6 +386,8 @@ class MainConnection(MistConnection):
                 self.list_teams()
             if 'monitoring' in sections:
                 self.check_monitoring()
+            if 'user' in sections:
+                self.update_user()
 
     def on_close(self, stale=False):
         if self.consumer is not None:
