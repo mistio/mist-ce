@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+ <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../../bower_components/iron-icons/image-icons.html">
@@ -38,15 +38,6 @@
 <link rel="import" href="../pages/page-items.html">
 <link rel="import" href="../notifications-element/notifications-element.html">
 <link rel="import" href="../pages/page-account.html">
-<link rel="import" href="../details-page/details-page.html">
-<link rel="import" href="../password-page/password-page.html">
-<link rel="import" href="../feedback-page/feedback-page.html">
-<link rel="import" href="../plans-list/plans-list.html">
-<link rel="import" href="../plans-list/plan-item.html">
-<link rel="import" href="../subscriptions-list/subscriptions-list.html">
-<link rel="import" href="../subscriptions-list/subscription-item.html">
-
-
 
 
 
@@ -113,7 +104,7 @@
             <iron-route path="/templates/:id" title="template" current="templates" href="../templates/template-page.html"></iron-route>
             <iron-route path="/add-template" title="add template" current="templates" href="../templates/template-add.html"></iron-route>
             <!-- stacks -->
-            <iron-route path="/create-stack/:id" title="add template" current="stacks" href="../stacks/stack-create.html"></iron-route>
+            <iron-route path="/create-stack/:id" title="create stack" current="stacks" href="../stacks/stack-create.html"></iron-route>
             <iron-route path="/stacks" title="stacks" current="stacks" href="../pages/page-items.html"></iron-route>
             <iron-route path="/stacks/:id" title="stack" current="stacks" href="../stacks/stack-page.html"></iron-route>
             <!-- teams -->
@@ -450,33 +441,26 @@
 
             this.sections = _generateMap(this.sectionsArray);
         },
+    toggleSidebar: function(){
+        this.$.sidebar.toggleClass('close');
+        this.querySelector("#app-main").toggleClass('center');
+    },
+    subscribeLogEvents: function(searchFilter) {
+        console.log('subscribeLogEvents', searchFilter.detail);
+        var socket = this.querySelector('app-socket');
+        socket.send('sub', 'logs');
+        socket.send('msg', 'logs', 'ready');
+        socket.send('msg', 'logs', 'get_logs', searchFilter.detail);
+    },
 
-        attached: function() {
-            // Load neighbouring pages progressively once loaded, don't rely on lazy loading
-            /*var that = this;
-            this.importHref(['../elements/pages/page-items.html'],
-                            function() {
-                                console.debug('pages loaded');
-                            });*/
-        },
-        toggleSidebar: function() {
-            this.$.sidebar.toggleClass('close');
-            this.querySelector("#app-main").toggleClass('center');
-        },
-        subscribeLogEvents: function(searchFilter) {
-            console.log('subscribeLogEvents', searchFilter.detail);
-            var socket = this.querySelector('app-socket');
-            socket.send('sub', 'logs');
-            socket.send('msg', 'logs', 'ready');
-            socket.send('msg', 'logs', 'get_logs', searchFilter.detail);
-        },
-
-        attributeChanged: function(attrName, oldVal, newVal) {
-            console.warn('attrChanged', attrName, oldVal, newVal);
-        },
-        updateCurrent: function(e) {
-            // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
-            var el = e.detail.item;
+    attributeChanged: function(attrName, oldVal, newVal) {
+        console.warn('attrChanged', attrName, oldVal, newVal);
+    },
+    updateCurrent: function(e) {
+        // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
+        var el = e.detail.item;
+        //console.log("el",e.detail);
+        if (el.nodeName == 'IRON-ROUTE' && el.title && el.getAttribute("current")) {
             this.current = el.getAttribute("current");
             this.title = el.title;
             console.log("el", e.detail);
@@ -485,7 +469,8 @@
                 this.title = el.title;
             }
 
-        },
+        }
+      },
 
         _style: function(current, sections) {
             if (current) {
