@@ -30,7 +30,9 @@ define('app/views/team_list', ['app/views/page'],
             }),
 
             canDelete: Ember.computed('Mist.teamsController.model.@each.selected', function() {
-                return Mist.teamsController.get('selectedObjects').length;
+                return Mist.teamsController.get('selectedObjects').every(function(team) {
+                    return team.members && !team.members.length;
+                });
             }),
 
             //
@@ -99,39 +101,23 @@ define('app/views/team_list', ['app/views/page'],
                 },
 
                 deleteClicked: function() {
-                    var teams = Mist.teamsController.get('selectedObjects'),
-                    teamsWithMembers = teams.filter(function(team) {
-                        return team.members.length > 0;
-                    }), paragraph;
+                    var teams = Mist.teamsController.get('selectedObjects');
 
-                    if (teamsWithMembers.length > 0) {
-                        paragraph = teamsWithMembers.length > 1 ? 'Teams ' + teamsWithMembers.toStringByProperty('name') + ' cannot be deleted. Remove their members first and try again!'
-                         : 'Team ' + teamsWithMembers.toStringByProperty('name') + ' cannot be deleted. Remove its members first and try again!';
-
-                        Mist.dialogController.open({
-                            type: DIALOG_TYPES.OK,
-                            head: 'Delete teams',
-                            body: [{
-                                paragraph: paragraph
-                            }]
-                        });
-                    } else {
-                        Mist.dialogController.open({
-                            type: DIALOG_TYPES.YES_NO,
-                            head: 'Delete teams',
-                            body: [{
-                                paragraph: 'Are you sure you want to delete ' + (teams.length > 1 ? 'these teams: ' : 'this team: ') + teams.toStringByProperty('name') + ' ?'
-                            }],
-                            callback: function(didConfirm) {
-                                if (!didConfirm) return;
-                                teams.forEach(function(team) {
-                                    Mist.teamsController.deleteTeam({
-                                        team: team
-                                    });
+                    Mist.dialogController.open({
+                        type: DIALOG_TYPES.YES_NO,
+                        head: 'Delete teams',
+                        body: [{
+                            paragraph: 'Are you sure you want to delete ' + (teams.length > 1 ? 'these teams: ' : 'this team: ') + teams.toStringByProperty('name') + ' ?'
+                        }],
+                        callback: function(didConfirm) {
+                            if (!didConfirm) return;
+                            teams.forEach(function(team) {
+                                Mist.teamsController.deleteTeam({
+                                    team: team
                                 });
-                            }
-                        });
-                    }
+                            });
+                        }
+                    });
                 },
 
                 clearClicked: function() {
