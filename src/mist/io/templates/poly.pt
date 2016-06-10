@@ -34,15 +34,24 @@
     <script tal:content="string: var EMAIL=${email}" />
     <script tal:content="string: var FIRST_NAME=${first_name}" />
     <script tal:content="string: var LAST_NAME=${last_name}" />
+    <script tal:content="string: var COUNTRY=${country}" />
+    <script tal:content="string: var NUMBER_OF_SERVERS=${number_of_servers}" />
+    <script tal:content="string: var NUMBER_OF_PEOPLE=${number_of_people}" />
+    <script tal:content="string: var COMPANY_NAME=${company_name}" />
+    <script tal:content="string: var HAS_PASS=${has_pass}" />
     <script tal:content="string: var CSRF_TOKEN=${csrf_token}" />
     <script tal:content="string: var BETA_FEATURES=${beta_features}" />
+    <script tal:content="string: var PLANS=${plans}" />
+    <script tal:content="string: var CURRENT_PLAN=${current_plan}" />
+    <script tal:content="string: var USER_PLANS=${user_plans}" />
+    <script tal:content="string: var PROMO_CODES=${promo_codes}" />
 
     <link rel="stylesheet" href="/styles/main.css" inline>
     <link rel="stylesheet" href="/styles/grid.css" inline>
 
     <script src="/bower_components/webcomponentsjs/webcomponents-lite.js" inline></script>
     <script src="/resources/dist/yamljs/dist/yaml.min.js" inline></script>
-    <!-- will be replaced with /elements/elements.build.html --> 
+    <!-- will be replaced with /elements/elements.build.html -->
     <link rel="import" href="/elements/elements.html">
     <!-- endreplace-->
 
@@ -68,7 +77,7 @@
   <app-main class="fit"></app-main>
 
   <!-- Shell calibration element -->
-  <div id="font-test"></div>  
+  <div id="font-test"></div>
 </body>
 
 </html>
