@@ -3,17 +3,16 @@
 # Uses pricing data from https://github.com/ilia-semenov/awspricingfull
 
 # Specify the csv file with prices and run with
-# ./bin/cloudpyt get_ec2_pricing.py
+# ./bin/cloudpy get_ec2_pricing.py aws_full_ri_pricing.csv
 
 
-import json, csv
+import sys, json, csv
 from libcloud.compute.types import Provider
 
-class mydict(dict):
-    def __str__(self):
-        return json.dumps(self)
+if not len(sys.argv) == 2:
+    sys.exit('Provide csv file')
 
-csv_file = '/home/user/Desktop/unweb/awspricingfull/EXAMPLE_OUTPUT_AWS_FULL_RI_pricing.csv'
+csv_file = sys.argv[1]
 
 regions = {}
 

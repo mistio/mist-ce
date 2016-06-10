@@ -6,7 +6,11 @@
 import requests, json
 
 prices_url = 'https://www.rackspace.com/profiles/www/modules/custom/rs/json/prices.json'
-GBP_TO_DOLLAR_RATE  = 1.45 # For conversion of Rackspace London prices to dollar
+
+GBP_TO_DOLLAR_RATE = requests.get('http://api.fixer.io/latest?base=GBP&symbols=USD').json()['rates']['USD'] 
+# For conversion of Rackspace London prices to dollar
+
+
 
 all_prices = requests.get(prices_url).json().get('geo')
 us_prices = all_prices.get('USA').get('rates').get('cloud-servers')
