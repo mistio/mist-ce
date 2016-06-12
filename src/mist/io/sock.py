@@ -14,6 +14,7 @@ import json
 import random
 import traceback
 import datetime
+import netaddr
 
 from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
@@ -23,6 +24,7 @@ try:
     from mist.core.methods import get_stats
     from mist.core.cloud.models import Cloud, Machine
     from mist.core.keypair.models import Keypair
+    from mist.core.vpn.models import Tunnel
     multi_user = True
 except ImportError:
     from mist.io import config
@@ -315,7 +317,21 @@ class MainConnection(MistConnection):
                     ips = filter(lambda ip: ':' not in ip,
                                  machine.get('public_ips', []))
                     if not ips:
-                        continue
+                        # if not public IPs, search for private IPs with an
+                        # associated Tunnel, otherwise continue iterating over
+                        # the list of machines
+                        ips = filter(lambda ip: ':' not in ip,
+                                     machine.get('private_ips', []))
+                        for tunnel in Tunnel.objects(owner=self.owner):
+                            for cidr in tunnel.cidrs:
+                                if netaddr.IPAddress(str(ips[0])) in \
+                                        netaddr.IPNetwork(str(cidr)):
+                                    break
+                            else:
+                                continue
+                            break
+                        else:
+                            continue
 
                     has_key = False
                     keypairs = Keypair.objects(owner=self.owner)
