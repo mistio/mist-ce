@@ -103,6 +103,11 @@ Polymer({
                     // console.debug('list_projects', data);
                     }, 250);
                 },
+                list_teams: function (data) {
+                    that.debounce(that._updateTeams(data), function(){
+                        console.debug('list_teams', data);
+                    }, 250);
+                },
                 ping: function (data) {
                     // console.debug('ping', data);
                     that._ping(data);
@@ -120,6 +125,10 @@ Polymer({
                     that.debounce(that._reloadPage(data), function () {
                       console.debug('reloading page', data);
                     }, 250);
+                },
+                user: function (data) {
+                    that.set('model.user', data);
+                    console.warn('Loaded user data');
                 }
             },
             logs: {
@@ -375,6 +384,10 @@ Polymer({
             this.set('onboarding.hasMonitoring', false);
         this.set('model.pending.monitoring', false);
         return this.set('model.monitoring', data);
+    },
+
+    _updateTeams: function (data) {
+        return this._updateModel('teams', data);
     },
 
     _updateKeys: function (data) {
