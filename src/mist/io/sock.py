@@ -204,6 +204,7 @@ class MainConnection(MistConnection):
 
     def start(self):
         self.update_user()
+        self.list_tags()
         self.list_keys()
         self.list_scripts()
         self.list_templates()
@@ -214,6 +215,10 @@ class MainConnection(MistConnection):
 
     def update_user(self):
         self.send('user', core_methods.get_user_data(self.auth_context))
+
+    def list_tags(self):
+        self.send('list_tags',
+                  core_methods.filter_list_tags(self.auth_context))
 
     def list_keys(self):
         self.send('list_keys',
@@ -384,6 +389,8 @@ class MainConnection(MistConnection):
                 self.list_stacks()
             if 'teams' in sections:
                 self.list_teams()
+            if 'tags' in section():
+                self.list_tags()
             if 'monitoring' in sections:
                 self.check_monitoring()
             if 'user' in sections:

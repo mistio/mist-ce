@@ -108,6 +108,11 @@ Polymer({
                         console.debug('list_teams', data);
                     }, 250);
                 },
+                list_tags: function (data) {
+                    that.debounce(that._updateTags(data), function(){
+                        console.debug('list_tags', data);
+                    }, 250);
+                },
                 ping: function (data) {
                     // console.debug('ping', data);
                     that._ping(data);
@@ -387,7 +392,8 @@ Polymer({
     },
 
     _updateTeams: function (data) {
-        return this._updateModel('teams', data);
+        this._updateModel('teams', data.teams);
+        this._updateModel('members', data.members);
     },
 
     _updateKeys: function (data) {
@@ -492,6 +498,10 @@ Polymer({
     _updateProjects: function (data) {
         this.set('model.clouds.' + data.cloud_id + '.projects', _generateMap(data.projects));
         this.set('model.clouds.' + data.cloud_id + '.projectsArray', data.projects);
+    },
+
+    _updateTags: function (data) {
+        console.warn('_updateTags not implemented. Got data', data);
     },
 
     _probe: function (data) {

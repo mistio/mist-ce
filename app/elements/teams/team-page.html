@@ -158,19 +158,19 @@
 
 
         <div id="content">
-            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
                 <div class="title flex">
                     <h2>
                         [[team.name]]
                     </h2>
                     <div class="subtitle">
-                        <span hidden$="[[!team.description]]">[[team.description]] </span> 
+                        <span hidden$="[[!team.description]]">[[team.description]] </span>
                         <span class="desc" hidden$="[[!team.members.length]]"> ([[team.members.length]] members)</span>
                     </div>
                 </div>
-                <div class="item-actions">                    
-                    <paper-button on-tap="_addMember" class="simple white" style$="color: [[section.color]]">Invite Members <iron-icon icon="add" style$="color: [[section.color]]"></iron-icon></paper-button>  
+                <div class="item-actions">
+                    <paper-button on-tap="_addMember" class="simple white" style$="color: [[section.color]]">Invite Members <iron-icon icon="add" style$="color: [[section.color]]"></iron-icon></paper-button>
                 </div>
             </paper-material>
             <paper-material hidden$="[[!team.description]] && [[!timestamp]]">
@@ -191,7 +191,7 @@
                         <template is="dom-if" if="[[hasMembers]]">
                             <paper-material class="no-pad">
                                 <h3 class="smallcaps resource-head">Members in [[team.name]] team</h3>
-                                <template is="dom-repeat" items="[[team.members]]">
+                                <template is="dom-repeat" items="[[members]]">
                                     <paper-item>
                                         <a href="/members/[[item.id]]"  class="flex-horizontal-with-ratios width100">
                                             <span class="flexchild">[[item.name]] </span>
@@ -311,7 +311,11 @@
                 return params.id;
             },
             _computeMembers: function(team){
-                return team.members;
+                var ret = [];
+                for (var i=0; i<team.members.length;i++){
+                    ret.push(this.get('model.members.'+team.members[i]));
+                }
+                return ret;
             },
             _addMember: function(e) {
                 page.show('/add-member/' + this.team.id);
