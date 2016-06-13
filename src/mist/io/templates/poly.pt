@@ -44,6 +44,7 @@
     <script tal:content="string: var ORGANIZATION=${organization}" />
     <script tal:content="string: var ORGS=${orgs|'{}'}" />
     <script tal:content="string: var CAN_CREATE_ORG=${can_create_org|False}" />
+    <script tal:content="string: var PERSONAL=${personal}" />
     <script tal:content="string: var PLANS=${plans}" />
     <script tal:content="string: var CURRENT_PLAN=${current_plan}" />
     <script tal:content="string: var USER_PLANS=${user_plans}" />

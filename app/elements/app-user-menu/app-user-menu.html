@@ -86,6 +86,10 @@
                 align-self: center;
             }
 
+            .active-org {
+                color: green;
+            }
+
             .teams {
                 display: block;
                 color: rgba(0, 0, 0, 0.54);
@@ -117,15 +121,15 @@
                         <iron-icon class="user-menu-icon" icon="social:person"></iron-icon>
                     </div>
                     <div class="org xs8">
-                        <h4>[[email]]</h4>
+                        <h4>[[gravatarName]]</h4>
                         <span>Faki fix teams</span>
                     </div>
                 </div>
                 <paper-menu>
-                    <template is="dom-repeat" items="[[orgsList]]" as="organization">
+                    <template is="dom-repeat" items="[[organizationsList]]" as="organization">
                         <paper-item class="context">
-                            <a href="javascript:void(0)" on-tap="_goToOrg" id="[[organization.id]]" class="grid-row">
-                                <iron-icon class="user-menu-icon" icon="social:group"></iron-icon>
+                            <a href="javascript:void(0)" on-tap="_goToOrg" id="[[organization.id]]" class$="grid-row [[_isCurrentClass(organization, model.org)]]">
+                                <iron-icon class="user-menu-icon" icon$="[[_computeOrganizationIcon(organization)]]"></iron-icon>
                                 <div>[[organization.name]]
                                     <span class="teams">Faki fix teams</span>
                                 </div>
@@ -176,8 +180,8 @@
     Polymer({
         is: 'app-user-menu',
         properties: {
-            email: {
-                type: String
+            model: {
+                type: Object
             },
             size: {
                 type: Number,
@@ -191,33 +195,25 @@
             },
             gravatar: {
                 type: String,
-                computed: '_computeGravatar(email, size, placeholder)'
+                computed: '_computeGravatar(model.user.email, size, placeholder)'
             },
-            organization: {
-                type: Object,
-                value: function() {
-                    return ORGANIZATION;
-                }
+            gravatarName: {
+                type: String,
+                computed: '_computeGravatarName(model.user.first_name, model.user.last_name, model.user.email)'
             },
-            orgs: {
+            organizationsList: {
                 type: Array,
-                value: function() {
-                    return ORGS;
-                }
+                computed: '_computeOrganizationsList(model.user.orgs)'
             },
-            orgsList: {
-                type: Array,
-                computed: '_computeOrgsList(orgs)'
+            memberOfTeamsText: {
+                type: String,
+                computed: '_computeMemberOfTeamsText(model.user.orgs)'
             },
             canCreateOrg: {
                 type: Boolean,
                 value: function() {
                     return CAN_CREATE_ORG;
                 }
-            },
-            isPersonalContext: {
-                type: Boolean,
-                computed: '_computeIsPersonalContext(organization)'
             }
         },
         _computeGravatar: function(email, size, placeholder) {
@@ -226,27 +222,52 @@
 
             return url;
         },
-        _computeOrgsList: function(orgs) {
-            var orgs = orgs.slice();
-            orgs.push({
-                id: null,
-                name: 'Personal'
-            });
-
-            return orgs;
+        _computeGravatarName: function(first_name, last_name, email) {
+            return first_name && last_name ? first_name + ' ' + last_name : email;
         },
-        _computeIsPersonalContext: function(organization) {
-            return Object.keys(organization).length === 0;
+        _computeOrganizationsList: function(orgs) {
+            if (orgs) {
+                var organizations = orgs
+                    .filter(function(org) {
+                        return org.name;
+                    })
+                    .sort(function(a, b) {
+                        if (a.name > b.name) {
+                            return 1;
+                        }
+                        if (a.name < b.name) {
+                            return -1;
+                        }
+                        return 0;
+                    });
+
+                if (PERSONAL) {
+                    organizations.unshift({
+                        id: '',
+                        name: 'Personal'
+                    });
+                }
+            }
+
+            return organizations || [];
+        },
+        _computeOrganizationIcon: function(organization) {
+            return organization.id ? 'social:group' : 'social:person';
+        },
+        _computeMemberOfTeamsText: function() {
+
+        },
+        _isCurrentClass: function(organization, org) {
+            console.log(org);
+            return !org || (organization.id == org.id) ? 'active-org' : null;
         },
         _addOrg: function(e) {
             var dialog = this.querySelector('organization-add');
             dialog.openDialog();
         },
         _goToOrg: function(e) {
-            if (! this.isPersonalContext) {
-                var orgId = e.currentTarget.getAttribute('id');
-                window.location.href = orgId ? '/orgs/' + orgId : '/orgs';
-            }
+            var orgId = e.currentTarget.getAttribute('id');
+            window.location.href = orgId ? '/switch_context/' + orgId : '/switch_context';
         },
         placeholder: {
             type: String,
