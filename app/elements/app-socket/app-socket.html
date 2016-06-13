@@ -103,11 +103,6 @@ Polymer({
                     // console.debug('list_projects', data);
                     }, 250);
                 },
-                list_teams: function (data) {
-                    that.debounce(that._updateTeams(data), function(){
-                        console.debug('list_teams', data);
-                    }, 250);
-                },
                 list_tags: function (data) {
                     that.debounce(that._updateTags(data), function(){
                         console.debug('list_tags', data);
@@ -132,8 +127,15 @@ Polymer({
                     }, 250);
                 },
                 user: function (data) {
-                    that.set('model.user', data);
-                    console.warn('Loaded user data');
+                    that.debounce(that._updateUser(data), function(){
+                        console.debug('Loaded user data');
+                    }, 250);
+                },
+                org: function (data) {
+                    console.warn('Loaded org data');
+                    that.debounce(that._updateOrg(data), function(){
+                        console.debug('Loaded org data');
+                    }, 250);
                 }
             },
             logs: {
@@ -391,9 +393,15 @@ Polymer({
         return this.set('model.monitoring', data);
     },
 
-    _updateTeams: function (data) {
+    _updateUser: function (data) {
+        this.set('model.user', data);
+    },
+
+    _updateOrg: function (data) {
         this._updateModel('teams', data.teams);
         this._updateModel('members', data.members);
+        data.teams = data.members = undefined;
+        this.set('model.org', data);
     },
 
     _updateKeys: function (data) {
