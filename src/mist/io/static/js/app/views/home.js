@@ -29,8 +29,16 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                 return Mist.cloudsController.machineCount;
             }),
 
-            isOrgOwner: Ember.computed('Mist.organization.id', 'Mist.teamsController.model', function() {
-                if (!!Mist.organization.id) {
+            hasOrg: Ember.computed('Mist.organization', function() {
+                return !!Object.keys(Mist.organization).length;
+            }),
+
+            firstOrg: Ember.computed('Mist.organization.name', 'hasOrg', function() {
+                return this.get('hasOrg') && !Mist.organization.name;
+            }),
+
+            isOrgOwner: Ember.computed('hasOrg', 'Mist.teamsController.model', function() {
+                if (this.get('hasOrg')) {
                     return Mist.teamsController.model.some(function(team) {
                         return team.name.toLowerCase() == 'owners';
                     });
@@ -73,6 +81,10 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                     else
                         Mist.__container__.lookup('router:main').transitionTo('machine',
                             incident.get('machine'));
+                },
+
+                editOrg: function() {
+                    Mist.organizationEditController.save();
                 }
             },
 

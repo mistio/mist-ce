@@ -43,6 +43,7 @@ var loadApp = function(
     TeamAddController,
     OrganizationsController,
     OrganizationAddController,
+    OrganizationEditController,
     MemberAddController,
     PolicyRuleEditController,
     PolicyOperatorEditController,
@@ -68,6 +69,7 @@ var loadApp = function(
     App.set('organization', ORGANIZATION);
     App.set('can_create_org', CAN_CREATE_ORG);
     App.set('orgs', ORGS);
+    App.set('personal', PERSONAL);
     App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)
         .test(navigator.userAgent)
     );
@@ -149,6 +151,7 @@ var loadApp = function(
     App.set('teamAddController', TeamAddController.create());
     App.set('organizationsController', OrganizationsController.create());
     App.set('organizationAddController', OrganizationAddController.create());
+    App.set('organizationEditController', OrganizationEditController.create());
     App.set('memberAddController', MemberAddController.create());
     App.set('policyRuleEditController', PolicyRuleEditController.create());
     App.set('policyOperatorEditController', PolicyOperatorEditController.create());

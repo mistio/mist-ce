@@ -55,6 +55,24 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                     });
             },
 
+            renameOrganization: function(args) {
+                var that = this;
+                that.set('renamingOrganization', true);
+                Mist.ajax
+                    .PUT('/org/' + args.organization.id, {
+                        'new_name': args.newName
+                    })
+                    .success(function(organization) {
+                        that._renameOrganization(args.newName);
+                    })
+                    .error(function(message) {
+                        Mist.notificationController.notify(message);
+                    })
+                    .complete(function(success) {
+                        that.set('renamingOrganization', false);
+                    });
+            },
+
             _addOrganization: function(organization) {
                 Mist.orgs.pushObject({
                     id: organization.id,
@@ -75,6 +93,16 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                         }
                     });
                 }, 100);
+            },
+
+            _renameOrganization: function(newName) {
+                Ember.set(Mist.organization, 'name', newName);
+
+                Mist.orgs.forEach(function(org) {
+                    if (org.id == Mist.organization.id) {
+                        Ember.set(org, 'name', newName);
+                    }
+                })
             },
 
             _updateModel: function(organization) {

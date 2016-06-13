@@ -2913,8 +2913,8 @@ def star_image(user, cloud_id, image_id):
             cloud.unstarred.remove(image_id)
     cloud.save()
     task = mist.io.tasks.ListImages()
-    task.clear_cache(user.email, cloud_id)
-    task.delay(user.email, cloud_id)
+    task.clear_cache(user.id, cloud_id)
+    task.delay(user.id, cloud_id)
     return not star
 
 
