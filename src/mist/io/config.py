@@ -43,8 +43,9 @@ ALLOW_LIBVIRT_LOCALHOST = settings.get('ALLOW_LIBVIRT_LOCALHOST', False)
 # mist.io interface to the OpenVPN server
 VPN_SERVER_API_ADDRESS = settings.get('VPN_SERVER_API_ADDRESS', '')
 ALLOWED_PRIVATE_NETWORKS = settings.get('ALLOWED_PRIVATE_NETWORKS', '')
+# list/range of private IPs to be excluded from VPN routing
 EXCLUDED_PRIVATE_ADDRESSES = settings.get('EXCLUDED_PRIVATE_ADDRESSES', '')
-# allow public address to be routed over VPN
+# allow public addresses to be routed over VPN
 ALLOW_PUBLIC_VPN = settings.get('ALLOW_PUBLIC_VPN', True)
 
 # celery settings
