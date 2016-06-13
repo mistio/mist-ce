@@ -103,6 +103,11 @@ Polymer({
                     // console.debug('list_projects', data);
                     }, 250);
                 },
+                list_tags: function (data) {
+                    that.debounce(that._updateTags(data), function(){
+                        console.debug('list_tags', data);
+                    }, 250);
+                },
                 ping: function (data) {
                     // console.debug('ping', data);
                     that._ping(data);
@@ -119,6 +124,17 @@ Polymer({
                 reload: function (data) {
                     that.debounce(that._reloadPage(data), function () {
                       console.debug('reloading page', data);
+                    }, 250);
+                },
+                user: function (data) {
+                    that.debounce(that._updateUser(data), function(){
+                        console.debug('Loaded user data');
+                    }, 250);
+                },
+                org: function (data) {
+                    console.warn('Loaded org data');
+                    that.debounce(that._updateOrg(data), function(){
+                        console.debug('Loaded org data');
                     }, 250);
                 }
             },
@@ -377,6 +393,17 @@ Polymer({
         return this.set('model.monitoring', data);
     },
 
+    _updateUser: function (data) {
+        this.set('model.user', data);
+    },
+
+    _updateOrg: function (data) {
+        this._updateModel('teams', data.teams);
+        this._updateModel('members', data.members);
+        data.teams = data.members = undefined;
+        this.set('model.org', data);
+    },
+
     _updateKeys: function (data) {
         return this._updateModel('keys', data);
     },
@@ -479,6 +506,10 @@ Polymer({
     _updateProjects: function (data) {
         this.set('model.clouds.' + data.cloud_id + '.projects', _generateMap(data.projects));
         this.set('model.clouds.' + data.cloud_id + '.projectsArray', data.projects);
+    },
+
+    _updateTags: function (data) {
+        console.warn('_updateTags not implemented. Got data', data);
     },
 
     _probe: function (data) {

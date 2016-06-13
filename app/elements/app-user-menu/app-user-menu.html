@@ -149,7 +149,7 @@
                         </a>
                     </paper-item>
                     <paper-item>
-                        <a href="/account" class="flex">
+                        <a href="/my-account" class="flex">
                             <iron-icon class="user-menu-icon" icon="account-circle"></iron-icon>Account
                         </a>
                     </paper-item>
@@ -248,8 +248,9 @@
                 window.location.href = orgId ? '/orgs/' + orgId : '/orgs';
             }
         },
-        _toggleUI: function() {
-            window.location.href = '/toggle-ui/legacy';
+        placeholder: {
+            type: String,
+            value: 'mist.io/resources/images/sprite-images/user.png'
         },
         _logout: function(e) {
             window.location.href = '/logout';

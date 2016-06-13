@@ -34,7 +34,7 @@
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <iron-ajax id="scriptEditAjaxRequest" url="/api/v1/scripts/[[script.script_id]]" method="PUT" on-response="_handleScriptEditAjaxResponse" on-error="_handleScriptEditAjaxError"></iron-ajax>
+        <iron-ajax id="scriptEditAjaxRequest" url="/api/v1/scripts/[[script.id]]" method="PUT" on-response="_handleScriptEditAjaxResponse" on-error="_handleScriptEditAjaxError"></iron-ajax>
     </template>
 
     <script>

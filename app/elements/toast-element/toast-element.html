@@ -1,10 +1,8 @@
 <link rel="import" href="../../bower_components/toast-er/toast-er.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
-
-
 <dom-module id="toast-element">
-  <template is="dom-bind">
+  <template>
     <style>
       .yellow-button {
       text-transform: none;
@@ -57,7 +55,9 @@
 
 
       },
-
+      notificationsQueue: function(item){
+        var queue = new Queue();
+      },
       someMethod: function() {
          this.fire('iron-signal',{
            name: 'toaster-bake',
@@ -70,8 +70,6 @@
            }
          });
       },
-
-
 
       someOtherMethod: function() {
          this.fire('iron-signal',{

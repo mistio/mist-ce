@@ -7,49 +7,60 @@
 <link rel="import" href="../plans-list/plans-list.html">
 <link rel="import" href="../plans-list/plan-item.html">
 
+<link rel="import" href="../subscriptions-list/subscriptions-list.html">
+<link rel="import" href="../subscriptions-list/subscription-item.html">
+
 
 <dom-module id="page-account">
-    <style>
-      #container {
-        max-width: 600px;
-      }
-      paper-tabs, paper-toolbar {
-        background-color: #d3d3d3;
-        color: #000;
-        --paper-tabs-selection-bar-color: #2196F3;
-      }
-    </style>
+
     <template>
+        <style is="custom-style" include="single-page">
+            #container {
+                max-width: 600px;
+            }
+            paper-tabs,
+            paper-toolbar {
+                background-color: #d3d3d3;
+                color: #000;
+                --paper-tabs-selection-bar-color: #2196F3;
+            }
+            iron-pages > * ::content paper-material {
+                padding: 24px;
+                display: block;
+            }
+        </style>
+        <div id="content">
+            <paper-tabs attr-for-selected="data-route" selected="{{selected}}">
+                <paper-tab data-route="0" current="account" title="Account">PROFILE</paper-tab>
+                <paper-tab data-route="1" current="account" title="Account">PASSWORD</paper-tab>
+                <paper-tab data-route="2" current="account" title="Account">BILLING</paper-tab>
+                <paper-tab data-route="3" current="account" title="Account">ACTIVE SESSIONS</paper-tab>
+                <paper-tab data-route="4" current="account" title="Account">API TOKENS</paper-tab>
+                <paper-tab data-route="5" current="account" title="Account">SUBSCRIPTION HISTORY</paper-tab>
+                <paper-tab data-route="6" current="account" title="Account">FEEDBACK</paper-tab>
+            </paper-tabs>
 
-        <paper-tabs attr-for-selected="data-route" selected="{{selected}}">
-          <paper-tab data-route="0">PROFILE</paper-tab>
-          <paper-tab data-route="1">PASSWORD</paper-tab>
-          <paper-tab data-route="2">BILLING</paper-tab>
-          <paper-tab data-route="3">ACTIVE SESSIONS</paper-tab>
-          <paper-tab data-route="4">API TOKENS</paper-tab>
-          <paper-tab data-route="5">FEEDBACK</paper-tab>
-        </paper-tabs>
+            <iron-pages selected="{{selected}}">
+                <details-page data-route="0"></details-page>
+                <password-page data-route="1"></password-page>
+                <plans-list data-route="2"></plans-list>
+                <div data-route="3"></div>
+                <div data-route="4"></div>
+                <subscriptions-list data-route="5"></subscriptions-list>
+                <feedback-page data-route="6"></feedback-page>
+            </iron-pages>
 
-      <iron-pages selected="{{selected}}">
-        <details-page data-route="0"></details-page>
-        <password-page data-route="1"></password-page>
-        <div data-route="2"></div>
-        <div data-route="3"></div>
-        <div data-route="4"></div>
-        <feedback-page data-route="5"></feedback-page>
-      </iron-pages>
-
+        </div>
     </template>
 </dom-module>
+
 <script>
-Polymer({
-    is: 'page-account',
-    properties: {
-      selected: {
-            value:0
+    Polymer({
+        is: 'page-account',
+        properties: {
+            selected: {
+                value: 0
+            }
         }
-
-    },
-
-});
+    });
 </script>

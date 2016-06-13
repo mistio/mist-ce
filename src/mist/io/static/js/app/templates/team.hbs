@@ -110,7 +110,7 @@
                 <a class="ui-btn ui-btn-icon-right ui-caps icon-edit" {{action "renameClicked" target=view}}>Edit</a>
             </div>
             <div class="ui-block-b">
-                <a class="ui-btn ui-btn-icon-right ui-caps icon-xx" {{action "deleteClicked" target=view}}>Delete</a>
+                <a class="ui-btn ui-btn-icon-right ui-caps icon-xx {{if view.hasMembers 'ui-state-disabled'}}" {{action "deleteClicked" target=view}}>Delete</a>
             </div>
         </div>
     </div>
