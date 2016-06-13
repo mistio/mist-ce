@@ -21,12 +21,12 @@ Polymer({
     ],
     computeTextColor: function(color) {
         return 'rgb(255,255,255)';
-        if (this.color) {
+        /*if (this.color) {
             var lightness = one.color(this.color).lightness();
             return (lightness > 0.5) ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.8)';
         } else {
             return null;
-        }
+        }*/
     },
     _color: function(node, bgColor, color) {
         node.style.color = color;
