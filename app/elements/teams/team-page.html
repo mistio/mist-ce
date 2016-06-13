@@ -274,7 +274,7 @@
                     },
                     team: {
                         type: Object,
-                        computed: '_computeTeam(params, model.teamsArray.*)'
+                        computed: '_computeTeam(params, model.teams.*)'
                     },
                     hasMembers: {
                         type: Boolean,
@@ -283,11 +283,7 @@
                     },
                     members: {
                         type: Array,
-                        computed: '_computeMembers(team)'
-                    },
-                    teamid: {
-                        type: String,
-                        computed: '_computeTeamId(params)'
+                        computed: '_computeMembers(team, model.members.*)'
                     },
                     timestamp: {
                         type: String,
@@ -320,15 +316,14 @@
                     return params.id;
                 },
                 _computeTeam: function(params, teams) {
-                    return teams.base.find(function(team) {
-                        return team.id == params.id;
+                    return teams.base[params.id];
+                },
+                _computeMembers: function(team, members) {
+                    var teamMembers = [];
+                    team.members.forEach(function(member) {
+                        teamMembers.push(members.base[member]);
                     });
-                },
-                _computeTeamId: function(params) {
-                    return params.id;
-                },
-                _computeMembers: function(team) {
-                    return team.members;
+                    return teamMembers;
                 },
                 _addMember: function(e) {
                     page.show('/add-member/' + this.team.id);
