@@ -487,7 +487,7 @@ Polymer({
             return ['name', 'cloud', 'state', 'id', 'public']
         }
         if (this.isScripts(this.section)) {
-            return ['name', 'script_id', 'exec_type', 'location_type'];
+            return ['name', 'id', 'exec_type', 'location_type'];
         }
         if (this.isTemplates(this.section)) {
             return ['name', 'exec_type', 'location_type'];
@@ -605,8 +605,6 @@ Polymer({
             p = item.uuid
         else if (s == "networks")
             p = item.name
-        else if (s == "scripts")
-            p = item.script_id
         else if (s == "incidents")
             p = item.machine_id
         else
