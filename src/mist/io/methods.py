@@ -2942,7 +2942,7 @@ def list_clouds(user):
             del cloud["docker_port"]
         cloud["state"] = 'online' if cloud["enabled"] else 'offline'
         cloud["id"] = cloud["_id"]
-        cloud['tags'] = mist.core.methods.get_cloud_tags(user, cloud.id)
+        cloud['tags'] = mist.core.methods.get_cloud_tags(user,  cloud["_id"])
         normalized_clouds.append(cloud)
 
     return normalized_clouds
