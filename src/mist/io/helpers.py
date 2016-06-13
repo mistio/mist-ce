@@ -314,11 +314,19 @@ def sanitize_host(host):
 def extract_port(url):
     """Returns the port number out of a url"""
     for prefix in ['http://', 'https://']:
-        url = url.replace(prefix, '')
+        if prefix in url:
+            url = url.replace(prefix, '')
+            break
+    else:
+        prefix = ''
     url = url.split('/')[0]
     url = url.split(':')
     if len(url) > 1:
         return int(url[1])
+    elif prefix == 'https://':
+        return 443
+    else:
+        return 80
 
 
 def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
