@@ -17,9 +17,13 @@ define('app/views/team', ['app/views/page'],
             // Computed Properties
             //
 
-            model: function () {
+            model: function() {
                 return this.get('controller').get('model');
             }.property('controller.model'),
+
+            hasMembers: Ember.computed('team.members.[]', function() {
+                return !!(this.get('team.members') && this.get('team.members').length);
+            }),
 
             //
             // Initialization
@@ -68,7 +72,9 @@ define('app/views/team', ['app/views/page'],
                 },
 
                 saveRulesClicked: function() {
-                    Mist.teamsController.saveRules({team: this.get('team')});
+                    Mist.teamsController.saveRules({
+                        team: this.get('team')
+                    });
                 },
 
                 addRulesClicked: function() {
