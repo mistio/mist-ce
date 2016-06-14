@@ -7,7 +7,7 @@ import json
 from libcloud.compute.types import NodeState
 from libcloud.compute.base import Node
 
-from mist.core.vpn.methods import destination_nat, ping_vpn_host, is_private
+from mist.core.vpn.methods import destination_nat, ping_vpn_host, to_tunnel
 
 VALID_RESPONSE_CODES = [httplib.OK, httplib.ACCEPTED, httplib.CREATED,
                         httplib.NO_CONTENT]
@@ -105,8 +105,7 @@ class BareMetalDriver(object):
             ports_list.insert(0, ssh_port, )
         for port in ports_list:
             try:
-                if is_private(user, hostname):
-                    hostname, port = destination_nat(user, hostname, port)
+                hostname, port = destination_nat(user, hostname, port)
                 s.connect((hostname, port))
                 s.shutdown(2)
                 state = NODE_STATE_MAP['on']
@@ -129,9 +128,9 @@ class BareMetalDriver(object):
         """
         if not hostname:
             return 256
-        if is_private(user, hostname):
+        if to_tunnel(user, hostname):
             ping = ping_vpn_host(owner=user, host=hostname)
-            if ping.status_code == 200 and int(json.loads(ping.content)['packets_rx']) > 0:
+            if ping.ok and int(json.loads(ping.content)['packets_rx']) > 0:
                 response = 0
             else:
                 response = 256

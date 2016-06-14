@@ -33,7 +33,7 @@ try:
 except ImportError:
     from mist.io import config
 
-from mist.core.vpn.methods import is_private, destination_nat
+from mist.core.vpn.methods import destination_nat
 
 import logging
 
@@ -271,9 +271,7 @@ class ParamikoShell(object):
                         # store the original ssh port in case of NAT
                         # by the OpenVPN server
                         ssh_port = port
-                        if is_private(user, self.host):
-                            self.host, port = destination_nat(user, ssh_host, port)
-                            log.info("Port forwarding SSH over VPN")
+                        self.host, port = destination_nat(user, ssh_host, port)
                         log.info("ssh -i %s %s@%s:%s",
                                  key.name, ssh_user, self.host, port)
                         self.connect(username=ssh_user,
@@ -350,8 +348,7 @@ class DockerShell(object):
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
         docker_port = cloud.docker_port
 
-        if is_private(user, self.host):
-            self.host, docker_port = destination_nat(user, self.host, docker_port)
+        self.host, docker_port = destination_nat(user, self.host, docker_port)
 
         # For basic auth
         if cloud.apikey and cloud.apisecret:

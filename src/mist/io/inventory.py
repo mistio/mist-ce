@@ -34,10 +34,8 @@ class MistInventory(object):
             except Exception as exc:
                 print exc
                 continue
-            if mist.core.vpn.methods.is_private(ip_addr):
-                ip_addr, port = mist.core.vpn.methods.destination_nat(self.user,
-                                                                      ip_addr,
-                                                                      port)
+            ip_addr, port = mist.core.vpn.methods.destination_nat(self.user,
+                                                                  ip_addr, port)
             if key_id not in self.keys:
                 keypair = Keypair.objects.get(owner=self.user, name=key_id)
                 self.keys[key_id] = keypair.private
