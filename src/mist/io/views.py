@@ -207,11 +207,12 @@ def list_clouds(request):
     auth_context = auth_context_from_request(request)
     # this check has already take place above
     # auth_context.check_perm("cloud", "read", None)
-    clouds = mist.core.methods.filter_list_clouds(auth_context)
-    for cloud in clouds:
-        cloud['tags'] = mist.core.methods.get_cloud_tags(
-                                            auth_context.owner, cloud.id)
-    return clouds
+    # clouds = mist.core.methods.filter_list_clouds(auth_context)
+    # for cloud in clouds:
+    #     cloud['tags'] = mist.core.methods.get_cloud_tags(
+    #                                         auth_context.owner, cloud.id)
+    # return clouds
+    return mist.core.methods.filter_list_clouds(auth_context)
 
 
 @view_config(route_name='api_v1_clouds', request_method='POST', renderer='json')
@@ -455,11 +456,12 @@ def list_keys(request):
     ---
     """
     auth_context = auth_context_from_request(request)
-    keys = mist.core.methods.filter_list_keys(auth_context)
-    for key in keys:
-        key['tags'] = mist.core.methods.get_key_tags(
-                                        auth_context.owner, key.id)
-    return keys
+    # keys = mist.core.methods.filter_list_keys(auth_context)
+    # for key in keys:
+    #     key['tags'] = mist.core.methods.get_key_tags(
+    #                                     auth_context.owner, key.id)
+    # return keys
+    return mist.core.methods.filter_list_keys(auth_context)
 
 
 @view_config(route_name='api_v1_keys', request_method='PUT', renderer='json')
