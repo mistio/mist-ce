@@ -338,6 +338,14 @@ def extract_params(url):
     return params
 
 
+def extract_prefix(url, prefixes=['http://', 'https://']):
+    """Extracts the (http, https) prefix out of a given url"""
+    try:
+        return [prefix for prefix in prefixes if prefix in url][0]
+    except IndexError:
+        return ''
+
+
 def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
                allow_private=config.ALLOW_CONNECT_PRIVATE):
     """Check if a given host is a valid DNS name or IPv4 address"""
