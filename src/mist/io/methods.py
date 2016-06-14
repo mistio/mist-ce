@@ -3467,6 +3467,9 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
     """
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
 
+    if cloud.provider not in config.EC2_PROVIDERS and cloud.provider not in ['gce', 'rackspace', 'openstack']:
+        return False
+
     conn = connect_provider(cloud)
 
     machine = Node(machine_id, name='', state=NodeState.RUNNING,
