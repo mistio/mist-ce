@@ -804,7 +804,6 @@ class ListMachines(UserTask):
                     tags = {}
                     for tag in machine["tags"]:
                         tags[tag["key"]]= tag["value"]
-                    set_machine_tags(owner, tags, cloud_id, machine.get("id"))
                 try:
                     mistio_tags = get_machine_tags(owner, cloud_id,
                                                    machine.get("id"))
