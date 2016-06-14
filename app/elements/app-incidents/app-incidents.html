@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/sc-timeago/sc-timeago.html">
+
 <dom-module id="app-incidents">
     <template>
         <style is="custom-style" include="headings"></style>
@@ -11,7 +13,7 @@
             transform: translate(0, 60px);
             opacity: 0;
             padding: 0;
-            margin: 0;            
+            margin: 0;
         }
 
         :host(.active) {
@@ -60,7 +62,7 @@
             @apply(--layout-flex);
         }
         .flex3child {
-            @apply(--layout-flex-3);            
+            @apply(--layout-flex-3);
         }
 
         .block {
@@ -91,45 +93,48 @@
             min-width: 150px;
         }
         </style>
-        <div class="flexchild">
-            <a href="/incidents" class="main-section" is="pushstate-anchor">
-                <section-tile name="incidents" color="#d96557" icon="icons:error-outline" count="{{incidents.length}}" incidents></section-tile>
-            </a>
-        </div>
-        <paper-material class="flex3child">
-            <h3>Happening Now</h3>
-            <div class="block">
-                <template is="dom-repeat" items="{{incidents}}">
-                    <!-- Only red incidents sould count and show. keep it temp/ly due to lacj of data -->
-                    <!-- [[incidentColor(item)]] -->
-                    <a class="list-item red layout horizontal wrap" href$="[[machineUri(item)]]">
+
+        <template is="dom-if" if="[[incidents.length]]">
+            <div class="flexchild">
+                <a href="/incidents" class="main-section" is="pushstate-anchor">
+                    <section-tile name="incidents" color="#d96557" icon="icons:error-outline" count="[[incidents.length]]" incidents></section-tile>
+                </a>
+            </div>
+            <paper-material class="flex3child">
+                <h3>Happening Now</h3>
+                <div class="block">
+                    <template is="dom-repeat" items="{{incidents}}">
+                        <!-- Only red incidents sould count and show. keep it temp/ly due to lacj of data -->
+                        <!-- [[incidentColor(item)]] -->
+                        <a class="list-item red layout horizontal wrap" href$="[[machineUri(item)]]">
+                            <div class="flexchild expression">
+                                <iron-icon icon="[[sections.machines.icon]]"></iron-icon>
+                                <span class="machine flexchild">[[machineName(item)]]</span>: <span class="rule-condition">[[ruleCondition(item)]]</span>
+                            </div>
+                            <span class="time">
+                                <template is="dom-if" if="[[!item.finished_at]]">
+                                    <sc-timeago datetime="[[incidentDuration(item)]]"></sc-timeago>
+                                </template>
+                                [[incidentTime(item)]]
+                            </span>
+                            <div>
+                                <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                            </div>
+                        </a>
+                    </template>
+                    <a class="list-item layout horizontal wrap" href="/incidents" hidden$="{{!resolvedCount}}">
                         <div class="flexchild expression">
-                            <iron-icon icon="[[sections.machines.icon]]"></iron-icon>
-                            <span class="machine flexchild">[[machineName(item)]]</span>: <span class="rule-condition">[[ruleCondition(item)]]</span>
+                            <iron-icon icon="icons:report-problem"></iron-icon>
+                            <span class="flexchild">and {{resolvedCount}} more incidents in the last day</span>
                         </div>
-                        <span class="time">
-                            <template is="dom-if" if="[[!item.finished_at]]">
-                                <sc-timeago datetime="[[incidentDuration(item)]]"></sc-timeago>
-                            </template>
-                            [[incidentTime(item)]]
-                        </span>
+                        <span class="time">view all</span>
                         <div>
                             <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
                         </div>
                     </a>
-                </template>
-                <a class="list-item layout horizontal wrap" href="/incidents" hidden$="{{!resolvedCount}}">
-                    <div class="flexchild expression">
-                        <iron-icon icon="icons:report-problem"></iron-icon>
-                        <span class="flexchild">and {{resolvedCount}} more incidents in the last day</span>
-                    </div>
-                    <span class="time">view all</span>
-                    <div>
-                        <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                    </div>
-                </a>
-            </div>
-        </paper-material>
+                </div>
+            </paper-material>
+        </template>
     </template>
 </dom-module>
 <script>
@@ -140,13 +145,11 @@ Polymer({
             String, value: "Incidents"
         },
         model: {
-            type: Object,            
-            notify: true
+            type: Object
         },
         incidents: {
             type: Array,
-            value: [],
-            notify: true
+            value: []
         },
         resolvedCount: {
             type: Number,
@@ -166,8 +169,7 @@ Polymer({
         } // alert > red, resolved > green
     },
     observers: [
-        '_incidents(model.incidents.*)',
-        '_totalDuration(model.incidents.*)'
+        '_incidents(model.incidents.*)'
     ],
     attached: function() {
         var rows = this.parentNode.querySelectorAll('block');

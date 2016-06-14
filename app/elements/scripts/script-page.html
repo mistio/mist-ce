@@ -168,13 +168,13 @@
                 </div>
                 <paper-material id="rightcolumn" class="right">
                     <!-- <div>
-                        <h4 class="id">Script ID: </h4><span class="id">[[script.script_id]]</span>
+                        <h4 class="id">Script ID: </h4><span class="id">[[script.id]]</span>
                     </div> -->
                 <div class="info-table">
                     <div class="info-body info-group">
                         <div class="info-item flex-horizontal-with-ratios">
                             <div class="flexchild">ID</div>
-                            <div class="flexchild">[[script.script_id]]</div>
+                            <div class="flexchild">[[script.id]]</div>
                         </div>
                         <template is="dom-if" if="[[script.description]]">
                             <div class="info-item flex-horizontal-with-ratios">
@@ -207,7 +207,7 @@
                 <paper-tooltip for="runScriptFab" position="top">Run Script</paper-tooltip>
             </div>
         </div>
-        <iron-ajax id="scriptDeleteAjaxRequest" url="/api/v1/scripts/[[script.script_id]]" method="DELETE" on-response="_handleScriptDeleteAjaxResponse" on-error="_handleScriptDeleteAjaxError"></iron-ajax>
+        <iron-ajax id="scriptDeleteAjaxRequest" url="/api/v1/scripts/[[script.id]]" method="DELETE" on-response="_handleScriptDeleteAjaxResponse" on-error="_handleScriptDeleteAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
         <tags-list resource="script"></tags-list>
@@ -261,7 +261,7 @@
             },
             _computeScript: function(params, scripts) {
                 return scripts.base.find(function(script) {
-                    return script.script_id == params.id;
+                    return script.id == params.id;
                 });
             },
             _computeScriptId: function(params) {

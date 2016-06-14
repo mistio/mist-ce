@@ -226,9 +226,6 @@
                 </div>
             </paper-material>
         </div>
-        <div class="absolute-bottom-right">
-            <app-fab></app-fab>
-        </div>
         <dialog-element></dialog-element>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>

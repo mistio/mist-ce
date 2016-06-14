@@ -49,10 +49,35 @@
     <link rel="stylesheet" href="/styles/main.css" inline>
     <link rel="stylesheet" href="/styles/grid.css" inline>
 
-    <script src="/bower_components/webcomponentsjs/webcomponents-lite.js" inline></script>
+    <script>
+        // setup Polymer options
+        window.Polymer = {lazyRegister: true};
+
+        // load webcomponents polyfills
+        (function() {
+          if ('registerElement' in document
+              && 'import' in document.createElement('link')
+              && 'content' in document.createElement('template')) {
+            // browser has web components
+          } else {
+            // polyfill web components
+            var e = document.createElement('script');
+            e.src = '/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+            document.head.appendChild(e);
+          }
+        })();
+
+        // load pre-caching service worker
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/elements/service-worker.js');
+          });
+        }
+    </script>
+    <!--script src="/bower_components/webcomponentsjs/webcomponents-lite.js" inline></script-->
     <script src="/resources/dist/yamljs/dist/yaml.min.js" inline></script>
     <!-- will be replaced with /elements/elements.build.html -->
-    <link rel="import" href="/elements/elements.html">
+    <link rel="import" href="/elements/app-main/app-main.html">
     <!-- endreplace-->
 
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:900">
@@ -74,7 +99,7 @@
     </script>
 </head>
 <body id="app" class="fullbleed" unresolved>
-  <app-main class="fit"></app-main>
+  <app-main></app-main>
 
   <!-- Shell calibration element -->
   <div id="font-test"></div>
