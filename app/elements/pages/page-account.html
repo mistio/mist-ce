@@ -58,9 +58,32 @@
     Polymer({
         is: 'page-account',
         properties: {
+            model: {
+                type: Object,
+                notify: true
+            },
             selected: {
                 value: 0
             }
-        }
+        },
+        ready: function() {
+            this.model = {
+                email: EMAIL,
+                cloudsArray: [],
+                machinesArray: [],
+                imagesArray: [],
+                keysArray: [],
+                networksArray: [],
+                scriptsArray: [],
+                stacksArray: [],
+                templatesArray: [],
+                teamsArray: [],
+                teams: [],
+                pending: {
+                    clouds: true,
+                    monitoring: true
+                }
+            };
+          },
     });
 </script>
