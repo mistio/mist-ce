@@ -329,6 +329,15 @@ def extract_port(url):
         return 80
 
 
+def extract_params(url):
+    """Extracts the trailing params beyond the port number out of a url"""
+    for prefix in ['http://', 'https://']:
+        url = url.replace(prefix, '')
+    params = url.split('/')[1:]
+    params = '/'.join(params)
+    return params
+
+
 def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
                allow_private=config.ALLOW_CONNECT_PRIVATE):
     """Check if a given host is a valid DNS name or IPv4 address"""
