@@ -1,11 +1,15 @@
-<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
-<link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
-<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
-<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
-<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
-<link rel="import" href="../../bower_components/iron-icons/device-icons.html">
-<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
+
+<link rel="import" href="../../styles/app-theme.html">
+<link rel="import" href="../../styles/shared-styles.html">
+
+<!-- Load later -->
+<link rel="import" href="../app-icons/app-icons.html">
+
+<link rel="import" href="../dialog-element/dialog-element.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/iron-routes/iron-routes.html">
 <link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
@@ -13,34 +17,26 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-drawer-panel/paper-drawer-panel.html">
-<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
-<link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../../bower_components/sc-timeago/sc-timeago.html">
 <link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
 <link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 
 <link rel="import" href="../app-bar/app-bar.html">
-<link rel="import" href="../app-socket/app-socket.html">
 <link rel="import" href="../app-styles/app-styles.html">
 <link rel="import" href="../app-logo/app-logo.html">
 <link rel="import" href="../app-user-menu/app-user-menu.html">
-<link rel="import" href="../app-icons/app-icons.html">
-<link rel="import" href="../app-image-icons/app-image-icons.html">
 <link rel="import" href="../app-check/app-check.html">
 <link rel="import" href="../pages/page-dashboard.html">
 <link rel="import" href="../pages/page-items.html">
-<link rel="import" href="../notifications-element/notifications-element.html">
-<link rel="import" href="../pages/page-account.html">
 
-<link rel="import" href="../pages/page-not-found.html">
 
-<link rel="import" href="../templates/template-add.html">
+<link rel="import" href="../app-socket/app-socket.html">
 
 <dom-module id="app-main">
     <template>
@@ -125,9 +121,7 @@
 
             <iron-pages id="app-main" main smallscreen$={{smallscreen}}>
                 <!-- dashboard -->
-                <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]">
-                    <title>Dashboard</title>
-                </page-dashboard>
+                <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]"></page-dashboard>
                 <cloud-add model="[[model]]" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
                 <page-items class="incidents" model="[[model]]" items="[[model.incidents]]" sections="[[sections]]" section="[[sections.incidents]]"></page-items>
                 <!-- machines -->
@@ -151,7 +145,7 @@
                 <!--templates-list model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" templates="[[model.templatesArray]]"></templates-list-->
                 <template-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.templates]]"></template-page>
                 <template-add model="[[model]]" sections="[[sections]]" section="[[sections.templates]]"></template-add>
-                <!-- stackss -->
+                <!-- stacks -->
                 <stack-create model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" params="[[params]]" restamp="true"></stack-create>
                 <page-items class="stacks" model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" items="[[model.stacksArray]]"></page-items>
                 <!--stacks-list model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" stacks="[[model.stacksArray]]"></stacks-list-->
@@ -161,7 +155,6 @@
                 <team-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></team-page>
                 <member-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-page>
                 <!-- scripts - leave scipts last due to editors highlighting problem -->
-                <!-- <grid-list-element model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></grid-list-element> -->
                 <!--scripts-list model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" scripts="[[model.scriptsArray]]"></scripts-list-->
                 <page-items model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
                 <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
@@ -234,140 +227,8 @@
                 scriptsArray: [],
                 stacksArray: [],
                 templatesArray: [],
-                teamsArray: [{
-                    name: "python dev",
-                    description: "python developers team",
-                    id: "123",
-                    created_at: 1455132184879,
-                    members: [],
-                    organisation: "mist.io",
-                    policy: ''
-                }, {
-                    name: "qa",
-                    description: "testing and qa team",
-                    id: "321",
-                    created_at: 1455132184879,
-                    members: [{
-                        name: "Debbie D. Doe",
-                        email: "debbie@x.com",
-                        id: "654"
-                    }, {
-                        name: "John P. Pan",
-                        email: "john@x.com",
-                        id: "987"
-                    }],
-                    organisation: "mist.io",
-                    policy: ''
-                }, {
-                    name: "front dev",
-                    description: "front end developers",
-                    id: "213",
-                    created_at: 1455132184879,
-                    members: [{
-                        name: "Xris Papakon",
-                        email: "xris@x.com",
-                        id: "456"
-                    }, {
-                        name: "Rik Rekveld",
-                        email: "rik@x.com",
-                        id: "789"
-                    }, {
-                        name: "John P. Pan",
-                        email: "john@x.com",
-                        id: "987"
-                    }],
-                    organisation: "mist.io",
-                    policy: ''
-                }],
-                teams: {
-                    123: {
-                        name: "python dev",
-                        description: "python developers team",
-                        id: "123",
-                        created_at: 1455132184879,
-                        members: [],
-                        organisation: "mist.io",
-                        policy: ''
-                    },
-                    321: {
-                        name: "qa",
-                        description: "testing and qa team",
-                        id: "321",
-                        created_at: 1455132184879,
-                        members: [{
-                            name: "Debbie D. Doe",
-                            email: "debbie@x.com",
-                            id: "654"
-                        }, {
-                            name: "John P. Pan",
-                            email: "john@x.com",
-                            id: "987"
-                        }],
-                        organisation: "mist.io",
-                        policy: ''
-                    },
-                    213: {
-                        name: "front dev",
-                        description: "front end developers",
-                        id: "213",
-                        created_at: 1455132184879,
-                        members: [{
-                            name: "Xris Papakon",
-                            email: "xris@x.com",
-                            id: "456"
-                        }, {
-                            name: "Rik Rekveld",
-                            email: "rik@x.com",
-                            id: "789"
-                        }, {
-                            name: "John P. Pan",
-                            email: "john@x.com",
-                            id: "987"
-                        }],
-                        organisation: "mist.io",
-                        policy: ''
-                    }
-                },
-                membersArray: [{
-                    name: "Xris Papakon",
-                    email: "xris@x.com",
-                    id: "456",
-                    signed_in: 1455132184879,
-                    teams: [{
-                        name: "front dev",
-                        id: "213",
-                    }]
-                }, {
-                    name: "Rik Rekveld",
-                    email: "rik@x.com",
-                    id: "789",
-                    signed_in: 1455132184879,
-                    teams: [{
-                        name: "front dev",
-                        id: "213",
-                    }]
-                }, {
-                    name: "John P. Pan",
-                    email: "john@x.com",
-                    id: "987",
-                    signed_in: 1455132184879,
-                    teams: [{
-                        name: "front dev",
-                        id: "213",
-                    }, {
-                        name: "qa",
-                        id: "321",
-                    }]
-                }, {
-                    name: "Debbie D. Doe",
-                    email: "debbie@x.com",
-                    id: "654",
-                    signed_in: 1455132184879,
-                    teams: [{
-                        name: "qa",
-                        id: "321",
-                    }]
-                }],
+                teamsArray: [],
+                teams: [],
                 pending: {
                     clouds: true,
                     monitoring: true
@@ -517,12 +378,4 @@
             // document.querySelector('#mainContainer').scrollTop();
         }
     });
-    var COUNTRY = "Greece";
-    var COMPANY_NAME = "mist.io";
-    var NUMBER_OF_PEOPLE = "6-20";
-    var NUMBER_OF_SERVERS = "1-5";
-    var EMAIL = "fakiolasmarios@gmail.com";
-    var HAS_PASS = true;
-    var PLANS = [];
-    var USER_PLANS = [];
 </script>

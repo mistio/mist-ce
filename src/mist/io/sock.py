@@ -203,13 +203,31 @@ class MainConnection(MistConnection):
             log.error("It seems we have received 'on_ready' more than once.")
 
     def start(self):
+        self.update_user()
+        self.update_org()
+        self.list_tags()
         self.list_keys()
         self.list_scripts()
         self.list_templates()
         self.list_stacks()
-        self.list_teams()
         self.list_clouds()
         self.check_monitoring()
+
+    def update_user(self):
+        self.send('user', core_methods.get_user_data(self.auth_context))
+
+    def update_org(self):
+        try:
+            org = rbac_methods.filter_org(self.auth_context)
+        except: # Forbidden
+            org = None
+
+        if org:
+            self.send('org', org)
+
+    def list_tags(self):
+        self.send('list_tags',
+                  core_methods.filter_list_tags(self.auth_context))
 
     def list_keys(self):
         self.send('list_keys',
@@ -226,14 +244,6 @@ class MainConnection(MistConnection):
     def list_stacks(self):
         self.send('list_stacks',
                   orchestration_methods.filter_list_stacks(self.auth_context))
-
-    def list_teams(self):
-        try:
-            teams = rbac_methods.filter_list_teams(self.auth_context)
-        except: # Forbidden
-            teams = None
-        if teams:
-            self.send('list_teams', teams)
 
     def list_clouds(self):
         self.send('list_clouds',
@@ -380,8 +390,12 @@ class MainConnection(MistConnection):
                 self.list_stacks()
             if 'teams' in sections:
                 self.list_teams()
+            if 'tags' in section():
+                self.list_tags()
             if 'monitoring' in sections:
                 self.check_monitoring()
+            if 'user' in sections:
+                self.update_user()
 
     def on_close(self, stale=False):
         if self.consumer is not None:

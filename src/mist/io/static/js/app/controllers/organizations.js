@@ -39,7 +39,7 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                 var that = this;
                 that.set('addingOrganization', true);
                 Mist.ajax
-                    .POST('/org', {
+                    .POST('/api/v1/org', {
                         'name': args.organization.name
                     })
                     .success(function(organization) {
@@ -52,6 +52,24 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                         that.set('addingOrganization', false);
                         if (args.callback)
                             args.callback(success);
+                    });
+            },
+
+            renameOrganization: function(args) {
+                var that = this;
+                that.set('renamingOrganization', true);
+                Mist.ajax
+                    .PUT('/api/v1/org/' + args.organization.id, {
+                        'new_name': args.newName
+                    })
+                    .success(function(organization) {
+                        that._renameOrganization(args.newName);
+                    })
+                    .error(function(message) {
+                        Mist.notificationController.notify(message);
+                    })
+                    .complete(function(success) {
+                        that.set('renamingOrganization', false);
                     });
             },
 
@@ -75,6 +93,16 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                         }
                     });
                 }, 100);
+            },
+
+            _renameOrganization: function(newName) {
+                Ember.set(Mist.organization, 'name', newName);
+
+                Mist.orgs.forEach(function(org) {
+                    if (org.id == Mist.organization.id) {
+                        Ember.set(org, 'name', newName);
+                    }
+                })
             },
 
             _updateModel: function(organization) {

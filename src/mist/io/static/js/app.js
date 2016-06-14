@@ -189,6 +189,7 @@ var loadFiles = function (callback) {
         'app/controllers/team_add',
         'app/controllers/organizations',
         'app/controllers/organization_add',
+        'app/controllers/organization_edit',
         'app/controllers/member_add',
         'app/controllers/policy_rule_edit',
         'app/controllers/policy_operator_edit',
