@@ -132,7 +132,7 @@
 
                             newItem.resource = {
                                 type: this.resource,
-                                item_id: this.resource == 'script' ? item.script_id : item.id,
+                                item_id: item.id,
                                 cloud_id: ['machine', 'image', 'network'].indexOf(this.resource) != -1 ? item.cloud.id : ''
                             };
                             newItem.tags = item.tags.concat(newTags);
