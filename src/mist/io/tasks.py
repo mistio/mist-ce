@@ -809,6 +809,7 @@ class ListMachines(UserTask):
                                                    machine.get("id"))
                 except:
                     log.info("Machine has not tags in mist db")
+                    mistio_tags = {}
                 else:
                     machine["tags"] = []
                     # optimized for js
