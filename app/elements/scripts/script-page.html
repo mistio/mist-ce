@@ -179,10 +179,10 @@
                     <div class="info-body info-group">
                         <div class="info-item flex-horizontal-with-ratios">
                             <h4 class="id tags">Tags
-                                <template is="dom-if" if="[[image.tags]]">
-                                    <span class="id">([[image.tags.length]])</span>
+                                <template is="dom-if" if="[[script.tags]]">
+                                    <span class="id">([[script.tags.length]])</span>
                                 </template>
-                                <template is="dom-if" if="[[!key.tags]]">
+                                <template is="dom-if" if="[[!script.tags]]">
                                     <span class="id">(0)</span>
                                 </template>
                                 :

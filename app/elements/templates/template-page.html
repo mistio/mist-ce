@@ -228,6 +228,22 @@
                         <!-- <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a> -->
                     </p>
                 </div>
+                <div class="page-block" >
+                    <h3 class="smallcaps">Tags
+                        <template is="dom-if" if="[[template.tags]]">
+                            <span class="id">([[script.tags.length]])</span>
+                        </template>
+                        <template is="dom-if" if="[[!template.tags]]">
+                            <span class="id">(0)</span>
+                        </template>
+                    </h3>                
+                    <template is="dom-if" if="[[template.tags]]">
+                        <template is="dom-repeat" items="[[template.tags]]">
+                            <span class="id tag">[[YamleParse(item)]]</span>
+                            <span class="id tag">test = tag</span>
+                        </template>
+                    </template>
+                </div>
             </paper-material>
             <div class="section">
                 <div class="flex-horizontal-with-ratios">
