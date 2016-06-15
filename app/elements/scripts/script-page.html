@@ -166,17 +166,12 @@
                 </div>
             </paper-material>
             <div class="columns">
-                <div id="leftcolumn" class="left command-container"  hidden$="[[!isInline]]">
+                <div id="leftcolumn" class="left command-container" hidden$="[[!isInline]]">
                     <div class="command-container">
-                        <pre><code>
-[[script.script]]
-                        </code></pre>
+                        <pre><code>[[script.script]]</code></pre>
                     </div>
                 </div>
                 <paper-material id="rightcolumn" class="right">
-                    <!-- <div>
-                        <h4 class="id">Script ID: </h4><span class="id">[[script.id]]</span>
-                    </div> -->
                 <div class="info-table">
                     <div class="info-body info-group">
                         <div class="info-item flex-horizontal-with-ratios">
@@ -191,7 +186,7 @@
                             </h4>
                             <template is="dom-if" if="[[script.tags]]">
                                 <template is="dom-repeat" items="[[script.tags]]">
-                                    <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
+                                    <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
                                 </template>
                             </template>
                         </div>

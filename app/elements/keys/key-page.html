@@ -169,7 +169,7 @@
             h4.id.tags {
                 padding-left: 36px;
             }
-            
+
             .tag {
                 padding: 0.5em;
                 display: inline-block;
@@ -263,7 +263,7 @@
                     </h4>
                     <template is="dom-if" if="[[key.tags]]">
                         <template is="dom-repeat" items="[[key.tags]]">
-                            <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
+                            <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
                         </template>
                     </template>
                 </paper-material>
