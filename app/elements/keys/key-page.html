@@ -117,6 +117,7 @@
                 border-color: #eeedeb;
                 color: rgba(0, 0, 0, 0.54);
                 white-space: normal;
+                text-align: left;
             }
 
             #keyPublicContainer textarea {
@@ -290,7 +291,7 @@
                         <paper-button hidden$="[[visiblePrivateKey]]" id="showPrivateKeybtn" on-tap="showPrivateKey">
                             <iron-icon icon="icons:visibility"></iron-icon> View Private Key</paper-button>
                         <textarea hidden$="[[!visiblePrivateKey]]" id="keyPrivate">
-                            [[privateKey]]
+                        [[privateKey]]
                         </textarea>
                     </div>
                 </paper-material>
