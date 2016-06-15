@@ -203,15 +203,17 @@
                         computed: '_computeShowProgress(sendingData)'
                     }
                 },
-                _computeUser: function(model){
-                  return{
-                      firstName: this.model.user.first_name,
-                      lastName: this.model.user.last_name,
-                      country: this.model.user.feedback.country,
-                      companyName: this.model.user.feedback.company_name,
-                      numberOfPeople: this.model.user.feedback.number_of_people,
-                      numberOfServers: this.model.user.feedback.number_of_servers
-                    };
+                _computeUser: function(model) {
+                    if (model.user) {
+                        return {
+                            firstName: model.user.first_name,
+                            lastName: model.user.last_name,
+                            country: model.user.feedback.country,
+                            companyName: model.user.feedback.company_name,
+                            numberOfPeople: model.user.feedback.number_of_people,
+                            numberOfServers: model.user.feedback.number_of_servers
+                        };
+                    }
                 },
                 _computeFormReady: function(firstName, lastName, country, companyName, numberOfPeople, numberOfServers, sendingData) {
                     var formReady = false;

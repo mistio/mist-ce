@@ -69,7 +69,7 @@
                 font-size: 12px;
             }
 
-            :host /deep/ paper-step:not(.iron-selected) .hover-target:hover + .stepper-circle {
+            :host /deep/ paper-step:not(.iron-selected) .hover-target:hover+ .stepper-circle {
                 background-color: #2196F3;
             }
 
@@ -238,8 +238,7 @@
                 is: 'feedback-page',
                 properties: {
                     model: {
-                        type: Object,
-                        notify: true
+                        type: Object
                     },
                     user: {
                         type: Object,
@@ -455,26 +454,28 @@
                     '_discoverChanged(user.discover)',
                     '_alternativeChanged(user.alternative)'
                 ],
-                _computeUserFeedback: function(model){
-                  return(
-                    firstName: this.model.user.first_name,
-                    lastName: this.model.user.last_name,
-                    country: this.model.user.feedback.country,
-                    companyName: this.model.user.feedback.company_name,
-                    numberOfPeople: this.model.user.feedback.number_of_people,
-                    numberOfServers: this.model.user.feedback.number_of_servers,
-                    discover: this.model.user.feedback.discover,
-                    hosted: this.model.user.feedback.hosted,
-                    hasExtraHosted: false,
-                    extraHosted: null,
-                    hasExtraDiscover: false,
-                    extraDiscover: null,
-                    satisfaction: this.model.user.feedback.satisfied,
-                    alternative: this.model.user.feedback.alternatives,
-                    hasExtraAlternative: false,
-                    extraAlternative: null,
-                    improve: this.model.user.feedback.improve
-                  );
+                _computeUserFeedback: function(model) {
+                    if (model.user) {
+                        return {
+                            firstName: model.user.first_name,
+                            lastName: model.user.last_name,
+                            country: model.user.feedback.country,
+                            companyName: model.user.feedback.company_name,
+                            numberOfPeople: model.user.feedback.number_of_people,
+                            numberOfServers: model.user.feedback.number_of_servers,
+                            discover: model.user.feedback.discover,
+                            hosted: model.user.feedback.hosted,
+                            hasExtraHosted: false,
+                            extraHosted: null,
+                            hasExtraDiscover: false,
+                            extraDiscover: null,
+                            satisfaction: model.user.feedback.satisfied,
+                            alternative: model.user.feedback.alternatives,
+                            hasExtraAlternative: false,
+                            extraAlternative: null,
+                            improve: model.user.feedback.improve
+                        };
+                    }
                 },
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
