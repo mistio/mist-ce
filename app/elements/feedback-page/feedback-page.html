@@ -455,7 +455,7 @@
                     '_discoverChanged(user.discover)',
                     '_alternativeChanged(user.alternative)'
                 ],
-                _computeUserFeedback: function(){
+                _computeUserFeedback: function(model){
                   return(
                     firstName: this.model.user.first_name,
                     lastName: this.model.user.last_name,
