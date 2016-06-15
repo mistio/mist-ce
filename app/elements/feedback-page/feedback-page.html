@@ -243,28 +243,7 @@
                     },
                     user: {
                         type: Object,
-                        value: function() {
-                            return {
-                                firstName: FIRST_NAME,
-                                lastName: LAST_NAME,
-                                country: COUNTRY,
-                                companyName: COMPANY_NAME,
-                                numberOfPeople: NUMBER_OF_PEOPLE,
-                                numberOfServers: NUMBER_OF_SERVERS,
-                                discover: null,
-                                hosted: [],
-                                hasExtraHosted: false,
-                                extraHosted: null,
-                                hasExtraDiscover: false,
-                                extraDiscover: null,
-                                satisfaction: null,
-                                alternative: null,
-                                hasExtraAlternative: false,
-                                extraAlternative: null,
-                                improve: null
-                            };
-                        },
-                        notify: true
+                        computed: "_computeUserFeedback(model)"
                     },
                     pageFirst: {
                         type: Boolean,
@@ -476,6 +455,27 @@
                     '_discoverChanged(user.discover)',
                     '_alternativeChanged(user.alternative)'
                 ],
+                _computeUserFeedback: function(){
+                  return(
+                    firstName = this.model.user.first_name,
+                    lastName = this.model.user.last_name,
+                    country = this.model.user.feedback.country,
+                    companyName = this.model.user.feedback.company_name,
+                    numberOfPeople = this.model.user.feedback.number_of_people,
+                    numberOfServers = this.model.user.feedback.number_of_servers,
+                    discover = this.model.user.feedback.discover,
+                    hosted = this.model.user.feedback.hosted,
+                    hasExtraHosted = false,
+                    extraHosted = null,
+                    hasExtraDiscover = false,
+                    extraDiscover = null,
+                    satisfaction = this.model.user.feedback.satisfied,
+                    alternative = this.model.user.feedback.alternatives,
+                    hasExtraAlternative = false,
+                    extraAlternative = null,
+                    improve = this.model.user.feedback.improve
+                  );
+                },
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
                 },

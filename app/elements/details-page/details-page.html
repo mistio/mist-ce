@@ -98,18 +98,7 @@
                     },
                     user: {
                         type: Object,
-                        // value: function() {
-                        //     return {
-                        //         firstName: FIRST_NAME,
-                        //         lastName: LAST_NAME,
-                        //         country: COUNTRY,
-                        //         companyName: COMPANY_NAME,
-                        //         numberOfPeople: NUMBER_OF_PEOPLE,
-                        //         numberOfServers: NUMBER_OF_SERVERS
-                        //     }
-                        // },
-                        // notify: true
-                        computed: "_computeUser()"
+                        computed: "_computeUser(model)"
                     },
                     countriesOptions: {
                         type: Array,
@@ -214,13 +203,15 @@
                         computed: '_computeShowProgress(sendingData)'
                     }
                 },
-                _computeUser: function(){
-                  var firstName = this.model.user.first_name;
-                  var lastName = this.model.user.last_name;
-                  var country = this.model.user.feedback.country;
-                  var companyName = this.model.user.feedback.company_name;
-                  var numberOfPeople = this.model.user.feedback.number_of_people;
-                  var numberOfServers = this.model.user.feedback.number_of_servers;
+                _computeUser: function(model){
+                  return{
+                      firstName = this.model.user.first_name,
+                      lastName = this.model.user.last_name,
+                      country = this.model.user.feedback.country,
+                      companyName = this.model.user.feedback.company_name,
+                      numberOfPeople = this.model.user.feedback.number_of_people,
+                      numberOfServers = this.model.user.feedback.number_of_servers
+                    };
                 },
                 _computeFormReady: function(firstName, lastName, country, companyName, numberOfPeople, numberOfServers, sendingData) {
                     var formReady = false;
