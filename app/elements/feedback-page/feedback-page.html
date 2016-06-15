@@ -456,7 +456,7 @@
                     '_alternativeChanged(user.alternative)'
                 ],
                 _computeUserFeedback: function(model){
-                  return(
+                  return{
                     firstName: this.model.user.first_name,
                     lastName: this.model.user.last_name,
                     country: this.model.user.feedback.country,
@@ -474,7 +474,7 @@
                     hasExtraAlternative: false,
                     extraAlternative: null,
                     improve: this.model.user.feedback.improve
-                  );
+                  };
                 },
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
