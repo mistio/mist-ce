@@ -1,543 +1,564 @@
 <script src="../../bower_components/sockjs-client/dist/sockjs.min.js"></script>
 <script>
-DEBUG_SOCKET = false;
-Polymer({
-    is: 'app-socket',
-    url: '/socket',
-    properties: {
-        socket: {
-            type: Object,
-            value: false
-        },
-        model: {
-            type: Object,
-            notify: true
-        },
-        initialized: {
-            type: Boolean,
-            value: false
-        },
-        onboarding: {
-            type: Object,
-            value: {}
-        }
-    },
-
-    ready: function () {
-        // Create the socket if it does not exist
-        if (this.socket)
-            return;
-
-        this.socket = new SockJS(this.url, null,
-            {'transports': ['websocket', 'xhr-polling']}
-        );
-
-        // Connect the receiver
-        var receiver = this.receive.bind(this);
-        this.socket.onmessage = function(e) {
-            receiver(e.data);
-        };
-
-        // Handle error & close
-        this.socket.onerror = this.connectionError;
-        this.socket.onclose = this.connectionClosed;
-        this.socket.onheartbeat = this.heartbeat;
-
-        // Initialize main handlers
-        var that = this;
-        this.handlers = {
-            main: {
-                list_clouds: function (data) {
-                    that.debounce(that._updateClouds(data), function(){
-                        // console.debug('list_clouds', data);
-                    }, 250); },
-                list_keys: function (data) {
-                    that.debounce(that._updateKeys(data), function(){
-                        // console.debug('list_keys', data);
-                    }, 250);
-                },
-                list_scripts: function (data) {
-                    that.debounce(that._updateScripts(data), function(){
-                        // console.debug('list_scripts', data);
-                    }, 250);
-                },
-                list_templates: function (data) {
-                    console.warn('got templates', data);
-                    that.debounce(that._updateTemplates(data), function(){
-                        console.debug('list_templates', data);
-                    }, 250);
-                },
-                list_stacks: function (data) {
-                    console.warn('got stacks', data);
-                    that.debounce(that._updateStacks(data), function(){
-                        console.debug('list_stacks', data);
-                    }, 250);
-                },
-                list_machines: function (data) {
-                    that.debounce(that._updateMachines(data), function(){
-                        // console.debug('list_machines', data);
-                    }, 250);
-                },
-                list_images: function (data) {
-                    that.debounce(that._updateImages(data), function(){
-                        // console.debug('list_images', data);
-                    }, 250);
-                },
-                list_sizes: function (data) {
-                    that.debounce(that._updateSizes(data), function(){
-                        // console.debug('list_sizes', data);
-                    }, 250);
-                },
-                list_locations: function (data) {
-                    that.debounce(that._updateLocations(data), function(){
-                    // console.debug('list_locations', data);
-                    }, 250);
-                },
-                list_networks: function (data) {
-                    that.debounce(that._updateNetworks(data), function(){
-                    // console.debug('list_networks', data);
-                    }, 250);
-                },
-                list_projects: function (data) {
-                    that.debounce(that._updateProjects(data), function(){
-                    // console.debug('list_projects', data);
-                    }, 250);
-                },
-                list_tags: function (data) {
-                    that.debounce(that._updateTags(data), function(){
-                        console.debug('list_tags', data);
-                    }, 250);
-                },
-                ping: function (data) {
-                    // console.debug('ping', data);
-                    that._ping(data);
-                },
-                probe: function (data) {
-                    // console.debug('probe', data);
-                    that._probe(data);
-                },
-                monitoring: function (data) {
-                    that.debounce(that._updateMonitoring(data), function () {
-                      // console.debug('monitoring', data);
-                    }, 250);
-                },
-                reload: function (data) {
-                    that.debounce(that._reloadPage(data), function () {
-                      console.debug('reloading page', data);
-                    }, 250);
-                },
-                user: function (data) {
-                    that.debounce(that._updateUser(data), function(){
-                        console.debug('Loaded user data');
-                    }, 250);
-                },
-                org: function (data) {
-                    console.warn('Loaded org data');
-                    that.debounce(that._updateOrg(data), function(){
-                        console.debug('Loaded org data');
-                    }, 250);
-                }
+    DEBUG_SOCKET = false;
+    Polymer({
+        is: 'app-socket',
+        url: '/socket',
+        properties: {
+            socket: {
+                type: Object,
+                value: false
             },
-            logs: {
-                logs: function (data) {
-                    console.warn('received log entries from socket', data);
-                },
-                event: function (data) {
-                    if (DEBUG_SOCKET)
-                        console.debug('received log event', data);
-                    var loglist = document.querySelector('log-list');
-                    if (loglist) {
-                        loglist.eventReceived(data);
-                    } else {
-                        console.warn('No log-list found in DOM to consume log event');
+            model: {
+                type: Object,
+                notify: true
+            },
+            initialized: {
+                type: Boolean,
+                value: false
+            },
+            onboarding: {
+                type: Object,
+                value: {}
+            }
+        },
+
+        ready: function() {
+            // Create the socket if it does not exist
+            if (this.socket)
+                return;
+
+            this.socket = new SockJS(this.url, null, {
+                'transports': ['websocket', 'xhr-polling']
+            });
+
+            // Connect the receiver
+            var receiver = this.receive.bind(this);
+            this.socket.onmessage = function(e) {
+                receiver(e.data);
+            };
+
+            // Handle error & close
+            this.socket.onerror = this.connectionError;
+            this.socket.onclose = this.connectionClosed;
+            this.socket.onheartbeat = this.heartbeat;
+
+            // Initialize main handlers
+            var that = this;
+            this.handlers = {
+                main: {
+                    list_clouds: function(data) {
+                        that.debounce(that._updateClouds(data), function() {
+                            // console.debug('list_clouds', data);
+                        }, 250);
+                    },
+                    list_keys: function(data) {
+                        that.debounce(that._updateKeys(data), function() {
+                            console.debug('list_keys', data);
+                        }, 250);
+                    },
+                    list_scripts: function(data) {
+                        that.debounce(that._updateScripts(data), function() {
+                            console.debug('list_scripts', data);
+                        }, 250);
+                    },
+                    list_templates: function(data) {
+                        console.warn('got templates', data);
+                        that.debounce(that._updateTemplates(data), function() {
+                            console.debug('list_templates', data);
+                        }, 250);
+                    },
+                    list_stacks: function(data) {
+                        console.warn('got stacks', data);
+                        that.debounce(that._updateStacks(data), function() {
+                            console.debug('list_stacks', data);
+                        }, 250);
+                    },
+                    list_machines: function(data) {
+                        that.debounce(that._updateMachines(data), function() {
+                            // console.debug('list_machines', data);
+                        }, 250);
+                    },
+                    list_images: function(data) {
+                        that.debounce(that._updateImages(data), function() {
+                            // console.debug('list_images', data);
+                        }, 250);
+                    },
+                    list_sizes: function(data) {
+                        that.debounce(that._updateSizes(data), function() {
+                            // console.debug('list_sizes', data);
+                        }, 250);
+                    },
+                    list_locations: function(data) {
+                        that.debounce(that._updateLocations(data), function() {
+                            // console.debug('list_locations', data);
+                        }, 250);
+                    },
+                    list_networks: function(data) {
+                        that.debounce(that._updateNetworks(data), function() {
+                            // console.debug('list_networks', data);
+                        }, 250);
+                    },
+                    list_projects: function(data) {
+                        that.debounce(that._updateProjects(data), function() {
+                            // console.debug('list_projects', data);
+                        }, 250);
+                    },
+                    list_tags: function(data) {
+                        that.debounce(that._updateTags(data), function() {
+                            console.debug('list_tags', data);
+                        }, 250);
+                    },
+                    ping: function(data) {
+                        // console.debug('ping', data);
+                        that._ping(data);
+                    },
+                    probe: function(data) {
+                        // console.debug('probe', data);
+                        that._probe(data);
+                    },
+                    monitoring: function(data) {
+                        that.debounce(that._updateMonitoring(data), function() {
+                            // console.debug('monitoring', data);
+                        }, 250);
+                    },
+                    reload: function(data) {
+                        that.debounce(that._reloadPage(data), function() {
+                            console.debug('reloading page', data);
+                        }, 250);
+                    },
+                    user: function(data) {
+                        that.debounce(that._updateUser(data), function() {
+                            console.debug('Loaded user data');
+                        }, 250);
+                    },
+                    org: function(data) {
+                        console.warn('Loaded org data');
+                        that.debounce(that._updateOrg(data), function() {
+                            console.debug('Loaded org data');
+                        }, 250);
                     }
                 },
-                open_incidents: function (data){
-                    if (DEBUG_SOCKET)
-                        console.debug('got incidents', data);
-                    that.set('model.incidents', data);
-                },
-                open_jobs: function (data) {
-                    if (DEBUG_SOCKET)
-                        console.debug('got jobs', data);
-                    that.set('model.jobs', data);
-                },
-                open_sessions: function (data) {
-                    if (DEBUG_SOCKET)
-                        console.debug('got sessions', data);
-                    that.set('model.sessions', data);
-                },
-                open_shells: function (data) {
-                    if (DEBUG_SOCKET)
-                        console.debug('got shells', data);
-                    that.set('model.shells', data);
-                }
-           }
-        };
-
-        // When socket connects prepare channels
-        this.socket.onopen = function () {
-            console.log('CONNECTION ESTABLISHED');
-            that.send('sub', 'main');
-            that.send('msg', 'main', 'ready');
-            that.send('sub', 'logs');
-            that.send('msg', 'logs', 'ready');
-            that.set('initialized', true);
-        };
-    },
-
-    // DEPRECATED
-    getScripts: function () {
-        var xhr = new XMLHttpRequest(), that = this;
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status == 200) {
-                    that._updateModel('scripts', JSON.parse(xhr.responseText));
-                }
-            }
-        }
-        xhr.open("GET", '/api/v1/scripts', true);
-        xhr.send();
-    },
-
-    // DEPRECATED
-    getTemplates: function () {
-        var xhr = new XMLHttpRequest(), that = this;
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status == 200) {
-                    that._updateModel('templates', JSON.parse(xhr.responseText));
-                }
-            }
-        }
-        xhr.open("GET", '/api/v1/templates', true);
-        xhr.send();
-    },
-
-    // DEPRECATED
-    getStacks: function () {
-        var xhr = new XMLHttpRequest(), that = this;
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                if (xhr.status == 200) {
-                    var stacks = JSON.parse(xhr.responseText)
-                    for (i in stacks){
-                        stacks[i].template_id = stacks[i].template
-                        if (stacks[i].node_instances){
-                            stacks[i].state = stacks[i].node_instances
-                            for (s in stacks[i].state){
-                                stacks[i].state[s].runtime_properties = YAML.stringify(stacks[i].state[s].runtime_properties)
-                            }
-                            delete stacks[i].node_instances
+                logs: {
+                    logs: function(data) {
+                        console.warn('received log entries from socket', data);
+                    },
+                    event: function(data) {
+                        if (DEBUG_SOCKET)
+                            console.debug('received log event', data);
+                        var loglist = document.querySelector('log-list');
+                        if (loglist) {
+                            loglist.eventReceived(data);
+                        } else {
+                            console.warn('No log-list found in DOM to consume log event');
                         }
-                        if (stacks[i].inputs){
-                            var inputs = stacks[i].inputs
-                            stacks[i].inputs = []
-                            for (input in inputs){
-                                stacks[i].inputs.push({
-                                    name:input,
-                                    value:inputs[input],
-                                    default: "",
-                                    type: "text",
-                                    description: "",
-                                    errorMessage: "",
-                                    helptext: "",
-                                    show: true,
-                                })
-                            }
-                        }
+                    },
+                    open_incidents: function(data) {
+                        if (DEBUG_SOCKET)
+                            console.debug('got incidents', data);
+                        that.set('model.incidents', data);
+                    },
+                    open_jobs: function(data) {
+                        if (DEBUG_SOCKET)
+                            console.debug('got jobs', data);
+                        that.set('model.jobs', data);
+                    },
+                    open_sessions: function(data) {
+                        if (DEBUG_SOCKET)
+                            console.debug('got sessions', data);
+                        that.set('model.sessions', data);
+                    },
+                    open_shells: function(data) {
+                        if (DEBUG_SOCKET)
+                            console.debug('got shells', data);
+                        that.set('model.shells', data);
                     }
-                    that._updateModel('stacks', stacks);
+                }
+            };
+
+            // When socket connects prepare channels
+            this.socket.onopen = function() {
+                console.log('CONNECTION ESTABLISHED');
+                that.send('sub', 'main');
+                that.send('msg', 'main', 'ready');
+                that.send('sub', 'logs');
+                that.send('msg', 'logs', 'ready');
+                that.set('initialized', true);
+            };
+        },
+
+        // DEPRECATED
+        getScripts: function() {
+            var xhr = new XMLHttpRequest(),
+                that = this;
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status == 200) {
+                        that._updateModel('scripts', JSON.parse(xhr.responseText));
+                    }
                 }
             }
-        }
-        xhr.open("GET", '/api/v1/stacks', true);
-        xhr.send();
-    },
+            xhr.open("GET", '/api/v1/scripts', true);
+            xhr.send();
+        },
 
-    heartbeat: function() {
-        console.debug('got heartbeat');
-        this.send('h'); // reply with empty frame
-    },
-
-    connectionClosed: function () {
-        console.log('CONNECTION CLOSED');
-        // TODO: try to reconnect
-    },
-
-    connectionError: function () {
-        console.log('CONNECTION ERROR');
-        // TODO: try to reconnect
-    },
-
-    send: function (type, namespace, body, params) {
-        if (namespace == undefined)
-            namespace = 'main';
-
-        var payload = type + ',' + namespace;
-
-        if (body !== undefined)
-            payload += ',' + body;
-
-        if (params !== undefined)
-            payload += ',' + JSON.stringify([params]);
-
-        this.socket.send(payload);
-        if (DEBUG_SOCKET)
-            console.debug('SENT: ' + payload);
-    },
-
-    receive: function (message) {
-        if (DEBUG_SOCKET)
-            console.debug('RECEIVED: ' + message);
-
-        var parts = message.split(',');
-        var type = parts[0], namespace = parts[1];
-        var body = JSON.parse(parts.splice(2).join(','));
-        if (this.handlers[namespace] === undefined)
-            console.warn('Unknown namespace', namespace);
-        var endpoint = this.handlers[namespace][Object.keys(body)[0]];
-        if (endpoint === undefined)
-            console.warn('Unknown endpoint', Object.keys(body)[0], 'in namespace', namespace);
-        else
-            endpoint(body[Object.keys(body)[0]]);
-    },
-
-    _reloadPage: function (data) {
-        console.warn('reloading', data);
-        document.location.reload();
-    },
-
-    _updateModel: function (section, data) {
-        var changed = false, // we wont update the model if it hasn't changed
-            pending = this.get('model.pending.' + section);
-
-        // if the received data array has different length than the respective
-        // model array, then things must have changed since last update
-        if (data.length != this.get('model.' + section + 'Array.length')) {
-            changed = true;
-        }
-
-        // For each item in the received data array
-        for (var i=0; i < data.length; i++) {
-            // If we know things have changed no need to keep checking
-            if (changed)
-                break;
-            // check if _id is used instead of id
-            if (!data[i].id){
-                data[i].id = data[i]._id
-            }
-            // Check if item exists in respective model
-            var item = this.get('model.' + section + '.' + data[i].id);
-            if (!item) { // If does not exist then model needs to be updated
-                changed = true;
-                break;
-            }
-
-            // check if all fields of the data item exist in the model item
-            var dataKeys = Object.keys(data[i]), modelKeys = Object.keys(item);
-            for (var k=0; k < dataKeys.length; k++){
-                if (modelKeys.indexOf(dataKeys[k]) == -1) {
-                    // If something is missing the model needs to be updated
-                    changed = true;
-                    break;
-                }
-                // If some field changed the model needs to be updated
-                if (JSON.stringify(data[i][dataKeys[k]])
-                      .localeCompare(JSON.stringify(item[dataKeys[k]]))) {
-                    console.debug('property ', dataKeys[k], ' changed in ', item);
-                    var oldVal = JSON.stringify(item[dataKeys[k]]),
-                        newVal = JSON.stringify(data[i][dataKeys[k]]);
-                    console.debug('Old value: ',  oldVal, oldVal.length);
-                    console.debug('New value: ',  newVal, newVal.length);
-                    changed = true;
-                    break;
+        // DEPRECATED
+        getTemplates: function() {
+            var xhr = new XMLHttpRequest(),
+                that = this;
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status == 200) {
+                        that._updateModel('templates', JSON.parse(xhr.responseText));
+                    }
                 }
             }
+            xhr.open("GET", '/api/v1/templates', true);
+            xhr.send();
+        },
 
-            if (changed)
-                break;
-        }
+        // DEPRECATED
+        getStacks: function() {
+            var xhr = new XMLHttpRequest(),
+                that = this;
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status == 200) {
+                        var stacks = JSON.parse(xhr.responseText)
+                        for (i in stacks) {
+                            stacks[i].template_id = stacks[i].template
+                            if (stacks[i].node_instances) {
+                                stacks[i].state = stacks[i].node_instances
+                                for (s in stacks[i].state) {
+                                    stacks[i].state[s].runtime_properties = YAML.stringify(stacks[i].state[s].runtime_properties)
+                                }
+                                delete stacks[i].node_instances
+                            }
+                            if (stacks[i].inputs) {
+                                var inputs = stacks[i].inputs
+                                stacks[i].inputs = []
+                                for (input in inputs) {
+                                    stacks[i].inputs.push({
+                                        name: input,
+                                        value: inputs[input],
+                                        default: "",
+                                        type: "text",
+                                        description: "",
+                                        errorMessage: "",
+                                        helptext: "",
+                                        show: true,
+                                    })
+                                }
+                            }
+                        }
+                        that._updateModel('stacks', stacks);
+                    }
+                }
+            }
+            xhr.open("GET", '/api/v1/stacks', true);
+            xhr.send();
+        },
 
-        if (changed) {
-            console.debug('updating', section);
-            this.set('model.' + section, _generateMap(data));
-            this.set('model.' + section + 'Array', data);
-        } else {
+        heartbeat: function() {
+            console.debug('got heartbeat');
+            this.send('h'); // reply with empty frame
+        },
+
+        connectionClosed: function() {
+            console.log('CONNECTION CLOSED');
+            // TODO: try to reconnect
+        },
+
+        connectionError: function() {
+            console.log('CONNECTION ERROR');
+            // TODO: try to reconnect
+        },
+
+        send: function(type, namespace, body, params) {
+            if (namespace == undefined)
+                namespace = 'main';
+
+            var payload = type + ',' + namespace;
+
+            if (body !== undefined)
+                payload += ',' + body;
+
+            if (params !== undefined)
+                payload += ',' + JSON.stringify([params]);
+
+            this.socket.send(payload);
             if (DEBUG_SOCKET)
-                console.debug('no need to update', section);
-        }
+                console.debug('SENT: ' + payload);
+        },
 
-        if (pending) {
-            this.set('model.pending.' + section, false);
-        }
+        receive: function(message) {
+            if (DEBUG_SOCKET)
+                console.debug('RECEIVED: ' + message);
 
-        return changed;
-    },
+            var parts = message.split(',');
+            var type = parts[0],
+                namespace = parts[1];
+            var body = JSON.parse(parts.splice(2).join(','));
+            if (this.handlers[namespace] === undefined)
+                console.warn('Unknown namespace', namespace);
+            var endpoint = this.handlers[namespace][Object.keys(body)[0]];
+            if (endpoint === undefined)
+                console.warn('Unknown endpoint', Object.keys(body)[0], 'in namespace', namespace);
+            else
+                endpoint(body[Object.keys(body)[0]]);
+        },
 
-    _updateClouds: function (data) {
-        if (data.length && (this.get('onboarding.hasCloud') != true))
-            this.set('onboarding.hasCloud', true);
-        if (!data.length)
-            this.set('onboarding.hasCloud', false);
-        return this._updateModel('clouds', data);
-    },
+        _reloadPage: function(data) {
+            console.warn('reloading', data);
+            document.location.reload();
+        },
 
-    _updateMonitoring: function (data) {
-        console.warn('got monitoring', data);
-        if (data.length && this.get('onboarding.hasMonitoring') != true)
-            this.set('onboarding.hasMonitoring', true);
-        if (!data.length)
-            this.set('onboarding.hasMonitoring', false);
-        this.set('model.pending.monitoring', false);
-        return this.set('model.monitoring', data);
-    },
+        _updateModel: function(section, data) {
+            var changed = false, // we wont update the model if it hasn't changed
+                pending = this.get('model.pending.' + section);
 
-    _updateUser: function (data) {
-        this.set('model.user', data);
-    },
-
-    _updateOrg: function (data) {
-        this._updateModel('teams', data.teams);
-        this._updateModel('members', data.members);
-        data.teams = data.members = undefined;
-        this.set('model.org', data);
-    },
-
-    _updateKeys: function (data) {
-        return this._updateModel('keys', data);
-    },
-
-    _updateScripts: function (data) {
-        return this._updateModel('scripts', data);
-    },
-
-    _updateTemplates: function (data) {
-        return this._updateModel('templates', data);
-    },
-
-    _updateStacks: function (data) {
-        return this._updateModel('stacks', data);
-    },
-
-    _updateSizes: function (data) {
-        return this._updateModel('clouds.' + data.cloud_id + '.sizes', data.sizes);
-    },
-
-    _updateLocations: function (data) {
-        return this._updateModel('clouds.' + data.cloud_id + '.locations', data.locations);
-    },
-
-    _updateImages: function (data) {
-        var changed = this._updateModel('clouds.' + data.cloud_id + '.images', data.images);
-        if (!changed)
-            return false;
-
-        self = this;
-        var allImages = [];
-        if (this.model != undefined) {
-            this.model.cloudsArray.forEach(
-              function(cloud){
-                if (cloud.imagesArray != undefined ) {
-                    cloud.imagesArray.forEach(function (image,index,arr) {
-                        arr[index].icons = self._generateIcon(image);
-                        arr[index].cloud = {'id': cloud.id,
-                                            'title': cloud.title,
-                                            'provider': cloud.provider};
-                        self.model.imagesArray.push(arr[index])
-                    });
-                }
-                return allImages = allImages.concat(cloud.imagesArray != undefined ? cloud.imagesArray : [])
-            });
-        }
-
-        this.set('model.imagesArray', allImages);
-    },
-
-    _updateMachines: function (data) {
-        var changed = this._updateModel('clouds.' + data.cloud_id + '.machines', data.machines);
-        if (!changed)
-            return false;
-
-        var allMachines = [];
-        if (this.model != undefined ) {
-            this.model.cloudsArray.forEach(
-                function(cloud){
-                    if (cloud.machinesArray != undefined ) {
-                        cloud.machinesArray.forEach(function (machine) {
-                                machine.cloud = {'id': cloud.id,
-                                                 'title': cloud.title,
-                                                 'provider': cloud.provider};
-                        });
-
-                    return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])
-                }
-            });
-        }
-
-        if (data.length && this.get('model.onboarding.hasMachines') != true)
-            this.set('model.onboarding.hasMachines', true);
-
-        this.set('model.machinesArray', allMachines);
-        this.set('machinesArray', allMachines);
-    },
-
-    _updateNetworks: function (data) {
-        var changed = this._updateModel('clouds.' + data.cloud_id + '.networks', data.networks);
-        if (!changed)
-            return false;
-
-          var allNetworks = [];
-          if (this.model  != undefined ) {
-              this.model.cloudsArray.forEach(
-                function(cloud){
-                  if (cloud.networksArray != undefined && 0 < cloud.networksArray.public.length + cloud.networksArray.private.length + cloud.networksArray.routers.length){
-                      cloud.networksArray.public.forEach(function(net){net["type"]="public"; net["provider"]=cloud.provider; allNetworks.push(net);});
-                      cloud.networksArray.private.forEach(function(net){net["type"]="private"; net["provider"]=cloud.provider; allNetworks.push(net);});
-                      cloud.networksArray.routers.forEach(function(net){net["type"]="router"; net["provider"]=cloud.provider; allNetworks.push(net);});
-                      return allNetworks;
-                      }
-                  }
-              );
-          }
-          this.set('model.networksArray', allNetworks);
-    },
-
-    _updateProjects: function (data) {
-        this.set('model.clouds.' + data.cloud_id + '.projects', _generateMap(data.projects));
-        this.set('model.clouds.' + data.cloud_id + '.projectsArray', data.projects);
-    },
-
-    _updateTags: function (data) {
-        console.warn('_updateTags not implemented. Got data', data);
-    },
-
-    _probe: function (data) {
-        // TODO
-    },
-
-    _ping: function (data) {
-        // TODO
-    },
-
-    _generateIcon: function (data) {
-        var lexicon = ["ubuntu", "mongo", "aws", "suse", "fedora", "linux"];
-        var keywords = [];
-        for (var i = 0; i < lexicon.length; i++) {
-            if ( data.name.toLowerCase().search(lexicon[i]) > -1 )
-            {
-                keywords.push(lexicon[i]);
+            // if the received data array has different length than the respective
+            // model array, then things must have changed since last update
+            if (data.length != this.get('model.' + section + 'Array.length')) {
+                changed = true;
             }
-        }
-        return keywords;
-    }
-});
 
-var _generateMap = function(list) {
-    var out = {};
-    for (var i = 0; i < list.length; i++) {
-        out[list[i].id] = list[i];
-    }
-    return out;
-};
+            // For each item in the received data array
+            for (var i = 0; i < data.length; i++) {
+                // If we know things have changed no need to keep checking
+                if (changed)
+                    break;
+                // check if _id is used instead of id
+                if (!data[i].id) {
+                    data[i].id = data[i]._id
+                }
+                // Check if item exists in respective model
+                var item = this.get('model.' + section + '.' + data[i].id);
+                if (!item) { // If does not exist then model needs to be updated
+                    changed = true;
+                    break;
+                }
+
+                // check if all fields of the data item exist in the model item
+                var dataKeys = Object.keys(data[i]),
+                    modelKeys = Object.keys(item);
+                for (var k = 0; k < dataKeys.length; k++) {
+                    if (modelKeys.indexOf(dataKeys[k]) == -1) {
+                        // If something is missing the model needs to be updated
+                        changed = true;
+                        break;
+                    }
+                    // If some field changed the model needs to be updated
+                    if (JSON.stringify(data[i][dataKeys[k]])
+                        .localeCompare(JSON.stringify(item[dataKeys[k]]))) {
+                        console.debug('property ', dataKeys[k], ' changed in ', item);
+                        var oldVal = JSON.stringify(item[dataKeys[k]]),
+                            newVal = JSON.stringify(data[i][dataKeys[k]]);
+                        console.debug('Old value: ', oldVal, oldVal.length);
+                        console.debug('New value: ', newVal, newVal.length);
+                        changed = true;
+                        break;
+                    }
+                }
+
+                if (changed)
+                    break;
+            }
+
+            if (changed) {
+                console.debug('updating', section);
+                this.set('model.' + section, _generateMap(data));
+                this.set('model.' + section + 'Array', data);
+            } else {
+                if (DEBUG_SOCKET)
+                    console.debug('no need to update', section);
+            }
+
+            if (pending) {
+                this.set('model.pending.' + section, false);
+            }
+
+            return changed;
+        },
+
+        _updateClouds: function(data) {
+            if (data.length && (this.get('onboarding.hasCloud') != true))
+                this.set('onboarding.hasCloud', true);
+            if (!data.length)
+                this.set('onboarding.hasCloud', false);
+            return this._updateModel('clouds', data);
+        },
+
+        _updateMonitoring: function(data) {
+            console.warn('got monitoring', data);
+            if (data.length && this.get('onboarding.hasMonitoring') != true)
+                this.set('onboarding.hasMonitoring', true);
+            if (!data.length)
+                this.set('onboarding.hasMonitoring', false);
+            this.set('model.pending.monitoring', false);
+            return this.set('model.monitoring', data);
+        },
+
+        _updateUser: function(data) {
+            this.set('model.user', data);
+        },
+
+        _updateOrg: function(data) {
+            this._updateModel('teams', data.teams);
+            this._updateModel('members', data.members);
+            data.teams = data.members = undefined;
+            this.set('model.org', data);
+        },
+
+        _updateKeys: function(data) {
+            return this._updateModel('keys', data);
+        },
+
+        _updateScripts: function(data) {
+            return this._updateModel('scripts', data);
+        },
+
+        _updateTemplates: function(data) {
+            return this._updateModel('templates', data);
+        },
+
+        _updateStacks: function(data) {
+            return this._updateModel('stacks', data);
+        },
+
+        _updateSizes: function(data) {
+            return this._updateModel('clouds.' + data.cloud_id + '.sizes', data.sizes);
+        },
+
+        _updateLocations: function(data) {
+            return this._updateModel('clouds.' + data.cloud_id + '.locations', data.locations);
+        },
+
+        _updateImages: function(data) {
+            var changed = this._updateModel('clouds.' + data.cloud_id + '.images', data.images);
+            if (!changed)
+                return false;
+
+            self = this;
+            var allImages = [];
+            if (this.model != undefined) {
+                this.model.cloudsArray.forEach(
+                    function(cloud) {
+                        if (cloud.imagesArray != undefined) {
+                            cloud.imagesArray.forEach(function(image, index, arr) {
+                                arr[index].icons = self._generateIcon(image);
+                                arr[index].cloud = {
+                                    'id': cloud.id,
+                                    'title': cloud.title,
+                                    'provider': cloud.provider
+                                };
+                                self.model.imagesArray.push(arr[index])
+                            });
+                        }
+                        return allImages = allImages.concat(cloud.imagesArray != undefined ? cloud.imagesArray : [])
+                    });
+            }
+
+            this.set('model.imagesArray', allImages);
+        },
+
+        _updateMachines: function(data) {
+            var changed = this._updateModel('clouds.' + data.cloud_id + '.machines', data.machines);
+            if (!changed)
+                return false;
+
+            var allMachines = [];
+            if (this.model != undefined) {
+                this.model.cloudsArray.forEach(
+                    function(cloud) {
+                        if (cloud.machinesArray != undefined) {
+                            cloud.machinesArray.forEach(function(machine) {
+                                machine.cloud = {
+                                    'id': cloud.id,
+                                    'title': cloud.title,
+                                    'provider': cloud.provider
+                                };
+                            });
+
+                            return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])
+                        }
+                    });
+            }
+
+            if (data.length && this.get('model.onboarding.hasMachines') != true)
+                this.set('model.onboarding.hasMachines', true);
+
+            this.set('model.machinesArray', allMachines);
+            this.set('machinesArray', allMachines);
+        },
+
+        _updateNetworks: function(data) {
+            var changed = this._updateModel('clouds.' + data.cloud_id + '.networks', data.networks);
+            if (!changed)
+                return false;
+
+            var allNetworks = [];
+            if (this.model != undefined) {
+                this.model.cloudsArray.forEach(
+                    function(cloud) {
+                        if (cloud.networksArray != undefined && 0 < cloud.networksArray.public.length + cloud.networksArray.private.length + cloud.networksArray.routers.length) {
+                            cloud.networksArray.public.forEach(function(net) {
+                                net["type"] = "public";
+                                net["provider"] = cloud.provider;
+                                allNetworks.push(net);
+                            });
+                            cloud.networksArray.private.forEach(function(net) {
+                                net["type"] = "private";
+                                net["provider"] = cloud.provider;
+                                allNetworks.push(net);
+                            });
+                            cloud.networksArray.routers.forEach(function(net) {
+                                net["type"] = "router";
+                                net["provider"] = cloud.provider;
+                                allNetworks.push(net);
+                            });
+                            return allNetworks;
+                        }
+                    }
+                );
+            }
+            this.set('model.networksArray', allNetworks);
+        },
+
+        _updateProjects: function(data) {
+            this.set('model.clouds.' + data.cloud_id + '.projects', _generateMap(data.projects));
+            this.set('model.clouds.' + data.cloud_id + '.projectsArray', data.projects);
+        },
+
+        _updateTags: function(data) {
+            console.warn('_updateTags not implemented. Got data', data);
+        },
+
+        _probe: function(data) {
+            // TODO
+        },
+
+        _ping: function(data) {
+            // TODO
+        },
+
+        _generateIcon: function(data) {
+            var lexicon = ["ubuntu", "mongo", "aws", "suse", "fedora", "linux"];
+            var keywords = [];
+            for (var i = 0; i < lexicon.length; i++) {
+                if (data.name.toLowerCase().search(lexicon[i]) > -1) {
+                    keywords.push(lexicon[i]);
+                }
+            }
+            return keywords;
+        }
+    });
+
+    var _generateMap = function(list) {
+        var out = {};
+        for (var i = 0; i < list.length; i++) {
+            out[list[i].id] = list[i];
+        }
+        return out;
+    };
 </script>

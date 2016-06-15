@@ -13,10 +13,10 @@
         }
         </style>
 
-        <paper-input label$="tag [[index]]" value="{{tag.key}}" class="flex"></paper-input>
+        <paper-input label$="tag [[newIndex]]" value="{{tag.key}}" class="flex"></paper-input>
         <paper-input value="{{tag.value}}"  class="flex"></paper-input>
         <paper-icon-button icon="icons:close" on-tap="_deleteTag"></paper-icon-button>
-        
+
     </template>
 </dom-module>
 <script>
@@ -28,7 +28,14 @@
                 type: Object,
                 notify: true
             },
-            index: Number
+            index: Number,
+            newIndex: {
+                type: Number,
+                computed: '_computedNewIndex(index)'
+            }
+        },
+        _computedNewIndex: function(index) {
+            return index + 1;
         },
         _deleteTag: function(e) {
             this.fire('tag-delete', {
