@@ -320,7 +320,7 @@ def add_cloud_v_2(user, title, provider, params):
     if provider == 'libvirt' and cloud.apisecret:
     # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
         key_id = params.get('machine_key')
-        node_id = cloud.apiurl # id of the hypervisor is the hostname provided
+        node_id = cloud.apiurl  # id of the hypervisor is the hostname provided
         username = cloud.apikey
         associate_key(user, key_id, cloud_id, node_id, username=username)
 
@@ -1379,9 +1379,10 @@ def connect_provider(cloud):
                                                                cloud.ssh_port)
             conn = driver(host, user=cloud.apikey, ssh_key=cloud.apisecret, ssh_port=port)
         else:
-            api_url = mist.core.vpn.methods.destination_nat(cloud.owner,
-                                                            cloud.apiurl, 5000)
-            conn = driver(api_url, user=cloud.apikey)
+            api_url, tcp_port = mist.core.vpn.methods.destination_nat(cloud.owner,
+                                                                      cloud.apiurl,
+                                                                      5000)
+            conn = driver(api_url, user=cloud.apikey, tcp_port=tcp_port)
     else:
         # ec2
         conn = driver(cloud.apikey, cloud.apisecret)
