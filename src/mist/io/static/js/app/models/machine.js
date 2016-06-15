@@ -293,7 +293,13 @@ define('app/models/machine', ['ember'],
                                 ips_v4.push(ip);
                             }
                         });
-                        return ips_v4[0];
+                        this.private_ips.forEach(function(ip) {
+                            if (ip.search(':') == -1) {
+                                // this is not an IPv6, so it is supported
+                                ips_v4.push(ip);
+                            }
+                        });
+                        return ips_v4.length ? ips_v4[0]: '';
                     } catch (error) {
                         //Mist.notificationController.notify('No host available for machine ' + this.name);
                         //error('No host available for machine ' + this.name);
