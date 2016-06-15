@@ -8,6 +8,7 @@
 <dom-module id="script-page">
     <template>
         <style is="custom-style" include="single-page"></style>
+        <style is="custom-style" include="tags-and-labels"></style>
         <style include="shared-styles">
         :host {
             display: block;
@@ -187,8 +188,8 @@
                                 </template>
                                 :
                             </h4>
-                            <template is="dom-if" if="[[key.tags]]">
-                                <template is="dom-repeat" items="[[key.tags]]">
+                            <template is="dom-if" if="[[script.tags]]">
+                                <template is="dom-repeat" items="[[script.tags]]">
                                     <span class="id tag">[[YamleParse(item)]]</span>
                                 </template>
                             </template>

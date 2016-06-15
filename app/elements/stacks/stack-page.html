@@ -10,6 +10,7 @@
 <dom-module id="stack-page">
     <template>
         <style is="custom-style" include="lists"></style>
+        <style is="custom-style" include="tags-and-labels"></style>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
             :host {
@@ -373,6 +374,11 @@
             font-size: 0.9em;
             padding-left: 8px;
         }
+        /* TODO: better */
+        .tag {
+            padding: 0.5em;
+            display: inline;
+        }
         </style>
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
@@ -407,7 +413,7 @@
 
             <!-- <paper-spinner id="spinner"></paper-spinner>-->
 
-            <paper-material class="">
+            <paper-material>
                 <div class="flex-horizontal-with-ratios">
                     <div class="page-block">
                         <h3 class="smallcaps">Stack Description</h3>
@@ -417,6 +423,22 @@
                         <h3 class="smallcaps">Created</h3>
                         <p>[[timestamp]]
                         </p>
+                    </div>
+                    <div class="page-block" hidden="[[!stack.tags]]">
+                        <h3 class="smallcaps">Tags
+                            <template is="dom-if" if="[[stack.tags]]">
+                                <span class="id">([[stack.tags.length]])</span>
+                            </template>
+                            <template is="dom-if" if="[[!stack.tags]]">
+                                <span class="id">(0)</span>
+                            </template>
+                        </h3>                
+                        <template is="dom-if" if="[[stack.tags]]">
+                            <template is="dom-repeat" items="[[stack.tags]]">
+                                <span class="id tag">[[YamleParse(item)]]</span>
+                                <span class="id tag">test = tag</span>
+                            </template>
+                        </template>
                     </div>
                 </div>
             </paper-material>
@@ -1050,6 +1072,9 @@
                 handleWorkflowRequest: function(e) {},
                 handleWorkflowResponse: function(e) {},
                 handleWorkflowError: function(e) {},
+                YamleParse: function(item) {
+                    return YAML.dump(item);
+                }
             });
         })();
     </script>

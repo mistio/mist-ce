@@ -10,6 +10,7 @@
     <template>
         <style is="custom-style" include="lists"></style>
         <style is="custom-style" include="single-page"></style>
+        <style is="custom-style" include="tags-and-labels"></style>
         <style include="shared-styles">
             :host {
                 display: block;
@@ -187,6 +188,11 @@
             .width100 {
                 width: 100%;
             }
+            /* TODO: better */
+            .tag {
+                padding: 0.5em;
+                display: inline;
+            }
         </style>
 
 
@@ -228,7 +234,7 @@
                         <!-- <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a> -->
                     </p>
                 </div>
-                <div class="page-block" >
+                <div class="page-block" hidden="[[!template.tags]]">
                     <h3 class="smallcaps">Tags
                         <template is="dom-if" if="[[template.tags]]">
                             <span class="id">([[script.tags.length]])</span>
@@ -240,7 +246,6 @@
                     <template is="dom-if" if="[[template.tags]]">
                         <template is="dom-repeat" items="[[template.tags]]">
                             <span class="id tag">[[YamleParse(item)]]</span>
-                            <span class="id tag">test = tag</span>
                         </template>
                     </template>
                 </div>
@@ -487,7 +492,6 @@
                         el.open = true;
                     });
                 },
-                ,
                 YamleParse: function(item) {
                     return YAML.dump(item);
                 }
