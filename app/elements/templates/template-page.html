@@ -486,6 +486,10 @@
                     [].forEach.call(els, function(el, index) {
                         el.open = true;
                     });
+                },
+                ,
+                YamleParse: function(item) {
+                    return YAML.dump(item);
                 }
             });
         })();
