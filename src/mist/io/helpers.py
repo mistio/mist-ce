@@ -311,7 +311,7 @@ def sanitize_host(host):
     return host
 
 
-def extract_port(url):
+def extract_port(url, no_return=False):
     """Returns the port number out of a url"""
     for prefix in ['http://', 'https://']:
         if prefix in url:
@@ -323,6 +323,8 @@ def extract_port(url):
     url = url.split(':')
     if len(url) > 1:
         return int(url[1])
+    elif no_return:
+        return
     elif prefix == 'https://':
         return 443
     else:
