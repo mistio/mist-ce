@@ -136,7 +136,8 @@
         /* TODO: better */
         .tag {
             padding: 0.5em;
-            display: inline;
+            display: inline-flex;
+            align-self: center;
         }
         paper-material.no-pad {
             padding: 0;
@@ -190,7 +191,7 @@
                             </h4>
                             <template is="dom-if" if="[[script.tags]]">
                                 <template is="dom-repeat" items="[[script.tags]]">
-                                    <span class="id tag">[[YamleParse(item)]]</span>
+                                    <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
                                 </template>
                             </template>
                         </div>
@@ -346,9 +347,6 @@
             },
             _goBack: function(){
                 history.back();
-            },
-            YamleParse: function(item) {
-                return YAML.dump(item);
             }
         });
     })();

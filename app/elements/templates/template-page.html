@@ -245,7 +245,7 @@
                     </h3>                
                     <template is="dom-if" if="[[template.tags]]">
                         <template is="dom-repeat" items="[[template.tags]]">
-                            <span class="id tag">[[YamleParse(item)]]</span>
+                            <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
                         </template>
                     </template>
                 </div>
@@ -491,9 +491,6 @@
                     [].forEach.call(els, function(el, index) {
                         el.open = true;
                     });
-                },
-                YamleParse: function(item) {
-                    return YAML.dump(item);
                 }
             });
         })();

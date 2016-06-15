@@ -157,7 +157,7 @@
                     </h4>
                     <template is="dom-if" if="[[image.tags]]">
                         <template is="dom-repeat" items="[[image.tags]]">
-                            <span class="id tag">[[YamleParse(item)]]</span>
+                            <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
                         </template>
                     </template>
                 </paper-material>
@@ -261,9 +261,6 @@
                 },
                 _goBack: function() {
                     history.back();
-                },
-                YamleParse: function(item) {
-                    return YAML.dump(item);
                 }
             });
         })();

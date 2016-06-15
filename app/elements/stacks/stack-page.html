@@ -435,7 +435,7 @@
                         </h3>                
                         <template is="dom-if" if="[[stack.tags]]">
                             <template is="dom-repeat" items="[[stack.tags]]">
-                                <span class="id tag">[[YamleParse(item)]]</span>
+                                <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
                                 <span class="id tag">test = tag</span>
                             </template>
                         </template>
@@ -1071,10 +1071,7 @@
                 handleCanceled: function(e) {},
                 handleWorkflowRequest: function(e) {},
                 handleWorkflowResponse: function(e) {},
-                handleWorkflowError: function(e) {},
-                YamleParse: function(item) {
-                    return YAML.dump(item);
-                }
+                handleWorkflowError: function(e) {}
             });
         })();
     </script>
