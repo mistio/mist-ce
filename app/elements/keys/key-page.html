@@ -6,6 +6,7 @@
 <dom-module id="key-page">
     <template>
         <style is="custom-style" include="single-page"></style>
+        <style is="custom-style" include="tags-and-labels"></style>
         <style include="shared-styles">
             :host {
                 display: block;
@@ -163,7 +164,16 @@
                 font-weight: 700;
                 margin-right: 16px;
             }
-
+            /* TODO: better */
+            h4.id.tags {
+                padding-left: 36px;
+            }
+            
+            .tag {
+                padding: 0.5em;
+                display: inline;
+            }
+            /**/
             .head paper-button {
                 flex: none !important;
                 display: inline-block;
@@ -240,6 +250,20 @@
                 <!-- <paper-material></paper-material> -->
                 <paper-material>
                     <h4 class="id">Key ID:</h4><span class="id">[[key.id]]</span>
+                    <h4 class="id tags">Tags
+                        <template is="dom-if" if="[[key.tags]]">
+                            <span class="id">([[key.tags.length]])</span>
+                        </template>
+                        <template is="dom-if" if="[[!key.tags]]">
+                            <span class="id">(0)</span>
+                        </template>
+                        :
+                    </h4>
+                    <template is="dom-if" if="[[key.tags]]">
+                        <template is="dom-repeat" items="[[key.tags]]">
+                            <span class="id tag">[[YamleParse(item)]]</span>
+                        </template>
+                    </template>
                     <div class="head">
                         <h4 class="key">Public Key</h4>
                         <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="right link">Copy <span class="wide">public key</span>
@@ -534,6 +558,9 @@
                 },
                 _goBack: function() {
                     history.back();
+                },
+                YamleParse: function(item) {
+                    return YAML.dump(item);
                 }
             });
         })();
