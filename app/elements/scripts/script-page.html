@@ -246,6 +246,7 @@
                 },
                 isInline: {
                     type: Boolean,
+                    value: false,
                     computed: '_computeIsInline(script.location_type)'
                 }
             },
@@ -268,7 +269,10 @@
                 return params.id;
             },
             _computeIsInline: function(location_type) {
-                return location_type == 'inline';
+                if (location_type)
+                    return location_type == 'inline';
+                else
+                    return true;
             },
             _editTags: function() {
                 var el = this.querySelector('tags-list'),
