@@ -3767,7 +3767,7 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
         ret = {}
     if mist.core.vpn.methods.to_tunnel(user, host):
         ping_out = ping.json()
-        log.info("Ping output over VPN: %s packets transmitted, %s received, "
+        log.info("Ping output over VPN: \n%s packets transmitted, %s received, "
                  "%s packet loss\nrtt min/avg/max = %s/%s/%s"
                  % (ping_out['packets_tx'], ping_out['packets_rx'], ping_out['packets_loss'],
                     ping_out['rtt_min'], ping_out['rtt_avg'], ping_out['rtt_max']))
@@ -3816,7 +3816,6 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
                                  host, command, key_id=key_id)
     else:
         retval, cmd_output = shell.command(command)
-
     cmd_output = cmd_output.replace('\r','').split('--------')
     log.warn(cmd_output)
     uptime_output = cmd_output[1]
@@ -3830,7 +3829,11 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
         ips.remove('127.0.0.1')
     macs = {}
     for i in range(0, len(ips)):
-        macs[ips[i]] = m[i]
+        try:
+            macs[ips[i]] = m[i]
+        except IndexError:
+            # in case of interfaces, such as VPN tunnels, with a dummy MAC addr
+            continue
     pub_ips = find_public_ips(ips)
     priv_ips = [ip for ip in ips if ip not in pub_ips]
 
