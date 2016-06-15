@@ -397,7 +397,7 @@
                     }
                 },
                 observers: [
-                    'update(params)'
+                    'update(params, model.keys.*)'
                 ],
                 listeners: {
                     'confirmation': '_deleteKeyEventResponse',

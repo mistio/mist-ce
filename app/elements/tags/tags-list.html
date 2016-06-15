@@ -9,6 +9,31 @@
             :host {
                 display: block;
                 width: 100%;
+
+            }
+            .tag-list {
+                padding: 0 8px 24px 24px;
+            }
+            .bottom-actions {
+                padding-bottom: 2px;
+                margin-top: 16px;
+                overflow: hidden;
+                vertical-align: middle;
+                display: block;
+                width: 100%;
+            }
+            paper-dialog {
+                width: 450px;
+            }
+            paper-button {
+                display: inline;
+            }
+            .pull-right {
+                float: right;
+            }
+            .submit-btn.add {
+                line-height: 20px;
+                margin: 0;
             }
         </style>
 
@@ -16,15 +41,15 @@
             <h2>Tags</h2>
             <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
-                <table class="info-table">
+                <div class="tag-list">
                     <template is="dom-repeat" items="[[tags]]" as="tag">
-                        <tag-item tag="[[tag]]"></tag-item>
+                        <tag-item tag="[[tag]]" index=[[index]]></tag-item>
                     </template>
-                </table>
+                </div>
 
                 <div class="clearfix bottom-actions xs12">
-                    <paper-button class="submit-btn pull-left" raised on-tap="_saveTags">Save Tags</paper-button>
-                    <paper-button class="submit-btn pull-right" raised on-tap="_addTag">Add Tag</paper-button>
+                    <paper-button class="submit-btn add" on-tap="_addTag"><iron-icon icon="add"></iron-icon> Add Tag</paper-button>
+                    <paper-button class="submit-btn pull-right blue" on-tap="_saveTags">Save Tags</paper-button>
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
