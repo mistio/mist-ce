@@ -48,13 +48,24 @@
                 is: 'subscriptions-list',
 
                 properties: {
+                  model: {
+                      type: Object
+                  },
+                  user: {
+                      type: Object,
+                      computed: "_computeUserPlans(model.user)"
+                  },
                     subscriptions: {
                         type: Array,
                         value: []
                     }
                 },
-                ready: function() {
-                    this.set('subscriptions', USER_PLANS);
+                _computeUserPlans: function(user) {
+                  if(user){
+                    return{
+                      userPlans: this.set('subscriptions',user.user_plans)
+                    };
+                  }
                 }
             });
         })();
