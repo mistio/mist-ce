@@ -7,6 +7,15 @@
     <template>
         <style is="custom-style" include="dialogs"></style>
         <style include="shared-styles">
+            :root {
+                --primary-color: #fff;
+                --primary-text-color: rgba(255,255,255,0.87);
+                --secondary-text-color: rgba(255,255,255,0.54);
+                --primary-background-color: #424242;
+                --secondary-background-color: #424242;
+                --paper-input-container-input-color: rgba(255,255,255,0.87);
+                --paper-input-container-focus-color: #424242;
+            }
             :host {
                 box-sizing: border-box;
                 width: 100%;
@@ -24,25 +33,25 @@
             }
             :host .cloud-block {
                 box-sizing: border-box;
-                background-color: #424242;                
+                background-color: #424242;
                 color: #fff !important;
                 @apply(--layout-horizontal);
             }
-            :host paper-input ::content label {
+            :host >::content .input-content.label-is-floating.paper-input-container label {
                 color: rgba(255,255,255,0.54) !important;
-            }
-            :host paper-input ::content input {
-                color: #fff !important;
             }
             :host paper-icon-button ::content iron-icon {
                 color: #fff !important;
             }
             .cloud-overview-item {
                 @apply(--layout-horizontal);
-                padding-bottom: 16px;
+                padding: 16px 0;
+            }
+            .cloud-overview-item.last {
+                padding: 4px 0 16px 0;   
             }
             .cloud-overview {
-                padding: 24px;
+                padding: 4px 24px 24px 24px;
                 border-right: 1px solid rgba(255,255,255,0.15); 
                 max-width: 33%;
             }
@@ -60,16 +69,26 @@
             paper-input {
                 padding-right: 16px;
             }
+            paper-button {
+                padding: 0.57em 0.57em;
+            }
             paper-button[disabled] {
                 background: rgba(255,255,255,0.15);
-                color: #333;
-            }
-            paper-input ::content .floated-label {
-              color: rgba(255,255,255,0.54);
+                color: #424242;
             }
             paper-toggle-button {
-                color: #fff;
                 margin-left: 36px;
+            }
+            :host paper-toggle-button >::content .toggle-button {
+                background-color: #d96557 !important;
+            }
+            :host paper-toggle-button[checked]:not([disabled]) >::content .toggle-button {
+                background-color: #69b46c !important;
+            }
+            ::selection,
+            :host >::content ::selection {
+                background-color: yellow;
+                color: black;
             }
         </style>
 
@@ -88,7 +107,7 @@
                         <paper-toggle-button checked$="[[isEnabled]]" on-tap="_changeState">[[cloud.state]]</paper-toggle-button>
                     </div>
                 </div>
-                <div class="cloud-overview-item">
+                <div class="cloud-overview-item last">
                     <paper-input class="flex" id="cloudId" label="ID" value="[[cloud.id]]"></paper-input>
                     <div class="button">
                         <paper-button on-tap="_copyId" class="blue">Copy Id</paper-button>
