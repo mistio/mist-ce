@@ -1,8 +1,10 @@
 <link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
 
 <link rel="import" href="../section-tile/section-tile.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
@@ -47,7 +49,7 @@
         .clouds cloud-chip {
             cursor: pointer;
             z-index: 9;
-        }        
+        }
         .clouds cloud-chip.online .icon {
             background-color: var(--green-color) !important;
         }
@@ -260,7 +262,7 @@ Polymer({
     listeners: {
         'close-cloud-info': '_closeCloudChips'
     },
-    ready: function() {        
+    ready: function() {
     },
     attached: function() {
         // reset page title since this is the default page

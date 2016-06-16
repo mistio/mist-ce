@@ -1,6 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+
 <link rel="import" href="../app-form/app-form.html">
+
 <dom-module id="script-add">
     <template>
         <style is="custom-style" include="forms"></style>
@@ -31,9 +35,9 @@
         }
 
         </style>
-        
+
                 <div id="content">
-                    <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+                    <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                         <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
                         <div class="title flex">
                             <h2>
@@ -42,11 +46,11 @@
                             <div class="subtitle">
                                 You can add scripts inline or from a url. You will soon be able to schedule your scripts to run.
                             </div>
-                        </div>                        
+                        </div>
                     </paper-material>
                     <app-form fields="[[fields]]" form="[[script]]" url="/api/v1/scripts" on-request="_addScriptAjaxRequest" on-response="_addScriptAjaxResponse" on-leadchange="_updateTypedName"></app-form>
                 </div>
-            
+
 
     </template>
     <script>
