@@ -98,7 +98,7 @@
                     },
                     user: {
                         type: Object,
-                        computed: "_computeUser(model)"
+                        computed: "_computeUser(model.user)"
                     },
                     countriesOptions: {
                         type: Array,
@@ -203,15 +203,15 @@
                         computed: '_computeShowProgress(sendingData)'
                     }
                 },
-                _computeUser: function(model) {
-                    if (model.user) {
+                _computeUser: function(user) {
+                    if (user) {
                         return {
-                            firstName: model.user.first_name,
-                            lastName: model.user.last_name,
-                            country: model.user.feedback.country,
-                            companyName: model.user.feedback.company_name,
-                            numberOfPeople: model.user.feedback.number_of_people,
-                            numberOfServers: model.user.feedback.number_of_servers
+                            firstName: user.first_name,
+                            lastName: user.last_name,
+                            country: user.feedback.country,
+                            companyName: user.feedback.company_name,
+                            numberOfPeople: user.feedback.number_of_people,
+                            numberOfServers: user.feedback.number_of_servers
                         };
                     }
                 },
