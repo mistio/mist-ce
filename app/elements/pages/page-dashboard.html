@@ -265,11 +265,13 @@
             opacity: 0.32;
             margin-bottom: 2em;
         }
+        .grid-row {
+            text-align: left;
+        }
         .field-helptext {
             font-size: 14px;             
             align-self: center;
             color: rgba(0,0,0,0.54);
-            text-align: left;
         }
         .invite-form-inputs {
             margin-bottom: 2em;   
@@ -383,7 +385,13 @@
                                         </paper-dropdown-menu>
                                     </div>
                                     <div class="field-helptext xs12 m6 l6">
-                                        Beware! Owners Team members have FULL access to all Organisation's resources. To create another team with a different policy use the <paper-button on-tap="goToAddTeam" class="blue-link" noink>add team form</paper-button>
+                                        Beware! Owner's Team members have FULL access to all Organisation's resources. To create another team with a different policy use the <paper-button on-tap="goToAddTeam" class="blue-link" noink>add team form</paper-button>
+                                    </div>
+                                    <div class="xs12 m6 l6">
+                                        <paper-textarea label="Members Emails" rows="5"></paper-textarea>
+                                    </div>
+                                    <div class="field-helptext xs12 m6 l6">
+                                        Members will receive an invation email to confirm their membership</paper-button>
                                     </div>
                                 </div>
                             </div>
