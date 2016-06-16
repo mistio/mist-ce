@@ -254,7 +254,11 @@ Polymer({
         replaceTargets: {
             type: Object,
             computed: '_computeReplaceTargets(model.monitoring)'
-        }
+        },
+        openedCloud: String
+    },
+    listeners: {
+        'close-cloud-info': '_closeCloudChips'
     },
     ready: function() {        
     },
@@ -355,18 +359,37 @@ Polymer({
         return ret;
     },
     _showCloudInfoDialog: function(e) {
-        var cloudId = e.currentTarget.getAttribute('id'),
-            dialog = this.querySelector('cloud-info'),
-            clouds = this.querySelectorAll('cloud-chip'),
-            cloud = this.model.cloudsArray.find(function(cloud) {
-                return cloud.id == cloudId;
+        var cloudId = e.currentTarget.getAttribute('id');
+        var dialog = this.querySelector('cloud-info');
+
+        if (this.openedCloud && this.openedCloud == cloudId) {
+            dialog.removeAttribute('opened');
+            this._closeCloudChips();
+            this.set('openedCloud', '');
+        }
+        else {
+            var cloudChips = this.querySelectorAll('cloud-chip'),
+                cloud = this.model.cloudsArray.find(function(cloud) {
+                    return cloud.id == cloudId;
+                });
+            [].forEach.call(cloudChips, function(el, index) {
+                if (el == e.currentTarget){
+                    el.setAttribute('opened', true)
+                }
+                else {
+                    el.removeAttribute('opened');
+                }
             });
-        [].forEach.call(clouds, function(el, index) {
+            this.set('openedCloud', cloudId);
+            dialog.cloud = cloud;
+            dialog.setAttribute('opened', true);
+        }
+    },
+    _closeCloudChips: function(){
+        var cloudChips = this.querySelectorAll('cloud-chip');
+        [].forEach.call(cloudChips, function(el, index) {
             el.removeAttribute('opened');
         });
-        e.currentTarget.setAttribute('opened', true)
-        dialog.cloud = cloud;
-        dialog.setAttribute('opened', true);
     }
 });
 </script>
