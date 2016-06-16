@@ -1,8 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
+
 <link rel="import" href="script-edit.html">
-<link rel="import" href="script-item.html">
 <link rel="import" href="script-run.html">
 
 <dom-module id="script-page">
@@ -105,10 +108,6 @@
 
         paper-icon-button.active-sort::content iron-icon {
             color: #D48900 !important;
-        }
-
-        app-bar .menu-icon {
-            margin-right: 15px;
         }
 
         [size=xs] > * {

@@ -125,7 +125,6 @@
           <div class="header">
             <iron-icon id="settings" icon="icons:settings" on-click="_onNextClick" active="{{mainDialogOpen}}"></iron-icon>
             <h2 class="flex">Notifications</h2>
-            <toast-element style="z-index: 1"></toast-element>
           </div>
           <paper-dialog-scrollable>
             <template is="dom-repeat" items="[[notifications]]">
@@ -167,10 +166,10 @@
           value: 0
         },
         // notifications: {
-				// 	type: Array,
-				// 	value: [],
-				// 	notify: true
-				// },
+        // 	type: Array,
+        // 	value: [],
+        // 	notify: true
+        // },
         notifications: {
           type: Array,
           value: [
