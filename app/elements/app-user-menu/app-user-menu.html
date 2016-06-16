@@ -193,6 +193,10 @@
                 type: String,
                 computed: '_computeGravatar(email, size, placeholder)'
             },
+            placeholder: {
+                type: String,
+                value: 'mist.io/resources/images/sprite-images/user.png'
+            },
             organization: {
                 type: Object,
                 value: function() {
@@ -243,14 +247,13 @@
             dialog.openDialog();
         },
         _goToOrg: function(e) {
-            if (! this.isPersonalContext) {
+            if (!this.isPersonalContext) {
                 var orgId = e.currentTarget.getAttribute('id');
                 window.location.href = orgId ? '/orgs/' + orgId : '/orgs';
             }
         },
-        placeholder: {
-            type: String,
-            value: 'mist.io/resources/images/sprite-images/user.png'
+        _toggleUI: function() {
+            window.location.href = '/toggle-ui/legacy';
         },
         _logout: function(e) {
             window.location.href = '/logout';
