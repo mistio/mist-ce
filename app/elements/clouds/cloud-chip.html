@@ -10,15 +10,22 @@
 <template>
 	<style>
 		:host {
-		  display: inline-block;
-		  vertical-align: top;
-		  position: relative;
-		  outline: none;
-		  font-size: 14px;
-		  cursor: default;
-		  margin: 8px 0;
-		  height: 32px;
-		  overflow: visible;
+			display: inline-block;
+			vertical-align: top;
+			position: relative;
+			outline: none;
+			font-size: 14px;
+			cursor: default;
+			margin: 8px 0;
+			height: 32px;
+			overflow: visible;
+
+			-webkit-touch-callout: none; /* iOS Safari */
+			-webkit-user-select: none;   /* Chrome/Safari/Opera */
+			-khtml-user-select: none;    /* Konqueror */
+			-moz-user-select: none;      /* Firefox */
+			-ms-user-select: none;       /* Internet Explorer/Edge */
+			user-select: none;
 		}
 		:host([animated]) *,
 		:host([animated]) /deep/ *,
