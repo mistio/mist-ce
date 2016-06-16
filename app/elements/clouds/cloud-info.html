@@ -38,6 +38,9 @@
                 color: #fff !important;
                 @apply(--layout-horizontal);
             }
+            :host >::content paper-input-container {
+                padding: 0 0 8px 0;
+            }
             :host >::content .input-content.label-is-floating.paper-input-container label {
                 color: rgba(255,255,255,0.54) !important;
             }
@@ -49,7 +52,7 @@
                 padding: 16px 0;
             }
             .cloud-overview-item.last {
-                padding: 4px 0 16px 0;   
+                padding: 12px 0 16px 0;   
             }
             .cloud-overview {
                 padding: 4px 24px 24px 24px;
@@ -79,6 +82,7 @@
             }
             paper-toggle-button {
                 margin-left: 36px;
+                cursor: pointer;
             }
             :host paper-toggle-button >::content .toggle-button {
                 background-color: #d96557 !important;
