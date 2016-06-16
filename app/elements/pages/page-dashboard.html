@@ -259,6 +259,21 @@
         .onboarding-form {
             transform: translate(0, 0);
         }
+        hr.shorten {
+            width: 75%;
+            margin: 0 auto;
+            opacity: 0.32;
+            margin-bottom: 2em;
+        }
+        .field-helptext {
+            font-size: 14px;             
+            align-self: center;
+            color: rgba(0,0,0,0.54);
+            text-align: left;
+        }
+        .invite-form-inputs {
+            margin-bottom: 2em;   
+        }
         </style>
         <div id="content" class="flex-horizontal-wide" main>
         <template is="dom-if" if="[[showDashboard]]">
@@ -354,9 +369,23 @@
                         </div>
                         <div id="invite-form" class="onboarding-form" closed>
                             <h1>Invite people in [[model.org.name]]</h1>
-                            <p>To add an organisation use the 'Add Organisation' option on your profile menu</p>
-                            <div class="onboarding-form-inputs">
-                                
+                            <p>To change or add an organisation use options on your profile menu</p>
+                            <hr class="shorten"/>
+                            <div class="invite-form-inputs">
+                                <div class="grid-row">
+                                    <div class="xs12 m6 l6">
+                                        <paper-dropdown-menu label="Team">
+                                            <paper-listbox class="dropdown-content" selected="1">
+                                                <template is="dom-repeat" items="[[model.teamsArray]]">
+                                                    <paper-item>[[item.name]]</paper-item>
+                                                </template>
+                                            </paper-listbox>
+                                        </paper-dropdown-menu>
+                                    </div>
+                                    <div class="field-helptext xs12 m6 l6">
+                                        Beware! Owners Team members have FULL access to all Organisation's resources. To create another team with a different policy use the <paper-button on-tap="goToAddTeam" class="blue-link" noink>add team form</paper-button>
+                                    </div>
+                                </div>
                             </div>
                             <paper-button noink on-tap="hideInviteForm" class="blue-link">Cancel</paper-button>
                         </div>
@@ -567,8 +596,15 @@ Polymer({
     saveOrg: function(){
         //save org and update model to new organisation context
     },
+    goToAddTeam: function(){
+        page.show('/add-team');
+        this.showSidebar();
+    },
     goToAddCloud: function(){
-        page.show('/add-cloud');
+        page.show('/add-cloud');    
+        this.showSidebar();    
+    },
+    showSidebar: function(){
         //show sidebar for navigation
         window.setTimeout(function(){
             var sidebar = document.querySelector('app-sidebar'),
