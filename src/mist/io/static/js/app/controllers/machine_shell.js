@@ -1,10 +1,10 @@
-define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term'],
+define('app/controllers/machine_shell', ['app/models/command', 'ember', 'term'],
     //
     //  Machine Shell Controller
     //
     //  @returns Class
     //
-    function (Command) {
+    function(Command) {
 
         'use strict';
 
@@ -25,7 +25,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
             //  Methods
             //
 
-            open: function (machine) {
+            open: function(machine) {
                 this._clear();
                 this.setProperties({
                     machine: machine,
@@ -33,10 +33,9 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                 });
 
                 // Get the first ipv4 public ip to connect to
-                machine.public_ips.forEach(function (ip) {
-                    if (ip.search(':') == -1)
-                        this.set('host', ip);
-                }, this);
+                // If private ipv4 do exist instead of public ones
+                // get the first private ipv4 ip
+                this.set('host', machine.host);
 
                 if (this.host)
                     this.view.open();
@@ -44,7 +43,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                     this.close();
             },
 
-            connect: function () {
+            connect: function() {
                 var that = this;
 
                 if (this.connected) {
@@ -68,10 +67,10 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                 Mist.set('shell', new Socket({
                     namespace: 'shell',
                     keepAlive: false,
-                    onConnect: function (socket) {
+                    onConnect: function(socket) {
                         warn('shell connect');
 
-                        Mist.term.on('data', function (data) {
+                        Mist.term.on('data', function(data) {
                             Mist.shell.emit('shell_data', data);
                         });
 
@@ -96,10 +95,10 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
                             // Make the hidden textfield focusable on android
                             if (Mist.term && Mist.term.isAndroid)
                                 $(Terminal._textarea)
-                                    .css('top', '1%')
-                                    .css('left', 0)
-                                    .width('100%')
-                                    .height($('#shell-return').height());
+                                .css('top', '1%')
+                                .css('left', 0)
+                                .width('100%')
+                                .height($('#shell-return').height());
 
                             $(Terminal._textarea).show();
                         }
@@ -108,15 +107,15 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
             },
 
 
-            resize: function () {
+            resize: function() {
                 Mist.term.resize(this.cols, this.rows);
-                Mist.shell.emit('shell_resize',this.cols, this.rows);
+                Mist.shell.emit('shell_resize', this.cols, this.rows);
             },
 
 
-            close: function () {
+            close: function() {
                 this.view.close();
-                Ember.run.later(this, function () {
+                Ember.run.later(this, function() {
                     Mist.term.destroy();
                     if (Mist.shell.channel)
                         Mist.shell.channel.close();
@@ -135,8 +134,8 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
             //
 
 
-            _clear: function () {
-                Ember.run(this, function () {
+            _clear: function() {
+                Ember.run(this, function() {
                     this.setProperties({
                         cols: null,
                         rows: null,
@@ -148,7 +147,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember' , 'term']
             },
 
 
-            _giveCallback: function (success, action) {
+            _giveCallback: function(success, action) {
                 if (this.callback) this.callback(success, action);
             }
         });
