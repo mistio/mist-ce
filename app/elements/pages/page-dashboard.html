@@ -160,21 +160,49 @@
         .ovhid {
             overflow: hidden;
         }
+        .onb.ovhid {
+            height: calc(100vh + 184px);
+            margin: -184px auto -104px auto;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 600px;
+            position: relative;
+        }
         #onboarding-area {
+            position: absolute;
+            padding-top: 184px;
+            top:0;
+            box-sizing: border-box;
             @apply(--layout-vertical);
             align-items: stretch;
             /*justify-content: space-between;*/
             width: 100%;
             max-width: 600px;
-            margin: 0 auto;
-            height: calc(100vh - 184px);
+            min-height: calc(100vh + 184px);
+            height: 100vh;
             -webkit-touch-callout: none; /* iOS Safari */
             -webkit-user-select: none;   /* Chrome/Safari/Opera */
             -khtml-user-select: none;    /* Konqueror */
             -moz-user-select: none;      /* Firefox */
             -ms-user-select: none;       /* Internet Explorer/Edge */
-            user-select: none;
+            user-select: none;            
+            transition: var(--material-curve-320);     
+            transition-delay: 200ms;
         }
+        #onboarding-area[higher] {
+            height: 115vh;
+            min-height: calc(113vh + 184px);
+            transform: translate(0, -15vh);
+        }
+        /*#onboarding-area .onb-graphics {
+            transition: var(--material-curve-320);                 
+        }
+        #onboarding-area[higher] .onb-graphics.top {
+            transform: translate(0, -13vh);
+        }
+        #onboarding-area[higher] .onb-graphics.bottom {
+            transform: translate(0, 13vh);
+        }*/
         .onb-graphics {
             margin: 0 auto;
             height: auto;
@@ -189,9 +217,10 @@
             bottom: 0;
             width: 100%;
             max-width: 600px;
-            /*align-self: flex-end;*/
             position: absolute;
             margin: 0 auto;
+            transition: var(--material-curve-320);
+            left: calc(50% - 300px);
         }
         .onboarding-form {
             text-align: center;
@@ -215,6 +244,20 @@
         .blue-link {
             padding: 0;
             text-transform: none;
+        }
+        .onb-forms {
+            position: relative;
+        }
+        .onboarding-form {
+            position: absolute;
+            width: 100%;
+            transition: var(--material-curve-320);            
+        }        
+        .onboarding-form[closed] {
+            transform: translate(0, 100vh);
+        }
+        .onboarding-form {
+            transform: translate(0, 0);
         }
         </style>
         <div id="content" class="flex-horizontal-wide" main>
@@ -279,38 +322,47 @@
             </div>
         </template>
         <template is="dom-if" if="[[!showDashboard]]">
-            <div id="onboarding-area">
-                <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
-                <div id="org-form" class="onboarding-form" hidden$="[[model.user.orgs.length]]">
-                    <h1>Welcome!</h1>
-                    <p>One small step to complete your sign up:<br/>
-                        Choose an organisation name. *
-                    </p>
-                    <div id="org-form" class="onboarding-form-inputs">
-                        <paper-input id="orginput" value$='[[model.user.email]] Org' placeholder$='[[model.user.email]] Org' tabindex='1'></paper-input>
+            <div class="onb ovhid">
+                <div id="onboarding-area">
+                    <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
+                    <div id="org-form" class="onboarding-form" hidden$="[[model.user.orgs.length]]">
+                        <h1>Welcome!</h1>
+                        <p>One small step to complete your sign up:<br/>
+                            Choose an organisation name. *
+                        </p>
+                        <div id="org-form" class="onboarding-form-inputs">
+                            <paper-input id="orginput" value$='[[model.user.email]] Org' placeholder$='[[model.user.email]] Org' tabindex='1'></paper-input>
+                            <div class="spacer"></div>
+                            <paper-button class="wide blue" on-tap="saveOrg"> Save organisation </paper-button>
+                        </div>
                         <div class="spacer"></div>
-                        <paper-button class="wide blue" on-tap="saveOrg"> Save organisation </paper-button>
+                        <h4 class="sub">
+                            * you can always add more organisations later, <br/>
+                            using your profile menu at the top right of your screen
+                        </h4>
                     </div>
-                    <div class="spacer"></div>
-                    <h4 class="sub">
-                        * you can always add more organisations later, <br/>
-                        using your profile menu at the top right of your screen
-                    </h4>
-                </div>
-                <div id="cloud-or-invite-form" class="onboarding-form" hidden$="[[!model.user.orgs.length]]">
-                    <h1>You are ready to go!</h1>
-                    <p>No clouds to manage in <strong>[[model.org.name]]</strong>. Yet.</p>
-                    <div class="onboarding-form-inputs">
-                        <paper-button class="wide blue" href="/add-cloud"> Add your clouds </paper-button>
+                    <div class="onb-forms" hidden$="[[!model.user.orgs.length]]">
+                        <div id="cloud-or-invite-form" class="onboarding-form">
+                            <h1>You are ready to go!</h1>
+                            <p>No clouds to manage in <strong>[[model.org.name]]</strong>. Yet.</p>
+                            <div class="onboarding-form-inputs">
+                                <paper-button class="wide blue" on-tap="goToAddCloud"> Add your clouds </paper-button>
+                            </div>
+                            <p>
+                                or <paper-button on-tap="showInviteForm" class="blue-link" noink>invite people </paper-button> to join you and add clouds.
+                            </p>
+                        </div>
+                        <div id="invite-form" class="onboarding-form" closed>
+                            <h1>Invite people in [[model.org.name]]</h1>
+                            <p>To add an organisation use the 'Add Organisation' option on your profile menu</p>
+                            <div class="onboarding-form-inputs">
+                                
+                            </div>
+                            <paper-button noink on-tap="hideInviteForm" class="blue-link">Cancel</paper-button>
+                        </div>
                     </div>
-                    <p>
-                        or <paper-button on-tap="showInviteForm" class="blue-link" noink>invite people </paper-button> to join you and add clouds.
-                    </p>
+                    <img class="onb-graphics bottom" src="../../images/onboarding/mount.svg"/>
                 </div>
-                <!-- <div id="invite-form" class="onboarding-form">
-
-                </div> -->
-                <img class="onb-graphics bottom" src="../../images/onboarding/mount.svg"/>
             </div>
         </template>
         <div class="absolute-bottom-right">
@@ -515,8 +567,31 @@ Polymer({
     saveOrg: function(){
         //save org and update model to new organisation context
     },
+    goToAddCloud: function(){
+        page.show('/add-cloud');
+        //show sidebar for navigation
+        window.setTimeout(function(){
+            var sidebar = document.querySelector('app-sidebar'),
+                content = document.querySelector('iron-pages');
+            sidebar.classList.remove('close');
+            content.classList.remove('center');
+        }, 200);
+    },
     showInviteForm: function(){
-        
+        var addform = document.querySelector("#cloud-or-invite-form"),
+            inviteform = document.querySelector("#invite-form"),
+            container = document.querySelector("#onboarding-area");
+        addform.setAttribute('closed', true);
+        inviteform.removeAttribute('closed');
+        container.setAttribute('higher', true);
+    },
+    hideInviteForm: function(){
+        var addform = document.querySelector("#cloud-or-invite-form"),
+            inviteform = document.querySelector("#invite-form"),
+            container = document.querySelector("#onboarding-area");
+        addform.removeAttribute('closed');
+        inviteform.setAttribute('closed', true);
+        container.removeAttribute('higher');
     }
 });
 </script>
