@@ -10,9 +10,11 @@
                 display: block;
                 width: 100%;
             }
+
             .tag-list {
                 padding: 0 8px 24px 24px;
             }
+
             .bottom-actions {
                 padding-bottom: 2px;
                 margin-top: 16px;
@@ -21,19 +23,24 @@
                 display: block;
                 width: 100%;
             }
+
             paper-dialog {
                 width: 450px;
             }
+
             paper-button {
                 display: inline;
             }
+
             .pull-right {
                 float: right;
             }
+
             .submit-btn.add {
                 line-height: 40px;
                 margin: 0;
             }
+
             .submit-btn.save {
                 padding-left: 16px;
                 padding-right: 16px;
@@ -51,7 +58,8 @@
                 </div>
 
                 <div class="clearfix bottom-actions xs12">
-                    <paper-button class="submit-btn add" on-tap="_addTag"><iron-icon icon="add"></iron-icon> Add Tag</paper-button>
+                    <paper-button class="submit-btn add" on-tap="_addTag">
+                        <iron-icon icon="add"></iron-icon> Add Tag</paper-button>
                     <paper-button class="submit-btn pull-right blue save" on-tap="_saveTags">Save Tags</paper-button>
                 </div>
             </paper-dialog-scrollable>
@@ -154,26 +162,24 @@
                         }),
                         payload = [];
 
-                    if (newTags.length) {
-                        payload = this.newItems.map(function(item) {
-                            var newItem = {};
+                    payload = this.newItems.map(function(item) {
+                        var newItem = {};
 
-                            newItem.resource = {
-                                type: this.resource,
-                                item_id: item.id,
-                                cloud_id: ['machine', 'image', 'network'].indexOf(this.resource) != -1 ? item.cloud.id : ''
-                            };
-                            newItem.tags = item.tags.concat(newTags);
+                        newItem.resource = {
+                            type: this.resource,
+                            item_id: item.id,
+                            cloud_id: ['machine', 'image', 'network'].indexOf(this.resource) != -1 ? item.cloud.id : ''
+                        };
+                        newItem.tags = item.tags.concat(newTags);
 
-                            return newItem;
-                        }, this);
-                        console.log(payload);
+                        return newItem;
+                    }, this);
+                    console.log(payload);
 
-                        this.$.tagsAjaxRequest.body = payload;
-                        this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
-                        this.$.tagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                        this.$.tagsAjaxRequest.generateRequest();
-                    }
+                    this.$.tagsAjaxRequest.body = payload;
+                    this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.tagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.tagsAjaxRequest.generateRequest();
                 },
                 _handleTagsAjaxResponse: function(e) {
                     this._closeDialog();
