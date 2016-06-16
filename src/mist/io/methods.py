@@ -3748,16 +3748,7 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
     if not host:
         raise RequiredParameterMissingError('host')
 
-    if mist.core.vpn.methods.to_tunnel(user, host):
-        log.info("Ping host %s over VPN", host)
-        ping = mist.core.vpn.methods.ping_vpn_host(owner=user, host=host)
-    else:
-        # start pinging the machine in the background
-        log.info("Starting ping in the background for host %s", host)
-        ping = subprocess.Popen(
-            ["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host],
-            stdout=subprocess.PIPE
-        )
+    ping = mist.core.vpn.methods.super_ping(owner=user, host=host)
     try:
         ret = probe_ssh_only(user, cloud_id, machine_id, host,
                              key_id=key_id, ssh_user=ssh_user)
@@ -3774,7 +3765,7 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
     else:
         ping_out = ping.stdout.read()
         ping.wait()
-        log.info("ping output: %s" % ping_out)
+        log.info("Ping output: %s" % ping_out)
         ping_out = parse_ping(ping_out)
     ret.update(ping_out)
     return ret
@@ -3851,14 +3842,10 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
 
 
 def ping(host, user=None):
+    ping = mist.core.vpn.methods.super_ping(user, host=host)
     if mist.core.vpn.methods.to_tunnel(user, host):
-        ping = mist.core.vpn.methods.ping_vpn_host(user, host=host)
         ping_out = ping.json()
     else:
-        ping = subprocess.Popen(
-                ["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host],
-                stdout=subprocess.PIPE
-            )
         ping_out = ping.stdout.read()
         ping.wait()
         ping_out = parse_ping(ping_out)

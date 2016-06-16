@@ -7,7 +7,7 @@ import json
 from libcloud.compute.types import NodeState
 from libcloud.compute.base import Node
 
-from mist.core.vpn.methods import destination_nat, ping_vpn_host, to_tunnel
+from mist.core.vpn.methods import destination_nat, super_ping
 
 VALID_RESPONSE_CODES = [httplib.OK, httplib.ACCEPTED, httplib.CREATED,
                         httplib.NO_CONTENT]
@@ -121,24 +121,13 @@ class BareMetalDriver(object):
     def ping_host(self, user, hostname):
         """Pings given host
 
-        Use ping utility, since a python implementation would require root privileges
-        (ICMP packages need be sent by root), while ping gets around this by being set SUID.
-        Will fail if ping is not found on system
-
+        Use ping utility, since a python implementation would require root
+        privileges (ICMP packages need be sent by root), while ping gets around
+        this by being set SUID. Will fail if ping is not found on system
         """
         if not hostname:
             return 256
-        if to_tunnel(user, hostname):
-            ping = ping_vpn_host(owner=user, host=hostname)
-            if ping.ok and int(json.loads(ping.content)['packets_rx']) > 0:
-                response = 0
-            else:
-                response = 256
-        else:
-            try:
-                response = os.system("ping -c 1 -w5 " + hostname + " > /dev/null 2>&1")
-            except:
-                response = 256
+        response = super_ping(owner=user, host=hostname, system_util=True)
         return response
 
 
