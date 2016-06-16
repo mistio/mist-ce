@@ -31,10 +31,10 @@
             index: Number,
             newIndex: {
                 type: Number,
-                computed: '_computedNewIndex(index)'
+                computed: '_computeNewIndex(index)'
             }
         },
-        _computedNewIndex: function(index) {
+        _computeNewIndex: function(index) {
             return index + 1;
         },
         _deleteTag: function(e) {
