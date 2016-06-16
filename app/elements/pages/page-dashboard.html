@@ -2,7 +2,6 @@
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
-<link rel="import" href="../../bower_components/paper-chip/paper-chip.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 
 <link rel="import" href="../section-tile/section-tile.html">
@@ -13,6 +12,7 @@
 <link rel="import" href="../onb-element/onb-element.html">
 <link rel="import" href="../app-header/app-header.html">
 <link rel="import" href="../clouds/cloud-info.html">
+<link rel="import" href="../clouds/cloud-chip.html">
 <dom-module id="page-dashboard">
     <template>
         <style is="custom-style" include="headings"></style>
@@ -44,17 +44,15 @@
             min-height: 48px;
             transition: all 200ms ease-in;
         }
-        .clouds paper-chip {
+        .clouds cloud-chip {
             cursor: pointer;
-        }
-        .clouds paper-chip ::content #chip {
-            background-color: #ddd;
-        }
-        .clouds paper-chip.online .icon {
+            z-index: 9;
+        }        
+        .clouds cloud-chip.online .icon {
             background-color: var(--green-color) !important;
         }
 
-        .clouds paper-chip.offline .icon {
+        .clouds cloud-chip.offline .icon {
             background-color: var(--red-color) !important;
         }
 
@@ -155,19 +153,24 @@
             display: block;
             margin: 0 auto;
         }
+        .ovhid {
+            overflow: hidden;
+        }
         </style>
         <div id="content" class="flex-horizontal-wide" main>
             <div class="clouds top flexchild-wide-top">
                 <div class="flex">
                     <template is="dom-repeat" items="[[model.cloudsArray]]">
-                        <paper-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]] paper-chip-0" on-tap="_showCloudInfoDialog" id$="[[item.id]]" animated>
+                        <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]] paper-chip-0" on-tap="_showCloudInfoDialog" id$="[[item.id]]">
                             <div class="icon"></div>
                             <!-- src="[[_computeProviderLogo(item.provider)]]" -->
                             <h1 class="cloud-title">{{item.title}}</h1>
-                        </paper-chip>
+                        </cloud-chip>
                     </template>
                 </div>
-                <cloud-info></cloud-info>
+                <div class="ovhid">
+                    <cloud-info></cloud-info>
+                </div>
             </div>
             <!-- <template is="dom-if" if="[[onbstate]]">
                 <onb-element class="onb-area flex2child top right" onbstate="[[onbstate]]" model="[[model]]"></onb-element>
@@ -251,9 +254,14 @@ Polymer({
         replaceTargets: {
             type: Object,
             computed: '_computeReplaceTargets(model.monitoring)'
-        }
+        },
+        openedCloud: String
     },
-    ready: function() {},
+    listeners: {
+        'close-cloud-info': '_closeCloudChips'
+    },
+    ready: function() {        
+    },
     attached: function() {
         // reset page title since this is the default page
         this.fire('page-meta', {
@@ -351,13 +359,37 @@ Polymer({
         return ret;
     },
     _showCloudInfoDialog: function(e) {
-        var cloudId = e.currentTarget.getAttribute('id'),
-        dialog = this.querySelector('cloud-info'),
-        cloud = this.model.cloudsArray.find(function(cloud) {
-            return cloud.id == cloudId;
+        var cloudId = e.currentTarget.getAttribute('id');
+        var dialog = this.querySelector('cloud-info');
+
+        if (this.openedCloud && this.openedCloud == cloudId) {
+            dialog.removeAttribute('opened');
+            this._closeCloudChips();
+            this.set('openedCloud', '');
+        }
+        else {
+            var cloudChips = this.querySelectorAll('cloud-chip'),
+                cloud = this.model.cloudsArray.find(function(cloud) {
+                    return cloud.id == cloudId;
+                });
+            [].forEach.call(cloudChips, function(el, index) {
+                if (el == e.currentTarget){
+                    el.setAttribute('opened', true)
+                }
+                else {
+                    el.removeAttribute('opened');
+                }
+            });
+            this.set('openedCloud', cloudId);
+            dialog.cloud = cloud;
+            dialog.setAttribute('opened', true);
+        }
+    },
+    _closeCloudChips: function(){
+        var cloudChips = this.querySelectorAll('cloud-chip');
+        [].forEach.call(cloudChips, function(el, index) {
+            el.removeAttribute('opened');
         });
-        dialog.cloud = cloud;
-        dialog._openDialog();
     }
 });
 </script>
