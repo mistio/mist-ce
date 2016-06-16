@@ -212,6 +212,10 @@
             line-height: 1.2em;
             opacity: 0.54;
         }
+        .blue-link {
+            padding: 0;
+            text-transform: none;
+        }
         </style>
         <div id="content" class="flex-horizontal-wide" main>
         <template is="dom-if" if="[[showDashboard]]">
@@ -294,21 +298,14 @@
                     </h4>
                 </div>
                 <div id="cloud-or-invite-form" class="onboarding-form" hidden$="[[!model.user.orgs.length]]">
-                    there are orgs
-                    <h1>Welcome!</h1>
-                    <p>One small step to complete your sign up:<br/>
-                        Choose an organisation name. *
-                    </p>
-                    <div id="org-form" class="onboarding-form-inputs">
-                        <paper-input id="orginput" value$='[[model.user.email]] Org' placeholder$='[[model.user.email]] Org' tabindex='1'></paper-input>
-                        <div class="spacer"></div>
-                        <paper-button class="wide blue" on-tap="saveOrg"> Save organisation </paper-button>
+                    <h1>You are ready to go!</h1>
+                    <p>No clouds to manage in <strong>[[model.org.name]]</strong>. Yet.</p>
+                    <div class="onboarding-form-inputs">
+                        <paper-button class="wide blue" href="/add-cloud"> Add your clouds </paper-button>
                     </div>
-                    <div class="spacer"></div>
-                    <h4 class="sub">
-                        * you can always add more organisations later, <br/>
-                        using your profile menu at the top right of your screen
-                    </h4>
+                    <p>
+                        or <paper-button on-tap="showInviteForm" class="blue-link" noink>invite people </paper-button> to join you and add clouds.
+                    </p>
                 </div>
                 <!-- <div id="invite-form" class="onboarding-form">
 
@@ -516,7 +513,10 @@ Polymer({
         });
     },
     saveOrg: function(){
-
+        //save org and update model to new organisation context
+    },
+    showInviteForm: function(){
+        
     }
 });
 </script>
