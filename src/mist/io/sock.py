@@ -20,11 +20,13 @@ from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
 
 try:
+    from mist.io import config as ioconfig
     from mist.core import config
     from mist.core.methods import get_stats
     from mist.core.cloud.models import Cloud, Machine
     from mist.core.keypair.models import Keypair
     from mist.core.vpn.models import Tunnel
+    from mist.core.vpn.methods import to_tunnel
     multi_user = True
 except ImportError:
     from mist.io import config
@@ -331,7 +333,9 @@ class MainConnection(MistConnection):
                                 continue
                             break
                         else:
-                            continue
+                            if ips[0] not in ioconfig.EXCLUDED_PRIVATE_ADDRESSES:
+                                continue
+                            pass
 
                     has_key = False
                     keypairs = Keypair.objects(owner=self.owner)
