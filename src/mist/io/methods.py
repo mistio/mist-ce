@@ -2958,6 +2958,7 @@ def list_clouds(user):
             del cloud["docker_port"]
         cloud["state"] = 'online' if cloud["enabled"] else 'offline'
         cloud["id"] = cloud["_id"]
+        cloud['tags'] = mist.core.methods.get_cloud_tags(user,  cloud["_id"])
         normalized_clouds.append(cloud)
 
     return normalized_clouds
@@ -2980,6 +2981,7 @@ def list_keys(user):
         key_object["isDefault"] = key.default
         key_object["machines"] = transform_key_machine_associations(machines,
                                                                     key)
+        key_object['tags'] = mist.core.methods.get_key_tags(user, key.id)
         key_objects.append(key_object)
     return key_objects
 
