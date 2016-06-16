@@ -92,13 +92,9 @@
                 is: 'details-page',
 
                 properties: {
-                    model: {
-                        type: Object,
-                        notify: true
-                    },
                     user: {
                         type: Object,
-                        computed: "_computeUser(model.user)"
+                        computed: "_computeUser(user)"
                     },
                     countriesOptions: {
                         type: Array,

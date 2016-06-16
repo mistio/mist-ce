@@ -237,12 +237,9 @@
             Polymer({
                 is: 'feedback-page',
                 properties: {
-                    model: {
-                        type: Object
-                    },
                     user: {
                         type: Object,
-                        computed: "_computeUser(model.user)"
+                        computed: "_computeUser(user)"
                     },
                     pageFirst: {
                         type: Boolean,
