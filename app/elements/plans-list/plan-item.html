@@ -37,6 +37,9 @@
             #select[disabled] {
                 background-color: #ACDEF6;
             }
+            .current-plan {
+                color: rgba(0,0,0,.5);
+            }
         </style>
 
         <h4>[[plan.title]]</h4>
@@ -46,7 +49,6 @@
         <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
         <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
         <paper-button id="select" class="btn-block submit-btn" disabled$="[[isCurrent]]" raised on-tap="_selectPlan">Select</paper-button>
-
     </template>
 
     <script>

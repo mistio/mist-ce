@@ -81,7 +81,7 @@
                 <paper-toolbar class="tall" style$="[[_getHeaderStyle(section.color)]]">
                     <paper-icon-button icon="icons:arrow-back" on-tap="_goBack"></paper-icon-button>
                     <span class="title"></span>
-                    <app-user-menu email="[[model.email]]"></app-user-menu>
+                    <app-user-menu model="[[model]]"></app-user-menu>
                     <span class="bottom title">Machine: [[machine.name]]</span>
                     <span class="bottom right-actions">
                         <template is="dom-if" if="[[machine.can_rename]]">
