@@ -1,0 +1,358 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-a11y-keys/iron-a11y-keys.html">
+<link rel="import" href="../../bower_components/iron-behaviors/iron-button-state.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
+<dom-module id="cloud-chip">
+<template>
+	<style>
+		:host {
+			display: inline-block;
+			vertical-align: top;
+			position: relative;
+			outline: none;
+			font-size: 14px;
+			cursor: default;
+			margin: 8px 0;
+			height: 32px;
+			overflow: visible;
+
+			-webkit-touch-callout: none; /* iOS Safari */
+			-webkit-user-select: none;   /* Chrome/Safari/Opera */
+			-khtml-user-select: none;    /* Konqueror */
+			-moz-user-select: none;      /* Firefox */
+			-ms-user-select: none;       /* Internet Explorer/Edge */
+			user-select: none;
+		}
+		:host([animated]) *,
+		:host([animated]) /deep/ *,
+		:host([animated]) ::content * {
+		  transition: 200ms ease-in;
+		}
+		#main, #chip {
+		  border-radius: 16px;
+		}
+		#main {
+		  background-color: var(--paper-chip-background-color, --paper-grey-200);
+		  position: relative;
+		  color: var(--paper-chip-secondary-text-color, --secondary-text-color);
+		  @apply(--layout-vertical);
+		}
+		#chip {
+		  box-sizing: border-box;
+		  height: 32px;
+		  background-color: #ddd;
+		  @apply(--layout-horizontal);
+		  @apply(--layout-center);
+		}
+		paper-material {
+		  border-radius: 16px;
+		}
+		#icon {
+		  @apply(--layout-horizontal);
+		  @apply(--layout-center);
+		  @apply(--layout-center-justified);
+		}
+		#icon ::content .icon {
+		  margin-right: -4px;
+		  width: 32px;
+		  height: 32px;
+		  line-height: 32px;
+		  border-radius: 100%;
+		  overflow: hidden;
+		  text-align: center;
+		  vertical-align: middle;
+		  font-size: 16px;
+		  font-weight: bold;
+		  background-color: var(--paper-chip-icon-background-color, --paper-grey-500);
+		  color: var(--paper-chip-icon-text-color, --text-primary-color);
+		  @apply(--layout-flex);
+		}
+		#icon ::content iron-icon.icon,
+		#icon ::content iron-icon.icon svg {
+		  width: 32px;
+		  height: 32px;
+		}
+		#icon ::content iron-icon.icon {
+		  vertical-align: bottom;
+		}
+		#label {
+		  padding: 0 12px;
+		  @apply(--layout-flex-auto);
+		  @apply(--layout-self-center);
+		}
+		#label ::content h1,
+		#label ::content h2 {
+		  white-space: nowrap;
+		  margin: 0;
+		  font-weight: normal;
+		  font-size: 14px;
+		}
+		.icon-btn-wrapper {
+		  @apply(--layout-self-center);
+		}
+		#removeBtn {
+		  padding: 0;
+		}
+		#removeBtn {
+		  background-color: var(--paper-chip-removebtn-background-color, --paper-grey-400);
+		  color: var(--paper-chip-removebtn-icon-color, --text-primary-color);
+		  padding: 0;
+		  margin: 0;
+		  width: 20px;
+		  height: 20px;
+		  margin-left: 20px;
+		  border-radius: 100%;
+		}
+		#removeBtn /deep/ iron-icon {
+		  width: 16px;
+		  height: 16px;
+		  margin: 2px;
+		}
+		:host(:not([removable])) #removeBtn {
+		  display: none;
+		}
+		/* pressed state */
+		:host([pressed]) #main {
+		  background-color: var(--paper-chip-pressed-background-color, --paper-grey-300);
+		}
+
+		/* initially hidden elements */
+		:host(:not([opened])) #label ::content h2 {
+		  color: var(--paper-chip-secondary-text-color, --secondary-text-color);
+		  font-size: 0;
+		  height: 0;
+		}
+		:host(:not([opened])) #removeBtn,
+		:host(:not([opened])) #removeBtn /deep/ iron-icon {
+		  width: 0;
+		  height: 0;
+		  margin: 0;
+		}
+		:host(:not([opened])) #content {
+		  width: 0;
+		  height: 0;
+		  min-width: 100%;
+		  overflow: hidden;
+		}
+		:host(:not([opened])) #label ::content h1 {
+		  color: var(--paper-chip-secondary-text-color, --secondary-text-color);
+		}
+
+		/* opened state */
+		:host([opened]) #main, :host([opened]) #chip {
+		  border-radius: 0;
+		}
+		:host([opened]) #content {
+		  height: auto;
+		  width: auto;
+		  min-width: 100%;
+		  overflow: hidden;
+		}
+		:host([opened]) #chip {
+		  height: 48px;
+		}
+		:host([opened]) #chip,
+		:host([opened]) #content ::content > * {
+		  padding: 8px 12px;
+		  background-color: #424242;
+		  color: #fff;
+		}
+		:host([opened]) #label ::content h1 {
+		  color: #fff;
+		  font-size: 14px;
+		}
+		:host([opened]) paper-material {
+		  border-radius: 0; 
+		  background-color: #424242;
+		  color: #fff;
+		}
+		:host([opened]) #icon ::content .icon,
+		:host([opened]) #icon ::content iron-icon.icon svg {
+		  font-size: 20px;
+		  width: 30px;
+		  height: 30px;
+		  line-height: 30px;
+		}
+
+		/* open + active state */
+		:host([opened][active]) #chip,
+		:host([opened][active]) ::content {
+		  background-color: #424242;
+		  color: #fff;
+		}
+		:host([opened][active]) #removeBtn {
+		  background-color: #424242;
+		  color: #fff;
+		}
+		:host([opened][active]) #chip #label ::content h1 {
+		  color: #fff;
+		}
+		:host([opened][active]) #chip #label ::content h2 {
+		  color: #fff;
+		}
+		
+	</style>
+	<iron-a11y-keys target="{{}}" keys="space enter" on-keys-pressed="toggleOpened"></iron-a11y-keys>
+    <paper-material id="shadow" elevation="0" animated$="{{animated}}">
+      <div id="main">
+        <div id="chip">
+          <div id="icon">
+            <content select=".icon"></content>
+          </div>
+          <div id="label">
+            <content select="h1"></content>
+            <content select="h2"></content>
+          </div>
+          <paper-icon-button id="removeBtn" icon="close" on-tap="remove"></paper-icon-button>
+        </div>
+        <div id="content">
+          <content></content>
+        </div>
+      </div>
+    </paper-material>
+</template>
+<script>
+    Polymer({
+      is: 'cloud-chip',
+      behaviors: [
+        Polymer.IronButtonState,
+        Polymer.IronControlState,
+      ],
+      properties: {
+        /**
+         * Whether or not the chip is removable. If `true`, a remove button will
+         * be shown.
+         * 
+         * @attribute removable
+         * @type boolean
+         * @default false
+         */
+        removable: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Whether or not the chip uses an animated transition between opened and
+         * closed states
+         *
+         * @attribute animated
+         * @type boolean
+         * @default true
+         */
+        animated: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+
+        /**
+         * Whether or not the chip is in its opened state.
+         * 
+         * @attribute opened
+         * @type boolean
+         * @default false
+         */
+        opened: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true,
+          observer: '_openedChanged'
+        },
+
+        /**
+         * Whether or not the chip state is "active". If `true`, the main chip
+         * area will be highlighted when in the opened state.
+         *
+         * @attribute active
+         * @type boolean
+         * @default false
+         */
+        active: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+
+        _elevation: {
+          type: Number
+        }
+      },
+      listeners: {
+        up: '_upAction',
+        blur: '_blurAction'
+      },
+      observers: [
+        '_calculateElevation(opened, focused, disabled, active, pressed)'
+      ],
+
+      ready: function() {
+        if (this.$.removeBtn) {
+          // disable tabindex on remove button so that tabindex can be used for chips
+          this.$.removeBtn.removeAttribute('tabindex');
+        }
+      },
+      _calculateElevation: function() {
+        var e = 0;
+        if (this.focused || this.pressed || this.receivedFocusFromKeyboard) {
+          e = 1;
+        }
+        if (this.opened) {
+          e = 4;
+        }
+        this._elevation = e;
+      },
+      _upAction: function(e) {
+        this.toggleOpened();
+      },
+      _blurAction: function() {
+        this.opened = false;
+      },
+      /**
+       * Fired before the element is removed. This event is cancelable.
+       * 
+       * @event remove
+       */
+      remove: function() {
+        var e = this.fire('remove', {}, this, false, true);
+        if (!e.defaultPrevented) {
+          this.parentNode.removeChild(this);
+        }
+      },
+      toggleOpened: function() {
+        this.opened = !this.opened;
+      },
+      _openedChanged: function() {
+        if (!this.animated) {
+          return;
+        }
+        var $content, width, height;
+        $content = this.$.content;
+        width = height = '';
+        if (this.opened) {
+          // temporarily disable transitions in order to take measurements of
+          // the content area, allowing for a proper css transision.
+          this.animated = false;
+          this.opened = true;
+          width = $content.offsetWidth + 'px';
+          height = $content.offsetHeight + 'px';
+          this.opened = false;
+          this._forceReflow();
+          this.opened = true;
+          this.animated = true;
+        }
+        $content.style.width = width;
+        $content.style.height = height;
+      },
+      _forceReflow: function() {
+        return this.offsetHeight;
+      }
+    });
+  </script>
+
+</dom-module>
