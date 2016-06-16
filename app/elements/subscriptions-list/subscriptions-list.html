@@ -51,22 +51,14 @@
                   model: {
                       type: Object
                   },
-                  user: {
-                      type: Object,
-                      computed: "_computeUserPlans(model.user)"
-                  },
-                    subscriptions: {
-                        type: Array,
-                        value: []
-                    }
-                },
-                _computeUserPlans: function(user) {
-                  if(user){
-                    return{
-                      userPlans: this.set('subscriptions',user.user_plans)
-                    };
+                  subscriptions: {
+                      type: Array,
+                      computed: "_computeUserPlans(model.user.*)"
                   }
-                }
+                },
+                _computeUserPlans: function(user){
+                    return user.user_plans;
+                  }
             });
         })();
     </script>
