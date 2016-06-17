@@ -401,6 +401,7 @@
                 <paper-fab id="addBtn" icon="cloud"></paper-fab>
             </a>
         </div>
+        <iron-ajax id="saveOrgRequest" method="PUT" url="/api/v1/org/[[model.org.id]]"></iron-ajax>
     </template>
 </dom-module>
 <script>
@@ -438,7 +439,8 @@ Polymer({
         },
         hasOrg: {
             type: Boolean,
-            computed: '_computeHasOrg(model.user.orgs.*)'
+            computed: '_computeHasOrg(model.org.name.*)',
+            notify: true
         }   
     },
     listeners: {
@@ -529,10 +531,14 @@ Polymer({
     isOffline: function(cloud) {
         return cloud.state == 'offline' && 'offline';
     },
-    _computeHasOrg: function (orgs) {
-        console.log(orgs.base);
-        if (orgs && orgs.base) {
-            return (orgs.base.length == 1 && orgs.base[0].name === "") ? false : true;
+    _computeHasOrg: function (name) {
+        console.log(name, name.base);
+
+        if (name.value == '') {
+            return false;
+        }
+        else {
+            return true;
         }
     },
     _computeshowDashboard: function(cloudslength) {
@@ -599,7 +605,14 @@ Polymer({
         });
     },
     saveOrg: function(){
-        //save org and update model to new organisation context
+        var new_name = this.querySelector("#orginput").value;
+        this.$.saveOrgRequest.headers["Content-Type"] = 'application/json';
+        this.$.saveOrgRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+        this.$.saveOrgRequest.body = { 'new_name': new_name };
+        // this.$.saveOrgRequest.params['new_name'] =  new_name;
+
+        // console.log('SAVE ORG', new_name, this.$.saveOrgRequest)
+        this.$.saveOrgRequest.generateRequest();
     },
     goToAddTeam: function(){
         page.show('/add-team');
