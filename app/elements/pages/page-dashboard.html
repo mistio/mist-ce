@@ -1,9 +1,11 @@
 <link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
 
 <link rel="import" href="../section-tile/section-tile.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
@@ -51,7 +53,7 @@
         .clouds cloud-chip {
             cursor: pointer;
             z-index: 9;
-        }        
+        }
         .clouds cloud-chip.online .icon {
             background-color: var(--green-color) !important;
         }
@@ -175,6 +177,10 @@
             box-sizing: border-box;
             position: relative;
         }
+        #org-form {
+            text-align: center;
+            padding-bottom: 200px;
+        }
         #onboarding-area {
             margin: 0 auto;
             width: 100%;
@@ -194,14 +200,14 @@
             transition-delay: 200ms;
         }
         #onboarding-area[higher] {
-            transform: translate(0, -200px);
+            transform: translate(0, -150px);
         }
         .onb-graphics {
             margin: 0 auto;
             height: auto;
             vertical-align: middle;
             top: 0;
-            width: 300px;
+            width: 200px;
             max-width: 100%;
         }
         .onboarding-form {
@@ -209,6 +215,7 @@
             z-index: 1;
             position: relative;
         }
+        #org-form paper-input,
         .onboarding-form paper-input {
             text-align: left;
         }
@@ -260,6 +267,9 @@
         }
         .invite-form-inputs {
             margin-bottom: 2em;   
+        }
+        paper-dropdown-menu {
+            width: 100%;
         }
         </style>
         <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
@@ -326,12 +336,12 @@
         <template is="dom-if" if="[[!showDashboard]]">
             <div id="onboarding-area">
                 <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
-                <div id="org-form" class="onboarding-form" hidden$="[[model.user.orgs.length]]">
+                <div id="org-form" hidden$="[[hasOrg]]">
                     <h1>Welcome!</h1>
                     <p>One small step to complete your sign up:<br/>
                         Choose an organisation name. *
                     </p>
-                    <div id="org-form" class="onboarding-form-inputs">
+                    <div class="onboarding-form-inputs">
                         <paper-input id="orginput" value$='[[model.user.email]] Org' placeholder$='[[model.user.email]] Org' tabindex='1'></paper-input>
                         <div class="spacer"></div>
                         <paper-button class="wide blue" on-tap="saveOrg"> Save organisation </paper-button>
@@ -342,7 +352,7 @@
                         using your profile menu at the top right of your screen
                     </h4>
                 </div>
-                <div class="onb-forms" hidden$="[[!model.user.orgs.length]]">
+                <div class="onb-forms" hidden$="[[!hasOrg]]">
                     <div id="cloud-or-invite-form" class="onboarding-form">
                         <h1>You are ready to go!</h1>
                         <p>No clouds to manage in <strong>[[model.org.name]]</strong>. Yet.</p>
@@ -425,12 +435,16 @@ Polymer({
             type: Boolean,
             computed: '_computeshowDashboard(model.cloudsArray.length)',
             notify: true
-        }
+        },
+        hasOrg: {
+            type: Boolean,
+            computed: '_computeHasOrg(model.user.orgs.*)'
+        }   
     },
     listeners: {
         'close-cloud-info': '_closeCloudChips'
     },
-    ready: function() {        
+    ready: function() {
     },
     attached: function() {
         // reset page title since this is the default page
@@ -515,8 +529,13 @@ Polymer({
     isOffline: function(cloud) {
         return cloud.state == 'offline' && 'offline';
     },
+    _computeHasOrg: function (orgs) {
+        console.log(orgs.base);
+        if (orgs && orgs.base) {
+            return (orgs.base.length == 1 && orgs.base[0].name === "") ? false : true;
+        }
+    },
     _computeshowDashboard: function(cloudslength) {
-        // TODO: don't forget to remove comments and last return
         var show;
         if (cloudslength > 0) {
             show =  true;
@@ -530,12 +549,6 @@ Polymer({
                 sidebar.classList.add('close');
                 content.classList.add('center');
             }, 2400);
-            // TODO: does not work
-            // give focus to paper input
-            var input = this.$.orginput;
-            if (input) {
-                input.focus();
-            }
         }
         return show;
     },

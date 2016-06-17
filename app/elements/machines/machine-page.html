@@ -1,7 +1,11 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
+
 <link rel="import" href="../app-rules/app-rules.html">
-<link rel="import" href="../element-for-in/element-for-in.html">
-<link rel="import" href="machine-edit.html">
+<link rel="import" href="../tags/tags-list.html">
+
 <dom-module id="machine-page">
     <template>
         <style is="custom-style" include="tags-and-labels"></style>
@@ -157,7 +161,7 @@
                     can_undefine:false -->
                     <paper-button on-tap="restart" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
                     <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
-                    <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="tag" class="simple" hidden$="[[!machine.can_tag]]">tag</paper-button>
+                    <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="_editTags" class="simple" hidden$="[[!machine.can_tag]]">tags</paper-button>
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
@@ -181,7 +185,7 @@
                 <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
                     <h3 class="smallcaps">TAGS:</h3>
                     <template is="dom-repeat" items="[[machine.tags]]">
-                        <span class="tag">[[item.key]] <span hidden$="[[!item.value]]">=</span> [[item.value]]</span>
+                        <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
                     </template>
                 </paper-material>
             </div>
@@ -229,6 +233,7 @@
         <dialog-element></dialog-element>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
+        <tags-list resource="machine"></tags-list>
     </template>
 </dom-module>
 <script>
@@ -414,9 +419,12 @@
             else
                 return "";
         },
-        _editMachineTags: function() {
-            var url = '/machines/' + this.machine.uuid + '/tags';
-            page.show(url);
+        _editTags: function() {
+            var el = this.querySelector('tags-list'),
+            items = [];
+            items.push(this.machine);
+            el.items = items;
+            el._openDialog();
         },
         _editMachine: function(e) {
             var el = this.querySelector('machine-edit');

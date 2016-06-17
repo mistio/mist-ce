@@ -1,5 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+
 <dom-module id="cloud-add">
     <template>
         <style is="custom-style" include="forms"></style>
@@ -48,9 +51,9 @@
                 max-height: 400px !important;
             }
         </style>
-        
+
                 <div id="content">
-                    <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+                    <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                         <span class="icon"><iron-icon icon="cloud"></iron-icon></span>
                         <div class="title flex">
                             <h2>
@@ -59,7 +62,7 @@
                             <div class="subtitle">
                                 Mist.io supports over 17 providers
                             </div>
-                        </div>                        
+                        </div>
                     </paper-material>
                     <paper-material>
                         <div class="grid-row">

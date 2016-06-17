@@ -1,15 +1,22 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../app-togglable/app-togglable-list.html">
+<link rel="import" href="../app-form/app-form.html">
+<link rel="import" href="../element-for-in/element-for-in.html">
+
 <link rel="import" href="stack-machine-item.html">
 <link rel="import" href="stack-network-item.html">
 <link rel="import" href="stack-key-item.html">
-<link rel="import" href="../app-form/app-form.html">
-<link rel="import" href="../element-for-in/element-for-in.html">
+
 <dom-module id="stack-page">
     <template>
         <style is="custom-style" include="lists"></style>
+        <style is="custom-style" include="tags-and-labels"></style>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
             :host {
@@ -135,10 +142,6 @@
 
             paper-icon-button.active-sort::content iron-icon {
                 color: #D48900 !important;
-            }
-
-            app-bar .menu-icon {
-                margin-right: 15px;
             }
 
             [size=xs] > * {
@@ -373,6 +376,11 @@
             font-size: 0.9em;
             padding-left: 8px;
         }
+        /* TODO: better */
+        .tag {
+            padding: 0.5em;
+            display: inline;
+        }
         </style>
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
@@ -407,7 +415,7 @@
 
             <!-- <paper-spinner id="spinner"></paper-spinner>-->
 
-            <paper-material class="">
+            <paper-material>
                 <div class="flex-horizontal-with-ratios">
                     <div class="page-block">
                         <h3 class="smallcaps">Stack Description</h3>
@@ -417,6 +425,22 @@
                         <h3 class="smallcaps">Created</h3>
                         <p>[[timestamp]]
                         </p>
+                    </div>
+                    <div class="page-block" hidden="[[!stack.tags]]">
+                        <h3 class="smallcaps">Tags
+                            <template is="dom-if" if="[[stack.tags]]">
+                                <span class="id">([[stack.tags.length]])</span>
+                            </template>
+                            <template is="dom-if" if="[[!stack.tags]]">
+                                <span class="id">(0)</span>
+                            </template>
+                        </h3>
+                        <template is="dom-if" if="[[stack.tags]]">
+                            <template is="dom-repeat" items="[[stack.tags]]">
+                                <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
+                                <span class="id tag">test = tag</span>
+                            </template>
+                        </template>
                     </div>
                 </div>
             </paper-material>
@@ -1039,7 +1063,7 @@
                         "workflow": action,
                         "inputs": this.stack.inputs.install
                     };
-                    
+
                     this.$.deploynow.classList.add('hidden');
                     this.$.workflowRequest.generateRequest();
                 },
@@ -1049,7 +1073,7 @@
                 handleCanceled: function(e) {},
                 handleWorkflowRequest: function(e) {},
                 handleWorkflowResponse: function(e) {},
-                handleWorkflowError: function(e) {},
+                handleWorkflowError: function(e) {}
             });
         })();
     </script>

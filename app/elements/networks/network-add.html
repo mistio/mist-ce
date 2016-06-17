@@ -1,5 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+
 <dom-module id="network-add">
     <template>
         <style is="custom-style" include="forms"></style>
@@ -32,18 +37,18 @@
         </style>
 
 
-        
+
                 <div id="content">
-                    <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+                    <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                         <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
                         <div class="title flex">
                             <h2>
                                 Add Network
                             </h2>
                             <div class="subtitle">
-                                
+
                             </div>
-                        </div>                        
+                        </div>
                     </paper-material>
                     <paper-material>
                         <div class="grid-row" hidden$=[[!hasOpenstackClouds]]>

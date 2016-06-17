@@ -1,5 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
 <link rel="import" href="../element-for-in/element-for-in.html">
 
 <dom-module id="image-page">
@@ -88,10 +90,6 @@
                 color: #D48900 !important;
             }
 
-            app-bar .menu-icon {
-                margin-right: 15px;
-            }
-
             [size=xs] > * {
                 display: none;
             }
@@ -110,6 +108,15 @@
                 font-size: 0.9rem;
                 font-weight: 700;
                 margin-right: 16px;
+            }
+            /* TODO: better */
+            h4.id.tags {
+                padding-left: 36px;
+            }
+
+            .tag {
+                padding: 0.5em;
+                display: inline;
             }
             paper-material.no-pad {
                 padding: 0;
@@ -137,6 +144,20 @@
             <template is="dom-if" if="[[image]]">
                 <paper-material>
                     <h4 class="id">Image ID:</h4><span class="id">[[image.id]]</span>
+                    <h4 class="id tags">Tags
+                        <template is="dom-if" if="[[image.tags]]">
+                            <span class="id">([[image.tags.length]])</span>
+                        </template>
+                        <template is="dom-if" if="[[!image.tags]]">
+                            <span class="id">(0)</span>
+                        </template>
+                        :
+                    </h4>
+                    <template is="dom-if" if="[[image.tags]]">
+                        <template is="dom-repeat" items="[[image.tags]]">
+                            <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
+                        </template>
+                    </template>
                 </paper-material>
                 <paper-material class="no-pad">
                     <div class="info-table">

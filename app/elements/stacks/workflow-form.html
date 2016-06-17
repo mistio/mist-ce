@@ -1,7 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+
 <dom-module id="workflow-form">
     <template>
         <style is="custom-style" include="forms"></style>
@@ -27,47 +30,47 @@
 
             :host >::content paper-input-container {
                 padding-top: 16px;
-                padding-bottom: 16px;            
+                padding-bottom: 16px;
             }
         </style>
         <paper-material>
-	        <div class="grid-row">
-		        <template is="dom-repeat" items="{{fields}}" as="field">
-		            <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-		                <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.name]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-		                <div class="field-helptext xs12 m6">[[field.helptext]]</div>
-		            </template>
-		            <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-		                <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.name]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
-		                <div class="field-helptext xs12 m6">[[field.helptext]]</div>
-		            </template>
-		            <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
-		                <paper-radio-group selected="{{field.value}}" class="xs12 m6">
-		                    <template is="dom-repeat" items="[[field.options]]" as="option">
-		                        <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
-		                    </template>
-		                </paper-radio-group>
-		                <div class="field-helptext xs12 m6">[[field.helptext]]</div>
-		            </template>
-		            <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-		                <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.name]]" horizontal-align="left">
-		                    <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
-		                        <template is="dom-repeat" items="[[field.options]]" as="option">
-		                            <paper-item value="[[option.val]]">[[option.title]]</paper-item>
-		                        </template>
-		                    </paper-menu>
-		                </paper-dropdown-menu>
-		                <div class="field-helptext xs12 m6">[[field.helptext]]</div>
-		            </template>
-		        </template>
-		        <paper-progress indeterminate value="800" min="100" max="1000" hidden$="[[!sendingData]]"></paper-progress>
-		        <div class="clearfix bottom-actions xs12">
-		            <paper-button id="submit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">[[workflow.name]]</paper-button>
-		            <paper-button class="blue-link pull-right" on-tap="_resetForm">Reset</paper-button>
-		        </div>
-		        <!-- <iron-ajax id="addTemplateAjax" url="/templates" method="POST" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></iron-ajax> -->
-		    </div>
-	    </template>
+          <div class="grid-row">
+            <template is="dom-repeat" items="{{fields}}" as="field">
+                <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
+                    <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.name]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                </template>
+                <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
+                    <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.name]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
+                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                </template>
+                <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
+                    <paper-radio-group selected="{{field.value}}" class="xs12 m6">
+                        <template is="dom-repeat" items="[[field.options]]" as="option">
+                            <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
+                        </template>
+                    </paper-radio-group>
+                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                </template>
+                <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
+                    <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.name]]" horizontal-align="left">
+                        <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[field.options]]" as="option">
+                                <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+                    <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                </template>
+            </template>
+            <paper-progress indeterminate value="800" min="100" max="1000" hidden$="[[!sendingData]]"></paper-progress>
+            <div class="clearfix bottom-actions xs12">
+                <paper-button id="submit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">[[workflow.name]]</paper-button>
+                <paper-button class="blue-link pull-right" on-tap="_resetForm">Reset</paper-button>
+            </div>
+            <!-- <iron-ajax id="addTemplateAjax" url="/templates" method="POST" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse"></iron-ajax> -->
+        </div>
+      </template>
     </paper-material>
     <script>
         (function() {
@@ -99,8 +102,8 @@
                         value: true
                     },
                     payload: {
-                    	type: Object,
-                    	value: {}
+                      type: Object,
+                      value: {}
                     }
                 },
                 observers: [
@@ -114,14 +117,14 @@
                                 var p = field.query[prop];
 
                                 if (p.startsWith("$.")){
-                                    p = this.payload[p.slice(2)]; 
+                                    p = this.payload[p.slice(2)];
                                 }
 
                                 if (inputModel.hasOwnProperty(p)) {
                                     inputModel = inputModel[p];
                                 }
                             }
-                            
+
                             var updatedOptions = [];
 
                             for (var prop in inputModel) {
@@ -140,7 +143,7 @@
                                 var existingField = this.fields[index];
                                 if (existingField.name == field.name){
                                     this.set("fields." + index + ".options", updatedOptions);
-                                } 
+                                }
                             }
                         }
                         return field.type == value;
@@ -154,17 +157,17 @@
                             dependency,
                             path = fields.path,
                             valueChanged = this.get(path.replace("value", "name"));
-                            
-                        if (path.endsWith("value")){                            
+
+                        if (path.endsWith("value")){
                             this._recomputeDependentFields(valueChanged);
                         }
-                        fields.base.forEach(function(el, index) {                            
+                        fields.base.forEach(function(el, index) {
                             this.set('payload.' + el.name, el.value);
 
                             if (el.showIf) {
                                 if (el.showIf.fieldExists) {
                                     dependency = payload[el.showIf.fieldName],
-                                        show = dependency;                                        
+                                        show = dependency;
                                     this.set('fields.' + index + '.show', show);
 
                                 } else {
@@ -233,7 +236,7 @@
                 },
                 _recomputeDependentFields: function(changedFieldName){
                     var name = changedFieldName;
-                    this.fields.forEach(function(el, index) {                        
+                    this.fields.forEach(function(el, index) {
                         if (el.showIf && el.showIf.fieldName == name) {
                             this.set('fields.' + index + '.options', []);
                             this._computeFieldType(el,el.type,el.show)

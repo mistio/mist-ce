@@ -201,10 +201,11 @@ def update_user_settings(request):
 def list_clouds(request):
     """
     Request a list of all added clouds.
-    READ permission requrired on cloud.
+    READ permission required on cloud.
     ---
     """
     auth_context = auth_context_from_request(request)
+    # to prevent iterate throw every cloud
     auth_context.check_perm("cloud", "read", None)
     return mist.core.methods.filter_list_clouds(auth_context)
 

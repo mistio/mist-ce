@@ -1,6 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<!-- <link rel="import" href="add-team.html"> -->
+<link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../../bower_components/paper-drawer-panel/paper-drawer-panel.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
 
 <dom-module id="member-page">
     <template>
@@ -96,10 +100,6 @@
 
         paper-icon-button.active-sort::content iron-icon {
             color: #D48900 !important;
-        }
-
-        app-bar .menu-icon {
-            margin-right: 15px;
         }
 
         [size=xs] > * {
