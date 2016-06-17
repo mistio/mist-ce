@@ -434,6 +434,7 @@ Polymer({
         openedCloud: String,
         showDashboard: {
             type: Boolean,
+            value: true,
             computed: '_computeshowDashboard(model.cloudsArray.length)',
             notify: true
         },
@@ -548,15 +549,19 @@ Polymer({
         }
         else {
             show = false;
-            //close sidebar for focus
-            window.setTimeout(function(){
-                var sidebar = document.querySelector('app-sidebar'),
-                    content = document.querySelector('iron-pages');
-                sidebar.classList.add('close');
-                content.classList.add('center');
-            }, 2400);
+            // TODO: does not work. hides no matter
+            // this.hideSidebar();
         }
         return show;
+    },
+    hideSidebar: function(){
+        // if we are on boarding, close sidebar for focus
+        window.setTimeout(function(){
+            var sidebar = document.querySelector('app-sidebar'),
+                content = document.querySelector('iron-pages');
+            sidebar.classList.add('close');
+            content.classList.add('center');
+        }, 2400);
     },
     _computeProviderLogo: function(className) {
         return '../assets/providers/provider-' + className.split('_')[0] + '.png';
