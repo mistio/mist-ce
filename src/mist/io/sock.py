@@ -292,7 +292,7 @@ class MainConnection(MistConnection):
                 cloud = Cloud.objects.get(owner=self.owner, id=cloud_id)
                 try:
                     mcount = Machine.objects(cloud=cloud).count()
-                    if multi_user and len(machines) != mcount:
+                    if multi_user and len(machines) != cloud.machine_count:
                         tasks.update_machine_count.delay(self.owner.id,
                                                          cloud_id,
                                                          len(machines))
