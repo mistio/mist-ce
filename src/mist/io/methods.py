@@ -1377,12 +1377,14 @@ def connect_provider(cloud):
             host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                cloud.apiurl,
                                                                cloud.ssh_port)
-            conn = driver(host, user=cloud.apikey, ssh_key=cloud.apisecret, ssh_port=port)
+            conn = driver(host, hypervisor=cloud.apiurl, user=cloud.apikey,
+                          ssh_key=cloud.apisecret, ssh_port=port)
         else:
             api_url, tcp_port = mist.core.vpn.methods.destination_nat(cloud.owner,
                                                                       cloud.apiurl,
                                                                       5000)
-            conn = driver(api_url, user=cloud.apikey, tcp_port=tcp_port)
+            conn = driver(api_url, hypervisor=cloud.apiurl, user=cloud.apikey,
+                          tcp_port=tcp_port)
     else:
         # ec2
         conn = driver(cloud.apikey, cloud.apisecret)
