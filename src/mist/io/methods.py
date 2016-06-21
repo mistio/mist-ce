@@ -4467,8 +4467,13 @@ def machine_cost_calculator(m):
             cost['indicative_cost_per_month'] = float(cost_per_hour) * 24 * month_days
 
     for key, value in cost.items():
-        if value and isinstance(value, (str, float):
-            cost[key] = "{0:.2f}".format(value) # 2 digits
+        if value and not isinstance(value, int):
+            try:
+                # value can be float or str, we want to cast to float with 2 dec points
+                value = float(value)
+                cost[key] = "{0:.2f}".format(value)
+            except:
+                cost[key] = 0
     return cost
 
 
