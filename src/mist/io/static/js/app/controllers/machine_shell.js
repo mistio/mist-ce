@@ -35,7 +35,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember', 'term'],
                 // Get the first ipv4 public ip to connect to
                 // If private ipv4 do exist instead of public ones
                 // get the first private ipv4 ip
-                this.set('host', machine.host);
+                this.set('host', machine.get('host'));
 
                 if (this.host)
                     this.view.open();
@@ -60,7 +60,7 @@ define('app/controllers/machine_shell', ['app/models/command', 'ember', 'term'],
                     screenKeys: true
                 });
                 term.open(document.getElementById('shell-return'));
-                term.write('Connecting to ' + this.host + '...\r\n');
+                term.write('Connecting to ' + this.get('host') + '...\r\n');
                 Mist.set('term', term);
 
                 // Open shell socket
