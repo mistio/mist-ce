@@ -25,12 +25,43 @@ define('app/views/user_menu', ['ember', 'md5'],
             gravatarName: Ember.computed('hasName', function() {
                 return this.get('hasName') ? FIRST_NAME + ' ' + LAST_NAME : EMAIL;
             }),
-            hasOrganization: Ember.computed('Mist.organization.id', function() {
-                return !!Mist.organization.id;
+            organization: Ember.computed('Mist.organization', 'Mist.organization.name', function() {
+                return Mist.organization;
             }),
-            memberTeam: Ember.computed('hasOrganization', 'Mist.teamsController.model', function() {
-                var teams = [], teamsText = '';
-                if (this.get('hasOrganization')) {
+            organizations: Ember.computed('Mist.orgs', 'Mist.orgs.@each.name', function() {
+                var organizations = Mist.orgs
+                    .filter(function(org) {
+                        return org.name;
+                    })
+                    .sort(function(a, b) {
+                        if (a.name > b.name) {
+                            return 1;
+                        }
+                        if (a.name < b.name) {
+                            return -1;
+                        }
+                        return 0;
+                    });
+
+                if (Mist.personal) {
+                    organizations.unshift({
+                        id: null,
+                        name: 'Personal'
+                    });
+                }
+
+                return organizations;
+            }),
+            showCurrentOrganization: Ember.computed('organization', function() {
+                return !!this.get('organization.name');
+            }),
+            showCreateOrganization: Ember.computed('showCurrentOrganization', function() {
+                return (this.get('showCurrentOrganization') || Mist.personal) && Mist.can_create_org;
+            }),
+            memberTeam: Ember.computed('showCurrentOrganization', 'Mist.teamsController.model', function() {
+                var teams = [],
+                    teamsText = '';
+                if (this.get('showCurrentOrganization')) {
                     Mist.teamsController.model.forEach(function(team) {
                         team.members.forEach(function(member) {
                             if (member.email == Mist.email) {
@@ -43,14 +74,6 @@ define('app/views/user_menu', ['ember', 'md5'],
                 }
 
                 return teamsText;
-            }),
-            orgs: Ember.computed('Mist.orgs', function() {
-                var orgs = Mist.orgs.slice().addObject({
-                    id: '',
-                    name: 'Personal'
-                });
-
-                return orgs.sortBy('id');
             }),
 
             //

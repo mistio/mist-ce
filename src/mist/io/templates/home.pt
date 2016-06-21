@@ -49,6 +49,7 @@
     <script tal:content="string: var ORGANIZATION=${organization}" />
     <script tal:content="string: var ORGS=${orgs|'{}'}" />
     <script tal:content="string: var CAN_CREATE_ORG=${can_create_org|False}" />
+    <script tal:content="string: var PERSONAL=${personal}" />
     <script src="resources/dist/requirejs/require.js"></script>
 
     <script>

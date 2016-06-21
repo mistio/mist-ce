@@ -94,6 +94,15 @@ def update_machine_count(owner, cloud_id, machine_count):
     )
     owner.save()
 
+    org_machine_count = 0
+    orgs = Organization.objects(members=user)
+    for org in orgs:
+        org_clouds = Cloud.objects(owner=org)
+        org.total_machine_count = sum(
+            [cloud.machine_count for cloud in org_clouds]
+        )
+        org.save()
+
 
 @app.task
 def ssh_command(owner, cloud_id, machine_id, host, command,
@@ -804,12 +813,12 @@ class ListMachines(UserTask):
                     tags = {}
                     for tag in machine["tags"]:
                         tags[tag["key"]]= tag["value"]
-                    set_machine_tags(owner, tags, cloud_id, machine.get("id"))
                 try:
                     mistio_tags = get_machine_tags(owner, cloud_id,
                                                    machine.get("id"))
                 except:
                     log.info("Machine has not tags in mist db")
+                    mistio_tags = {}
                 else:
                     machine["tags"] = []
                     # optimized for js

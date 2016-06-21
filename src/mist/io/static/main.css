@@ -1305,6 +1305,7 @@ ul.checkbox-list .ui-grid-b {
 .ui-popup ul.ui-listview li.organization-item.org-active a:hover:after {
     background-color: #009688 !important;
     color: #fff;
+    cursor: default;
 }
 
 .monitoring-dialog-container, .associate-key-container, .probe-dialog-container div {
@@ -1504,7 +1505,8 @@ ul.checkbox-list .ui-grid-b {
     background-color: #FFF;
 }
 
-#no-collection-inner .icon-cloud-check:after {
+#no-collection-inner .icon-cloud-check:after,
+#no-collection-inner .icon-teams:after {
     color: #A5A4A1;
     font-size: 150px;
     opacity: 0.3;
@@ -1552,6 +1554,35 @@ ul.checkbox-list .ui-grid-b {
 #no-collection-inner .floating-collapsible {
     float: none;
     margin: 30px auto !important;
+}
+
+#no-collection-inner #edit-org-form .ui-input-text {
+    display: inline-block;
+    width: 250px;
+    margin: 20px 0;
+    vertical-align: middle;
+}
+
+#no-collection-inner #edit-org-form .ui-input-text input {
+    padding-top: 11.2px;
+    padding-bottom: 11.2px;
+    line-height: 19.975px;
+}
+
+#no-collection-inner #edit-org-form .ui-btn {
+    display: inline-block;
+    width: auto;
+    margin: 20px 0;
+    vertical-align: middle;
+}
+
+@media only screen and  (max-width: 500px) {
+    #no-collection-inner #edit-org-form .ui-input-text,
+    #no-collection-inner #edit-org-form .ui-btn {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+    }
 }
 
 /* Dialog
