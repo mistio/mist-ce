@@ -4465,6 +4465,10 @@ def machine_cost_calculator(m):
             cost_per_hour = m.extra.get('hourlyRecurringFee')
             cost['indicative_cost_per_hour'] = cost_per_hour
             cost['indicative_cost_per_month'] = float(cost_per_hour) * 24 * month_days
+
+    for key, value in cost.items():
+        if value and isinstance(value, (str, float):
+            cost[key] = "{0:.2f}".format(value) # 2 digits
     return cost
 
 
