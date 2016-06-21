@@ -1,0 +1,189 @@
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+
+<dom-module id="app-costs">
+    <template>
+        <style is="custom-style" include="headings"></style>
+        <style>
+        :host {
+            display: flex;
+            transition: var(--material-curve-320);
+            transform: translate(0, 60px);
+            opacity: 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        :host(.active) {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+
+        h3 {
+            text-transform: uppercase;
+            font-size: 13px;
+            color: rgba(0, 0, 0, 0.54);
+            padding: 0 10px;
+            border-bottom: 1px solid #eee;
+        }
+        paper-material {
+            overflow: hidden !important;
+        }
+
+        .list-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+        }
+
+        .list-item:last-child {
+            border-bottom: 0 none;
+            padding-top: 16px;
+        }
+
+        .list-item.red .machine {
+            color: var(--red-color);
+        }
+        .list-item .expression > iron-icon {
+            color: rgba(0,0,0,0.32);
+            margin-right: 4px;
+        }
+
+        .list-item.red .expression > iron-icon {
+            color: var(--red-color);
+        }
+
+        .list-item.green .expression > iron-icon {
+            color: green;
+        }
+
+        .flexchild {
+            @apply(--layout-flex);
+        }
+        .flex3child {
+            @apply(--layout-flex-3);
+        }
+
+        .block {
+            transform: translate(0, 50px);
+            opacity: 0;
+            transition: all 700ms 320ms;
+            transition-timing-function: var(--material-curve-320);
+            display: flex;
+            flex-direction: column;
+            flex: 1 100%;
+            height: inherit;
+        }
+
+        :host(.active) .block {
+            transform: translate(0, 0);
+            opacity: 1;
+            height: 100%;
+        }
+
+        span.rule-condition {
+            font-weight: normal;
+        }
+
+        span.time {
+            float: right;
+        }
+        a.main-section {
+            min-width: 150px;
+            cursor: ;
+        }
+        </style>
+
+        <div class="flexchild">
+            <a href="#" class="main-section">
+                <section-tile name="cost" color="#FFFF8D" icon="" count="[[totalCost]]"></section-tile>
+            </a>
+        </div>
+        <paper-material class="flex3child">
+            <h3>Top 3 cloud cost</h3>
+            <div class="block">
+                <template is="dom-repeat" items="[[topClouds]]">
+                    <div class="list-item layout horizontal wrap">
+                        <div class="flexchild expression">
+                            <span class="machine flexchild"> [[item.name]] | [[item.machinesCount]] machines | $[[item.cost]]</span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </paper-material>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'app-costs',
+    properties: {
+        model: {
+            type: Object
+        },
+        sections: {
+            type: Object
+        },
+        totalCost: {
+            type: Number,
+            computed: '_computeTotalCost(model.machinesArray.*)'
+        },
+        topClouds: {
+            type: Array,
+            computed: '_computeTopClouds(model.cloudsArray.*, model.machinesArray.*)'
+        }
+    },
+    observers: [
+        '_incidents(model.incidents.*)'
+    ],
+    attached: function() {
+        var rows = this.parentNode.querySelectorAll('block');
+        var index = Array.prototype.indexOf.call(rows, this);
+        setTimeout(function() {
+            this.classList.add('active');
+        }.bind(this), (index + 1) * 50);
+    },
+    _computeTotalCost: function(machines) {
+        var cost = 0;
+        if (machines.base.length > 0){
+            // map machines costs in an array
+            var machinesWithCost = this.model.machinesArray.map(function(m){
+                return m.extra.indicative_cost_per_month ? m.extra.indicative_cost_per_month : 0;
+            });
+            // add all cost values
+            cost = machinesWithCost.reduce(function(previous, current, index){
+                return previous + current;
+            });
+        }
+        return Math.round(cost);
+    },
+    _computeTopClouds: function(clouds, machines) {
+        var topCloudsArray = [];
+        if (clouds.base.length > 0) {
+            this.model.cloudsArray.forEach(function(c){
+                var cloudCost = 0;
+                var machinesCount = 0;
+                if (c.machines) {
+                    for (var m in c.machines) {
+                        if (c.machines[m].extra && c.machines[m].extra.indicative_cost_per_month) {
+                            cloudCost = cloudCost + c.machines[m].extra.indicative_cost_per_month
+                        }
+                        machinesCount ++;
+                    }
+                }
+                var cloud = {};
+                    cloud.name = c.title;
+                    cloud.cost = Math.round(cloudCost);
+                    cloud.machinesCount = machinesCount;
+                topCloudsArray.push(cloud);
+            });
+        }
+        // sort by cost
+        topCloudsArray.sort(function (a, b) {
+            if (a.cost > b.cost) { return -1; }
+            if (a.cost < b.cost) { return 1; }
+            return 0;
+        });
+        return topCloudsArray.slice(0,3);
+    }
+});
+</script>

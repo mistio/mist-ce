@@ -8,6 +8,7 @@
 
 <link rel="import" href="../section-tile/section-tile.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
+<link rel="import" href="../app-costs/app-costs.html">
 <link rel="import" href="../app-forms/app-forms.html">
 <link rel="import" href="../app-fab/app-fab.html">
 <link rel="import" href="../logs/log-list.html">
@@ -68,10 +69,12 @@
             /*margin-bottom: 1em;*/
             margin-bottom: 32px;
         }
+        .costs,
         .incidents {
-           margin-bottom: 1em;
-           display: block;
-           width: 100%;
+           /*margin-bottom: 1em;*/
+            margin-bottom: 32px;
+            display: block;
+            width: 100%;
         }
         a.main-section {
             min-width: 150px;
@@ -93,6 +96,10 @@
             align-items: flex-start;
             flex-direction: column;
             flex: 1 50%;
+        }
+        .logs {
+            width: 100%;
+            flex: 1 100%;
         }
         log-list,
         .graphs {
@@ -181,7 +188,7 @@
             </template> -->
             <div class="columns">
                 <div id="leftcolumn" class="left">
-                    <template is="dom-if" if="[[model.monitoring]]">
+                    <template is="dom-if" if="[[hasIncidents]]">
                         <div class="incidents">
                             <app-incidents model="[[model]]" sections="[[sections]]">
                             </app-incidents>
@@ -218,9 +225,15 @@
                         <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                     </paper-material>
                 </div>
-                <paper-material id="rightcolumn" class="left logs">
-                    <log-list></log-list>
-                </paper-material>
+                <div class="left">
+                    <div class="costs">
+                        <app-costs model="[[model]]" sections="[[sections]]">
+                        </app-costs>
+                    </div>
+                    <paper-material id="rightcolumn" class="logs">
+                        <log-list></log-list>
+                    </paper-material>
+                </div>
             </div>
 
             <div class="absolute-bottom-right">
@@ -258,6 +271,11 @@ Polymer({
         replaceTargets: {
             type: Object,
             computed: '_computeReplaceTargets(model.monitoring)'
+        },
+        hasIncidents: {
+            type: Boolean,
+            computed: '_computeHasIncidents(model.incidents.*)',
+            value: false
         },
         openedCloud: String
     },
@@ -348,6 +366,14 @@ Polymer({
     },
     isOffline: function(cloud) {
         return cloud.state == 'offline' && 'offline';
+    },
+    _computeHasIncidents: function(incidents){
+        if (incidents.base){
+            return incidents.base.length > 0 ? true : false;
+        }
+        else {
+            return false;
+        }
     },
     _computeProviderLogo: function(className) {
         return '../assets/providers/provider-' + className.split('_')[0] + '.png';
