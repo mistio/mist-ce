@@ -135,9 +135,6 @@ Polymer({
             computed: '_computeTopClouds(model.cloudsArray.*, model.machinesArray.*)'
         }
     },
-    observers: [
-        '_incidents(model.incidents.*)'
-    ],
     attached: function() {
         var rows = this.parentNode.querySelectorAll('block');
         var index = Array.prototype.indexOf.call(rows, this);
