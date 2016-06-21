@@ -382,12 +382,13 @@ Polymer({
     itemsChanged: function (changeRecord) {
         var that = this;
         // update height of list depending on number of items
-        var topOfset = 150;
-        var wh = window.innerHeight - topOfset;
-        var itemHeight = 64;
+        var topOfset = 142;
+        var wh = document.getElementById('mainPanel').offsetHeight - 24 - 54; //#mainPanel height - top padding - header height
+        var itemHeight = 64 + 2; //list item height + border + 1px
         var criticalNumofItems = Math.floor(wh/itemHeight) - 1;
         
-        console.log('criticalNumofItems',criticalNumofItems, 'wh', wh);
+        // console.log( wh, ' / ', itemHeight, ' -1 = ' , criticalNumofItems, '|', this.items.length, ' * 64 = ', itemHeight * this.items.length );
+
         if (that.items.length > criticalNumofItems){
             this.vpHeight = 'height:'+ wh +'px;';
         }
@@ -416,7 +417,7 @@ Polymer({
             if (that.get('items.length') != that.get('selectedItems.length'))
                 that.set('allselected', false);
 
-        }, 300);
+        }, 50);
     },
 
     selectedItemsChanged: function (changeRecord) {
