@@ -83,15 +83,29 @@
         section-tile ::content h2 {
             color: rgba(0,0,0,0.54) !important;
         }
+        section-tile {
+            position: relative;
+        }
+        .sub {
+            padding: 8px;
+            line-height: 2em;
+            font-size: 0.9em;
+            color: rgba(0,0,0,0.32);
+            /*position: absolute;
+            bottom: 0;
+            left: 0;*/
+        }
         </style>
 
         <div class="flex">
             <div class="main-section">
-                <section-tile name="total cost" color="#FFFF8D" icon="" count="$[[totalCost]]"></section-tile>
+                <section-tile name="total cost *" color="#FFFF8D" icon="" count="$[[totalCost]]">
+                    <span class="sub">* current monthly rate</span>
+                </section-tile>
             </div>
         </div>
         <paper-material class="flex3child">
-            <h3>Top 3 clouds per monthly cost </h3>
+            <h3>Top 3 clouds per monthly cost</h3>
             <table>
                 <template is="dom-repeat" items="[[topClouds]]">
                     <tr>
@@ -100,7 +114,7 @@
                         <td class="text-right cost">$[[item.cost]]</td>
                     </tr>
                 </template>
-            </table>
+            </table>            
         </paper-material>
     </template>
 </dom-module>
