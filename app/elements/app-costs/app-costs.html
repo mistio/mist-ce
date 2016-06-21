@@ -33,46 +33,19 @@
 
         .list-item {
             border-bottom: 1px solid #eee;
-            padding: 10px;
+            padding: 6px 10px;
+            min-width: 33%;
         }
 
         .list-item:last-child {
             border-bottom: 0 none;
             padding-top: 16px;
         }
-
-        .list-item.red .machine {
-            color: var(--red-color);
-        }
-        .list-item .expression > iron-icon {
-            color: rgba(0,0,0,0.32);
-            margin-right: 4px;
-        }
-
-        .list-item.red .expression > iron-icon {
-            color: var(--red-color);
-        }
-
-        .list-item.green .expression > iron-icon {
-            color: green;
-        }
-
-        .flexchild {
+        .flex {
             @apply(--layout-flex);
         }
         .flex3child {
             @apply(--layout-flex-3);
-        }
-
-        .block {
-            transform: translate(0, 50px);
-            opacity: 0;
-            transition: all 700ms 320ms;
-            transition-timing-function: var(--material-curve-320);
-            display: flex;
-            flex-direction: column;
-            flex: 1 100%;
-            height: inherit;
         }
 
         :host(.active) .block {
@@ -80,36 +53,54 @@
             opacity: 1;
             height: 100%;
         }
-
-        span.rule-condition {
-            font-weight: normal;
+        table {
+            table-layout: fixed;
+            width: 100%;
+            padding: 0 6px;
         }
-
-        span.time {
-            float: right;
+        table tr {
+            border-bottom: 1px solid #eee;
         }
-        a.main-section {
-            min-width: 150px;
-            cursor: ;
+        table td {
+            width: 30%;
+            padding: 4px 6px;
+        }
+        .name, .cost {
+            font-weight: 500;
+        }
+        .count {
+            color: rgba(0,0,0,0.54);
+        }
+        .name, .count {
+            width: 30%;
+        }
+        .text-right {
+            text-align: right;
+        }
+        section-tile ::content paper-material {
+            background-color: #ffff8d;
+        }
+        section-tile ::content h2 {
+            color: rgba(0,0,0,0.54) !important;
         }
         </style>
 
-        <div class="flexchild">
-            <a href="#" class="main-section">
-                <section-tile name="cost" color="#FFFF8D" icon="" count="[[totalCost]]"></section-tile>
-            </a>
+        <div class="flex">
+            <div class="main-section">
+                <section-tile name="total cost" color="#FFFF8D" icon="" count="$[[totalCost]]"></section-tile>
+            </div>
         </div>
         <paper-material class="flex3child">
-            <h3>Top 3 cloud cost</h3>
-            <div class="block">
+            <h3>Top 3 clouds per monthly cost </h3>
+            <table>
                 <template is="dom-repeat" items="[[topClouds]]">
-                    <div class="list-item layout horizontal wrap">
-                        <div class="flexchild expression">
-                            <span class="machine flexchild"> [[item.name]] | [[item.machinesCount]] machines | $[[item.cost]]</span>
-                        </div>
-                    </div>
+                    <tr>
+                        <td class="name"">[[item.name]] </td>
+                        <td class="count">[[item.machinesCount]] machines </td>
+                        <td class="text-right cost">$[[item.cost]]</td>
+                    </tr>
                 </template>
-            </div>
+            </table>
         </paper-material>
     </template>
 </dom-module>

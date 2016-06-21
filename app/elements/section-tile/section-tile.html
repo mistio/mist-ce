@@ -38,14 +38,16 @@
             opacity: 0;
             transition: all 600ms 320ms;
             transition-timing-function: var(--material-curve-320);
-            text-transform: uppercase;
-            margin-left: 40px;
+            text-transform: uppercase;            
             display: inline;
             font-size: 16px;
             font-weight: 400;
             line-height: 36px;
+            margin-left: 8px;
         }
-        
+        h3.icon-true {
+            margin-left: 40px;
+        }
         :host(.active) h3 {
             transform: translate(0, 0);
             opacity: 1;
@@ -78,7 +80,10 @@
         }
         </style>
         <paper-material>
-            <iron-icon icon="[[icon]]"></iron-icon><h3 class="title">[[name]]</h3>
+            <template is="dom-if" if="[[icon]]">
+                <iron-icon icon="[[icon]]"></iron-icon>
+            </template>
+            <h3 class$="title icon-[[hasIcon]]">[[name]]</h3>
             <h2 class="count">[[count]]</h2>
             <!-- <theme-color color="[[statecolor]]" class="vertical layout" themed-reverse>
             </theme-color> -->
@@ -102,6 +107,12 @@ Polymer({
         statecolor: {
             type: String,
             computed: "_computeStateColor(count, color)"
+        },
+        icon: String,
+        hasIcon: {
+            type: Boolean,
+            value: true,
+            computed: "_computeHasIcon(icon)"
         }
     },
     _computeStateColor: function (count, color){
@@ -113,6 +124,12 @@ Polymer({
         setTimeout(function() {
             this.classList.add('active');
         }.bind(this), (index + 1) * 500);
+    },
+    _computeHasIcon: function (icon) {
+        if (icon)
+            return true;
+        else
+            return false;
     }
 });
 </script>
