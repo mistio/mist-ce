@@ -82,6 +82,7 @@
         }
         section-tile ::content h2 {
             color: rgba(0,0,0,0.54) !important;
+            padding: 23px 0px !important;
         }
         section-tile {
             position: relative;
@@ -91,9 +92,6 @@
             line-height: 2em;
             font-size: 0.9em;
             color: rgba(0,0,0,0.32);
-            /*position: absolute;
-            bottom: 0;
-            left: 0;*/
         }
         </style>
 
@@ -156,6 +154,12 @@ Polymer({
             });
             // add all cost values
             cost = machinesWithCost.reduce(function(previous, current, index){
+                if (typeof previous != 'number'){
+                    previous = parseInt(previous);
+                }
+                if (typeof current != 'number'){
+                    current = parseInt(current);
+                }
                 return previous + current;
             });
         }
@@ -170,7 +174,14 @@ Polymer({
                 if (c.machines) {
                     for (var m in c.machines) {
                         if (c.machines[m].extra && c.machines[m].extra.indicative_cost_per_month) {
-                            cloudCost = cloudCost + c.machines[m].extra.indicative_cost_per_month
+                            var mcost;
+                            if (typeof c.machines[m].extra.indicative_cost_per_month != 'number'){
+                                mcost = parseInt(c.machines[m].extra.indicative_cost_per_month);
+                            }
+                            else {
+                                mcost = c.machines[m].extra.indicative_cost_per_month;
+                            }
+                            cloudCost = cloudCost + mcost;
                         }
                         machinesCount ++;
                     }
