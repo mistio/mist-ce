@@ -388,7 +388,7 @@ Polymer({
         // update height of list depending on number of items
         var topOfset = 142;
         var wh = document.getElementById('mainPanel').offsetHeight - 24 - 54; //#mainPanel height - top padding - header height
-        var itemHeight = 64 + 2; //list item height + border + 1px
+        var itemHeight = 64 + 1; //list item height + border
         var criticalNumofItems = Math.floor(wh/itemHeight) - 1;
         
         // console.log( wh, ' / ', itemHeight, ' -1 = ' , criticalNumofItems, '|', this.items.length, ' * 64 = ', itemHeight * this.items.length );
