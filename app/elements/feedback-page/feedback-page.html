@@ -69,7 +69,7 @@
                 font-size: 12px;
             }
 
-            :host /deep/ paper-step:not(.iron-selected) .hover-target:hover+ .stepper-circle {
+            :host /deep/ paper-step:not(.iron-selected) .hover-target:hover + .stepper-circle {
                 background-color: #2196F3;
             }
 
@@ -237,9 +237,36 @@
             Polymer({
                 is: 'feedback-page',
                 properties: {
+                    model: {
+                        type: Object,
+                        notify: true
+                    },
                     user: {
                         type: Object,
-                        computed: "_computeUser(user)"
+                    },
+                    hasExtraHosted: {
+                      type:Boolean,
+                      value: false
+                    },
+                    hasExtraAlternative: {
+                      type:Boolean,
+                      value: false
+                    },
+                    hasExtraDiscover: {
+                      type:Boolean,
+                      value: false
+                    },
+                    extraHosted: {
+                      type: Number,
+                      value: null
+                    },
+                    extraDiscover: {
+                      type: Number,
+                      value: null
+                    },
+                    extraAlternative: {
+                      type: Number,
+                      value: null
                     },
                     pageFirst: {
                         type: Boolean,
@@ -451,29 +478,6 @@
                     '_discoverChanged(user.discover)',
                     '_alternativeChanged(user.alternative)'
                 ],
-                _computeUser: function(user) {
-                    if (user) {
-                        return {
-                            firstName: user.first_name,
-                            lastName: user.last_name,
-                            country: user.feedback.country,
-                            companyName: user.feedback.company_name,
-                            numberOfPeople: user.feedback.number_of_people,
-                            numberOfServers: user.feedback.number_of_servers,
-                            discover: user.feedback.discover,
-                            hosted: user.feedback.hosted,
-                            hasExtraHosted: false,
-                            extraHosted: null,
-                            hasExtraDiscover: false,
-                            extraDiscover: null,
-                            satisfaction: user.feedback.satisfied,
-                            alternative: user.feedback.alternatives,
-                            hasExtraAlternative: false,
-                            extraAlternative: null,
-                            improve: user.feedback.improve
-                        };
-                    }
-                },
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
                 },
