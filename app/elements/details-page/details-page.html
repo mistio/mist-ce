@@ -93,8 +93,7 @@
 
                 properties: {
                     user: {
-                        type: Object,
-                        computed: "_computeUser(user)"
+                        type: Object
                     },
                     countriesOptions: {
                         type: Array,
@@ -199,18 +198,6 @@
                         computed: '_computeShowProgress(sendingData)'
                     }
                 },
-                _computeUser: function(user) {
-                    if (user) {
-                        return {
-                            firstName: user.first_name,
-                            lastName: user.last_name,
-                            country: user.feedback.country,
-                            companyName: user.feedback.company_name,
-                            numberOfPeople: user.feedback.number_of_people,
-                            numberOfServers: user.feedback.number_of_servers
-                        };
-                    }
-                },
                 _computeFormReady: function(firstName, lastName, country, companyName, numberOfPeople, numberOfServers, sendingData) {
                     var formReady = false;
 
@@ -227,16 +214,16 @@
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
                 },
-                _submitForm: function(e) {
+                _submitForm: function(e, user) {
                     var payload = {
                         action: 'update_details',
-                        first_name: this.user.firstName,
-                        last_name: this.user.lastName,
-                        last_name: this.user.lastName,
-                        company_name: this.user.companyName,
-                        country: this.user.country,
-                        number_of_servers: this.user.numberOfServers,
-                        number_of_people: this.user.numberOfPeople
+                        first_name: user.firstName,
+                        last_name: user.lastName,
+                        last_name: user.lastName,
+                        company_name: user.companyName,
+                        country: user.country,
+                        number_of_servers: user.numberOfServers,
+                        number_of_people: user.numberOfPeople
                     };
 
                     this.set('sendingData', true);
