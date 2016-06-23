@@ -1,6 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../app-togglable/app-togglable-list.html">
+
 <link rel="import" href="team-edit.html">
 <link rel="import" href="team-add.html">
 
@@ -9,164 +13,149 @@
         <style is="custom-style" include="lists"></style>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
+        :host {
+            display: block;
+        }
 
-            paper-material {
-                display: block;
-                padding: 24px;
-            }
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
 
-            paper-material.no-pad {
-                padding: 0;
-            }
+        paper-material.no-pad {
+            padding: 0;
+        }
 
-            paper-menu-button paper-button {
-                display: block;
-            }
+        paper-menu-button paper-button {
+            display: block;
+        }
 
-            .flex-horizontal-with-ratios {
-                @apply(--layout-horizontal);
-                align-content: stretch;
-            }
+        .flex-horizontal-with-ratios {
+            @apply(--layout-horizontal);
+            align-content: stretch;
+        }
 
-            .flexchild {
-                @apply(--layout-flex);
-            }
+        .flexchild {
+            @apply(--layout-flex);
+        }
 
-            a {
-                color: black;
-                text-decoration: none;
-            }
+        a {
+            color: black;
+            text-decoration: none;
+        }
 
-            .paper-header [paper-drawer-toggle] {
-                margin-left: 10px;
-            }
+        .paper-header [paper-drawer-toggle] {
+            margin-left: 10px;
+        }
 
-            .paper-header {
-                @apply(--layout-horizontal);
-            }
+        .paper-header {
+            @apply(--layout-horizontal);
+        }
 
-            .paper-header {
-                height: 60px;
-                font-size: 24px;
-                line-height: 60px;
-                padding: 0 10px;
-                color: white;
-                transition: height 0.2s;
-                transition: font-size 0.2s;
-            }
+        .paper-header {
+            height: 60px;
+            font-size: 24px;
+            line-height: 60px;
+            padding: 0 10px;
+            color: white;
+            transition: height 0.2s;
+            transition: font-size 0.2s;
+        }
 
-            .paper-header.tall {
-                height: 320px;
-                font-size: 16px;
-            }
+        .paper-header.tall {
+            height: 320px;
+            font-size: 16px;
+        }
 
-            .paper-header h2 {
-                margin-left: 20px;
-                @apply(--layout-flex);
-                text-transform: capitalize;
-            }
+        .paper-header h2 {
+            margin-left: 20px;
+            @apply(--layout-flex);
+            text-transform: capitalize;
+        }
 
-            .paper-header .toggleViewButton {
-                --paper-icon-button-ink-color: transparent;
-            }
+        .paper-header .toggleViewButton {
+            --paper-icon-button-ink-color: transparent;
+        }
 
-            .paper-header .cartButton {
-                margin-right: 10px;
-            }
+        .paper-header .cartButton {
+            margin-right: 10px;
+        }
 
-            paper-icon-button {
-                transition: all 200ms;
-            }
+        paper-icon-button {
+            transition: all 200ms;
+        }
 
-            paper-icon-button.active-sort {
-                transform: rotate(180deg);
-            }
+        paper-icon-button.active-sort {
+            transform: rotate(180deg);
+        }
 
-            paper-icon-button.active-sort::content iron-icon {
-                color: #D48900 !important;
-            }
+        paper-icon-button.active-sort::content iron-icon {
+            color: #D48900 !important;
+        }
 
-            app-bar .menu-icon {
-                margin-right: 15px;
-            }
+        [size=xs] > * {
+            display: none;
+        }
 
-            [size=xs] > * {
-                display: none;
-            }
+        [size=xs] app-sidebar {
+            min-width: 100%;
+            height: auto;
+        }
 
-            [size=xs] app-sidebar {
-                min-width: 100%;
-                height: auto;
-            }
+        paper-icon-bottom.bottom {
+            padding-right: 8px;
+        }
+        .subhead {
+            box-sizing: border-box;
+            position: absolute;
+            width: 100%;
+            left: 0;
+            height: 57px;
+            bottom: -57px;
+            right: 0;
+            z-index: 9;
+            color: rgba(0,0,0,0.87);
+            font-size: 15px;
+            line-height: 24px;
+        }
+        .content {
+            margin-top: 57px;
+            padding-bottom: 80px
+        }
+        paper-header-panel ::content #dropShadow {
+            top: 56px;
+        }
+        paper-toolbar ::content #bottomBar .right-actions{
+            transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
+        }
+        paper-toolbar:not(.tall) ::content #bottomBar .right-actions{
+            margin-right: 70px;
+        }
 
-            paper-icon-bottom.bottom {
-                padding-right: 8px;
-            }
-
-            .subhead {
-                box-sizing: border-box;
-                position: absolute;
-                width: 100%;
-                left: 0;
-                height: 57px;
-                bottom: -57px;
-                right: 0;
-                z-index: 9;
-                color: rgba(0, 0, 0, 0.87);
-                font-size: 15px;
-                line-height: 24px;
-            }
-
-            .content {
-                margin-top: 57px;
-                padding-bottom: 80px
-            }
-
-            paper-header-panel::content #dropShadow {
-                top: 56px;
-            }
-
-            paper-toolbar::content #bottomBar .right-actions {
-                transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
-            }
-
-            paper-toolbar:not(.tall)::content #bottomBar .right-actions {
-                margin-right: 70px;
-            }
-
-            .section {
-                padding-top: 16px;
-            }
-
-            .red {
-                color: var(--red-color);
-                background-color: transparent;
-            }
-
-            .required {
-                font-size: 0.9em;
-            }
-
-            .resource-head {
-                font-weight: 500;
-                padding: 8px 16px;
-                opacity: 0.87;
-                border-bottom: 1px solid #ddd;
-                margin-bottom: 0;
-            }
-
-            .title .up {
-                text-transform: uppercase;
-            }
-
-            .width100 {
-                width: 100%;
-            }
+        .section {
+            padding-top: 16px;
+        }
+        .red {
+            color: var(--red-color);
+            background-color: transparent;
+        }
+        .required {
+            font-size: 0.9em;
+        }
+        .resource-head {
+            font-weight: 500;
+            padding: 8px 16px;
+            opacity: 0.87;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 0;
+        }
+        .title .up {
+            text-transform: uppercase;
+        }
+        .width100 {
+            width: 100%;
+        }
         </style>
-
 
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">

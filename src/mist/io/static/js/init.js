@@ -377,7 +377,7 @@ var setupMainChannel = function(socket, callback) {
                 name: organization.name
             };
             var members = organization.members.filter(function(member) {
-                return team.members.indexOf(member.id) > -1;
+                return team.members.indexOf(member.id) > -1 || team.members.indexOf(member) > -1;
             });
             team.members = members;
             teams.pushObject(team);

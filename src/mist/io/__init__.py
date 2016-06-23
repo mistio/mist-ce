@@ -82,6 +82,7 @@ def add_routes(configurator):
                            '/api/v1/clouds/{cloud}/machines/{machine}/tags')
     configurator.add_route('api_v1_machine_tag',
                            '/api/v1/clouds/{cloud}/machines/{machine}/tags/{tag}')
+    configurator.add_route('api_v1_tags', '/api/v1/tags')
     configurator.add_route('api_v1_probe',
                            '/api/v1/clouds/{cloud}/machines/{machine}/probe')
 

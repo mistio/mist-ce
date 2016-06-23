@@ -1,33 +1,35 @@
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
 <dom-module id="onb-element">
     <template>
         <style is="custom-style" include="headings"></style>
-		<style is="custom-style" include="shared-styles">
-		:host {
-            @apply(--layout-vertical);
-            justify-content: stretch;
-        }
-        .clouds-image {
-            background: url(../../assets/onboarding/clouds.svg) center center no-repeat transparent;
-            background-size: 50%;
-            width: 100%;
-            height: 224px;
-        }
-        .call-onboard {
-            text-align: center;
-        }
-        .mounts-image {
-            background: url(../../assets/onboarding/mount.svg)  center bottom no-repeat transparent;
-            background-size: 100%;
-            width: 100%;
-            height: 250px;
-        }
-        paper-material {
-			background-color: #f1f1f1;
-			padding: 0;
-        }
-		</style>
+        <style is="custom-style" include="shared-styles">
+            :host {
+                @apply(--layout-vertical);
+                justify-content: stretch;
+            }
+            .clouds-image {
+                background: url(../../assets/onboarding/clouds.svg) center center no-repeat transparent;
+                background-size: 50%;
+                width: 100%;
+                height: 224px;
+            }
+            .call-onboard {
+                text-align: center;
+            }
+            .mounts-image {
+                background: url(../../assets/onboarding/mount.svg)  center bottom no-repeat transparent;
+                background-size: 100%;
+                width: 100%;
+                height: 250px;
+            }
+            paper-material {
+                background-color: #f1f1f1;
+                padding: 0;
+            }
+        </style>
 
-		<paper-material elevation="1">
+        <paper-material elevation="1">
             <div class="onb">
                 <div class="clouds-image"></div>
                 <div class="call-onboard">
@@ -37,78 +39,79 @@
                 <div class="mounts-image"></div>
             </div>
         </paper-material>
-	</template>
-	<script>
-	Polymer({
-	    is: 'onb-element',
-	    enableCustomStyleProperties: true,
-	    properties: {
-	        model: {
-	            type: Object,
-	            notify: true
-	        },
-	        onb: {
-	            type: Array,
-	            value: [
-	            {
-	                state : 0,
-	                description : 'user is onboard',
-	                textMessage: '',
-	                promptButton: ''
-	            },
-	            {
-	                state : 10,
-	                description : 'user has no data at all',
-	                textMessage: "You have no data.",
-	                promptButton: 'Add your first cloud'
-	            },
-	            {
-	                state : 20,
-	                description : 'user has added a cloud, has no monitoring, no rules',
-	                textMessage: "You have added your first cloud!",
-	                promptButton: 'Add monitoring'
-	            },
-	            {
-	                state : 21,
-	                description : 'user has added cloud and monitoring, has no rules',
-	                textMessage: "You have added monitoring.",
-	                promptButton: 'Set your rules'
-	            },
-	            {
-	                state : 30,
-	                description : 'user has added other, but no clouds',
-	                textMessage: "You have no clouds.",
-	                promptButton: 'Add your first cloud'
-	            }
-	        ]
-	        },
-	        onbstate : {
-	            type: Number,
-	            value: 0,
-	            notify: true
-	        },
-	        state: {
-	            type:Object,
-	            value: {},
-	            computed: 'getStateFromNum(onbstate)',
-	            notify: true
-	        }
-	    },
-	    observers: [
-	             'updateOnbTexts(state)'
-	    ],
-	    ready: function() {},
-	    getStateFromNum : function(onbstate){
-	        var statenum = onbstate;
-	        var state = this.onb.find(function(st, statenum) {
-	            return st.state == onbstate;
-	        });
-	        return state;
-	    },
-	    updateOnbTexts: function(state){
-	        this.$.onbtext.textContent = this.state.textMessage;
-	        this.$.onbbutton.textContent = this.state.promptButton;
-	    }
-	});
-	</script>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'onb-element',
+            enableCustomStyleProperties: true,
+            properties: {
+                model: {
+                    type: Object,
+                    notify: true
+                },
+                onb: {
+                    type: Array,
+                    value: [
+                    {
+                        state : 0,
+                        description : 'user is onboard',
+                        textMessage: '',
+                        promptButton: ''
+                    },
+                    {
+                        state : 10,
+                        description : 'user has no data at all',
+                        textMessage: "You have no data.",
+                        promptButton: 'Add your first cloud'
+                    },
+                    {
+                        state : 20,
+                        description : 'user has added a cloud, has no monitoring, no rules',
+                        textMessage: "You have added your first cloud!",
+                        promptButton: 'Add monitoring'
+                    },
+                    {
+                        state : 21,
+                        description : 'user has added cloud and monitoring, has no rules',
+                        textMessage: "You have added monitoring.",
+                        promptButton: 'Set your rules'
+                    },
+                    {
+                        state : 30,
+                        description : 'user has added other, but no clouds',
+                        textMessage: "You have no clouds.",
+                        promptButton: 'Add your first cloud'
+                    }
+                ]
+                },
+                onbstate : {
+                    type: Number,
+                    value: 0,
+                    notify: true
+                },
+                state: {
+                    type:Object,
+                    value: {},
+                    computed: 'getStateFromNum(onbstate)',
+                    notify: true
+                }
+            },
+            observers: [
+                     'updateOnbTexts(state)'
+            ],
+            ready: function() {},
+            getStateFromNum : function(onbstate){
+                var statenum = onbstate;
+                var state = this.onb.find(function(st, statenum) {
+                    return st.state == onbstate;
+                });
+                return state;
+            },
+            updateOnbTexts: function(state){
+                this.$.onbtext.textContent = this.state.textMessage;
+                this.$.onbbutton.textContent = this.state.promptButton;
+            }
+        });
+    </script>
 </dom-module>

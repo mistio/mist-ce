@@ -390,7 +390,7 @@ class MainConnection(MistConnection):
                 self.list_stacks()
             if 'teams' in sections:
                 self.list_teams()
-            if 'tags' in section():
+            if 'tags' in sections:
                 self.list_tags()
             if 'monitoring' in sections:
                 self.check_monitoring()

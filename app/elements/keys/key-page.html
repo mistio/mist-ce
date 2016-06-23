@@ -1,10 +1,16 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
+<link rel="import" href="../tags/tags-list.html">
+
 <link rel="import" href="key-edit.html">
 
 <dom-module id="key-page">
     <template>
         <style is="custom-style" include="single-page"></style>
+        <style is="custom-style" include="tags-and-labels"></style>
         <style include="shared-styles">
             :host {
                 display: block;
@@ -83,10 +89,6 @@
                 color: #D48900 !important;
             }
 
-            app-bar .menu-icon {
-                margin-right: 15px;
-            }
-
             [size=xs] > * {
                 display: none;
             }
@@ -115,6 +117,7 @@
                 border-color: #eeedeb;
                 color: rgba(0, 0, 0, 0.54);
                 white-space: normal;
+                text-align: left;
             }
 
             #keyPublicContainer textarea {
@@ -162,7 +165,17 @@
                 font-weight: 700;
                 margin-right: 16px;
             }
+            /* TODO: better */
+            h4.id.tags {
+                padding-left: 36px;
+            }
 
+            .tag {
+                padding: 0.5em;
+                display: inline-block;
+                vertical-align: middle;
+            }
+            /**/
             .head paper-button {
                 flex: none !important;
                 display: inline-block;
@@ -209,7 +222,9 @@
         </style>
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
-                <a class="icon" href="/keys"><iron-icon icon="[[section.icon]]"></iron-icon></a>
+                <a class="icon" href="/keys">
+                    <iron-icon icon="[[section.icon]]"></iron-icon>
+                </a>
                 <div class="title flex">
                     <h2>
                         [[key.name]] <iron-icon icon="star" hidden$="[[!isDefault]]"></iron-icon>
@@ -226,7 +241,10 @@
                 </div>
                 <div class="item-actions">
                     <paper-button on-tap="_makeDefaultKey" hidden$="[[isDefault]]" class="simple">make default</paper-button>
-                    <paper-button on-tap="_deleteKey" class="simple">delete <iron-icon icon="delete"></iron-icon></paper-button>
+                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>
+                    <paper-button on-tap="_deleteKey" class="simple">delete
+                        <iron-icon icon="delete"></iron-icon>
+                    </paper-button>
                 </div>
             </paper-material>
 
@@ -234,6 +252,22 @@
                 <!-- <paper-material></paper-material> -->
                 <paper-material>
                     <h4 class="id">Key ID:</h4><span class="id">[[key.id]]</span>
+                    <h4 class="id tags">Tags
+                        <template is="dom-if" if="[[key.tags]]">
+                            <span class="id">([[key.tags.length]])</span>
+                        </template>
+                        <template is="dom-if" if="[[!key.tags]]">
+                            <span class="id">(0)</span>
+                        </template>
+                        :
+                    </h4>
+                    <template is="dom-if" if="[[key.tags]]">
+                        <template is="dom-repeat" items="[[key.tags]]">
+                            <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
+                        </template>
+                    </template>
+                </paper-material>
+                <paper-material>
                     <div class="head">
                         <h4 class="key">Public Key</h4>
                         <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="right link">Copy <span class="wide">public key</span>
@@ -260,7 +294,7 @@
                         <paper-button hidden$="[[visiblePrivateKey]]" id="showPrivateKeybtn" on-tap="showPrivateKey">
                             <iron-icon icon="icons:visibility"></iron-icon> View Private Key</paper-button>
                         <textarea hidden$="[[!visiblePrivateKey]]" id="keyPrivate">
-                            [[privateKey]]
+                        [[privateKey]]
                         </textarea>
                     </div>
                 </paper-material>
@@ -273,7 +307,7 @@
                                 <iron-icon icon='hardware:laptop'></iron-icon> <a href="[[getMachineUrl(machine)]]" class="machine">[[getMachineName(machine)]]</a>
                                 <span class="machine-info">
                                     <span hidden="[[!machine.1]]">: id: [[machine.1]], </span>
-                                    <span hidden="[[!machine.3]]">image: [[machine.3]]</span>
+                                <span hidden="[[!machine.3]]">image: [[machine.3]]</span>
                                 </span>
                             </li>
                         </template>
@@ -292,6 +326,7 @@
         <key-edit key="[[key]]"></key-edit>
         <dialog-element></dialog-element>
         <paper-toast></paper-toast>
+        <tags-list resource="key"></tags-list>
     </template>
     <script>
         (function() {
@@ -362,7 +397,7 @@
                     }
                 },
                 observers: [
-                    'update(params)'
+                    'update(params, model.keys.*)'
                 ],
                 listeners: {
                     'confirmation': '_deleteKeyEventResponse',
@@ -478,6 +513,13 @@
                 },
                 _handleKeyMakeDefaultAjaxResponse: function(e) {
                     this._showToast(this.key.name + ' has become your default Key!');
+                },
+                _editTags: function() {
+                    var el = this.querySelector('tags-list'),
+                    items = [];
+                    items.push(this.key);
+                    el.items = items;
+                    el._openDialog();
                 },
                 _deleteKey: function(e) {
                     this._showDialog({

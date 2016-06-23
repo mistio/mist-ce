@@ -8,6 +8,7 @@ import base64
 import requests
 import subprocess
 import re
+import calendar
 import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError, DoesNotExist
 from time import sleep, time
@@ -39,7 +40,7 @@ import ansible.constants
 # try:
 # from mist.core.user.models import User
 from mist.core.tag.models import Tag
-from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+from mist.core.cloud.models import Cloud, Machine, KeyAssociation, CloudSize, CloudImage
 from mist.core.keypair.models import Keypair
 from mist.core import config
 # except ImportError:
@@ -1635,6 +1636,21 @@ def list_machines(user, cloud_id):
                    'last_seen': str(machine_entry.last_seen)
                         if machine_entry and machine_entry.last_seen else '',
                    'extra': m.extra}
+        try:
+            machine_cost = machine_cost_calculator(m)
+        except:
+            machine_cost = {}
+        indicative_cost_per_month = machine_cost.get('indicative_cost_per_month', 0)
+        indicative_cost_per_hour = machine_cost.get('indicative_cost_per_hour', 0)
+        if indicative_cost_per_hour:
+            machine['extra']['indicative_cost_per_hour'] = indicative_cost_per_hour
+        if indicative_cost_per_month:
+            machine['extra']['indicative_cost_per_month'] = indicative_cost_per_month
+
+        # IDEA: allow to override this, if user wants to add a special tag
+        # if tags.get('indicative_price_per_month'):
+        #     machine['indicative_price_per_month'] = tags.get('indicative_price_per_month')
+
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
     if conn.type == 'libvirt':
@@ -2942,6 +2958,7 @@ def list_clouds(user):
             del cloud["docker_port"]
         cloud["state"] = 'online' if cloud["enabled"] else 'offline'
         cloud["id"] = cloud["_id"]
+        cloud['tags'] = mist.core.methods.get_cloud_tags(user,  cloud["_id"])
         normalized_clouds.append(cloud)
 
     return normalized_clouds
@@ -2964,6 +2981,7 @@ def list_keys(user):
         key_object["isDefault"] = key.default
         key_object["machines"] = transform_key_machine_associations(machines,
                                                                     key)
+        key_object['tags'] = mist.core.methods.get_key_tags(user, key.id)
         key_objects.append(key_object)
     return key_objects
 
@@ -3466,6 +3484,9 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
     Tags is expected to be a list of key-value dicts
     """
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
+
+    if cloud.provider not in config.EC2_PROVIDERS and cloud.provider not in ['gce', 'rackspace', 'openstack']:
+        return False
 
     conn = connect_provider(cloud)
 
@@ -4363,6 +4384,102 @@ def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
 
 def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
     return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s -e COLLECTD_PORT=%s mist/collectd" % (uuid, password, monitor, port)
+
+
+def machine_cost_calculator(m):
+    """
+    Calculates and returns the cost for a VM.
+    Highly provider specific, since there is not a
+    straightforward way to get this info
+
+    Supported providers:
+        Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr
+    TODO: GCE, Azure, NephoScale,
+    HostVirtual
+    """
+    cost = {'indicative_cost_per_hour': 0, 'indicative_cost_per_month': 0}
+    if m.driver.type in [Provider.LINODE, Provider.PACKET, Provider.GCE]:
+        sizes = CloudSize.objects.filter(cloud_provider=m.driver.type)
+    if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
+        sizes = CloudSize.objects.filter(cloud_provider=m.driver.type, cloud_region=m.driver.region)
+    now = datetime.now()
+    month_days = calendar.monthrange(now.year, now.month)[1]
+    if m.driver.type in config.EC2_PROVIDERS:
+        # Need to get image in order to specify the OS type
+        # out of the image id
+        instance_image = m.extra.get('image_id')
+        try:
+            os_type = CloudImage.objects.get(cloud_provider=m.driver.type, image_id=instance_image).os_type
+        except:
+            os_type = 'linux'
+        sizes = m.driver.list_sizes()
+        size = m.extra.get('instance_type')
+        for node_size in sizes:
+            if node_size.id == size:
+                plan_price = node_size.price.get(os_type)
+                if not plan_price:
+                    # use the default which is linux
+                    plan_price = node_size.price.get('linux')
+                plan_price = float(plan_price.replace('/hour','').replace('$', ''))
+                # just need the float value
+                cost['indicative_cost_per_hour'] = plan_price
+                cost['indicative_cost_per_month'] = float(plan_price) * 24 * month_days
+    if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
+        # Need to get image in order to specify the OS type
+        # out of the image id
+        instance_image = m.extra.get('imageId')
+        try:
+            image = CloudImage.objects.get(cloud_provider=m.driver.type, image_id=instance_image).os_type
+        except:
+            os_type = 'linux'
+
+        size = m.extra.get('flavorId')
+        for node_size in sizes:
+            if node_size.size_id == size:
+                plan_price = json.loads(node_size.price).get('os_type')
+                if not plan_price:
+                    # use the default which is linux
+                    plan_price = json.loads(node_size.price).get('linux')
+                # just need the float value
+                cost['indicative_cost_per_hour'] = plan_price
+                cost['indicative_cost_per_month'] = float(plan_price) * 730
+                # 730 is the number of hours per month as on https://www.rackspace.com/calculator
+                # TODO: RackSpace mentions on https://www.rackspace.com/cloud/public-pricing
+                # there's a minimum service charge of $50/mo across all Cloud Servers
+    if m.driver.type == Provider.LINODE:
+        size = m.extra.get('PLANID')
+        if size:
+            for node_size in sizes:
+                if node_size.size_id == size:
+                    plan_price = node_size.price.replace('/month','').replace('$', '')
+                    cost['indicative_cost_per_month'] = plan_price
+    if m.driver.type == Provider.PACKET:
+        size = m.extra.get('plan')
+        if size:
+            for plan_size in sizes:
+                try:
+                    if plan_size.name.startswith(size):
+                        plan_price = plan_size.price.split(' ')[0]
+                        cost['indicative_cost_per_hour'] = plan_price
+                        cost['indicative_cost_per_month'] = float(plan_price) * 24 * month_days
+                except:
+                    pass
+    if m.driver.type == Provider.DIGITAL_OCEAN:
+        size = m.extra.get('size', {})
+        cost['indicative_cost_per_month'] = size.get('price_monthly')
+        cost['indicative_cost_per_hour'] = size.get('price_hourly')
+    if m.driver.type == Provider.VULTR:
+        cost['indicative_cost_per_month'] = m.extra.get('cost_per_month')
+    if m.driver.type == Provider.SOFTLAYER:
+        if not m.extra.get('hourlyRecurringFee'):
+            cost['indicative_cost_per_month'] = m.extra.get('recurringFee')
+        else:
+            # m.extra.get('recurringFee') here will show what it has
+            # cost for the current month, up to now
+            cost_per_hour = m.extra.get('hourlyRecurringFee')
+            cost['indicative_cost_per_hour'] = cost_per_hour
+            cost['indicative_cost_per_month'] = float(cost_per_hour) * 24 * month_days
+    return cost
 
 
 def machine_name_validator(provider, name):
