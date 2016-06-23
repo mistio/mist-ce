@@ -165,8 +165,9 @@
                         [[team.name]]
                     </h2>
                     <div class="subtitle">
-                        <span hidden$="[[!team.description]]">[[team.description]] </span>
-                        <span class="desc" hidden$="[[!team.members.length]]"> ([[team.members.length]] members)</span>
+                        <span class="sub" hidden$="[[!team.description]]">[[team.description]] </span>
+                        <span class="desc" hidden$="[[hasOtherMembers]]"> Only you</span>
+                        <span class="desc" hidden$="[[!hasOtherMembers]]"> ([[team.members.length]] members)</span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -270,6 +271,11 @@
                         value: false,
                         computed: '_hasMembers(team)'
                     },
+                    hasOtherMembers: {
+                        type: Boolean,
+                        value: true,
+                        computed: '_hasOtherMembers(team)'  
+                    },
                     members: {
                         type: Array,
                         computed: '_computeMembers(team, model.members.*)'
@@ -296,6 +302,19 @@
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
+                },
+                _hasOtherMembers: function(team) {
+                    if (team.members) {
+                        if (team.members.length == 1 && team.members[0].email == this.model.user.email){
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    else {
+                        return true;
+                    }
                 },
                 _hasMembers: function(team) {
                     if (team.members)
