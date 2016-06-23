@@ -75,6 +75,17 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
                     datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
+try:  # Multi-user environment
+    from mist.core.user.models import User, Owner
+    multi_user = True
+except ImportError:  # Standalone mist.io
+    multi_user = False
+
+# this is a sanity check for the user supplied
+# tags indicative_cost_per_month/indicative_cost_per_hour
+# used for VM cost analysis
+MAX_USER_PROVIDER_COST_PER_HOUR = 100
+MAX_USER_PROVIDER_COST_PER_MONTH = 100 * 24 * 31
 
 
 def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
@@ -1513,22 +1524,19 @@ def list_machines(user, cloud_id):
 
         if m.driver.type == 'gce':
             # tags and metadata exist in GCE
-            tags = m.extra.get('metadata', {}).get('items')
+            tags_from_provider = m.extra.get('metadata', {}).get('items')
         else:
-            tags = m.extra.get('tags') or m.extra.get('metadata') or {}
+            tags_from_provider = m.extra.get('tags') or m.extra.get('metadata') or {}
         # optimize for js
-        if type(tags) == dict:
-            tags = [{'key': key, 'value': value} for key, value in tags.iteritems() if key != 'Name']
-        # if m.extra.get('availability', None):
-        #    # for EC2
-        #    tags.append({'key': 'availability', 'value': m.extra['availability']})
+        if type(tags_from_provider) == dict:
+            tags_from_provider = [{'key': key, 'value': value} for key, value in tags_from_provider.iteritems() if key != 'Name']
         if m.extra.get('DATACENTERID', None):
             # for Linode
             dc = config.LINODE_DATACENTERS.get(m.extra['DATACENTERID'])
-            tags.append({'key': 'DATACENTERID', 'value':dc})
+            tags_from_provider.append({'key': 'DATACENTERID', 'value':dc})
         elif m.extra.get('vdc', None):
             # for vCloud
-            tags.append({'key': 'vdc', 'value': m.extra['vdc']})
+            tags_from_provider.append({'key': 'vdc', 'value': m.extra['vdc']})
 
         image_id = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
@@ -1607,9 +1615,40 @@ def list_machines(user, cloud_id):
             if m.extra.get('xml_description'):
                 m.extra['xml_description'] = escape(m.extra['xml_description'])
 
-        # tags should be a list
-        if not tags:
-            tags = []
+        all_tags = tags_from_provider
+
+        if multi_user:
+            from mist.core.methods import get_machine_tags
+            try:
+                mistio_tags = get_machine_tags(user, cloud_id, m.id)
+            except:
+                mistio_tags = {}
+
+            for tag in mistio_tags:
+                key, value = tag.popitem()
+                tag_dict = {'key': key, 'value': value}
+                all_tags.append(tag_dict)
+                # indicative_cost_per_hour + indicative_cost_per_month fixed tags for
+                # machine cost analysis
+                if key == 'indicative_cost_per_hour':
+                    cost_per_hour = value
+                    month_days = calendar.monthrange(now.year, now.month)[1]
+                    try:
+                        cost_per_hour = float(cost_per_hour)
+                        if MAX_USER_PROVIDER_COST_PER_HOUR > cost_per_hour >= 0:
+                            m['extra']['indicative_cost_per_hour'] = "{0:.2f}".format(cost_per_hour)
+                            cost_per_month = float(cost_per_hour) * 24 * month_days
+                            m['extra']['indicative_cost_per_month'] = "{0:.2f}".format(cost_per_month)
+                    except:
+                        pass
+                if key == 'indicative_cost_per_month':
+                    cost_per_month = value
+                    try:
+                        cost_per_month = float(cost_per_month)
+                        if MAX_USER_PROVIDER_COST_PER_MONTH > cost_per_month >= 0:
+                            m['extra']['indicative_cost_per_month'] = "{0:.2f}".format(cost_per_month)
+                    except:
+                        pass
 
         machine = {'id': m.id,
                    'uuid': machine_entry.id if machine_entry else '',
@@ -1619,7 +1658,7 @@ def list_machines(user, cloud_id):
                    'state': config.STATES[m.state],
                    'private_ips': m.private_ips,
                    'public_ips': m.public_ips,
-                   'tags': tags,
+                   'tags': all_tags,
                    'missing_since': str(machine_entry.missing_since)
                         if machine_entry and machine_entry.missing_since else '',
                    'last_seen': str(machine_entry.last_seen)
@@ -1635,10 +1674,6 @@ def list_machines(user, cloud_id):
             machine['extra']['indicative_cost_per_hour'] = indicative_cost_per_hour
         if indicative_cost_per_month:
             machine['extra']['indicative_cost_per_month'] = indicative_cost_per_month
-
-        # IDEA: allow to override this, if user wants to add a special tag
-        # if tags.get('indicative_price_per_month'):
-        #     machine['indicative_price_per_month'] = tags.get('indicative_price_per_month')
 
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
