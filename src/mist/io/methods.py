@@ -75,11 +75,7 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
                     datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
-try:  # Multi-user environment
-    from mist.core.user.models import User, Owner
-    multi_user = True
-except ImportError:  # Standalone mist.io
-    multi_user = False
+from mist.core.methods import get_machine_tags
 
 # this is a sanity check for the user supplied
 # tags cost_per_month/cost_per_hour
@@ -1617,39 +1613,37 @@ def list_machines(user, cloud_id):
 
         all_tags = tags_from_provider
 
-        if multi_user:
-            from mist.core.methods import get_machine_tags
-            try:
-                mistio_tags = get_machine_tags(user, cloud_id, m.id)
-            except:
-                mistio_tags = {}
+        try:
+            mistio_tags = get_machine_tags(user, cloud_id, m.id)
+        except:
+            mistio_tags = {}
 
-            for tag in mistio_tags:
-                key, value = tag.popitem()
-                tag_dict = {'key': key, 'value': value}
-                if tag_dict not in all_tags:
-                    all_tags.append(tag_dict)
-                # cost_per_hour + cost_per_month fixed tags for
-                # machine cost analysis
-                if key == 'cost_per_hour':
-                    cost_per_hour = value
-                    month_days = calendar.monthrange(now.year, now.month)[1]
-                    try:
-                        cost_per_hour = float(cost_per_hour)
-                        if MAX_USER_PROVIDER_COST_PER_HOUR > cost_per_hour >= 0:
-                            m.extra['cost_per_hour'] = "{0:.2f}".format(cost_per_hour)
-                            cost_per_month = float(cost_per_hour) * 24 * month_days
-                            m.extra['cost_per_month'] = "{0:.2f}".format(cost_per_month)
-                    except:
-                        pass
-                if key == 'cost_per_month':
-                    cost_per_month = value
-                    try:
-                        cost_per_month = float(cost_per_month)
-                        if MAX_USER_PROVIDER_COST_PER_MONTH > cost_per_month >= 0:
-                            m.extra['cost_per_month'] = "{0:.2f}".format(cost_per_month)
-                    except:
-                        pass
+        for tag in mistio_tags:
+            key, value = tag.popitem()
+            tag_dict = {'key': key, 'value': value}
+            if tag_dict not in all_tags:
+                all_tags.append(tag_dict)
+            # cost_per_hour + cost_per_month fixed tags for
+            # machine cost analysis
+            if key == 'cost_per_hour':
+                cost_per_hour = value
+                month_days = calendar.monthrange(now.year, now.month)[1]
+                try:
+                    cost_per_hour = float(cost_per_hour)
+                    if MAX_USER_PROVIDER_COST_PER_HOUR > cost_per_hour >= 0:
+                        m.extra['cost_per_hour'] = "{0:.2f}".format(cost_per_hour)
+                        cost_per_month = float(cost_per_hour) * 24 * month_days
+                        m.extra['cost_per_month'] = "{0:.2f}".format(cost_per_month)
+                except:
+                    pass
+            if key == 'cost_per_month':
+                cost_per_month = value
+                try:
+                    cost_per_month = float(cost_per_month)
+                    if MAX_USER_PROVIDER_COST_PER_MONTH > cost_per_month >= 0:
+                        m.extra['cost_per_month'] = "{0:.2f}".format(cost_per_month)
+                except:
+                    pass
 
         machine = {'id': m.id,
                    'uuid': machine_entry.id if machine_entry else '',
