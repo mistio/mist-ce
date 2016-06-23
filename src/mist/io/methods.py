@@ -1627,7 +1627,8 @@ def list_machines(user, cloud_id):
             for tag in mistio_tags:
                 key, value = tag.popitem()
                 tag_dict = {'key': key, 'value': value}
-                all_tags.append(tag_dict)
+                if tag_dict not in all_tags:
+                    all_tags.append(tag_dict)
                 # cost_per_hour + cost_per_month fixed tags for
                 # machine cost analysis
                 if key == 'cost_per_hour':
@@ -1636,9 +1637,9 @@ def list_machines(user, cloud_id):
                     try:
                         cost_per_hour = float(cost_per_hour)
                         if MAX_USER_PROVIDER_COST_PER_HOUR > cost_per_hour >= 0:
-                            m['extra']['cost_per_hour'] = "{0:.2f}".format(cost_per_hour)
+                            m.extra['cost_per_hour'] = "{0:.2f}".format(cost_per_hour)
                             cost_per_month = float(cost_per_hour) * 24 * month_days
-                            m['extra']['cost_per_month'] = "{0:.2f}".format(cost_per_month)
+                            m.extra['cost_per_month'] = "{0:.2f}".format(cost_per_month)
                     except:
                         pass
                 if key == 'cost_per_month':
@@ -1646,7 +1647,7 @@ def list_machines(user, cloud_id):
                     try:
                         cost_per_month = float(cost_per_month)
                         if MAX_USER_PROVIDER_COST_PER_MONTH > cost_per_month >= 0:
-                            m['extra']['cost_per_month'] = "{0:.2f}".format(cost_per_month)
+                            m.extra['cost_per_month'] = "{0:.2f}".format(cost_per_month)
                     except:
                         pass
 
