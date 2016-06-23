@@ -48,7 +48,7 @@
         <p>[[descriptionText]]</p>
         <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
         <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
-        <paper-button id="select" class="btn-block submit-btn" disabled$="[[isCurrent]]" raised on-tap="_selectPlan">Select</paper-button>
+        <paper-button id="select" class="btn-block submit-btn" disabled$="[[iscurrent]]" raised on-tap="_selectPlan">Select</paper-button>
     </template>
 
     <script>
@@ -67,11 +67,12 @@
                         type: Object
                     },
                     index: {
-                        type: Number
+                        type: Number,
+                        value: 0
                     },
-                    isCurrent: {
+                    iscurrent: {
                         type: Boolean,
-                        computed: '_computeIsCurrent(plan.title, index)'
+                        //TODO: make as a computed property
                     },
                     priceText: {
                         type: String,
@@ -106,12 +107,9 @@
                 _computeExpirationDate: function(expiration) {
                     if (expiration) {
                         var d = new Date(expiration * 1000);
-                        return d.getMonthName() + " " + d.getDate() + ", " + d.getFullYear();
+                        return d.getMonth() + " " + d.getDate() + ", " + d.getFullYear();
                     }
                     return '';
-                },
-                _computeIsCurrent: function(title, index) {
-                    return this.user.current_plan.title ? title == this.user.current_plan.title : index === 0;
                 },
                 _selectPlan: function(e) {
                     console.log(this.plan);

@@ -26,9 +26,12 @@
 
         <paper-material>
             <h2>Billing</h2>
+            <h3>current plan</h3>
+            <plan-item user="[[user]]" plan="[[user.currrent_plan]]" iscurrent="true" index="0"></plan-item>
+
             <div class="plans">
                 <template is="dom-repeat" items=[[plans]] as="plan">
-                    <plan-item user="[[user]]" plan="[[plan]]" index="[[index]]" class$="[[_computeCurrentClass(plan, index)]] plan"></plan-item>
+                    <plan-item user="[[user]]" plan="[[plan]]" index="[[index]]" iscurrent$="[[computeIsCurrent(plan, user)]]"></plan-item>
                 </template>
             </div>
         </paper-material>
@@ -56,13 +59,14 @@
                     }
 
                 },
-                _computeCurrentClass: function(plan, index) {
-                    var isCurrent =  plan.title == this.user.current_plan.title? 'current-plan' :'';
-                    return isCurrent ? 'current-plan' : null;
-                 },
-                _isPlanCurrent: function(plan) {
-                  return user.current_plan;
-                }
+                computeIsCurrent: function(plan, user) {
+                  if (this.user.current_plan) {
+                    return plan.title == this.user.current_plan.title ? true : false;
+                  }
+                  else {
+                    return false;
+                  }
+                 }
             });
         })();
     </script>
