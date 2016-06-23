@@ -190,12 +190,12 @@
                 type: Object
             },
             org: {
-                type: Object,
-                notify: true
+                type: Object
             },
             isPersonal: {
                 type: Boolean,
-                computed: 'computeIsPersonal(user)'
+                computed: '_computeIsPersonal(org)',
+                value: true
             },
             size: {
                 type: Number,
@@ -239,8 +239,8 @@
         _computeGravatarName: function(first_name, last_name, email) {
             return first_name && last_name ? first_name + ' ' + last_name : email;
         },
-        computeIsPersonal: function(user) {
-            return PERSONAL;
+        _computeIsPersonal: function(org) {
+            return org ? false : true;
         },
         _computeOrganizationsList: function(orgs, isPersonal) {
             if (orgs) {
@@ -259,6 +259,13 @@
                         }
                         return 0;
                     });
+
+                if (!isPersonal) {
+                    organizations.unshift({
+                        id: '',
+                        name: 'Personal'
+                    });
+                }
             }
 
             return organizations || [];
