@@ -28,7 +28,7 @@
             <h2>Billing</h2>
             <div class="plans">
                 <template is="dom-repeat" items=[[plans]] as="plan">
-                    <plan-item current="[[user.current_plan]]" plan="[[plan]]" index="[[index]]" class$="[[_computeCurrentClass(plan, index)]] plan"></plan-item>
+                    <plan-item user="[[user]]" plan="[[plan]]" index="[[index]]" class$="[[_computeCurrentClass(plan, index)]] plan"></plan-item>
                 </template>
             </div>
         </paper-material>
@@ -43,10 +43,8 @@
 
                 properties: {
                     user: {
-                        type: Object
-                    },
-                    current: {
-                        type: Object
+                        type: Object,
+                        notify: true
                     },
                     plans: {
                         type: Array,
@@ -59,7 +57,7 @@
 
                 },
                 _computeCurrentClass: function(plan, index) {
-                    var isCurrent =  plan.title == this.current.title? 'current-plan' :'';
+                    var isCurrent =  plan.title == this.user.current_plan.title? 'current-plan' :'';
                     return isCurrent ? 'current-plan' : null;
                  },
                 _isPlanCurrent: function(plan) {
