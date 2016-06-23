@@ -198,6 +198,7 @@
                                     <paper-item>
                                         <a href="/members/[[item.id]]"  class="flex-horizontal-with-ratios width100">
                                             <span class="flexchild">[[item.name]] </span>
+                                            <span class="flexchild" hidden$="[[!item.pending]]">pending </span>
                                             <span class="flexchild">[[item.email]]</span>
                                         </a>
                                     </paper-item>
