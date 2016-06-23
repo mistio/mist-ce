@@ -42,9 +42,9 @@ ALLOW_CONNECT_PRIVATE = settings.get('ALLOW_CONNECT_PRIVATE', True)
 ALLOW_LIBVIRT_LOCALHOST = settings.get('ALLOW_LIBVIRT_LOCALHOST', False)
 # mist.io interface to the OpenVPN server
 VPN_SERVER_API_ADDRESS = settings.get('VPN_SERVER_API_ADDRESS', '')
-ALLOWED_PRIVATE_NETWORKS = settings.get('ALLOWED_PRIVATE_NETWORKS', '')
-# list/range of private IPs to be excluded from VPN routing
-EXCLUDED_PRIVATE_ADDRESSES = settings.get('EXCLUDED_PRIVATE_ADDRESSES', '')
+ALLOWED_PRIVATE_NETWORKS = settings.get('ALLOWED_PRIVATE_NETWORKS', ['192.168.0.0/16', '172.16.0.0/12', '10.0.0.0/8'])
+# list/range of private IPs to be excluded from VPN routing (docker-dev by default)
+EXCLUDED_PRIVATE_ADDRESSES = settings.get('EXCLUDED_PRIVATE_ADDRESSES', ['172.17.0.1'])
 # allow public addresses to be routed over VPN
 ALLOW_PUBLIC_VPN = settings.get('ALLOW_PUBLIC_VPN', True)
 
