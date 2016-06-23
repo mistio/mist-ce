@@ -28,7 +28,7 @@
             <h2>Billing</h2>
             <div class="plans">
                 <template is="dom-repeat" items=[[plans]] as="plan">
-                    <plan-item plan="[[plan]]" index="[[index]]" class$="[[_computeCurrentClass(plan, index)]] plan"></plan-item>
+                    <plan-item current="[[user.current_plan]]" plan="[[plan]]" index="[[index]]" class$="[[_computeCurrentClass(plan, index)]] plan"></plan-item>
                 </template>
             </div>
         </paper-material>
@@ -42,6 +42,9 @@
                 is: 'plans-list',
 
                 properties: {
+                    user: {
+                        type: Object
+                    },
                     current: {
                         type: Object
                     },

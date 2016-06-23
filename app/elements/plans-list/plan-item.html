@@ -110,7 +110,7 @@
                     return '';
                 },
                 _computeIsCurrent: function(title, index) {
-                    return current.title ? title == current.title : index === 0;
+                    return this.current.title ? title == this.current.title : index === 0;
                 },
                 _selectPlan: function(e) {
                     console.log(this.plan);
