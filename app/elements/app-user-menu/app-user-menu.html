@@ -121,17 +121,17 @@
                         <iron-icon class="user-menu-icon" icon="social:person"></iron-icon>
                     </div>
                     <div class="org xs8">
-                        <h4>[[gravatarName]]</h4>
-                        <span>Faki fix teams</span>
+                        <h4>[[org.name]]</h4>
+                        <span>teams</span>
                     </div>
                 </div>
                 <paper-menu>
                     <template is="dom-repeat" items="[[organizationsList]]" as="organization">
                         <paper-item class="context">
-                            <a href="javascript:void(0)" on-tap="_goToOrg" id="[[organization.id]]" class$="grid-row [[_isCurrentClass(organization, model.org)]]">
+                            <a href="javascript:void(0)" on-tap="_goToOrg" id="[[organization.id]]" class$="grid-row [[_isCurrentClass(organization, org)]]">
                                 <iron-icon class="user-menu-icon" icon$="[[_computeOrganizationIcon(organization)]]"></iron-icon>
                                 <div>[[organization.name]]
-                                    <span class="teams">Faki fix teams</span>
+                                    <!-- <span class="teams">Faki fix teams</span> -->
                                 </div>
                             </a>
                         </paper-item>
@@ -180,8 +180,12 @@
     Polymer({
         is: 'app-user-menu',
         properties: {
-            model: {
+            user: {
                 type: Object
+            },
+            org: {
+                type: Object,
+                notify: true
             },
             size: {
                 type: Number,
@@ -195,19 +199,19 @@
             },
             gravatar: {
                 type: String,
-                computed: '_computeGravatar(model.user.email, size, placeholder)'
+                computed: '_computeGravatar(user.email, size, placeholder)'
             },
             gravatarName: {
                 type: String,
-                computed: '_computeGravatarName(model.user.first_name, model.user.last_name, model.user.email)'
+                computed: '_computeGravatarName(user.first_name, user.last_name, user.email)'
             },
             organizationsList: {
                 type: Array,
-                computed: '_computeOrganizationsList(model.user.orgs)'
+                computed: '_computeOrganizationsList(user.orgs, org)'
             },
             memberOfTeamsText: {
                 type: String,
-                computed: '_computeMemberOfTeamsText(model.user.orgs)'
+                computed: '_computeMemberOfTeamsText(user.orgs)'
             },
             canCreateOrg: {
                 type: Boolean,
@@ -227,11 +231,9 @@
         },
         _computeOrganizationsList: function(orgs) {
             if (orgs) {
-                var organizations = orgs
-                    .filter(function(org) {
-                        return org.name;
-                    })
-                    .sort(function(a, b) {
+                var organizations = orgs.filter(function(o) {
+                        return o.name != this.org.name;
+                    }, this).sort(function(a, b) {
                         if (a.name > b.name) {
                             return 1;
                         }
