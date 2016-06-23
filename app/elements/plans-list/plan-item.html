@@ -59,6 +59,9 @@
                 is: 'plan-item',
 
                 properties: {
+                    current: {
+                        type: Object
+                    },
                     plan: {
                         type: Object
                     },
@@ -107,7 +110,7 @@
                     return '';
                 },
                 _computeIsCurrent: function(title, index) {
-                    return CURRENT_PLAN.title ? title == CURRENT_PLAN.title : index === 0;
+                    return current.title ? title == current.title : index === 0;
                 },
                 _selectPlan: function(e) {
                     console.log(this.plan);

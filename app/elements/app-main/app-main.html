@@ -161,7 +161,7 @@
                 <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
                 <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
                 <page-elements></page-elements>
-                <page-account user="[[user]]"></page-account>
+                <page-account user="[[model.user]]"></page-account>
                 <page-not-found></page-not-found>
             </iron-pages>
         </paper-header-panel>
@@ -176,10 +176,6 @@
 
         properties: {
             model: {
-                type: Object,
-                notify: true
-            },
-            user: {
                 type: Object,
                 notify: true
             },

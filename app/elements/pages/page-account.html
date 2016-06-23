@@ -43,10 +43,10 @@
             <iron-pages selected="{{selected}}">
                 <details-page user="[[user]]" data-route="0"></details-page>
                 <password-page user="[[user]]" data-route="1"></password-page>
-                <plans-list user="[[user]]" data-route="2"></plans-list>
+                <plans-list current="[[user.current_plan]]" data-route="2"></plans-list>
                 <div data-route="3"></div>
                 <div data-route="4"></div>
-                <subscriptions-list data-route="5"></subscriptions-list>
+                <subscriptions-list user="[[user]]" data-route="5"></subscriptions-list>
                 <feedback-page user="[[user]]" data-route="6"></feedback-page>
             </iron-pages>
 
@@ -59,7 +59,8 @@
         is: 'page-account',
         properties: {
             user: {
-                type: Object
+                type: Object,
+                notify: true
             },
             selected: {
                 value: 0

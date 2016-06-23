@@ -30,7 +30,7 @@
                         <div class="flexchild text-right">Action</div>
                     </div>
                     <div class="info-body">
-                        <template is="dom-repeat" items=[[subscriptions]] as="subscription">
+                        <template is="dom-repeat" items=[[user.user_plans]] as="subscription">
                             <div class="row">
                                 <subscription-item subscription="[[subscription]]" index="[[index]]" count="[[subscriptions.length]]"></subscription-item>
                             </div>
@@ -49,16 +49,10 @@
 
                 properties: {
                   user: {
-                      type: Object
-                  },
-                  subscriptions: {
-                      type: Array,
-                      computed: "_computeUserPlans(model.user.*)"
+                      type: Object,
+                      notify: true
                   }
-                },
-                _computeUserPlans: function(user){
-                    return user.user_plans;
-                  }
+                }
             });
         })();
     </script>
