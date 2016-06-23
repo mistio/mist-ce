@@ -121,8 +121,14 @@
                         <iron-icon class="user-menu-icon" icon="social:person"></iron-icon>
                     </div>
                     <div class="org xs8">
-                        <h4>[[org.name]]</h4>
-                        <span>teams</span>
+                        <template is="dom-if" if="[[!isPersonal]]">
+                            <h4>[[org.name]]</h4>
+                            <span>teams</span>
+                        </template>
+                        <template is="dom-if" if="[[isPersonal]]">
+                            <h4>Personal Account</h4>
+                            <span>[[user.email]]</span>
+                        </template>
                     </div>
                 </div>
                 <paper-menu>
@@ -187,6 +193,10 @@
                 type: Object,
                 notify: true
             },
+            isPersonal: {
+                type: Boolean,
+                computed: 'computeIsPersonal(user)'
+            },
             size: {
                 type: Number,
                 value: function() {
@@ -207,7 +217,7 @@
             },
             organizationsList: {
                 type: Array,
-                computed: '_computeOrganizationsList(user.orgs, org)'
+                computed: '_computeOrganizationsList(user.orgs, isPersonal)'
             },
             memberOfTeamsText: {
                 type: String,
@@ -229,10 +239,17 @@
         _computeGravatarName: function(first_name, last_name, email) {
             return first_name && last_name ? first_name + ' ' + last_name : email;
         },
-        _computeOrganizationsList: function(orgs) {
+        computeIsPersonal: function(user) {
+            return PERSONAL;
+        },
+        _computeOrganizationsList: function(orgs, isPersonal) {
             if (orgs) {
+                var curOrgName = '';
+                if (!isPersonal) {
+                    curOrgName = this.org.name;
+                }
                 var organizations = orgs.filter(function(o) {
-                        return o.name != this.org.name;
+                        return o.name != curOrgName;
                     }, this).sort(function(a, b) {
                         if (a.name > b.name) {
                             return 1;
@@ -242,13 +259,6 @@
                         }
                         return 0;
                     });
-
-                if (PERSONAL) {
-                    organizations.unshift({
-                        id: '',
-                        name: 'Personal'
-                    });
-                }
             }
 
             return organizations || [];
