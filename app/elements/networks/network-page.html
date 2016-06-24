@@ -123,7 +123,20 @@
         </style>
 
         <div id="content">
-            <h2>[[network.name]]</h2>
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>[[network.name]]</h2>
+                    <div class="subtitle">
+                        [[network.cloud.title]]
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <paper-button on-tap="_deleteNetwork" class="simple">delete
+                        <iron-icon icon="delete"></iron-icon>
+                    </paper-button>
+                </div>
+            </paper-material>
             <paper-material>
                 <div class="info-table">
                     <div class="info-body info-group">

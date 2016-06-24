@@ -227,12 +227,6 @@
             memberOfTeamsText: {
                 type: String,
                 computed: '_computeMemberOfTeamsText(user.orgs)'
-            },
-            canCreateOrg: {
-                type: Boolean,
-                value: function() {
-                    return CAN_CREATE_ORG;
-                }
             }
         },
         _computeGravatar: function(email, size, placeholder) {

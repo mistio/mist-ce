@@ -45,7 +45,7 @@
                 padding: 0;
             }
         </style>
-        <app-socket model="{{model}}"></app-socket>
+        <app-socket model="{{model}}" onboarding="{{onboarding}}" ></app-socket>
         <iron-media-query query="(max-width: 860px)" query-matches="{{smallscreen}}"></iron-media-query>
         <iron-routes for="app-main" selected="[[section]]">
             <!-- dashboard -->
@@ -56,7 +56,7 @@
             <!-- machines -->
             <iron-route path="/machines" title="machines" current="machines" href="../pages/page-items.html"></iron-route>
             <iron-route path="/machines/:uuid" title="machine" current="machines" href="../machines/machine-page.html"></iron-route>
-            <iron-route path="/machines/:uuid/tags" title="machine" current="machines" href="../machines/machine-tags.html"></iron-route>
+            <iron-route path="/create-machine" title="create machine" current="machines" href="../machines/machine-create.html"></iron-route>
 
             <!-- images -->
             <iron-route path="/images" title="images" current="images" href="../pages/page-items.html"></iron-route>
@@ -105,13 +105,13 @@
 
             <iron-pages id="app-main" main smallscreen$={{smallscreen}}>
                 <!-- dashboard -->
-                <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]"></page-dashboard>
+                <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]" onboarding="[[onboarding]]"></page-dashboard>
                 <cloud-add model="[[model]]" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
                 <page-items class="incidents" model="[[model]]" items="[[model.incidents]]" sections="[[sections]]" section="[[sections.incidents]]"></page-items>
                 <!-- machines -->
                 <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
                 <machine-page params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-page>
-                <machine-tags params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-tags>
+                <machine-create model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-create>
                 <!-- images -->
                 <page-items class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
                 <image-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.images]]"></image-page>
@@ -154,8 +154,7 @@
 
         properties: {
             model: {
-                type: Object,
-                notify: true
+                type: Object
             },
             sections: {
                 type: Object
@@ -163,6 +162,9 @@
             sectionsArray: {
                 type: Array,
                 notify: true
+            },
+            onboarding: {
+                type: Object
             },
             title: {
                 type: String,
@@ -202,7 +204,7 @@
                 machinesArray: [],
                 imagesArray: [],
                 keysArray: [],
-                networksArray: [],
+                networksArray: [],                
                 scriptsArray: [],
                 stacksArray: [],
                 templatesArray: [],

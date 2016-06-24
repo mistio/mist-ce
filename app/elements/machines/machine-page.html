@@ -5,6 +5,7 @@
 
 <link rel="import" href="../app-rules/app-rules.html">
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../element-for-in/element-for-in.html">
 
 <dom-module id="machine-page">
     <template>
@@ -195,7 +196,7 @@
                 <!-- <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard> -->
             </div>
             <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">Basic Info</h2>
+                <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
                 <div class="card-content">
                     <table class="info-table">
                         <template is="dom-if" if="[[machine.public_ips]]">
@@ -224,7 +225,7 @@
                 </div>
             </paper-material>
             <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]" on-tap="toggle">More Info</h2>
+                <h2 style$="[[_getHeaderStyle(section.color)]]">More Info</h2>
                 <div class="card-content">
                     <element-for-in content="[[machine.extra]]"></element-for-in>
                 </div>

@@ -161,6 +161,9 @@
             right: 0;
             top: 12px;
         }
+        timerange-picker {
+            display: flex;
+        }
         polyana-dashboard ::content paper-button {
             margin: 0;
             min-width: 1px;
@@ -176,7 +179,7 @@
             margin-right: -24px;
             margin-left: -24px;
             padding-left: 24px;
-            padding-right: 24px; 
+            padding-right: 24px;
         }
         .ovhid {
             overflow: hidden;
@@ -204,8 +207,8 @@
             -khtml-user-select: none;    /* Konqueror */
             -moz-user-select: none;      /* Firefox */
             -ms-user-select: none;       /* Internet Explorer/Edge */
-            user-select: none;            
-            transition: var(--material-curve-320);     
+            user-select: none;
+            transition: var(--material-curve-320);
             transition-delay: 200ms;
         }
         #onboarding-area[higher] {
@@ -244,7 +247,7 @@
         .blue-link {
             padding: 0;
             text-transform: none;
-            font-weight: 400; 
+            font-weight: 400;
         }
         .onb-forms {
             position: relative;
@@ -252,8 +255,8 @@
         .onboarding-form {
             position: absolute;
             width: 100%;
-            transition: var(--material-curve-320);            
-        }        
+            transition: var(--material-curve-320);
+        }
         .onboarding-form[closed] {
             transform: translate(0, 200vh);
         }
@@ -270,15 +273,32 @@
             text-align: left;
         }
         .field-helptext {
-            font-size: 14px;             
+            font-size: 14px;
             align-self: center;
             color: rgba(0,0,0,0.54);
         }
         .invite-form-inputs {
-            margin-bottom: 2em;   
+            margin-bottom: 2em;
         }
         paper-dropdown-menu {
             width: 100%;
+        }
+        .is-loading {
+            position: absolute;
+            top: 20px;
+            left: 270px;
+            right: 0;
+            bottom: 0;
+            width: calc(100% - 270px);
+            height: 100vh;
+            z-index: 999;
+            background-color: #eee;
+        }
+        paper-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 10% auto;
+            display: block;
         }
         </style>
         <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
@@ -299,7 +319,7 @@
                 </div>
                 <div class="columns">
                     <div id="leftcolumn" class="left">
-                        <template is="dom-if" if="[[model.monitoring]]">
+                        <template is="dom-if" if="[[hasIncidents]]">
                             <div class="incidents">
                                 <app-incidents model="[[model]]" sections="[[sections]]">
                                 </app-incidents>
@@ -336,18 +356,15 @@
                             <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                         </paper-material>
                     </div>
-                    <paper-material id="rightcolumn" class="left logs">
-                        <log-list></log-list>
-                    </paper-material>
-                </div>
-                <div class="left">
-                    <div class="costs">
-                        <app-costs model="[[model]]" sections="[[sections]]">
-                        </app-costs>
+                    <div class="left">
+                        <div class="costs">
+                            <app-costs model="[[model]]" sections="[[sections]]">
+                            </app-costs>
+                        </div>
+                        <paper-material id="rightcolumn" class="logs">
+                            <log-list></log-list>
+                        </paper-material>
                     </div>
-                    <paper-material id="rightcolumn" class="logs">
-                        <log-list></log-list>
-                    </paper-material>
                 </div>
             </div>
         </template>
@@ -420,6 +437,10 @@
             </a>
         </div>
         <iron-ajax id="saveOrgRequest" method="PUT" url="/api/v1/org/[[model.org.id]]"></iron-ajax>
+
+        <div class="is-loading" hidden$="[[!onboarding.isLoadingClouds]]">
+            <paper-spinner active></paper-spinner>
+        </div>
     </template>
 </dom-module>
 <script>
@@ -432,8 +453,10 @@ Polymer({
             type: Object
         },
         model: {
-            type: Object,
-            notify: true
+            type: Object
+        },
+        onboarding: {
+            type: Object
         },
         onbstate: {
             type: Number
@@ -452,15 +475,20 @@ Polymer({
         openedCloud: String,
         showDashboard: {
             type: Boolean,
-            value: true,
-            computed: '_computeshowDashboard(model.cloudsArray.length)',
+            // value: true,
+            computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds)',
             notify: true
         },
         hasOrg: {
             type: Boolean,
             computed: '_computeHasOrg(model.org.name.*)',
             notify: true
-        }
+        },
+        hasIncidents: {
+             type: Boolean,
+             computed: '_computeHasIncidents(model.incidents.*)',
+             value: false
+         }
     },
     listeners: {
         'close-cloud-info': '_closeCloudChips'
@@ -560,9 +588,18 @@ Polymer({
             return true;
         }
     },
-    _computeshowDashboard: function(cloudslength) {
+    _computeHasIncidents: function(incidents){
+         if (incidents.base){
+             return incidents.base.length > 0 ? true : false;
+         }
+         else {
+             return false;
+         }
+     },
+    _computeshowDashboard: function(cloudslength, isLoadingClouds) {
+        console.log("HERERE", cloudslength, isLoadingClouds);
         var show;
-        if (cloudslength > 0) {
+        if (cloudslength > 0 && isLoadingClouds == false) {
             show =  true;
         }
         else {
@@ -642,8 +679,8 @@ Polymer({
         this.showSidebar();
     },
     goToAddCloud: function(){
-        page.show('/add-cloud');    
-        this.showSidebar();    
+        page.show('/add-cloud');
+        this.showSidebar();
     },
     showSidebar: function(){
         //show sidebar for navigation
