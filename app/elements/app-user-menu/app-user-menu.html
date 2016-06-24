@@ -121,17 +121,25 @@
                         <iron-icon class="user-menu-icon" icon="social:person"></iron-icon>
                     </div>
                     <div class="org xs8">
-                        <h4>[[gravatarName]]</h4>
-                        <span>Faki fix teams</span>
+                        <template is="dom-if" if="[[!isPersonal]]">
+                            <h4>[[org.name]]</h4>
+                            <template is="dom-repeat" items="[[teams]]">
+                                <span>[[item.name]]</span>
+                            </template>
+                        </template>
+                        <template is="dom-if" if="[[isPersonal]]">
+                            <h4>Personal Account</h4>
+                            <span>[[user.email]]</span>
+                        </template>
                     </div>
                 </div>
                 <paper-menu>
                     <template is="dom-repeat" items="[[organizationsList]]" as="organization">
                         <paper-item class="context">
-                            <a href="javascript:void(0)" on-tap="_goToOrg" id="[[organization.id]]" class$="grid-row [[_isCurrentClass(organization, model.org)]]">
+                            <a href="javascript:void(0)" on-tap="_goToOrg" id="[[organization.id]]" class$="grid-row [[_isCurrentClass(organization, org)]]">
                                 <iron-icon class="user-menu-icon" icon$="[[_computeOrganizationIcon(organization)]]"></iron-icon>
                                 <div>[[organization.name]]
-                                    <span class="teams">Faki fix teams</span>
+                                    <!-- <span class="teams">Faki fix teams</span> -->
                                 </div>
                             </a>
                         </paper-item>
@@ -180,8 +188,16 @@
     Polymer({
         is: 'app-user-menu',
         properties: {
-            model: {
+            user: {
                 type: Object
+            },
+            org: {
+                type: Object
+            },
+            isPersonal: {
+                type: Boolean,
+                computed: '_computeIsPersonal(org)',
+                value: true
             },
             size: {
                 type: Number,
@@ -189,25 +205,28 @@
                     return window.devicePixelRatio > 1.5 ? 80 : 40;
                 }
             },
+            teams: {
+                type: Array
+            },
             placeholder: {
                 type: String,
                 value: 'http://findicons.com/files/icons/1072/face_avatars/300/i04.png'
             },
             gravatar: {
                 type: String,
-                computed: '_computeGravatar(model.user.email, size, placeholder)'
+                computed: '_computeGravatar(user.email, size, placeholder)'
             },
             gravatarName: {
                 type: String,
-                computed: '_computeGravatarName(model.user.first_name, model.user.last_name, model.user.email)'
+                computed: '_computeGravatarName(user.first_name, user.last_name, user.email)'
             },
             organizationsList: {
                 type: Array,
-                computed: '_computeOrganizationsList(model.user.orgs)'
+                computed: '_computeOrganizationsList(user.orgs, isPersonal)'
             },
             memberOfTeamsText: {
                 type: String,
-                computed: '_computeMemberOfTeamsText(model.user.orgs)'
+                computed: '_computeMemberOfTeamsText(user.orgs)'
             },
             canCreateOrg: {
                 type: Boolean,
@@ -225,13 +244,18 @@
         _computeGravatarName: function(first_name, last_name, email) {
             return first_name && last_name ? first_name + ' ' + last_name : email;
         },
-        _computeOrganizationsList: function(orgs) {
+        _computeIsPersonal: function(org) {
+            return org ? false : true;
+        },
+        _computeOrganizationsList: function(orgs, isPersonal) {
             if (orgs) {
-                var organizations = orgs
-                    .filter(function(org) {
-                        return org.name;
-                    })
-                    .sort(function(a, b) {
+                var curOrgName = '';
+                if (!isPersonal) {
+                    curOrgName = this.org.name;
+                }
+                var organizations = orgs.filter(function(o) {
+                        return o.name != curOrgName;
+                    }, this).sort(function(a, b) {
                         if (a.name > b.name) {
                             return 1;
                         }
@@ -241,7 +265,7 @@
                         return 0;
                     });
 
-                if (PERSONAL) {
+                if (!isPersonal) {
                     organizations.unshift({
                         id: '',
                         name: 'Personal'

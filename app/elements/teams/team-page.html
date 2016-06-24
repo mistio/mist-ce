@@ -155,8 +155,15 @@
         .width100 {
             width: 100%;
         }
+        .pending {
+            font-weight: 500;
+            font-size: 0.9em;
+            background-color: #69b46c;
+            color: #fff;
+            padding: 2px 6px 4px 6px;
+            border-radius: 3px;
+        }
         </style>
-
 
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
@@ -166,8 +173,9 @@
                         [[team.name]]
                     </h2>
                     <div class="subtitle">
-                        <span hidden$="[[!team.description]]">[[team.description]] </span>
-                        <span class="desc" hidden$="[[!team.members.length]]"> ([[team.members.length]] members)</span>
+                        <span class="sub" hidden$="[[!team.description]]">[[team.description]] </span>
+                        <span class="desc" hidden$="[[hasOtherMembers]]"> Only you</span>
+                        <span class="desc" hidden$="[[!hasOtherMembers]]"> ([[team.members.length]] members)</span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -197,7 +205,9 @@
                                 <template is="dom-repeat" items="[[members]]">
                                     <paper-item>
                                         <a href="/members/[[item.id]]"  class="flex-horizontal-with-ratios width100">
-                                            <span class="flexchild">[[item.name]] </span>
+                                            <span class="flexchild">[[item.name]] 
+                                                <span class="pending" hidden$="[[!item.pending]]">pending </span>
+                                            </span>
                                             <span class="flexchild">[[item.email]]</span>
                                         </a>
                                     </paper-item>
@@ -218,12 +228,20 @@
                     <div class="width100">
                     <paper-material class="no-pad">
                         <!-- TODO: make interactive add edit of rules -->
-                        <h3 class="smallcaps resource-head">Team Policy</h3>
-                        <paper-item>ALLOW add cloud</paper-item>
-                        <paper-item>ALLOW create machines</paper-item>
-                        <paper-item>ALLOW read machines</paper-item>
-                        <paper-item>ALLOW reboot machines</paper-item>
-                        <paper-item>ALLOW monitor machines</paper-item>
+                        <h3 class="smallcaps resource-head">Team Policy</h3>                        
+                        <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
+                            <paper-item>
+                                [[rule.operator]] 
+                                [[rule.rtype]] 
+
+                                [[rule.action]] 
+                                [[rule.rid]] 
+                                <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
+                                    [[tag]]
+                                </template>
+                            </paper-item>
+                        </template>
+                        <paper-item>[[team.policy.operator]] every other action ON any other resource</paper-item>
                     </paper-material>
                 </div>
             </div>
@@ -271,6 +289,11 @@
                         value: false,
                         computed: '_hasMembers(team)'
                     },
+                    hasOtherMembers: {
+                        type: Boolean,
+                        value: true,
+                        computed: '_hasOtherMembers(team)'  
+                    },
                     members: {
                         type: Array,
                         computed: '_computeMembers(team, model.members.*)'
@@ -297,6 +320,19 @@
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
+                },
+                _hasOtherMembers: function(team) {
+                    if (team.members) {
+                        if (team.members.length == 1 && team.members[0].email == this.model.user.email){
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    else {
+                        return true;
+                    }
                 },
                 _hasMembers: function(team) {
                     if (team.members)
@@ -326,6 +362,18 @@
                     var team = e.detail.team;
                     this.set('team.name', team.name);
                     this.set('team.description', team.description);
+                },
+                _computeRTags: function(tags){
+                    // dom-repeat needs an array
+                    var arrTags = [];
+                    for (var t in tags) {
+                        // TODO: proper obj push in array
+                        // if (tags.t.value)
+                        //     arrTags.push(t + '= '+ tags.t.value);
+                        // else
+                            arrTags.push(t);
+                    }
+                    return arrTags;
                 },
                 _deleteTeam: function(e) {
                     this._showDialog({

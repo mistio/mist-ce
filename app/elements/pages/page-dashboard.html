@@ -9,6 +9,7 @@
 
 <link rel="import" href="../section-tile/section-tile.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
+<link rel="import" href="../app-costs/app-costs.html">
 <link rel="import" href="../app-forms/app-forms.html">
 <link rel="import" href="../app-fab/app-fab.html">
 <link rel="import" href="../logs/log-list.html">
@@ -21,7 +22,8 @@
         <style is="custom-style" include="headings"></style>
         <style>
         :host {
-            --layout-margin: 0.5em;
+            /*--layout-margin: 0.5em;*/
+            --layout-margin: 16px;
         }
         paper-material {
             overflow: auto !important;
@@ -69,12 +71,15 @@
 
         .sections {
             align-items: flex-start;
-            margin-bottom: 1em;
+            /*margin-bottom: 1em;*/
+            margin-bottom: 32px;
         }
+        .costs,
         .incidents {
-           margin-bottom: 1em;
-           display: block;
-           width: 100%;
+           /*margin-bottom: 1em;*/
+            margin-bottom: 32px;
+            display: block;
+            width: 100%;
         }
         a.main-section {
             min-width: 150px;
@@ -96,6 +101,10 @@
             align-items: flex-start;
             flex-direction: column;
             flex: 1 50%;
+        }
+        .logs {
+            width: 100%;
+            flex: 1 100%;
         }
         log-list,
         .graphs {
@@ -331,6 +340,15 @@
                         <log-list></log-list>
                     </paper-material>
                 </div>
+                <div class="left">
+                    <div class="costs">
+                        <app-costs model="[[model]]" sections="[[sections]]">
+                        </app-costs>
+                    </div>
+                    <paper-material id="rightcolumn" class="logs">
+                        <log-list></log-list>
+                    </paper-material>
+                </div>
             </div>
         </template>
         <template is="dom-if" if="[[!showDashboard]]">
@@ -442,7 +460,7 @@ Polymer({
             type: Boolean,
             computed: '_computeHasOrg(model.org.name.*)',
             notify: true
-        }   
+        }
     },
     listeners: {
         'close-cloud-info': '_closeCloudChips'
