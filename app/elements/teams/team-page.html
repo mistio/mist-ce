@@ -1,6 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../app-togglable/app-togglable-list.html">
+
 <link rel="import" href="team-edit.html">
 <link rel="import" href="team-add.html">
 
@@ -9,164 +13,158 @@
         <style is="custom-style" include="lists"></style>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
 
-            paper-material {
-                display: block;
-                padding: 24px;
-            }
+        :host {
+            display: block;
+        }
 
-            paper-material.no-pad {
-                padding: 0;
-            }
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
 
-            paper-menu-button paper-button {
-                display: block;
-            }
+        paper-material.no-pad {
+            padding: 0;
+        }
 
-            .flex-horizontal-with-ratios {
-                @apply(--layout-horizontal);
-                align-content: stretch;
-            }
+        paper-menu-button paper-button {
+            display: block;
+        }
 
-            .flexchild {
-                @apply(--layout-flex);
-            }
+        .flex-horizontal-with-ratios {
+            @apply(--layout-horizontal);
+            align-content: stretch;
+        }
 
-            a {
-                color: black;
-                text-decoration: none;
-            }
+        .flexchild {
+            @apply(--layout-flex);
+        }
 
-            .paper-header [paper-drawer-toggle] {
-                margin-left: 10px;
-            }
+        a {
+            color: black;
+            text-decoration: none;
+        }
 
-            .paper-header {
-                @apply(--layout-horizontal);
-            }
+        .paper-header [paper-drawer-toggle] {
+            margin-left: 10px;
+        }
 
-            .paper-header {
-                height: 60px;
-                font-size: 24px;
-                line-height: 60px;
-                padding: 0 10px;
-                color: white;
-                transition: height 0.2s;
-                transition: font-size 0.2s;
-            }
+        .paper-header {
+            @apply(--layout-horizontal);
+        }
 
-            .paper-header.tall {
-                height: 320px;
-                font-size: 16px;
-            }
+        .paper-header {
+            height: 60px;
+            font-size: 24px;
+            line-height: 60px;
+            padding: 0 10px;
+            color: white;
+            transition: height 0.2s;
+            transition: font-size 0.2s;
+        }
 
-            .paper-header h2 {
-                margin-left: 20px;
-                @apply(--layout-flex);
-                text-transform: capitalize;
-            }
+        .paper-header.tall {
+            height: 320px;
+            font-size: 16px;
+        }
 
-            .paper-header .toggleViewButton {
-                --paper-icon-button-ink-color: transparent;
-            }
+        .paper-header h2 {
+            margin-left: 20px;
+            @apply(--layout-flex);
+            text-transform: capitalize;
+        }
 
-            .paper-header .cartButton {
-                margin-right: 10px;
-            }
+        .paper-header .toggleViewButton {
+            --paper-icon-button-ink-color: transparent;
+        }
 
-            paper-icon-button {
-                transition: all 200ms;
-            }
+        .paper-header .cartButton {
+            margin-right: 10px;
+        }
 
-            paper-icon-button.active-sort {
-                transform: rotate(180deg);
-            }
+        paper-icon-button {
+            transition: all 200ms;
+        }
 
-            paper-icon-button.active-sort::content iron-icon {
-                color: #D48900 !important;
-            }
+        paper-icon-button.active-sort {
+            transform: rotate(180deg);
+        }
 
-            app-bar .menu-icon {
-                margin-right: 15px;
-            }
+        paper-icon-button.active-sort::content iron-icon {
+            color: #D48900 !important;
+        }
 
-            [size=xs] > * {
-                display: none;
-            }
+        [size=xs] > * {
+            display: none;
+        }
 
-            [size=xs] app-sidebar {
-                min-width: 100%;
-                height: auto;
-            }
+        [size=xs] app-sidebar {
+            min-width: 100%;
+            height: auto;
+        }
 
-            paper-icon-bottom.bottom {
-                padding-right: 8px;
-            }
+        paper-icon-bottom.bottom {
+            padding-right: 8px;
+        }
+        .subhead {
+            box-sizing: border-box;
+            position: absolute;
+            width: 100%;
+            left: 0;
+            height: 57px;
+            bottom: -57px;
+            right: 0;
+            z-index: 9;
+            color: rgba(0,0,0,0.87);
+            font-size: 15px;
+            line-height: 24px;
+        }
+        .content {
+            margin-top: 57px;
+            padding-bottom: 80px
+        }
+        paper-header-panel ::content #dropShadow {
+            top: 56px;
+        }
+        paper-toolbar ::content #bottomBar .right-actions{
+            transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
+        }
+        paper-toolbar:not(.tall) ::content #bottomBar .right-actions{
+            margin-right: 70px;
+        }
 
-            .subhead {
-                box-sizing: border-box;
-                position: absolute;
-                width: 100%;
-                left: 0;
-                height: 57px;
-                bottom: -57px;
-                right: 0;
-                z-index: 9;
-                color: rgba(0, 0, 0, 0.87);
-                font-size: 15px;
-                line-height: 24px;
-            }
-
-            .content {
-                margin-top: 57px;
-                padding-bottom: 80px
-            }
-
-            paper-header-panel::content #dropShadow {
-                top: 56px;
-            }
-
-            paper-toolbar::content #bottomBar .right-actions {
-                transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
-            }
-
-            paper-toolbar:not(.tall)::content #bottomBar .right-actions {
-                margin-right: 70px;
-            }
-
-            .section {
-                padding-top: 16px;
-            }
-
-            .red {
-                color: var(--red-color);
-                background-color: transparent;
-            }
-
-            .required {
-                font-size: 0.9em;
-            }
-
-            .resource-head {
-                font-weight: 500;
-                padding: 8px 16px;
-                opacity: 0.87;
-                border-bottom: 1px solid #ddd;
-                margin-bottom: 0;
-            }
-
-            .title .up {
-                text-transform: uppercase;
-            }
-
-            .width100 {
-                width: 100%;
-            }
+        .section {
+            padding-top: 16px;
+        }
+        .red {
+            color: var(--red-color);
+            background-color: transparent;
+        }
+        .required {
+            font-size: 0.9em;
+        }
+        .resource-head {
+            font-weight: 500;
+            padding: 8px 16px;
+            opacity: 0.87;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 0;
+        }
+        .title .up {
+            text-transform: uppercase;
+        }
+        .width100 {
+            width: 100%;
+        }
+        .pending {
+            font-weight: 500;
+            font-size: 0.9em;
+            background-color: #69b46c;
+            color: #fff;
+            padding: 2px 6px 4px 6px;
+            border-radius: 3px;
+        }
         </style>
-
 
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
@@ -176,8 +174,9 @@
                         [[team.name]]
                     </h2>
                     <div class="subtitle">
-                        <span hidden$="[[!team.description]]">[[team.description]] </span>
-                        <span class="desc" hidden$="[[!team.members.length]]"> ([[team.members.length]] members)</span>
+                        <span class="sub" hidden$="[[!team.description]]">[[team.description]] </span>
+                        <span class="desc" hidden$="[[hasOtherMembers]]"> Only you</span>
+                        <span class="desc" hidden$="[[!hasOtherMembers]]"> ([[team.members.length]] members)</span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -207,7 +206,9 @@
                                 <template is="dom-repeat" items="[[members]]">
                                     <paper-item>
                                         <a href="/members/[[item.id]]"  class="flex-horizontal-with-ratios width100">
-                                            <span class="flexchild">[[item.name]] </span>
+                                            <span class="flexchild">[[item.name]]
+                                                <span class="pending" hidden$="[[!item.pending]]">pending </span>
+                                            </span>
                                             <span class="flexchild">[[item.email]]</span>
                                         </a>
                                     </paper-item>
@@ -229,11 +230,19 @@
                     <paper-material class="no-pad">
                         <!-- TODO: make interactive add edit of rules -->
                         <h3 class="smallcaps resource-head">Team Policy</h3>
-                        <paper-item>ALLOW add cloud</paper-item>
-                        <paper-item>ALLOW create machines</paper-item>
-                        <paper-item>ALLOW read machines</paper-item>
-                        <paper-item>ALLOW reboot machines</paper-item>
-                        <paper-item>ALLOW monitor machines</paper-item>
+                        <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
+                            <paper-item>
+                                [[rule.operator]]
+                                [[rule.rtype]]
+
+                                [[rule.action]]
+                                [[rule.rid]]
+                                <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
+                                    [[tag]]
+                                </template>
+                            </paper-item>
+                        </template>
+                        <paper-item>[[team.policy.operator]] every other action ON any other resource</paper-item>
                     </paper-material>
                 </div>
             </div>
@@ -274,20 +283,21 @@
                     },
                     team: {
                         type: Object,
-                        computed: '_computeTeam(params, model.teamsArray.*)'
+                        computed: '_computeTeam(params, model.teams.*)'
                     },
                     hasMembers: {
                         type: Boolean,
                         value: false,
                         computed: '_hasMembers(team)'
                     },
+                    hasOtherMembers: {
+                        type: Boolean,
+                        value: true,
+                        computed: '_hasOtherMembers(team)'
+                    },
                     members: {
                         type: Array,
-                        computed: '_computeMembers(team)'
-                    },
-                    teamid: {
-                        type: String,
-                        computed: '_computeTeamId(params)'
+                        computed: '_computeMembers(team, model.members.*)'
                     },
                     timestamp: {
                         type: String,
@@ -312,6 +322,19 @@
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
+                _hasOtherMembers: function(team) {
+                    if (team.members) {
+                        if (team.members.length == 1 && team.members[0].email == this.model.user.email){
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                    else {
+                        return true;
+                    }
+                },
                 _hasMembers: function(team) {
                     if (team.members)
                         return team.members.length > 0 ? true : false;
@@ -320,15 +343,14 @@
                     return params.id;
                 },
                 _computeTeam: function(params, teams) {
-                    return teams.base.find(function(team) {
-                        return team.id == params.id;
+                    return teams.base[params.id];
+                },
+                _computeMembers: function(team, members) {
+                    var teamMembers = [];
+                    team.members.forEach(function(member) {
+                        teamMembers.push(members.base[member]);
                     });
-                },
-                _computeTeamId: function(params) {
-                    return params.id;
-                },
-                _computeMembers: function(team) {
-                    return team.members;
+                    return teamMembers;
                 },
                 _addMember: function(e) {
                     page.show('/add-member/' + this.team.id);
@@ -341,6 +363,18 @@
                     var team = e.detail.team;
                     this.set('team.name', team.name);
                     this.set('team.description', team.description);
+                },
+                _computeRTags: function(tags){
+                    // dom-repeat needs an array
+                    var arrTags = [];
+                    for (var t in tags) {
+                        // TODO: proper obj push in array
+                        // if (tags.t.value)
+                        //     arrTags.push(t + '= '+ tags.t.value);
+                        // else
+                            arrTags.push(t);
+                    }
+                    return arrTags;
                 },
                 _deleteTeam: function(e) {
                     this._showDialog({

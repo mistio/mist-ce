@@ -1,6 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../app-user-menu/app-user-menu.html">
 <link rel="import" href="../notifications-element/notifications-element.html">
+
 <link rel="import" href="top-search.html">
 
 <dom-module id="app-header">
@@ -69,7 +74,7 @@
       <div class="container" tabindex="4">
         <notifications-element></notifications-element>
       </div>
-      <app-user-menu email="[[model.email]]" tabindex="5"></app-user-menu>
+      <app-user-menu user="[[model.user]]" org="[[model.org]]" teams="[[model.teamsArray]]" tabindex="5"></app-user-menu>
     </paper-toolbar>
   </template>
   <script>

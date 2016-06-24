@@ -1,12 +1,17 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
+<link rel="import" href="../tags/tags-list.html">
+
 <link rel="import" href="script-edit.html">
-<link rel="import" href="script-item.html">
 <link rel="import" href="script-run.html">
 
 <dom-module id="script-page">
     <template>
         <style is="custom-style" include="single-page"></style>
+        <style is="custom-style" include="tags-and-labels"></style>
         <style include="shared-styles">
         :host {
             display: block;
@@ -105,10 +110,6 @@
             color: #D48900 !important;
         }
 
-        app-bar .menu-icon {
-            margin-right: 15px;
-        }
-
         [size=xs] > * {
             display: none;
         }
@@ -131,6 +132,12 @@
         .id {
             display: inline-block;
         }
+        /* TODO: better */
+        .tag {
+            padding: 0.5em;
+            display: inline-flex;
+            align-self: center;
+        }
         paper-material.no-pad {
             padding: 0;
         }
@@ -140,11 +147,11 @@
         </style>
 
         <div id="content">
-            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]"> 
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <a class="icon" href="/keys"><iron-icon icon="[[section.icon]]"></iron-icon></a>
                 <div class="title flex">
                     <h2>
-                        [[script.name]] 
+                        [[script.name]]
                     </h2>
                     <div class="subtitle">
                         <span hidden$="[[!isInline]]">Inline Script</span>
@@ -153,23 +160,35 @@
                     </div>
                 </div>
                 <div class="item-actions">
+                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>
                     <paper-button on-tap="_runScript" class="simple"> run <iron-icon icon="av:play-arrow"></iron-icon></paper-button>
                 </div>
             </paper-material>
             <div class="columns">
-                <div id="leftcolumn" class="left command-container"  hidden$="[[!isInline]]"> 
+                <div id="leftcolumn" class="left command-container" hidden$="[[!isInline]]">
                     <div class="command-container">
-                        <pre><code>
-[[script.script]]
-                        </code></pre>
+                        <pre><code>[[script.script]]</code></pre>
                     </div>
                 </div>
                 <paper-material id="rightcolumn" class="right">
-                    <!-- <div>
-                        <h4 class="id">Script ID: </h4><span class="id">[[script.id]]</span>
-                    </div> -->
                 <div class="info-table">
                     <div class="info-body info-group">
+                        <div class="info-item flex-horizontal-with-ratios">
+                            <h4 class="id tags">Tags
+                                <template is="dom-if" if="[[script.tags]]">
+                                    <span class="id">([[script.tags.length]])</span>
+                                </template>
+                                <template is="dom-if" if="[[!script.tags]]">
+                                    <span class="id">(0)</span>
+                                </template>
+                                :
+                            </h4>
+                            <template is="dom-if" if="[[script.tags]]">
+                                <template is="dom-repeat" items="[[script.tags]]">
+                                    <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
+                                </template>
+                            </template>
+                        </div>
                         <div class="info-item flex-horizontal-with-ratios">
                             <div class="flexchild">ID</div>
                             <div class="flexchild">[[script.id]]</div>
@@ -189,7 +208,7 @@
                                 <div class="flexchild">Status</div>
                                 <div class="flexchild">[[script.entrypoint]]</div>
                             </div>
-                        </template>                        
+                        </template>
                         <template is="dom-if" if="[[!isInline]]">
                             <div class="info-item flex-horizontal-with-ratios">
                                 <div class="flexchild">Url</div>
@@ -208,6 +227,7 @@
         <iron-ajax id="scriptDeleteAjaxRequest" url="/api/v1/scripts/[[script.id]]" method="DELETE" on-response="_handleScriptDeleteAjaxResponse" on-error="_handleScriptDeleteAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
+        <tags-list resource="script"></tags-list>
     </template>
     <script>
     (function() {
@@ -243,6 +263,7 @@
                 },
                 isInline: {
                     type: Boolean,
+                    value: false,
                     computed: '_computeIsInline(script.location_type)'
                 }
             },
@@ -265,7 +286,17 @@
                 return params.id;
             },
             _computeIsInline: function(location_type) {
-                return location_type == 'inline';
+                if (location_type)
+                    return location_type == 'inline';
+                else
+                    return true;
+            },
+            _editTags: function() {
+                var el = this.querySelector('tags-list'),
+                items = [];
+                items.push(this.script);
+                el.items = items;
+                el._openDialog();
             },
             _runScript: function(e) {
                 page.show('/run-script/' + this.script.id);

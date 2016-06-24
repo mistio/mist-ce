@@ -1,5 +1,9 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
+
 <link rel="import" href="network-item.html">
 <link rel="import" href="network-add.html">
 <link rel="import" href="subnet-item.html">
@@ -97,10 +101,6 @@
                 color: #D48900 !important;
             }
 
-            app-bar .menu-icon {
-                margin-right: 15px;
-            }
-
             h4.key {
                 @apply(--layout-flex);
                 text-transform: uppercase;
@@ -121,7 +121,7 @@
                 padding-right: 8px;
             }
         </style>
-        
+
         <div id="content">
             <h2>[[network.name]]</h2>
             <paper-material>

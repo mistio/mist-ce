@@ -1,33 +1,130 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-from-top-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-up-animation.html">
 
 <dom-module id="cloud-info">
     <template>
         <style is="custom-style" include="dialogs"></style>
         <style include="shared-styles">
+            :root {
+                --primary-color: #fff;
+                --primary-text-color: rgba(255,255,255,0.87);
+                --secondary-text-color: rgba(255,255,255,0.54);
+                --primary-background-color: #424242;
+                --secondary-background-color: #424242;
+                --paper-input-container-input-color: rgba(255,255,255,0.87);
+                --paper-input-container-focus-color: #424242;
+            }
             :host {
-                display: block;
+                box-sizing: border-box;
                 width: 100%;
+                height: auto;
+                margin-top: 8px;
+                transition: 200ms all ease-in;
+                position: relative;
+            }
+            :host[opened='true'],
+            :host[opened] {
+                display: block;
+            }
+            :host[opened="false"],
+            :host:not([opened]){
+                display: none;
+            }
+            :host .cloud-block {
+                box-sizing: border-box;
+                background-color: #424242;
+                color: #fff !important;
+                @apply(--layout-horizontal);
+            }
+            :host >::content paper-input-container {
+                padding: 0 0 8px 0;
+            }
+            :host >::content .input-content.label-is-floating.paper-input-container label {
+                color: rgba(255,255,255,0.54) !important;
+            }
+            :host paper-icon-button ::content iron-icon {
+                color: #fff !important;
+            }
+            .cloud-overview-item {
+                @apply(--layout-horizontal);
+                padding: 16px 0;
+            }
+            .cloud-overview-item.last {
+                padding: 12px 0 16px 0;
+            }
+            .cloud-overview {
+                padding: 4px 24px 24px 24px;
+                border-right: 1px solid rgba(255,255,255,0.15);
+                max-width: 33%;
+            }
+            .cloud-credentials {
+                padding: 24px;
+            }
+            #close-btn {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+            }
+            .button {
+                align-self: center;
+            }
+            paper-input {
+                padding-right: 16px;
+            }
+            paper-button {
+                padding: 0.57em 0.57em;
+            }
+            paper-button[disabled] {
+                background: rgba(255,255,255,0.15);
+                color: #424242;
+            }
+            paper-toggle-button {
+                margin-left: 36px;
+                cursor: pointer;
+            }
+            :host paper-toggle-button >::content .toggle-button {
+                background-color: #d96557 !important;
+            }
+            :host paper-toggle-button[checked]:not([disabled]) >::content .toggle-button {
+                background-color: #69b46c !important;
+            }
+            ::selection,
+            :host >::content ::selection {
+                background-color: yellow;
+                color: black;
             }
         </style>
 
-        <paper-dialog entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
-            <h2>[[cloud.title]]</h2>
-            <paper-dialog-scrollable>
-                <p>
-                    <paper-input label="Title" value="{{newCloud.title}}"></paper-input>
-                    <paper-button raised disabled$="[[!formReady]]" on-tap="_changeTitle">Save</paper-button>
-                </p>
-                <p>
+        <div class="cloud-block">
+            <paper-icon-button id="close-btn" icon="close" on-tap="close"></paper-icon-button>
+            <div class="cloud-overview flex">
+                <div class="cloud-overview-item">
+                    <paper-input class="flex" label="Title" value="{{newCloud.title}}"></paper-input>
+                    <div class="button">
+                        <paper-button disabled$="[[!formReady]]" on-tap="_changeTitle" class="blue">Save</paper-button>
+                    </div>
+                </div>
+                <div class="cloud-overview-item">
                     <iron-label>State</iron-label>
-                    <paper-toggle-button checked$="[[isEnabled]]" on-tap="_changeState">[[cloud.state]]</paper-toggle-button>
-                </p>
-                <p>
-                    <paper-input id="cloudId" label="ID" value="[[cloud.id]]"></paper-input>
-                    <paper-button raised on-tap="_copyId">Copy Id</paper-button>
-                </p>
-            </paper-dialog-scrollable>
-        </paper-dialog>
+                    <div class="button">
+                        <paper-toggle-button checked$="[[isEnabled]]" on-tap="_changeState">[[cloud.state]]</paper-toggle-button>
+                    </div>
+                </div>
+                <div class="cloud-overview-item last">
+                    <paper-input class="flex" id="cloudId" label="ID" value="[[cloud.id]]"></paper-input>
+                    <div class="button">
+                        <paper-button on-tap="_copyId" class="blue">Copy Id</paper-button>
+                    </div>
+                </div>
+            </div>
+            <div class="cloud-credentials flex">
+                credentials
+            </div>
+        </div>
 
         <iron-ajax id="cloudEditAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="PUT" on-response="_handleCloudEditAjaxResponse" on-error="_handleCloudEditAjaxError"></iron-ajax>
         <iron-ajax id="cloudStateAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="POST" on-response="_handleCloudStateAjaxResponse" on-error="_handleCloudStateAjaxError"></iron-ajax>
@@ -40,8 +137,15 @@
 
             Polymer({
                 is: 'cloud-info',
-
+                behaviors: [
+                    Polymer.NeonAnimationRunnerBehavior
+                ],
                 properties: {
+                    opened: {
+                      type: Boolean,
+                      value: false,
+                      reflectToAttribute: true
+                    },
                     cloud: Object,
                     newCloud: {
                         type: Object,
@@ -58,10 +162,59 @@
                     isEnabled: {
                         type: Boolean,
                         computed: '_computeIsEnabled(cloud.enabled)'
-                    }
+                    },
+                    // animationConfig: {
+                    //   value: function() {
+                    //     return {
+                    //       'entry': {
+                    //         // provided by neon-animation/animations/scale-up-animation.html
+                    //         name: 'slide-from-top-animation',
+                    //         node: this
+                    //       },
+                    //       'exit': {
+                    //         // provided by neon-animation/animations/fade-out-animation.html
+                    //         name: 'slide-up-animation',
+                    //         node: this
+                    //       }
+                    //     }
+                    //   }
+                    // }
                 },
                 listeners: {
-                    'iron-overlay-closed': '_modalClosed'
+                    // 'neon-animation-finish': '_onNeonAnimationFinish'
+                },
+                // toggle: function(){
+                //     if (this.opened == true){
+                //         this.opened = false;
+                //         this.style.display = 'inline-block';
+                //         // run scale-up-animation
+                //         this.playAnimation('entry');
+                //     }
+                //     else {
+                //         this.opened = true;
+                //         // run fade-out-animation
+                //         this.playAnimation('exit');
+                //     }
+                // },
+                // show: function() {
+                //     this.opened = true;
+                //     this.style.display = 'inline-block';
+                //     // run scale-up-animation
+                //     this.playAnimation('entry');
+                // },
+                // hide: function() {
+                //     this.opened = false;
+                //     // run fade-out-animation
+                //     this.playAnimation('exit');
+                // },
+                // _onNeonAnimationFinish: function() {
+                //     if (!this.opened) {
+                //       this.style.display = 'none';
+                //     }
+                // },
+                close: function(){
+                    this.set('opened', false);
+                    this.fire('close-cloud-info');
                 },
                 _computeNewCloud: function(cloud) {
                     return {
