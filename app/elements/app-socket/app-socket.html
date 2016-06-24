@@ -19,7 +19,10 @@
             },
             onboarding: {
                 type: Object,
-                value: {}
+                value: {
+                    isLoadingClouds: true
+                },
+                notify: true
             }
         },
 
@@ -386,7 +389,10 @@
                 this.set('onboarding.hasCloud', true);
             if (!data.length)
                 this.set('onboarding.hasCloud', false);
-            return this._updateModel('clouds', data);
+
+            var ret = this._updateModel('clouds', data);
+            this.set('onboarding.isLoadingClouds', false);
+            return ret;
         },
 
         _updateMonitoring: function(data) {

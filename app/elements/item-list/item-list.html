@@ -47,8 +47,11 @@
         .row paper-button.more {
             position: absolute;
             top: 0;
-            right: 0px;
-            padding: 22px 0;
+            right: 0;
+            padding: 0 0 0 24px;
+            background-color: inherit;
+            min-width: auto;
+            height: 64px;
         }
 
         .row paper-button.more iron-icon {
@@ -71,6 +74,7 @@
             font-size: 14px;
             font-weight: 400;
             border-bottom: 1px solid #e5e5e5;
+            overflow: hidden;
         }
 
         .header > .item-list {
@@ -173,6 +177,17 @@
             text-overflow: ellipsis;
         }
 
+        /* show arrow */
+        .field {
+            cursor: pointer;
+        }
+        .field #sortarrow {
+            display: none;
+        }
+        .field.asc #sortarrow, .field.desc #sortarrow {
+            display: inline-block;
+        }
+
         </style>
 
         <iron-media-query query="(min-width: 1700px)" query-matches="{{xxwideViewport}}"></iron-media-query>
@@ -200,6 +215,7 @@
               <template is="dom-repeat" items="[[fields]]">
                   <div class$="[[item]] field field[[index]] [[_isSortedBy(item, sortBy, sortOrder)]]" on-tap="_changeSortOrder">
                       [[item]]
+                      <span id="sortarrow"><iron-icon icon$="[[_icon(sortOrder)]]"></iron-icon></span>
                   </div>
               </template>
               <div class="field tags">tags</div>
@@ -212,7 +228,7 @@
                               <paper-item>[[item]]</paper-item>
                           </template>
                       </paper-listbox>
-                </paper-dropdown-menu>[[_isSortedBy(sortBy, sortBy, sortOrder)]]
+                  </paper-dropdown-menu>[[_isSortedBy(sortBy, sortBy, sortOrder)]]
               </div>
             </template>
             <item-actions id="actions" items="[[items]]" selected-items="[[selectedItems]]"></item-actions>
@@ -358,14 +374,24 @@ Polymer({
             that.querySelector('iron-list').notifyResize();
         }, 300);
     },
-
+    _icon: function(sortOrder){
+        console.log(this.sortOrder);
+        if (this.sortOrder){
+            return 'icons:arrow-upward'
+        }
+        else {
+            return 'icons:arrow-downward'
+        }
+    },
     itemsChanged: function (changeRecord) {
         var that = this;
         // update height of list depending on number of items
         var topOfset = 142;
-        var wh = window.innerHeight - topOfset;
-        var itemHeight = 64;
-        var criticalNumofItems = Math.floor(wh/itemHeight) ;
+        var wh = document.getElementById('mainPanel').offsetHeight - 24 - 54; //#mainPanel height - top padding - header height
+        var itemHeight = 64 + 1; //list item height + border
+        var criticalNumofItems = Math.floor(wh/itemHeight) - 1;
+        
+        // console.log( wh, ' / ', itemHeight, ' -1 = ' , criticalNumofItems, '|', this.items.length, ' * 64 = ', itemHeight * this.items.length );
 
         if (that.items.length > criticalNumofItems){
             this.vpHeight = 'height:'+ wh +'px;';
@@ -395,7 +421,7 @@ Polymer({
             if (that.get('items.length') != that.get('selectedItems.length'))
                 that.set('allselected', false);
 
-        }, 300);
+        }, 50);
     },
 
     selectedItemsChanged: function (changeRecord) {
