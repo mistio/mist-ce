@@ -9,6 +9,7 @@
             @apply(--layout-horizontal);
             padding: 0px 24px;
             width: 100%;
+            min-height: 64px;
         }
 
         :host(:not([narrow-viewport])) a {
@@ -120,11 +121,21 @@ Polymer({
     },
 
     itemField: function(item, field) {
+        
+        if (field == 'cost') {
+            if (item.extra.indicative_cost_per_month) {
+                return '$'+Math.round(item.extra.indicative_cost_per_month);
+            }
+            else {
+                return '';
+            }
+        }
+
         var ret = item[field];
 
         // return cloud title
         if (field == 'cloud')
-            return ret.title;
+            return ret.title;        
 
         if (field == 'template')
             return document.querySelector('app-main').model.templates[ret].name;

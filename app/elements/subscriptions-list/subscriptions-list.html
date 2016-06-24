@@ -30,7 +30,7 @@
                         <div class="flexchild text-right">Action</div>
                     </div>
                     <div class="info-body">
-                        <template is="dom-repeat" items=[[subscriptions]] as="subscription">
+                        <template is="dom-repeat" items=[[user.user_plans]] as="subscription">
                             <div class="row">
                                 <subscription-item subscription="[[subscription]]" index="[[index]]" count="[[subscriptions.length]]"></subscription-item>
                             </div>
@@ -48,13 +48,10 @@
                 is: 'subscriptions-list',
 
                 properties: {
-                    subscriptions: {
-                        type: Array,
-                        value: []
-                    }
-                },
-                ready: function() {
-                    this.set('subscriptions', USER_PLANS);
+                  user: {
+                      type: Object,
+                      notify: true
+                  }
                 }
             });
         })();

@@ -1,12 +1,15 @@
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+
 <link rel="import" href="../details-page/details-page.html">
 <link rel="import" href="../password-page/password-page.html">
 <link rel="import" href="../feedback-page/feedback-page.html">
 <link rel="import" href="../plans-list/plans-list.html">
 <link rel="import" href="../plans-list/plan-item.html">
+
 <link rel="import" href="../subscriptions-list/subscriptions-list.html">
 <link rel="import" href="../subscriptions-list/subscription-item.html">
+
 
 <dom-module id="page-account">
 
@@ -38,13 +41,13 @@
             </paper-tabs>
 
             <iron-pages selected="{{selected}}">
-                <details-page data-route="0"></details-page>
-                <password-page data-route="1"></password-page>
-                <plans-list data-route="2"></plans-list>
+                <details-page user="[[user]]" data-route="0"></details-page>
+                <password-page user="[[user]]" data-route="1"></password-page>
+                <plans-list user="[[user]]" data-route="2"></plans-list>
                 <div data-route="3"></div>
                 <div data-route="4"></div>
-                <subscriptions-list data-route="5"></subscriptions-list>
-                <feedback-page data-route="6"></feedback-page>
+                <subscriptions-list user="[[user]]" data-route="5"></subscriptions-list>
+                <feedback-page user="[[user]]" data-route="6"></feedback-page>
             </iron-pages>
 
         </div>
@@ -55,6 +58,10 @@
     Polymer({
         is: 'page-account',
         properties: {
+            user: {
+                type: Object,
+                notify: true
+            },
             selected: {
                 value: 0
             }

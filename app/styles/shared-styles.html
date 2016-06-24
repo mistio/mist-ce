@@ -103,7 +103,8 @@
             --mist-light-color: #B0BEC5;
             --mist-lighter-color: #eceff1;
             /*accent color*/
-            --mist-blue: #039BE5;
+            /*--mist-blue: #039BE5;*/
+            --mist-blue: #2196F3;
         }
 
         .green {
@@ -221,7 +222,7 @@
             margin: 0;
             @apply(--layout-flex);
         }
-        paper-material paper-button.blue-link {
+        paper-button.blue-link {
             background-color: transparent;
             font-weight: 400;
             color: rgba(0,0,0,87);
@@ -764,9 +765,10 @@
         .single-head .subtitle {
             margin-top: 4px;
         }
-
+        .subtitle .sub {
+            padding-right: 16px;
+        }
         .subtitle .desc {
-            padding-left: 16px;
             opacity: 0.54;
             font-size: 0.9em;
         }
