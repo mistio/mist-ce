@@ -402,6 +402,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
             Cloud.objects.get(owner=user, id=cloud.id).delete()
             raise CloudUnauthorizedError(exc)
         except ServiceUnavailableError as exc:
+            Cloud.objects.get(owner=user, id=cloud.id).delete()
             raise MistError("Couldn't connect to host '%s'."
                             % machine_hostname)
     if params.get('monitoring'):
@@ -479,6 +480,7 @@ def _add_cloud_coreos(user, title, provider, params):
             Cloud.objects.get(owner=user, id=cloud.id).delete()
             raise CloudUnauthorizedError(exc)
         except ServiceUnavailableError as exc:
+            Cloud.objects.get(owner=user, id=cloud.id).delete()
             raise MistError("Couldn't connect to host '%s'."
                             % machine_hostname)
 
