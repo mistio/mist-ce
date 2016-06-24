@@ -75,8 +75,6 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
                     datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
-from mist.core.methods import get_machine_tags
-
 # this is a sanity check for the user supplied
 # tags cost_per_month/cost_per_hour
 # used for VM cost analysis
@@ -1614,6 +1612,7 @@ def list_machines(user, cloud_id):
         all_tags = tags_from_provider
 
         try:
+            from mist.core.methods import get_machine_tags
             mistio_tags = get_machine_tags(user, cloud_id, m.id)
         except:
             mistio_tags = {}
