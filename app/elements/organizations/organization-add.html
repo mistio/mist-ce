@@ -1,0 +1,106 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="organization-add">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                width: 100%;
+            }
+        </style>
+
+        <paper-dialog id="organizationAddModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Add Organization</h2>
+            <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
+            <paper-dialog-scrollable>
+                <p>
+                    <paper-input id="name" label="Name" error-message="Please enter organization's name" value="{{newOrganization.name}}"></paper-input>
+                </p>
+                <div class="clearfix btn-group">
+                    <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
+                </div>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <iron-ajax id="organizationAddAjaxRequest" url="/api/v1/org" method="POST" on-response="_handleOrganizationAddAjaxResponse" on-error="_handleOrganizationAddAjaxError"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'organization-add',
+
+                properties: {
+                    newOrganization: {
+                        type: Object,
+                        value: {
+                            name: ''
+                        },
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(newOrganization.name, sendingData)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed'
+                },
+                _computeFormReady: function(name, sendingData) {
+                    var formReady = false;
+
+                    if (name) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _computeType: function(type, value) {
+                    return type == value;
+                },
+                _computeDanger: function(danger) {
+                    return danger;
+                },
+                openDialog: function(e) {
+                    this.querySelector('paper-dialog').open();
+                },
+                _closeDialog: function(e) {
+                    this.querySelector('paper-dialog').close();
+                },
+                _submitForm: function() {
+                    this.$.organizationAddAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.organizationAddAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.organizationAddAjaxRequest.body = {
+                        name: this.newOrganization.name
+                    };
+                    this.$.organizationAddAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _handleOrganizationAddAjaxResponse: function() {
+                    this.set('sendingData', false);
+                    this._formReset();
+                },
+                _modalClosed: function(e) {
+                    if (e.srcElement.id == 'organizationAddModal') {
+                        this._formReset();
+                    }
+                },
+                _formReset: function() {
+                    this.set('newOrganization.name', '');
+                }
+            });
+        })();
+    </script>
+</dom-module>

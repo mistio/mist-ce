@@ -10,7 +10,6 @@
 
 <link rel="import" href="../app-styles/app-styles.html">
 <link rel="import" href="../app-socket/app-socket.html">
-
 <link rel="import" href="../app-icons/app-icons.html">
 
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
@@ -18,7 +17,6 @@
 
 <link rel="import" href="../pages/page-dashboard.html">
 <link rel="import" href="../pages/page-items.html">
-
 
 <dom-module id="app-main">
     <template>
@@ -32,7 +30,7 @@
             }
 
             iron-pages {
-                padding: 24px;
+                padding: 24px 24px 0 24px;
                 margin-left: 210px;
                 overflow: hidden;
                 transition: margin-left 350ms ease-in-out;
@@ -214,6 +212,10 @@
                     clouds: true,
                     monitoring: true
                 }
+            };
+
+            for(i = 1; i<= this.model.teamsArray.length; i++){
+              this.model.teams = this.model.teamsArray[i].teams[i].id;
             };
 
             this.sectionsArray = [{
