@@ -75,6 +75,13 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
                     datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
+from mist.core.methods import get_machine_tags
+
+# this is a sanity check for the user supplied
+# tags cost_per_month/cost_per_hour
+# used for VM cost analysis
+MAX_USER_PROVIDER_COST_PER_HOUR = 100
+MAX_USER_PROVIDER_COST_PER_MONTH = 100 * 24 * 31
 
 
 def add_cloud(user, title, provider, apikey, apisecret, apiurl, tenant_name,
@@ -1513,22 +1520,19 @@ def list_machines(user, cloud_id):
 
         if m.driver.type == 'gce':
             # tags and metadata exist in GCE
-            tags = m.extra.get('metadata', {}).get('items')
+            tags_from_provider = m.extra.get('metadata', {}).get('items')
         else:
-            tags = m.extra.get('tags') or m.extra.get('metadata') or {}
+            tags_from_provider = m.extra.get('tags') or m.extra.get('metadata') or {}
         # optimize for js
-        if type(tags) == dict:
-            tags = [{'key': key, 'value': value} for key, value in tags.iteritems() if key != 'Name']
-        # if m.extra.get('availability', None):
-        #    # for EC2
-        #    tags.append({'key': 'availability', 'value': m.extra['availability']})
+        if type(tags_from_provider) == dict:
+            tags_from_provider = [{'key': key, 'value': value} for key, value in tags_from_provider.iteritems() if key != 'Name']
         if m.extra.get('DATACENTERID', None):
             # for Linode
             dc = config.LINODE_DATACENTERS.get(m.extra['DATACENTERID'])
-            tags.append({'key': 'DATACENTERID', 'value':dc})
+            tags_from_provider.append({'key': 'DATACENTERID', 'value':dc})
         elif m.extra.get('vdc', None):
             # for vCloud
-            tags.append({'key': 'vdc', 'value': m.extra['vdc']})
+            tags_from_provider.append({'key': 'vdc', 'value': m.extra['vdc']})
 
         image_id = m.image or m.extra.get('imageId', None)
         size = m.size or m.extra.get('flavorId', None)
@@ -1607,9 +1611,39 @@ def list_machines(user, cloud_id):
             if m.extra.get('xml_description'):
                 m.extra['xml_description'] = escape(m.extra['xml_description'])
 
-        # tags should be a list
-        if not tags:
-            tags = []
+        all_tags = tags_from_provider
+
+        try:
+            mistio_tags = get_machine_tags(user, cloud_id, m.id)
+        except:
+            mistio_tags = {}
+
+        for tag in mistio_tags:
+            key, value = tag.popitem()
+            tag_dict = {'key': key, 'value': value}
+            if tag_dict not in all_tags:
+                all_tags.append(tag_dict)
+            # cost_per_hour + cost_per_month fixed tags for
+            # machine cost analysis
+            if key == 'cost_per_hour':
+                cost_per_hour = value
+                month_days = calendar.monthrange(now.year, now.month)[1]
+                try:
+                    cost_per_hour = float(cost_per_hour)
+                    if MAX_USER_PROVIDER_COST_PER_HOUR > cost_per_hour >= 0:
+                        m.extra['cost_per_hour'] = "{0:.2f}".format(cost_per_hour)
+                        cost_per_month = float(cost_per_hour) * 24 * month_days
+                        m.extra['cost_per_month'] = "{0:.2f}".format(cost_per_month)
+                except:
+                    pass
+            if key == 'cost_per_month':
+                cost_per_month = value
+                try:
+                    cost_per_month = float(cost_per_month)
+                    if MAX_USER_PROVIDER_COST_PER_MONTH > cost_per_month >= 0:
+                        m.extra['cost_per_month'] = "{0:.2f}".format(cost_per_month)
+                except:
+                    pass
 
         machine = {'id': m.id,
                    'uuid': machine_entry.id if machine_entry else '',
@@ -1619,7 +1653,7 @@ def list_machines(user, cloud_id):
                    'state': config.STATES[m.state],
                    'private_ips': m.private_ips,
                    'public_ips': m.public_ips,
-                   'tags': tags,
+                   'tags': all_tags,
                    'missing_since': str(machine_entry.missing_since)
                         if machine_entry and machine_entry.missing_since else '',
                    'last_seen': str(machine_entry.last_seen)
@@ -1629,16 +1663,12 @@ def list_machines(user, cloud_id):
             machine_cost = machine_cost_calculator(m)
         except:
             machine_cost = {}
-        indicative_cost_per_month = machine_cost.get('indicative_cost_per_month', 0)
-        indicative_cost_per_hour = machine_cost.get('indicative_cost_per_hour', 0)
-        if indicative_cost_per_hour:
-            machine['extra']['indicative_cost_per_hour'] = indicative_cost_per_hour
-        if indicative_cost_per_month:
-            machine['extra']['indicative_cost_per_month'] = indicative_cost_per_month
-
-        # IDEA: allow to override this, if user wants to add a special tag
-        # if tags.get('indicative_price_per_month'):
-        #     machine['indicative_price_per_month'] = tags.get('indicative_price_per_month')
+        cost_per_month = machine_cost.get('cost_per_month', 0)
+        cost_per_hour = machine_cost.get('cost_per_hour', 0)
+        if cost_per_hour:
+            machine['extra']['cost_per_hour'] = cost_per_hour
+        if cost_per_month:
+            machine['extra']['cost_per_month'] = cost_per_month
 
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
@@ -4383,7 +4413,7 @@ def machine_cost_calculator(m):
     TODO: GCE, Azure, NephoScale,
     HostVirtual
     """
-    cost = {'indicative_cost_per_hour': 0, 'indicative_cost_per_month': 0}
+    cost = {'cost_per_hour': 0, 'cost_per_month': 0}
     if m.driver.type in [Provider.LINODE, Provider.PACKET, Provider.GCE]:
         sizes = CloudSize.objects.filter(cloud_provider=m.driver.type)
     if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
@@ -4408,8 +4438,8 @@ def machine_cost_calculator(m):
                     plan_price = node_size.price.get('linux')
                 plan_price = float(plan_price.replace('/hour','').replace('$', ''))
                 # just need the float value
-                cost['indicative_cost_per_hour'] = plan_price
-                cost['indicative_cost_per_month'] = float(plan_price) * 24 * month_days
+                cost['cost_per_hour'] = plan_price
+                cost['cost_per_month'] = float(plan_price) * 24 * month_days
     if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
         # Need to get image in order to specify the OS type
         # out of the image id
@@ -4427,8 +4457,8 @@ def machine_cost_calculator(m):
                     # use the default which is linux
                     plan_price = json.loads(node_size.price).get('linux')
                 # just need the float value
-                cost['indicative_cost_per_hour'] = plan_price
-                cost['indicative_cost_per_month'] = float(plan_price) * 730
+                cost['cost_per_hour'] = plan_price
+                cost['cost_per_month'] = float(plan_price) * 730
                 # 730 is the number of hours per month as on https://www.rackspace.com/calculator
                 # TODO: RackSpace mentions on https://www.rackspace.com/cloud/public-pricing
                 # there's a minimum service charge of $50/mo across all Cloud Servers
@@ -4438,7 +4468,7 @@ def machine_cost_calculator(m):
             for node_size in sizes:
                 if node_size.size_id == size:
                     plan_price = node_size.price.replace('/month','').replace('$', '')
-                    cost['indicative_cost_per_month'] = plan_price
+                    cost['cost_per_month'] = plan_price
     if m.driver.type == Provider.PACKET:
         size = m.extra.get('plan')
         if size:
@@ -4446,25 +4476,34 @@ def machine_cost_calculator(m):
                 try:
                     if plan_size.name.startswith(size):
                         plan_price = plan_size.price.split(' ')[0]
-                        cost['indicative_cost_per_hour'] = plan_price
-                        cost['indicative_cost_per_month'] = float(plan_price) * 24 * month_days
+                        cost['cost_per_hour'] = plan_price
+                        cost['cost_per_month'] = float(plan_price) * 24 * month_days
                 except:
                     pass
     if m.driver.type == Provider.DIGITAL_OCEAN:
         size = m.extra.get('size', {})
-        cost['indicative_cost_per_month'] = size.get('price_monthly')
-        cost['indicative_cost_per_hour'] = size.get('price_hourly')
+        cost['cost_per_month'] = size.get('price_monthly')
+        cost['cost_per_hour'] = size.get('price_hourly')
     if m.driver.type == Provider.VULTR:
-        cost['indicative_cost_per_month'] = m.extra.get('cost_per_month')
+        cost['cost_per_month'] = m.extra.get('cost_per_month')
     if m.driver.type == Provider.SOFTLAYER:
         if not m.extra.get('hourlyRecurringFee'):
-            cost['indicative_cost_per_month'] = m.extra.get('recurringFee')
+            cost['cost_per_month'] = m.extra.get('recurringFee')
         else:
             # m.extra.get('recurringFee') here will show what it has
             # cost for the current month, up to now
             cost_per_hour = m.extra.get('hourlyRecurringFee')
-            cost['indicative_cost_per_hour'] = cost_per_hour
-            cost['indicative_cost_per_month'] = float(cost_per_hour) * 24 * month_days
+            cost['cost_per_hour'] = cost_per_hour
+            cost['cost_per_month'] = float(cost_per_hour) * 24 * month_days
+
+    for key, value in cost.items():
+        if value and not isinstance(value, int):
+            try:
+                # value can be float or str, we want to cast to float with 2 dec points
+                value = float(value)
+                cost[key] = "{0:.2f}".format(value)
+            except:
+                cost[key] = 0
     return cost
 
 
