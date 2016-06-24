@@ -45,7 +45,7 @@
                 padding: 0;
             }
         </style>
-        <app-socket model="{{model}}"></app-socket>
+        <app-socket model="{{model}}" onboarding="{{onboarding}}" ></app-socket>
         <iron-media-query query="(max-width: 860px)" query-matches="{{smallscreen}}"></iron-media-query>
         <iron-routes for="app-main" selected="[[section]]">
             <!-- dashboard -->
@@ -105,7 +105,7 @@
 
             <iron-pages id="app-main" main smallscreen$={{smallscreen}}>
                 <!-- dashboard -->
-                <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]"></page-dashboard>
+                <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]" onboarding="[[onboarding]]"></page-dashboard>
                 <cloud-add model="[[model]]" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
                 <page-items class="incidents" model="[[model]]" items="[[model.incidents]]" sections="[[sections]]" section="[[sections.incidents]]"></page-items>
                 <!-- machines -->
@@ -154,8 +154,7 @@
 
         properties: {
             model: {
-                type: Object,
-                notify: true
+                type: Object
             },
             sections: {
                 type: Object
@@ -163,6 +162,9 @@
             sectionsArray: {
                 type: Array,
                 notify: true
+            },
+            onboarding: {
+                type: Object
             },
             title: {
                 type: String,

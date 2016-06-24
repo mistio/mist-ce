@@ -284,8 +284,25 @@
         paper-dropdown-menu {
             width: 100%;
         }
+        .is-loading {
+            position: absolute;
+            top: 20px;
+            left: 270px;
+            right: 0;
+            bottom: 0;
+            width: calc(100% - 270px);
+            height: 100vh;
+            z-index: 999;
+            background-color: #eee;
+        }
+        paper-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 10% auto;
+            display: block;
+        }
         </style>
-        <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
+        <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>        
         <template is="dom-if" if="[[showDashboard]]">
                 <div class="clouds top flexchild-wide-top">
                     <div class="flex">
@@ -421,6 +438,10 @@
             </a>
         </div>
         <iron-ajax id="saveOrgRequest" method="PUT" url="/api/v1/org/[[model.org.id]]"></iron-ajax>
+
+        <div class="is-loading" hidden$="[[!onboarding.isLoadingClouds]]">        
+            <paper-spinner active></paper-spinner>
+        </div>
     </template>
 </dom-module>
 <script>
@@ -433,8 +454,10 @@ Polymer({
             type: Object
         },
         model: {
-            type: Object,
-            notify: true
+            type: Object
+        },
+        onboarding: {
+            type: Object
         },
         onbstate: {
             type: Number
@@ -453,8 +476,8 @@ Polymer({
         openedCloud: String,
         showDashboard: {
             type: Boolean,
-            value: true,
-            computed: '_computeshowDashboard(model.cloudsArray.length)',
+            // value: true,
+            computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds)',
             notify: true
         },
         hasOrg: {
@@ -574,9 +597,10 @@ Polymer({
              return false;
          }
      },
-    _computeshowDashboard: function(cloudslength) {
+    _computeshowDashboard: function(cloudslength, isLoadingClouds) {
+        console.log("HERERE", cloudslength, isLoadingClouds);
         var show;
-        if (cloudslength > 0) {
+        if (cloudslength > 0 && isLoadingClouds == false) {
             show =  true;
         }
         else {
