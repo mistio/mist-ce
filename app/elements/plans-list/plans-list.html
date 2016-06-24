@@ -25,13 +25,12 @@
         </style>
 
         <paper-material>
-            <h2>Billing</h2>
-            <h3>current plan</h3>
-            <plan-item user="[[user]]" plan="[[user.current_plan]]" iscurrent="true" index="0"></plan-item>
-
+            <h3>Your plan</h3>
+            <plan-item user="[[user]]" plan="[[user.current_plan]]" iscurrent="true" index="0" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
+            <h3>Other plans</h3>
             <div class="plans">
                 <template is="dom-repeat" items=[[plans]] as="plan">
-                    <plan-item user="[[user]]" plan="[[plan]]" index="[[index]]" iscurrent$="[[computeIsCurrent(plan, user)]]"></plan-item>
+                    <plan-item user="[[user]]" plan="[[plan]]" index="[[index]]" iscurrent$="[[computeIsCurrent(plan, user)]]" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
                 </template>
             </div>
         </paper-material>
@@ -66,7 +65,7 @@
                   else {
                     return false;
                   }
-                 }
+                }
             });
         })();
     </script>
