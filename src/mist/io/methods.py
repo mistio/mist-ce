@@ -1077,14 +1077,13 @@ def delete_key(user, key_id):
     :param key_id:
     :return:
     """
-
     log.info("Deleting key with id '%s'.", key_id)
     key = Keypair.objects.get(owner=user, id=key_id)
     default_key = key.default
     # if key.default:
     #     default_key = key.default
     key.delete()
-    other_key = Keypair.objects(owner=user).first()
+    other_key = Keypair.objects(owner=user, id__ne=key_id).first()
     if default_key and other_key:
         other_key.default = True
         other_key.save()
