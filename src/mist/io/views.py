@@ -276,7 +276,7 @@ def add_cloud(request):
         if type(params[key]) in [unicode, str]:
             params[key] = params[key].rstrip().lstrip()
 
-    api_version = request.headers.get('Api-Version', 1)
+    # api_version = request.headers.get('Api-Version', 1)
     title = params.get('title', '')
     provider = params.get('provider', '')
 
@@ -284,41 +284,10 @@ def add_cloud(request):
         raise RequiredParameterMissingError('provider')
 
     monitoring = None
-    if int(api_version) == 2:
-        ret = methods.add_cloud_v_2(owner, title, provider, params)
-        cloud_id = ret['cloud_id']
-        monitoring = ret.get('monitoring')
-    else:
-        apikey = params.get('apikey', '')
-        apisecret = params.get('apisecret', '')
-        apiurl = params.get('apiurl') or ''  # fixes weird issue w/ none value
-        tenant_name = params.get('tenant_name', '')
-        # following params are for baremetal
-        machine_hostname = params.get('machine_ip', '')
-        machine_key = params.get('machine_key', '')
-        machine_user = params.get('machine_user', '')
-        remove_on_error = params.get('remove_on_error', True)
-        try:
-            docker_port = int(params.get('docker_port', 4243))
-        except:
-            docker_port = 4243
-        try:
-            ssh_port = int(params.get('machine_port', 22))
-        except:
-            ssh_port = 22
-        region = params.get('region', '')
-        compute_endpoint = params.get('compute_endpoint', '')
-        # TODO: check if all necessary information was provided in the request
+    ret = methods.add_cloud_v_2(owner, title, provider, params)
 
-        cloud_id = methods.add_cloud(
-            owner, title, provider, apikey, apisecret, apiurl,
-            tenant_name=tenant_name,
-            machine_hostname=machine_hostname, machine_key=machine_key,
-            machine_user=machine_user, region=region,
-            compute_endpoint=compute_endpoint, port=ssh_port,
-            docker_port=docker_port,
-            remove_on_error=remove_on_error,
-        )
+    cloud_id = ret['cloud_id']
+    monitoring = ret.get('monitoring')
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
