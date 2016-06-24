@@ -6,7 +6,6 @@
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
-<link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
 
 <link rel="import" href="../section-tile/section-tile.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
@@ -180,7 +179,7 @@
             margin-right: -24px;
             margin-left: -24px;
             padding-left: 24px;
-            padding-right: 24px; 
+            padding-right: 24px;
         }
         .ovhid {
             overflow: hidden;
@@ -208,8 +207,8 @@
             -khtml-user-select: none;    /* Konqueror */
             -moz-user-select: none;      /* Firefox */
             -ms-user-select: none;       /* Internet Explorer/Edge */
-            user-select: none;            
-            transition: var(--material-curve-320);     
+            user-select: none;
+            transition: var(--material-curve-320);
             transition-delay: 200ms;
         }
         #onboarding-area[higher] {
@@ -248,7 +247,7 @@
         .blue-link {
             padding: 0;
             text-transform: none;
-            font-weight: 400; 
+            font-weight: 400;
         }
         .onb-forms {
             position: relative;
@@ -256,8 +255,8 @@
         .onboarding-form {
             position: absolute;
             width: 100%;
-            transition: var(--material-curve-320);            
-        }        
+            transition: var(--material-curve-320);
+        }
         .onboarding-form[closed] {
             transform: translate(0, 200vh);
         }
@@ -274,12 +273,12 @@
             text-align: left;
         }
         .field-helptext {
-            font-size: 14px;             
+            font-size: 14px;
             align-self: center;
             color: rgba(0,0,0,0.54);
         }
         .invite-form-inputs {
-            margin-bottom: 2em;   
+            margin-bottom: 2em;
         }
         paper-dropdown-menu {
             width: 100%;
@@ -302,7 +301,7 @@
             display: block;
         }
         </style>
-        <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>        
+        <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
         <template is="dom-if" if="[[showDashboard]]">
                 <div class="clouds top flexchild-wide-top">
                     <div class="flex">
@@ -439,7 +438,7 @@
         </div>
         <iron-ajax id="saveOrgRequest" method="PUT" url="/api/v1/org/[[model.org.id]]"></iron-ajax>
 
-        <div class="is-loading" hidden$="[[!onboarding.isLoadingClouds]]">        
+        <div class="is-loading" hidden$="[[!onboarding.isLoadingClouds]]">
             <paper-spinner active></paper-spinner>
         </div>
     </template>
@@ -680,8 +679,8 @@ Polymer({
         this.showSidebar();
     },
     goToAddCloud: function(){
-        page.show('/add-cloud');    
-        this.showSidebar();    
+        page.show('/add-cloud');
+        this.showSidebar();
     },
     showSidebar: function(){
         //show sidebar for navigation
