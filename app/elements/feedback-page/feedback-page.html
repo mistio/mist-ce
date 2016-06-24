@@ -240,28 +240,6 @@
                 properties: {
                     user: {
                         type: Object,
-                        value: function() {
-                            return {
-                                firstName: FIRST_NAME,
-                                lastName: LAST_NAME,
-                                country: COUNTRY,
-                                companyName: COMPANY_NAME,
-                                numberOfPeople: NUMBER_OF_PEOPLE,
-                                numberOfServers: NUMBER_OF_SERVERS,
-                                discover: null,
-                                hosted: [],
-                                hasExtraHosted: false,
-                                extraHosted: null,
-                                hasExtraDiscover: false,
-                                extraDiscover: null,
-                                satisfaction: null,
-                                alternative: null,
-                                hasExtraAlternative: false,
-                                extraAlternative: null,
-                                improve: null
-                            };
-                        },
-                        notify: true
                     },
                     pageFirst: {
                         type: Boolean,
@@ -275,6 +253,16 @@
                         type: Boolean,
                         value: false
                     },
+                    discover: String,
+                    hasExtraHosted: Boolean,
+                    extraHosted: Array,
+                    hasExtraDiscover: Boolean,
+                    extraDiscover: String,
+                    satisfaction: String,
+                    alternative: String,
+                    hasExtraAlternative: Boolean,
+                    extraAlternative: String,
+                    improve: String,
                     countriesOptions: {
                         type: Array,
                         value: ["Afghanistan", "Åland Islands", "Albania", "Algeria",
@@ -449,15 +437,15 @@
                     },
                     firstFormReady: {
                         type: Boolean,
-                        computed: '_computeFirstFormReady(user.firstName, user.lastName, user.country, user.companyName, user.numberOfPeople, user.numberOfServers)'
+                        computed: '_computeFirstFormReady(user.firstName, user.lastName, user.country, user.companyName, user.feedback.number_of_people, user.feedback.number_of_servers)'
                     },
                     secondFormReady: {
                         type: Boolean,
-                        computed: '_computeSecondFormReady(user.hosted.*, user.hasExtraHosted, user.extraHosted)'
+                        computed: '_computeSecondFormReady(user.feedback.hosted.*, this.hasExtraHosted, this.extraHosted)'
                     },
                     thirdFormReady: {
                         type: Boolean,
-                        computed: '_computeThirdFormReady(user.discover, user.hasExtraDiscover, user.extraDiscover, user.satisfaction, user.alternative, user.hasExtraAlternative, user.extraAlternative, user.improve, sendingData)'
+                        computed: '_computeThirdFormReady(this.discover, this.hasExtraDiscover, this.extraDiscover, this.satisfaction, this.alternative, this.hasExtraAlternative, this.extraAlternative, this.improve, sendingData)'
                     },
                     sendingData: {
                         type: Boolean,
@@ -469,9 +457,9 @@
                     }
                 },
                 observers: [
-                    '_hostedChanged(user.hosted.*)',
-                    '_discoverChanged(user.discover)',
-                    '_alternativeChanged(user.alternative)'
+                    '_hostedChanged(user.feedback.hosted.*)',
+                    '_discoverChanged(this.discover)',
+                    '_alternativeChanged(this.alternative)'
                 ],
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
@@ -515,17 +503,17 @@
                 _hostedChanged: function(changeRecord) {
                     var hasExtraHosted = changeRecord.base.indexOf('other') != -1;
                     if (hasExtraHosted) {
-                        this.set('user.extraHosted', null);
+                        this.set('this.extraHosted', null);
                     }
-                    this.set('user.hasExtraHosted', hasExtraHosted);
+                    this.set('this.hasExtraHosted', hasExtraHosted);
                 },
                 _discoverChanged: function(discover) {
-                    this.set('user.extraDiscover', null);
-                    this.set('user.hasExtraDiscover', discover == 'other');
+                    this.set('this.extraDiscover', null);
+                    this.set('this.hasExtraDiscover', discover == 'other');
                 },
                 _alternativeChanged: function(alternative) {
-                    this.set('user.extraAlternative', null);
-                    this.set('user.hasExtraAlternative', alternative == 'other');
+                    this.set('this.extraAlternative', null);
+                    this.set('this.hasExtraAlternative', alternative == 'other');
                 },
                 _pageChange: function(e) {
                     e.preventDefault();
@@ -554,22 +542,23 @@
                     var checkbox = e.currentTarget,
                         checked = checkbox.checked,
                         val = checkbox.value;
+                        console.log(checkbox, checked, val)
                     if (checked) {
-                        this.push('user.hosted', val);
+                        this.push('user.feedback.hosted', val);
                     } else {
-                        var index = this.user.hosted.indexOf(val);
-                        this.splice('user.hosted', index, 1);
+                        var index = this.user.feedback.hosted.indexOf(val);
+                        this.splice('user.feedback.hosted', index, 1);
                     }
                 },
                 _submitForm: function() {
-                    var hosted = this.user.hosted,
+                    var hosted = this.user.feedback.hosted,
                         index = hosted.indexOf('other');
                     if (index > -1) {
                         hosted.splice(index, 1);
-                        hosted.push(this.user.extraHosted);
+                        hosted.push(this.extraHosted);
                     }
-                    var discover = this.user.hasExtraDiscover ? this.user.extraDiscover : this.user.discover,
-                        alternatives = this.user.hasExtraAlternative ? this.user.extraAlternative : this.user.alternative;
+                    var discover = this.hasExtraDiscover ? this.extraDiscover : this.discover,
+                        alternatives = this.hasExtraAlternative ? this.extraAlternative : this.alternative;
                     var payload = {
                         action: 'update_details',
                         first_name: this.user.firstName,
@@ -580,11 +569,12 @@
                         number_of_people: this.user.numberOfPeople,
                         hosted: hosted,
                         discover: discover,
-                        satisfied: this.user.satisfaction,
+                        satisfied: this.satisfaction,
                         alternatives: alternatives,
-                        improve: this.user.improve,
+                        improve: this.improve,
                         feedback: true
                     };
+                    console.log(payload);
 
                     this.set('sendingData', true);
 

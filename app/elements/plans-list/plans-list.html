@@ -18,17 +18,19 @@
                 @apply(--shadow-elevation-2dp);
                 text-align: center;
             }
-            .plan.current-plan {
+            plan-item[iscurrent = 'true'] {
                 background-color: #f2f2f2;
                 color: rgba(66,66,66,.8);
             }
         </style>
 
         <paper-material>
-            <h2>Billing</h2>
+            <h3>Your plan</h3>
+            <plan-item user="[[user]]" plan="[[user.current_plan]]" iscurrent="true" index="0" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
+            <h3>Other plans</h3>
             <div class="plans">
                 <template is="dom-repeat" items=[[plans]] as="plan">
-                    <plan-item plan="[[plan]]" index="[[index]]" class$="[[_computeCurrentClass(plan, index)]] plan"></plan-item>
+                    <plan-item user="[[user]]" plan="[[plan]]" index="[[index]]" iscurrent$="[[computeIsCurrent(plan, user)]]" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
                 </template>
             </div>
         </paper-material>
@@ -42,6 +44,10 @@
                 is: 'plans-list',
 
                 properties: {
+                    user: {
+                        type: Object,
+                        notify: true
+                    },
                     plans: {
                         type: Array,
                         value: function() {
@@ -50,12 +56,14 @@
                             });
                         }
                     }
-
                 },
-                _computeCurrentClass: function(plan, index) {
-                    var isCurrent = CURRENT_PLAN.title ? plan.title == CURRENT_PLAN.title : index === 0;
-
-                    return isCurrent ? 'current-plan' : null;
+                computeIsCurrent: function(plan, user) {
+                  if (this.user.current_plan) {
+                    return plan.title == this.user.current_plan.title ? true : false;
+                  }
+                  else {
+                    return false;
+                  }
                 }
             });
         })();

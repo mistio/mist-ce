@@ -210,7 +210,7 @@
             },
             placeholder: {
                 type: String,
-                value: 'http://findicons.com/files/icons/1072/face_avatars/300/i04.png'
+                value: 'https://mist.io/resources/images/sprite-images/user.png'
             },
             gravatar: {
                 type: String,
@@ -287,9 +287,8 @@
             var orgId = e.currentTarget.getAttribute('id');
             window.location.href = orgId ? '/switch_context/' + orgId : '/switch_context';
         },
-        placeholder: {
-            type: String,
-            value: 'mist.io/resources/images/sprite-images/user.png'
+        _toggleUI: function() {
+            window.location.href = '/toggle-ui/legacy';
         },
         _logout: function(e) {
             window.location.href = '/logout';

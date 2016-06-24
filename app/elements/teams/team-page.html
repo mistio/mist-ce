@@ -13,6 +13,7 @@
         <style is="custom-style" include="lists"></style>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
+
         :host {
             display: block;
         }
@@ -205,7 +206,7 @@
                                 <template is="dom-repeat" items="[[members]]">
                                     <paper-item>
                                         <a href="/members/[[item.id]]"  class="flex-horizontal-with-ratios width100">
-                                            <span class="flexchild">[[item.name]] 
+                                            <span class="flexchild">[[item.name]]
                                                 <span class="pending" hidden$="[[!item.pending]]">pending </span>
                                             </span>
                                             <span class="flexchild">[[item.email]]</span>
@@ -228,14 +229,14 @@
                     <div class="width100">
                     <paper-material class="no-pad">
                         <!-- TODO: make interactive add edit of rules -->
-                        <h3 class="smallcaps resource-head">Team Policy</h3>                        
+                        <h3 class="smallcaps resource-head">Team Policy</h3>
                         <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
                             <paper-item>
-                                [[rule.operator]] 
-                                [[rule.rtype]] 
+                                [[rule.operator]]
+                                [[rule.rtype]]
 
-                                [[rule.action]] 
-                                [[rule.rid]] 
+                                [[rule.action]]
+                                [[rule.rid]]
                                 <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
                                     [[tag]]
                                 </template>
@@ -292,7 +293,7 @@
                     hasOtherMembers: {
                         type: Boolean,
                         value: true,
-                        computed: '_hasOtherMembers(team)'  
+                        computed: '_hasOtherMembers(team)'
                     },
                     members: {
                         type: Array,
