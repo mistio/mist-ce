@@ -148,15 +148,20 @@
         </style>
 
         <div id="content">
-            <div id="section-heading" hidden$="[[!section]]">
-                <div class="description">[[section.description]]</div>
+            <div hidden$="[[!showEmptyScreen]]"> 
+                No [[section.id]] available
             </div>
-            <template is="dom-if" if="[[_stampCards(view)]]">
-                <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>
-            </template>
-            <template is="dom-if" if="[[_stampTable(view)]]">
-                <item-list sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-list>
-            </template>
+            <div hidden$="[[showEmptyScreen]]">
+                <div id="section-heading" hidden$="[[!section]]">
+                    <div class="description">[[section.description]]</div>
+                </div>
+                <template is="dom-if" if="[[_stampCards(view)]]">
+                    <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>
+                </template>
+                <template is="dom-if" if="[[_stampTable(view)]]">
+                    <item-list sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-list>
+                </template>
+            </div>
         </div>
 
         <div class="absolute-bottom-right">
@@ -177,7 +182,10 @@
             sections: Object,
             section: Object,
             pageTitle: String,
-
+            showEmptyScreen: {
+                type: Boolean,
+                computed: 'computeShowEmptyScreen(items, section)'
+            },
             view: {
                 type: String, // list or cards
                 value: 'table'
@@ -215,7 +223,14 @@
         ready: function() {
 
         },
-
+        computeShowEmptyScreen: function(items, section){
+            if (items.length > 0 && section){
+                return false;
+            }
+            else {
+                return true;
+            }
+        },
         attached: function() {
             if (this.section.id == 'machines')
                 this.set('sortBy', 'state');

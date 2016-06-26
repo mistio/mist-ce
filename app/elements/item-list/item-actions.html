@@ -325,7 +325,7 @@ Polymer({
     },
 
     _selectMultiAction: function (event) {
-        console.warn('selected', event);
+        console.warn('selected', event, this.selectedItems);
         this.set('selectedAction', event.model.item);
         this.set('multi', true);
         if (event.model.item.confirm)

@@ -38,6 +38,9 @@
             #select[disabled] {
                 background-color: #ACDEF6;
             }
+            .current-plan {
+                color: rgba(0,0,0,.5);
+            }
         </style>
 
         <h4>[[plan.title]]</h4>
@@ -58,15 +61,20 @@
                 is: 'plan-item',
 
                 properties: {
+                    user: {
+                        type: Object,
+                        notify: true
+                    },
                     plan: {
                         type: Object
                     },
                     index: {
-                        type: Number
+                        type: Number,
+                        value: 0
                     },
-                    isCurrent: {
+                    iscurrent: {
                         type: Boolean,
-                        computed: '_computeIsCurrent(plan.title, index)'
+                        //TODO: make as a computed property
                     },
                     priceText: {
                         type: String,
@@ -101,12 +109,9 @@
                 _computeExpirationDate: function(expiration) {
                     if (expiration) {
                         var d = new Date(expiration * 1000);
-                        return d.getMonthName() + " " + d.getDate() + ", " + d.getFullYear();
+                        return d.getMonth() + " " + d.getDate() + ", " + d.getFullYear();
                     }
                     return '';
-                },
-                _computeIsCurrent: function(title, index) {
-                    return CURRENT_PLAN.title ? title == CURRENT_PLAN.title : index === 0;
                 },
                 _selectPlan: function(e) {
                     console.log(this.plan);
