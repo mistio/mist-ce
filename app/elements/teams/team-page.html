@@ -175,8 +175,9 @@
                     </h2>
                     <div class="subtitle">
                         <span class="sub" hidden$="[[!team.description]]">[[team.description]] </span>
-                        <span class="desc" hidden$="[[hasOtherMembers]]"> Only you</span>
-                        <span class="desc" hidden$="[[!hasOtherMembers]]"> ([[team.members.length]] members)</span>
+                        <span class="desc" hidden$="[[!hasOnlyYou]]"> Only you</span>
+                        <span class="desc" hidden$="[[hasOnlyYou]]"> [[confirmedMembersLength]] members.</span>
+                        <span class="desc" hidden$="[[!hasPending]]"> [[pendingMembers.length]] pending.</span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -281,6 +282,10 @@
                     model: {
                         type: Object
                     },
+                    hasPending: {
+                        type: Boolean,
+                        notify: true
+                    },
                     team: {
                         type: Object,
                         computed: '_computeTeam(params, model.teams.*)'
@@ -288,16 +293,26 @@
                     hasMembers: {
                         type: Boolean,
                         value: false,
-                        computed: '_hasMembers(team)'
+                        // computed: '_hasMembers(team)'
+                    },
+                    hasOnlyYou: {
+                        type: Boolean,
+                        value: true,
+                        computed: '_hasOnlyYou(team)'
                     },
                     hasOtherMembers: {
                         type: Boolean,
                         value: true,
                         computed: '_hasOtherMembers(team)'
                     },
+                    confirmedMembersLength: Number,
                     members: {
                         type: Array,
                         computed: '_computeMembers(team, model.members.*)'
+                    },
+                    pendingMembers: {
+                        type: Array,
+                        // computed: '_computePendingMembers(team, model.members.*)'
                     },
                     timestamp: {
                         type: String,
@@ -322,17 +337,20 @@
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
-                _hasOtherMembers: function(team) {
-                    if (team.members) {
-                        if (team.members.length == 1 && team.members[0].email == this.model.user.email){
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
+                _hasOnlyYou: function(team) {
+                    if (team.members && team.members.length == 1 && team.members[0].email == this.model.user.email){
+                        return true;
                     }
                     else {
+                        return false;
+                    }
+                },
+                _hasOtherMembers: function(team) {
+                    if (team.members && !this._hasOnlyYou && team.members.length > 0){
                         return true;
+                    }
+                    else {
+                        return false;
                     }
                 },
                 _hasMembers: function(team) {
@@ -346,10 +364,28 @@
                     return teams.base[params.id];
                 },
                 _computeMembers: function(team, members) {
-                    var teamMembers = [];
+                    var teamMembers = [],
+                        pendingMembers = [],
+                        confirmedMembers = [];
+
                     team.members.forEach(function(member) {
+                        if (members.base[member].pending){
+                            pendingMembers.push(members.base[member]);
+                        }
+                        else {
+                            confirmedMembers.push(members.base[member]);
+                        }
                         teamMembers.push(members.base[member]);
                     });
+
+                    if (pendingMembers.length > 0) { this.set("hasPending", true); }
+                    else { this.set("hasPending", false); }
+                    
+                    if (teamMembers.length > 0) { this.set("hasMembers", true);}
+                    else { this.set("hasMembers", false);}
+
+                    this.set("confirmedMembersLength", teamMembers.length - pendingMembers.length);
+                    this.set("pendingMembers", pendingMembers);
                     return teamMembers;
                 },
                 _addMember: function(e) {
