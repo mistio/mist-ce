@@ -164,6 +164,9 @@
             padding: 2px 6px 4px 6px;
             border-radius: 3px;
         }
+        .delete-member {
+            opacity: 0.32;
+        }
         </style>
 
         <div id="content">
@@ -177,18 +180,26 @@
                         <span class="sub" hidden$="[[!team.description]]">[[team.description]] </span>
                         <span class="desc" hidden$="[[!hasOnlyYou]]"> Only you</span>
                         <span class="desc" hidden$="[[hasOnlyYou]]"> [[confirmedMembersLength]] members.</span>
-                        <span class="desc" hidden$="[[!hasPending]]"> [[pendingMembers.length]] pending.</span>
+                        <span class="desc" hidden$="[[!hasPending]]"> [[pendingMembers.length]] pending</span>
                     </div>
                 </div>
                 <div class="item-actions">
-                    <paper-button on-tap="_addMember" class="simple white" style$="color: [[section.color]]">Invite Members
-                        <iron-icon icon="add" style$="color: [[section.color]]"></iron-icon>
+                    <paper-menu-button horizontal-align="right">
+                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu id="machine_actions" class="dropdown-content">
+                            <paper-button on-tap="_deleteTeam" class="simple"> Delete Team</paper-button>
+                            <paper-button on-tap="_editTeam" class="simple">Edit Team</paper-button>
+                        </paper-menu>
+                    </paper-menu-button>
+
+                    <paper-button on-tap="_addMember" class="simple white left-icon" style$="color: [[section.color]]">
+                        <iron-icon icon="social:person-add" style$="color: [[section.color]]"></iron-icon> Invite Members
                     </paper-button>
                 </div>
             </paper-material>
-            <paper-material hidden$="[[!team.description]] && [[!timestamp]]">
+            <paper-material>
                 <div class="flex-horizontal-with-ratios">
-                    <div class="page-block">
+                    <div class="page-block" hidden$="[[!team.description]]">
                         <h3 class="smallcaps">Team Description</h3>
                         <p>[[team.description]]</p>
                     </div>
@@ -211,6 +222,7 @@
                                                 <span class="pending" hidden$="[[!item.pending]]">pending </span>
                                             </span>
                                             <span class="flexchild">[[item.email]]</span>
+                                            <iron-icon class="delete-member" icon="icons:more-vert"></iron-icon>
                                         </a>
                                     </paper-item>
                                 </template>
@@ -253,7 +265,7 @@
             <paper-fab icon="add" on-tap="_addTeam"></paper-fab>
         </div>
 
-        <team-edit team="[[team]]"></team-edit>
+        <team-edit team="[[team]]" org="[[model.org]]"></team-edit>
         <team-add></team-add>
         <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[team.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
         <dialog-element></dialog-element>
@@ -292,8 +304,7 @@
                     },
                     hasMembers: {
                         type: Boolean,
-                        value: false,
-                        // computed: '_hasMembers(team)'
+                        value: false
                     },
                     hasOnlyYou: {
                         type: Boolean,
@@ -311,8 +322,7 @@
                         computed: '_computeMembers(team, model.members.*)'
                     },
                     pendingMembers: {
-                        type: Array,
-                        // computed: '_computePendingMembers(team, model.members.*)'
+                        type: Array
                     },
                     timestamp: {
                         type: String,
@@ -329,8 +339,8 @@
                     this.vpHeight = 'height:' + wh + 'px; overflow: auto;';
                 },
                 _getFormattedTimestamp: function(team) {
-                    // var timestamp = parseInt(team.created_at);
-                    return new Date(team.created_at).toLocaleString('en-US', {
+                    var timestamp = parseInt(team.created_at);
+                    return Date(timestamp).toLocaleString('en-US', {
                         timeZoneName: 'short'
                     });
                 },
