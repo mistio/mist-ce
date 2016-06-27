@@ -442,8 +442,8 @@
                         this.$.teamDeleteAjaxRequest.generateRequest();
                     }
                 },
-                _handleKeyDeleteAjaxResponse: function(e) {
-                    page.show('/teams');
+                _handleTeamDeleteAjaxResponse: function(e) {
+                    page('/teams');
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element');
