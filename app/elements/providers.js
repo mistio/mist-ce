@@ -23,7 +23,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter subscription id",
-        helpText: "You can find your subscriptionID on the Azure portal",
+        helptext: "You can find your subscriptionID on the Azure portal",
         helpHref: "http://docs.mist.io/article/18-adding-microsoft-azure"
     }, {
         name: "certificate",
@@ -35,7 +35,7 @@ PROVIDERS.push({
         required: true,
         buttonText: "Add Certificate",
         buttonFilledText: "Certificate",
-        helpText: "Your Azure certificate PEM file",
+        helptext: "Your Azure certificate PEM file",
         helpHref: "http://docs.mist.io/article/18-adding-microsoft-azure"
     }]
 });
@@ -139,7 +139,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter token",
-        helpText: 'You can find your API Token on the Digital Ocean portal',
+        helptext: 'You can find your API Token on the Digital Ocean portal',
         helpHref: 'http://docs.mist.io/article/19-adding-digital-ocean'
     }]
 });
@@ -286,7 +286,7 @@ PROVIDERS.push({
         defaultValue: "",
         show: true,
         required: true,
-        helpText: 'You can find your API key on your Amazon console',
+        helptext: 'You can find your API key on your Amazon console',
         helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2'
     }, {
         name: "api_secret",
@@ -296,7 +296,7 @@ PROVIDERS.push({
         defaultValue: "",
         show: true,
         required: true,
-        helpText: 'You can find your API secret on your Amazon console',
+        helptext: 'You can find your API secret on your Amazon console',
         helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2'
     }]
 });
@@ -324,7 +324,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter project's ID",
-        helpText: 'You can find your project ID on your GCE portal',
+        helptext: 'You can find your project ID on your GCE portal',
         helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
     }, {
         name: "private_key",
@@ -335,7 +335,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter private key",
-        helpText: 'You can create a new key on your GCE portal',
+        helptext: 'You can create a new key on your GCE portal',
         helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
     }]
 });
@@ -363,7 +363,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter API Key",
-        helpText: 'You can find your API Token on the HostVirtual portal',
+        helptext: 'You can find your API Token on the HostVirtual portal',
         helpHref: 'http://docs.mist.io/article/22-adding-hostvirtual'
     }]
 });
@@ -391,7 +391,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter username",
-        helpText: 'The username you use to login Indonesian Cloud\'s portal'
+        helptext: 'The username you use to login Indonesian Cloud\'s portal'
     }, {
         name: "password",
         label: "Password *",
@@ -401,7 +401,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter password",
-        helpText: 'The password you use to login Indonesian Cloud\'s portal'
+        helptext: 'The password you use to login Indonesian Cloud\'s portal'
     }, {
         name: "host",
         label: "Hostname *",
@@ -411,7 +411,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter hostname",
-        helpText: 'The URL or IP vCloud listens to',
+        helptext: 'The URL or IP vCloud listens to',
         helpHref: 'http://docs.mist.io/article/31-adding-vmware-vcloud'
     }, {
         name: "indonesianRegion",
@@ -454,7 +454,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter KVM hostname",
-        helpText: 'The URL or IP that your KVM hypervisor listens to',
+        helptext: 'The URL or IP that your KVM hypervisor listens to',
         helpHref: 'http://docs.mist.io/article/24-adding-kvm'
     }, {
         name: "machine_key",
@@ -465,7 +465,7 @@ PROVIDERS.push({
         show: true,
         required: false,
         options: [],
-        helpText: 'If you don\'t specify an SSH key, mist.io will assume that you are connecting via tcp (qemu+tcp)',
+        helptext: 'If you don\'t specify an SSH key, mist.io will assume that you are connecting via tcp (qemu+tcp)',
         helpHref: 'http://docs.mist.io/article/24-adding-kvm'
     }, {
         name: "machine_user",
@@ -475,7 +475,7 @@ PROVIDERS.push({
         defaultValue: "root",
         show: true,
         required: false,
-        helpText: 'The SSH user that Mist.io should try to connect as'
+        helptext: 'The SSH user that Mist.io should try to connect as'
     }, {
         name: "ssh_port",
         label: "SSH port",
@@ -492,7 +492,7 @@ PROVIDERS.push({
         defaultValue: '/var/lib/libvirt/images',
         show: true,
         required: false,
-        helpText: 'The path that your disk or iso images are located, example /var/lib/libvirt/images'
+        helptext: 'The path that your disk or iso images are located, example /var/lib/libvirt/images'
     }]
 });
 
@@ -519,7 +519,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter API Key",
-        helpText: 'You can create an API key on your Linode portal',
+        helptext: 'You can create an API key on your Linode portal',
         helpHref: 'http://docs.mist.io/article/25-adding-linode'
     }]
 });
@@ -547,7 +547,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter username",
-        helpText: 'The username you use to connect to the Nephoscale portal'
+        helptext: 'The username you use to connect to the Nephoscale portal'
     }, {
         name: "password",
         label: "Password *",
@@ -557,7 +557,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter password",
-        helpText: 'The password you use to connect to the Nephoscale portal'
+        helptext: 'The password you use to connect to the Nephoscale portal'
     }]
 });
 
@@ -602,7 +602,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter url",
-        helpText: 'Your OpenStack Auth URL',
+        helptext: 'Your OpenStack Auth URL',
         helpHref: 'http://docs.mist.io/article/27-adding-openstack'
     }, {
         name: "tenant_name",
@@ -647,7 +647,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter API Key",
-        helpText: 'You can find your API Token on the Packet.net portal',
+        helptext: 'You can find your API Token on the Packet.net portal',
         helpHref: 'http://docs.mist.io/article/100-adding-packet'
     }, {
         name: "project_id",
@@ -658,7 +658,7 @@ PROVIDERS.push({
         show: true,
         required: false,
         errorMessage: "Please enter title",
-        helpText: 'Optionally specify the project name'
+        helptext: 'Optionally specify the project name'
     }]
 });
 
@@ -694,7 +694,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter title",
-        helpText: 'The username you use to connect to the RackSpace portal'
+        helptext: 'The username you use to connect to the RackSpace portal'
     }, {
         name: "api_key",
         label: "API Key *",
@@ -704,7 +704,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter API Key",
-        helpText: 'You can find your API key on your RackSpace portal',
+        helptext: 'You can find your API key on your RackSpace portal',
         helpHref: 'http://docs.mist.io/article/29-adding-rackspace'
     }]
 });
@@ -732,7 +732,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter username",
-        helpText: 'The username you use to connect to the SoftLayer portal'
+        helptext: 'The username you use to connect to the SoftLayer portal'
     }, {
         name: "api_key",
         label: "API Key *",
@@ -742,7 +742,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter API Key",
-        helpText: 'You can find your API key on your SoftLayer portal',
+        helptext: 'You can find your API key on your SoftLayer portal',
         helpHref: 'http://docs.mist.io/article/30-adding-softlayer'
     }]
 });
@@ -770,7 +770,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter username",
-        helpText: 'The username you use to login to vCloud Director'
+        helptext: 'The username you use to login to vCloud Director'
     }, {
         name: "password",
         label: "Password *",
@@ -780,7 +780,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter password",
-        helpText: 'The password you use to login to vCloud Director'
+        helptext: 'The password you use to login to vCloud Director'
     }, {
         name: "organization",
         label: "Organization *",
@@ -799,7 +799,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter hostname",
-        helpText: 'The URL or IP vCloud listens to',
+        helptext: 'The URL or IP vCloud listens to',
         helpHref: 'http://docs.mist.io/article/31-adding-vmware-vcloud'
     }]
 });
@@ -845,7 +845,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter hostname",
-        helpText: 'The URL or IP vSphere listens to',
+        helptext: 'The URL or IP vSphere listens to',
         helpHref: 'http://docs.mist.io/article/73-adding-vsphere'
     }]
 });
@@ -873,7 +873,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter API Key",
-        helpText: 'You can find your API Token on the Vultr portal',
+        helptext: 'You can find your API Token on the Vultr portal',
         helpHref: 'http://docs.mist.io/article/72-adding-vultr'
     }]
 });
@@ -899,7 +899,7 @@ PROVIDERS.push({
         placeholder: 'DNS or IP',
         show: true,
         required: false,
-        helpText: 'The URL or IP adress that your server listens to',
+        helptext: 'The URL or IP adress that your server listens to',
         helpHref: 'http://docs.mist.io/article/28-adding-other-servers'
     }, {
         name: "operating_system",

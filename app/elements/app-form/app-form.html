@@ -61,16 +61,17 @@
             }
         </style>
 
-        <paper-material>
-            <div class="grid-row">
-                <template is="dom-repeat" items="{{fields}}" as="field">
+        <div class="grid-row">
+            <template is="dom-repeat" items="{{fields}}" as="field">
+                <template is="dom-if" if="[[field.show]]">
                     <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
                         <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-input>
-                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'password', field.show)]]">
+                        <paper-input  class="xs12 m6" id="[[field.name]]" type="password" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
                         <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-textarea>
-                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
                         <paper-radio-group selected="{{field.value}}" class="xs12 m6" disabled="[[field.disabled]]">
@@ -78,7 +79,6 @@
                                 <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
                             </template>
                         </paper-radio-group>
-                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
                         <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]">
@@ -88,49 +88,48 @@
                                 </template>
                             </paper-menu>
                         </paper-dropdown-menu>
-                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
+                    </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'ssh_key', field.show)]]">
+                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left">
+                            <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                <template is="dom-repeat" items="[[field.options]]" as="option">
+                                    <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                </template>
+                            </paper-menu>
+                        </paper-dropdown-menu>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'toggle', field.show)]]">
                         <div class="xs12 m6">
                             <paper-toggle-button checked="{{field.value}}" disabled="[[field.disabled]]">[[field.name]]</paper-toggle-button>
                         </div>
-                        <div class="field-helptext xs12 m6">[[field.helptext]]</div>
                     </template>
+                    <div class="field-helptext xs12 m6">[[field.helptext]]
+                        <a hidden$="[[!field.helpHref]]" href$="[[field.helpHref]]" target="new" class="helpHref">
+                            <paper-icon-button suffix icon="communication:live-help" alt="open docs" title="open docs">
+                            </paper-icon-button>
+                        </a>
+                    </div>
                     <template is="dom-if" if="[[field.isLead]]">
                         <hr class="xs12" />
                     </template>
-
                 </template>
+            </template>
 
-                <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
-                <hr class="xs12" />
-                <!-- <div class="notifications xs12">
-                <div class="red">
-                    <iron-icon icon="icons:error-outline"></iron-icon> Error message from server
-                    <div class="info-code">
-                        <code>test code</code>
-                    </div>
-                </div>
-                <div class="green">
-                    <iron-icon icon="check"></iron-icon> Success message from server
-                </div>
-                <div class="blue">
-                    Info message from server
-                </div>
-            </div> -->
-                <div class="clearfix bottom-actions xs12">
-                    <paper-button id="appformsubmit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">
-                        <template is="dom-if" if="[[btncontent.length]]">
-                            [[btncontent]]
-                        </template>
-                        <template is="dom-if" if="[[!btncontent]]">
-                            Add
-                        </template>
-                    </paper-button>
-                    <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
-                </div>
+            <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
+            <hr class="xs12" />
+
+            <div class="clearfix bottom-actions xs12">
+                <paper-button id="appformsubmit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">
+                    <template is="dom-if" if="[[btncontent.length]]">
+                        [[btncontent]]
+                    </template>
+                    <template is="dom-if" if="[[!btncontent]]">
+                        Add
+                    </template>
+                </paper-button>
+                <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
             </div>
-        </paper-material>
+        </div>
 
         <iron-ajax id="formAjax" url="[[url]]" contentType="application/json" method="[[method]]" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
     </template>
@@ -231,55 +230,8 @@
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
                 },
-                _computeFieldType: function(field, value, show) {
-                    var inputModel = this.model;
-
-                    if (!field.helptext && field.description) {
-                        field.helptext = field.description
-                    }
-                    if (!field.label && field.name) {
-                        field.label = field.name
-                    }
-                    if (!(field.showIf && !field.show)) {
-                        if (field.type == "dropdown" && field.query) {
-
-                            for (var prop in field.query) {
-                                var p = field.query[prop];
-
-                                if (p.startsWith("$.")) {
-                                    p = this.form[p.slice(2)];
-                                }
-
-                                if (inputModel.hasOwnProperty(p)) {
-                                    inputModel = inputModel[p];
-                                }
-                            }
-
-                            var updatedOptions = [];
-
-                            for (var prop in inputModel) {
-                                var dropdownItem = {};
-                                if (inputModel[prop].hasOwnProperty("title")) {
-                                    dropdownItem.title = inputModel[prop].title;
-                                } else if (inputModel[prop].hasOwnProperty("name")) {
-                                    dropdownItem.title = inputModel[prop].name;
-                                } else if (inputModel[prop].hasOwnProperty("id")) {
-                                    dropdownItem.title = inputModel[prop].id;
-                                }
-                                dropdownItem.val = inputModel[prop].id;
-                                updatedOptions.push(dropdownItem);
-
-                            }
-                            for (var index in this.fields) {
-                                var existingField = this.fields[index];
-                                if (existingField.name == field.name) {
-                                    this.set("fields." + index + ".options", updatedOptions);
-                                }
-                            }
-                        }
-                        return field.type == value;
-                    }
-
+                _computeFieldType: function(field, value) {
+                    return field.type == value;
                 },
                 _handleRequest: function(e) {
                     this.fire("request", e.detail)
@@ -302,6 +254,8 @@
                                 leadValue: this.get(fields.path)
                             });
                         }
+
+                        // Update show field flag after calculating dependencies
                         fields.base.forEach(function(el, index) {
                             if (el.showIf) {
                                 if (el.showIf.fieldExists) {
@@ -451,8 +405,6 @@
                         if (el.showIf && el.showIf.fieldName == name) {
                             if (this._query(el.showIf.query) in el.showIf.queryResult) {
                                 this.set('fields.' + index + '.options', []);
-                                this._computeFieldType(el, el.type, el.show)
-
                             }
                         }
                     })
@@ -461,7 +413,6 @@
                     this.fields.forEach(function(el, index) {
                         if (el.showIf && el.showIf.fieldName == name) {
                             this.set('fields.' + index + '.options', []);
-                            this._computeFieldType(el, el.type, el.show)
                         }
                     }, this);
                 },
