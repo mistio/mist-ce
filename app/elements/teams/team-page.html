@@ -267,7 +267,7 @@
 
         <team-edit team="[[team]]" org="[[model.org]]"></team-edit>
         <team-add></team-add>
-        <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[team.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
+        <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
         <dialog-element></dialog-element>
     </template>
     <script>
@@ -300,7 +300,8 @@
                     },
                     team: {
                         type: Object,
-                        computed: '_computeTeam(params, model.teams.*)'
+                        computed: '_computeTeam(params, model.teams.*)',
+                        notify: true
                     },
                     hasMembers: {
                         type: Boolean,
