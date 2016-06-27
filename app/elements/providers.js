@@ -290,7 +290,7 @@ PROVIDERS.push({
         helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2'
     }, {
         name: "api_secret",
-        label: "Password *",
+        label: "API Secret *",
         type: "password",
         value: "",
         defaultValue: "",
