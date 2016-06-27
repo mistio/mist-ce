@@ -714,18 +714,27 @@ Polymer({
         container.removeAttribute('higher');
     },
     invitePeople: function(){
-        var email = document.querySelector('#membersemails').value;
-        if (email) {
-            this.$.invitePeopleRequest.body;
-            this.$.invitePeopleRequest.headers["Content-Type"] = 'application/json';
-            this.$.invitePeopleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-            this.$.invitePeopleRequest.params = { 'email': email };
-
-            this.$.invitePeopleRequest.generateRequest();
+        var emailsString = document.querySelector('#membersemails').value; 
+        var emails = emailsString.split('\n');
+        for (var i=0; i<emails.length; i++) {
+            var email = emails[i].trim();
+            this.inviteMember(email);
         }
-        else {
-
-        }
+        console.log(emails);
+    },
+    inviteMember: function(email){
+        var email = email;
+        this.async(function(){
+            if (email) {
+                this.$.invitePeopleRequest.headers["Content-Type"] = 'application/json';
+                this.$.invitePeopleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.invitePeopleRequest.body = { 'email': email };
+                this.$.invitePeopleRequest.generateRequest();
+            }
+            else {
+                console.log('no email provided');
+            }
+        }, 100);
     },
     updateSelectTeamId: function(e){
         if ( e.detail.item.id == 'teamoption') {
