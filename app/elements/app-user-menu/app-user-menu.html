@@ -40,7 +40,7 @@
 
             .add-org {
                 opacity: 0.54;
-                margin-top: 8px;
+                margin-top: 0;
                 /*flex-flow: row-reverse wrap;*/
                 border-top: 1px solid #ddd;
             }
@@ -66,8 +66,17 @@
                 background-color: #f2f2f2;
                 border-radius: 50%;
                 margin-right: 22px;
-                width: 36px;
-                height: 36px;
+            }
+
+            iron-icon.user-menu-icon {
+                padding: 4px; 
+                width: 30px;
+                height: 30px;
+                box-sizing: border-box;
+            }
+
+            .context .org-name {
+                line-height: 30px;
             }
 
             .current.context {
@@ -112,6 +121,20 @@
                 margin: 0 !important;
                 border: 1px solid #ddd !important;
             }
+            paper-menu {
+                margin-top: 0;
+            }
+            .current-org-teams {
+                color: rgba(0,0,0,0.54);
+                font-size: 0.8em;
+            }
+            .current-org-teams:after {
+                position: relative;
+                content: ", ";
+            }
+            .current-org-teams:last-of-type:after {
+                content: " ";
+            }
         </style>
         <paper-menu-button horizontal-align="right">
             <paper-icon-button src="[[gravatar]]" class="gravatar dropdown-trigger"></paper-icon-button>
@@ -120,27 +143,29 @@
                     <div class="logo xs4">
                         <iron-icon class="user-menu-icon" icon="social:person"></iron-icon>
                     </div>
-                    <div class="org xs8">
-                        <template is="dom-if" if="[[!isPersonal]]">
+                    <template is="dom-if" if="[[!isPersonal]]">
+                        <div class="org xs8">
                             <h4>[[org.name]]</h4>
+                            <div>[[user.email]]</div>
                             <template is="dom-repeat" items="[[teams]]">
-                                <span>[[item.name]]</span>
+                                <span class="current-org-teams">[[item.name]]</span>
                             </template>
-                        </template>
-                        <template is="dom-if" if="[[isPersonal]]">
+                        </div>
+                    </template>
+                    <template is="dom-if" if="[[isPersonal]]">
+                        <div class="org xs8">
+
                             <h4>Personal Account</h4>
                             <span>[[user.email]]</span>
-                        </template>
-                    </div>
+                        </div>
+                    </template>
                 </div>
                 <paper-menu>
                     <template is="dom-repeat" items="[[organizationsList]]" as="organization">
                         <paper-item class="context">
                             <a href="javascript:void(0)" on-tap="_goToOrg" id="[[organization.id]]" class$="grid-row [[_isCurrentClass(organization, org)]]">
                                 <iron-icon class="user-menu-icon" icon$="[[_computeOrganizationIcon(organization)]]"></iron-icon>
-                                <div>[[organization.name]]
-                                    <!-- <span class="teams">Faki fix teams</span> -->
-                                </div>
+                                <div class="org-name">[[organization.name]]</div>
                             </a>
                         </paper-item>
                     </template>
@@ -152,28 +177,28 @@
                     <hr/>
                     <paper-item>
                         <a href="http://docs.mist.io/contact" target="_blank" class="flex">
-                            <iron-icon class="user-menu-icon" icon="question-answer"></iron-icon>Support
+                            <iron-icon icon="question-answer"></iron-icon>Support
                         </a>
                     </paper-item>
                     <paper-item>
                         <a href="http://docs.mist.io/" target="_blank" class="flex">
-                            <iron-icon class="user-menu-icon" icon="description"></iron-icon>Docs
+                            <iron-icon icon="description"></iron-icon>Docs
                         </a>
                     </paper-item>
                     <paper-item>
                         <a href="/my-account" class="flex">
-                            <iron-icon class="user-menu-icon" icon="account-circle"></iron-icon>Account
+                            <iron-icon icon="account-circle"></iron-icon>Account
                         </a>
                     </paper-item>
                     <paper-item>
                         <a href="javascript:void(0)" on-tap="_toggleUI" class="flex">
-                            <iron-icon class="user-menu-icon" icon="hardware:laptop-mac"></iron-icon>Legacy UI
+                            <iron-icon icon="hardware:laptop-mac"></iron-icon>Legacy UI
                         </a>
                     </paper-item>
                     <hr/>
                     <paper-item>
                         <a href="javascript:void(0)" on-tap="_logout" class="flex">
-                            <iron-icon class="user-menu-icon" icon="power-settings-new"></iron-icon> Logout
+                            <iron-icon icon="power-settings-new"></iron-icon> Logout
                         </a>
                     </paper-item>
                 </paper-menu>

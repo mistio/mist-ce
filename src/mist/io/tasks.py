@@ -35,7 +35,6 @@ from mist.io.helpers import get_auth_header
 from mist.core.user.models import User, Owner
 from mist.core.cloud.models import Cloud, Machine, KeyAssociation
 from mist.core.keypair.models import Keypair
-#from mist.core.tasks import ListTeams
 from mist.core import config
 
 cert_path = "src/mist.io/cacert.pem"
@@ -975,7 +974,6 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
         error = False
         node = {}
         try:
-
             node = create_machine(*args, **kwargs)
         except MachineCreationError as exc:
             error = str(exc)
