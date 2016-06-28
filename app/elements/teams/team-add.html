@@ -4,17 +4,18 @@
 <dom-module id="team-add">
     <template>
         <style is="custom-style" include="dialogs"></style>
-        <style is="custom-style" include="formss"></style>
         <style is="custom-style" include="shared-styles">
             :host {
                 display: block;
                 width: 100%;
             }
+            paper-button.blue {
+                margin-right: 0;
+            }
         </style>
 
         <paper-dialog id="teamAddModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
-            <h2>Add Team</h2>
-            <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
+            <h2>Add Team</h2>            
             <paper-dialog-scrollable>
                 <p>
                     <paper-input id="name" label="Name" error-message="Please enter team's name" value="{{newTeam.name}}"></paper-input>
@@ -23,7 +24,8 @@
                     <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter team's description" value="{{newTeam.description}}"></paper-textarea>
                 </p>
                 <div class="clearfix btn-group">
-                    <paper-button class="unflex blue" disabled$="[[!formReady]]" on-tap="_submitForm">Add</paper-button>
+                    <paper-button class="blue-link" dialog-dismiss>Cancel</paper-button>
+                    <paper-button class="blue" disabled$="[[!formReady]]" on-tap="_submitForm">Add</paper-button>
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
