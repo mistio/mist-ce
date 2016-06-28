@@ -63,7 +63,6 @@
             border-bottom: 1px solid #eee;
         }
         table td {
-            width: 30%;
             padding: 4px 6px;
         }
         .name, .cost {
@@ -71,9 +70,6 @@
         }
         .count {
             color: rgba(0,0,0,0.54);
-        }
-        .name, .count {
-            width: 30%;
         }
         .text-right {
             text-align: right;
@@ -108,7 +104,7 @@
             <table>
                 <template is="dom-repeat" items="[[topClouds]]">
                     <tr>
-                        <td class="name"">[[item.name]] </td>
+                        <td colspan="2" class="name"">[[item.name]] </td>
                         <td class="count">[[item.machinesCount]] machines </td>
                         <td class="text-right cost">$[[item.cost]]</td>
                     </tr>
