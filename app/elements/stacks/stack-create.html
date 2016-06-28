@@ -146,9 +146,9 @@
                     <iron-ajax id="formAjax" url="/api/v1/stacks" contentType="application/json" method="POST" on-request="_handleRequest" on-response="_handleResponse"></iron-ajax>
 
  -->
-
-            <app-form model=[[model]] fields="[[fields]]" templateid="[[template.id]]" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
-
+            <paper-material>
+                <app-form model=[[model]] fields="[[fields]]" templateid="[[template.id]]" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
+            </paper-material>
         </div>
 
 

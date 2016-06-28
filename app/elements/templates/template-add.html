@@ -50,7 +50,9 @@
                     </div>
                 </div>
             </paper-material>
-            <app-form fields="[[fields]]" method="POST" form="[[template]]" url="/api/v1/templates" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse" on-error="_addTemplateAjaxError"></app-form>
+            <paper-material>
+                <app-form fields="[[fields]]" method="POST" form="[[template]]" url="/api/v1/templates" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse" on-error="_addTemplateAjaxError"></app-form>
+            </paper-material>
         </div>
     </template>
     <script>
