@@ -526,15 +526,15 @@ PROVIDERS.push({
 
 // NEPHOSCALE
 PROVIDERS.push({
-    title: 'Nephoscale',
+    title: 'NephoScale',
     val: 'nephoscale',
     className: 'provider-nephoscale',
     options: [{
         name: "title",
         label: "Title *",
         type: "text",
-        value: "Nephoscale",
-        defaultValue: "Nephoscale",
+        value: "NephoScale",
+        defaultValue: "NephoScale",
         show: true,
         required: true,
         errorMessage: "Please enter title"
@@ -547,7 +547,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter username",
-        helptext: 'The username you use to connect to the Nephoscale portal'
+        helptext: 'The username you use to connect to the NephoScale portal'
     }, {
         name: "password",
         label: "Password *",
@@ -557,7 +557,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter password",
-        helptext: 'The password you use to connect to the Nephoscale portal'
+        helptext: 'The password you use to connect to the NephoScale portal'
     }]
 });
 
@@ -633,8 +633,8 @@ PROVIDERS.push({
         name: "title",
         label: "Title *",
         type: "text",
-        value: "Packet.net",
-        defaultValue: "Packet.net",
+        value: "Packet",
+        defaultValue: "Packet",
         show: true,
         required: true,
         errorMessage: "Please enter title"
@@ -647,7 +647,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter API Key",
-        helptext: 'You can find your API Token on the Packet.net portal',
+        helptext: 'You can find your API Token on the Packet portal',
         helpHref: 'http://docs.mist.io/article/100-adding-packet'
     }, {
         name: "project_id",
@@ -711,7 +711,7 @@ PROVIDERS.push({
 
 // SOFTLAYER
 PROVIDERS.push({
-    title: 'Softlayer',
+    title: 'SoftLayer',
     val: 'softlayer',
     className: 'provider-softlayer',
     options: [{
