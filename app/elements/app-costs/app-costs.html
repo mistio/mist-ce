@@ -112,7 +112,7 @@
                         <td class="text-right cost">$[[item.cost]]</td>
                     </tr>
                 </template>
-            </table>            
+            </table>
         </paper-material>
     </template>
 </dom-module>
@@ -147,7 +147,7 @@ Polymer({
         if (machines.base.length > 0){
             // map machines costs in an array
             var machinesWithCost = this.model.machinesArray.map(function(m){
-                return m.extra.indicative_cost_per_month ? m.extra.indicative_cost_per_month : 0;
+                return m.extra.cost_per_month ? m.extra.cost_per_month : 0;
             });
             // add all cost values
             cost = machinesWithCost.reduce(function(previous, current, index){
@@ -170,13 +170,13 @@ Polymer({
                 var machinesCount = 0;
                 if (c.machines) {
                     for (var m in c.machines) {
-                        if (c.machines[m].extra && c.machines[m].extra.indicative_cost_per_month) {
+                        if (c.machines[m].extra && c.machines[m].extra.cost_per_month) {
                             var mcost;
-                            if (typeof c.machines[m].extra.indicative_cost_per_month != 'number'){
-                                mcost = parseInt(c.machines[m].extra.indicative_cost_per_month);
+                            if (typeof c.machines[m].extra.cost_per_month != 'number'){
+                                mcost = parseInt(c.machines[m].extra.cost_per_month);
                             }
                             else {
-                                mcost = c.machines[m].extra.indicative_cost_per_month;
+                                mcost = c.machines[m].extra.cost_per_month;
                             }
                             cloudCost = cloudCost + mcost;
                         }
