@@ -171,6 +171,10 @@ SUPPORTED_PROVIDERS_V_2 = [
                 'location': 'Oregon',
                 'id': Provider.EC2_US_WEST_OREGON
             },
+            {
+                'location': 'Mumbai',
+                'id': Provider.EC2_AP_SOUTH1
+            },
         ]
     },
     # GCE
@@ -323,6 +327,10 @@ SUPPORTED_PROVIDERS = [
     {
         'title': 'EC2 AP Seoul',
         'provider': Provider.EC2_AP_NORTHEAST2
+    },
+    {
+        'title': 'EC2 AP Mumbai',
+        'provider': Provider.EC2_AP_SOUTH1
     },
     {
         'title': 'EC2 AP SOUTHEAST',
