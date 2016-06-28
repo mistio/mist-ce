@@ -33,6 +33,7 @@
                 padding: 24px 24px 0 24px;
                 margin-left: 210px;
                 overflow: hidden;
+                min-height: 85vh;
                 transition: margin-left 350ms ease-in-out;
             }
 
@@ -106,7 +107,7 @@
             <iron-pages id="app-main" main smallscreen$={{smallscreen}}>
                 <!-- dashboard -->
                 <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]" onboarding="[[onboarding]]"></page-dashboard>
-                <cloud-add model="[[model]]" keys="[[model.keysArray]]" sections="[[sections]]" section="[[sections.clouds]]"></cloud-add>
+                <cloud-add providers="[[providers]]" keys="[[model.keysArray]]" section="[[sections.clouds]]"></cloud-add>
                 <page-items class="incidents" model="[[model]]" items="[[model.incidents]]" sections="[[sections]]" section="[[sections.incidents]]"></page-items>
                 <!-- machines -->
                 <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
@@ -150,6 +151,8 @@
 
 <script type="text/javascript" src="../../bower_components/swiftSet/swiftSet.js"></script>
 
+<script type="text/javascript" src="../providers.js" inline></script>
+
 <script>
     var app = Polymer({
         is: 'app-main',
@@ -157,6 +160,10 @@
         properties: {
             model: {
                 type: Object
+            },
+            providers: {
+                type: Object,
+                value: PROVIDERS
             },
             sections: {
                 type: Object
@@ -201,12 +208,11 @@
         },
         ready: function() {
             this.model = {
-                email: EMAIL,
                 cloudsArray: [],
                 machinesArray: [],
                 imagesArray: [],
                 keysArray: [],
-                networksArray: [],                
+                networksArray: [],
                 scriptsArray: [],
                 stacksArray: [],
                 templatesArray: [],

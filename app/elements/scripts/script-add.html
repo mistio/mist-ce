@@ -48,7 +48,9 @@
                             </div>
                         </div>
                     </paper-material>
-                    <app-form fields="[[fields]]" form="[[script]]" url="/api/v1/scripts" on-request="_addScriptAjaxRequest" on-response="_addScriptAjaxResponse" on-leadchange="_updateTypedName"></app-form>
+                    <paper-material>
+                        <app-form fields="[[fields]]" form="[[script]]" url="/api/v1/scripts" on-request="_addScriptAjaxRequest" on-response="_addScriptAjaxResponse" on-leadchange="_updateTypedName"></app-form>
+                    </paper-material>
                 </div>
 
 

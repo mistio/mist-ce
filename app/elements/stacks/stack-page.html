@@ -504,7 +504,9 @@
 
                                 <template is="dom-if" if=[[workflow.params.length]]>
                                     <paper-material class="app-form-title">[[workflow.name]]</paper-material>
-                                    <app-form model=[[model]] fields="[[workflow.params]]" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[params.id]]" on-request="handleWorkflowRequest" on-response="handleWorkflowResponse" on-error="handleWorkflowError" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
+                                    <paper-material>
+                                        <app-form model=[[model]] fields="[[workflow.params]]" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[params.id]]" on-request="handleWorkflowRequest" on-response="handleWorkflowResponse" on-error="handleWorkflowError" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
+                                    </paper-material>
                                 </template>
 
                                 <template is="dom-if" if=[[!workflow.params.length]]>
