@@ -57,12 +57,12 @@
             table-layout: fixed;
             width: 100%;
             padding: 0 6px;
+            margin-bottom: 6px;
         }
         table tr {
             border-bottom: 1px solid #eee;
         }
         table td {
-            width: 30%;
             padding: 4px 6px;
         }
         .name, .cost {
@@ -70,9 +70,6 @@
         }
         .count {
             color: rgba(0,0,0,0.54);
-        }
-        .name, .count {
-            width: 30%;
         }
         .text-right {
             text-align: right;
@@ -107,7 +104,7 @@
             <table>
                 <template is="dom-repeat" items="[[topClouds]]">
                     <tr>
-                        <td class="name"">[[item.name]] </td>
+                        <td colspan="2" class="name"">[[item.name]] </td>
                         <td class="count">[[item.machinesCount]] machines </td>
                         <td class="text-right cost">$[[item.cost]]</td>
                     </tr>
@@ -196,7 +193,8 @@ Polymer({
             if (a.cost < b.cost) { return 1; }
             return 0;
         });
-        return topCloudsArray.slice(0,3);
+        // return all clouds instead of topCloudsArray.slice(0,3);
+        return topCloudsArray;
     }
 });
 </script>
