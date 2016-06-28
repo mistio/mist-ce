@@ -115,7 +115,7 @@
                 </template>
             </template>
 
-            <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
+            <paper-progress indeterminate hidden$="[[!sendingData]]"></paper-progress>
             <hr class="xs12" />
 
             <div class="clearfix bottom-actions xs12">
@@ -215,11 +215,6 @@
                         type: Boolean,
                         value: false
                     },
-                    showProgress: {
-                        type: Boolean,
-                        value: false,
-                        // computed: '_computeShowProgress(sendingData)'
-                    },
                     workflow: {
                         type: String
                     }
@@ -266,65 +261,7 @@
                                     dependency = form[el.showIf.fieldName],
                                         show = el.showIf.fieldValues.indexOf(dependency) != -1;
                                     this.set('fields.' + index + '.show', show);
-
-                                    // console.log('>>>');
-                                    // if (el.showIf.fieldName == "yaml_or_form" && el.value != el.defaultValue) {
-                                    //     reset = false;
-                                    //     var yamlFields = fields.base
-                                    //         .filter(function(ele) {
-                                    //             return ele.showIf && ele.showIf.fieldName == 'yaml_or_form';
-                                    //         });
-                                    //     if (el.type == 'text') {
-                                    //         var yamlField = yamlFields
-                                    //             .find(function(ele) {
-                                    //                 return ele.type == 'textarea';
-                                    //             }),
-                                    //             newYamlText = yamlFields
-                                    //             .filter(function(ele) {
-                                    //                 return ele.type == 'text';
-                                    //             })
-                                    //             .map(function(ele) {
-                                    //                 return ele.name + ': ' + ele.value;
-                                    //             })
-                                    //             .join('\n');
-                                    //
-                                    //         this.set('fields.' + this.fields.indexOf(yamlField) + '.value', newYamlText);
-                                    //     } else {
-                                    //         var formFieldsArray = yamlFields
-                                    //             .filter(function(ele) {
-                                    //                 return ele.type == 'text';
-                                    //             })
-                                    //             .map(function(ele) {
-                                    //                 return ele.name;
-                                    //             }),
-                                    //             formFieldsPairs = el.value
-                                    //             .split('\n')
-                                    //             .filter(function(ele) {
-                                    //                 return ele != '';
-                                    //             })
-                                    //             .map(function(ele) {
-                                    //                 var obj = {};
-                                    //                 obj[ele.split(':')[0].trim()] = ele.split(':')[1].trim();
-                                    //                 return obj;
-                                    //             })
-                                    //             .reduce(function(acc, x) {
-                                    //                 for (var key in x) {
-                                    //                     acc[key] = x[key];
-                                    //                 }
-                                    //                 return acc;
-                                    //             }, {});
-                                    //
-                                    //         fields.base
-                                    //             .forEach(function(ele, index) {
-                                    //                 if (formFieldsArray.indexOf(ele.name) > -1) {
-                                    //                     this.set('fields.' + index + '.value', formFieldsPairs[ele.name]);
-                                    //                 }
-                                    //             }, this);
-                                    //     }
-                                    // }
-                                    // console.log('<<<');
                                 }
-
 
                                 if (!show && reset) {
                                     this._resetField(el, index);
@@ -370,10 +307,6 @@
                     this.$.formAjax.body = payload;
                     this.$.formAjax.generateRequest();
 
-                    this.set('showProgress', true);
-                    this.async(function(){
-                        this.set('showProgress', false);
-                    }, 2000);
                     this.set('sendingData', true);
                 },
                 _resetForm: function(e) {

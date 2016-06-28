@@ -170,6 +170,7 @@
                     });
                 },
                 _keysChanged: function(keys, providerFields) {
+                    // Set list of keys in providerFields when model keys change
                     var keysOptions = keys.base.map(function(key) {
                         var obj = {};
                         obj['title'] = key.name;
@@ -178,7 +179,7 @@
                     });
 
                     var index = this.providerFields.findIndex(function(field) {
-                        return field.name == "machine_key";
+                        return field.type == "ssh_key";
                     }, this);
 
                     this.set('providerFields.' + index + '.options', keysOptions);
