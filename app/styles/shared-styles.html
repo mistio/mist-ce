@@ -215,7 +215,7 @@
 
         paper-card paper-button:not([disabled]),
         paper-material paper-button:not([disabled]),
-        paper-button.blue {
+        paper-button.blue:not([disabled]) {
             background-color: var(--mist-blue);
             font-weight: 500;
             color: #fff;
@@ -907,6 +907,9 @@
             background: transparent;
             border-width: 0 0 1px 0;
             margin: 32px 0 8px 0;
+        }
+        ::content hr.appform {
+            margin: 0;   
         }
 
         paper-material > h2 {

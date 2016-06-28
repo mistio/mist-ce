@@ -27,8 +27,6 @@
             }
 
             paper-progress {
-                position: absolute;
-                bottom: 82px;
                 width: 100%;
                 left: 0;
                 right: 0;
@@ -66,6 +64,19 @@
             }
             .pull-right {
                 float: right;
+            }
+            .progress {
+                margin: 32px 0 8px 0;
+                width: 100%;
+            }
+            paper-progress#progresserror ::content #primaryProgress {
+                background-color: var(--red-color);
+            }
+            .errormsg-container {
+                color: var(--red-color);
+            }
+            .errormsg-container iron-icon {
+                color: inherit;
             }
         </style>
 
@@ -123,8 +134,12 @@
                 </template>
             </template>
 
-            <paper-progress indeterminate hidden$="[[!sendingData]]"></paper-progress>
-            <hr class="xs12" />
+            <div class="progress">
+                <paper-progress id="progress" indeterminate hidden$="[[!sendingData]]"></paper-progress>
+                <paper-progress id="progresserror" value="100" hidden$="[[!formError]]"></paper-progress>
+                <hr class="appform"/>
+                <p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
+            </div>
 
             <div class="clearfix bottom-actions xs12">
                 <paper-button id="appformsubmit" class="submit-btn pull-left blue" disabled$="[[!formReady]]" raised on-tap="_submitForm">
@@ -223,6 +238,10 @@
                         type: Boolean,
                         value: false
                     },
+                    formError: {
+                        type: Boolean,
+                        value: false
+                    },
                     workflow: {
                         type: String
                     }
@@ -242,11 +261,18 @@
                 _handleResponse: function(e) {
                     this.fire("response", e.detail);
                     this.set('sendingData', false);
+                    console.log('RESPONSE', e.detail);
                 },
                 _handleError: function(e) {
                     this.set('sendingData', false);
+                    this.set('formError', true);
+                    console.log('ERROR', e.detail);
+                    this.$.errormsg.textContent = e.detail.error.message;
                 },
                 _fieldsChanged: function(fields, sendingData) {
+                    if (this.formError){
+                        this.set('formError', false);
+                    }
                     this.async(function() {
                         var form = this.form,
                             show = true,
