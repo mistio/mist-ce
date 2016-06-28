@@ -5,6 +5,8 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 
+<link rel="import" href="../teams/team-add.html">
+
 <dom-module id="onb-element">
     <template>
         <style is="custom-style" include="headings"></style>
@@ -170,7 +172,7 @@
                                 </paper-dropdown-menu>
                             </div>
                             <div class="field-helptext xs12 m6 l6">
-                                Heads up! <br/>Owner's Team members have FULL access to all Organisation's resources. To create another team with a different policy use the <paper-button on-tap="goToAddTeam" class="blue-link" noink>add team form</paper-button>
+                                Heads up! <br/>Owner's Team members have FULL access to all Organisation's resources. To create another team with a different policy use the <paper-button on-tap="_addTeam" class="blue-link" noink>add team form</paper-button>
                             </div>
                             <div class="xs12 m6 l6">
                                 <paper-textarea id="membersemails" label="Members Emails" rows="5" error-message="Error in emails"></paper-textarea>
@@ -193,6 +195,7 @@
             </div>
         </div>
 
+        <team-add></team-add>
         <iron-ajax id="saveOrgRequest" method="PUT" url="/api/v1/org/[[model.org.id]]"></iron-ajax>
         <iron-ajax id="invitePeopleRequest" method="POST" on-response="invitePeopleResponse" on-error="invitePeopleError" url$="api/v1/org/[[model.org.id]]/teams/[[selectedTeamId]]/members"></iron-ajax>
 
@@ -333,7 +336,11 @@
                 if (this.hasError){
                     this.set('hasError', false);
                 }
-            }
+            },
+            _addTeam: function(e) {
+                var dialog = this.querySelector('team-add');
+                dialog.openDialog();
+            },
         });
     </script>
 </dom-module>

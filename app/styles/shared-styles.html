@@ -123,8 +123,13 @@
         }
 
         .blue {
-            background-color: var(--blue-color);
-            color: #444;
+            background-color: var(--mist-blue);
+            color: #fff;
+        }
+
+        .blue[disabled] {
+            background-color: #eaeaea;
+            color: #a8a8a8;
         }
 
         .mist-dark {
@@ -221,6 +226,13 @@
             color: #fff;
             margin: 0;
             @apply(--layout-flex);
+        }
+        paper-button.blue:not([disabled]) {
+            background-color: var(--mist-blue);
+            font-weight: 500;
+            color: #fff;
+            margin: 0;
+            @apply(--layout-flex-none);
         }
         paper-button.blue-link {
             background-color: transparent;
