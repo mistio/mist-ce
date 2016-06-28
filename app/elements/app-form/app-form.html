@@ -59,6 +59,14 @@
             *:not(paper-button)[disabled] {
                 display: none;
             }
+            paper-icon-button.docs {
+                opacity: 0.54;
+                width: 36px;
+                height: 36px;
+            }
+            .pull-right {
+                float: right;
+            }
         </style>
 
         <div class="grid-row">
@@ -105,7 +113,7 @@
                     </template>
                     <div class="field-helptext xs12 m6">[[field.helptext]]
                         <a hidden$="[[!field.helpHref]]" href$="[[field.helpHref]]" target="new" class="helpHref">
-                            <paper-icon-button suffix icon="communication:live-help" alt="open docs" title="open docs">
+                            <paper-icon-button suffix icon="icons:help" alt="open docs" title="open docs" class="docs">
                             </paper-icon-button>
                         </a>
                     </div>
@@ -119,15 +127,15 @@
             <hr class="xs12" />
 
             <div class="clearfix bottom-actions xs12">
-                <paper-button id="appformsubmit" class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">
-                    <template is="dom-if" if="[[btncontent.length]]">
+                <paper-button id="appformsubmit" class="submit-btn pull-left blue" disabled$="[[!formReady]]" raised on-tap="_submitForm">
+                    <template is="dom-if" if="[[btncontent]]">
                         [[btncontent]]
                     </template>
                     <template is="dom-if" if="[[!btncontent]]">
                         Add
                     </template>
                 </paper-button>
-                <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
+                <paper-button class="submit-btn pull-right" on-tap="_resetForm"><iron-icon icon="icons:refresh"></iron-icon>Reset Form</paper-button>
             </div>
         </div>
 

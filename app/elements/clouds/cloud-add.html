@@ -78,8 +78,12 @@
                 </div>
             </paper-material>
             <paper-material class$="selected-[[!selectedProvider]]">
+                <div hidden$=[[selectedProvider]]>
+                    <h3 class="smallcaps">Verification</h3>
+                    <p>Choose a provider above to fill in the required fields.</p>
+                </div>
                 <div hidden$=[[!selectedProvider]]>
-                    <app-form fields="[[providerFields]]" method="POST" url="/api/v1/clouds" on-response="_cloudAddAjaxResponse" on-error="_cloudAddAjaxError"></app-form>
+                    <app-form fields="[[providerFields]]" method="POST" url="/api/v1/clouds" on-response="_cloudAddAjaxResponse" on-error="_cloudAddAjaxError" btncontent="Add Cloud"></app-form>
                 </div>
             </paper-material>
         </div>
