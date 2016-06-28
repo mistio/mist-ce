@@ -1,9 +1,12 @@
 #!/usr/bin/python
 # return a dic with prices for different ec2 providers.
 # Uses pricing data from https://github.com/ilia-semenov/awspricingfull
+# to produce a csv file with ondemand ec2 prices:
+# import awspricingfull
+# allpricing=awspricingfull.EC2Prices().save_csv(u='ondemand', path='/path/aws.csv')
 
 # Specify the csv file with prices and run with
-# ./bin/cloudpy get_ec2_pricing.py aws_full_ri_pricing.csv
+# ./bin/cloudpy get_ec2_pricing.py /path/aws.csv
 
 
 import sys, json, csv
