@@ -4,6 +4,7 @@
 
 <link rel="import" href="../app-sidebar/app-sidebar.html">
 <link rel="import" href="../item-list/item-list.html">
+<!-- <link rel="import" href="../empty-pages/empty-pages.html"> -->
 
 <!--link rel="import" href="../item-cards/item-cards.html"-->
 <dom-module id="page-items">
@@ -185,11 +186,12 @@
         </style>
 
         <div id="onboarding-area">
-            <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
             <div id="list-form" hidden$="[[!showEmptyScreen]]">
+                <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
                 <div>No [[section.id]] available. Yet.</div>
                 <paper-button class="wide blue" on-tap="_fabAction"> ADD YOUR [[section.id]] </paper-button>
             </div>
+            <!-- <empty-pages></empty-pages> -->
             <div hidden$="[[showEmptyScreen]]">
                 <div id="section-heading" hidden$="[[!section]]">
                     <div class="description">[[section.description]]</div>
