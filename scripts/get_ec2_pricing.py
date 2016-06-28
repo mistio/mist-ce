@@ -19,17 +19,15 @@ regions = {}
 with open(csv_file, 'rb') as csvfile:
     reader = csv.reader(csvfile, delimiter=',')
     for row in reader:
-        instance_type = row[0]
-        if row[1] == 'ec2' and instance_type == 'ondemand':
-            region = row[2]
-            size = row[3]
-            os = row[6]
-            price = row[10]
-            if not regions.get(region):
-                regions[region] = {}
-            if not regions[region].get(size):
-                regions[region][size] = {}
-            regions[region][size][os] = price
+        region = row[0]
+        size = row[1]
+        os = row[2]
+        price = row[3]
+        if not regions.get(region):
+            regions[region] = {}
+        if not regions[region].get(size):
+            regions[region][size] = {}
+        regions[region][size][os] = price
 
 mist_regions = {}
 mist_regions[Provider.EC2_EU_WEST] = regions['eu-west-1']
@@ -43,6 +41,7 @@ mist_regions[Provider.EC2_US_EAST] = regions['us-east-1']
 mist_regions[Provider.EC2_EU_CENTRAL] = regions['eu-central-1']
 mist_regions[Provider.EC2_AP_NORTHEAST2] = regions['ap-northeast-2']
 mist_regions[Provider.EC2_AP_NORTHEAST1] = regions['ap-northeast-1']
+mist_regions[Provider.EC2_AP_SOUTH1] = regions['ap-south-1']
 
 # formatting for easy copy/paste to mist.io/config.py
 for provider in mist_regions:
