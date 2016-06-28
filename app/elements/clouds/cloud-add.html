@@ -71,7 +71,7 @@
                     <paper-dropdown-menu class="dropdown-block l6 xs12 dropdown-with-logos" label="Choose Provider" horizontal-align="left">
                         <paper-menu attr-for-selected="value" selected="{{selectedProvider}}" class="dropdown-content">
                             <template is="dom-repeat" items="[[providers]]" as="provider">
-                                <paper-item value="[[provider.val]]"><img src="[[_computeProviderLogo(provider.className)]]" width="24px" />[[provider.title]]</paper-item>
+                                <paper-item value="[[provider.val]]"><img src="[[_computeProviderLogo(provider.className)]]" width="24px" /><span>[[provider.title]]</span></paper-item>
                             </template>
                         </paper-menu>
                     </paper-dropdown-menu>
