@@ -196,7 +196,8 @@ Polymer({
             if (a.cost < b.cost) { return 1; }
             return 0;
         });
-        return topCloudsArray.slice(0,3);
+        // return all clouds instead of topCloudsArray.slice(0,3);
+        return topCloudsArray;
     }
 });
 </script>
