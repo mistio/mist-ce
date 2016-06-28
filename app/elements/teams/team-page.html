@@ -400,7 +400,7 @@
                     return teamMembers;
                 },
                 _addMember: function(e) {
-                    page.show('/add-member/' + this.team.id);
+                    page('/add-member/' + this.team.id);
                 },
                 _editTeam: function(e) {
                     var el = this.querySelector('team-edit');
