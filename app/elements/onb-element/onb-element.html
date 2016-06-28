@@ -120,7 +120,7 @@
                 width: 70%;
                 margin: 0 auto;
             }
-            #progress paper-progress[error] ::content #primaryProgress {
+            #progress paper-progress[error]>::content #primaryProgress {
                 background-color: var(--red-color) !important;
             }
         </style>
@@ -307,6 +307,8 @@
             },
             invitePeopleResponse: function(){
                 page('/teams/' + this.selectedTeamId);
+                this.set('showProgress', false);
+                this.hideInviteForm();
             },
             invitePeopleError: function(e){
                     this.set('showProgress', false);
