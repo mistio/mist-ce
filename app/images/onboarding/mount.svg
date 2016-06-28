@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="736px" height="227px" viewBox="0 0 736 227" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.6.1 (26313) - http://www.bohemiancoding.com/sketch -->
+    <title>Slice 1</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <polygon id="Triangle-4" fill="#FFFFFF" points="257.5 66.0078125 297 122.007812 284.419922 115.46875 271.333984 140.224609 255.121094 110.134766 243.667969 122.007812 238.283203 105.132812 218 122.007812 "></polygon>
+        <polygon id="Triangle-1" fill="#DEDEDE" points="155.5 1.0078125 311 226.007812 0 226.007812 "></polygon>
+        <polygon id="Triangle-4" fill="#FFFFFF" points="155.5 1.0078125 195 57.0078125 182.419922 50.46875 169.333984 75.2246094 153.121094 45.1347656 141.667969 57.0078125 136.283203 40.1328125 116 57.0078125 "></polygon>
+        <path d="M467.811111,226.007812 L336.5,36.0078125 L205.188889,226.007812 L467.811111,226.007812 Z" id="Combined-Shape" fill="#DEDEDE"></path>
+        <path d="M735.395683,226.007812 L580,1.0078125 L424.604317,226.007813 L735.395683,226.007812 Z" id="Combined-Shape" fill="#DEDEDE"></path>
+        <polygon id="Triangle-4" fill="#FFFFFF" points="468.5 36.0078125 508 92.0078125 495.419922 85.46875 482.333984 110.224609 466.121094 80.1347656 454.667969 92.0078125 449.283203 75.1328125 429 92.0078125 "></polygon>
+        <path d="M581.181641,0 L620.417969,58.1816406 L608.365234,48.46875 L596.244141,62.765625 L577.447266,42.4277344 L566.236328,68.6015625 L557.943359,42.4277344 L541.945312,55.0078125 L581.181641,0 Z M336.708984,34 L375.945312,90 L363.449209,83.4609375 L350.450624,108.216797 L334.345958,78.1269531 L322.969285,90 L317.620464,73.125 L297.472656,90 L336.708984,34 Z" id="Triangle-4" fill="#FFFFFF"></path>
+    </g>
+</svg>

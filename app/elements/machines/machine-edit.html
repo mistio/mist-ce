@@ -1,0 +1,118 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+
+<dom-module id="machine-edit">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+            }
+
+            paper-dialog {
+                width: 300px;
+            }
+            .submit-btn {
+                background-color: var(--mist-blue);
+                color: #fff;
+            }
+        </style>
+
+        <paper-dialog id="editMachineModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Rename Machine</h2>
+            <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
+            <paper-dialog-scrollable>
+                <p>
+                    <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter machines's new name" value="{{machine.name}}"></paper-input>
+                </p>
+                <div class="clearfix btn-group">
+                <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                </div>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <iron-ajax id="editMachineAjax" url="/machines/[[machine.uuid]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'machine-edit',
+
+                properties: {
+                    machine: {
+                        type: Object,
+                        value: {
+                            uuid: null
+                        },
+                        notify: true
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(machine.uuid, sendingData)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed'
+                },
+                ready: function() {
+
+                },
+                _computeFormReady: function(id, sendingData) {
+                    var formReady = false;
+
+                    if (id) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _openEditMachineModal: function(e) {
+                    this.$.editMachineModal.open();
+                },
+                _closeEditMachineModal: function(e) {
+                    this.$.editMachineModal.close();
+                },
+                _modalClosed: function() {
+                    this._formReset();
+                },
+                _submitForm: function(e) {
+                    this.fire('updateSelectedMachine', {
+                        machine: this.machine
+                    });
+                    this._closeEditMachineModal();
+                },
+                _formReset: function() {
+                    //   this.set('machine.uuid', '');
+                },
+                _editMachineAjax: function(e) {
+                    //   this.$.editMachineAjax.generateRequest();
+                },
+                _editMachineRequest: function() {
+                    this.set('sendingData', true);
+                },
+                _editMachineResponse: function(e) {
+                    this.set('sendingData', false);
+                }
+            });
+        })();
+    </script>
+</dom-module>

@@ -1,0 +1,222 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+
+<link rel="import" href="../helpers/custom-validator.html">
+<link rel="import" href="../helpers/file-upload.html">
+
+<dom-module id="key-add">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                padding: 24px;
+            }
+
+            #content {
+                max-width: 900px;
+            }
+
+            paper-progress {
+                position: absolute;
+                bottom: 85px;
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
+        </style>
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Add Key
+                    </h2>
+                    <div class="subtitle">
+                        You can generate or upload a key.
+                    </div>
+                </div>
+            </paper-material>
+            <paper-material>
+                <custom-validator validator-name="isUniqueValidator"></custom-validator>
+                <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" validator="isUniqueValidator" auto-validate error-message="Please enter a unique key's name" value="{{key.name}}"></paper-input>
+
+                <paper-textarea id="privateKey" label="Private Key" rows="5" required auto-validate error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
+
+                <paper-textarea id="publicKey" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
+                <div class="clearfix btn-group">
+                    <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
+                    <hr class="xs12" />
+                    <div class="clearfix bottom-actions xs12">
+                        <paper-button class="submit-btn pull-left" raised on-tap="_generateKey">Generate</paper-button>
+                        <paper-button class="submit-btn pull-left" raised on-tap="_uploadKey">Upload</paper-button>
+                        <input type="file" name="file" value="{{key.file}}" on-change="_uploadFile" hidden id="keyUpload" />
+                        <paper-button class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
+                    </div>
+                </div>
+            </paper-material>
+        </div>
+
+        <file-upload></file-upload>
+
+        <iron-ajax id="keyGenerateAjaxRequest" url="/api/v1/keys" method="POST" on-response="_handleKeyGenerateAjaxResponse" on-error="_handleKeyGenerateAjaxError"></iron-ajax>
+        <iron-ajax id="keyAddAjaxRequest" url="/api/v1/keys" method="PUT" on-response="_handleKeyAddAjaxResponse" on-error="_handleKeyAddAjaxError"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'key-add',
+
+                properties: {
+                    key: {
+                        type: Object,
+                        value: function() {
+                            return {
+                                name: '',
+                                publicKey: '',
+                                privateKey: ''
+                            }
+                        },
+                        notify: true
+                    },
+                    model: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    showPublicKey: {
+                        type: Boolean,
+                        value: false
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        value: false
+                    },
+                    showProgress: {
+                        type: Boolean,
+                        computed: '_computeShowProgress(sendingData)'
+                    }
+                },
+                ready: function() {
+                    this.querySelector('custom-validator').validate = this.isUniqueValidator.bind(this);
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed',
+                    'file-uploaded': '_fileUploadedResponse'
+                },
+                observers: [
+                    '_filedsChanged(key.*, sendingData)'
+                ],
+                _filedsChanged: function(key, sendingData) {
+                    this.async(function() {
+                        var inputs = this.querySelectorAll("paper-input, paper-textarea"),
+                            valid = [].every.call(inputs, function(el) {
+                                return (el.required && !el.value) || el.invalid ? false : true;
+                            });
+
+                        this.set('formReady', valid && !sendingData);
+                    });
+                },
+                _computeShowProgress: function(sendingData) {
+                    return sendingData;
+                },
+                isUniqueValidator: function(value) {
+                    var isUnique = this.model.keysArray.every(function(key) {
+                        return key.name != value;
+                    });
+                    return isUnique;
+                },
+                _openAddKeyModal: function(e) {
+                    this.$.addKeyModal.open();
+                },
+                _closeAddKeyModal: function(e) {
+                    this.$.addKeyModal.close();
+                },
+                _uploadKey: function(e) {
+                    this.$.keyUpload.click();
+                },
+                _uploadFile: function(e) {
+                    this.querySelector('file-upload').upload({
+                        e: e,
+                        type: 'ssh_key'
+                    });
+                },
+                _fileUploadedResponse: function(e) {
+                    var file = e.detail.file;
+                    if (file.type == 'ssh_key') {
+                        this.set('key.privateKey', file.value);
+                    }
+                },
+                _modalClosed: function() {
+                    this._formReset();
+                },
+                _submitForm: function() {
+                    this.$.keyAddAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyAddAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyAddAjaxRequest.body = {
+                        name: this.key.name,
+                        priv: this.key.privateKey
+                    };
+                    this.$.keyAddAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _handleKeyAddAjaxResponse: function(e) {
+                    this.set('sendingData', false);
+
+                    var keyID = e.detail.response.id;
+                    page('/keys/' + keyID);
+
+                    this.debounce('formReset', function() {
+                        this._formReset();
+                    }, 500);
+                },
+                _handleKeyAddAjaxError: function(e) {
+                    this.set('sendingData', false);
+                },
+                _formReset: function() {
+                    this.set('key.name', '');
+                    this.set('key.publicKey', '');
+                    this.set('key.privateKey', '');
+                    this.set('showPublicKey', false);
+                },
+                _generateKey: function(e) {
+                    this.$.keyGenerateAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyGenerateAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyGenerateAjaxRequest.body = {};
+                    this.$.keyGenerateAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _generateKeyAjaxRequest: function() {
+                    this.set('sendingData', true);
+                },
+                _handleKeyGenerateAjaxResponse: function(e) {
+                    this.set('sendingData', false);
+                    var response = e.detail.response;
+                    this.set('key.publicKey', response.public);
+                    this.set('key.privateKey', response.priv);
+                    this.set('sendingData', false);
+                    this.set('showPublicKey', true);
+                },
+                _handleKeyGenerateAjaxError: function(e) {
+                    this.set('sendingData', false);
+                }
+            });
+        })();
+    </script>
+</dom-module>

@@ -1,0 +1,246 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+
+<dom-module id="details-page">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                display: block;
+            }
+
+            label {
+                color: rgba(0, 0, 0, 0.54) !important;
+                font-size: 12px;
+            }
+
+            #numberOfPeople {
+                padding-top: 6px;
+            }
+
+            #numberOfServers {
+                padding-top: 6px;
+            }
+
+            paper-radio-button {
+                --paper-radio-button-checked-color: var(--paper-light-blue-500);
+                --paper-radio-button-checked-ink-color: var(--paper-light-blue-500);
+                --paper-radio-button-unchecked-ink-color: var(--paper-light-blue-900);
+            }
+
+            paper-progress {
+                position: absolute;
+                bottom: 91px;
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
+        </style>
+        <paper-material>
+            <h2>Account Details</h2>
+            <div class="grid-row">
+                <paper-input class="xs12 l6" id="firstName" label="NAME" required error-message="Please enter your first name" value="{{user.firstName}}" auto-validate always-float-label></paper-input>
+
+                <paper-input class="xs12 l6" id="lastName" label="SURNAME" required error-message="Please enter your last name" value="{{user.lastName}}" auto-validate always-float-label></paper-input>
+
+                <paper-input class="xs12 l6" id="companyName" label="COMPAMY NAME" required error-message="Please enter your company's name" value="{{user.companyName}}" auto-validate always-float-label></paper-input>
+
+                <paper-dropdown-menu class="dropdown-block xs12 l6" id="country" label="COMPANY LOCATION" horizontal-align="left" always-float-label>
+                    <paper-menu attr-for-selected="value" selected="{{user.country}}" class="dropdown-content">
+                        <template is="dom-repeat" items="[[countriesOptions]]" as="country">
+                            <paper-item value="[[country]]">[[country]]</paper-item>
+                        </template>
+                    </paper-menu>
+                </paper-dropdown-menu>
+
+                <div class="dropdown-block xs12 l6" id="numberOfPeople" horizontal-align="left">
+                    <label id="label1">NUMBER OF EMPLOYEES</label>
+                    <paper-radio-group attr-for-selected="value" selected="{{user.numberOfPeople}}" aria-labelledby="label1">
+                        <template is="dom-repeat" items="[[numberOfPeopleOptions]]" as="people">
+                            <paper-radio-button value="[[people]]">[[people]]</paper-radio-button>
+                        </template>
+                    </paper-radio-group>
+                </div>
+
+                <div class="dropdown-block xs12 l6" id="numberOfServers" horizontal-align="left">
+                    <label id="label2">NUMBER OF SERVERS</label>
+                    <paper-radio-group attr-for-selected="value" selected="{{user.numberOfServers}}" aria-labelledby="label2">
+                        <template is="dom-repeat" items="[[numberOfServersOptions]]" as="servers">
+                            <paper-radio-button value="[[servers]]">[[servers]]</paper-radio-button>
+                        </template>
+                    </paper-radio-group>
+                </div>
+                <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
+                <hr class="xs12" />
+                <div class="bottom-actions clearfix xs12">
+                    <paper-button class="pull-right" disabled$="[[!formReady]]" raised on-tap="_submitForm" page="second">Submit</paper-button>
+                </div>
+            </div>
+        </paper-material>
+        <iron-ajax id="detailsAjaxRequest" url="/account" method="POST" on-response="_handleDetailsAjaxResponse" on-error="_handleDetailsAjaxError"></iron-ajax>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'details-page',
+
+                properties: {
+                    user: {
+                        type: Object
+                    },
+                    countriesOptions: {
+                        type: Array,
+                        value: ["Afghanistan", "Åland Islands", "Albania", "Algeria",
+                            "American Samoa", "Andorra", "Angola", "Anguilla",
+                            "Antarctica", "Antigua and Barbuda", "Argentina",
+                            "Armenia", "Aruba", "Australia", "Austria",
+                            "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
+                            "Barbados", "Belarus", "Belgium", "Belize", "Benin",
+                            "Bermuda", "Bhutan", "Bolivia",
+                            "Bosnia and Herzegovina", "Botswana", "Bouvet Island",
+                            "Brazil", "British Indian Ocean Territory",
+                            "Brunei Darussalam", "Bulgaria", "Burkina Faso",
+                            "Burundi", "Cambodia", "Cameroon", "Canada",
+                            "Cape Verde", "Cayman Islands",
+                            "Central African Republic", "Chad", "Chile", "China",
+                            "Christmas Island", "Cocos (Keeling) Islands",
+                            "Colombia", "Comoros", "Congo",
+                            "Congo, The Democratic Republic of the",
+                            "Cook Islands", "Costa Rica", "Cote D'Ivoire",
+                            "Croatia", "Cuba", "Cyprus", "Czech Republic",
+                            "Denmark", "Djibouti", "Dominica",
+                            "Dominican Republic", "Ecuador", "Egypt",
+                            "El Salvador", "Equatorial Guinea", "Eritrea",
+                            "Estonia", "Ethiopia", "Falkland Islands (Malvinas)",
+                            "Faroe Islands", "Fiji", "Finland", "France",
+                            "French Guiana", "French Polynesia",
+                            "French Southern Territories", "Gabon", "Gambia",
+                            "Georgia", "Germany", "Ghana", "Gibraltar", "Greece",
+                            "Greenland", "Grenada", "Guadeloupe", "Guam",
+                            "Guatemala", "Guernsey", "Guinea", "Guinea-Bissau",
+                            "Guyana", "Haiti", "Heard Island and Mcdonald Islands",
+                            "Holy See (Vatican City State)", "Honduras",
+                            "Hong Kong", "Hungary", "Iceland", "India",
+                            "Indonesia", "Iran, Islamic Republic Of", "Iraq",
+                            "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica",
+                            "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya",
+                            "Kiribati", "Korea, Democratic People'S Republic of",
+                            "Korea, Republic of", "Kuwait", "Kyrgyzstan",
+                            "Lao People'S Democratic Republic", "Latvia", "Lebanon",
+                            "Lesotho", "Liberia", "Libyan Arab Jamahiriya",
+                            "Liechtenstein", "Lithuania", "Luxembourg", "Macao",
+                            "Macedonia, The Former Yugoslav Republic of",
+                            "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali",
+                            "Malta", "Marshall Islands", "Martinique", "Mauritania",
+                            "Mauritius", "Mayotte", "Mexico",
+                            "Micronesia, Federated States of",
+                            "Moldova, Republic of", "Monaco", "Mongolia",
+                            "Montserrat", "Morocco", "Mozambique", "Myanmar",
+                            "Namibia", "Nauru", "Nepal", "Netherlands",
+                            "Netherlands Antilles", "New Caledonia", "New Zealand",
+                            "Nicaragua", "Niger", "Nigeria", "Niue",
+                            "Norfolk Island", "Northern Mariana Islands", "Norway",
+                            "Oman", "Pakistan", "Palau",
+                            "Palestinian Territory, Occupied", "Panama",
+                            "Papua New Guinea", "Paraguay", "Peru", "Philippines",
+                            "Pitcairn", "Poland", "Portugal", "Puerto Rico",
+                            "Qatar", "Reunion", "Romania", "Russian Federation",
+                            "RWANDA", "Saint Helena", "Saint Kitts and Nevis",
+                            "Saint Lucia", "Saint Pierre and Miquelon",
+                            "Saint Vincent and the Grenadines", "Samoa",
+                            "San Marino", "Sao Tome and Principe", "Saudi Arabia",
+                            "Senegal", "Serbia and Montenegro", "Seychelles",
+                            "Sierra Leone", "Singapore", "Slovakia", "Slovenia",
+                            "Solomon Islands", "Somalia", "South Africa",
+                            "South Georgia and the South Sandwich Islands",
+                            "Spain", "Sri Lanka", "Sudan", "Suriname",
+                            "Svalbard and Jan Mayen", "Swaziland", "Sweden",
+                            "Switzerland", "Syrian Arab Republic",
+                            "Taiwan, Province of China", "Tajikistan",
+                            "Tanzania, United Republic of", "Thailand",
+                            "Timor-Leste", "Togo", "Tokelau", "Tonga",
+                            "Trinidad and Tobago", "Tunisia", "Turkey",
+                            "Turkmenistan", "Turks and Caicos Islands", "Tuvalu",
+                            "Uganda", "Ukraine", "United Arab Emirates",
+                            "United Kingdom", "United States",
+                            "United States Minor Outlying Islands", "Uruguay",
+                            "Uzbekistan", "Vanuatu", "Venezuela", "Viet Nam",
+                            "Virgin Islands, British", "Virgin Islands, U.S.",
+                            "Wallis and Futuna", "Western Sahara", "Yemen",
+                            "Zambia", "Zimbabwe"
+                        ]
+                    },
+                    numberOfPeopleOptions: {
+                        type: Array,
+                        value: ['1-5', '6-20', '21-100', '100+']
+                    },
+                    numberOfServersOptions: {
+                        type: Array,
+                        value: ['1-5', '6-20', '21-100', '100+']
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(user.firstName, user.lastName, user.country, user.companyName, user.numberOfPeople, user.numberOfServers, sendingData)'
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    showProgress: {
+                        type: Boolean,
+                        computed: '_computeShowProgress(sendingData)'
+                    }
+                },
+                _computeFormReady: function(firstName, lastName, country, companyName, numberOfPeople, numberOfServers, sendingData) {
+                    var formReady = false;
+
+                    if (firstName && lastName && country && companyName && numberOfPeople && numberOfServers) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _computeShowProgress: function(sendingData) {
+                    return sendingData;
+                },
+                _submitForm: function(e, user) {
+                    var payload = {
+                        action: 'update_details',
+                        first_name: user.firstName,
+                        last_name: user.lastName,
+                        company_name: user.companyName,
+                        country: user.country,
+                        number_of_servers: user.numberOfServers,
+                        number_of_people: user.numberOfPeople
+                    };
+
+                    this.set('sendingData', true);
+
+                    this.$.detailsAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.detailsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.detailsAjaxRequest.body = payload;
+                    this.$.detailsAjaxRequest.generateRequest();
+                },
+                _handleDetailsAjaxResponse: function(e) {
+                    this.set('sendingData', false);
+                },
+                _handleDetailsAjaxError: function() {
+                    this.set('sendingData', false);
+                }
+            });
+        })();
+    </script>
+</dom-module>

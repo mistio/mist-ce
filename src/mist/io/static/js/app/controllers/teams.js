@@ -79,7 +79,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 var that = this;
                 that.set('addingTeam', true);
                 Mist.ajax
-                    .POST('/org/' + Mist.organization.id + '/teams', {
+                    .POST('/api/v1/org/' + Mist.organization.id + '/teams', {
                         'name': args.team.name,
                         'description': args.team.description
                     })
@@ -101,7 +101,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     that = this;
                 that.set('deletingTeam', true);
                 Mist.ajax
-                    .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id, {})
+                    .DELETE('/api/v1/org/' + args.team.organization.id + '/teams/' + args.team.id, {})
                     .success(function() {
                         that._deleteObject(args.team);
                     })
@@ -119,7 +119,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 var that = this;
                 that.set('renamingTeam', true);
                 Mist.ajax
-                    .PUT('/org/' + args.team.organization.id + '/teams/' + args.team.id, {
+                    .PUT('/api/v1/org/' + args.team.organization.id + '/teams/' + args.team.id, {
                         new_name: args.newName,
                         new_description: args.newDescription
                     })
@@ -140,7 +140,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 var that = this;
                 that.set('deletingMember', true);
                 Mist.ajax
-                    .DELETE('/org/' + args.team.organization.id + '/teams/' + args.team.id + '/members/' + args.member.id, {})
+                    .DELETE('/api/v1/org/' + args.team.organization.id + '/teams/' + args.team.id + '/members/' + args.member.id, {})
                     .success(function() {
                         that._deleteMember(args.team, args.member);
                     })
@@ -158,7 +158,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 var that = this;
                 that.set('invitingMember', true);
                 Mist.ajax
-                    .POST('/org/' + args.team.organization.id + '/teams/' + args.team.id + '/members', {
+                    .POST('/api/v1/org/' + args.team.organization.id + '/teams/' + args.team.id + '/members', {
                         'email': args.member.email
                     })
                     .success(function(member) {
@@ -276,7 +276,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 var that = this;
                 that.set('updatingRules', true);
                 Mist.ajax
-                    .PUT('/org/' + team.organization.id + '/teams/' + team.id + '/policy', {
+                    .PUT('/api/v1/org/' + team.organization.id + '/teams/' + team.id + '/policy', {
                         policy: {
                             operator: team.policy.operator,
                             rules: payloadRules

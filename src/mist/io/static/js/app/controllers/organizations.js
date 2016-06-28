@@ -39,7 +39,7 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                 var that = this;
                 that.set('addingOrganization', true);
                 Mist.ajax
-                    .POST('/org', {
+                    .POST('/api/v1/org', {
                         'name': args.organization.name
                     })
                     .success(function(organization) {
@@ -59,7 +59,7 @@ define('app/controllers/organizations', ['app/models/organization', 'ember'],
                 var that = this;
                 that.set('renamingOrganization', true);
                 Mist.ajax
-                    .PUT('/org/' + args.organization.id, {
+                    .PUT('/api/v1/org/' + args.organization.id, {
                         'new_name': args.newName
                     })
                     .success(function(organization) {
