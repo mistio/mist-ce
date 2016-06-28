@@ -269,6 +269,7 @@
         <team-add></team-add>
         <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
         <dialog-element></dialog-element>
+
     </template>
     <script>
         (function() {
@@ -400,7 +401,7 @@
                     return teamMembers;
                 },
                 _addMember: function(e) {
-                    page('/add-member/' + this.team.id);
+                    page('/add-members/' + this.team.id);
                 },
                 _editTeam: function(e) {
                     var el = this.querySelector('team-edit');
