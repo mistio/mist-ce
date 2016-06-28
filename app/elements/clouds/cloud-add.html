@@ -158,20 +158,18 @@
                 },
                 _providerChanged: function(selectedProvider, providers) {
                     this._resetForm();
-                    var providerFields = providers
+                    var selectedProviderDetails = providers
                         .filter(function(fields) {
                             return fields.val == selectedProvider;
                         });
-
-                    var ret = providerFields.length ? providerFields.shift().options : [];
-
-                    this.set('providerFields', ret);
-                    this.unshift('providerFields', {
+                    console.warn('providerFields', providerFields);
+                    var providerFields = selectedProviderDetails.length ? selectedProviderDetails.shift().options : [];
+                    this.set('providerFields', [{
                           name: "provider",
                           type: "text",
                           show: false,
                           value: selectedProvider
-                    });
+                    }].concat(providerFields));
                 },
                 _keysChanged: function(keys, providerFields) {
                     // Set list of keys in providerFields when model keys change
