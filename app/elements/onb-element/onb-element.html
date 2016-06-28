@@ -195,10 +195,10 @@
             </div>
         </div>
 
-        <team-add></team-add>
+        <team-add referrel="onb"></team-add>
         <iron-ajax id="saveOrgRequest" method="PUT" url="/api/v1/org/[[model.org.id]]"></iron-ajax>
         <iron-ajax id="invitePeopleRequest" method="POST" on-response="invitePeopleResponse" on-error="invitePeopleError" url$="api/v1/org/[[model.org.id]]/teams/[[selectedTeamId]]/members"></iron-ajax>
-
+        
     </template>
 
     <script>
@@ -232,6 +232,7 @@
                 }
             },
             listeners: {
+                'new-team-added': 'updateToNewTeam',
                 'iron-select': 'updateSelectTeamId',
                 'input': 'resetError'
             },
@@ -341,6 +342,9 @@
                 var dialog = this.querySelector('team-add');
                 dialog.openDialog();
             },
+            updateToNewTeam: function(newTeam) {
+                // would be nice to update dropdown to new team
+            }
         });
     </script>
 </dom-module>
