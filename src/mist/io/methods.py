@@ -30,6 +30,7 @@ from libcloud.utils.networking import is_private_subnet
 from libcloud.dns.types import Provider as DnsProvider
 from libcloud.dns.types import RecordType
 from libcloud.dns.providers import get_driver as get_dns_driver
+from libcloud.pricing import get_size_price
 
 import ansible.playbook
 import ansible.utils.template
@@ -4421,12 +4422,11 @@ def machine_cost_calculator(m):
     straightforward way to get this info
 
     Supported providers:
-        Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr
-    TODO: GCE, Azure, NephoScale,
-    HostVirtual
+        GCE, Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr
+    TODO: Azure, NephoScale, HostVirtual
     """
     cost = {'cost_per_hour': 0, 'cost_per_month': 0}
-    if m.driver.type in [Provider.LINODE, Provider.PACKET, Provider.GCE]:
+    if m.driver.type in [Provider.LINODE, Provider.PACKET]:
         sizes = CloudSize.objects.filter(cloud_provider=m.driver.type)
     if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
         sizes = CloudSize.objects.filter(cloud_provider=m.driver.type, cloud_region=m.driver.region)
@@ -4492,6 +4492,17 @@ def machine_cost_calculator(m):
                         cost['cost_per_month'] = float(plan_price) * 24 * month_days
                 except:
                     pass
+    if m.driver.type == Provider.GCE:
+        size = m.extra.get('machineType')
+        location = m.extra.get('location') # eg europe-west1-d
+        price = get_size_price(driver_type='compute', driver_name='gce', size_id=size)
+        if price:
+            try:
+                price_per_hour = price[location[:2]].replace('$','').replace('/h','')
+                cost['cost_per_hour'] = float(price_per_hour)
+                cost['cost_per_month'] = float(plan_price) * 24 * month_days
+            except:
+                pass
     if m.driver.type == Provider.DIGITAL_OCEAN:
         size = m.extra.get('size', {})
         cost['cost_per_month'] = size.get('price_monthly')
