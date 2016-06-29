@@ -172,6 +172,14 @@
             position: relative;
             content: ""
         }
+        .pending {
+            font-weight: 500;
+            font-size: 0.9em;
+            background-color: #69b46c;
+            color: #fff;
+            padding: 2px 6px 4px 6px;
+            border-radius: 3px;
+        }
         </style>
 
         <div id="content">
@@ -200,14 +208,14 @@
                 <div class="flex-horizontal-with-ratios">
                     <div class="page-block">
                         <h3 class="smallcaps">Short Info</h3>
-                        <p>[[member.email]] <span hidden$="[[member.pending]]">Pending</span></p>
+                        <p>[[member.email]] <span class="pending" hidden$="[[!member.pending]]">Pending</span></p>
                     </div>
                     <div class="page-block">
                         <h3 class="smallcaps">[[member.name]] is in:</h3>
                         <p>
                             <span hidden$="[[memberTeams]]">No teams</span>
                             <template is="dom-repeat" items="[[memberTeams]]">
-                                <span class="team">[[item.name]]</span>
+                                <span class="team"><a class="regular blue-link" href$="/teams/[[item.id]]">[[item.name]]</a></span>
                             </template>
                         </p>
                     </div>

@@ -219,14 +219,14 @@
                                 <template is="dom-repeat" items="[[members]]">
                                     <paper-item>
                                         <div class="flex-horizontal-with-ratios width100">
-                                            <span class="flexchild">[[item.name]]
-                                                <span class="pending" hidden$="[[!item.pending]]">pending </span>
+                                            <span class="flexchild">
+                                                <a href="/members/[[item.id]]" class="pad-left">
+                                                    [[item.name]]
+                                                    <span class="pending" hidden$="[[!item.pending]]">pending </span>
+                                                </a>
                                             </span>
                                             <span class="flexchild">[[item.email]]</span>
                                             <iron-icon icon="icons:delete" on-tap="_deleteMemberFromTeam" class="delete-member" memberid$="[[item.id]]" membername$="[[item.name]]"></iron-icon>
-                                            <a href="/members/[[item.id]]" class="pad-left">
-                                                <iron-icon class="delete-member" icon="icons:more-vert"></iron-icon>
-                                            </a>
                                         </div>
                                     </paper-item>
                                 </template>
