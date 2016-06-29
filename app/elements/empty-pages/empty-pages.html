@@ -1,6 +1,4 @@
-<link rel="import" href="../item-list/item-list.html">
 
-<!--link rel="import" href="../item-cards/item-cards.html"-->
 <dom-module id="empty-pages">
     <template>
         <style>
@@ -57,32 +55,19 @@
     </template>
 </dom-module>
 <script>
-(function() {
-    var _lastNavigated = null;
-    Polymer({
-        is: 'empty-pages',
 
-        enableCustomStyleProperties: true,
+Polymer({
+    is: 'empty-pages',
 
-        properties: {
-            model: Object,
-            sections: Object,
-            section: Object,
-            pageTitle: String,
-            showEmptyScreen: {
-                type: Boolean,
-                computed: 'computeShowEmptyScreen(items, section)'
-            },
-            items: Array
-        },
-        ready: function() {
+    properties: {
 
-        },
-        _fabAction: function(e) {
-            console.debug('fabAction', e, this.section.add);
-            page(this.section.add);
-        }
+        section: Object
 
-    });
-})();
+    },
+    _fabAction: function(e) {
+        console.debug('fabAction', e, this.section.add);
+        page(this.section.add);
+    }
+
+});
 </script>
