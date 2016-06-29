@@ -47,7 +47,7 @@
                 </div>
             </paper-material>
             <paper-material>
-                <app-form fields="[[fields]]" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/members" method="POST" on-request="_addRequest" on-response="_addResponse"></app-form>
+                <app-form fields="[[fields]]" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/members" method="POST" on-request="_addMembersRequest" on-response="_addMembersResponse" ></app-form>
             </paper-material>
         </div>
     </template>
@@ -85,7 +85,7 @@
                         helptext: "Fill in the members' emails you want to invite, one per line",
                         defaultValue: "",
                         placeholder: "",
-                        errorMessage: "Please enter script's name",
+                        errorMessage: "Please enter the users emails",
                         show: true,
                         required: true
                     }]
@@ -110,11 +110,11 @@
                     };
                 }
             },
-            //TODO: request must be send per email, ie per line
-            _addRequest: function() {
+            _addMembersRequest: function() {
                 this.set('sendingData', true);
             },
-            _addResponse: function(e) {
+            _addMembersResponse: function(e) {
+                page('/teams/'+this.team.id);
                 this.set('sendingData', false);
             },
         });
