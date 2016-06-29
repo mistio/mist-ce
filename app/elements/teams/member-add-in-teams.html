@@ -1,0 +1,155 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+
+<link rel="import" href="../app-form/app-form.html">
+
+<dom-module id="member-add-in-teams">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+        :host {
+            display: block;
+        }
+        #content {
+            max-width: 900px;
+        }
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
+
+        paper-progress {
+            position: absolute;
+            bottom: 85px;
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        :host >::content paper-input-container {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+        h3, .item {
+            display: block;
+            width: 100%;   
+        }
+        .item {
+            margin: 8px 0;
+        }
+        .pull-right {
+            float: right;
+        }
+        .progress {
+            margin: 32px 0 8px 0;
+            width: 100%;
+        }
+        </style>
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Add [[member.name]] in teams
+                    </h2>
+                    <div class="subtitle" hidden$="[[member.pending]]">
+                        You can add the user in multiple teams in one go.
+                    </div>
+                    <div class="subtitle" hidden$="[[!member.pending]]">
+                        As soon as the user confirms, will be added in all teams you select.
+                    </div>
+                </div>
+            </paper-material>
+            <paper-material>
+                <h3 class="smallcaps xs-12">Choose Teams</h3>
+                <template is="dom-repeat" items="[[model.teamsArray]]" as="team">
+                        <div class="item">
+                            <paper-checkbox checked$="_memberIsInTeam(team.id)" disabled$="_memberIsInTeam(team.id)">[[team.name]]</paper-checkbox>
+                        </div>
+                </template>
+                <div class="clearfix bottom-actions xs12">
+
+                </div>
+                <!-- <app-form fields="[[fields]]" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/members" method="POST" on-request="_addMembersRequest" on-response="_addMembersResponse" ></app-form> -->
+            </paper-material>
+        </div>
+        <iron-ajax id="formAjax" url="api/v1/org/[[model.org.id]]/teams/[[teamId]]/members/[[member.id]]" contentType="application/json" handle-as="document" method="POST" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'member-add-in-teams',
+
+            properties: {
+                sections: {
+                    type: Object
+                },
+                section: {
+                    type: Object
+                },
+                model: {
+                    type: Object
+                },
+                params: {
+                    type: Object
+                },
+                member: {
+                    type: Object,
+                    computed: '_computeMember(params, model.members.*)'
+                },
+                fields: {
+                    type: Array,
+                    value: [{
+                        name: "Teams",
+                        label: "teams *",
+                        type: "teams",
+                        value: "",
+                        helptext: "Choose the teams you want to invite the user in",
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please select at least one team",
+                        show: true,
+                        required: true
+                    }]
+                }
+            },
+            listeners: {
+
+            },
+            ready: function() {
+
+            },
+            _computeMember: function(params, membersArray) {
+                var member = this.model.membersArray.find(function(m){
+                    return m.id == params.id
+                });
+                if (member){
+                    return member;
+                }
+                else {
+                    return {
+                        name: "member not found"
+                    };
+                }
+            },
+            _addMembersRequest: function() {
+                this.set('sendingData', true);
+            },
+            _addMembersResponse: function(e) {
+                page('/members/'+this.member.id);
+                this.set('sendingData', false);
+            },
+            _memberIsInTeam: function(team){
+                console.log("check if is team",team, this.model.teams[team], this.model.teams[team].members.indexOf(this.member.id));
+                return this.model.teams[team].members.indexOf(this.member.id) > -1;
+            }
+        });
+    })();
+    </script>
+</dom-module>

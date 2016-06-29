@@ -211,7 +211,7 @@
                         <p>[[member.email]] <span class="pending" hidden$="[[!member.pending]]">Pending</span></p>
                     </div>
                     <div class="page-block">
-                        <h3 class="smallcaps">[[member.name]] is in:</h3>
+                        <h3 class="smallcaps">[[member.name]] is in teams:</h3>
                         <p>
                             <span hidden$="[[memberTeams]]">No teams</span>
                             <template is="dom-repeat" items="[[memberTeams]]">
@@ -350,6 +350,9 @@
                     dialog[i] = info[i];
                 }
                 dialog._openDialog();
+            },
+            _addMemberInTeams: function(){
+                page('/members/'+this.member.id+'/add-in-teams');
             }
         });
     })();
