@@ -4494,13 +4494,13 @@ def machine_cost_calculator(m):
                     pass
     if m.driver.type == Provider.GCE:
         size = m.extra.get('machineType')
-        location = m.extra.get('location') # eg europe-west1-d
-        price = get_size_price(driver_type='compute', driver_name='gce', size_id=size)
+        location = m.extra.get('location').split('-')[0] # eg europe-west1-d
+        driver_name = 'google_' + location
+        price = get_size_price(driver_type='compute', driver_name=driver_name, size_id=size)
         if price:
             try:
-                price_per_hour = price[location[:2]].replace('$','').replace('/h','')
-                cost['cost_per_hour'] = float(price_per_hour)
-                cost['cost_per_month'] = float(price_per_hour) * 24 * month_days
+                cost['cost_per_hour'] = float(price)
+                cost['cost_per_month'] = float(price) * 24 * month_days
             except:
                 pass
     if m.driver.type == Provider.DIGITAL_OCEAN:
