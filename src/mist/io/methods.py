@@ -4500,7 +4500,7 @@ def machine_cost_calculator(m):
             try:
                 price_per_hour = price[location[:2]].replace('$','').replace('/h','')
                 cost['cost_per_hour'] = float(price_per_hour)
-                cost['cost_per_month'] = float(plan_price) * 24 * month_days
+                cost['cost_per_month'] = float(price_per_hour) * 24 * month_days
             except:
                 pass
     if m.driver.type == Provider.DIGITAL_OCEAN:
