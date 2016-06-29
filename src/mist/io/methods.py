@@ -4493,19 +4493,38 @@ def machine_cost_calculator(m):
                 except:
                     pass
     if m.driver.type == Provider.GCE:
+        # https://cloud.google.com/compute/pricing
         size = m.extra.get('machineType')
         location = m.extra.get('location').split('-')[0] # eg europe-west1-d
         driver_name = 'google_' + location
         price = get_size_price(driver_type='compute', driver_name=driver_name, size_id=size)
+        os_type = m.extra.get('os_type')
+        os_cost_per_hour = 0
         if price:
+            if os_type == 'sles':
+                if size in ['f1-micro', 'g1-small']:
+                    os_cost_per_hour = 0.02
+                else:
+                    os_cost_per_hour = 0.11
+            if os_type == 'win':
+                if size in ['f1-micro', 'g1-small']:
+                    os_cost_per_hour = 0.02
+                else:
+                    cores = size.split('-')[-1]
+                    os_cost_per_hour = cores * 0.04
+            if os_type == 'rhel':
+                if size in ['n1-highmem-2', 'n1-highcpu-2', 'n1-highmem-4', 'n1-highcpu-4', 'f1-micro', 'g1-small', 'n1-standard-1', 'n1-standard-2', 'n1-standard-4']:
+                    os_cost_per_hour = 0.06
+                else:
+                    os_cost_per_hour = 0.13
+
             try:
-                cost['cost_per_hour'] = float(price)
-                cost['cost_per_month'] = float(price) * 24 * month_days * 0.7
+                total_hour_price = price + os_cost_per_hour
+                cost['cost_per_hour'] = float(total_hour_price)
+                cost['cost_per_month'] = float(price) * 24 * month_days * 0.7 + float(os_cost_per_hour) * 24 * month_days
                 # monthly discount of 30% if the VM runs all the billing month
                 # TODO: better calculate the discounts, taking under consideration
                 # when the VM has been initiated
-                # TODO: take under consideration the OS types that are not free -
-                # suse, rhel, win
             except:
                 pass
 
