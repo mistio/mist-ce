@@ -78,7 +78,7 @@
                 fields: {
                     type: Array,
                     value: [{
-                        name: "email",
+                        name: "emails",
                         label: "Emails *",
                         type: "textarea",
                         value: "",
@@ -92,10 +92,10 @@
                 }
             },
             listeners: {
-                
+
             },
             ready: function() {
-                
+
             },
             _computeTeam: function(params, teamsArray) {
                 var team = this.model.teamsArray.find(function(t){
@@ -107,7 +107,7 @@
                 else {
                     return {
                         name: "team not found"
-                    };   
+                    };
                 }
             },
             //TODO: request must be send per email, ie per line
@@ -115,7 +115,7 @@
                 this.set('sendingData', true);
             },
             _addResponse: function(e) {
-                this.set('sendingData', false);                
+                this.set('sendingData', false);
             },
         });
     })();
