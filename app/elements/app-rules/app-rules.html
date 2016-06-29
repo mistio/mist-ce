@@ -1,0 +1,90 @@
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<dom-module id="app-rules">
+    <template>
+        <style>
+        :host paper-card {
+            min-width: 100%;
+        }
+
+        .container > div {
+            padding: 10px;
+            background-color: #eee;
+        }
+
+        .flex-horizontal {
+            @apply(--layout-horizontal);
+        }
+
+        .flexchild {
+            @apply(--layout-flex);
+        }
+
+        .an-app-rule {
+            margin-bottom: 1px;
+        }
+
+        .rule-expression {
+            padding: 8px;
+        }
+
+        .card-actions {
+            overflow: hidden;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        paper-button.custom.blue {
+            /*line-height: 24px;
+            padding-right: 15px;*/
+        }
+        </style>
+        <paper-card heading="Rules">
+            <div class="container card-content">
+                <!-- this could be dom-repeat > new custom element app-rule -->
+                <div class="an-app-rule flex-horizontal">
+                    <div>
+                        <paper-icon-button icon="icons:radio-button-checked" paper-card-toggle>toggle</paper-icon-button>
+                    </div>
+                    <div class="flexchild rule-expression">the actual rule expression here</div>
+                    <!-- on click make form -->
+                    <div>
+                        <paper-icon-button icon="close" paper-card-toggle>delete</paper-icon-button>
+                    </div>
+                </div>
+                <div class="an-app-rule flex-horizontal">
+                    <div>
+                        <paper-icon-button icon="icons:radio-button-checked" paper-card-toggle>toggle</paper-icon-button>
+                    </div>
+                    <div class="flexchild rule-expression">the actual rule expression here</div>
+                    <div>
+                        <paper-icon-button icon="close" paper-card-toggle>delete</paper-icon-button>
+                    </div>
+                </div>
+                <div class="an-app-rule flex-horizontal">
+                    <div>
+                        <paper-icon-button icon="icons:radio-button-unchecked" paper-card-toggle>toggle</paper-icon-button>
+                    </div>
+                    <div class="flexchild rule-expression">the actual rule expression here</div>
+                    <div>
+                        <paper-icon-button icon="close" paper-card-toggle>delete</paper-icon-button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content card-actions">
+                <paper-button class="custom blue">
+                    <iron-icon icon="icons:add"></iron-icon>add rule</paper-button>
+            </div>
+        </paper-card>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'app-rules',
+    properties: {
+
+    }
+});
+</script>

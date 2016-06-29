@@ -101,6 +101,10 @@ define('app/views/user_menu', ['ember', 'md5'],
 
                 logoutClicked: function() {
                     Mist.loginController.logout();
+                },
+
+                toggleUIClicked: function() {
+                    window.location.href = '/toggle-ui/beta';
                 }
             }
         });

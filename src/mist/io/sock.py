@@ -1,7 +1,7 @@
 """mist.io.socket.
 
 
-Here we define the socketio Connection and handlers.
+Here we define the sockjs Connection and handlers.
 
 When a user loads mist.io or comes back online, their browser will request a
 new socket and the initialize function will be triggered on the server within a
@@ -40,6 +40,9 @@ from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
 from mist.core import methods as core_methods
+from mist.core.orchestration import methods as orchestration_methods
+from mist.core.rbac import methods as rbac_methods
+
 from mist.io import tasks
 from mist.io.hub.tornado_shell_client import ShellHubClient
 
@@ -204,13 +207,47 @@ class MainConnection(MistConnection):
             log.error("It seems we have received 'on_ready' more than once.")
 
     def start(self):
+        self.update_user()
+        self.update_org()
+        self.list_tags()
         self.list_keys()
+        self.list_scripts()
+        self.list_templates()
+        self.list_stacks()
         self.list_clouds()
         self.check_monitoring()
+
+    def update_user(self):
+        self.send('user', core_methods.get_user_data(self.auth_context))
+
+    def update_org(self):
+        try:
+            org = rbac_methods.filter_org(self.auth_context)
+        except: # Forbidden
+            org = None
+
+        if org:
+            self.send('org', org)
+
+    def list_tags(self):
+        self.send('list_tags',
+                  core_methods.filter_list_tags(self.auth_context))
 
     def list_keys(self):
         self.send('list_keys',
                   core_methods.filter_list_keys(self.auth_context))
+
+    def list_scripts(self):
+        self.send('list_scripts',
+                  core_methods.filter_list_scripts(self.auth_context))
+
+    def list_templates(self):
+        self.send('list_templates',
+                  orchestration_methods.filter_list_templates(self.auth_context))
+
+    def list_stacks(self):
+        self.send('list_stacks',
+                  orchestration_methods.filter_list_stacks(self.auth_context))
 
     def list_clouds(self):
         self.send('list_clouds',
@@ -222,7 +259,8 @@ class MainConnection(MistConnection):
                           ('list_sizes', tasks.ListSizes()),
                           ('list_networks', tasks.ListNetworks()),
                           ('list_locations', tasks.ListLocations()),
-                          ('list_projects', tasks.ListProjects()),):
+                          ('list_projects', tasks.ListProjects()),
+                          ):
 
             for cloud in clouds:
                 cached = task.smart_delay(self.owner.id, cloud.id)
@@ -363,8 +401,20 @@ class MainConnection(MistConnection):
                 self.list_clouds()
             if 'keys' in sections:
                 self.list_keys()
+            if 'scripts' in sections:
+                self.list_scripts()
+            if 'templates' in sections:
+                self.list_templates()
+            if 'stacks' in sections:
+                self.list_stacks()
+            if 'teams' in sections:
+                self.list_teams()
+            if 'tags' in sections:
+                self.list_tags()
             if 'monitoring' in sections:
                 self.check_monitoring()
+            if 'user' in sections:
+                self.update_user()
 
     def on_close(self, stale=False):
         if self.consumer is not None:

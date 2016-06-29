@@ -227,7 +227,9 @@ def amqp_owner_listening(owner):
         connection.close()
 
 
-def trigger_session_update(owner, sections=['clouds', 'keys', 'monitoring']):
+def trigger_session_update(owner, sections=['clouds', 'keys', 'monitoring',
+                                            'scripts', 'templates', 'stacks',
+                                            'teams']):
     amqp_publish_user(owner, routing_key='update', data=sections)
 
 

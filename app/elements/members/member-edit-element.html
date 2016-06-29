@@ -1,0 +1,99 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+
+<dom-module id="member-edit-element">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-dialog {
+                width: 300px;
+            }
+        </style>
+
+        <paper-dialog entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Edit Member</h2>
+            <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
+            <paper-dialog-scrollable>
+                <paper-input id="name" name="name" type="name" label="Name" required error-message="Please enter member's name" value="{{member.name}}" auto-validate></paper-input>
+
+                <paper-input id="role" role="role" type="role" label="Name" required error-message="Please enter member's role" value="{{member.role}}" auto-validate></paper-input>
+
+                <div class="bottom-actions">
+                    <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                </div>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <iron-ajax id="editMemberAjax" url="/members/[[member.id]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'member-edit-element',
+
+                properties: {
+                    member: {
+                        type: Object
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(member.name, member.role, sendingData)'
+                    }
+                },
+                ready: function() {
+
+                },
+                _computeFormReady: function(name, role, sendingData) {
+                    var formReady = false;
+
+                    if (name && role) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _closeEditMemberModal: function(e) {
+                    this.querySelector('paper-dialog').close();
+                },
+                _openEditMemberModal: function(e) {
+                    this.querySelector('paper-dialog').open();
+                },
+                _submitForm: function(e) {
+                    this.fire('updateSelectedMember', {
+                        member: this.member
+                    });
+                    this._closeEditMemberModal();
+                },
+                _formReset: function() {
+
+                },
+                _editMemberAjax: function(e) {
+                    //   this.$.editMemberAjax.generateRequest();
+                },
+                _editMemberRequest: function() {
+                    this.set('sendingData', true);
+                },
+                _editMemberResponse: function(e) {
+                    this.set('sendingData', false);
+                }
+            });
+        })();
+    </script>
+</dom-module>

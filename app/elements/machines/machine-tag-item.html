@@ -1,0 +1,34 @@
+<dom-module id="machine-tag-item">
+    <template>
+        <style include="shared-styles">
+
+        </style>
+
+        <tr>
+            <td>
+                <paper-input value="{{tag.key}}"></paper-input>
+            </td>
+            <td>
+                <paper-input value="{{tag.value}}"></paper-input>
+            </td>
+            <td>
+                <paper-icon-button icon="icons:close" on-tap="_deleteTag"></paper-icon-button>
+            </td>
+        </tr>
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'machine-tag-item',
+
+        properties: {
+            tag: {
+                type: Object,
+                notify: true
+            }
+        },
+        _deleteTag: function(e) {
+            console.log(e);
+        }
+    });
+</script>

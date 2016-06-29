@@ -32,6 +32,13 @@ def main(global_config, **settings):
     configurator.add_renderer('json', json_renderer)
     configurator.add_static_view('resources', 'mist.io:static')
     configurator.add_static_view('docs', path='../../../docs/build')
+
+    # polymer resources
+    configurator.add_static_view('bower_components', path='../../../bower_components')
+    configurator.add_static_view('elements', path='../../../app/elements')
+    configurator.add_static_view('images', path='../../../app/images')
+    configurator.add_static_view('styles', path='../../../app/styles')
+
     configurator.include(add_routes)
     configurator.scan()
     app = configurator.make_wsgi_app()
@@ -50,6 +57,15 @@ def add_routes(configurator):
     """
 
     configurator.add_route('home', '/')
+    configurator.add_route('machines', '/machines')
+    configurator.add_route('networks', '/networks')
+    configurator.add_route('keys', '/keys')
+    configurator.add_route('key', '/keys/{key}')
+    configurator.add_route('machine', '/machines/{machine}')
+    configurator.add_route('images', '/images')
+    configurator.add_route('image', '/images/{image}')
+
+
     configurator.add_route('api_v1_providers', '/api/v1/providers')
     configurator.add_route('providers', '/providers')
     configurator.add_route('api_v1_clouds', '/api/v1/clouds')
@@ -58,25 +74,17 @@ def add_routes(configurator):
     configurator.add_route('cloud_action', '/clouds/{cloud}')
 
     configurator.add_route('api_v1_machines', '/api/v1/clouds/{cloud}/machines')
-    configurator.add_route('machines', '/clouds/{cloud}/machines')
     configurator.add_route('api_v1_machine',
                            '/api/v1/clouds/{cloud}/machines/{machine}')
-    configurator.add_route('machine', '/clouds/{cloud}/machines/{machine}')
     configurator.add_route('api_v1_machine_rdp',
                            '/api/v1/clouds/{cloud}/machines/{machine}/rdp')
-    configurator.add_route('machine_rdp',
-                           '/clouds/{cloud}/machines/{machine}/rdp')
     configurator.add_route('api_v1_machine_tags',
                            '/api/v1/clouds/{cloud}/machines/{machine}/tags')
-    configurator.add_route('machine_tags',
-                           '/clouds/{cloud}/machines/{machine}/tags')
     configurator.add_route('api_v1_machine_tag',
                            '/api/v1/clouds/{cloud}/machines/{machine}/tags/{tag}')
-    configurator.add_route('machine_tag',
-                           '/clouds/{cloud}/machines/{machine}/tags/{tag}')
+    configurator.add_route('api_v1_tags', '/api/v1/tags')
     configurator.add_route('api_v1_probe',
                            '/api/v1/clouds/{cloud}/machines/{machine}/probe')
-    configurator.add_route('probe', '/clouds/{cloud}/machines/{machine}/probe')
 
     configurator.add_route('api_v1_monitoring', '/api/v1/monitoring')
     configurator.add_route('monitoring', '/monitoring')
@@ -99,23 +107,17 @@ def add_routes(configurator):
                            '/clouds/{cloud}/machines/{machine}/plugins/{plugin}')
 
     configurator.add_route('api_v1_images', '/api/v1/clouds/{cloud}/images')
-    configurator.add_route('images', '/clouds/{cloud}/images')
     configurator.add_route('api_v1_image',
                            '/api/v1/clouds/{cloud}/images/{image:.*}')
-    configurator.add_route('image', '/clouds/{cloud}/images/{image:.*}')
     configurator.add_route('api_v1_sizes', '/api/v1/clouds/{cloud}/sizes')
-    configurator.add_route('sizes', '/clouds/{cloud}/sizes')
     configurator.add_route('api_v1_locations',
                            '/api/v1/clouds/{cloud}/locations')
-    configurator.add_route('locations', '/clouds/{cloud}/locations')
     configurator.add_route('api_v1_networks', '/api/v1/clouds/{cloud}/networks')
-    configurator.add_route('networks', '/clouds/{cloud}/networks')
     configurator.add_route('api_v1_network',
                            '/api/v1/clouds/{cloud}/networks/{network}')
     configurator.add_route('network', '/clouds/{cloud}/networks/{network}')
 
     configurator.add_route('api_v1_keys', '/api/v1/keys')
-    configurator.add_route('keys', '/keys')
     configurator.add_route('api_v1_key_action', '/api/v1/keys/{key}')
     configurator.add_route('key_action', '/keys/{key}')
     configurator.add_route('api_v1_key_public', '/api/v1/keys/{key}/public')

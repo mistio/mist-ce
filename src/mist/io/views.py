@@ -17,6 +17,7 @@ import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError
 
 from pyramid.response import Response
+from pyramid.renderers import render_to_response
 
 # try:
 from mist.core.helpers import view_config
@@ -87,19 +88,31 @@ def exception_handler_mist(exc, request):
     return Response(str(exc), exc.http_code)
 
 
-@view_config(context='pyramid.httpexceptions.HTTPNotFound',
-             renderer='templates/404.pt')
-def not_found(self, request):
-    return pyramid.httpexceptions.HTTPFound(request.host_url + "/#" + request.path)
+#@view_config(context='pyramid.httpexceptions.HTTPNotFound',
+#             renderer='templates/404.pt')
+#def not_found(self, request):
+#    return pyramid.httpexceptions.HTTPFound(request.host_url+"/#"+request.path)
 
 
-@view_config(route_name='home', request_method='GET',
-             renderer='templates/home.pt')
+@view_config(route_name='home', request_method='GET')
+@view_config(route_name='machines', request_method='GET')
+@view_config(route_name='machine', request_method='GET')
+@view_config(route_name='images', request_method='GET')
+@view_config(route_name='image', request_method='GET')
+@view_config(route_name='keys', request_method='GET')
+@view_config(route_name='key', request_method='GET')
+@view_config(route_name='networks', request_method='GET')
+@view_config(route_name='network', request_method='GET')
 def home(request):
     """Home page view"""
+    params = params_from_request(request)
     user = user_from_request(request)
-
-    return {
+    if params.get('ember'):
+        template = 'home.pt'
+    else:
+        template = 'poly.pt'
+    return render_to_response('templates/%s' % template,
+        {
         'project': 'mist.io',
         'email': json.dumps(user.email),
         'first_name': json.dumps(""),
@@ -115,7 +128,7 @@ def home(request):
         'csrf_token': json.dumps(""),
         'beta_features': json.dumps(False),
         'last_build': config.LAST_BUILD
-    }
+        }, request=request)
 
 
 @view_config(route_name="check_auth", request_method='POST', renderer="json")
@@ -189,10 +202,11 @@ def update_user_settings(request):
 def list_clouds(request):
     """
     Request a list of all added clouds.
-    READ permission requrired on cloud.
+    READ permission required on cloud.
     ---
     """
     auth_context = auth_context_from_request(request)
+    # to prevent iterate throw every cloud
     auth_context.check_perm("cloud", "read", None)
     return mist.core.methods.filter_list_clouds(auth_context)
 
@@ -263,7 +277,7 @@ def add_cloud(request):
         if type(params[key]) in [unicode, str]:
             params[key] = params[key].rstrip().lstrip()
 
-    api_version = request.headers.get('Api-Version', 1)
+    # api_version = request.headers.get('Api-Version', 1)
     title = params.get('title', '')
     provider = params.get('provider', '')
 
@@ -271,41 +285,10 @@ def add_cloud(request):
         raise RequiredParameterMissingError('provider')
 
     monitoring = None
-    if int(api_version) == 2:
-        ret = methods.add_cloud_v_2(owner, title, provider, params)
-        cloud_id = ret['cloud_id']
-        monitoring = ret.get('monitoring')
-    else:
-        apikey = params.get('apikey', '')
-        apisecret = params.get('apisecret', '')
-        apiurl = params.get('apiurl') or ''  # fixes weird issue w/ none value
-        tenant_name = params.get('tenant_name', '')
-        # following params are for baremetal
-        machine_hostname = params.get('machine_ip', '')
-        machine_key = params.get('machine_key', '')
-        machine_user = params.get('machine_user', '')
-        remove_on_error = params.get('remove_on_error', True)
-        try:
-            docker_port = int(params.get('docker_port', 4243))
-        except:
-            docker_port = 4243
-        try:
-            ssh_port = int(params.get('machine_port', 22))
-        except:
-            ssh_port = 22
-        region = params.get('region', '')
-        compute_endpoint = params.get('compute_endpoint', '')
-        # TODO: check if all necessary information was provided in the request
+    ret = methods.add_cloud_v_2(owner, title, provider, params)
 
-        cloud_id = methods.add_cloud(
-            owner, title, provider, apikey, apisecret, apiurl,
-            tenant_name=tenant_name,
-            machine_hostname=machine_hostname, machine_key=machine_key,
-            machine_user=machine_user, region=region,
-            compute_endpoint=compute_endpoint, port=ssh_port,
-            docker_port=docker_port,
-            remove_on_error=remove_on_error,
-        )
+    cloud_id = ret['cloud_id']
+    monitoring = ret.get('monitoring')
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
@@ -430,7 +413,6 @@ def toggle_cloud(request):
 
 
 @view_config(route_name='api_v1_keys', request_method='GET', renderer='json')
-@view_config(route_name='keys', request_method='GET', renderer='json')
 def list_keys(request):
     """
     List keys
@@ -838,7 +820,6 @@ def disassociate_key(request):
 
 
 @view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
-@view_config(route_name='machines', request_method='GET', renderer='json')
 def list_machines(request):
     """
     List machines on cloud
@@ -1171,7 +1152,6 @@ def machine_actions(request):
 
 
 @view_config(route_name='api_v1_machine_rdp', request_method='GET', renderer='json')
-@view_config(route_name='machine_rdp', request_method='GET', renderer='json')
 def machine_rdp(request):
     """
     Rdp file for windows machines
@@ -1332,7 +1312,6 @@ def list_specific_images(request):
 
 
 @view_config(route_name='api_v1_images', request_method='GET', renderer='json')
-@view_config(route_name='images', request_method='GET', renderer='json')
 def list_images(request):
     """
     List images of specified cloud
@@ -1385,7 +1364,6 @@ def star_image(request):
 
 
 @view_config(route_name='api_v1_sizes', request_method='GET', renderer='json')
-@view_config(route_name='sizes', request_method='GET', renderer='json')
 def list_sizes(request):
     """
     List sizes of a cloud
@@ -1404,7 +1382,6 @@ def list_sizes(request):
 
 
 @view_config(route_name='api_v1_locations', request_method='GET', renderer='json')
-@view_config(route_name='locations', request_method='GET', renderer='json')
 def list_locations(request):
     """
     List locations of cloud
@@ -1428,7 +1405,6 @@ def list_locations(request):
 
 
 @view_config(route_name='api_v1_networks', request_method='GET', renderer='json')
-@view_config(route_name='networks', request_method='GET', renderer='json')
 def list_networks(request):
     """
     List networks of a cloud
@@ -1488,7 +1464,6 @@ def create_network(request):
 
 
 @view_config(route_name='api_v1_network', request_method='DELETE')
-@view_config(route_name='network', request_method='DELETE')
 def delete_network(request):
     """
     Delete a network
@@ -1515,7 +1490,6 @@ def delete_network(request):
 
 
 @view_config(route_name='api_v1_network', request_method='POST')
-@view_config(route_name='network', request_method='POST')
 def associate_ip(request):
     """
     Associate ip
@@ -1565,7 +1539,6 @@ def associate_ip(request):
 
 
 @view_config(route_name='api_v1_probe', request_method='POST', renderer='json')
-@view_config(route_name='probe', request_method='POST', renderer='json')
 def probe(request):
     """
     Probe a machine

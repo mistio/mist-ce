@@ -1,0 +1,232 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+
+<link rel="import" href="../app-form/app-form.html">
+
+<dom-module id="cloud-add">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                display: block;
+                padding: 24px;
+                transition: all 0.2 ease-in;
+            }
+
+            paper-material.selected-true {
+                padding-bottom: 120px;
+            }
+            #content {
+                max-width: 900px;
+            }
+            paper-card,
+            paper-checkbox {
+                display: block;
+            }
+
+            paper-card {
+                margin-bottom: 40px;
+            }
+
+            paper-toggle-button,
+            paper-checkbox {
+                margin-top: 20px;
+            }
+
+            .dropdown-with-logos paper-item img {
+                margin-right: 16px;
+            }
+
+            .dropdown-with-logos paper-item {
+                text-transform: capitalize;
+                opacity: 0.87;
+            }
+            paper-dropdown-menu ::content .dropdown-content {
+                max-height: 400px !important;
+            }
+        </style>
+
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="cloud"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Add Cloud
+                    </h2>
+                    <div class="subtitle">
+                        Mist.io supports over 17 providers
+                    </div>
+                </div>
+            </paper-material>
+            <paper-material>
+                <div class="grid-row">
+                    <paper-dropdown-menu class="dropdown-block l6 xs12 dropdown-with-logos" label="Choose Provider" horizontal-align="left">
+                        <paper-menu attr-for-selected="value" selected="{{selectedProvider}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[providers]]" as="provider">
+                                <paper-item value="[[provider.val]]"><img src="[[_computeProviderLogo(provider.className)]]" width="24px" /><span>[[provider.title]]</span></paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+                </div>
+            </paper-material>
+            <paper-material class$="selected-[[!selectedProvider]]">
+                <div hidden$=[[selectedProvider]]>
+                    <h3 class="smallcaps">Verification</h3>
+                    <p>Choose a provider above to fill in the required fields.</p>
+                </div>
+                <div hidden$=[[!selectedProvider]]>
+                    <app-form fields="[[providerFields]]" method="POST" url="/api/v1/clouds" on-response="_cloudAddAjaxResponse" on-error="_cloudAddAjaxError" btncontent="Add Cloud"></app-form>
+                </div>
+            </paper-material>
+        </div>
+
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'cloud-add',
+
+                properties: {
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    cloud: {
+                        type: Object,
+                        value: {}
+                    },
+                    selectedProvider: {
+                        type: String,
+                        value: null,
+                        notify: true
+                    },
+                    providerFields: {
+                        type: Array,
+                        value: []
+                    },
+                    providers: {
+                        type: Array
+                    },
+                    keys: {
+                        type: Array
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        value: false
+                    }
+                },
+                observers: [
+                    '_providerChanged(selectedProvider, providers)',
+                    '_keysChanged(keys.*, providerFields)'
+                ],
+                ready: function() {
+
+                },
+                _cloudAddAjaxResponse: function(response) {
+                    page('/');
+                },
+                _cloudAddAjaxError: function(response) {
+                    console.error('add-cloud error', response);
+                },
+                _openDocs: function(href) {
+                    document.location = href;
+                },
+                _computeProviderLogo: function(className) {
+                    return '../assets/providers/' + className + '.png';
+                },
+                _computeFieldType: function(field, value, show) {
+                    if (!(field.showIf && !field.show)) {
+                        return field.type == value;
+                    }
+                },
+                _providerChanged: function(selectedProvider, providers) {
+                    this._resetForm();
+                    var selectedProviderDetails = providers
+                        .filter(function(fields) {
+                            return fields.val == selectedProvider;
+                        });
+                    console.warn('providerFields', providerFields);
+                    var providerFields = selectedProviderDetails.length ? selectedProviderDetails.shift().options : [];
+                    this.set('providerFields', [{
+                          name: "provider",
+                          type: "text",
+                          show: false,
+                          value: selectedProvider
+                    }].concat(providerFields));
+                },
+                _keysChanged: function(keys, providerFields) {
+                    // Set list of keys in providerFields when model keys change
+                    var keysOptions = keys.base.map(function(key) {
+                        var obj = {};
+                        obj['title'] = key.name;
+                        obj['val'] = key;
+                        return obj;
+                    });
+
+                    var index = this.providerFields.findIndex(function(field) {
+                        return field.type == "ssh_key";
+                    }, this);
+
+                    this.set('providerFields.' + index + '.options', keysOptions);
+                    this.set('providerFields.' + index + '.value', '');
+                },
+                _providerReset: function() {
+                    this.set('provider', null);
+                },
+                _submitForm: function(e) {
+                    console.log(this.cloud);
+                    this.$.cloudAddAjaxRequest.body = this.cloud;
+                    this.$.cloudAddAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.cloudAddAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.cloudAddAjaxRequest.generateRequest();
+                    this.set('sendingData', true);
+                },
+                _addCloudResponse: function(e) {
+                    this.set('sendingData', false);
+                },
+                _resetForm: function(e) {
+                    // Reset cloud
+                    this.set('cloud', {});
+
+                    // Reset Form Fields
+                    this.providerFields.forEach(function(el, index) {
+                        if (el.showIf) {
+                            this.set('providerFields.' + index + '.show', false);
+                        }
+
+                        // Reset Form Fields Validation
+                        this._resetField(el, index);
+                    }, this);
+                },
+                _resetField: function(el, index) {
+                    this.set('providerFields.' + index + '.value', el.defaultValue);
+
+                    var input = this.querySelector('#' + el.name);
+                    if (input) {
+                        input.invalid = false;
+                    }
+                },
+                _goBack: function(){
+                    history.back();
+                }
+            });
+        })();
+    </script>
+</dom-module>
