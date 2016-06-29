@@ -179,7 +179,7 @@
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
-                            <paper-button on-tap="_deleteMember" class="simple"> Delete Member</paper-button>
+                            <paper-button on-tap="_deleteMember" class="simple">Delete Member</paper-button>
                         </paper-menu>
                     </paper-menu-button>
 
@@ -197,9 +197,9 @@
                     <div class="page-block">
                         <h3 class="smallcaps">[[member.name]] is in:</h3>
                         <p>
-                            <span hidden$="[[!memberTeams]]">No teams</span>
+                            <span hidden$="[[memberTeams]]">No teams</span>
                             <template is="dom-repeat" items="[[memberTeams]]">
-                                <span>[[item.name]] </span>
+                                <span>[[item.name]]</span>
                             </template>
                         </p>
                     </div>
@@ -220,6 +220,7 @@
             </div>
         </div>
         <dialog-element></dialog-element>
+        <iron-ajax id="deleteMember" url="/api/v1/org/[[model.org.id]]/teams/[[teamId]]/members/[[member.id]]" method="DELETE" on-response="_deleteMemberResponseAjax" on-error="_deleteMemberError"></iron-ajax>
     </template>
     <script>
     (function() {
@@ -260,7 +261,8 @@
                 timestamp: {
                     type: String,
                     computed: '_getFormattedTimestamp(member)'
-                }
+                },
+                teamId: String
             },
             listeners: {
                 'confirmation': '_deleteMemberResponse',
@@ -275,8 +277,8 @@
                 }, this);
             },
             _computeTeams: function(member, teams){
-                var memberTeams = this.model.teamsArray.find(function(t){
-                    return t.members.indexOf(member.id) > -1;
+                var memberTeams = this.model.teamsArray.filter(function(t, index){
+                    return t.members.indexOf(this.member.id) > -1;
                 }, this);
                 return memberTeams;
             },
@@ -290,8 +292,8 @@
             },
             _deleteMember: function(e) {
                 this._showDialog({
-                    title: 'Delete member?',
-                    body: "Deleting members cannot be undone. You are about to delete member: " + this.member.name ,
+                    title: 'Delete '+ this.member.name +' ?',
+                    body: "Deleting a member will also remove the member from all the teams they participate in",
                     danger: true,
                     reason: "delete_member"
                 });
@@ -301,8 +303,28 @@
                     response = e.detail.response;
 
                 if (response.confirmed && reason == "delete_member") {
-                    console.log('i ll delete the member');
-                    page('/teams');
+                    this.memberTeams.forEach(function(t){
+                        this.async(function(){
+                            this.set('teamId', t.id);
+                            this.deleteMemberRequest(t.id);
+                        }, 100, this)
+                    }, this);                    
+                }
+            },
+            deleteMemberRequest: function(team){
+                console.log("TEAMSS",team)
+                this.$.deleteMember.body = {};
+                this.$.deleteMember.headers["Content-Type"] = 'application/json';
+                this.$.deleteMember.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.deleteMember.generateRequest();
+            },
+            _deleteMemberResponseAjax: function(e){
+                // if user was in one single team return there, else in teams
+                if (this.memberTeams.length == 1 ){                        
+                    page('/teams/'+this.memberTeams[0].id);
+                }
+                else {
+                    page('/teams')
                 }
             },
             _showDialog: function(info) {

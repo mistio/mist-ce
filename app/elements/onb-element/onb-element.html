@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../../bower_components/paper-textarea/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 
@@ -198,7 +198,7 @@
         <team-add referrel="onb"></team-add>
         <iron-ajax id="saveOrgRequest" method="PUT" url="/api/v1/org/[[model.org.id]]"></iron-ajax>
         <iron-ajax id="invitePeopleRequest" method="POST" on-response="invitePeopleResponse" on-error="invitePeopleError" url$="api/v1/org/[[model.org.id]]/teams/[[selectedTeamId]]/members"></iron-ajax>
-        
+
     </template>
 
     <script>
