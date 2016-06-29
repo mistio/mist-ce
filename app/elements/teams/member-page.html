@@ -17,7 +17,7 @@
 
         paper-material {
             display: block;
-            padding: 8px;
+            padding: 24px;
         }
 
         paper-material.no-pad {
@@ -176,45 +176,36 @@
                     </div>
                 </div>
                 <div class="item-actions">
-                    
+                    <paper-menu-button horizontal-align="right">
+                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu id="machine_actions" class="dropdown-content">
+                            <paper-button on-tap="_deleteMember" class="simple"> Delete Member</paper-button>
+                        </paper-menu>
+                    </paper-menu-button>
+
+                    <paper-button on-tap="_addMemberInTeams" class="simple white left-icon" style$="color: [[section.color]]">
+                        <iron-icon icon="social:people" style$="color: [[section.color]]"></iron-icon> Add in Teams
+                    </paper-button>
                 </div>
             </paper-material>
-            <div class="page section">
-                <div class="flex-horizontal-with-ratios section">
+            <paper-material>
+                <div class="flex-horizontal-with-ratios">
                     <div class="page-block">
-                        <h3 class="smallcaps">Description</h3>
-                        <p>[[member.name]], [[member.email]]</p>
+                        <h3 class="smallcaps">Short Info</h3>
+                        <p>[[member.email]] <span hidden$="[[member.pending]]">Pending</span></p>
                     </div>
                     <div class="page-block">
-                        <h3 class="smallcaps">Signed up at</h3>
-                        <p>[[timestamp]] </p>
+                        <h3 class="smallcaps">[[member.name]] is in:</h3>
+                        <p>
+                            <span hidden$="[[!memberTeams]]">No teams</span>
+                            <template is="dom-repeat" items="[[memberTeams]]">
+                                <span>[[item.name]] </span>
+                            </template>
+                        </p>
                     </div>
                 </div>
-                <div class="flex-horizontal-with-ratios section">
-                    <div class="width100">
-                        <template is="dom-if" if="[[hasTeams]]">
-                            <paper-material class="no-pad">
-                                <h3 class="smallcaps resource-head">[[member.name]] is member in teams</h3>
-                                <template is="dom-repeat" items="[[teams]]">
-                                    <paper-item>
-                                        <a href="/teams/[[item.id]]" class="flex-horizontal-with-ratios width100">
-                                            <span class="flexchild">[[item.name]] </span>
-                                            <span class="flexchild">[[item.email]]</span>
-                                        </a>
-                                    </paper-item>
-                                </template>
-                            </paper-material>
-                        </template>
-
-                        <template is="dom-if" if="[[!hasMembers]]">
-                            <h3 class="smallcaps">Members</h3>
-                            <p>
-                                You have not yet added this member in any team.
-                            </p>
-                            <paper-button class="blue pad-left2 pad-right2" on-tap="_addMemberToTeam"> Add Member to team </paper-button>
-                        </template>
-                    </div>
-                </div>
+            </paper-material>
+            <div class="page section">                                
                 <div class="flex-horizontal-with-ratios section">
                     <div class="width100">
                         <paper-material class="no-pad">
@@ -228,7 +219,6 @@
                 </div>
             </div>
         </div>
-        <team-edit team="[[team]]"></team-edit>
         <dialog-element></dialog-element>
     </template>
     <script>
@@ -261,62 +251,37 @@
                 },
                 hasTeams: {
                     type: Boolean,
-                    value: false,
-                    computed: '_hasTeams(member)'
+                    value: true
                 },
-                teams: {
+                memberTeams: {
                     type: Array,
-                    computed: '_computeTeams(member)'
-                },
-                memberid: {
-                    type: String,
-                    computed: '_computeMemberId(params)'
+                    computed: '_computeTeams(member, model.teamsArray.*)'
                 },
                 timestamp: {
                     type: String,
                     computed: '_getFormattedTimestamp(member)'
-                },
-                vpHeight: String
+                }
             },
             listeners: {
                 'confirmation': '_deleteMemberResponse',
                 'updateSelectedMember': '_updateMember'
             },
             ready: function() {
-                var wh = window.innerHeight;
-                this.vpHeight = 'height:'+ wh +'px; overflow: auto;';
-            },
-            _getFormattedTimestamp: function (member) {
-                // var timestamp = parseInt(team.created_at);
-                return new Date(member.signed_in).toLocaleString('en-US', {timeZoneName: 'short'});
-            },
-            _getHeaderStyle: function(section) {
-                return 'background-color: ' + section.color + '; color: #fff;';
-            },
-            _hasTeams: function(member){
-                if (member.teams)
-                    return member.teams.length > 0 ? true : false;
-            },
-            _computeId: function(params) {
-                return params.id;
+
             },
             _computeMember: function(params) {
                 return this.model.membersArray.find(function(member) {
                     return member.id == params.id;
                 }, this);
             },
-            _computeMemberId: function(params) {
-                return params.id;
-            },
-            _computeTeams: function(member){
-                return member.teams;
+            _computeTeams: function(member, teams){
+                var memberTeams = this.model.teamsArray.find(function(t){
+                    return t.members.indexOf(member.id) > -1;
+                }, this);
+                return memberTeams;
             },
             _addMemberToTeam: function(e) {
-                page.show('/add-member-to-a-team/' + this.member.id);
-            },
-            _editMember: function(e) {
-                var el = this.querySelector('member-edit');
-                el._openEditTeamModal();
+                // page.show('/add-member-to-a-team/' + this.member.id);
             },
             _updateMember: function(e) {
                 var team = e.detail.team;
@@ -337,7 +302,7 @@
 
                 if (response.confirmed && reason == "delete_member") {
                     console.log('i ll delete the member');
-                    page.show('/members');
+                    page('/teams');
                 }
             },
             _showDialog: function(info) {
@@ -347,9 +312,6 @@
                     dialog[i] = info[i];
                 }
                 dialog._openDialog();
-            },
-            _goBack: function(){
-                history.back();
             }
         });
     })();
