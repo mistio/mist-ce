@@ -4500,9 +4500,15 @@ def machine_cost_calculator(m):
         if price:
             try:
                 cost['cost_per_hour'] = float(price)
-                cost['cost_per_month'] = float(price) * 24 * month_days
+                cost['cost_per_month'] = float(price) * 24 * month_days * 0.7
+                # monthly discount of 30% if the VM runs all the billing month
+                # TODO: better calculate the discounts, taking under consideration
+                # when the VM has been initiated
+                # TODO: take under consideration the OS types that are not free -
+                # suse, rhel, win
             except:
                 pass
+
     if m.driver.type == Provider.DIGITAL_OCEAN:
         size = m.extra.get('size', {})
         cost['cost_per_month'] = size.get('price_monthly')
