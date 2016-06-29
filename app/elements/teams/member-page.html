@@ -164,6 +164,14 @@
         .width100 {
             width: 100%;
         }
+        .team:after {
+            position: relative;
+            content: ", "
+        }
+        .team:last-of-type:after {
+            position: relative;
+            content: ""
+        }
         </style>
 
         <div id="content">
@@ -199,7 +207,7 @@
                         <p>
                             <span hidden$="[[memberTeams]]">No teams</span>
                             <template is="dom-repeat" items="[[memberTeams]]">
-                                <span>[[item.name]]</span>
+                                <span class="team">[[item.name]]</span>
                             </template>
                         </p>
                     </div>
@@ -307,7 +315,7 @@
                         this.async(function(){
                             this.set('teamId', t.id);
                             this.deleteMemberRequest(t.id);
-                        }, 100, this)
+                        }, 50, this)
                     }, this);                    
                 }
             },
