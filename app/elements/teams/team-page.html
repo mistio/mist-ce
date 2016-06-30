@@ -342,9 +342,9 @@
                     }
                 },
                 listeners: {
-                    'confirmation': '_deleteTeamEventResponse',
+                    'confirmation': '_deleteResponse',
                     'updateSelectedTeam': '_updateTeam',
-                    'confirmation': '_deleteMemberEventResponse'
+                    // 'confirmation': '_deleteMemberEventResponse'
                 },
                 ready: function() {
                     var wh = window.innerHeight;
@@ -439,7 +439,7 @@
                         reason: "team.delete"
                     });
                 },
-                _deleteTeamEventResponse: function(e) {
+                _deleteResponse: function(e) {
                     var reason = e.detail.reason,
                         response = e.detail.response;
 
@@ -448,6 +448,13 @@
                         this.$.teamDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
                         this.$.teamDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                         this.$.teamDeleteAjaxRequest.generateRequest();
+                        page('/teams');
+                    }
+                    if (response.confirmed && reason == "member.delete") {
+                        this.$.deleteMember.body = {};
+                        this.$.deleteMember.headers["Content-Type"] = 'application/json';
+                        this.$.deleteMember.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.deleteMember.generateRequest();
                     }
                 },
                 _handleTeamDeleteAjaxResponse: function(e) {
@@ -463,17 +470,6 @@
                         danger: true,
                         reason: "member.delete"
                     });
-                },
-                _deleteMemberEventResponse: function(e){                    
-                    var reason = e.detail.reason,
-                        response = e.detail.response;
-
-                    if (response.confirmed && reason == "member.delete") {
-                        this.$.deleteMember.body = {};
-                        this.$.deleteMember.headers["Content-Type"] = 'application/json';
-                        this.$.deleteMember.headers["Csrf-Token"] = CSRF_TOKEN;
-                        this.$.deleteMember.generateRequest();
-                    }
                 },
                 _deleteMemberResponse: function(){
                     this.set('memberToDelete', null);
