@@ -1,3 +1,4 @@
+<link rel="import" href="../teams/team-add.html">
 
 <dom-module id="empty-pages">
     <template>
@@ -49,9 +50,16 @@
         </style>
         <div id="list-form">
           <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
-          <div>No [[section.id]] available. Yet.</div>
-          <paper-button class="wide blue" on-tap="_fabAction"> ADD YOUR [[section.id]] </paper-button>
+          <template is="dom-if" if= "[[needCloud]]">
+            <div>To see [[section.id]] you need to add clouds.</div>
+            <paper-button class="wide blue" on-tap="_addCloudAction"> ADD YOUR CLOUDS </paper-button>
+          </template>
+          <template is="dom-if" if="[[!needCloud]]">
+            <div>No [[section.id]] available. Yet.</div>
+            <paper-button class="wide blue" on-tap="_fabAction"> ADD YOUR [[section.id]] </paper-button>
+          </template>
         </div>
+        <team-add></team-add>
     </template>
 </dom-module>
 <script>
@@ -61,12 +69,34 @@ Polymer({
 
     properties: {
 
-        section: Object
-
+        section: Object,
+        needCloud: {
+            type: Boolean,
+            value: true,
+            computed: "needCloudChange(section)"
+        },
+    },
+    needCloudChange: function(section){
+      if(this.section.id == "machines" || this.section.id == "networks" || this.section.id == "images" || this.section.id == "stacks"){
+        return true;
+      }
+      else{
+        return false;
+      }
+    },
+    _addCloudAction: function(){
+        page("/add-cloud");
     },
     _fabAction: function(e) {
-        console.debug('fabAction', e, this.section.add);
-        page(this.section.add);
+        if(this.section.id != "teams")
+        {
+          console.debug('fabAction', e, this.section.add);
+          page(this.section.add);
+        }
+        else{
+          var dialog = this.querySelector('team-add');
+          dialog.openDialog();
+        }
     }
 
 });

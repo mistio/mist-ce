@@ -6,7 +6,6 @@
 <link rel="import" href="../item-list/item-list.html">
 <link rel="import" href="../empty-pages/empty-pages.html">
 
-<!--link rel="import" href="../item-cards/item-cards.html"-->
 <dom-module id="page-items">
     <template>
         <style>
@@ -147,50 +146,11 @@
         [view=table] #item-cards {
             display: none;
         }
-        #onboarding-area {
-            margin: 0 auto;
-            width: 100%;
-            max-width: 600px;
-            box-sizing: border-box;
-            @apply(--layout-vertical);
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-            -webkit-touch-callout: none; /* iOS Safari */
-            -webkit-user-select: none;   /* Chrome/Safari/Opera */
-            -khtml-user-select: none;    /* Konqueror */
-            -moz-user-select: none;      /* Firefox */
-            -ms-user-select: none;       /* Internet Explorer/Edge */
-            user-select: none;
-            transition: var(--material-curve-320);
-            transition-delay: 200ms;
-        }
-        #onboarding-area[higher] {
-            transform: translate(0, -150px);
-        }
-        .onb-graphics {
-            margin: 0 auto;
-            height: auto;
-            vertical-align: middle;
-            top: 0;
-            width: 200px;
-            max-width: 100%;
-        }
-        #list-form {
-            text-align: center;
-            padding-bottom: 200px;
-        }
-        paper-button{
-          margin: 12px;
-        }
         </style>
 
         <div id="onboarding-area">
             <div hidden$="[[!showEmptyScreen]]">
               <empty-pages section="[[section]]"></empty-pages>
-                <!-- <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
-                <div>No [[section.id]] available. Yet.</div>
-                <paper-button class="wide blue" on-tap="_fabAction"> ADD YOUR [[section.id]] </paper-button> -->
             </div>
             <div hidden$="[[showEmptyScreen]]">
                 <div id="section-heading" hidden$="[[!section]]">
