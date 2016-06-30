@@ -159,7 +159,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                 that.set('invitingMember', true);
                 Mist.ajax
                     .POST('/api/v1/org/' + args.team.organization.id + '/teams/' + args.team.id + '/members', {
-                        'email': args.member.email
+                        'emails': args.member.email
                     })
                     .success(function(member) {
                         Mist.notificationController.notify('An invitation was sent to user with email: ' + args.member.email);
