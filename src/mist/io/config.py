@@ -172,10 +172,10 @@ SUPPORTED_PROVIDERS_V_2 = [
                 'location': 'Oregon',
                 'id': Provider.EC2_US_WEST_OREGON
             },
-            {
-                'location': 'Mumbai',
-                'id': Provider.EC2_AP_SOUTH1
-            },
+#            {
+#                'location': 'Mumbai',
+#                'id': Provider.EC2_AP_SOUTH1
+#            },
         ]
     },
     # GCE
@@ -329,10 +329,10 @@ SUPPORTED_PROVIDERS = [
         'title': 'EC2 AP Seoul',
         'provider': Provider.EC2_AP_NORTHEAST2
     },
-    {
-        'title': 'EC2 AP Mumbai',
-        'provider': Provider.EC2_AP_SOUTH1
-    },
+#    {
+#        'title': 'EC2 AP Mumbai',
+#        'provider': Provider.EC2_AP_SOUTH1
+#    },
     {
         'title': 'EC2 AP SOUTHEAST',
         'provider': Provider.EC2_AP_SOUTHEAST
@@ -552,7 +552,7 @@ EC2_IMAGES[Provider.EC2_US_EAST] = EC2_IMAGES['us-east-1']
 EC2_IMAGES[Provider.EC2_EU_CENTRAL] = EC2_IMAGES['eu-central-1']
 EC2_IMAGES[Provider.EC2_AP_NORTHEAST2] = EC2_IMAGES['ap-northeast-2']
 EC2_IMAGES[Provider.EC2_AP_NORTHEAST1] = EC2_IMAGES['ap-northeast-1']
-EC2_IMAGES[Provider.EC2_AP_SOUTH1] = EC2_IMAGES['ap-south-1']
+#EC2_IMAGES[Provider.EC2_AP_SOUTH1] = EC2_IMAGES['ap-south-1']
 
 # Provider.EC2_EU_WEST etc naming is deprecated by libcloud.
 #
