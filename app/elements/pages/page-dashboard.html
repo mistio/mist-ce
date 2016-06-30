@@ -31,7 +31,7 @@
 <link rel="import" href="../onb-element/onb-element.html">
 <link rel="import" href="../app-header/app-header.html">
 <link rel="import" href="../clouds/cloud-info.html">
-<link rel="import" href="../clouds/cloud-chipp.html">
+<link rel="import" href="../clouds/cloud-chip.html">
 
 <dom-module id="page-dashboard">
     <template>
@@ -64,15 +64,15 @@
             min-height: 48px;
             transition: all 200ms ease-in;
         }
-        .clouds cloud-chipp {
+        .clouds cloud-chip {
             cursor: pointer;
             z-index: 9;
         }
-        .clouds cloud-chipp.online .icon {
+        .clouds cloud-chip.online .icon {
             background-color: var(--green-color) !important;
         }
 
-        .clouds cloud-chipp.offline .icon {
+        .clouds cloud-chip.offline .icon {
             background-color: var(--red-color) !important;
         }
 
@@ -89,7 +89,7 @@
         }
         .costs,
         .incidents {
-           /*margin-bottom: 1em;*/            
+           /*margin-bottom: 1em;*/
             display: block;
             width: 100%;
         }
@@ -206,10 +206,10 @@
             height: calc(100vh + 184px);
             box-sizing: border-box;
             position: relative;
-        }        
+        }
         .wide {
             padding: 0.7em 1.5em;
-        }                
+        }
         .is-loading {
             position: absolute;
             top: 20px;
@@ -233,11 +233,11 @@
                 <div class="clouds top flexchild-wide-top">
                     <div class="flex">
                         <template is="dom-repeat" items="[[model.cloudsArray]]">
-                            <cloud-chipp label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" on-tap="_showCloudInfoDialog" id$="[[item.id]]">
+                            <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" on-tap="_showCloudInfoDialog" id$="[[item.id]]">
                                 <div class="icon"></div>
                                 <!-- src="[[_computeProviderLogo(item.provider)]]" -->
                                 <h1 class="cloud-title">[[item.title]]</h1>
-                            </cloud-chipp>
+                            </cloud-chip>
                         </template>
                     </div>
                     <div class="ovhid">
@@ -303,7 +303,7 @@
                 <paper-fab id="addBtn" icon="cloud"></paper-fab>
             </a>
         </div>
-        
+
         <div class="is-loading" hidden$="[[!onboarding.isLoadingClouds]]">
             <paper-spinner active></paper-spinner>
         </div>
@@ -338,7 +338,7 @@ Polymer({
             // value: true,
             computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds)',
             notify: true
-        },        
+        },
         hasIncidents: {
              type: Boolean,
              computed: '_computeHasIncidents(model.incidents.*)',
@@ -346,7 +346,7 @@ Polymer({
          }
     },
     listeners: {
-        'close-cloud-info': '_closeCloudChips'        
+        'close-cloud-info': '_closeCloudChips'
     },
     ready: function() {
     },
@@ -432,7 +432,7 @@ Polymer({
     },
     isOffline: function(cloud) {
         return cloud.state == 'offline' && 'offline';
-    },    
+    },
     _computeHasIncidents: function(incidents){
          if (incidents.base){
              return incidents.base.length > 0 ? true : false;
@@ -486,7 +486,7 @@ Polymer({
             this.set('openedCloud', '');
         }
         else {
-            var cloudChips = this.querySelectorAll('cloud-chipp'),
+            var cloudChips = this.querySelectorAll('cloud-chip'),
                 cloud = this.model.cloudsArray.find(function(cloud) {
                     return cloud.id == cloudId;
                 });
@@ -504,11 +504,11 @@ Polymer({
         }
     },
     _closeCloudChips: function(){
-        var cloudChips = this.querySelectorAll('cloud-chipp');
+        var cloudChips = this.querySelectorAll('cloud-chip');
         [].forEach.call(cloudChips, function(el, index) {
             el.removeAttribute('opened');
         });
-    },    
+    },
     showSidebar: function(){
         //show sidebar for navigation
         window.setTimeout(function(){
@@ -517,6 +517,6 @@ Polymer({
             sidebar.classList.remove('close');
             content.classList.remove('center');
         }, 200);
-    }    
+    }
 });
 </script>
