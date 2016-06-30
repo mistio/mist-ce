@@ -73,7 +73,7 @@
                 <h3 class="smallcaps xs-12">Choose Teams</h3>
                 <div id="teamslist">
                     <template is="dom-repeat" items="[[model.teamsArray]]" as="team">
-                        <paper-checkbox id$="[[team.id]]" class="item" checked$="_memberIsInTeam(team.id)" disabled$="_memberIsInTeam(team.id)">[[team.name]]</paper-checkbox>
+                        <paper-checkbox id$="[[team.id]]" class="item" checked$="[[_memberIsInTeam(team.id,member)]]" disabled$="[[_memberIsInTeam(team.id,member)]]">[[team.name]]</paper-checkbox>
                     </template>
                 </div>
                 <div class="progress">
@@ -193,9 +193,16 @@
                 this.set('formError', true);
                 console.log('member add in teams error');
             },
-            _memberIsInTeam: function(team){
-                console.log("check if is team",team, this.model.teams[team], this.model.teams[team].members.indexOf(this.member.id));
-                return this.model.teams[team].members.indexOf(this.member.id) > -1;
+            _memberIsInTeam: function(team, member){
+                var index = this.model.teams[team].members.indexOf(this.member.id);
+                console.log(index, team);
+                if (index > -1) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+
             },
             goToMember: function(){
                 page('/members/'+this.member.id);
