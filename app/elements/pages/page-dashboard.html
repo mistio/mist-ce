@@ -1,4 +1,6 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
@@ -29,7 +31,8 @@
 <link rel="import" href="../onb-element/onb-element.html">
 <link rel="import" href="../app-header/app-header.html">
 <link rel="import" href="../clouds/cloud-info.html">
-<link rel="import" href="../clouds/cloud-chip.html">
+<link rel="import" href="../clouds/cloud-chipp.html">
+
 <dom-module id="page-dashboard">
     <template>
         <style is="custom-style" include="headings"></style>
@@ -61,15 +64,15 @@
             min-height: 48px;
             transition: all 200ms ease-in;
         }
-        .clouds cloud-chip {
+        .clouds cloud-chipp {
             cursor: pointer;
             z-index: 9;
         }
-        .clouds cloud-chip.online .icon {
+        .clouds cloud-chipp.online .icon {
             background-color: var(--green-color) !important;
         }
 
-        .clouds cloud-chip.offline .icon {
+        .clouds cloud-chipp.offline .icon {
             background-color: var(--red-color) !important;
         }
 
@@ -230,11 +233,11 @@
                 <div class="clouds top flexchild-wide-top">
                     <div class="flex">
                         <template is="dom-repeat" items="[[model.cloudsArray]]">
-                            <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]] paper-chip-0" on-tap="_showCloudInfoDialog" id$="[[item.id]]">
+                            <cloud-chipp label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" on-tap="_showCloudInfoDialog" id$="[[item.id]]">
                                 <div class="icon"></div>
                                 <!-- src="[[_computeProviderLogo(item.provider)]]" -->
-                                <h1 class="cloud-title">{{item.title}}</h1>
-                            </cloud-chip>
+                                <h1 class="cloud-title">[[item.title]]</h1>
+                            </cloud-chipp>
                         </template>
                     </div>
                     <div class="ovhid">
@@ -483,7 +486,7 @@ Polymer({
             this.set('openedCloud', '');
         }
         else {
-            var cloudChips = this.querySelectorAll('cloud-chip'),
+            var cloudChips = this.querySelectorAll('cloud-chipp'),
                 cloud = this.model.cloudsArray.find(function(cloud) {
                     return cloud.id == cloudId;
                 });
@@ -501,7 +504,7 @@ Polymer({
         }
     },
     _closeCloudChips: function(){
-        var cloudChips = this.querySelectorAll('cloud-chip');
+        var cloudChips = this.querySelectorAll('cloud-chipp');
         [].forEach.call(cloudChips, function(el, index) {
             el.removeAttribute('opened');
         });
