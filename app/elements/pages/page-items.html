@@ -155,7 +155,6 @@
             <div hidden$="[[showEmptyScreen]]">
                 <div id="section-heading" hidden$="[[!section]]">
                     <div class="description">[[section.description]]</div>
-                    <div>search: [[q]]</div>
                 </div>
                 <template is="dom-if" if="[[_stampCards(view)]]">
                     <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>

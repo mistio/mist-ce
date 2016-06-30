@@ -21,15 +21,11 @@
             display: block;
             padding: 24px;
         }
-
         paper-progress {
-            position: absolute;
-            bottom: 85px;
             width: 100%;
             left: 0;
             right: 0;
         }
-
         :host >::content paper-input-container {
             padding-top: 16px;
             padding-bottom: 16px;
@@ -47,6 +43,15 @@
         .progress {
             margin: 32px 0 8px 0;
             width: 100%;
+        }
+        paper-progress#progresserror ::content #primaryProgress {
+            background-color: var(--red-color);
+        }
+        .errormsg-container {
+            color: var(--red-color);
+        }
+        .errormsg-container iron-icon {
+            color: inherit;
         }
         </style>
         <div id="content">
@@ -66,18 +71,23 @@
             </paper-material>
             <paper-material>
                 <h3 class="smallcaps xs-12">Choose Teams</h3>
-                <template is="dom-repeat" items="[[model.teamsArray]]" as="team">
-                        <div class="item">
-                            <paper-checkbox checked$="_memberIsInTeam(team.id)" disabled$="_memberIsInTeam(team.id)">[[team.name]]</paper-checkbox>
-                        </div>
-                </template>
-                <div class="clearfix bottom-actions xs12">
-
+                <div id="teamslist">
+                    <template is="dom-repeat" items="[[model.teamsArray]]" as="team">
+                        <paper-checkbox id$="[[team.id]]" class="item" checked$="_memberIsInTeam(team.id)" disabled$="_memberIsInTeam(team.id)">[[team.name]]</paper-checkbox>
+                    </template>
                 </div>
+                <div class="progress">
+                    <paper-progress id="progress" indeterminate hidden$="[[!sendingData]]"></paper-progress>
+                    <paper-progress id="progresserror" value="100" hidden$="[[!formError]]"></paper-progress>
+                    <hr class="appform"/>
+                    <p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
+                </div>
+                <paper-button id="appformsubmit" class="submit-btn pull-left blue" disabled$="[[!formReady]]" on-tap="_addMemberRequest">Add in teams</paper-button>
+                <paper-button class="pull-right blue-link" on-tap="goToMember">Cancel</paper-button>
                 <!-- <app-form fields="[[fields]]" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/members" method="POST" on-request="_addMembersRequest" on-response="_addMembersResponse" ></app-form> -->
             </paper-material>
         </div>
-        <iron-ajax id="formAjax" url="api/v1/org/[[model.org.id]]/teams/[[teamId]]/members/[[member.id]]" contentType="application/json" handle-as="document" method="POST" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="formAjax" url="/api/v1/org/[[model.org.id]]/teams/[[teamId]]/members" contentType="application/json" handle-as="document" method="POST" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
     </template>
     <script>
     (function() {
@@ -102,25 +112,30 @@
                 member: {
                     type: Object,
                     computed: '_computeMember(params, model.members.*)'
-                },
-                fields: {
+                },                
+                selectedTeams: {
                     type: Array,
-                    value: [{
-                        name: "Teams",
-                        label: "teams *",
-                        type: "teams",
-                        value: "",
-                        helptext: "Choose the teams you want to invite the user in",
-                        defaultValue: "",
-                        placeholder: "",
-                        errorMessage: "Please select at least one team",
-                        show: true,
-                        required: true
-                    }]
+                    value: []
+                },
+                formReady: {
+                    type: Boolean,
+                    value: false
+                },
+                sendingData: {
+                    type: Boolean,
+                    value: false
+                },
+                formError: {
+                    type: Boolean,
+                    value: false
+                },
+                teamId: {
+                    type: String,
+                    value: null
                 }
             },
             listeners: {
-
+                'change' : 'updateSelectedTeams'
             },
             ready: function() {
 
@@ -138,16 +153,52 @@
                     };
                 }
             },
-            _addMembersRequest: function() {
-                this.set('sendingData', true);
+            updateSelectedTeams: function(e){
+                if (this.formError){
+                    this.set('formError', false);
+                }
+                var clickedTeam = e.target.attributes.id.value;
+                var index = this.selectedTeams.indexOf(clickedTeam);
+                if (index > -1 ){
+                    this.selectedTeams.splice(index,1);
+                }
+                else {
+                    this.selectedTeams.push(clickedTeam);
+                }
+                if (this.selectedTeams.length > 0) { this.set('formReady', true); }
+                else { this.set('formReady', false); }
             },
-            _addMembersResponse: function(e) {
+            _addMemberRequest: function() {
+                this.set('sendingData', true);
+
+                this.$.formAjax.body = {
+                    'emails' : this.member.email
+                };
+                this.$.formAjax.headers["Content-Type"] = 'application/json';
+                this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                
+                this.async(function(){
+                    this.selectedTeams.forEach(function(t){
+                        this.set('teamId', t);
+                        this.$.formAjax.generateRequest();
+                    }, this);
+                },100, this);
+
+            },
+            _handleResponse: function(e) {
                 page('/members/'+this.member.id);
                 this.set('sendingData', false);
+            },
+            _handleError: function(e){
+                this.set('formError', true);
+                console.log('member add in teams error');
             },
             _memberIsInTeam: function(team){
                 console.log("check if is team",team, this.model.teams[team], this.model.teams[team].members.indexOf(this.member.id));
                 return this.model.teams[team].members.indexOf(this.member.id) > -1;
+            },
+            goToMember: function(){
+                page('/members/'+this.member.id);
             }
         });
     })();

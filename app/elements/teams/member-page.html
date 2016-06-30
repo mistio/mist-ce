@@ -264,7 +264,7 @@
                 },
                 member: {
                     type: Object,
-                    computed: '_computeMember(params)'
+                    computed: '_computeMember(params, model.membersArray.*)'
                 },
                 hasTeams: {
                     type: Boolean,
@@ -287,7 +287,7 @@
             ready: function() {
 
             },
-            _computeMember: function(params) {
+            _computeMember: function(params, members) {
                 return this.model.membersArray.find(function(member) {
                     return member.id == params.id;
                 }, this);
