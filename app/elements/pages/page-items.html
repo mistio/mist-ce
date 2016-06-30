@@ -4,7 +4,8 @@
 
 <link rel="import" href="../app-sidebar/app-sidebar.html">
 <link rel="import" href="../item-list/item-list.html">
-<!--link rel="import" href="../item-cards/item-cards.html"-->
+<link rel="import" href="../empty-pages/empty-pages.html">
+
 <dom-module id="page-items">
     <template>
         <style>
@@ -148,12 +149,13 @@
         </style>
 
         <div id="content">
-            <div hidden$="[[!showEmptyScreen]]"> 
-                No [[section.id]] available
+            <div hidden$="[[!showEmptyScreen]]">
+                <empty-pages section="[[section]]"></empty-pages>
             </div>
             <div hidden$="[[showEmptyScreen]]">
                 <div id="section-heading" hidden$="[[!section]]">
                     <div class="description">[[section.description]]</div>
+                    <div>search: [[q]]</div>
                 </div>
                 <template is="dom-if" if="[[_stampCards(view)]]">
                     <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>
@@ -219,7 +221,6 @@
         observers: [
             'sortingObserver(items.*, sortBy, sortOrder, q)',
         ],
-
         ready: function() {
 
         },
