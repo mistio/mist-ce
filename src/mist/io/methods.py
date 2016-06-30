@@ -4499,6 +4499,12 @@ def machine_cost_calculator(m):
         driver_name = 'google_' + location
         price = get_size_price(driver_type='compute', driver_name=driver_name, size_id=size)
         os_type = m.extra.get('os_type')
+        if 'sles' in m.image:
+            os_type = 'sles'
+        if 'rhel' in m.image:
+            os_type = 'rhel'
+        if 'win' in m.image:
+            os_type = 'win'
         os_cost_per_hour = 0
         if price:
             if os_type == 'sles':
