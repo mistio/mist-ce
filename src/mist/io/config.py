@@ -86,7 +86,7 @@ EC2_PROVIDERS = (
     Provider.EC2_AP_SOUTHEAST2,
     Provider.EC2_SA_EAST,
     Provider.EC2_US_WEST_OREGON,
-    Provider.EC2_AP_SOUTH1,
+#    Provider.EC2_AP_SOUTH1,
 )
 
 
