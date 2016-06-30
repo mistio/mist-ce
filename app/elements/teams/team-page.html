@@ -327,7 +327,7 @@
                     confirmedMembersLength: Number,
                     members: {
                         type: Array,
-                        computed: '_computeMembers(team, model.members.*)'
+                        computed: '_computeMembers(team, team.members, model.members.*)'
                     },
                     pendingMembers: {
                         type: Array
@@ -382,7 +382,7 @@
                 _computeTeam: function(params, teams) {
                     return teams.base[params.id];
                 },
-                _computeMembers: function(team, members) {
+                _computeMembers: function(team, teamMembers, members) {
                     var teamMembers = [],
                         pendingMembers = [],
                         confirmedMembers = [];
@@ -487,9 +487,6 @@
                 _addTeam: function(e) {
                     var dialog = this.querySelector('team-add');
                     dialog.openDialog();
-                },
-                _goBack: function() {
-                    history.back();
                 }
             });
         })();
