@@ -4527,8 +4527,13 @@ def machine_cost_calculator(m):
             try:
                 total_hour_price = price + os_cost_per_hour
                 cost['cost_per_hour'] = float(total_hour_price)
-                cost['cost_per_month'] = float(price) * 24 * month_days * 0.7 + float(os_cost_per_hour) * 24 * month_days
-                # monthly discount of 30% if the VM runs all the billing month
+                if 'preemptible' in size:
+                    # no monthly discount
+                    cost['cost_per_month'] = float(total_hour_price) * 24 * month_days
+                else:
+                    # monthly discount of 30% if the VM runs all the billing month
+                    # monthly discount on instance size only (not on OS image)
+                    cost['cost_per_month'] = float(price) * 24 * month_days * 0.7 + float(os_cost_per_hour) * 24 * month_days
                 # TODO: better calculate the discounts, taking under consideration
                 # when the VM has been initiated
             except:
