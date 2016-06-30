@@ -123,8 +123,8 @@ Polymer({
     itemField: function(item, field) {
         
         if (field == 'cost') {
-            if (item.extra.indicative_cost_per_month) {
-                return '$'+Math.round(item.extra.indicative_cost_per_month);
+            if (item.extra.cost_per_month) {
+                return '$'+Math.round(item.extra.cost_per_month);
             }
             else {
                 return '';
