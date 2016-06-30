@@ -395,6 +395,8 @@ class MainConnection(MistConnection):
                 self.check_monitoring()
             if 'user' in sections:
                 self.update_user()
+            if 'org' in sections:
+                self.update_org()
 
     def on_close(self, stale=False):
         if self.consumer is not None:
