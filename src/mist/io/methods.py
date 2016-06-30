@@ -1680,6 +1680,10 @@ def list_machines(user, cloud_id):
         if cost_per_month:
             machine['extra']['cost_per_month'] = cost_per_month
 
+        if m.state in ['TERMINATED', 'terminated']:
+            machine['extra'].pop('cost_per_month', None)
+            machine['extra'].pop('cost_per_hour', None)
+
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
     if conn.type == 'libvirt':
