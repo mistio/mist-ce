@@ -30,6 +30,7 @@ from libcloud.utils.networking import is_private_subnet
 from libcloud.dns.types import Provider as DnsProvider
 from libcloud.dns.types import RecordType
 from libcloud.dns.providers import get_driver as get_dns_driver
+from libcloud.pricing import get_size_price
 
 import ansible.playbook
 import ansible.utils.template
@@ -1678,6 +1679,10 @@ def list_machines(user, cloud_id):
             machine['extra']['cost_per_hour'] = cost_per_hour
         if cost_per_month:
             machine['extra']['cost_per_month'] = cost_per_month
+
+        if m.state in ['TERMINATED', 'terminated']:
+            machine['extra'].pop('cost_per_month', None)
+            machine['extra'].pop('cost_per_hour', None)
 
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
@@ -4421,12 +4426,11 @@ def machine_cost_calculator(m):
     straightforward way to get this info
 
     Supported providers:
-        Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr
-    TODO: GCE, Azure, NephoScale,
-    HostVirtual
+        GCE, Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr
+    TODO: Azure, NephoScale, HostVirtual
     """
     cost = {'cost_per_hour': 0, 'cost_per_month': 0}
-    if m.driver.type in [Provider.LINODE, Provider.PACKET, Provider.GCE]:
+    if m.driver.type in [Provider.LINODE, Provider.PACKET]:
         sizes = CloudSize.objects.filter(cloud_provider=m.driver.type)
     if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
         sizes = CloudSize.objects.filter(cloud_provider=m.driver.type, cloud_region=m.driver.region)
@@ -4492,6 +4496,53 @@ def machine_cost_calculator(m):
                         cost['cost_per_month'] = float(plan_price) * 24 * month_days
                 except:
                     pass
+    if m.driver.type == Provider.GCE:
+        # https://cloud.google.com/compute/pricing
+        size = m.extra.get('machineType')
+        location = m.extra.get('location').split('-')[0] # eg europe-west1-d
+        driver_name = 'google_' + location
+        price = get_size_price(driver_type='compute', driver_name=driver_name, size_id=size)
+        os_type = m.extra.get('os_type')
+        if 'sles' in m.image:
+            os_type = 'sles'
+        if 'rhel' in m.image:
+            os_type = 'rhel'
+        if 'win' in m.image:
+            os_type = 'win'
+        os_cost_per_hour = 0
+        if price:
+            if os_type == 'sles':
+                if size in ['f1-micro', 'g1-small']:
+                    os_cost_per_hour = 0.02
+                else:
+                    os_cost_per_hour = 0.11
+            if os_type == 'win':
+                if size in ['f1-micro', 'g1-small']:
+                    os_cost_per_hour = 0.02
+                else:
+                    cores = size.split('-')[-1]
+                    os_cost_per_hour = cores * 0.04
+            if os_type == 'rhel':
+                if size in ['n1-highmem-2', 'n1-highcpu-2', 'n1-highmem-4', 'n1-highcpu-4', 'f1-micro', 'g1-small', 'n1-standard-1', 'n1-standard-2', 'n1-standard-4']:
+                    os_cost_per_hour = 0.06
+                else:
+                    os_cost_per_hour = 0.13
+
+            try:
+                total_hour_price = price + os_cost_per_hour
+                cost['cost_per_hour'] = float(total_hour_price)
+                if 'preemptible' in size:
+                    # no monthly discount
+                    cost['cost_per_month'] = float(total_hour_price) * 24 * month_days
+                else:
+                    # monthly discount of 30% if the VM runs all the billing month
+                    # monthly discount on instance size only (not on OS image)
+                    cost['cost_per_month'] = float(price) * 24 * month_days * 0.7 + float(os_cost_per_hour) * 24 * month_days
+                # TODO: better calculate the discounts, taking under consideration
+                # when the VM has been initiated
+            except:
+                pass
+
     if m.driver.type == Provider.DIGITAL_OCEAN:
         size = m.extra.get('size', {})
         cost['cost_per_month'] = size.get('price_monthly')
