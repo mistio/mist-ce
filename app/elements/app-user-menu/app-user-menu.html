@@ -163,7 +163,7 @@
                 <paper-menu>
                     <template is="dom-repeat" items="[[organizationsList]]" as="organization">
                         <paper-item class="context">
-                            <a href="javascript:void(0)" on-tap="_goToOrg" id="[[organization.id]]" class$="grid-row [[_isCurrentClass(organization, org)]]">
+                            <a href="javascript:void(0)" on-tap="_goToOrg" id="[[organization.id]]" class="grid-row">
                                 <iron-icon class="user-menu-icon" icon$="[[_computeOrganizationIcon(organization)]]"></iron-icon>
                                 <div class="org-name">[[organization.name]]</div>
                             </a>
@@ -257,7 +257,6 @@
         _computeGravatar: function(email, size, placeholder) {
             var avatarString = md5(email),
                 url = 'http://www.gravatar.com/avatar/' + avatarString + '.jpg?s=' + size + '&d=' + placeholder;
-
             return url;
         },
         _computeGravatarName: function(first_name, last_name, email) {
@@ -299,10 +298,6 @@
         },
         _computeMemberOfTeamsText: function() {
 
-        },
-        _isCurrentClass: function(organization, org) {
-            console.log(org);
-            return !org || (organization.id == org.id) ? 'active-org' : null;
         },
         _addOrg: function(e) {
             var dialog = this.querySelector('organization-add');
