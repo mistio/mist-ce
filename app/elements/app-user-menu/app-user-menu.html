@@ -7,7 +7,7 @@
 <dom-module id="app-user-menu">
     <template>
         <style>
-            :host::content paper-material {
+            :host::content iron-dropdaown {
                 width: 300px !important;
             }
 
@@ -56,6 +56,7 @@
             .grid-row {
                 padding: 0;
                 margin: 0;
+                max-width: 270px;
             }
 
             paper-item:not(.context) {
@@ -154,7 +155,6 @@
                     </template>
                     <template is="dom-if" if="[[isPersonal]]">
                         <div class="org xs8">
-
                             <h4>Personal Account</h4>
                             <span>[[user.email]]</span>
                         </div>
