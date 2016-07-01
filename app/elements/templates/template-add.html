@@ -219,19 +219,16 @@
                 _addTemplateAjaxRequest: function() {
                     this.set('sendingData', true);
                 },
-                _addTemplateAjaxResponse: function(e) {
-                    this.fire('addTemplate', {
-                        template: {
-                            name: this.template.name,
-                            description: this.template.description
-                        }
-                    });
-
-                    page.show('/templates/' + e.detail.response.template.id);
+                _addTemplateAjaxResponse: function(e) {                    
+                    var response = YAML.parse(e.detail.xhr.response);
+                    page('/templates/'+ response.template.id);
+                    console.log(response.template.id);
 
                     this.debounce('resetForm', function() {
                         this._resetForm();
                     }, 500);
+
+                    this.set('sendingData', false);
                 },
                 _resetForm: function(e) {
                     // Reset template

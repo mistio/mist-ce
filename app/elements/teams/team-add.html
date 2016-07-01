@@ -110,8 +110,8 @@
                 },
                 _handleTeamAddAjaxResponse: function(e) {
                     this.set('sendingData', false);
-                    console.log("team added",e);
                     this.querySelector('paper-dialog').close();
+
                     if (this.referral && this.referral=="onb") {
                         this.fire("new-team-added", e.detail.response);
                     }

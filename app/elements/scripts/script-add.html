@@ -214,32 +214,29 @@
                     }],
                     notify: true
                 },
-                sendingData: {
-                    type: Boolean,
-                    value: false
-                },
-                formReady: {
-                    type: Boolean,
-                    value: false
-                },
-                hideprogress: {
-                    type: Boolean,
-                    value: true
-                }
+                // sendingData: {
+                //     type: Boolean,
+                //     value: false
+                // },
+                // formReady: {
+                //     type: Boolean,
+                //     value: false
+                // },
+                // hideprogress: {
+                //     type: Boolean,
+                //     value: true
+                // }
+            },
+            listeners: {
             },
             _addScriptAjaxRequest: function() {
-                this.set('sendingData', true);
             },
             _addScriptAjaxResponse: function(e) {
-                this.set('sendingData', false);
-                console.log("response")
-                console.log(e.detail.response)
-                this.fire('addScript', {
-                    script: {
-                        name: this.script.name,
-                        description: this.script.description
-                    }
-                });
+                // 
+                // console.log('XHR', e.detail);
+                var response = YAML.parse(e.detail.xhr.response);
+                page('/scripts/'+ response.id);
+                page('/scripts/');
             },
         });
     })();
