@@ -61,53 +61,8 @@
             text-decoration: none;
         }
 
-        .paper-header [paper-drawer-toggle] {
-            margin-left: 10px;
-        }
-
-        .paper-header {
-            @apply(--layout-horizontal);
-        }
-
-        .paper-header {
-            height: 60px;
-            font-size: 24px;
-            line-height: 60px;
-            padding: 0 10px;
-            color: white;
-            transition: height 0.2s;
-            transition: font-size 0.2s;
-        }
-
-        .paper-header.tall {
-            height: 320px;
-            font-size: 16px;
-        }
-
-        .paper-header h2 {
-            margin-left: 20px;
-            @apply(--layout-flex);
-            text-transform: capitalize;
-        }
-
-        .paper-header .toggleViewButton {
-            --paper-icon-button-ink-color: transparent;
-        }
-
-        .paper-header .cartButton {
-            margin-right: 10px;
-        }
-
         paper-icon-button {
             transition: all 200ms;
-        }
-
-        paper-icon-button.active-sort {
-            transform: rotate(180deg);
-        }
-
-        paper-icon-button.active-sort::content iron-icon {
-            color: #D48900 !important;
         }
 
         [size=xs] > * {
@@ -119,9 +74,6 @@
             height: auto;
         }
 
-        paper-icon-bottom.bottom {
-            padding-right: 8px;
-        }
         h4.id {
             display: inline-block;
             text-transform: uppercase;
@@ -137,9 +89,6 @@
             padding: 0.5em;
             display: inline-flex;
             align-self: center;
-        }
-        paper-material.no-pad {
-            padding: 0;
         }
         .info-table {
             border-top: 1px solid #ddd;
@@ -164,10 +113,11 @@
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
+                            <paper-button on-tap="_editScript" class="simple">Edit Script</paper-button>
                             <paper-button on-tap="_deleteScript" class="simple">Delete Script</paper-button>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button on-tap="_runScript" class="simple"> run <iron-icon icon="av:play-arrow"></iron-icon></paper-button>
+                    <paper-button on-tap="_runScript" class="simple white right-icon" style$="color: [[section.color]]"> run <iron-icon icon="av:play-arrow" style$="color: [[section.color]]"></iron-icon></paper-button>
                 </div>
             </paper-material>
             <div class="columns">
