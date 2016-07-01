@@ -1,0 +1,213 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+
+<link rel="import" href="../app-form/app-form.html">
+
+<dom-module id="member-add-in-teams">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+        :host {
+            display: block;
+        }
+        #content {
+            max-width: 900px;
+        }
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
+        paper-progress {
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
+        :host >::content paper-input-container {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+        h3, .item {
+            display: block;
+            width: 100%;   
+        }
+        .item {
+            margin: 8px 0;
+        }
+        .pull-right {
+            float: right;
+        }
+        .progress {
+            margin: 32px 0 8px 0;
+            width: 100%;
+        }
+        paper-progress#progresserror ::content #primaryProgress {
+            background-color: var(--red-color);
+        }
+        .errormsg-container {
+            color: var(--red-color);
+        }
+        .errormsg-container iron-icon {
+            color: inherit;
+        }
+        </style>
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Add [[member.name]] in teams
+                    </h2>
+                    <div class="subtitle" hidden$="[[member.pending]]">
+                        You can add the user in multiple teams in one go.
+                    </div>
+                    <div class="subtitle" hidden$="[[!member.pending]]">
+                        As soon as the user confirms, will be added in all teams you select.
+                    </div>
+                </div>
+            </paper-material>
+            <paper-material>
+                <h3 class="smallcaps xs-12">Choose Teams</h3>
+                <div id="teamslist">
+                    <template is="dom-repeat" items="[[model.teamsArray]]" as="team">
+                        <paper-checkbox id$="[[team.id]]" class="item" checked$="[[_memberIsInTeam(team.id,member)]]" disabled$="[[_memberIsInTeam(team.id,member)]]">[[team.name]]</paper-checkbox>
+                    </template>
+                </div>
+                <div class="progress">
+                    <paper-progress id="progress" indeterminate hidden$="[[!sendingData]]"></paper-progress>
+                    <paper-progress id="progresserror" value="100" hidden$="[[!formError]]"></paper-progress>
+                    <hr class="appform"/>
+                    <p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
+                </div>
+                <paper-button id="appformsubmit" class="submit-btn pull-left blue" disabled$="[[!formReady]]" on-tap="_addMemberRequest">Add in teams</paper-button>
+                <paper-button class="pull-right blue-link" on-tap="goToMember">Cancel</paper-button>
+                <!-- <app-form fields="[[fields]]" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/members" method="POST" on-request="_addMembersRequest" on-response="_addMembersResponse" ></app-form> -->
+            </paper-material>
+        </div>
+        <iron-ajax id="formAjax" url="/api/v1/org/[[model.org.id]]/teams/[[teamId]]/members" contentType="application/json" handle-as="document" method="POST" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'member-add-in-teams',
+
+            properties: {
+                sections: {
+                    type: Object
+                },
+                section: {
+                    type: Object
+                },
+                model: {
+                    type: Object
+                },
+                params: {
+                    type: Object
+                },
+                member: {
+                    type: Object,
+                    computed: '_computeMember(params, model.members.*)'
+                },                
+                selectedTeams: {
+                    type: Array,
+                    value: []
+                },
+                formReady: {
+                    type: Boolean,
+                    value: false
+                },
+                sendingData: {
+                    type: Boolean,
+                    value: false
+                },
+                formError: {
+                    type: Boolean,
+                    value: false
+                },
+                teamId: {
+                    type: String,
+                    value: null
+                }
+            },
+            listeners: {
+                'change' : 'updateSelectedTeams'
+            },
+            ready: function() {
+
+            },
+            _computeMember: function(params, membersArray) {
+                var member = this.model.membersArray.find(function(m){
+                    return m.id == params.id
+                });
+                if (member){
+                    return member;
+                }
+                else {
+                    return {
+                        name: "member not found"
+                    };
+                }
+            },
+            updateSelectedTeams: function(e){
+                if (this.formError){
+                    this.set('formError', false);
+                }
+                var clickedTeam = e.target.attributes.id.value;
+                var index = this.selectedTeams.indexOf(clickedTeam);
+                if (index > -1 ){
+                    this.selectedTeams.splice(index,1);
+                }
+                else {
+                    this.selectedTeams.push(clickedTeam);
+                }
+                if (this.selectedTeams.length > 0) { this.set('formReady', true); }
+                else { this.set('formReady', false); }
+            },
+            _addMemberRequest: function() {
+                this.set('sendingData', true);
+
+                this.$.formAjax.body = {
+                    'emails' : this.member.email
+                };
+                this.$.formAjax.headers["Content-Type"] = 'application/json';
+                this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                
+                this.async(function(){
+                    this.selectedTeams.forEach(function(t){
+                        this.set('teamId', t);
+                        this.$.formAjax.generateRequest();
+                    }, this);
+                },100, this);
+
+            },
+            _handleResponse: function(e) {
+                page('/members/'+this.member.id);
+                this.set('sendingData', false);
+            },
+            _handleError: function(e){
+                this.set('formError', true);
+                console.log('member add in teams error');
+            },
+            _memberIsInTeam: function(team, member){
+                var index = this.model.teams[team].members.indexOf(this.member.id);
+                console.log(index, team);
+                if (index > -1) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+
+            },
+            goToMember: function(){
+                page('/members/'+this.member.id);
+            }
+        });
+    })();
+    </script>
+</dom-module>
