@@ -86,7 +86,7 @@ def update_machine_count(owner, cloud_id, machine_count):
     owner.save()
 
     org_machine_count = 0
-    orgs = Organization.objects(members=user)
+    orgs = Organization.objects(members=owner)
     for org in orgs:
         org_clouds = Cloud.objects(owner=org)
         org.total_machine_count = sum(
