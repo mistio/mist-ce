@@ -108,36 +108,36 @@
                 <!-- dashboard -->
                 <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]" onboarding="[[onboarding]]"></page-dashboard>
                 <cloud-add providers="[[providers]]" keys="[[model.keysArray]]" section="[[sections.clouds]]"></cloud-add>
-                <page-items class="incidents" model="[[model]]" items="[[model.incidents]]" sections="[[sections]]" section="[[sections.incidents]]"></page-items>
+                <page-items q="{{q}}" class="incidents" model="[[model]]" items="[[model.incidents]]" sections="[[sections]]" section="[[sections.incidents]]"></page-items>
                 <!-- machines -->
-                <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
+                <page-items q="{{q}}" class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
                 <machine-page params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-page>
                 <machine-create model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-create>
                 <!-- images -->
-                <page-items class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
+                <page-items q="{{q}}" class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
                 <image-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.images]]"></image-page>
                 <!-- keys -->
-                <page-items class="keys" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.keysArray]]"></page-items>
+                <page-items q="{{q}}" class="keys" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.keysArray]]"></page-items>
                 <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
                 <key-add model="[[model]]" sections="[[sections]]" section="[[sections.keys]]"></key-add>
                 <!-- networks -->
-                <page-items class="networks" model="[[model]]" sections="[[sections]]" section="[[sections.networks]]" items="[[model.networksArray]]"></page-items>
+                <page-items q="{{q}}" class="networks" model="[[model]]" sections="[[sections]]" section="[[sections.networks]]" items="[[model.networksArray]]"></page-items>
                 <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
                 <network-add model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
                 <!-- templates -->
-                <page-items class="templates" model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" items="[[model.templatesArray]]"></page-items>
+                <page-items q="{{q}}" class="templates" model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" items="[[model.templatesArray]]"></page-items>
                 <template-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.templates]]"></template-page>
                 <template-add model="[[model]]" sections="[[sections]]" section="[[sections.templates]]"></template-add>
                 <!-- stacks -->
                 <stack-create model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" params="[[params]]" restamp="true"></stack-create>
-                <page-items class="stacks" model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" items="[[model.stacksArray]]"></page-items>
+                <page-items q="{{q}}" class="stacks" model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" items="[[model.stacksArray]]"></page-items>
                 <stack-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.stacks]]" restamp="true"></stack-page>
                 <!-- teams -->
-                <page-items class="teams" model="[[model]]" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]"></page-items>
+                <page-items q="{{q}}" class="teams" model="[[model]]" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]"></page-items>
                 <team-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></team-page>
                 <member-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-page>
                 <!-- scripts - leave scipts last due to editors highlighting problem -->
-                <page-items model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
+                <page-items q="{{q}}" model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
                 <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
                 <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
 
@@ -186,6 +186,11 @@
                 observer: '_currentChanged',
                 notify: true
             },
+            q: { // search query
+                type: String,
+                value: '',
+                notify: true
+            },
             style: {
                 computed: "_style(current, sections)",
                 value: "background-color: #424242;",
@@ -201,8 +206,13 @@
             'page-meta': 'updateTitle',
             'toast': 'showToast',
             'subscribeLogEvents': 'subscribeLogEvents',
+            'search': 'updateq'
         },
         _toast: null,
+        updateq: function(e){
+            console.log('listen  uin listt',e.detail);
+            this.set('q',e.detail);
+        },
         _currentChanged: function() {
             console.log('current: ', this.current);
         },

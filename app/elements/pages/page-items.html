@@ -4,7 +4,8 @@
 
 <link rel="import" href="../app-sidebar/app-sidebar.html">
 <link rel="import" href="../item-list/item-list.html">
-<!--link rel="import" href="../item-cards/item-cards.html"-->
+<link rel="import" href="../empty-pages/empty-pages.html">
+
 <dom-module id="page-items">
     <template>
         <style>
@@ -148,12 +149,8 @@
         </style>
 
         <div id="content">
-<<<<<<< Updated upstream
-            <div hidden$="[[!showEmptyScreen]]"> 
-=======
             <div hidden$="[[!showEmptyScreen]]">
->>>>>>> Stashed changes
-                No [[section.id]] available
+                <empty-pages section="[[section]]"></empty-pages>
             </div>
             <div hidden$="[[showEmptyScreen]]">
                 <div id="section-heading" hidden$="[[!section]]">
@@ -216,7 +213,6 @@
             },
             q: { // search query
                 type: String,
-                value: '',
                 observer: '_qChanged'
             }
         },
@@ -224,9 +220,6 @@
         observers: [
             'sortingObserver(items.*, sortBy, sortOrder, q)',
         ],
-        listeners: {
-          'search' : 'updateq'
-        },
         ready: function() {
 
         },
@@ -335,6 +328,8 @@
             this.async(function() {
               this.updateMeta(this.section);
             });
+
+            console.log("PAGE ITEMS LISTENED");
         },
 
         _stampCards: function(view) {
