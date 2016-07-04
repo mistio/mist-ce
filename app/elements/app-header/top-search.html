@@ -98,6 +98,8 @@
           // make sure to force the cursor to the end of the
           // input. Only an issue in Firefox.
           this.$.query.setSelectionRange(q.length, q.length);
+          console.log('fire in top searvh', q);
+          this.fire('search', q);
         });
       }
     },
