@@ -150,7 +150,7 @@
 
         <div id="content">
             <div hidden$="[[!showEmptyScreen]]">
-                <empty-pages section="[[section]]"></empty-pages>
+                <empty-pages clouds="[[model.cloudsArray]]" section="[[section]]"></empty-pages>
             </div>
             <div hidden$="[[showEmptyScreen]]">
                 <div id="section-heading" hidden$="[[!section]]">
@@ -212,7 +212,6 @@
             },
             q: { // search query
                 type: String,
-                value: '',
                 observer: '_qChanged'
             }
         },
