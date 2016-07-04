@@ -203,7 +203,6 @@
             tag: String
         },
         listeners: {
-            'iron-activate': 'updateDocTitle',
             'iron-activate': 'updateCurrent',
             'iron-navigate': 'scrollToTop',
             'toggle-sidebar': 'toggleSidebar',
@@ -321,7 +320,6 @@
         updateCurrent: function(e) {
             // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
             var el = e.detail.item;
-            //console.log("el",e.detail);
             if (el.nodeName == 'IRON-ROUTE' && el.title && el.getAttribute("current")) {
                 this.current = el.getAttribute("current");
                 this.title = el.title;
@@ -330,9 +328,16 @@
                     this.current = el.getAttribute("current");
                     this.title = el.title;
                 }
-
-
             }
+            // updateDocTitle function was overriden
+            if (details.item.title && details.item.title.length) {
+                document.title = details.item.title + " - mist.io";
+            } else {
+                document.title = "mist.io";
+            }
+            // cleanup search query from page to page
+            this.set('q', '');
+            document.querySelector('#query').value = '';
         },
 
         _style: function(current, sections) {
@@ -344,14 +349,6 @@
         updateTitle: function(_, detail) {
             if (detail.title && detail.title.length) {
                 document.title = detail.title + " - mist.io";
-            } else {
-                document.title = "mist.io";
-            }
-        },
-
-        updateDocTitle: function(e, details) {
-            if (details.item.title && details.item.title.length) {
-                document.title = details.item.title + " - mist.io";
             } else {
                 document.title = "mist.io";
             }
@@ -379,6 +376,9 @@
         },
 
         scrollToTop: function() {
+            // cleanup search query from page to page
+            this.set('q', '');
+            document.querySelector('#query').value = '';
             // TODO: scroll to top on iron-navigate
             // https://groups.google.com/forum/#!topic/polymer-dev/tDetYDnxG48
             // https://github.com/Polymer/docs/blob/master/js/app.js#L141:L147

@@ -56,7 +56,7 @@
     <div id="search" class="horizontal layout center">
       <iron-icon icon="search"></iron-icon>
       <form on-submit="performSearch" class="flex">
-          <input type="search" id="query" value="{{query::keyup}}" autocomplete="off" placeholder="Search" on-blur="clearSearch">
+          <input type="search" id="query" value="{{query::keyup}}" autocomplete="off" placeholder="Search">
       </form>
     </div>
   </template>
@@ -76,12 +76,7 @@
     ],
 
     listeners: {
-      keyup: 'hotkeys'
-    },
-
-    clearSearch: function() {
-      //this.set('query', '');
-      this.showingSearch = false;
+      keyup: 'hotkeys',
     },
 
     performSearch: function(e) {
@@ -90,7 +85,7 @@
         url: '?q=' + this.query
       });
     },
-
+    
     _queryChanged: function(q) {
       if (q) {
         this.async(function() {
@@ -98,7 +93,6 @@
           // make sure to force the cursor to the end of the
           // input. Only an issue in Firefox.
           this.$.query.setSelectionRange(q.length, q.length);
-          console.log('fire in top searvh', q);
           this.fire('search', q);
         });
       }
