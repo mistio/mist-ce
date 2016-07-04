@@ -154,7 +154,7 @@
             </div>
         </div>
 
-        <iron-ajax id="formAjax" url="[[url]]" contentType="application/json" handle-as="document" method="[[method]]" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="formAjax" url="[[url]]" contentType="application/json" handle-as="xml" method="[[method]]" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
     </template>
     <script>
         (function() {
@@ -265,7 +265,8 @@
                 _handleError: function(e,d) {
                     this.set('sendingData', false);
                     this.set('formError', true);
-                    this.$.errormsg.textContent = e.detail.request.xhr.response.body.innerText;
+                    // this.$.errormsg.textContent = e.detail.request.xhr.response.body.innerText;
+                    this.$.errormsg.textContent = e.detail.request.xhr.responseText;
                 },
                 _fieldsChanged: function(fields, sendingData) {
                     if (this.formError){

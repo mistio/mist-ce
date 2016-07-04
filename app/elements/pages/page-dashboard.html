@@ -1,4 +1,6 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
@@ -30,6 +32,7 @@
 <link rel="import" href="../app-header/app-header.html">
 <link rel="import" href="../clouds/cloud-info.html">
 <link rel="import" href="../clouds/cloud-chip.html">
+
 <dom-module id="page-dashboard">
     <template>
         <style is="custom-style" include="headings"></style>
@@ -53,10 +56,6 @@
 
         .flex2child {
             @apply(--layout-flex-2);
-        }
-        .spacer {
-            display: block;
-            height: 16px;
         }
         .search.active {
             left: 15px;
@@ -86,15 +85,18 @@
             align-items: flex-start;
             /*margin-bottom: 1em;*/
             margin-bottom: 32px;
-        }
-        .costs,
-        .incidents {
-           /*margin-bottom: 1em;*/            
-            display: block;
             width: 100%;
         }
         .costs,
-        app-incidents {
+        .incidents {
+           /*margin-bottom: 1em;*/
+            display: block;
+            width: 100%;
+        }
+        .incidents {
+            padding-bottom: 32px;
+        }
+        .costs {
             margin-bottom: 32px;
         }
         a.main-section {
@@ -205,99 +207,8 @@
             box-sizing: border-box;
             position: relative;
         }
-        #org-form {
-            text-align: center;
-            padding-bottom: 200px;
-        }
-        #onboarding-area {
-            margin: 0 auto;
-            width: 100%;
-            max-width: 600px;
-            box-sizing: border-box;
-            @apply(--layout-vertical);
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-            -webkit-touch-callout: none; /* iOS Safari */
-            -webkit-user-select: none;   /* Chrome/Safari/Opera */
-            -khtml-user-select: none;    /* Konqueror */
-            -moz-user-select: none;      /* Firefox */
-            -ms-user-select: none;       /* Internet Explorer/Edge */
-            user-select: none;
-            transition: var(--material-curve-320);
-            transition-delay: 200ms;
-        }
-        #onboarding-area[higher] {
-            transform: translate(0, -150px);
-        }
-        .onb-graphics {
-            margin: 0 auto;
-            height: auto;
-            vertical-align: middle;
-            top: 0;
-            width: 200px;
-            max-width: 100%;
-        }
-        .onboarding-form {
-            text-align: center;
-            z-index: 1;
-            position: relative;
-        }
-        #org-form paper-input,
-        .onboarding-form paper-input {
-            text-align: left;
-        }
-        .onboarding-form-inputs {
-            width: 50%;
-            min-width: 300px;
-            margin: 0 auto;
-        }
         .wide {
             padding: 0.7em 1.5em;
-        }
-        .sub {
-            font-size: 0.9em;
-            line-height: 1.2em;
-            opacity: 0.54;
-        }
-        .blue-link {
-            padding: 0;
-            text-transform: none;
-            font-weight: 400;
-        }
-        .onb-forms {
-            position: relative;
-        }
-        .onboarding-form {
-            position: absolute;
-            width: 100%;
-            transition: var(--material-curve-320);
-        }
-        .onboarding-form[closed] {
-            transform: translate(0, 200vh);
-        }
-        .onboarding-form {
-            transform: translate(0, 0);
-        }
-        hr.shorten {
-            width: 35%;
-            margin: 0 auto;
-            opacity: 0.32;
-            margin-bottom: 2em;
-        }
-        .grid-row {
-            text-align: left;
-        }
-        .field-helptext {
-            font-size: 14px;
-            align-self: center;
-            color: rgba(0,0,0,0.54);
-        }
-        .invite-form-inputs {
-            margin-bottom: 2em;
-        }
-        paper-dropdown-menu {
-            width: 100%;
         }
         .is-loading {
             position: absolute;
@@ -322,10 +233,10 @@
                 <div class="clouds top flexchild-wide-top">
                     <div class="flex">
                         <template is="dom-repeat" items="[[model.cloudsArray]]">
-                            <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]] paper-chip-0" on-tap="_showCloudInfoDialog" id$="[[item.id]]">
+                            <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" on-tap="_showCloudInfoDialog" id$="[[item.id]]">
                                 <div class="icon"></div>
                                 <!-- src="[[_computeProviderLogo(item.provider)]]" -->
-                                <h1 class="cloud-title">{{item.title}}</h1>
+                                <h1 class="cloud-title">[[item.title]]</h1>
                             </cloud-chip>
                         </template>
                     </div>
@@ -385,74 +296,13 @@
             </div>
         </template>
         <template is="dom-if" if="[[!showDashboard]]">
-            <div id="onboarding-area">
-                <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
-                <div id="org-form" hidden$="[[hasOrg]]">
-                    <h1>Welcome!</h1>
-                    <p>One small step to complete your sign up:<br/>
-                        Choose an organisation name. *
-                    </p>
-                    <div class="onboarding-form-inputs">
-                        <paper-input id="orginput" value$='[[model.user.email]] Org' placeholder$='[[model.user.email]] Org' tabindex='1'></paper-input>
-                        <div class="spacer"></div>
-                        <paper-button class="wide blue" on-tap="saveOrg"> Save organisation </paper-button>
-                    </div>
-                    <div class="spacer"></div>
-                    <h4 class="sub">
-                        * you can always add more organisations later, <br/>
-                        using your profile menu at the top right of your screen
-                    </h4>
-                </div>
-                <div class="onb-forms" hidden$="[[!hasOrg]]">
-                    <div id="cloud-or-invite-form" class="onboarding-form">
-                        <h1>You are ready to go!</h1>
-                        <p>No clouds to manage in <strong>[[model.org.name]]</strong>. Yet.</p>
-                        <div class="onboarding-form-inputs">
-                            <paper-button class="wide blue" on-tap="goToAddCloud"> Add your clouds </paper-button>
-                        </div>
-                        <p>
-                            or <paper-button on-tap="showInviteForm" class="blue-link" noink>invite people </paper-button> to join you and add clouds.
-                        </p>
-                    </div>
-                    <div id="invite-form" class="onboarding-form" closed>
-                        <h1>Invite people in [[model.org.name]]</h1>
-                        <p>To change or add an organisation use options on your profile menu</p>
-                        <hr class="shorten"/>
-                        <div class="invite-form-inputs">
-                            <div class="grid-row">
-                                <div class="xs12 m6 l6">
-                                    <paper-dropdown-menu label="Team">
-                                        <paper-listbox class="dropdown-content" selected="1">
-                                            <template is="dom-repeat" items="[[model.teamsArray]]">
-                                                <paper-item>[[item.name]]</paper-item>
-                                            </template>
-                                        </paper-listbox>
-                                    </paper-dropdown-menu>
-                                </div>
-                                <div class="field-helptext xs12 m6 l6">
-                                    Heads up! <br/>Owner's Team members have FULL access to all Organisation's resources. To create another team with a different policy use the <paper-button on-tap="goToAddTeam" class="blue-link" noink>add team form</paper-button>
-                                </div>
-                                <div class="xs12 m6 l6">
-                                    <paper-textarea label="Members Emails" rows="5"'></paper-textarea>
-                                </div>
-                                <div class="field-helptext xs12 m6 l6">
-                                    Invited members will receive an invation email to confirm their membership. They will have permissions according to their teams's policy. Make sure you have allowed some basic access such as view clouds.</paper-button>
-                                </div>
-                            </div>
-                        </div>
-                        <paper-button on-tap="invitePeople" class="blue wide" noink>Invite People</paper-button>
-                        <div class="spacer"></div>
-                        <paper-button noink on-tap="hideInviteForm" class="blue-link">Cancel</paper-button>
-                    </div>
-                </div>
-            </div>
+            <onb-element model="[[model]]"></onb-element>
         </template>
         <div class="absolute-bottom-right">
             <a href="/add-cloud">
                 <paper-fab id="addBtn" icon="cloud"></paper-fab>
             </a>
         </div>
-        <iron-ajax id="saveOrgRequest" method="PUT" url="/api/v1/org/[[model.org.id]]"></iron-ajax>
 
         <div class="is-loading" hidden$="[[!onboarding.isLoadingClouds]]">
             <paper-spinner active></paper-spinner>
@@ -471,12 +321,6 @@ Polymer({
         model: {
             type: Object
         },
-        onboarding: {
-            type: Object
-        },
-        onbstate: {
-            type: Number
-        },
         q: {
             type: String,
             notify: true
@@ -493,11 +337,6 @@ Polymer({
             type: Boolean,
             // value: true,
             computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds)',
-            notify: true
-        },
-        hasOrg: {
-            type: Boolean,
-            computed: '_computeHasOrg(model.org.name.*)',
             notify: true
         },
         hasIncidents: {
@@ -594,16 +433,6 @@ Polymer({
     isOffline: function(cloud) {
         return cloud.state == 'offline' && 'offline';
     },
-    _computeHasOrg: function (name) {
-        console.log(name, name.base);
-
-        if (name.value == '') {
-            return false;
-        }
-        else {
-            return true;
-        }
-    },
     _computeHasIncidents: function(incidents){
          if (incidents.base){
              return incidents.base.length > 0 ? true : false;
@@ -680,24 +509,6 @@ Polymer({
             el.removeAttribute('opened');
         });
     },
-    saveOrg: function(){
-        var new_name = this.querySelector("#orginput").value;
-        this.$.saveOrgRequest.headers["Content-Type"] = 'application/json';
-        this.$.saveOrgRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-        this.$.saveOrgRequest.body = { 'new_name': new_name };
-        // this.$.saveOrgRequest.params['new_name'] =  new_name;
-
-        // console.log('SAVE ORG', new_name, this.$.saveOrgRequest)
-        this.$.saveOrgRequest.generateRequest();
-    },
-    goToAddTeam: function(){
-        page.show('/add-team');
-        this.showSidebar();
-    },
-    goToAddCloud: function(){
-        page.show('/add-cloud');
-        this.showSidebar();
-    },
     showSidebar: function(){
         //show sidebar for navigation
         window.setTimeout(function(){
@@ -706,25 +517,6 @@ Polymer({
             sidebar.classList.remove('close');
             content.classList.remove('center');
         }, 200);
-    },
-    showInviteForm: function(){
-        var addform = document.querySelector("#cloud-or-invite-form"),
-            inviteform = document.querySelector("#invite-form"),
-            container = document.querySelector("#onboarding-area");
-        addform.setAttribute('closed', true);
-        inviteform.removeAttribute('closed');
-        container.setAttribute('higher', true);
-    },
-    hideInviteForm: function(){
-        var addform = document.querySelector("#cloud-or-invite-form"),
-            inviteform = document.querySelector("#invite-form"),
-            container = document.querySelector("#onboarding-area");
-        addform.removeAttribute('closed');
-        inviteform.setAttribute('closed', true);
-        container.removeAttribute('higher');
-    },
-    invitePeople: function(){
-
     }
 });
 </script>

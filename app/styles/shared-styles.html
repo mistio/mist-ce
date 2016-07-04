@@ -123,8 +123,13 @@
         }
 
         .blue {
-            background-color: var(--blue-color);
-            color: #444;
+            background-color: var(--mist-blue);
+            color: #fff;
+        }
+
+        .blue[disabled] {
+            background-color: #eaeaea;
+            color: #a8a8a8;
         }
 
         .mist-dark {
@@ -222,10 +227,18 @@
             margin: 0;
             @apply(--layout-flex);
         }
+        paper-button.blue:not([disabled]) {
+            background-color: var(--mist-blue);
+            font-weight: 500;
+            color: #fff;
+            margin: 0;
+            @apply(--layout-flex-none);
+        }
         paper-button.blue-link {
             background-color: transparent;
             font-weight: 400;
             color: rgba(0,0,0,87);
+            margin: 0;
         }
 
         paper-material paper-button.simple {
@@ -338,7 +351,7 @@
         }
 
         paper-fab {
-            background: #4DC0F3;
+            background: var(--mist-blue);
         }
 
         /* Paper progress */
@@ -707,6 +720,7 @@
             -webkit-overflow-scrolling: touch;
             max-width: 1500px;
             margin: 0px auto;
+            overflow: visible;
             padding: 36px 36px 80px 36px;
         }
         .paper-toolbar .title {
@@ -721,6 +735,7 @@
             border-bottom: 1px solid #7f7f7f;
         }
 
+        paper-material.single-head,
         .single-head {
             height: 108px;
             padding: 24px;
@@ -729,7 +744,7 @@
             background-color: #424242;
             border-radius: 4px 4px 0 0;
             box-sizing: border-box;
-            /*background-image: linear-gradient(rgba(0,0,0,0),rgba(0,0,0,.46));*/
+            display: flex !important;
         }
         .single-head .icon {
             font-size: 14px;
@@ -781,6 +796,15 @@
             display: inline-block;
             flex: 0 0 auto;
             color: #fff;
+        }
+        .item-actions > * {
+            vertical-align: middle;
+        }
+        .item-actions > paper-button.left-icon iron-icon {
+            padding-right: 8px;
+        }
+        .item-actions > paper-button.right-icon iron-icon {
+            padding-left: 8px;
         }
         .single-head .item-actions ::content iron-icon {
             color: #fff;
@@ -993,6 +1017,10 @@
             margin: 0;
             top: 15px;
             right: 16px;
+        }
+
+        paper-button {
+            margin-left: 0;
         }
 
         .btn-group {

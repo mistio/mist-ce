@@ -16,20 +16,16 @@
 
         <paper-dialog id="dialogModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
             <h2>[[title]]</h2>
-            <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
                 <p>
                     [[body]]
                 </p>
-
-                <!-- <paper-button class="btn-block submit-btn" raised dialog-confirm>Submit</paper-button> -->
-
                 <div hidden$="[[!_computeType(type, 'isYesNo')]]" class="clearfix btn-group">
-                    <paper-button hidden$="[[_computeDanger(danger)]]" class="green" dialog-confirm>Yes</paper-button>
-                    <paper-button hidden$="[[_computeDanger(danger)]]" class="red" dialog-dismiss>No</paper-button>
+                    <paper-button hidden$="[[danger]]" class="green" dialog-confirm>Yes</paper-button>
+                    <paper-button hidden$="[[danger]]" class="red" dialog-dismiss>No</paper-button>
 
-                    <paper-button hidden$="[[!_computeDanger(danger)]]" dialog-dismiss>Cancel</paper-button>
-                    <paper-button hidden$="[[!_computeDanger(danger)]]" class="red" dialog-confirm>Delete</paper-button>
+                    <paper-button hidden$="[[!danger]]" dialog-dismiss>Cancel</paper-button>
+                    <paper-button hidden$="[[!danger]]" class="red" dialog-confirm>Delete</paper-button>
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
@@ -72,9 +68,6 @@
                 },
                 _computeType: function(type, value) {
                     return type == value;
-                },
-                _computeDanger: function(danger) {
-                    return danger;
                 },
                 _openDialog: function(e) {
                     this.$.dialogModal.open();

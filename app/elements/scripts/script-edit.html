@@ -96,10 +96,6 @@
                     this._formReset();
                 },
                 _submitForm: function(e) {
-                    // this.fire('updateSelectedScript', {
-                    //     script: this.script
-                    // });
-
                     this.$.scriptEditAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.scriptEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.scriptEditAjaxRequest.body = {
