@@ -1,4 +1,3 @@
-<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../teams/team-add.html">
 
 <dom-module id="empty-pages">
@@ -69,28 +68,21 @@ Polymer({
     is: 'empty-pages',
 
     properties: {
+
         section: Object,
-        clouds: {
-            type: Array
-        },
         needCloud: {
             type: Boolean,
             value: true,
-            computed: "needCloudChange(clouds, section)"
+            computed: "needCloudChange(section)"
         },
     },
-    needCloudChange: function(clouds, section){
-        if (this.clouds.length > 0) {
-            return false;
-        }
-        else {
-          if(this.section.id == "machines" || this.section.id == "networks" || this.section.id == "images" || this.section.id == "stacks"){
-            return true;
-          }
-          else {
-            return false;
-          }
-        }
+    needCloudChange: function(section){
+      if(this.section.id == "machines" || this.section.id == "networks" || this.section.id == "images" || this.section.id == "stacks"){
+        return true;
+      }
+      else{
+        return false;
+      }
     },
     _addCloudAction: function(){
         page("/add-cloud");
