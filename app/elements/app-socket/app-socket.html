@@ -30,7 +30,11 @@
             // Create the socket if it does not exist
             if (this.socket)
                 return;
+            this.connect();
+        },
 
+        connect: function() {
+            // Create the SockJS object
             this.socket = new SockJS(this.url, null, {
                 'transports': ['websocket', 'xhr-polling']
             });
@@ -41,13 +45,30 @@
                 receiver(e.data);
             };
 
+            var that = this;
+
             // Handle error & close
-            this.socket.onerror = this.connectionError;
-            this.socket.onclose = this.connectionClosed;
+            this.socket.onerror = function() {
+                console.warn('CONNECTION ERROR');
+                that.async(that.connect, 1000);
+            };
+            this.socket.onclose = function() {
+                console.warn('CONNECTION CLOSED');
+                that.async(that.connect, 1000);
+            };
             this.socket.onheartbeat = this.heartbeat;
 
+            // When socket connects prepare channels
+            this.socket.onopen = function() {
+                console.log('CONNECTION ESTABLISHED');
+                that.send('sub', 'main');
+                that.send('msg', 'main', 'ready');
+                that.send('sub', 'logs');
+                that.send('msg', 'logs', 'ready');
+                that.set('initialized', true);
+            };
+
             // Initialize main handlers
-            var that = this;
             this.handlers = {
                 main: {
                     list_clouds: function(data) {
@@ -57,24 +78,24 @@
                     },
                     list_keys: function(data) {
                         that.debounce(that._updateKeys(data), function() {
-                            console.debug('list_keys', data);
+                            // console.debug('list_keys', data);
                         }, 250);
                     },
                     list_scripts: function(data) {
                         that.debounce(that._updateScripts(data), function() {
-                            console.debug('list_scripts', data);
+                            // console.debug('list_scripts', data);
                         }, 250);
                     },
                     list_templates: function(data) {
                         console.warn('got templates', data);
                         that.debounce(that._updateTemplates(data), function() {
-                            console.debug('list_templates', data);
+                            // console.debug('list_templates', data);
                         }, 250);
                     },
                     list_stacks: function(data) {
                         console.warn('got stacks', data);
                         that.debounce(that._updateStacks(data), function() {
-                            console.debug('list_stacks', data);
+                            // console.debug('list_stacks', data);
                         }, 250);
                     },
                     list_machines: function(data) {
@@ -178,103 +199,11 @@
                     }
                 }
             };
-
-            // When socket connects prepare channels
-            this.socket.onopen = function() {
-                console.log('CONNECTION ESTABLISHED');
-                that.send('sub', 'main');
-                that.send('msg', 'main', 'ready');
-                that.send('sub', 'logs');
-                that.send('msg', 'logs', 'ready');
-                that.set('initialized', true);
-            };
-        },
-
-        // DEPRECATED
-        getScripts: function() {
-            var xhr = new XMLHttpRequest(),
-                that = this;
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == XMLHttpRequest.DONE) {
-                    if (xhr.status == 200) {
-                        that._updateModel('scripts', JSON.parse(xhr.responseText));
-                    }
-                }
-            }
-            xhr.open("GET", '/api/v1/scripts', true);
-            xhr.send();
-        },
-
-        // DEPRECATED
-        getTemplates: function() {
-            var xhr = new XMLHttpRequest(),
-                that = this;
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == XMLHttpRequest.DONE) {
-                    if (xhr.status == 200) {
-                        that._updateModel('templates', JSON.parse(xhr.responseText));
-                    }
-                }
-            }
-            xhr.open("GET", '/api/v1/templates', true);
-            xhr.send();
-        },
-
-        // DEPRECATED
-        getStacks: function() {
-            var xhr = new XMLHttpRequest(),
-                that = this;
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState == XMLHttpRequest.DONE) {
-                    if (xhr.status == 200) {
-                        var stacks = JSON.parse(xhr.responseText)
-                        for (i in stacks) {
-                            stacks[i].template_id = stacks[i].template
-                            if (stacks[i].node_instances) {
-                                stacks[i].state = stacks[i].node_instances
-                                for (s in stacks[i].state) {
-                                    stacks[i].state[s].runtime_properties = YAML.stringify(stacks[i].state[s].runtime_properties)
-                                }
-                                delete stacks[i].node_instances
-                            }
-                            if (stacks[i].inputs) {
-                                var inputs = stacks[i].inputs
-                                stacks[i].inputs = []
-                                for (input in inputs) {
-                                    stacks[i].inputs.push({
-                                        name: input,
-                                        value: inputs[input],
-                                        default: "",
-                                        type: "text",
-                                        description: "",
-                                        errorMessage: "",
-                                        helptext: "",
-                                        show: true,
-                                    })
-                                }
-                            }
-                        }
-                        that._updateModel('stacks', stacks);
-                    }
-                }
-            }
-            xhr.open("GET", '/api/v1/stacks', true);
-            xhr.send();
         },
 
         heartbeat: function() {
             console.debug('got heartbeat');
             this.send('h'); // reply with empty frame
-        },
-
-        connectionClosed: function() {
-            console.log('CONNECTION CLOSED');
-            // TODO: try to reconnect
-        },
-
-        connectionError: function() {
-            console.log('CONNECTION ERROR');
-            // TODO: try to reconnect
         },
 
         send: function(type, namespace, body, params) {
