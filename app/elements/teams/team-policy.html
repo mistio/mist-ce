@@ -7,6 +7,7 @@
         </style>
         <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
             <paper-item>
+            	[[index]].
                 [[rule.operator]]
                 [[rule.rtype]]
 
@@ -31,14 +32,12 @@
             	team: Object
             },
             _computeRTags: function(tags){
-                // dom-repeat needs an array
-                var arrTags = [];
-                for (var t in tags) {
-                    // TODO: proper obj push in array
-                    // if (tags.t.value)
-                    //     arrTags.push(t + '= '+ tags.t.value);
-                    // else
-                        arrTags.push(t);
+            	var arrTags = Object.keys(tags); 
+                for (var i=0; i < arrTags.length; i++) {
+                	var t = arrTags[i];
+                	if (tags[t] != null) {
+                		arrTags[i] = arrTags[i]+'='+tags[t];
+                	}
                 }
                 return arrTags;
             }
