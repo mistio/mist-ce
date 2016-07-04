@@ -51,26 +51,24 @@
         </style>
         <div id="list-form">
           <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
-          <template is="dom-if" if="[[needCloud]]">
-            <div hidden$="[[isStacks]]">
-                <div>To see [[section.id]] you need to add clouds.</div>
-                <paper-button class="wide blue" on-tap="_addCloudAction"> ADD YOUR CLOUDS </paper-button>
-            </div>
             <div hidden$="[[!isStacks]]">
-                <div>To create [[section.id]] you need to have added templates.</div>
-                <paper-button class="wide blue" on-tap="_addTemplate"> ADD YOUR TEMPLATES </paper-button>
+                <div>To create [[section.id]] you need to use a template.</div>
+                <paper-button class="wide blue" on-tap="_goToTemplate"> VIEW YOUR TEMPLATES </paper-button>
             </div>
-          </template>
-          <template is="dom-if" if="[[!needCloud]]">
             <div hidden$="[[isStacks]]">
-                <div>No [[section.id]] available. Yet.</div>
-                <paper-button class="wide blue" on-tap="_fabAction"> ADD YOUR [[section.id]] </paper-button>
-            </div>
-            <div hidden$="[[!isStacks]]">
-                <div>To create [[section.id]] you need to have added templates.</div>
-                <paper-button class="wide blue" on-tap="_addTemplate"> ADD YOUR TEMPLATES </paper-button>
-            </div>
-          </template>
+                <template is="dom-if" if="[[needCloud]]">
+                <div hidden$="[[!isStacks]]">
+                    <div>To create [[section.id]] you need to have added templates.</div>
+                    <paper-button class="wide blue" on-tap="_addTemplate"> ADD YOUR TEMPLATES </paper-button>
+                </div>
+              </template>
+              <template is="dom-if" if="[[!needCloud]]">
+                <div hidden$="[[isStacks]]">
+                    <div>No [[section.id]] available. Yet.</div>
+                    <paper-button class="wide blue" on-tap="_fabAction"> ADD YOUR [[section.id]] </paper-button>
+                </div>            
+              </template>
+            </div>          
         </div>
         <team-add></team-add>
     </template>
@@ -112,8 +110,8 @@ Polymer({
     _addCloudAction: function(){
         page("/add-cloud");
     },
-    _addTemplate: function(){
-        page("/add-template");
+    _goToTemplate: function(){
+        page("/templates");
     },
     _computeIsStacks: function(section){
         return this.section.id == "stacks";
