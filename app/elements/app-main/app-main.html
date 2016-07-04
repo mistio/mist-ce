@@ -87,6 +87,8 @@
             <iron-route path="/teams" title="teams" current="teams" href="../pages/page-items.html"></iron-route>
             <iron-route path="/teams/:id" title="team" current="teams" href="../teams/team-page.html"></iron-route>
             <iron-route path="/members/:id" title="member" current="teams" href="../teams/member-page.html"></iron-route>
+            <iron-route path="/add-members/:id" title="add member" current="teams" href="../teams/members-add.html"></iron-route>
+            <iron-route path="/members/:id/add-in-teams" title="add in teams" current="teams" href="../teams/member-add-in-teams.html"></iron-route>
             <!-- <iron-route path="/teams/:id" title="script" href="../teams/team-page.html"></iron-route>
             <iron-route path="/add-team" title="add script" href="../teams/team-add.html"></iron-route> -->
 
@@ -136,6 +138,8 @@
                 <page-items class="teams" model="[[model]]" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]"></page-items>
                 <team-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></team-page>
                 <member-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-page>
+                <members-add model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></members-add>
+                <member-add-in-teams model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-add-in-teams>
                 <!-- scripts - leave scipts last due to editors highlighting problem -->
                 <page-items model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
                 <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>

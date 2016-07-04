@@ -38,7 +38,7 @@
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <iron-ajax id="teamEditAjaxRequest" url="/api/v1/org/[[team.org.id]]/teams/[[team.id]]" method="PUT" on-response="_handleTeamEditAjaxResponse" on-error="_handleTeamEditAjaxError"></iron-ajax>
+        <iron-ajax id="teamEditAjaxRequest" url="/api/v1/org/[[org.id]]/teams/[[team.id]]" method="PUT" on-response="_handleTeamEditAjaxResponse" on-error="_handleTeamEditAjaxError"></iron-ajax>
     </template>
 
     <script>
@@ -49,6 +49,9 @@
                 is: 'team-edit',
 
                 properties: {
+                    org: {
+                        type: Object
+                    },
                     team: {
                         type: Object
                     },
@@ -105,8 +108,8 @@
                     this.$.teamEditAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.teamEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.teamEditAjaxRequest.body = {
-                        new_name: this.newTeam.newName,
-                        new_description: this.newTeam.newDescription
+                        'new_name': this.newTeam.name,
+                        'new_description': this.newTeam.description
                     };
                     this.$.teamEditAjaxRequest.generateRequest();
 

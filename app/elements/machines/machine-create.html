@@ -18,10 +18,6 @@
                 padding: 24px;
                 transition: all 0.2 ease-in;
             }
-
-            paper-material.selected-true {
-                padding-bottom: 120px;
-            }
             #content {
                 max-width: 900px;
             }
@@ -115,8 +111,8 @@
                     </template>
                     <hr/>
                     <div class="clearfix">
-                        <paper-button class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
-                        <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
+                        <paper-button class="submit-btn pull-left blue" disabled$="[[!formReady]]" on-tap="_submitForm">Add</paper-button>
+                        <paper-button class="submit-btn pull-right blue" on-tap="_resetForm">Reset</paper-button>
                     </div>
                 </div>
             </paper-material>
