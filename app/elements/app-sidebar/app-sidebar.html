@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+ou<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
 
 <link rel="import" href="../section-symbol/section-symbol.html">
@@ -260,6 +260,15 @@
                             <section-symbol aria-hidden="true" icon="[[sections.teams.icon]]" color="[[sections.teams.color]]"></section-symbol>
                             <span class="title flex">
                                 <span>teams</span>
+                            <span class="count">[[model.teamsArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a id="private_networks" class="section" is="pushstate-anchor" href="/private-networks" active$="[[_isEqual(current, 'teams')]]" tabindex="1" style$="[[style(sections.teams.color)]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.teams.icon]]" color="[[sections.teams.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>private networks</span>
                             <span class="count">[[model.teamsArray.length]]</span>
                             </span>
                         </div>
