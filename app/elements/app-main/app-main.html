@@ -210,11 +210,10 @@
             'page-meta': 'updateTitle',
             'toast': 'showToast',
             'subscribeLogEvents': 'subscribeLogEvents',
-            'search': 'updateq'
+            'search': 'updateSearchQuery'
         },
         _toast: null,
-        updateq: function(e){
-            console.log('listen  uin listt',e.detail);
+        updateSearchQuery: function(e){
             this.set('q',e.detail);
         },
         _currentChanged: function() {
