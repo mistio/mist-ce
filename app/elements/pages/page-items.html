@@ -212,7 +212,6 @@
             },
             q: { // search query
                 type: String,
-                value: '',
                 observer: '_qChanged'
             }
         },
@@ -328,6 +327,8 @@
             this.async(function() {
               this.updateMeta(this.section);
             });
+
+            console.log("PAGE ITEMS LISTENED");
         },
 
         _stampCards: function(view) {
