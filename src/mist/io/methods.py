@@ -1343,12 +1343,19 @@ def connect_provider(cloud):
                 ca_cert_temp_file = NamedTemporaryFile(delete=False)
                 ca_cert_temp_file.write(cloud.ca_cert_file)
                 ca_cert_temp_file.close()
-            conn = driver(host=cloud.apiurl,
-                          port=cloud.docker_port,
-                          key_file=key_temp_file.name,
-                          cert_file=cert_temp_file.name,
-                          ca_cert=ca_cert_temp_file.name,
-                          verify_match_hostname=False)
+                conn = driver(host=cloud.apiurl,
+                              port=cloud.docker_port,
+                              key_file=key_temp_file.name,
+                              cert_file=cert_temp_file.name,
+                              ca_cert=ca_cert_temp_file.name,
+                              verify_match_hostname=False)
+            else:
+                conn = driver(host=cloud.apiurl,
+                                  port=cloud.docker_port,
+                                  key_file=key_temp_file.name,
+                                  cert_file=cert_temp_file.name,
+                                  verify_match_hostname=False)
+
         else:
             conn = driver(cloud.apikey, cloud.apisecret, cloud.apiurl, cloud.docker_port)
     elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN,
