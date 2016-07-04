@@ -1,0 +1,47 @@
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<dom-module id="team-policy">
+	<template>
+        <style is="custom-style" include="shared-styles">
+
+        </style>
+        <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
+            <paper-item>
+                [[rule.operator]]
+                [[rule.rtype]]
+
+                [[rule.action]]
+                [[rule.rid]]
+                <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
+                    [[tag]]
+                </template>
+            </paper-item>
+        </template>
+        <paper-item>[[team.policy.operator]] every other action ON any other resource</paper-item>
+    </template>
+</dom-module>
+
+<script>
+	(function() {
+        'use strict';
+
+        Polymer({
+            is: 'team-policy',
+            properties: {
+            	team: Object
+            },
+            _computeRTags: function(tags){
+                // dom-repeat needs an array
+                var arrTags = [];
+                for (var t in tags) {
+                    // TODO: proper obj push in array
+                    // if (tags.t.value)
+                    //     arrTags.push(t + '= '+ tags.t.value);
+                    // else
+                        arrTags.push(t);
+                }
+                return arrTags;
+            }
+        });
+    })();
+</script>

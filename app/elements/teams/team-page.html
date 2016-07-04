@@ -8,6 +8,7 @@
 
 <link rel="import" href="team-edit.html">
 <link rel="import" href="team-add.html">
+<link rel="import" href="team-policy.html">
 
 <dom-module id="team-page">
     <template>
@@ -247,19 +248,7 @@
                     <paper-material class="no-pad">
                         <!-- TODO: make interactive add edit of rules -->
                         <h3 class="smallcaps resource-head">Team Policy</h3>
-                        <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
-                            <paper-item>
-                                [[rule.operator]]
-                                [[rule.rtype]]
-
-                                [[rule.action]]
-                                [[rule.rid]]
-                                <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
-                                    [[tag]]
-                                </template>
-                            </paper-item>
-                        </template>
-                        <paper-item>[[team.policy.operator]] every other action ON any other resource</paper-item>
+                        <team-policy team="[[team]]"></team-policy>                        
                     </paper-material>
                 </div>
             </div>
@@ -418,18 +407,6 @@
                     var team = e.detail.team;
                     this.set('team.name', team.name);
                     this.set('team.description', team.description);
-                },
-                _computeRTags: function(tags){
-                    // dom-repeat needs an array
-                    var arrTags = [];
-                    for (var t in tags) {
-                        // TODO: proper obj push in array
-                        // if (tags.t.value)
-                        //     arrTags.push(t + '= '+ tags.t.value);
-                        // else
-                            arrTags.push(t);
-                    }
-                    return arrTags;
                 },
                 _deleteTeam: function(e) {
                     this._showDialog({
