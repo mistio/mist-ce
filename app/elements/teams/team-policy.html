@@ -3,19 +3,39 @@
 <dom-module id="team-policy">
 	<template>
         <style is="custom-style" include="shared-styles">
-
+        .rule span {
+        	padding-right: 8px;
+        }
         </style>
         <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
-            <paper-item>
-            	[[index]].
-                [[rule.operator]]
-                [[rule.rtype]]
-
-                [[rule.action]]
-                [[rule.rid]]
-                <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
-                    [[tag]]
-                </template>
+            <paper-item class="rule">
+            	<span>
+            		[[index]]. 
+            	</span>
+            	<span>
+                	[[rule.operator]] 
+                </span>
+                <span hidden$="[[rule.action.length]]">
+                	ALL 
+                </span>
+                <span hidden$="[[!rule.action.length]]">
+                	[[rule.action]] 
+                </span>
+                <span>
+                	on 
+                </span>
+                <span>
+                	[[rule.rtype]]
+                </span>
+                <span hidden$="[[!rule.rid]]">
+                	WHERE ID = [[rule.rid]] 
+                </span>
+                <span hidden$="[[!_ruleHasTags(rule)]]">
+                	WHERE TAGS: 
+	                <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
+	                    [[tag]]
+	                </template>
+                </span>
             </paper-item>
         </template>
         <paper-item>[[team.policy.operator]] every other action ON any other resource</paper-item>
@@ -30,6 +50,9 @@
             is: 'team-policy',
             properties: {
             	team: Object
+            },
+            _ruleHasTags: function(rule){
+            	return Object.keys(rule.rtags).length > 0 ? true : false;
             },
             _computeRTags: function(tags){
             	var arrTags = Object.keys(tags); 
