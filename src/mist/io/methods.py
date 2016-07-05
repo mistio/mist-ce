@@ -1365,7 +1365,7 @@ def connect_provider(cloud):
     elif cloud.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        conn = driver(cloud.apikey, cloud.apisecret, host=cloud.apiurl)
+        conn = driver(cloud.apikey, cloud.apisecret, host=cloud.apiurl, verify_match_hostname=False)
     elif cloud.provider == Provider.DIGITAL_OCEAN:
         if cloud.apikey == cloud.apisecret:  # API v2
             conn = driver(cloud.apisecret)
