@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/Sortable/Sortable.html">
 
 <dom-module id="team-policy">
 	<template>
@@ -10,12 +11,13 @@
         .uppercase {
         	text-transform: uppercase;
         }
-        .rules {
+        #rules {
         	display: table;
         	padding: 16px;
         }
         .rule {
         	display: table-row;
+            cursor: move;
         }
         .rule > span {
         	display: table-cell;
@@ -25,8 +27,12 @@
         	display: inline-block;
         	vertical-align: middle;
         }
+        .sub {
+        	font-size: 0.9em;
+        	color: rgba(0,0,0,0.54); 
+        }
         </style>
-        <div class="rules">
+        <div id="rules">
 	        <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
 	            <div class="rule">
 	            	<span>
@@ -54,9 +60,9 @@
 	                <span>
 		                <span hidden$="[[!rule.rid]]">
 		                	where ID = [[rule.rid]] 
-		                	
-		                	<span hidden$="[[!_computeLink(rule.rtype,rule.rid)]]">	[[_computeLink(rule.rtype,rule.rid)]]</span>
-		                	<a href$="/[[rule.rtype]]s/[[rule.rid]]" class="blue-link regular" target="_blank" hidden$="[[_computeLink(rule.rtype,rule.rid)]]"><iron-icon icon="link"></iron-icon></a>
+		                	<!-- resource info -->
+		                	<span class="sub" hidden$="[[!_computeLink(rule.rtype,rule.rid)]]">	- [[_computeLink(rule.rtype,rule.rid)]]</span>
+		                	<a class="sub" href$="/[[rule.rtype]]s/[[rule.rid]]" class="blue-link regular" hidden$="[[_computeLink(rule.rtype,rule.rid)]]"> -<iron-icon icon="link"></iron-icon>  [[_computeResourceName(rule.rtype,rule.rid)]]</a>
 		                </span>
 		                <span hidden$="[[!_ruleHasTags(rule)]]">
 		                	where TAGS: 
@@ -85,6 +91,10 @@
             _ruleHasTags: function(rule){
             	return Object.keys(rule.rtags).length > 0 ? true : false;
             },
+            attached: function(){
+                var el = document.getElementById('rules');
+                var sortable = Sortable.create(el);
+            },
             _computeRTags: function(tags){
             	var arrTags = Object.keys(tags); 
                 for (var i=0; i < arrTags.length; i++) {
@@ -99,9 +109,18 @@
             	if (type && id && type != "cloud") {
             		return false;
             	}
-            	else if (type == "cloud"){
+            	else if (type == "cloud" && id){
             		return this.model.clouds[id].title;
             	}
+                else if (type == "cloud" && !id){
+                    return 'all clouds';
+                }
+            },
+            _computeResourceName: function(type, id){
+                if (type && id) {                    
+                    var mod =  this.model[type+'s'];
+                    return mod[id].name;
+                }
             }
         });
     })();
