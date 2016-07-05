@@ -2,43 +2,73 @@
 
 <dom-module id="team-policy">
 	<template>
+		<style is="custom-style" include="tags-and-labels"></style>
         <style is="custom-style" include="shared-styles">
         .rule span {
         	padding-right: 8px;
         }
+        .uppercase {
+        	text-transform: uppercase;
+        }
+        .rules {
+        	display: table;
+        	padding: 16px;
+        }
+        .rule {
+        	display: table-row;
+        }
+        .rule > span {
+        	display: table-cell;
+        	padding: 8px;
+        }
+        .rule > span > span {
+        	display: inline-block;
+        	vertical-align: middle;
+        }
         </style>
-        <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
-            <paper-item class="rule">
-            	<span>
-            		[[index]]. 
-            	</span>
-            	<span>
-                	[[rule.operator]] 
-                </span>
-                <span hidden$="[[rule.action.length]]">
-                	ALL 
-                </span>
-                <span hidden$="[[!rule.action.length]]">
-                	[[rule.action]] 
-                </span>
-                <span>
-                	on 
-                </span>
-                <span>
-                	[[rule.rtype]]
-                </span>
-                <span hidden$="[[!rule.rid]]">
-                	WHERE ID = [[rule.rid]] 
-                </span>
-                <span hidden$="[[!_ruleHasTags(rule)]]">
-                	WHERE TAGS: 
-	                <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
-	                    [[tag]]
-	                </template>
-                </span>
-            </paper-item>
-        </template>
-        <paper-item>[[team.policy.operator]] every other action ON any other resource</paper-item>
+        <div class="rules">
+	        <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
+	            <div class="rule">
+	            	<span>
+	            		[[index]]. 
+	            	</span>
+	            	<span>
+	                	[[rule.operator]] 
+	                </span>
+	                <span>
+		                <span hidden$="[[rule.action.length]]">
+		                	ALL 
+		                </span>
+		                <span class="uppercase" hidden$="[[!rule.action.length]]">
+		                	[[rule.action]] 
+		                </span>
+	                </span>
+	                <span>
+		                <span>
+		                	on 
+		                </span>
+		                <span class="uppercase">
+		                	[[rule.rtype]]
+		                </span>
+	                </span>
+	                <span>
+		                <span hidden$="[[!rule.rid]]">
+		                	where ID = [[rule.rid]] 
+		                	
+		                	<span hidden$="[[!_computeLink(rule.rtype,rule.rid)]]">	[[_computeLink(rule.rtype,rule.rid)]]</span>
+		                	<a href$="/[[rule.rtype]]s/[[rule.rid]]" class="blue-link regular" target="_blank" hidden$="[[_computeLink(rule.rtype,rule.rid)]]"><iron-icon icon="link"></iron-icon></a>
+		                </span>
+		                <span hidden$="[[!_ruleHasTags(rule)]]">
+		                	where TAGS: 
+			                <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
+			                    <span class="tag">[[tag]]</span>
+			                </template>
+		                </span>
+	                </span>
+	            </div>
+	        </template>
+        </div>
+        <paper-item class="no-table">[[team.policy.operator]] every other action ON any other resource</paper-item>
     </template>
 </dom-module>
 
@@ -49,7 +79,8 @@
         Polymer({
             is: 'team-policy',
             properties: {
-            	team: Object
+            	team: Object,
+            	model: Object
             },
             _ruleHasTags: function(rule){
             	return Object.keys(rule.rtags).length > 0 ? true : false;
@@ -63,6 +94,14 @@
                 	}
                 }
                 return arrTags;
+            },
+            _computeLink: function(type, id){
+            	if (type && id && type != "cloud") {
+            		return false;
+            	}
+            	else if (type == "cloud"){
+            		return this.model.clouds[id].title;
+            	}
             }
         });
     })();
