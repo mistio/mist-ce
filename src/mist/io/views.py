@@ -102,8 +102,8 @@ def exception_handler_mist(exc, request):
 @view_config(route_name='key', request_method='GET')
 @view_config(route_name='networks', request_method='GET')
 @view_config(route_name='network', request_method='GET')
-@view_config(route_name='private_networks', request_method='GET')
-@view_config(route_name='private_network', request_method='GET')
+@view_config(route_name='tunnels', request_method='GET')
+@view_config(route_name='tunnel', request_method='GET')
 def home(request):
     """Home page view"""
     params = params_from_request(request)

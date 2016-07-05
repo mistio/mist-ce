@@ -93,8 +93,8 @@
             <iron-route path="/add-team" title="add script" href="../teams/team-add.html"></iron-route> -->
 
             <!-- private-networks -->
-            <iron-route path="/private-networks" title="networks" current="privateNetworks" href="../pages/page-items.html"></iron-route>
-
+            <iron-route path="/tunnels" title="tunnels" current="tunnels" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/tunnels/:id" title="tunnel" current="tunnels" href="../tunnels/tunnel-page.html"></iron-route>
             <!-- scripts -->
             <iron-route path="/scripts" title="scripts" current="scripts" href="../pages/page-items.html"></iron-route>
             <iron-route path="/scripts/:id" title="script" current="scripts" href="../scripts/script-page.html"></iron-route>
@@ -144,7 +144,8 @@
                 <members-add model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></members-add>
                 <member-add-in-teams model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-add-in-teams>
                 <!-- private networks -->
-                <page-items class="private_networks" model="[[model]]" sections="[[sections]]" section="[[sections.privateNetworks]]" items="[[model.privateNetworksArray]]"></page-items>
+                <page-items class="tunnels" model="[[model]]" sections="[[sections]]" section="[[sections.tunnels]]" items="[[model.tunnelsArray]]"></page-items>
+                <tunnel-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.tunnels]]" restamp="true"></tunnel-page>
                 <!-- scripts - leave scipts last due to editors highlighting problem -->
                 <page-items model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
                 <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
@@ -222,7 +223,7 @@
                 imagesArray: [],
                 keysArray: [],
                 networksArray: [],
-                privateNetworksArray: [
+                tunnelsArray: [
                   {
                   	"name": "myTunnel",
                   	"accessed_at": "2016-07-01 11:12:38.173492",
@@ -280,7 +281,7 @@
                 count: '0',
                 add: '/add-network'
             },{
-                id: 'privateNetworks',
+                id: 'tunnels',
                 color: '#2F2F3E',
                 icon: 'hardware:device-hub',
                 count: '0',

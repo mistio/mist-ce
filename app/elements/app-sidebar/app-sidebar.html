@@ -228,12 +228,12 @@ ou<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-b
                             </span>
                         </div>
                     </a>
-                    <a id="private_networks" class="section" is="pushstate-anchor" href="/private-networks" active$="[[_isEqual(current, 'privateNetworks')]]" tabindex="1" style$="[[style(sections.privateNetworks.color)]]">
+                    <a id="tunnels" class="section" is="pushstate-anchor" href="/tunnels" active$="[[_isEqual(current, 'tunnels')]]" tabindex="1" style$="[[style(sections.tunnels.color)]]">
                         <div class="layout horizontal center">
-                            <section-symbol aria-hidden="true" icon="[[sections.privateNetworks.icon]]" color="[[sections.privateNetworks.color]]"></section-symbol>
+                            <section-symbol aria-hidden="true" icon="[[sections.tunnels.icon]]" color="[[sections.tunnels.color]]"></section-symbol>
                             <span class="title flex">
-                                <span>private networks</span>
-                            <span class="count">[[model.privateNetworksArray.length]]</span>
+                                <span>tunnels</span>
+                            <span class="count">[[model.tunnelsArray.length]]</span>
                             </span>
                         </div>
                     </a>
