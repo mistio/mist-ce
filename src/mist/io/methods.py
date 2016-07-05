@@ -1343,12 +1343,19 @@ def connect_provider(cloud):
                 ca_cert_temp_file = NamedTemporaryFile(delete=False)
                 ca_cert_temp_file.write(cloud.ca_cert_file)
                 ca_cert_temp_file.close()
-            conn = driver(host=cloud.apiurl,
-                          port=cloud.docker_port,
-                          key_file=key_temp_file.name,
-                          cert_file=cert_temp_file.name,
-                          ca_cert=ca_cert_temp_file.name,
-                          verify_match_hostname=False)
+                conn = driver(host=cloud.apiurl,
+                              port=cloud.docker_port,
+                              key_file=key_temp_file.name,
+                              cert_file=cert_temp_file.name,
+                              ca_cert=ca_cert_temp_file.name,
+                              verify_match_hostname=False)
+            else:
+                conn = driver(host=cloud.apiurl,
+                                  port=cloud.docker_port,
+                                  key_file=key_temp_file.name,
+                                  cert_file=cert_temp_file.name,
+                                  verify_match_hostname=False)
+
         else:
             conn = driver(cloud.apikey, cloud.apisecret, cloud.apiurl, cloud.docker_port)
     elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN,
@@ -1358,7 +1365,7 @@ def connect_provider(cloud):
     elif cloud.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        conn = driver(cloud.apikey, cloud.apisecret, host=cloud.apiurl)
+        conn = driver(cloud.apikey, cloud.apisecret, host=cloud.apiurl, verify_match_hostname=False)
     elif cloud.provider == Provider.DIGITAL_OCEAN:
         if cloud.apikey == cloud.apisecret:  # API v2
             conn = driver(cloud.apisecret)
