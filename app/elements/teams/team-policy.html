@@ -1,26 +1,43 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/Sortable/Sortable.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <dom-module id="team-policy">
 	<template>
 		<style is="custom-style" include="tags-and-labels"></style>
         <style is="custom-style" include="shared-styles">
+        :host {
+            display: block;
+            padding-bottom: 16px; 
+        }
         .rule span {
         	padding-right: 8px;
         }
         .uppercase {
         	text-transform: uppercase;
         }
-        #rules {
+        #rules,
+        .rules {
         	display: table;
+            width: 100%;
+            border-collapse: collapse;
         	padding: 16px;
         }
         .rule {
         	display: table-row;
+            border-bottom: 1px solid #eee;
+            border-right: 1px solid #eee;
+        }
+        #rules .rule:nth-of-type(2n+1) {
+            background-color: #f6f6f6;
+        }
+        #rules .rule .index {
             cursor: move;
         }
         .rule > span {
         	display: table-cell;
+            border-left: 1px solid #eee;
         	padding: 8px;
         }
         .rule > span > span {
@@ -30,31 +47,62 @@
         .sub {
         	font-size: 0.9em;
         	color: rgba(0,0,0,0.54); 
+            font-weight: 300;
+        }
+        .default {
+            padding: 8px 8px 8px 16px;
+            font-size: 16px;
+        }
+        .index {
+            text-align: center;
+        }
+        .add {
+            border-bottom: 1px solid #eee;
+            width: 100%;
+            display: block;
+        }
+        .bottom-actions {
+            display: flex;
+        }
+        paper-toggle-button.operator {
+            display: inline-block;    
+            --paper-toggle-button-checked-bar-color:  var(--green-color);
+            --paper-toggle-button-checked-button-color:  var(--green-color);
+            --paper-toggle-button-checked-ink-color: var(--green-color);
+            --paper-toggle-button-unchecked-bar-color:  var(--red-color);
+            --paper-toggle-button-unchecked-button-color:  var(--red-color);
+            --paper-toggle-button-unchecked-ink-color: var(--red-color);
         }
         </style>
         <div id="rules">
 	        <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
-	            <div class="rule">
-	            	<span>
+	            <div class$="rule [[index]]">
+	            	<span class="index">
 	            		[[index]]. 
 	            	</span>
 	            	<span>
-	                	[[rule.operator]] 
-	                </span>
+                        <paper-toggle-button class="operator" checked$="[[_computeToggle(rule.operator)]]"></paper-toggle-button on-tap="_">
+	                	[[rule.operator]]
+                    </span>
+                    <span>
+                        <span>
+                            on 
+                        </span>
+                        <span class="uppercase">
+                            <span hidden$="[[rule.rtype.length]]">
+                                ALL 
+                            </span>
+                            <span class="uppercase" hidden$="[[!rule.rtype.length]]">
+                                [[rule.rtype]]
+                            </span>
+                        </span>
+                    </span>
 	                <span>
-		                <span hidden$="[[rule.action.length]]">
-		                	ALL 
-		                </span>
-		                <span class="uppercase" hidden$="[[!rule.action.length]]">
-		                	[[rule.action]] 
-		                </span>
-	                </span>
-	                <span>
-		                <span>
-		                	on 
-		                </span>
-		                <span class="uppercase">
-		                	[[rule.rtype]]
+                        <span hidden$="[[rule.action.length]]">
+                        	ALL 
+                        </span>
+                        <span class="uppercase" hidden$="[[!rule.action.length]]">
+                            [[rule.action]] 
 		                </span>
 	                </span>
 	                <span>
@@ -74,7 +122,20 @@
 	            </div>
 	        </template>
         </div>
-        <paper-item class="no-table">[[team.policy.operator]] every other action ON any other resource</paper-item>
+        <div class="rules">
+            <div class="rule add">
+                <span class="index">
+                    <iron-icon icon="icons:add-circle" on-tap="_add"></iron-icon>
+                </span>
+            </div>
+            <paper-item class="default">
+                <paper-toggle-button class="operator" checked$="[[_computeToggle(team.policy.operator)]]" [[_computeDisabled(team)]]></paper-toggle-button>[[team.policy.operator]] every other action ON any other resource [[_computeDisabled(team)]]
+            </paper-item>
+        </div>
+        <div class="clearfix bottom-actions xs12">
+            <paper-button id="appformsubmit" class="submit-btn pull-left blue" disabled$="[[!formReady]]" raised on-tap="_submitForm">Save policy</paper-button>
+            <paper-button class="submit-btn pull-right" on-tap="_resetForm"><iron-icon icon="icons:refresh"></iron-icon>Reset Form</paper-button>
+        </div>
     </template>
 </dom-module>
 
@@ -86,7 +147,12 @@
             is: 'team-policy',
             properties: {
             	team: Object,
-            	model: Object
+            	model: Object,
+                payload: Object,
+                formReady: {
+                    type: Boolean,
+                    value: false
+                }
             },
             _ruleHasTags: function(rule){
             	return Object.keys(rule.rtags).length > 0 ? true : false;
@@ -94,6 +160,12 @@
             attached: function(){
                 var el = document.getElementById('rules');
                 var sortable = Sortable.create(el);
+
+                var toggles = document.querySelectorAll(".ALLOW");
+                console.log("HEERERER",toggles.length);
+                [].forEach.call(toggles, function(el){
+                    el.setAttribute('checked', true);
+                });
             },
             _computeRTags: function(tags){
             	var arrTags = Object.keys(tags); 
@@ -121,7 +193,13 @@
                     var mod =  this.model[type+'s'];
                     return mod[id].name;
                 }
-            }
+            },
+            _computeToggle: function(operator) {
+                return operator == 'ALLOW'? true : false;
+            },
+            _computeDisabled: function(team) {
+                return team.name == 'Owners'? 'disabled' : '';
+            },
         });
     })();
 </script>
