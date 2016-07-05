@@ -67,7 +67,7 @@ var loadApp = function(
     App.set('email', EMAIL);
     App.set('password', '');
     App.set('organization', ORGANIZATION);
-    App.set('can_create_org', CAN_CREATE_ORG);
+    App.set('can_create_org', true);
     App.set('orgs', ORGS);
     App.set('personal', PERSONAL);
     App.set('isClientMobile', (/iPhone|iPod|iPad|Android|BlackBerry|Windows Phone/)

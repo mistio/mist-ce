@@ -9,8 +9,11 @@ import requests
 import subprocess
 import re
 import calendar
+import ssl
+
 import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError, DoesNotExist
+
 from time import sleep, time
 from datetime import datetime
 from hashlib import sha256
@@ -67,11 +70,6 @@ import mist.io.inventory
 
 import mist.core.vpn.methods
 
-
-## # add curl ca-bundle default path to prevent libcloud certificate error
-import libcloud.security
-libcloud.security.CA_CERTS_PATH.append('cacert.pem')
-libcloud.security.CA_CERTS_PATH.append('./src/mist.io/cacert.pem')
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -1312,7 +1310,6 @@ def connect_provider(cloud):
     Cloud is expected to be a mist.io.Cloud
 
     """
-    import libcloud.security
     if cloud.provider == Provider.LIBVIRT:
         import libcloud.compute.drivers.libvirt_driver
         libcloud.compute.drivers.libvirt_driver.ALLOW_LIBVIRT_LOCALHOST = config.ALLOW_LIBVIRT_LOCALHOST
@@ -1349,7 +1346,6 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.DOCKER:
         docker_host, docker_port = mist.core.vpn.methods.destination_nat(
                 cloud.owner, cloud.apiurl, cloud.docker_port)
-        libcloud.security.VERIFY_SSL_CERT = False;
         if cloud.key_file and cloud.cert_file:
             # tls auth, needs to pass the key and cert as files
             key_temp_file = NamedTemporaryFile(delete=False)
@@ -1363,10 +1359,18 @@ def connect_provider(cloud):
                 ca_cert_temp_file = NamedTemporaryFile(delete=False)
                 ca_cert_temp_file.write(cloud.ca_cert_file)
                 ca_cert_temp_file.close()
-                libcloud.security.VERIFY_SSL_CERT = True
-                libcloud.security.CA_CERTS_PATH.insert(0,ca_cert_temp_file.name)
-            conn = driver(host=docker_host, port=docker_port,
-                          key_file=key_temp_file.name, cert_file=cert_temp_file.name)
+                conn = driver(host=cloud.apiurl,
+                              port=cloud.docker_port,
+                              key_file=key_temp_file.name,
+                              cert_file=cert_temp_file.name,
+                              ca_cert=ca_cert_temp_file.name,
+                              verify_match_hostname=False)
+            else:
+                conn = driver(host=cloud.apiurl,
+                              port=cloud.docker_port,
+                              key_file=key_temp_file.name,
+                              cert_file=cert_temp_file.name,
+                              verify_match_hostname=False)
         else:
             conn = driver(cloud.apikey, cloud.apisecret, docker_host, docker_port)
     elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
@@ -1374,9 +1378,8 @@ def connect_provider(cloud):
     elif cloud.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        libcloud.security.VERIFY_SSL_CERT = False
         api_url = mist.core.vpn.methods.destination_nat(cloud.owner, cloud.apiurl)
-        conn = driver(cloud.apikey, cloud.apisecret, host=api_url)
+        conn = driver(cloud.apikey, cloud.apisecret, host=api_url, verify_match_hostname=False)
     elif cloud.provider == Provider.DIGITAL_OCEAN:
         if cloud.apikey == cloud.apisecret:  # API v2
             conn = driver(cloud.apisecret)
@@ -1529,9 +1532,15 @@ def list_machines(user, cloud_id):
         machines_from_provider = conn.list_nodes()
     except InvalidCredsError:
         raise CloudUnauthorizedError()
-    except Exception as exc:
-        log.error("Error while running list_nodes: %r", exc)
+    except ssl.SSLError as exc:
+        traceback.print_exc()
+        log.error("SSLError while running list_nodes on provider %s: %r, %s" % (cloud.provider, exc, type(exc)))
         raise CloudUnavailableError(exc=exc)
+    except Exception as exc:
+        traceback.print_exc()
+        log.error("Error while running list_nodes on provider %s: %r, %s" % (cloud.provider, exc, type(exc)))
+        raise CloudUnavailableError(exc=exc)
+
 
     # create a dict with the machines from the db with key the machine_id
     machines_from_db = {machine.machine_id: machine

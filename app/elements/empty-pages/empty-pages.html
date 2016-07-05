@@ -1,3 +1,4 @@
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../teams/team-add.html">
 
 <dom-module id="empty-pages">
@@ -50,14 +51,24 @@
         </style>
         <div id="list-form">
           <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
-          <template is="dom-if" if= "[[needCloud]]">
-            <div>To see [[section.id]] you need to add clouds.</div>
-            <paper-button class="wide blue" on-tap="_addCloudAction"> ADD YOUR CLOUDS </paper-button>
-          </template>
-          <template is="dom-if" if="[[!needCloud]]">
-            <div>No [[section.id]] available. Yet.</div>
-            <paper-button class="wide blue" on-tap="_fabAction"> ADD YOUR [[section.id]] </paper-button>
-          </template>
+            <div hidden$="[[!isStacks]]">
+                <div>To create [[section.id]] you need to use a template.</div>
+                <paper-button class="wide blue" on-tap="_goToTemplate"> VIEW YOUR TEMPLATES </paper-button>
+            </div>
+            <div hidden$="[[isStacks]]">
+                <template is="dom-if" if="[[needCloud]]">
+                <div hidden$="[[!isStacks]]">
+                    <div>To create [[section.id]] you need to have added templates.</div>
+                    <paper-button class="wide blue" on-tap="_addTemplate"> ADD YOUR TEMPLATES </paper-button>
+                </div>
+              </template>
+              <template is="dom-if" if="[[!needCloud]]">
+                <div hidden$="[[isStacks]]">
+                    <div>No [[section.id]] available. Yet.</div>
+                    <paper-button class="wide blue" on-tap="_fabAction"> ADD YOUR [[section.id]] </paper-button>
+                </div>            
+              </template>
+            </div>
         </div>
         <team-add></team-add>
     </template>
@@ -68,24 +79,42 @@ Polymer({
     is: 'empty-pages',
 
     properties: {
-
         section: Object,
+        clouds: {
+            type: Array
+        },
+        isStacks: {
+            type: Boolean,
+            value: false,
+            computed: '_computeIsStacks(section)'
+        },
         needCloud: {
             type: Boolean,
             value: true,
-            computed: "needCloudChange(section)"
+            computed: "needCloudChange(clouds, section)"
         },
     },
-    needCloudChange: function(section){
-      if(this.section.id == "machines" || this.section.id == "networks" || this.section.id == "images" || this.section.id == "stacks"){
-        return true;
-      }
-      else{
-        return false;
-      }
+    needCloudChange: function(clouds, section){
+        if (this.clouds.length > 0) {
+            return false;
+        }
+        else {
+          if(this.section.id == "machines" || this.section.id == "networks" || this.section.id == "images" || this.section.id == "stacks"){
+            return true;
+          }
+          else {
+            return false;
+          }
+        }
     },
     _addCloudAction: function(){
         page("/add-cloud");
+    },
+    _goToTemplate: function(){
+        page("/templates");
+    },
+    _computeIsStacks: function(section){
+        return this.section.id == "stacks";
     },
     _fabAction: function(e) {
         if(this.section.id != "teams")
