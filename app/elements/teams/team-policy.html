@@ -24,11 +24,13 @@
             border-collapse: collapse;
         	padding: 16px;
         }
+        /*policy-rule,*/
         .rule {
         	display: table-row;
             border-bottom: 1px solid #eee;
             border-right: 1px solid #eee;
         }
+        /*#rules policy-rule:nth-of-type(2n+1),*/
         #rules .rule:nth-of-type(2n+1) {
             background-color: #f6f6f6;
         }
@@ -216,7 +218,9 @@
             },
             attached: function(){
                 var el = document.getElementById('rules');
-                var sortable = Sortable.create(el);                
+                var sortable = Sortable.create(el, {
+                    filter: '.head'
+                });
             },
             _computePayload: function(team){
                 return this.team.policy;
@@ -274,11 +278,12 @@
                 this.payload.rules.push(emptyRuleObj);
             },
             _deleteRule: function(e){
+                e.preventDefault();
                 var path = e.detail.sourceEvent.path;
                 var target = path.find(function(p){
                     return p.classList.contains('rule');
                 });
-                console.log('CLICk ON delete',target)
+                console.log('CLICk ON delete ',target)
                 this.$.rules.removeChild(target);
             },
             _changeOperator: function(e){
