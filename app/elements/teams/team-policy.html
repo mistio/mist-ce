@@ -169,8 +169,8 @@
                 </span>
             </div>
             <paper-item class="default">
-                <paper-toggle-button id="defaultoperator" class="operator" checked$="[[_computeToggle(team.policy.operator)]]" [[_computeDisabled(team)]] on-tap="_changeOperator"></paper-toggle-button>
-                <span id="defaultoperator" class="operator-text">[[team.policy.operator]] </span> 
+                <paper-toggle-button id="defaultoperator" class="operator" checked$="[[_computeToggle(defaultOperator)]]" [[_computeDisabled(team)]] on-tap="_changeOperator"></paper-toggle-button>
+                <span id="defaultoperator" class="operator-text">[[defaultOperator]] </span> 
                 every other action ON any other resource
             </paper-item>
         </div>
@@ -201,9 +201,9 @@
                     type: Array,
                     value: []
                 },
-                initialPolicy: {
-                    type: Object,
-                    value: {}
+                defaultOperator: {
+                    type: String,
+                    value: ''
                 },
                 formReady: {
                     type: Boolean,
@@ -218,7 +218,8 @@
                 }
             },
             observers: [
-                '_teamChanged(team, model.teamsArray.*)'
+                // removed model.teamsArray from dep, due to reseting on conection changes
+                '_teamChanged(team)'
             ],
             _ruleHasTags: function(rule){
             	return Object.keys(rule.rtags).length > 0 ? true : false;
@@ -230,10 +231,11 @@
                 });                
             },
             _teamChanged: function(team, teams){
-                var op = '';
-                    op = this.team.policy.operator;
-                var pol = { operator: op };
-                this.initialPolicy = pol;
+                // copy default operator to a new string
+                var initialOp = this.team.policy.operator;
+                var newString = initialOp.slice(0);
+                this.set("defaultOperator", newString);
+
                 // copy the array to a new array by .slice(0)
                 var initial = this.team.policy.rules;
                 var newArr = initial.slice(0);
@@ -299,19 +301,22 @@
                     this.set('rules.#'+index+'.operator', newOp);
                 }
                 else {
-                    this.set('team.policy.operator', newOp);
+                    this.set('defaultOperator', newOp);
                 }
             },
             _resetForm: function(){
                 var initial = this.team.policy.rules;
                 var newArr = initial.slice(0);
-                this.set("rules", []);
                 this.set("rules", newArr);
+                // TODO: does not work: operators' changes affect team.policy.rules, they should note
+                for (var i = 0; i < newArr.length; i++) {
+                    this.set('rules.#'+i+'.operator', newArr[i].operator);
+                }
 
-                var op = '';
-                    op = this.initialPolicy.operator;
+                var initialOp = this.team.policy.operator;
+                var newString = initialOp.slice(0);
+                this.set("defaultOperator", newString);
 
-                this.set("team.policy.operator", op);
                 this.set('formReady', false);
             }
         });
