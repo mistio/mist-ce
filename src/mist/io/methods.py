@@ -1631,6 +1631,33 @@ def list_machines(user, cloud_id):
             if m.extra.get('xml_description'):
                 m.extra['xml_description'] = escape(m.extra['xml_description'])
 
+        machine = {'id': m.id,
+                   'uuid': machine_entry.id if machine_entry else '',
+                   'name': m.name,
+                   'imageId': image_id,
+                   'size': size,
+                   'state': config.STATES[m.state],
+                   'private_ips': m.private_ips,
+                   'public_ips': m.public_ips,
+                   'missing_since': str(machine_entry.missing_since)
+                        if machine_entry and machine_entry.missing_since else '',
+                   'last_seen': str(machine_entry.last_seen)
+                        if machine_entry and machine_entry.last_seen else '',
+                   'extra': m.extra}
+        try:
+            machine_cost = machine_cost_calculator(m)
+        except:
+            machine_cost = {}
+        cost_per_month = machine_cost.get('cost_per_month', 0)
+        cost_per_hour = machine_cost.get('cost_per_hour', 0)
+        if cost_per_hour:
+            machine['extra']['cost_per_hour'] = cost_per_hour
+        if cost_per_month:
+            machine['extra']['cost_per_month'] = cost_per_month
+
+        # the reason this goes down is that we want to allow
+        # cost_per_hour/cost_per_month to be overrided by users
+
         all_tags = tags_from_provider
 
         try:
@@ -1666,30 +1693,7 @@ def list_machines(user, cloud_id):
                 except:
                     pass
 
-        machine = {'id': m.id,
-                   'uuid': machine_entry.id if machine_entry else '',
-                   'name': m.name,
-                   'imageId': image_id,
-                   'size': size,
-                   'state': config.STATES[m.state],
-                   'private_ips': m.private_ips,
-                   'public_ips': m.public_ips,
-                   'tags': all_tags,
-                   'missing_since': str(machine_entry.missing_since)
-                        if machine_entry and machine_entry.missing_since else '',
-                   'last_seen': str(machine_entry.last_seen)
-                        if machine_entry and machine_entry.last_seen else '',
-                   'extra': m.extra}
-        try:
-            machine_cost = machine_cost_calculator(m)
-        except:
-            machine_cost = {}
-        cost_per_month = machine_cost.get('cost_per_month', 0)
-        cost_per_hour = machine_cost.get('cost_per_hour', 0)
-        if cost_per_hour:
-            machine['extra']['cost_per_hour'] = cost_per_hour
-        if cost_per_month:
-            machine['extra']['cost_per_month'] = cost_per_month
+        machine['tags'] = all_tags
 
         if m.state in ['TERMINATED', 'terminated']:
             machine['extra'].pop('cost_per_month', None)
@@ -1697,6 +1701,7 @@ def list_machines(user, cloud_id):
 
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
+
     if conn.type == 'libvirt':
         # close connection with libvirt
         conn.disconnect()
@@ -4441,10 +4446,6 @@ def machine_cost_calculator(m):
     TODO: Azure, NephoScale, HostVirtual
     """
     cost = {'cost_per_hour': 0, 'cost_per_month': 0}
-    if m.driver.type in [Provider.LINODE, Provider.PACKET]:
-        sizes = CloudSize.objects.filter(cloud_provider=m.driver.type)
-    if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
-        sizes = CloudSize.objects.filter(cloud_provider=m.driver.type, cloud_region=m.driver.region)
     now = datetime.now()
     month_days = calendar.monthrange(now.year, now.month)[1]
     if m.driver.type in config.EC2_PROVIDERS:
@@ -4475,38 +4476,29 @@ def machine_cost_calculator(m):
             image = CloudImage.objects.get(cloud_provider=m.driver.type, image_id=instance_image).os_type
         except:
             os_type = 'linux'
-
         size = m.extra.get('flavorId')
-        for node_size in sizes:
-            if node_size.size_id == size:
-                plan_price = json.loads(node_size.price).get('os_type')
-                if not plan_price:
-                    # use the default which is linux
-                    plan_price = json.loads(node_size.price).get('linux')
-                # just need the float value
-                cost['cost_per_hour'] = plan_price
-                cost['cost_per_month'] = float(plan_price) * 730
-                # 730 is the number of hours per month as on https://www.rackspace.com/calculator
-                # TODO: RackSpace mentions on https://www.rackspace.com/cloud/public-pricing
-                # there's a minimum service charge of $50/mo across all Cloud Servers
+        location = m.driver.region[:3]
+        driver_name = 'rackspacenova' + location
+        price = get_size_price(driver_type='compute', driver_name=driver_name, size_id=size)
+        if price:
+            plan_price = price.get(os_type, 'linux')
+            # just need the float value
+            cost['cost_per_hour'] = plan_price
+            cost['cost_per_month'] = float(plan_price) * 730
+            # 730 is the number of hours per month as on https://www.rackspace.com/calculator
+            # TODO: RackSpace mentions on https://www.rackspace.com/cloud/public-pricing
+            # there's a minimum service charge of $50/mo across all Cloud Servers
     if m.driver.type == Provider.LINODE:
         size = m.extra.get('PLANID')
-        if size:
-            for node_size in sizes:
-                if node_size.size_id == size:
-                    plan_price = node_size.price.replace('/month','').replace('$', '')
-                    cost['cost_per_month'] = plan_price
+        price = get_size_price(driver_type='compute', driver_name='linode', size_id=size)
+        if price:
+            cost['cost_per_month'] = price
     if m.driver.type == Provider.PACKET:
         size = m.extra.get('plan')
-        if size:
-            for plan_size in sizes:
-                try:
-                    if plan_size.name.startswith(size):
-                        plan_price = plan_size.price.split(' ')[0]
-                        cost['cost_per_hour'] = plan_price
-                        cost['cost_per_month'] = float(plan_price) * 24 * month_days
-                except:
-                    pass
+        price = get_size_price(driver_type='compute', driver_name='packet', size_id=size)
+        if price:
+            cost['cost_per_hour'] = price
+            cost['cost_per_month'] = float(price) * 24 * month_days
     if m.driver.type == Provider.GCE:
         # https://cloud.google.com/compute/pricing
         size = m.extra.get('machineType')
