@@ -112,7 +112,7 @@
                 <span>resource identifier</span>
                 <span></span>
             </div>
-	        <template is="dom-repeat" items="[[team.policy.rules]]" as="rule">
+	        <template is="dom-repeat" items="[[rules]]" as="rule" id="rulesrepeat">
 	            <div class$="rule [[index]]">
 	            	<span class="index">
 	            		[[index]]. 
@@ -157,7 +157,7 @@
 		                </span>
 	                </span>
                     <span class="delete">
-                        <iron-icon icon="close" on-tap="_deleteRule"></iron-icon>
+                        <iron-icon id$="delete-[[index]]" icon="close" on-tap="_deleteRule"></iron-icon>
                     </span>
 	            </div>
 	        </template>            
@@ -169,12 +169,12 @@
                 </span>
             </div>
             <paper-item class="default">
-                <paper-toggle-button id="defaultoperator" class="operator" checked$="[[_computeToggle(team.policy.operator)]]" [[_computeDisabled(team)]] on-tap="_changeDefaultOperator"></paper-toggle-button>
-                <span class="operator-text">[[team.policy.operator]] </span> 
+                <paper-toggle-button id="defaultoperator" class="operator" checked$="[[_computeToggle(team.policy.operator)]]" [[_computeDisabled(team)]] on-tap="_changeOperator"></paper-toggle-button>
+                <span id="defaultoperator" class="operator-text">[[team.policy.operator]] </span> 
                 every other action ON any other resource
             </paper-item>
         </div>
-        <div id="changeRecord" hidden$="[[!formReady]]">
+        <div id="changeRecord" hidden>
             <h4>Changes: </h4>
             <p>
                 Add rule 4.<br/>
@@ -183,7 +183,7 @@
         </div>
         <div class="clearfix bottom-actions xs12">
             <paper-button id="appformsubmit" class="submit-btn pull-left blue" disabled$="[[!formReady]]" raised on-tap="_submitForm">Save policy</paper-button>
-            <paper-button class="submit-btn pull-right" on-tap="_resetForm"><iron-icon icon="icons:refresh"></iron-icon>Reset Form</paper-button>
+            <paper-button class="submit-btn pull-right" on-tap="_resetForm"><iron-icon icon="icons:refresh"></iron-icon>Reset Policy</paper-button>
         </div>
     </template>
 </dom-module>
@@ -197,10 +197,11 @@
             properties: {
             	team: Object,
             	model: Object,
-                payload: {
-                    type: Object,
-                    computed: '_computePayload(team)'
+                rules: {
+                    type: Array,
+                    value: []
                 },
+                initialRules: 
                 formReady: {
                     type: Boolean,
                     value: false
@@ -213,6 +214,9 @@
                     type: Array
                 }
             },
+            observers: [
+                '_teamChanged(team, model.teamsArray.*)'
+            ],
             _ruleHasTags: function(rule){
             	return Object.keys(rule.rtags).length > 0 ? true : false;
             },
@@ -220,10 +224,10 @@
                 var el = document.getElementById('rules');
                 var sortable = Sortable.create(el, {
                     filter: '.head'
-                });
+                });                
             },
-            _computePayload: function(team){
-                return this.team.policy;
+            _teamChanged: function(team, teams){
+                this.set("rules", this.team.policy.rules);
             },
             _computeRTags: function(tags){
             	var arrTags = Object.keys(tags); 
@@ -259,32 +263,20 @@
                 return team.name == 'Owners'? 'disabled' : '';
             },
             _addRule: function(e){
-                var s = '<span class="index">'+this.payload.rules.length+'.</span><span><paper-toggle-button id$="index-'+this.payload.rules.length+'" class="operator" on-tap="_changeOperator"></paper-toggle-button><span id$="index-'+this.payload.rules.length+'" class="operator-text">DENY </span></span><span><span>on </span><span class="uppercase"><span>ALL</span></span></span><span><span>ALL </span></span><span></span><span class="delete"><iron-icon icon="close" on-tap="_deleteRule"></iron-icon></span>';
-                
-                var emptyRule = document.createElement('div')
-                    emptyRule.innerHTML = s;
-                    emptyRule.classList.add('rule');
-
-                var parent = document.getElementById("rules");
-                    Polymer.dom(parent).insertBefore(emptyRule, null);
-
                 var emptyRuleObj = {
-                    action:"",
-                    operator:"DENY",
-                    rid:"",
-                    rtags:{},
-                    rtype:""
+                    action: '',
+                    operator: 'DENY',
+                    rid: '',
+                    rtags: {},
+                    rtype: ''
                 };
-                this.payload.rules.push(emptyRuleObj);
+                this.push('rules', emptyRuleObj);
+                this.set('formReady', true);
             },
             _deleteRule: function(e){
-                e.preventDefault();
-                var path = e.detail.sourceEvent.path;
-                var target = path.find(function(p){
-                    return p.classList.contains('rule');
-                });
-                console.log('CLICk ON delete ',target)
-                this.$.rules.removeChild(target);
+                var target = e.detail.sourceEvent.path[0];
+                var index = target.getAttribute('id').split('-')[1];
+                this.splice('rules',index,1);
             },
             _changeOperator: function(e){
                 var path = e.detail.sourceEvent.path;
@@ -293,14 +285,17 @@
                 });
                 var index = target.getAttribute('id').split('-')[1];
                 var newOp = target.attributes.checked ? 'ALLOW' : "DENY";
-                var text = document.querySelector('#index-'+index+'.operator-text');
-                    text.textContent = newOp;
-
-                // this.updatePayload('rules',index, newRule);
-                // this.updatePayload('default');
+                if (index) {
+                    this.set('rules.#'+index+'.operator', newOp);
+                }
+                else {
+                    this.set('team.policy.operator', newOp);
+                }
             },
-            _changeDefaultOperator: function(e){
-                // this.$.defaultoperator
+            _resetForm: function(){
+                var initialRules = this.team.policy.rules;
+                this.set("rules", initialRules);
+                this.set('formReady', false);
             }
         });
     })();
