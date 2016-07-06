@@ -4446,9 +4446,6 @@ def machine_cost_calculator(m):
     TODO: Azure, NephoScale, HostVirtual
     """
     cost = {'cost_per_hour': 0, 'cost_per_month': 0}
-    if m.driver.type in [Provider.LINODE, Provider.PACKET]:
-        sizes = CloudSize.objects.filter(cloud_provider=m.driver.type)
-
     now = datetime.now()
     month_days = calendar.monthrange(now.year, now.month)[1]
     if m.driver.type in config.EC2_PROVIDERS:
@@ -4493,22 +4490,15 @@ def machine_cost_calculator(m):
             # there's a minimum service charge of $50/mo across all Cloud Servers
     if m.driver.type == Provider.LINODE:
         size = m.extra.get('PLANID')
-        if size:
-            for node_size in sizes:
-                if node_size.size_id == size:
-                    plan_price = node_size.price.replace('/month','').replace('$', '')
-                    cost['cost_per_month'] = plan_price
+        price = get_size_price(driver_type='compute', driver_name='linode', size_id=size)
+        if price:
+            cost['cost_per_month'] = price
     if m.driver.type == Provider.PACKET:
         size = m.extra.get('plan')
-        if size:
-            for plan_size in sizes:
-                try:
-                    if plan_size.name.startswith(size):
-                        plan_price = plan_size.price.split(' ')[0]
-                        cost['cost_per_hour'] = plan_price
-                        cost['cost_per_month'] = float(plan_price) * 24 * month_days
-                except:
-                    pass
+        price = get_size_price(driver_type='compute', driver_name='packet', size_id=size)
+        if price:
+            cost['cost_per_hour'] = price
+            cost['cost_per_month'] = float(price) * 24 * month_days
     if m.driver.type == Provider.GCE:
         # https://cloud.google.com/compute/pricing
         size = m.extra.get('machineType')
