@@ -160,7 +160,9 @@
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
                             <div class="flexchild">CIRDS</div>
-                            <div class="flexchild" cidrs="[[_computeCidrs(tunnel)]]"></div>
+                            <template is="dom-repeat" items=[[tunnel.cidrs]]>
+                              <div class="flexchild">[[tunnel.cidrs]]</div>
+                            </template>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
                             <div class="flexchild">TUNNEL ID</div>
@@ -216,10 +218,6 @@
                     type: String,
                     computed: '_computeTunnelId(params)'
                 },
-                cidrs:{
-                    type: Array,
-                    computed: '_computeCirds(tunnel)'
-                },
                 isInline: {
                     type: Boolean,
                     value: true
@@ -228,12 +226,6 @@
             listeners: {
                 'confirmation': '_deleteTunnelEventResponse',
                 'updateSelectedScript': '_updateScript'
-            },
-            _computeCidrs: function(tunnel){
-                for(i = 0;i<this.tunnel.cidrs;i++){
-                    var cidrs = this.tunnel.cidrs[i];
-                    return cidrs;
-                }
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
