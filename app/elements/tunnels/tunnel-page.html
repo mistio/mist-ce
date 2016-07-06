@@ -103,9 +103,7 @@
                         [[tunnel.name]]
                     </h2>
                     <div class="subtitle">
-                        <span hidden$="[[!isInline]]">Inline Tunnel</span>
-                        <span hidden$="[[isInline]]">Tunnel source <a class="regular" href$="[[script.script]]" target="_blank"> [[script.script]] <iron-icon icon="icons:link"></iron-icon></a>
-                        </span>
+                        <span>A Tunnel</span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -113,64 +111,65 @@
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
-                            <paper-button on-tap="_editScript" class="simple">Edit Tunnel</paper-button>
-                            <paper-button on-tap="_deleteScript" class="simple">Delete Tunnel</paper-button>
+                            <paper-button on-tap="_editTunnel" class="simple">Edit Tunnel</paper-button>
+                            <paper-button on-tap="_deleteTunnel" class="simple">Delete Tunnel</paper-button>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button on-tap="_runScript" class="simple white right-icon" style$="color: [[section.color]]"> run <iron-icon icon="av:play-arrow" style$="color: [[section.color]]"></iron-icon></paper-button>
                 </div>
             </paper-material>
             <div class="columns">
-                <div id="leftcolumn" class="left command-container" hidden$="[[!isInline]]">
+                <div id="leftcolumn" class="left command-container">
                     <div class="pad2">
-                        <pre><code>[[script.script]]</code></pre>
+                        <pre><code>[[tunnel.script]]</code></pre>
                     </div>
                 </div>
                 <paper-material id="rightcolumn" class="right">
                 <div class="info-table">
                     <div class="info-body info-group">
                         <div class="info-item flex-horizontal-with-ratios">
-                            <h4 class="id tags">Tags
-                                <template is="dom-if" if="[[script.tags]]">
-                                    <span class="id">([[script.tags.length]])</span>
+                            <div class="flexchild">ID</div>
+                            <div class="flexchild">[[tunnel.id]]</div>
+                        </div>
+                        <div class="info-item flex-horizontal-with-ratios">
+                            <div class="flexchild">OWNER</div>
+                            <div class="flexchild">[[tunnel.owner]]</div>
+                        </div>
+                        <div class="info-item flex-horizontal-with-ratios">
+                            <div class="flexchild">CLIENT</div>
+                            <div class="flexchild">[[tunnel.client]]</div>
+                        </div>
+                        <div class="info-item flex-horizontal-with-ratios">
+                            <div class="flexchild">SERVER</div>
+                            <div class="flexchild">[[tunnel.server]]</div>
+                        </div>
+                        <div class="info-item flex-horizontal-with-ratios">
+                        <h4 class="id tags">TAGS
+                                <template is="dom-if" if="[[tunnel.tags]]">
+                                    <span class="id">[[tunnel.tags]]</span>
                                 </template>
-                                <template is="dom-if" if="[[!script.tags]]">
+                                <template is="dom-if" if="[[!tunnel.tags]]">
                                     <span class="id">(0)</span>
                                 </template>
-                                :
+
                             </h4>
-                            <template is="dom-if" if="[[script.tags]]">
-                                <template is="dom-repeat" items="[[script.tags]]">
+                            <template is="dom-if" if="[[tunnel.tags]]">
+                                <template is="dom-repeat" items="[[tunnel.tags]]">
                                     <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
                                 </template>
                             </template>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
-                            <div class="flexchild">ID</div>
-                            <div class="flexchild">[[script.id]]</div>
+                            <div class="flexchild">CIRDS</div>
+                            <div class="flexchild" cidrs="[[_computeCidrs(tunnel)]]"></div>
                         </div>
-                        <template is="dom-if" if="[[script.description]]">
-                            <div class="info-item flex-horizontal-with-ratios">
-                                <div class="flexchild">Description</div>
-                                <div class="flexchild">[[script.description]]</div>
-                            </div>
-                        </template>
                         <div class="info-item flex-horizontal-with-ratios">
-                            <div class="flexchild">Type</div>
-                            <div class="flexchild">[[script.exec_type]]</div>
+                            <div class="flexchild">TUNNEL ID</div>
+                            <div class="flexchild">[[tunnel.tunnel_id]]</div>
                         </div>
-                        <template is="dom-if" if="[[script.entrypoint]]">
-                            <div class="info-item flex-horizontal-with-ratios">
-                                <div class="flexchild">Status</div>
-                                <div class="flexchild">[[script.entrypoint]]</div>
-                            </div>
-                        </template>
-                        <template is="dom-if" if="[[!isInline]]">
-                            <div class="info-item flex-horizontal-with-ratios">
-                                <div class="flexchild">Url</div>
-                                <div class="flexchild"><a class="regular" href$="[[script.script]]" target="_blank"> [[script.script]] <iron-icon icon="icons:link"></iron-icon></a></div>
-                            </div>
-                        </template>
+                        <div class="info-item flex-horizontal-with-ratios">
+                            <div class="flexchild">ACCESSED AT</div>
+                            <div class="flexchild">[[tunnel.accessed_at]]</div>
+                        </div>
                     </div>
                 </div>
             </paper-material>
@@ -180,10 +179,10 @@
                 <paper-tooltip for="runScriptFab" position="top">Run Script</paper-tooltip>
             </div>
         </div>
-        <iron-ajax id="scriptDeleteAjaxRequest" url="/api/v1/scripts/[[script.id]]" method="DELETE" on-response="_handleScriptDeleteAjaxResponse" on-error="_handleScriptDeleteAjaxError"></iron-ajax>
+        <iron-ajax id="tunnelDeleteAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]" method="DELETE" on-response="_handleTunnelDeleteAjaxResponse" on-error="_handleTunnelDeleteAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
-        <tags-list resource="script"></tags-list>
+        <tags-list resource="tunnel"></tags-list>
     </template>
     <script>
     (function() {
@@ -217,15 +216,24 @@
                     type: String,
                     computed: '_computeTunnelId(params)'
                 },
+                cidrs:{
+                    type: Array,
+                    computed: '_computeCirds(tunnel)'
+                },
                 isInline: {
                     type: Boolean,
-                    value: false,
-                    computed: '_computeIsInline(script.location_type)'
+                    value: true
                 }
             },
             listeners: {
-                'confirmation': '_deleteScriptEventResponse',
+                'confirmation': '_deleteTunnelEventResponse',
                 'updateSelectedScript': '_updateScript'
+            },
+            _computeCidrs: function(tunnel){
+                for(i = 0;i<this.tunnel.cidrs;i++){
+                    var cidrs = this.tunnel.cidrs[i];
+                    return cidrs;
+                }
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
@@ -257,7 +265,7 @@
             _runScript: function(e) {
                 page.show('/run-script/' + this.tunnel.id);
             },
-            _editScript: function(e) {
+            _editTunnel: function(e) {
                 var el = this.querySelector('script-edit');
                 el._openEditScriptModal();
             },
@@ -266,7 +274,7 @@
                 this.set('tunnel.name', tunnel.name);
                 this.set('script.description', script.description);
             },
-            _deleteScript: function(e) {
+            _deleteTunnel: function(e) {
                 this._showDialog({
                     title: 'Delete Tunnel?',
                     body: "Deleting tunnels cannot be undone. You are about to delete tunnel: '" + this.tunnel.name + "'." ,
@@ -274,18 +282,18 @@
                     reason: "tunnel.delete"
                 });
             },
-            _deleteScriptEventResponse: function(e) {
+            _deleteTunnelEventResponse: function(e) {
                 var reason = e.detail.reason,
                     response = e.detail.response;
 
-                if (response.confirmed && reason == "script.delete") {
-                    this.$.scriptDeleteAjaxRequest.body = {};
-                    this.$.scriptDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
-                    this.$.scriptDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.scriptDeleteAjaxRequest.generateRequest();
+                if (response.confirmed && reason == "tunnel.delete") {
+                    this.$.tunnelDeleteAjaxRequest.body = {};
+                    this.$.tunnelDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.tunnelDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.tunnelDeleteAjaxRequest.generateRequest();
                 }
             },
-            _handleScriptDeleteAjaxResponse: function(e) {
+            _handleTunnelDeleteAjaxResponse: function(e) {
                 page.show('/tunnels');
             },
             _showDialog: function(info) {
