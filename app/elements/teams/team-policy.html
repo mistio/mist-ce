@@ -2,6 +2,8 @@
 <link rel="import" href="../../bower_components/Sortable/Sortable.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 
 <dom-module id="team-policy">
 	<template>
@@ -102,6 +104,28 @@
             opacity: 0.54;
             cursor: pointer;
         }
+        .progress {
+            margin: 0;
+            width: 100%;
+            display: block;
+        }
+        paper-progress {
+            width: 100%;
+        }
+        paper-progress#progresserror ::content #primaryProgress {
+            background-color: var(--red-color);
+        }
+        .errormsg-container {
+            color: var(--red-color);
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+        .errormsg-container iron-icon {
+            color: inherit;
+        }
+        .pull-right {
+            float: right;
+        }
         </style>
         <div id="rules">
             <div class="rule head">
@@ -181,11 +205,20 @@
                 Change ALLOW to DENY in rule 5.<br/>
             </p>
         </div>
+
+        <div class="progress">
+            <paper-progress id="progress" indeterminate hidden$="[[!sendingData]]"></paper-progress>
+            <paper-progress id="progresserror" value="100" hidden$="[[!formError]]"></paper-progress>
+            <p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
+        </div>
+
         <div class="clearfix bottom-actions xs12">
             <paper-button id="appformsubmit" class="submit-btn pull-left blue" disabled$="[[!formReady]]" raised on-tap="_submitForm">Save policy</paper-button>
-            <paper-button class="submit-btn pull-right" on-tap="_resetForm"><iron-icon icon="icons:refresh"></iron-icon>Reset Policy</paper-button>
+            <paper-button class="submit-btn pull-right" on-tap="_resetForm" disabled$="[[!formReady]]"><iron-icon icon="icons:refresh"></iron-icon>Reset Policy</paper-button>
         </div>
-        <iron-ajax id="postPolicy" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/policy" contentType="application/json" handle-as="json" method="PUT" on-request="_handlePostPolicy" on-response="_handlePostPolicyResponse" on-error="_handlePostPolicyError"></iron-ajax>
+        <iron-ajax id="postPolicy" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/policy" contentType="application/json" handle-as="xml" method="PUT" on-request="_handlePostPolicy" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
+
+        <paper-toast></paper-toast>
     </template>
 </dom-module>
 
@@ -216,7 +249,15 @@
                 },
                 changes: {
                     type: Array
-                }
+                },
+                sendingData: {
+                    type: Boolean,
+                    value: false  
+                },
+                formError: {
+                    type: Boolean,
+                    value: false  
+                },
             },
             observers: [
                 // removed model.teamsArray from dep, due to reseting on conection changes
@@ -290,6 +331,7 @@
                 var target = e.detail.sourceEvent.path[0];
                 var index = target.getAttribute('id').split('-')[1];
                 this.splice('rules',index,1);
+                this.set('formReady', true);
             },
             _changeOperator: function(e){
                 var path = e.detail.sourceEvent.path;
@@ -304,6 +346,7 @@
                 else {
                     this.set('defaultOperator', newOp);
                 }
+                this.set('formReady', true);
             },
             _resetForm: function(){
                 var initial = this.team.policy.rules;
@@ -320,15 +363,32 @@
 
                 this.set('formReady', false);
             },
-            _submitForm: function(){
-                    var policy = {};
-                    policy.rules = this.rules;
-                    policy.operator = this.defaultOperator;
-                    this.$.postPolicy.headers["Content-Type"] = 'application/json';
-                    this.$.postPolicy.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.postPolicy.body = {'policy': policy};
-                    this.$.postPolicy.generateRequest();
-            }
+            _submitForm: function(){            
+                var policy = {};
+                policy.rules = this.rules;
+                policy.operator = this.defaultOperator;
+                this.$.postPolicy.headers["Content-Type"] = 'application/json';
+                this.$.postPolicy.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.postPolicy.body = {'policy': policy};
+                this.$.postPolicy.generateRequest();
+
+                this.set('sendingData', true);
+                this.set('formReady', false);              
+            },
+            _handleResponse: function(e){
+                console.log(e);
+                var toast = this.querySelector('paper-toast');
+                    toast.text = 'Team policy updated successfully.';
+                    toast.show();
+                this.set('sendingData', false);
+                this.set('formReady', false);
+            },
+            _handleError: function(e,d) {
+                this.set('sendingData', false);
+                this.set('formError', true);
+                this.$.errormsg.textContent = e.detail.request.xhr.responseText;
+                this.set('formReady', true);
+            },
         });
     })();
 </script>
