@@ -185,6 +185,7 @@
             <paper-button id="appformsubmit" class="submit-btn pull-left blue" disabled$="[[!formReady]]" raised on-tap="_submitForm">Save policy</paper-button>
             <paper-button class="submit-btn pull-right" on-tap="_resetForm"><iron-icon icon="icons:refresh"></iron-icon>Reset Policy</paper-button>
         </div>
+        <iron-ajax id="postPolicy" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/policy" contentType="application/json" handle-as="json" method="PUT" on-request="_handlePostPolicy" on-response="_handlePostPolicyResponse" on-error="_handlePostPolicyError"></iron-ajax>
     </template>
 </dom-module>
 
@@ -308,7 +309,7 @@
                 var initial = this.team.policy.rules;
                 var newArr = initial.slice(0);
                 this.set("rules", newArr);
-                // TODO: does not work: operators' changes affect team.policy.rules, they should note
+                // TODO: does not work: operators' changes affect team.policy.rules, they should not
                 for (var i = 0; i < newArr.length; i++) {
                     this.set('rules.#'+i+'.operator', newArr[i].operator);
                 }
@@ -318,6 +319,15 @@
                 this.set("defaultOperator", newString);
 
                 this.set('formReady', false);
+            },
+            _submitForm: function(){
+                    var policy = {};
+                    policy.rules = this.rules;
+                    policy.operator = this.defaultOperator;
+                    this.$.postPolicy.headers["Content-Type"] = 'application/json';
+                    this.$.postPolicy.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.postPolicy.body = {'policy': policy};
+                    this.$.postPolicy.generateRequest();
             }
         });
     })();
