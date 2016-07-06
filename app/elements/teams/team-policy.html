@@ -201,6 +201,10 @@
                     type: Array,
                     value: []
                 },
+                initialPolicy: {
+                    type: Object,
+                    value: {}
+                },
                 formReady: {
                     type: Boolean,
                     value: false
@@ -226,7 +230,14 @@
                 });                
             },
             _teamChanged: function(team, teams){
-                this.set("rules", this.team.policy.rules);
+                var op = '';
+                    op = this.team.policy.operator;
+                var pol = { operator: op };
+                this.initialPolicy = pol;
+                // copy the array to a new array by .slice(0)
+                var initial = this.team.policy.rules;
+                var newArr = initial.slice(0);
+                this.set("rules", newArr);
             },
             _computeRTags: function(tags){
             	var arrTags = Object.keys(tags); 
@@ -292,8 +303,15 @@
                 }
             },
             _resetForm: function(){
-                var initialRules = this.team.policy.rules;
-                this.set("rules", initialRules);
+                var initial = this.team.policy.rules;
+                var newArr = initial.slice(0);
+                this.set("rules", []);
+                this.set("rules", newArr);
+
+                var op = '';
+                    op = this.initialPolicy.operator;
+
+                this.set("team.policy.operator", op);
                 this.set('formReady', false);
             }
         });
