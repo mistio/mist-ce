@@ -169,11 +169,14 @@
                         </span>
                     </span>
 	                <span>
-                        <span hidden$="[[rule.action.length]]">
-                        	ALL 
-                        </span>
-                        <span class="uppercase" hidden$="[[!rule.action.length]]">
-                            [[rule.action]] 
+                        <span class="uppercase">
+                            <paper-dropdown-menu>
+                              <paper-listbox class="dropdown-content" selected="[[_computeSelectedAction(index, rule.rtype, rule.action)]]" >
+                                <template is="dom-repeat" items="[[_computeActions(index, rule.rtype)]]">
+                                    <paper-item value="[[item]]" class="raction">[[pretify(item)]]</paper-item>    
+                                </template>
+                              </paper-listbox>
+                            </paper-dropdown-menu>
 		                </span>
 	                </span>
 	                <span>
@@ -379,9 +382,18 @@
                     var rtype = e.detail.item.textContent.trim();
                     if (rtype == 'ALL') {
                         rtype = '';
-                    }            
+                    }
                     this.set('rules.#'+ind+'.rtype', rtype);
                 }
+                //case of editing raction
+                else if (e.detail.item.attributes.class.nodeValue.indexOf('raction') > -1){
+                    var raction = e.detail.item.textContent.trim().replace(' ','_').toLowerCase();
+                    if (raction == 'all') {
+                        raction = '';
+                    }
+                    this.set('rules.#'+ind+'.action', raction);
+                }
+                console.log(ind, e.detail.item.attributes.class.nodeValue.indexOf('raction'), e.detail.item.textContent.trim() )
             },
             _addRule: function(e){
                 var emptyRuleObj = {
@@ -461,6 +473,25 @@
                 //index of type in resources list
                 var typeIndex = this.resources.indexOf(type.toUpperCase());
                 return typeIndex > -1 ? typeIndex : 0;
+            },
+            _computeActions: function(index, rtype){
+                var type = rtype.toLowerCase();
+                var union = ['edit','read','edit_tags','read_logs'];
+                if (type != 'all'){
+                    return this.model.permissions[type];
+                }
+                else {
+                    return union;
+                }
+            },
+            _computeSelectedAction: function(index, type, action){
+                var actionIndex = 0;
+                if (action != '')
+                    actionIndex = this.model.permissions[type.toLowerCase()].indexOf(action);
+                return actionIndex > -1 ? actionIndex : 0;
+            },
+            pretify: function(item){
+                return item.replace('_',' ').toUpperCase();
             }
         });
     })();
