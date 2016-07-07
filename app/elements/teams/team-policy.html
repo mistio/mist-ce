@@ -135,6 +135,9 @@
               width: 150px;
             }
         }
+        paper-dropdown-menu ::content div.floated-label-placeholder {
+            margin-top: -12px;
+        }
         </style>
         <div id="rules">
             <div class="rule head">
@@ -234,7 +237,7 @@
         <paper-toast></paper-toast>
     </template>
 </dom-module>
-
+<script type="text/javascript" src="../../bower_components/swiftSet/swiftSet.js"></script>
 <script>
 	(function() {
         'use strict';
@@ -287,10 +290,14 @@
                         "STACK",
                         "TEAM"
                     ]
+                },
+                commonPermissions: {
+                    type: Array,
+                    computed: '_computeCommonPermissions(model)'
                 }
             },
             observers: [
-                // removed model.teamsArray from dep, due to reseting rules on conection changes
+                // removed model.teamsArray from dep, due to reseting rules on connection changes
                 '_teamChanged(team, team.policy.rules)'
             ],
             listeners: {
@@ -306,6 +313,15 @@
                     filter: '.head'
                 });
 
+            },
+            _computeCommonPermissions: function(model){
+                var commonPermissions = this.model.permissions['cloud'],
+                    that = this;
+                ['machine', 'key', 'script', 'template', 'stack', 'team'].forEach(function(t){
+                    var s = new swiftSet.Set(commonPermissions);
+                    commonPermissions = s.intersection(that.model.permissions[t]);
+                });
+                return commonPermissions;
             },
             _orderChanged: function(e){
                 var reorderElements = this.$.rules.children;
@@ -383,9 +399,9 @@
                     if (rtype == 'ALL') {
                         rtype = '';
                     }
-                    this.set('rules.#'+ind+'.rtype', rtype);
+                    this.set('rules.#'+ind+'.rtype', rtype.toLowerCase());
                 }
-                //case of editing raction
+                //case of editing rule action
                 else if (e.detail.item.attributes.class.nodeValue.indexOf('raction') > -1){
                     var raction = e.detail.item.textContent.trim().replace(' ','_').toLowerCase();
                     if (raction == 'all') {
@@ -393,7 +409,10 @@
                     }
                     this.set('rules.#'+ind+'.action', raction);
                 }
-                console.log(ind, e.detail.item.attributes.class.nodeValue.indexOf('raction'), e.detail.item.textContent.trim() )
+                if(this.formError){
+                    this.set('formError', false);
+                }
+                this.set('formReady', true);
             },
             _addRule: function(e){
                 var emptyRuleObj = {
@@ -476,19 +495,27 @@
             },
             _computeActions: function(index, rtype){
                 var type = rtype.toLowerCase();
-                var union = ['edit','read','edit_tags','read_logs'];
-                if (type != 'all'){
-                    return this.model.permissions[type];
+
+                if (type != ''){
+                    return ['all'].concat(this.model.permissions[type]);
                 }
-                else {
-                    return union;
+                else {                    
+                    return ['all'].concat(this.commonPermissions);
                 }
             },
-            _computeSelectedAction: function(index, type, action){
+            _computeSelectedAction: function(index, rtype, raction){
                 var actionIndex = 0;
-                if (action != '')
-                    actionIndex = this.model.permissions[type.toLowerCase()].indexOf(action);
-                return actionIndex > -1 ? actionIndex : 0;
+                var type = rtype.toLowerCase();
+                var action = raction.toLowerCase();
+
+                if (type && action != ''){
+                    actionIndex = this.model.permissions[type.toLowerCase()].indexOf(action);                
+                }
+                else {
+                    actionIndex = this.commonPermissions.indexOf(action);
+                }   
+                // add one to include concatenated 'all' action
+                return actionIndex > -1 ? actionIndex+1 : 0;
             },
             pretify: function(item){
                 return item.replace('_',' ').toUpperCase();
