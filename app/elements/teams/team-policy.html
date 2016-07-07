@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<!-- <link rel="import" href="../../node_modules/polymer-sortablejs/polymer-sortablejs.html"> -->
 
 <dom-module id="team-policy">
 	<template>
@@ -137,7 +138,7 @@
                 <span></span>
             </div>
 	        <template is="dom-repeat" items="[[rules]]" as="rule" id="rulesrepeat">
-	            <div class$="rule [[index]]">
+	            <div id="[[index]]" class$="rule ruleitem-[[index]]">
 	            	<span class="index">
 	            		[[index]]. 
 	            	</span>
@@ -258,11 +259,18 @@
                     type: Boolean,
                     value: false  
                 },
+                newOrder: {
+                    type: Array,
+                    value: []
+                }
             },
             observers: [
-                // removed model.teamsArray from dep, due to reseting on conection changes
-                '_teamChanged(team)'
+                // removed model.teamsArray from dep, due to reseting rules on conection changes
+                '_teamChanged(team, team.policy.rules)'
             ],
+            listeners: {
+                'end': '_orderChanged'
+            },
             _ruleHasTags: function(rule){
             	return Object.keys(rule.rtags).length > 0 ? true : false;
             },
@@ -270,9 +278,24 @@
                 var el = document.getElementById('rules');
                 var sortable = Sortable.create(el, {
                     filter: '.head'
-                });                
+                });
+
             },
-            _teamChanged: function(team, teams){
+            _orderChanged: function(e){
+                var reorderElements = this.$.rules.children;
+                this.newOrder = [];
+                [].forEach.call(reorderElements, function(el){
+                    el.classList.forEach(function(c){
+                        if(c.indexOf('ruleitem') > -1){
+                            var ind = parseInt(c.split('-')[1]);                            
+                            this.push('newOrder',this.rules[ind]);
+                        }
+                    },this)
+                }, this);
+
+                this.set('formReady', true);
+            },
+            _teamChanged: function(team, rules, teams){
                 // copy default operator to a new string
                 var initialOp = this.team.policy.operator;
                 var newString = initialOp.slice(0);
@@ -282,6 +305,12 @@
                 var initial = this.team.policy.rules;
                 var newArr = initial.slice(0);
                 this.set("rules", newArr);
+
+                //initialize new order
+                this.set('newOrder',[])
+                for (var i=0; i<this.team.policy.rules.length; i++){
+                     this.push('newOrder', this.rules[i])
+                }
             },
             _computeRTags: function(tags){
             	var arrTags = Object.keys(tags); 
@@ -326,12 +355,14 @@
                 };
                 this.push('rules', emptyRuleObj);
                 this.set('formReady', true);
+                this.push('newOrder', emptyRuleObj)
             },
             _deleteRule: function(e){
                 var target = e.detail.sourceEvent.path[0];
                 var index = target.getAttribute('id').split('-')[1];
                 this.splice('rules',index,1);
                 this.set('formReady', true);
+                this.splice('newOrder', index, 1)
             },
             _changeOperator: function(e){
                 var path = e.detail.sourceEvent.path;
@@ -365,7 +396,8 @@
             },
             _submitForm: function(){            
                 var policy = {};
-                policy.rules = this.rules;
+                policy.rules = this.newOrder;
+
                 policy.operator = this.defaultOperator;
                 this.$.postPolicy.headers["Content-Type"] = 'application/json';
                 this.$.postPolicy.headers["Csrf-Token"] = CSRF_TOKEN;
@@ -376,7 +408,6 @@
                 this.set('formReady', false);              
             },
             _handleResponse: function(e){
-                console.log(e);
                 var toast = this.querySelector('paper-toast');
                     toast.text = 'Team policy updated successfully.';
                     toast.show();
