@@ -217,7 +217,7 @@
             this.set('q',e.detail);
         },
         _currentChanged: function() {
-            console.log('current: ', this.current);
+            // console.log('current: ', this.current);
         },
         ready: function() {
             this.model = {
@@ -325,7 +325,7 @@
             if (el.nodeName == 'IRON-ROUTE' && el.title && el.getAttribute("current")) {
                 this.current = el.getAttribute("current");
                 this.title = el.title;
-                console.log("el", e.detail);
+                // console.log("el", e.detail);
                 if (el.nodeName == 'IRON-ROUTE') {
                     this.current = el.getAttribute("current");
                     this.title = el.title;
