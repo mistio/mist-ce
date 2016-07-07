@@ -4,7 +4,9 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
-<!-- <link rel="import" href="../../node_modules/polymer-sortablejs/polymer-sortablejs.html"> -->
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
 
 <dom-module id="team-policy">
 	<template>
@@ -27,13 +29,11 @@
             border-collapse: collapse;
         	padding: 16px;
         }
-        /*policy-rule,*/
         .rule {
         	display: table-row;
             border-bottom: 1px solid #eee;
             border-right: 1px solid #eee;
         }
-        /*#rules policy-rule:nth-of-type(2n+1),*/
         #rules .rule:nth-of-type(2n+1) {
             background-color: #f6f6f6;
         }
@@ -127,6 +127,14 @@
         .pull-right {
             float: right;
         }
+        paper-dropdown-menu {
+            --paper-dropdown-menu-input: {
+              text-transform: uppercase;
+              /* no underline */
+              border-bottom: none;
+              width: 150px;
+            }
+        }
         </style>
         <div id="rules">
             <div class="rule head">
@@ -151,12 +159,13 @@
                             on 
                         </span>
                         <span class="uppercase">
-                            <span hidden$="[[rule.rtype.length]]">
-                                ALL 
-                            </span>
-                            <span class="uppercase" hidden$="[[!rule.rtype.length]]">
-                                [[rule.rtype]]
-                            </span>
+                            <paper-dropdown-menu>
+                              <paper-listbox class="dropdown-content" selected="[[_computeSelectedType(index, rule.rtype)]]" >
+                                <template is="dom-repeat" items="[[resources]]">
+                                    <paper-item value="[[item]]" class="rtype">[[item]]</paper-item>    
+                                </template>
+                              </paper-listbox>
+                            </paper-dropdown-menu>
                         </span>
                     </span>
 	                <span>
@@ -262,6 +271,19 @@
                 newOrder: {
                     type: Array,
                     value: []
+                },
+                resources: {
+                    type: Array,
+                    value: [
+                        "ALL",
+                        "CLOUD",
+                        "MACHINE",
+                        "SCRIPT",
+                        "KEY",
+                        "TEMPLATE",
+                        "STACK",
+                        "TEAM"
+                    ]
                 }
             },
             observers: [
@@ -269,7 +291,8 @@
                 '_teamChanged(team, team.policy.rules)'
             ],
             listeners: {
-                'end': '_orderChanged'
+                'end': '_orderChanged',
+                'iron-select': '_updateRule'
             },
             _ruleHasTags: function(rule){
             	return Object.keys(rule.rtags).length > 0 ? true : false;
@@ -345,6 +368,21 @@
             _computeDisabled: function(team) {
                 return team.name == 'Owners'? 'disabled' : '';
             },
+            _updateRule: function(e){
+                //get rule index
+                var target = e.path.find(function(p){
+                    return p.classList.contains('rule');
+                });
+                var ind = parseInt(target.id);
+                //case of editing rtype
+                if (e.detail.item.attributes.class.nodeValue.indexOf('rtype') > -1){
+                    var rtype = e.detail.item.textContent.trim();
+                    if (rtype == 'ALL') {
+                        rtype = '';
+                    }            
+                    this.set('rules.#'+ind+'.rtype', rtype);
+                }
+            },
             _addRule: function(e){
                 var emptyRuleObj = {
                     action: '',
@@ -383,7 +421,6 @@
                 var initial = this.team.policy.rules;
                 var newArr = initial.slice(0);
                 this.set("rules", newArr);
-                // TODO: does not work: operators' changes affect team.policy.rules, they should not
                 for (var i = 0; i < newArr.length; i++) {
                     this.set('rules.#'+i+'.operator', newArr[i].operator);
                 }
@@ -420,6 +457,11 @@
                 this.$.errormsg.textContent = e.detail.request.xhr.responseText;
                 this.set('formReady', true);
             },
+            _computeSelectedType(index,type){
+                //index of type in resources list
+                var typeIndex = this.resources.indexOf(type.toUpperCase());
+                return typeIndex > -1 ? typeIndex : 0;
+            }
         });
     })();
 </script>
