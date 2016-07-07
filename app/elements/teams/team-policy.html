@@ -7,7 +7,8 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
-
+<link rel="import" href="../../bower_components/vaadin-combo-box/vaadin-combo-box.html">
+<link rel="import" href="rule-identifier.html">
 <dom-module id="team-policy">
 	<template>
 		<style is="custom-style" include="tags-and-labels"></style>
@@ -54,7 +55,7 @@
         }
         .rule .tag {
         	display: inline-block;
-        	vertical-align: bottom;
+        	vertical-align: middle;
         }
         .operator-text {
             padding-right: 8px;
@@ -128,16 +129,32 @@
             float: right;
         }
         paper-dropdown-menu {
+            width: 150px;
             --paper-dropdown-menu-input: {
-              text-transform: uppercase;
-              /* no underline */
-              border-bottom: none;
-              width: 150px;
+                text-transform: uppercase;
             }
+            --paper-input-container-underline: {
+                /*display: none;*/
+                opacity: 0.32;
+            };
         }
         paper-dropdown-menu ::content div.floated-label-placeholder {
             margin-top: -12px;
         }
+        paper-dropdown-menu.short {
+            width: 80px;
+            margin-right: 16px;
+        }
+        paper-input ::content div.floated-label-placeholder{
+            display: none;
+        }
+        paper-input {
+            vertical-align: baseline;
+        }
+        paper-input ::content paper-input-container {
+            padding: 0;
+        }
+        
         </style>
         <div id="rules">
             <div class="rule head">
@@ -153,16 +170,16 @@
 	            	<span class="index">
 	            		[[index]]. 
 	            	</span>
-	            	<span>
+	            	<span class="operator">
                         <paper-toggle-button id$="index-[[index]]" class="operator" checked$="[[_computeToggle(rule.operator)]]" on-tap="_changeOperator"></paper-toggle-button>
 	                	<span id$="index-[[index]]" class="operator-text">[[rule.operator]] </span>
                     </span>
-                    <span>
+                    <span class="resource">
                         <span>
                             on 
                         </span>
                         <span class="uppercase">
-                            <paper-dropdown-menu>
+                            <paper-dropdown-menu no-animations>
                               <paper-listbox class="dropdown-content" selected="[[_computeSelectedType(index, rule.rtype)]]" >
                                 <template is="dom-repeat" items="[[resources]]">
                                     <paper-item value="[[item]]" class="rtype">[[item]]</paper-item>    
@@ -171,9 +188,9 @@
                             </paper-dropdown-menu>
                         </span>
                     </span>
-	                <span>
+	                <span class="action">
                         <span class="uppercase">
-                            <paper-dropdown-menu>
+                            <paper-dropdown-menu no-animations>
                               <paper-listbox class="dropdown-content" selected="[[_computeSelectedAction(index, rule.rtype, rule.action)]]" >
                                 <template is="dom-repeat" items="[[_computeActions(index, rule.rtype)]]">
                                     <paper-item value="[[item]]" class="raction">[[pretify(item)]]</paper-item>    
@@ -182,20 +199,10 @@
                             </paper-dropdown-menu>
 		                </span>
 	                </span>
-	                <span>
-		                <span hidden$="[[!rule.rid]]">
-		                	where ID = [[rule.rid]] 
-		                	<!-- resource info -->
-		                	<span class="sub" hidden$="[[!_computeLink(rule.rtype,rule.rid)]]">	- [[_computeLink(rule.rtype,rule.rid)]]</span>
-		                	<a class="sub" href$="/[[rule.rtype]]s/[[rule.rid]]" class="blue-link regular" hidden$="[[_computeLink(rule.rtype,rule.rid)]]"> -<iron-icon icon="link"></iron-icon>  [[_computeResourceName(rule.rtype,rule.rid)]]</a>
-		                </span>
-		                <span hidden$="[[!_ruleHasTags(rule)]]">
-		                	where TAGS: 
-			                <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
-			                    <span class="tag">[[tag]]</span>
-			                </template>
-		                </span>
-	                </span>
+	                <span class="identifier">
+                        where
+                        <rule-identifier model="[[model]]" rule="[[rule]]"></rule-identifier>
+                    </span>
                     <span class="delete">
                         <iron-icon id$="delete-[[index]]" icon="close" on-tap="_deleteRule"></iron-icon>
                     </span>
@@ -303,10 +310,7 @@
             listeners: {
                 'end': '_orderChanged',
                 'iron-select': '_updateRule'
-            },
-            _ruleHasTags: function(rule){
-            	return Object.keys(rule.rtags).length > 0 ? true : false;
-            },
+            },            
             attached: function(){
                 var el = document.getElementById('rules');
                 var sortable = Sortable.create(el, {
@@ -353,34 +357,7 @@
                 for (var i=0; i<this.team.policy.rules.length; i++){
                      this.push('newOrder', this.rules[i])
                 }
-            },
-            _computeRTags: function(tags){
-            	var arrTags = Object.keys(tags); 
-                for (var i=0; i < arrTags.length; i++) {
-                	var t = arrTags[i];
-                	if (tags[t] != null) {
-                		arrTags[i] = arrTags[i]+'='+tags[t];
-                	}
-                }
-                return arrTags;
-            },
-            _computeLink: function(type, id){
-            	if (type && id && type != "cloud") {
-            		return false;
-            	}
-            	else if (type == "cloud" && id){
-            		return this.model.clouds[id].title;
-            	}
-                else if (type == "cloud" && !id){
-                    return 'all clouds';
-                }
-            },
-            _computeResourceName: function(type, id){
-                if (type && id) {                    
-                    var mod =  this.model[type+'s'];
-                    return mod[id].name;
-                }
-            },
+            },            
             _computeToggle: function(operator) {
                 return operator == 'ALLOW'? true : false;
             },
@@ -409,11 +386,27 @@
                     }
                     this.set('rules.#'+ind+'.action', raction);
                 }
+                // case of changing indettype 
+                // else if (e.detail.item.attributes.class.nodeValue.indexOf('indettype') > -1){
+                //     var indettype = e.detail.item.textContent.trim().toLowerCase();
+                //     if (indettype == 'tags') {
+                        // this.set('rules.#'+ind+'.rid', '');
+                        // var tags = Object.keys(this.rules[ind].rtags).length > 0 ? this.rules[ind].tags : {'add_tags':null};
+                        // this.set('rules.#'+ind+'.rtags', tags);
+                    // }
+                    // else {
+                        // var id = this.rules[ind].rid ? this.rules[ind].rid :'select resource';
+                        // this.set('rules.#'+ind+'.rid', id);
+                        // this.set('rules.#'+ind+'.rtags', {});
+                    // }
+                    
+                // }
+
                 if(this.formError){
                     this.set('formError', false);
                 }
                 this.set('formReady', true);
-            },
+            },            
             _addRule: function(e){
                 var emptyRuleObj = {
                     action: '',
@@ -519,7 +512,8 @@
             },
             pretify: function(item){
                 return item.replace('_',' ').toUpperCase();
-            }
+            },
+            
         });
     })();
 </script>
