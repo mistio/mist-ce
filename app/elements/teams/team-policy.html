@@ -125,6 +125,11 @@
         .errormsg-container iron-icon {
             color: inherit;
         }
+        .head iron-icon {
+            opacity: 0.32;
+            width: 13px;
+            height: 13px;
+        }
         .pull-right {
             float: right;
         }
@@ -142,7 +147,7 @@
             margin-top: -12px;
         }
         paper-dropdown-menu.short {
-            width: 80px;
+            /*width: 80px;*/
             margin-right: 16px;
         }
         paper-input ::content div.floated-label-placeholder{
@@ -162,7 +167,9 @@
                 <span>operator</span>
                 <span>resource</span>
                 <span>action</span>
-                <span>resource identifier</span>
+                <span>condition <iron-icon id="condition" icon="icons:help"></iron-icon>
+                   <paper-tooltip for="condition" position="top">Multiple tags will apply an AND operation </paper-tooltip>
+                </span>
                 <span></span>
             </div>
 	        <template is="dom-repeat" items="[[rules]]" as="rule" id="rulesrepeat">
@@ -200,7 +207,6 @@
 		                </span>
 	                </span>
 	                <span class="identifier">
-                        where
                         <rule-identifier model="[[model]]" rule="[[rule]]" rtype="[[rule.rtype]]" rtags="[[rule.rtags]]" index="[[index]]"></rule-identifier>
                     </span>
                     <span class="delete">

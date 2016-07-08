@@ -23,7 +23,7 @@
             margin-top: -12px;
         }
         paper-dropdown-menu.short {
-            width: 80px;
+            /*width: 80px;*/
             margin-right: 16px;
         }
         paper-input ::content div.floated-label-placeholder{
@@ -63,8 +63,9 @@
         </style>
         <paper-dropdown-menu class="short" no-animations>
         	<paper-listbox class="dropdown-content" selected="[[selectedIndetifierType]]">
-                <paper-item class="indettype">ID</paper-item>
-                <paper-item class="indettype">TAGS</paper-item>
+        		<paper-item class="indettype" value="always">ALWAYS</paper-item>
+                <paper-item class="indettype" value="ID" hidden$="[[!rtype.length]]">WHERE ID</paper-item>
+                <paper-item class="indettype" value="TAGS">WHERE TAGS</paper-item>
           	</paper-listbox>
         </paper-dropdown-menu>
 
@@ -154,15 +155,24 @@
             _updateIdentifier: function(e){
                 // case of changing indettype 
                 if (e.detail.item.attributes.class.nodeValue.indexOf('indettype') > -1){
-                    var indettype = e.detail.item.textContent.trim().toLowerCase();
+                	console.log(e.detail);
+                    var indettype = e.detail.item.attributes.value.value.toLowerCase();
                     if (indettype == 'tags') {
                         this.set('showDropDown', false);
                         this.set('showTags', true);
+                    	// this.fire('update-rid', {'index': this.index, 'rid': ''});
                     }
-                    else {
+                    else if (indettype == 'id'){
                         var id = this.rule.rid;
                      	this.set('showDropDown', true); 
                      	this.set('showTags', false);
+                        // this.fire('update-rtags', {'index': this.index, 'rtags': {}});
+                    }
+                    else {
+                    	this.set('showDropDown', false);
+                        this.set('showTags', false);
+                    	this.fire('update-rid', {'index': this.index, 'rid': ''});
+                    	this.fire('update-rtags', {'index': this.index, 'rtags': {}});
                     }
                     
                 }
@@ -176,7 +186,6 @@
                     	})
                     	rid = mach.uuid;
                     }
-                    console.log('////input',e.detail.item.value, 'rid', rid, 'index', this.index);
                     this.fire('update-rid', {'index': this.index, 'rid': rid});
                 }
             },
@@ -222,10 +231,10 @@
             },
             _computeSelectedIdentifierType: function(rule){
                 if (rule.rid.length > 0) {
-                    return 0;
+                    return 1;
                 }
                 else {
-                    return Object.keys(this.rule.rtags).length > 0 ? 1 : null;
+                    return Object.keys(this.rule.rtags).length > 0 ? 2 : 0;
                 }
             },
             _computeRuleDD: function(rule, rtype, model){
