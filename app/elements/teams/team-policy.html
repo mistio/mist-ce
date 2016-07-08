@@ -52,7 +52,7 @@
         	display: table-cell;
             border-left: 1px solid #eee;
         	padding: 8px;
-        }
+        }        
         .rule .tag {
         	display: inline-block;
         	vertical-align: middle;
@@ -127,8 +127,11 @@
         }
         .head iron-icon {
             opacity: 0.32;
-            width: 13px;
-            height: 13px;
+            width: 20px;
+            height: 20px;
+        }
+        paper-tooltip ::content #tooltip{
+            font-size: 12px;
         }
         .pull-right {
             float: right;
@@ -159,7 +162,17 @@
         paper-input ::content paper-input-container {
             padding: 0;
         }
-        
+        @media (max-width: 1380px) { 
+            .rule > span {
+                vertical-align: top;
+            }
+            .narrow-hide {
+                display: none;
+            }
+            paper-toggle-button {
+                display: block !important;
+            }
+        }
         </style>
         <div id="rules">
             <div class="rule head">
@@ -168,7 +181,10 @@
                 <span>resource</span>
                 <span>action</span>
                 <span>condition <iron-icon id="condition" icon="icons:help"></iron-icon>
-                   <paper-tooltip for="condition" position="top">Multiple tags will apply an AND operation </paper-tooltip>
+                   <paper-tooltip for="condition" position="top">
+                        A conditional rule will apply to either a specified resource, <br/>
+                        or resources that have ALL specified tags. <br/>
+                        Tags must be comma separated. </paper-tooltip>
                 </span>
                 <span></span>
             </div>
@@ -182,7 +198,7 @@
 	                	<span id$="index-[[index]]" class="operator-text">[[rule.operator]] </span>
                     </span>
                     <span class="resource">
-                        <span>
+                        <span class="narrow-hide">
                             on 
                         </span>
                         <span class="uppercase">
