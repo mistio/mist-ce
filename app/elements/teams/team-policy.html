@@ -311,7 +311,9 @@
                 'end': '_orderChanged',
                 'iron-select': '_updateRule',
                 'delete-rtag': '_deleteRtag',
-                '_update-rtags': '_updateRtags'
+                'update-rtags': '_updateRtags',
+                'update-rid': '_updateRid'
+
             },            
             attached: function(){
                 var el = document.getElementById('rules');
@@ -412,12 +414,15 @@
             _updateRtags: function(e){
                 var ind = e.detail.index,
                     rtags = e.detail.rtags;
-                console.log('_updateRtags 1',e.detail, rtags);
-                
                 this.set('rules.#'+ind+'.rid', '');
                 this.set('rules.#'+ind+'.rtags', rtags);
-
-                console.log('_updateRtags 2', this.rules[ind].rtags, this.rules[ind].rid);
+                this.ruleHasChanges();
+            },
+            _updateRid: function(e){
+                var ind = e.detail.index,
+                    rid = e.detail.rid;
+                this.set('rules.#'+ind+'.rid', rid);
+                this.set('rules.#'+ind+'.rtags', {});
                 this.ruleHasChanges();
             },
             _addRule: function(e){

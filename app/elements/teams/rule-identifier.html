@@ -68,7 +68,7 @@
           	</paper-listbox>
         </paper-dropdown-menu>
 
-        <span hidden$="[[!ruleHasTags]]">
+        <span hidden$="[[!showTags]]">
             <template is="dom-repeat" items="[[tags]]" as="tag">
             	<span class="tag" class="flex" hidden$="[[showEdit]]">[[tag]] <iron-icon id$="tag-[[index]]" icon="close" on-tap="_deleteTag"></iron-icon></span>
             </template>
@@ -166,15 +166,29 @@
                     }
                     
                 }
+                // case of choοsing rid                 
+                if (e.detail.item.attributes.class.nodeValue.indexOf('rid') > -1){
+                    var rid = e.detail.item.value;
+                    // only in case of machines we need uuid instead
+                    if (this.rtype == 'machine'){
+                    	var mach = this.model.machinesArray.find(function(m){
+                    		return m.id == rid;
+                    	})
+                    	rid = mach.uuid;
+                    }
+                    console.log('////input',e.detail.item.value, 'rid', rid, 'index', this.index);
+                    this.fire('update-rid', {'index': this.index, 'rid': rid});
+                }
             },
             _ruleHasTags: function(rule, tags){
+            	if (Object.keys(rule.rtags).length > 0)
+            		this.showTags = true;
             	return Object.keys(rule.rtags).length > 0 ? true : false;
             },
             _ruleHasId: function(rule){
                 return rule.rid.length > 0 ? true : false;
             },
             _computeRTags: function(tags, rtags){
-            	console.log(rtags);
             	if (tags) {
 	            	var arrTags = Object.keys(tags); 
 	                for (var i=0; i < arrTags.length; i++) {
@@ -207,7 +221,7 @@
                 }
             },
             _computeSelectedIdentifierType: function(rule){
-                if (rule.rid) {
+                if (rule.rid.length > 0) {
                     return 0;
                 }
                 else {
@@ -240,7 +254,13 @@
                     var i;
                     var obj = this.model[rule.rtype+'sArray'].find(function(r, index){
                         i = index;
-                        return r.id == rule.rid;
+                        console.log('_computeSelectedRuleDD',rule.rid, i)
+                        if (rule.rtype != 'machine'){
+                        	return r.id == rule.rid;
+                        }
+                        else{
+                        	return r.uuid == rule.rid;
+                        }
                     });
                     return i;
                 }
@@ -262,7 +282,7 @@
 	            	}
             	}, this);
             	console.log('newRtags',newRtags);
-            	this.fire('_update-rtags', {'index': this.index, 'rtags': newRtags});
+            	this.fire('update-rtags', {'index': this.index, 'rtags': newRtags});
             },
             _deleteTag: function(e){
             	var tag = e.detail.sourceEvent.path[1].textContent.split('=')[0].trim();
