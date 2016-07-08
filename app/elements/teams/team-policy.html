@@ -231,7 +231,7 @@
 		                </span>
 	                </span>
 	                <span class="identifier">
-                        <rule-identifier model="[[model]]" rule="[[rule]]" rtype="[[rule.rtype]]" rtags="[[rule.rtags]]" index="[[index]]"></rule-identifier>
+                        <rule-identifier model="[[model]]" rule="[[rule]]" rtype="[[rule.rtype]]" rtags="[[rule.rtags]]" index="[[index]]" rid="[[rule.rid]]"></rule-identifier>
                     </span>
                     <span class="delete">
                         <iron-icon id$="delete-[[index]]" icon="close" on-tap="_deleteRule"></iron-icon>
@@ -385,9 +385,38 @@
                 this.set("defaultOperator", newString);
 
                 // copy the rules array to a new array by .slice(0)
-                var initial = this.team.policy.rules;
-                var newArr = initial.slice(0);                
-                this.set("rules", newArr);
+                // var initial = this.team.policy.rules;
+                // var newArr = initial.slice(0);
+                // clean copy of items
+                var newArr = [];
+                this.team.policy.rules.forEach(function(rule, i){
+                    var cleanCopy = {};
+                    for(var p in rule) {
+                        if (typeof rule[p] == 'string'){
+                            var initial = rule[p];
+                            var str = initial.slice(0);
+                            cleanCopy[p] = str;
+                        }
+                        //case of rule tags
+                        else if (typeof rule[p] == 'object') {
+                            var obj = {};
+                            for(var q in rule[p]) {
+                                var initialq = q;
+                                // var key = initial.slice(0);
+                                var val = null;
+                                if (rule[p][q] != null){
+                                    var initialv = rule[p][q];
+                                        val = initialv.slice(0);
+                                }
+                                obj[initialq] = val;
+                            }
+                            cleanCopy[p] = obj;
+                        }
+                    }
+                    newArr[i] = cleanCopy;
+                });
+                var cleanCopyRules = newArr.slice(0);
+                this.set("rules", cleanCopyRules);
 
                 //initialize new order
                 this.set('newOrder',[])
@@ -497,9 +526,39 @@
                 this.ruleHasChanges();
             },
             _resetForm: function(){
-                var initial = this.team.policy.rules;
-                var newArr = initial.slice(0);
-                this.set("rules", newArr);
+                // var initial = this.team.policy.rules;
+                // var newArr = initial.slice(0);
+                // this.set("rules", newArr);
+                var newArr = [];
+                this.team.policy.rules.forEach(function(rule, i){
+                    var cleanCopy = {};
+                    for(var p in rule) {
+                        if (typeof rule[p] == 'string'){
+                            var initial = rule[p];
+                            var str = initial.slice(0);
+                            cleanCopy[p] = str;
+                        }
+                        //case of rule tags
+                        else if (typeof rule[p] == 'object') {
+                            var obj = {};
+                            for(var q in rule[p]) {
+                                var initialq = q;
+                                // var key = initial.slice(0);
+                                var val = null;
+                                if (rule[p][q] != null){
+                                    var initialv = rule[p][q];
+                                        val = initialv.slice(0);
+                                }
+                                obj[initialq] = val;
+                            }
+                            cleanCopy[p] = obj;
+                        }
+                    }
+                    newArr[i] = cleanCopy;
+                });
+                var cleanCopyRules = newArr.slice(0);
+                this.set("rules", cleanCopyRules);
+
                 for (var i = 0; i < newArr.length; i++) {
                     this.set('rules.#'+i+'.operator', newArr[i].operator);
                 }
@@ -573,6 +632,8 @@
                     this.set('formError', false);
                 }
                 this.set('formReady', true);
+
+                console.log(this.rules[0], this.team.policy.rules[0] );
             }
             
         });

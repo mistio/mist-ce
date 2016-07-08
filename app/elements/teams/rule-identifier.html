@@ -104,9 +104,10 @@
             	index: Number,
             	rtype: String,
             	rtags: Object,
+            	rid: String,
             	selectedIndetifierType: {
             		type: Number,
-            		computed: "_computeSelectedIdentifierType(rule)"
+            		computed: "_computeSelectedIdentifierType(rule, rtags, rid)"
             	},
             	resourceDropDown: {
             		type: Array,
@@ -114,7 +115,7 @@
             	},
             	selectedResource: {
             		type: Number,
-            		computed: "_computeSelectedRuleDD(rule, model)"
+            		computed: "_computeSelectedRuleDD(rule, model, rid)"
             	},
             	showDropDown: {
             		type: Boolean,
@@ -230,7 +231,7 @@
                     return mod[id].name;
                 }
             },
-            _computeSelectedIdentifierType: function(rule){
+            _computeSelectedIdentifierType: function(rule, rtags, rid){
                 if (rule.rid.length > 0) {
                     return 1;
                 }
@@ -245,21 +246,8 @@
                 else {
                     return [{name:'no '+rtype+'s found'}];
                 }
-            },
-            _computeRuleCombo: function(rtype){
-                if (rtype && this.model[rtype+'sArray'].length > 0) {
-                    var ar = [];
-                    for (var i=0; i<this.model[rtype+'sArray'].length; i++){
-                        var name = this.model[rtype+'sArray'][i].title ? this.model[rtype+'sArray'][i].title : this.model[rtype+'sArray'][i].name;
-                        ar.push(name);
-                    }
-                    return ar;
-                }
-                else {
-                    return [{name:'no '+rtype+'s found'}];
-                }
-            },
-            _computeSelectedRuleDD: function(rule, model){
+            },           
+            _computeSelectedRuleDD: function(rule, model, rid){
                 if (rule.rid && rule.rid.length > 0){
                     var i;
                     var obj = this.model[rule.rtype+'sArray'].find(function(r, index){
