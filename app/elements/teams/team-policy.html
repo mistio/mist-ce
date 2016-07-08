@@ -201,7 +201,7 @@
 	                </span>
 	                <span class="identifier">
                         where
-                        <rule-identifier model="[[model]]" rule="[[rule]]" rtype="[[rule.rtype]]" index="[[index]]"></rule-identifier>
+                        <rule-identifier model="[[model]]" rule="[[rule]]" rtype="[[rule.rtype]]" rtags="[[rule.rtags]]" index="[[index]]"></rule-identifier>
                     </span>
                     <span class="delete">
                         <iron-icon id$="delete-[[index]]" icon="close" on-tap="_deleteRule"></iron-icon>
@@ -341,7 +341,7 @@
                     },this)
                 }, this);
 
-                this.set('formReady', true);
+                this.ruleHasChanges();
             },
             _teamChanged: function(team, rules, teams){
                 // copy default operator to a new string
@@ -389,10 +389,7 @@
                     this.set('rules.#'+ind+'.action', raction);
                 }
 
-                if(this.formError){
-                    this.set('formError', false);
-                }
-                this.set('formReady', true);
+                this.ruleHasChanges();
             },
             _deleteRtag: function(e){
                 var ind = e.detail.index,
@@ -409,22 +406,19 @@
                 }
                 delete rtags[tag];
                 this.set('rules.#'+ind+'.rtags', rtags);
-                if(this.formError){
-                    this.set('formError', false);
-                }
-                this.set('formReady', true);
+                
+                this.ruleHasChanges();
             },
             _updateRtags: function(e){
                 var ind = e.detail.index,
                     rtags = e.detail.rtags;
-                console.log('_updateRtags',e.detail, rtags);
+                console.log('_updateRtags 1',e.detail, rtags);
                 
+                this.set('rules.#'+ind+'.rid', '');
                 this.set('rules.#'+ind+'.rtags', rtags);
 
-                if(this.formError){
-                    this.set('formError', false);
-                }
-                this.set('formReady', true);
+                console.log('_updateRtags 2', this.rules[ind].rtags, this.rules[ind].rid);
+                this.ruleHasChanges();
             },
             _addRule: function(e){
                 var emptyRuleObj = {
@@ -437,6 +431,8 @@
                 this.push('rules', emptyRuleObj);
                 this.set('formReady', true);
                 this.push('newOrder', emptyRuleObj)
+
+                this.ruleHasChanges();
             },
             _deleteRule: function(e){
                 var target = e.detail.sourceEvent.path[0];
@@ -444,6 +440,8 @@
                 this.splice('rules',index,1);
                 this.set('formReady', true);
                 this.splice('newOrder', index, 1)
+
+                this.ruleHasChanges();
             },
             _changeOperator: function(e){
                 var path = e.detail.sourceEvent.path;
@@ -458,7 +456,7 @@
                 else {
                     this.set('defaultOperator', newOp);
                 }
-                this.set('formReady', true);
+                this.ruleHasChanges();
             },
             _resetForm: function(){
                 var initial = this.team.policy.rules;
@@ -532,6 +530,12 @@
             pretify: function(item){
                 return item.replace('_',' ').toUpperCase();
             },
+            ruleHasChanges: function(){
+                if(this.formError){
+                    this.set('formError', false);
+                }
+                this.set('formReady', true);
+            }
             
         });
     })();

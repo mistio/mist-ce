@@ -68,7 +68,7 @@
           	</paper-listbox>
         </paper-dropdown-menu>
 
-        <span hidden$="[[!_ruleHasTags(rule)]]">
+        <span hidden$="[[!ruleHasTags]]">
             <template is="dom-repeat" items="[[tags]]" as="tag">
             	<span class="tag" class="flex" hidden$="[[showEdit]]">[[tag]] <iron-icon id$="tag-[[index]]" icon="close" on-tap="_deleteTag"></iron-icon></span>
             </template>
@@ -102,6 +102,7 @@
             	},
             	index: Number,
             	rtype: String,
+            	rtags: Object,
             	selectedIndetifierType: {
             		type: Number,
             		computed: "_computeSelectedIdentifierType(rule)"
@@ -125,7 +126,7 @@
             	ruleHasTags: {
             		type: Boolean,
             		value: false,
-            		computed: "_ruleHasTags(rule)"
+            		computed: "_ruleHasTags(rule, rtags)"
             	},
             	showEdit: {
             		type: Boolean,
@@ -137,7 +138,7 @@
             	},
             	tags: {
             		type: Array,
-            		computed: '_computeRTags(rule.rtags)'
+            		computed: '_computeRTags(rule.rtags, rtags)'
             	}
             },
             listeners: {
@@ -159,20 +160,21 @@
                         this.set('showTags', true);
                     }
                     else {
-                        var id = this.rule.rid ? this.rule.rid :'select resource';
+                        var id = this.rule.rid;
                      	this.set('showDropDown', true); 
                      	this.set('showTags', false);
                     }
                     
                 }
             },
-            _ruleHasTags: function(rule){
+            _ruleHasTags: function(rule, tags){
             	return Object.keys(rule.rtags).length > 0 ? true : false;
             },
             _ruleHasId: function(rule){
                 return rule.rid.length > 0 ? true : false;
             },
-            _computeRTags: function(tags){
+            _computeRTags: function(tags, rtags){
+            	console.log(rtags);
             	if (tags) {
 	            	var arrTags = Object.keys(tags); 
 	                for (var i=0; i < arrTags.length; i++) {
