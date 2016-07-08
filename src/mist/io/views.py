@@ -10,7 +10,6 @@ be performed inside the corresponding method functions.
 """
 
 import re
-import socket
 import requests
 import json
 import mongoengine as me

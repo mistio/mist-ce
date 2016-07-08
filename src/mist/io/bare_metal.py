@@ -97,7 +97,7 @@ class BareMetalDriver(object):
         state = NODE_STATE_MAP['unknown']
         if not hostname:
             return state
-        socket.setdefaulttimeout(10)
+        socket.setdefaulttimeout(5)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         ports_list = [22, 80, 443, 3389]
@@ -127,7 +127,8 @@ class BareMetalDriver(object):
         """
         if not hostname:
             return 256
-        response = super_ping(owner=user, host=hostname, system_util=True)
+        ping = super_ping(owner=user, host=hostname, pkts=1)
+        response = 0 if int(ping['packets_rx']) > 0 else 256
         return response
 
 

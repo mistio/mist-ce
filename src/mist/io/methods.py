@@ -19,7 +19,6 @@ from datetime import datetime
 from hashlib import sha256
 from StringIO import StringIO
 from tempfile import NamedTemporaryFile
-from netaddr import IPSet, IPNetwork
 from xml.sax.saxutils import escape
 
 from libcloud.compute.providers import get_driver
@@ -54,9 +53,8 @@ from mist.core import config
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
-from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver, CoreOSDriver
-from mist.io.helpers import check_host, sanitize_host, extract_port
+from mist.io.helpers import check_host, sanitize_host
 from mist.io.helpers import transform_key_machine_associations
 from mist.io.exceptions import *
 
@@ -68,7 +66,8 @@ from mist.io.helpers import StdStreamCapture
 import mist.io.tasks
 import mist.io.inventory
 
-import mist.core.vpn.methods
+from mist.core.vpn.methods import destination_nat as dnat
+from mist.core.vpn.methods import super_ping
 
 
 import logging
@@ -382,8 +381,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
     machine.ssh_port = port
     machine.remote_desktop_port = rdp_port
     if machine_hostname:
-        if mist.core.vpn.methods.to_tunnel(user, machine_hostname) and \
-                is_private_subnet(socket.gethostbyname(machine_hostname)):
+        if is_private_subnet(socket.gethostbyname(machine_hostname)):
             machine.private_ips = [machine_hostname]
         else:
             machine.dns_name = machine_hostname
@@ -460,8 +458,7 @@ def _add_cloud_coreos(user, title, provider, params):
     machine = Machine()
     machine.ssh_port = port
     if machine_hostname:
-        if mist.core.vpn.methods.to_tunnel(user, machine_hostname) and \
-                is_private_subnet(socket.gethostbyname(machine_hostname)):
+        if is_private_subnet(socket.gethostbyname(machine_hostname)):
             machine.private_ips = [machine_hostname]
         else:
             machine.dns_name = machine_hostname
@@ -1324,7 +1321,7 @@ def connect_provider(cloud):
         temp_key_file.close()
         conn = driver(cloud.apikey, temp_key_file.name)
     elif cloud.provider == Provider.OPENSTACK:
-        auth_url = mist.core.vpn.methods.destination_nat(cloud.owner, cloud.apiurl)
+        auth_url = dnat(cloud.owner, cloud.apiurl)
         conn = driver(
             cloud.apikey,
             cloud.apisecret,
@@ -1344,8 +1341,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.GCE:
         conn = driver(cloud.apikey, cloud.apisecret, project=cloud.tenant_name)
     elif cloud.provider == Provider.DOCKER:
-        docker_host, docker_port = mist.core.vpn.methods.destination_nat(
-                cloud.owner, cloud.apiurl, cloud.docker_port)
+        docker_host, docker_port = dnat(cloud.owner, cloud.apiurl, cloud.docker_port)
         if cloud.key_file and cloud.cert_file:
             # tls auth, needs to pass the key and cert as files
             key_temp_file = NamedTemporaryFile(delete=False)
@@ -1359,15 +1355,15 @@ def connect_provider(cloud):
                 ca_cert_temp_file = NamedTemporaryFile(delete=False)
                 ca_cert_temp_file.write(cloud.ca_cert_file)
                 ca_cert_temp_file.close()
-                conn = driver(host=cloud.apiurl,
-                              port=cloud.docker_port,
+                conn = driver(host=docker_host,
+                              port=docker_port,
                               key_file=key_temp_file.name,
                               cert_file=cert_temp_file.name,
                               ca_cert=ca_cert_temp_file.name,
                               verify_match_hostname=False)
             else:
-                conn = driver(host=cloud.apiurl,
-                              port=cloud.docker_port,
+                conn = driver(host=docker_host,
+                              port=docker_port,
                               key_file=key_temp_file.name,
                               cert_file=cert_temp_file.name,
                               verify_match_hostname=False)
@@ -1378,7 +1374,7 @@ def connect_provider(cloud):
     elif cloud.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        api_url = mist.core.vpn.methods.destination_nat(cloud.owner, cloud.apiurl)
+        api_url = dnat(cloud.owner, cloud.apiurl)
         conn = driver(cloud.apikey, cloud.apisecret, host=api_url, verify_match_hostname=False)
     elif cloud.provider == Provider.DIGITAL_OCEAN:
         if cloud.apikey == cloud.apisecret:  # API v2
@@ -1387,7 +1383,7 @@ def connect_provider(cloud):
             driver = get_driver('digitalocean_first_gen')
             conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider == Provider.VSPHERE:
-        api_url = mist.core.vpn.methods.destination_nat(cloud.owner, cloud.apiurl)
+        api_url = dnat(cloud.owner, cloud.apiurl)
         conn = driver(host=api_url, username=cloud.apikey, password=cloud.apisecret)
     elif cloud.provider == 'bare_metal':
         conn = BareMetalDriver(Machine.objects(cloud=cloud))
@@ -1396,15 +1392,11 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if cloud.apisecret:
-            host, port = mist.core.vpn.methods.destination_nat(cloud.owner,
-                                                               cloud.apiurl,
-                                                               cloud.ssh_port)
+            host, port = dnat(cloud.owner, cloud.apiurl, cloud.ssh_port)
             conn = driver(host, hypervisor=cloud.apiurl, user=cloud.apikey,
                           ssh_key=cloud.apisecret, ssh_port=port)
         else:
-            api_url, tcp_port = mist.core.vpn.methods.destination_nat(cloud.owner,
-                                                                      cloud.apiurl,
-                                                                      5000)
+            api_url, tcp_port = dnat(cloud.owner, cloud.apiurl, 5000)
             conn = driver(api_url, hypervisor=cloud.apiurl, user=cloud.apikey,
                           tcp_port=tcp_port)
     else:
@@ -3821,13 +3813,16 @@ def disable_monitoring(user, cloud_id, machine_id, no_ssh=False):
     trigger_session_update(user, ['monitoring'])
 
 
+# TODO deprecate this!
+# We should decouple probe_ssh_only from ping.
+# Use them as two separate functions instead & through celery
 def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
     """Ping and SSH to machine and collect various metrics."""
 
     if not host:
         raise RequiredParameterMissingError('host')
 
-    ping = mist.core.vpn.methods.super_ping(owner=user, host=host)
+    ping = super_ping(owner=user, host=host)
     try:
         ret = probe_ssh_only(user, cloud_id, machine_id, host,
                              key_id=key_id, ssh_user=ssh_user)
@@ -3835,18 +3830,8 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
         log.error(exc)
         log.warning("SSH failed when probing, let's see what ping has to say.")
         ret = {}
-    if mist.core.vpn.methods.to_tunnel(user, host):
-        ping_out = ping.json()
-        log.info("Ping output over VPN: \n%s packets transmitted, %s received, "
-                 "%s packet loss\nrtt min/avg/max = %s/%s/%s"
-                 % (ping_out['packets_tx'], ping_out['packets_rx'], ping_out['packets_loss'],
-                    ping_out['rtt_min'], ping_out['rtt_avg'], ping_out['rtt_max']))
-    else:
-        ping_out = ping.stdout.read()
-        ping.wait()
-        log.info("Ping output: %s" % ping_out)
-        ping_out = parse_ping(ping_out)
-    ret.update(ping_out)
+
+    ret.update(ping)
     return ret
 
 
@@ -3921,14 +3906,7 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
 
 
 def ping(host, user=None):
-    ping = mist.core.vpn.methods.super_ping(user, host=host)
-    if mist.core.vpn.methods.to_tunnel(user, host):
-        ping_out = ping.json()
-    else:
-        ping_out = ping.stdout.read()
-        ping.wait()
-        ping_out = parse_ping(ping_out)
-    return ping_out
+    return super_ping(user, host=host)
 
 
 def find_public_ips(ips):

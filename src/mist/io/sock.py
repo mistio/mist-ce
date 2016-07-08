@@ -26,7 +26,7 @@ try:
     from mist.core.cloud.models import Cloud, Machine
     from mist.core.keypair.models import Keypair
     from mist.core.vpn.models import Tunnel
-    from mist.core.vpn.methods import to_tunnel
+    from mist.core.vpn.methods import get_tunnel
     multi_user = True
 except ImportError:
     from mist.io import config
@@ -361,18 +361,10 @@ class MainConnection(MistConnection):
                         # the list of machines
                         ips = filter(lambda ip: ':' not in ip,
                                      machine.get('private_ips', []))
-                        for tunnel in Tunnel.objects(owner=self.owner):
-                            for cidr in tunnel.cidrs:
-                                if netaddr.IPAddress(str(ips[0])) in \
-                                        netaddr.IPNetwork(str(cidr)):
-                                    break
-                            else:
-                                continue
-                            break
-                        else:
+                        tunnel = get_tunnel(self.owner, ips[0])
+                        if not tunnel:
                             if ips[0] not in ioconfig.EXCLUDED_PRIVATE_ADDRESSES:
                                 continue
-                            pass
 
                     has_key = False
                     keypairs = Keypair.objects(owner=self.owner)

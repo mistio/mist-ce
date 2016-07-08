@@ -1,15 +1,13 @@
-import socket
-
 try:
     from mist.core.user.models import User
     from mist.core.cloud.models import Cloud, Machine, KeyAssociation
     from mist.core.keypair.models import Keypair
     from mist.core import config
+    from mist.core.vpn.methods import destination_nat as dnat
 except ImportError:
     from mist.io import config, model
 
 import mist.io.methods
-import mist.core.vpn.methods
 
 
 class MistInventory(object):
@@ -34,8 +32,7 @@ class MistInventory(object):
             except Exception as exc:
                 print exc
                 continue
-            ip_addr, port = mist.core.vpn.methods.destination_nat(self.user,
-                                                                  ip_addr, port)
+            ip_addr, port = dnat(self.user, ip_addr, port)
             if key_id not in self.keys:
                 keypair = Keypair.objects.get(owner=self.user, name=key_id)
                 self.keys[key_id] = keypair.private
