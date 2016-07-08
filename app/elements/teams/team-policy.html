@@ -162,6 +162,14 @@
         paper-input ::content paper-input-container {
             padding: 0;
         }
+        .notice {
+            font-size: 0.9em;
+            opacity: 0.54;
+            padding-left: 40px;
+        }
+        .notice iron-icon {
+            opacity: 0.6;
+        }
         @media (max-width: 1380px) { 
             .rule > span {
                 vertical-align: top;
@@ -241,6 +249,9 @@
                 <paper-toggle-button id="defaultoperator" class="operator" checked$="[[_computeToggle(defaultOperator)]]" [[_computeDisabled(team)]] on-tap="_changeOperator"></paper-toggle-button>
                 <span id="defaultoperator" class="operator-text">[[defaultOperator]] </span> 
                 every other action ON any other resource
+                <span class="notice" hidden$="[[!_computeToggle(defaultOperator)]]"> 
+                    <iron-icon icon="icons:warning"></iron-icon> This option will allow EVERY action on anything not specified in the policy above.
+                </span>
             </paper-item>
         </div>
         <div id="changeRecord" hidden>
