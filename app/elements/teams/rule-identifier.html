@@ -48,6 +48,12 @@
         		opacity: 0.32;
         	}
         }
+        .tag iron-icon {
+        	color: #fff;
+        	width: 13px;
+        	height: 13px;
+        	cursor: pointer;
+        }
         </style>
         <paper-dropdown-menu class="short" no-animations>
         	<paper-listbox class="dropdown-content" selected="[[selectedIndetifierType]]">
@@ -56,19 +62,20 @@
           	</paper-listbox>
         </paper-dropdown-menu>
 
-        <span hidden$="[[!_ruleHasTags(rule)]]">
-            <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
-                <span class="tag" class="flex">[[tag]]</span>
-                <!-- <paper-input class="flex" value="[[tag]]"></paper-input> -->
-            </template>
-        </span>
 
         <span hidden$="[[!showInputField]]">
-        	<paper-input class="flex" value=""></paper-input>
+	        <span hidden$="[[!_ruleHasTags(rule)]]">
+	            <template is="dom-repeat" items="[[_computeRTags(rule.rtags)]]" as="tag">
+<!-- 	        	<paper-input class="flex" value="[[tag]]"></paper-input> -->
+	            	<span class="tag" class="flex">[[tag]] <iron-icon icon="icons:remove-circle-outline" on-tap="_deleteTag"></iron-icon></span>
+	            </template>
+	        </span>
+	        <paper-input class="flex" value=""></paper-input>
+
         </span>
 
         <span hidden$="[[!_ruleHasId(rule)]]">
-            <paper-input value="[[rule.rid]]" class="flex"></paper-input>
+            <!-- <paper-input value="[[rule.rid]]" class="flex"></paper-input> -->
         </span>
 
         <span hidden$="[[!showDropDown]]">
@@ -100,15 +107,17 @@
             properties: {
             	model: Object,
             	rule: Object,
+            	rtype: String,
             	selectedIndetifierType: {
             		type: Number,
             		computed: "_computeSelectedIdentifierType(rule)"
             	},
             	resourceDropDown: {
             		type: Array,
-            		computed: "_computeRuleDD(rule, model)"
+            		computed: "_computeRuleDD(rule, rtype, model)"
             	},
             	selectedResource: {
+            		type: Number,
             		computed: "_computeSelectedRuleDD(rule, model)"
             	},
             	showDropDown: {
@@ -188,13 +197,13 @@
                     return Object.keys(this.rule.rtags).length > 0 ? 1 : null;
                 }
             },
-            _computeRuleDD: function(rule, model){
-                console.log(rule.rtype, model);
-                if (rule.rtype && rule.rtype!='' && this.model[rule.rtype+'sArray'] && this.model[rule.rtype+'sArray'].length > 0) {
-                    return this.model[rule.rtype+'sArray'];
+            _computeRuleDD: function(rule, rtype, model){
+                console.log(rtype, model);
+                if (rtype && rtype!='' && this.model[rtype+'sArray'] && this.model[rtype+'sArray'].length > 0) {
+                    return this.model[rtype+'sArray'];
                 }
                 else {
-                    return [{name:'no '+rule.rtype+'s found'}];
+                    return [{name:'no '+rtype+'s found'}];
                 }
             },
             _computeRuleCombo: function(rtype){
