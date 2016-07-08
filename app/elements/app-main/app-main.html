@@ -216,7 +216,7 @@
             this.set('q',e.detail);
         },
         _currentChanged: function() {
-            console.log('current: ', this.current);
+            // console.log('current: ', this.current);
         },
         ready: function() {
             this.model = {
@@ -234,6 +234,80 @@
                     clouds: true,
                     monitoring: true
                 }
+            };
+            this.model.permissions = {
+                'cloud': [
+                    'add',
+                    'read',
+                    'edit',
+                    'remove',
+                    'create_resources',
+                    'edit_tags',
+                    'read_logs',
+                ],
+                'machine': [
+                    'read',
+                    'edit',
+                    'create',
+                    'edit_tags',
+                    'edit_rules',
+                    'edit_graphs',
+                    'edit_custom_metrics',
+                    'start',
+                    'stop',
+                    'reboot',
+                    'destroy',
+                    'resize',
+                    'run_script',
+                    'open_shell',
+                    'associate_key',
+                    'disassociate_key',
+                    'read_logs',
+                ],
+                'script': [
+                    'add',
+                    'read',
+                    'edit',
+                    'run',
+                    'remove',
+                    'edit_tags',
+                    'read_logs',
+                ],
+                'key': [
+                    'add',
+                    'read',
+                    'read_private',
+                    'edit',
+                    'remove',
+                    'edit_tags',
+                    'read_logs',
+                ],
+                'template': [
+                    'add',
+                    'read',
+                    'edit',
+                    'remove',
+                    'apply',
+                    'edit_tags',
+                    'read_logs',
+                ],
+                'stack': [
+                    'create',
+                    'read',
+                    'edit',
+                    'remove',
+                    'run_workflow',
+                    'edit_tags',
+                    'read_logs',
+                ],
+                'team': [
+                    'add',
+                    'read',
+                    'edit',
+                    'remove',
+                    'edit_tags',
+                    'read_logs',
+                ],
             };
 
             for(i = 1; i<= this.model.teamsArray.length; i++){
@@ -323,7 +397,7 @@
             if (el.nodeName == 'IRON-ROUTE' && el.title && el.getAttribute("current")) {
                 this.current = el.getAttribute("current");
                 this.title = el.title;
-                console.log("el", e.detail);
+                // console.log("el", e.detail);
                 if (el.nodeName == 'IRON-ROUTE') {
                     this.current = el.getAttribute("current");
                     this.title = el.title;
