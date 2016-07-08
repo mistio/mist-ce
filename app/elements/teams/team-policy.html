@@ -201,7 +201,7 @@
 	                </span>
 	                <span class="identifier">
                         where
-                        <rule-identifier model="[[model]]" rule="[[rule]]" rtype="[[rule.rtype]]"></rule-identifier>
+                        <rule-identifier model="[[model]]" rule="[[rule]]" rtype="[[rule.rtype]]" index="[[index]]"></rule-identifier>
                     </span>
                     <span class="delete">
                         <iron-icon id$="delete-[[index]]" icon="close" on-tap="_deleteRule"></iron-icon>
@@ -309,7 +309,8 @@
             ],
             listeners: {
                 'end': '_orderChanged',
-                'iron-select': '_updateRule'
+                'iron-select': '_updateRule',
+                'delete-rtag': '_deleteRtag'
             },            
             attached: function(){
                 var el = document.getElementById('rules');
@@ -386,27 +387,35 @@
                     }
                     this.set('rules.#'+ind+'.action', raction);
                 }
-                // case of changing indettype 
-                // else if (e.detail.item.attributes.class.nodeValue.indexOf('indettype') > -1){
-                //     var indettype = e.detail.item.textContent.trim().toLowerCase();
-                //     if (indettype == 'tags') {
-                        // this.set('rules.#'+ind+'.rid', '');
-                        // var tags = Object.keys(this.rules[ind].rtags).length > 0 ? this.rules[ind].tags : {'add_tags':null};
-                        // this.set('rules.#'+ind+'.rtags', tags);
-                    // }
-                    // else {
-                        // var id = this.rules[ind].rid ? this.rules[ind].rid :'select resource';
-                        // this.set('rules.#'+ind+'.rid', id);
-                        // this.set('rules.#'+ind+'.rtags', {});
-                    // }
-                    
-                // }
 
                 if(this.formError){
                     this.set('formError', false);
                 }
                 this.set('formReady', true);
-            },            
+            },
+            _deleteRtag: function(e){
+                var ind = e.detail.index,
+                    tag = e.detail.tag;
+                //clean copy rules
+                var rtags = {};
+                for (var p in this.rules[ind].rtags){
+                    if (this.rules[ind].rtags[p] && this.rules[ind].rtags[p] != null)
+                        var copy = this.rules[ind].rtags[p].slice(0);
+                    else {
+                        copy = null;
+                    }
+                    rtags[p] = copy;
+                }
+
+                console.log('BEFORE',rtags);
+                delete rtags[tag];
+                console.log('AFTER',rtags)
+                this.set('rules.#'+ind+'.rtags', rtags);
+                if(this.formError){
+                    this.set('formError', false);
+                }
+                this.set('formReady', true);
+            },         
             _addRule: function(e){
                 var emptyRuleObj = {
                     action: '',
