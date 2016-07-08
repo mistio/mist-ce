@@ -250,7 +250,7 @@
                 <span id="defaultoperator" class="operator-text">[[defaultOperator]] </span> 
                 every other action ON any other resource
                 <span class="notice" hidden$="[[!_computeToggle(defaultOperator)]]"> 
-                    <iron-icon icon="icons:warning"></iron-icon> This option will allow EVERY action on anything not specified in the policy above.
+                    <iron-icon icon="icons:warning"></iron-icon> This option will allow EVERY action on any resource not specified in the policy above.
                 </span>
             </paper-item>
         </div>
@@ -384,9 +384,9 @@
                 var newString = initialOp.slice(0);
                 this.set("defaultOperator", newString);
 
-                // copy the array to a new array by .slice(0)
+                // copy the rules array to a new array by .slice(0)
                 var initial = this.team.policy.rules;
-                var newArr = initial.slice(0);
+                var newArr = initial.slice(0);                
                 this.set("rules", newArr);
 
                 //initialize new order

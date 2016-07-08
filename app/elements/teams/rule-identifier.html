@@ -290,6 +290,7 @@
 	            		newRtags[k] = v;
 	            	}
             	}, this);
+            	this.set('showEdit', false);
             	this.fire('update-rtags', {'index': this.index, 'rtags': newRtags});
             },
             _deleteTag: function(e){
@@ -300,8 +301,7 @@
             hotkeys: function(e){
             	// if 'enter'
             	if (e.keyCode === 13 ) {
-            		this.$.inputField.blur();
-            		this.set('showEdit', false);
+            		this.$.inputField.blur();   		
             		this._updateTags();
             	}
             }
