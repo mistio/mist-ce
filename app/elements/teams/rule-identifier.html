@@ -83,7 +83,7 @@
             </paper-dropdown-menu>
         </span>
         <span hidden$="[[!showTags]]">
-	        <paper-input class="flex" value$="[[tagString]]" hidden$="[[!showEdit]]"></paper-input>
+	        <paper-input id="inputField" class="flex" value$="{{tagString::input}}" hidden$="[[!showEdit]]" on-blur="_updateTags"></paper-input>
 	        <iron-icon class="edit" icon="editor:mode-edit" on-tap="_toggleShowEdit"></iron-icon>
         </span>
     </template>
@@ -141,7 +141,8 @@
             	}
             },
             listeners: {
-            	'iron-select': '_updateIdentifier'
+            	'iron-select': '_updateIdentifier',
+            	keyup: 'hotkeys'
             },
             ready: function(){
 
@@ -172,14 +173,19 @@
                 return rule.rid.length > 0 ? true : false;
             },
             _computeRTags: function(tags){
-            	var arrTags = Object.keys(tags); 
-                for (var i=0; i < arrTags.length; i++) {
-                	var t = arrTags[i];
-                	if (tags[t] != null) {
-                		arrTags[i] = arrTags[i]+'='+tags[t];
-                	}
-                }
-                return arrTags;
+            	if (tags) {
+	            	var arrTags = Object.keys(tags); 
+	                for (var i=0; i < arrTags.length; i++) {
+	                	var t = arrTags[i];
+	                	if (tags[t] != null) {
+	                		arrTags[i] = arrTags[i]+'='+tags[t];
+	                	}
+	                }
+	                return arrTags;
+            	}
+            	else {
+            		return []
+            	}
             },
             _computeLink: function(type, id){
             	if (type && id && type != "cloud") {
@@ -243,11 +249,33 @@
             _toggleShowEdit: function(){
             	this.set('showEdit', !this.showEdit);
             },
+            _updateTags: function(){          	
+            	var tagArr = this.$.inputField.value.split(',');
+            	var newRtags = {};
+            	tagArr.forEach(function(t){
+            		var k = t.split("=")[0].replace(' ','').trim();
+            		if (k !='') {
+	            		var v = t.split("=")[1] ? t.split("=")[1].trim() : null;
+	            		newRtags[k] = v;
+	            	}
+            	}, this);
+            	console.log('newRtags',newRtags);
+            	this.fire('_update-rtags', {'index': this.index, 'rtags': newRtags});
+            },
             _deleteTag: function(e){
             	var tag = e.detail.sourceEvent.path[1].textContent.split('=')[0].trim();
             	var index = e.detail.sourceEvent.path[0].id.split('-')[1];
-            	console.log(e, tag, index);
             	this.fire('delete-rtag', {'index': this.index, 'tag': tag});
+            },
+            hotkeys: function(e){
+            	// if 'enter'
+            	if (e.keyCode === 13){
+
+            		console.log("enetr", Polymer.dom(e).rootTarget)
+            	}
+            	if (e.keyCode === 13 && Polymer.dom(e).rootTarget === this.$.input) {
+            		this._updateTags();
+            	}
             }
         });
     })();

@@ -310,7 +310,8 @@
             listeners: {
                 'end': '_orderChanged',
                 'iron-select': '_updateRule',
-                'delete-rtag': '_deleteRtag'
+                'delete-rtag': '_deleteRtag',
+                '_update-rtags': '_updateRtags'
             },            
             attached: function(){
                 var el = document.getElementById('rules');
@@ -406,16 +407,25 @@
                     }
                     rtags[p] = copy;
                 }
-
-                console.log('BEFORE',rtags);
                 delete rtags[tag];
-                console.log('AFTER',rtags)
                 this.set('rules.#'+ind+'.rtags', rtags);
                 if(this.formError){
                     this.set('formError', false);
                 }
                 this.set('formReady', true);
-            },         
+            },
+            _updateRtags: function(e){
+                var ind = e.detail.index,
+                    rtags = e.detail.rtags;
+                console.log('_updateRtags',e.detail, rtags);
+                
+                this.set('rules.#'+ind+'.rtags', rtags);
+
+                if(this.formError){
+                    this.set('formError', false);
+                }
+                this.set('formReady', true);
+            },
             _addRule: function(e){
                 var emptyRuleObj = {
                     action: '',
