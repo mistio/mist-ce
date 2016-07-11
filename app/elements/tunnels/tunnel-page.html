@@ -5,8 +5,8 @@
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
 
-<!-- <link rel="import" href="script-edit.html">
-<link rel="import" href="script-run.html"> -->
+<link rel="import" href="tunnel-edit.html">
+<!-- <link rel="import" href="script-run.html"> -->
 
 <dom-module id="tunnel-page">
     <template>
@@ -262,8 +262,8 @@
                 page.show('/run-script/' + this.tunnel.id);
             },
             _editTunnel: function(e) {
-                var el = this.querySelector('script-edit');
-                el._openEditScriptModal();
+                var el = this.querySelector('tunnel-edit');
+                el._openEditTunnelModal();
             },
             _updateScript: function(e) {
                 var tunnel = e.detail.tunnel;

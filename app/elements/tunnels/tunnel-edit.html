@@ -1,0 +1,119 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+
+<dom-module id="tunnel-edit">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+            }
+
+            .submit-btn {
+                background-color: var(--mist-blue);
+                color: #fff;
+            }
+
+        </style>
+
+        <paper-dialog id="editTunnelModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Edit Tunnel</h2>
+            <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
+            <paper-dialog-scrollable>
+                <p>
+                    <paper-input id="name" label="Name" error-message="Please enter tunnel's name" value="{{newTunnel.name}}"></paper-input>
+                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter tunnel's description" value="{{newTunnel.description}}"></paper-textarea>
+                </p>
+                <div class="clearfix btn-group">
+                    <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                </div>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <iron-ajax id="tunnelEditAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]" method="PUT" on-response="_handleTunnelEditAjaxResponse" on-error="_handleTunnelEditAjaxError"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'tunnel-edit',
+
+                properties: {
+                    tunnel: {
+                        type: Object
+                    },
+                    newTunnel: {
+                        type: Object,
+                        computed: '_computeNewTunnel(tunnel)',
+                        notify: true
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(newTunnel.name, sendingData)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed'
+                },
+                _computeNewTunnel: function(tunnel) {
+                    return {
+                        name: tunnel.name,
+                        description: tunnel.description
+                    };
+                },
+                _computeFormReady: function(name, sendingData) {
+                    var formReady = false;
+
+                    if (name) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _openEditTunnelModal: function(e) {
+                    this.$.editTunnelModal.open();
+                },
+                _closeEditTunnelModal: function(e) {
+                    this.$.editTunnelModal.close();
+                },
+                _modalClosed: function() {
+                    this._formReset();
+                },
+                _submitForm: function(e) {
+                    this.$.tunnelEditAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.tunnelEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.tunnelEditAjaxRequest.body = {
+                        new_name: this.newTunnel.name,
+                        new_description: this.newTunnel.description
+                    };
+                    this.$.tunnelEditAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _formReset: function() {
+                    //   this.set('tunnel.id', '');
+                },
+                _handleTunnelEditAjaxResponse: function(e) {
+                    this.set('sendingData', false);
+                    this._closeEditTunnelModal();
+                }
+            });
+        })();
+    </script>
+</dom-module>
