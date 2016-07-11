@@ -13,6 +13,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input-addon-behavior.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
+
 <dom-module id="app-form">
     <template>
         <style is="custom-style" include="forms"></style>
@@ -53,10 +54,6 @@
             paper-toggle-button::content paper-input-container input {
                 color: color: rgba(0, 0, 0, 0.54);
             }
-
-            *:not(paper-button)[disabled] {
-                display: none;
-            }
             paper-icon-button.docs {
                 opacity: 0.54;
                 width: 36px;
@@ -90,6 +87,9 @@
                         <paper-input  class="xs12 m6" id="[[field.name]]" type="password" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
+                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-textarea>
+                    </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'ip_textarea', field.show)]]">
                         <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-textarea>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
@@ -246,6 +246,9 @@
                         type: String
                     }
                 },
+                behaviors: [
+                  Polymer.IronValidatorBehavior
+                ],
                 observers: [
                     '_fieldsChanged(fields.*, sendingData)',
                 ],
@@ -312,7 +315,14 @@
                         }, this);
 
                         var valid = fields.base.every(function(el, index) {
-                            return el.show && el.required ? el.value : true;
+                            console.log(el.type);
+                            if(el.type == "ip_textarea") {
+                              console.log( this.validateip(el.value));
+                              return this.validateip(el.value);
+                            }
+                            else {
+                              return el.show && el.required ? el.value : true;
+                            }
                         }, this);
 
                         this.set('form', form);
@@ -381,6 +391,19 @@
                             this.set('fields.' + index + '.options', []);
                         }
                     }, this);
+                },
+                /*validate ip type in progress*/
+                validateip: function(value) {
+                  /*validate ip type 172.1.2.0,185.4.5.6 with comma split or new line split in progress*/
+                  ('/n')
+                  if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(value))
+                  {
+                    return (true)
+                  }
+                  //alert("You have entered an invalid IP address!")
+                  return (false)
+                  // this regex validates incomplete ip's (by design)
+                  //return !value || value.match(/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/);
                 },
             });
         })();

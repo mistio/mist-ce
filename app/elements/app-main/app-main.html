@@ -92,9 +92,10 @@
             <!-- <iron-route path="/teams/:id" title="script" href="../teams/team-page.html"></iron-route>
             <iron-route path="/add-team" title="add script" href="../teams/team-add.html"></iron-route> -->
 
-            <!-- private-networks -->
+            <!-- tunnels -->
             <iron-route path="/tunnels" title="tunnels" current="tunnels" href="../pages/page-items.html"></iron-route>
             <iron-route path="/tunnels/:id" title="tunnel" current="tunnels" href="../tunnels/tunnel-page.html"></iron-route>
+            <iron-route path="/add-tunnel" title="add tunnel" current="tunnels" href="../tunnels/tunnel-add.html"></iron-route>
             <!-- scripts -->
             <iron-route path="/scripts" title="scripts" current="scripts" href="../pages/page-items.html"></iron-route>
             <iron-route path="/scripts/:id" title="script" current="scripts" href="../scripts/script-page.html"></iron-route>
@@ -143,9 +144,10 @@
                 <member-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-page>
                 <members-add model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></members-add>
                 <member-add-in-teams model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-add-in-teams>
-                <!-- private networks -->
+                <!-- tunnels -->
                 <page-items class="tunnels" model="[[model]]" sections="[[sections]]" section="[[sections.tunnels]]" items="[[model.tunnelsArray]]"></page-items>
                 <tunnel-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.tunnels]]" restamp="true"></tunnel-page>
+                <tunnel-add model="[[model]]"  sections="[[sections]]" section="[[sections.tunnels]]"></tunnel-add>
                 <!-- scripts - leave scipts last due to editors highlighting problem -->
                 <page-items model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
                 <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
@@ -283,9 +285,9 @@
             },{
                 id: 'tunnels',
                 color: '#2F2F3E',
-                icon: 'hardware:device-hub',
+                icon: 'editor:merge-type',
                 count: '0',
-                add: '/add-private-network'
+                add: '/add-tunnel'
             }, {
                 id: 'scripts',
                 color: '#D48900',

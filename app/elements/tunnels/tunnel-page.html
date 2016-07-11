@@ -159,7 +159,7 @@
                             </template>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
-                            <div class="flexchild">CIRDS</div>
+                            <div class="flexchild">CIDRS</div>
                             <template is="dom-repeat" items=[[tunnel.cidrs]]>
                               <div class="flexchild">[[tunnel.cidrs]]</div>
                             </template>
@@ -169,6 +169,10 @@
                             <div class="flexchild">[[tunnel.tunnel_id]]</div>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
+                            <div class="flexchild">ACTIVE</div>
+                            <div class="flexchild">[[tunnel.active]]</div>
+                        </div>
+                        <div class="info-item flex-horizontal-with-ratios">
                             <div class="flexchild">ACCESSED AT</div>
                             <div class="flexchild">[[tunnel.accessed_at]]</div>
                         </div>
@@ -176,10 +180,10 @@
                 </div>
             </paper-material>
             </div>
-            <div class="absolute-bottom-right">
+            <!-- <div class="absolute-bottom-right">
                 <paper-fab icon="av:play-arrow" on-tap="_runScript" id="runScriptFab"></paper-fab>
                 <paper-tooltip for="runScriptFab" position="top">Run Script</paper-tooltip>
-            </div>
+            </div> -->
         </div>
         <iron-ajax id="tunnelDeleteAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]" method="DELETE" on-response="_handleTunnelDeleteAjaxResponse" on-error="_handleTunnelDeleteAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>

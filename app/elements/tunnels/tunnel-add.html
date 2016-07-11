@@ -1,0 +1,163 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../app-form/app-form.html">
+
+<dom-module id="tunnel-add">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+        :host {
+            display: block;
+        }
+        #content {
+            max-width: 900px;
+        }
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
+
+        paper-progress {
+            position: absolute;
+            bottom: 85px;
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        :host >::content paper-input-container {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+
+        </style>
+
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Add Tunnel
+                    </h2>
+                    <div class="subtitle">
+                        You can add tunnels to your networks by providing a list of cidrs ips.
+                    </div>
+                </div>
+            </paper-material>
+            <paper-material>
+                <app-form fields="[[fields]]" form="[[tunnel]]" url="/api/v1/tunnels" on-request="_addTunnelAjaxRequest" on-response="_addTunnelAjaxResponse"></app-form>
+            </paper-material>
+        </div>
+
+
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'tunnel-add',
+
+            properties: {
+                sections: {
+                    type: Object
+                },
+                section: {
+                    type: Object
+                },
+                model: {
+                    type: Object
+                },
+                tunnel: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            name: '',
+                            description: '',
+                            cidrs: '',
+                            excluded_cidrs: '',
+                            active: ''
+                        }
+                    }
+                },
+                typedName: {
+                    type: String,
+                    value: '',
+                    notify: true
+                },
+                fields: {
+                    type: Array,
+                    value: [{
+                        name: "name",
+                        label: "Tunnel Name *",
+                        type: "text",
+                        value: "",
+                        isLead: true,
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please enter tunnel's name",
+                        show: true,
+                        required: true
+                    }, {
+                        name: "description",
+                        label: "Tunnel Description",
+                        type: "textarea",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please enter tunnel's description",
+                        helptext: "Optional.",
+                        show: true,
+                        required: false
+                    },{
+                        name: "cidrs",
+                        label: "Cidrs *",
+                        type: "ip_textarea",
+                        value: "",
+                        defaultValue: "",
+                        errorMessage: "Please enter tunnel's cidrs",
+                        helptext: "These cidrs ..",
+                        show: true,
+                        required: true
+                    }, {
+                        name: "excluded_cidrs",
+                        label: "Excluded Cidrs",
+                        type: "ip_textarea",
+                        value: "",
+                        defaultValue: "",
+                        errorMessage: "Please enter tunnel's cidrs",
+                        helptext: "Optional. These cidrs will be excluded from ",
+                        show: true,
+                        required: false
+                    },{
+                        name: "Αctive",
+                        label: "Active",
+                        type: "toggle",
+                        value: "true",
+                        defaultValue: "",
+                        placeholder: "",
+                        show: true,
+                        required: false,
+                        disabled: true
+                    }]
+              }
+            },
+            listeners: {
+            },
+            _addTunnelAjaxRequest: function() {
+            },
+            _addTunnelAjaxResponse: function(e) {
+                //
+                // console.log('XHR', e.detail);
+                var response = YAML.parse(e.detail.xhr.response);
+                page('/tunnels/'+ response.id);
+                page('/tunnels/');
+            },
+        });
+    })();
+    </script>
+</dom-module>
