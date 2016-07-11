@@ -302,7 +302,7 @@ class StdStreamCapture(object):
 
 
 def sanitize_host(host):
-    "Return the hostame or ip address out of a URL"
+    """Return the hostname or ip address out of a URL"""
 
     for prefix in ['https://', 'http://']:
         host = host.replace(prefix, '')
@@ -311,6 +311,41 @@ def sanitize_host(host):
     host = host.split(':')[0]
 
     return host
+
+
+def extract_port(url):
+    """Returns the port number out of a url"""
+    for prefix in ['http://', 'https://']:
+        if prefix in url:
+            url = url.replace(prefix, '')
+            break
+    else:
+        prefix = ''
+    url = url.split('/')[0]
+    url = url.split(':')
+    if len(url) > 1:
+        return int(url[1])
+    elif prefix == 'https://':
+        return 443
+    else:
+        return 80
+
+
+def extract_params(url):
+    """Extracts the trailing params beyond the port number out of a url"""
+    for prefix in ['http://', 'https://']:
+        url = url.replace(prefix, '')
+    params = url.split('/')[1:]
+    params = '/'.join(params)
+    return params
+
+
+def extract_prefix(url, prefixes=['http://', 'https://']):
+    """Extracts the (http, https) prefix out of a given url"""
+    try:
+        return [prefix for prefix in prefixes if prefix in url][0]
+    except IndexError:
+        return ''
 
 
 def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
