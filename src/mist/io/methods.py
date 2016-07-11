@@ -4558,7 +4558,15 @@ def machine_cost_calculator(m):
         else:
             # m.extra.get('recurringFee') here will show what it has
             # cost for the current month, up to now
-            cost_per_hour = m.extra.get('hourlyRecurringFee')
+            # very strange but recurringFee is only the compute - CPU pricing
+            # and does not include RAM pricing :(
+            from libcloud.compute.drivers.softlayer import VS_RAM_PRICES
+            try:
+                mem = m.extra.get('maxMemory')
+                mem_price = VS_RAM_PRICES[mem]
+            except:
+                mem_price = 0
+            cost_per_hour = float(m.extra.get('hourlyRecurringFee')) + mem_price
             cost['cost_per_hour'] = cost_per_hour
             cost['cost_per_month'] = float(cost_per_hour) * 24 * month_days
 
