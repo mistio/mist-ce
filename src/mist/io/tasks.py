@@ -4,7 +4,6 @@ import uuid
 import tempfile
 import functools
 
-import libcloud.security
 from libcloud.compute.types import NodeState
 
 from time import time, sleep
@@ -37,7 +36,6 @@ from mist.core.cloud.models import Cloud, Machine, KeyAssociation
 from mist.core.keypair.models import Keypair
 from mist.core import config
 
-cert_path = "src/mist.io/cacert.pem"
 celery_cfg = 'mist.core.celery_config'
 
 
@@ -45,9 +43,6 @@ from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_owner_listening
 from mist.io.helpers import amqp_log
 
-
-# libcloud certificate fix for OS X
-libcloud.security.CA_CERTS_PATH.append(cert_path)
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -872,7 +867,7 @@ class Ping(UserTask):
 
     def execute(self, owner_id, cloud_id, machine_id, host):
         from mist.io import methods
-        res = methods.ping(host)
+        res = methods.ping(host, owner_id)
         return {'cloud_id': cloud_id,
                 'machine_id': machine_id,
                 'host': host,

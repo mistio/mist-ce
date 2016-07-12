@@ -1,10 +1,13 @@
 import os
 import socket
 import httplib
+import requests
+import json
 
 from libcloud.compute.types import NodeState
 from libcloud.compute.base import Node
 
+from mist.core.vpn.methods import destination_nat, super_ping
 
 VALID_RESPONSE_CODES = [httplib.OK, httplib.ACCEPTED, httplib.CREATED,
                         httplib.NO_CONTENT]
@@ -21,6 +24,7 @@ except ImportError:
     from mist.io import config
 
 import logging
+
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
@@ -64,7 +68,8 @@ class BareMetalDriver(object):
         return result in VALID_RESPONSE_CODES
 
     def _to_node(self, machine_id, machine):
-        state = self.check_host(machine.dns_name, machine.ssh_port)
+        hostname = machine.dns_name if machine.dns_name else machine.private_ips[0]
+        state = self.check_host(machine.cloud.owner, hostname, machine.ssh_port)
         extra = {}
         if hasattr(machine, 'os_type') and machine.os_type:
             extra['os_type'] = machine.os_type
@@ -73,21 +78,22 @@ class BareMetalDriver(object):
                 extra['remote_desktop_port'] = machine.remote_desktop_port
 
         node = Node(id=machine_id, name=machine.name, state=state,
-                    public_ips=machine.public_ips, private_ips=[],
+                    public_ips=machine.public_ips, private_ips=machine.private_ips,
                     driver=self, extra=extra)
         return node
 
-    def check_host(self, hostname, ssh_port=22):
+    def check_host(self, user, hostname, ssh_port=22):
         """Check if host is running.
 
         Initially attempt a connection to ssh port specified for host and
-        also to a list of common ports. If connection is successfull,
-         then consider host as running. If not, send an ICMP package
+        also to a list of common ports. If connection is successful,
+        then consider host as running. If not, send an ICMP package
         with ping. If this fails too, consider host state as stopped.
         Still needs to be improved to perform more robust checks.
 
         """
-
+        # keep original hostname in case of private host address translation
+        real_hostname = hostname
         state = NODE_STATE_MAP['unknown']
         if not hostname:
             return state
@@ -99,6 +105,7 @@ class BareMetalDriver(object):
             ports_list.insert(0, ssh_port, )
         for port in ports_list:
             try:
+                hostname, port = destination_nat(user, hostname, port)
                 s.connect((hostname, port))
                 s.shutdown(2)
                 state = NODE_STATE_MAP['on']
@@ -106,25 +113,22 @@ class BareMetalDriver(object):
             except:
                 pass
             if state == NODE_STATE_MAP['unknown']:
-                ping_response = self.ping_host(hostname)
+                ping_response = self.ping_host(user, real_hostname)
                 if ping_response == 0:
                     state = NODE_STATE_MAP['on']
         return state
 
-    def ping_host(self, hostname):
+    def ping_host(self, user, hostname):
         """Pings given host
 
-        Use ping utility, since a python implementation would require root privileges
-        (ICMP packages need be sent by root), while ping gets around this by being set SUID.
-        Will fail if ping is not found on system
-
+        Use ping utility, since a python implementation would require root
+        privileges (ICMP packages need be sent by root), while ping gets around
+        this by being set SUID. Will fail if ping is not found on system
         """
         if not hostname:
             return 256
-        try:
-            response = os.system("ping -c 1 -w5 " + hostname + " > /dev/null 2>&1")
-        except:
-            response = 256
+        ping = super_ping(owner=user, host=hostname, pkts=1)
+        response = 0 if int(ping['packets_rx']) > 0 else 256
         return response
 
 

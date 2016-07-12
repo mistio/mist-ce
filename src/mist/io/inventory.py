@@ -3,6 +3,7 @@ try:
     from mist.core.cloud.models import Cloud, Machine, KeyAssociation
     from mist.core.keypair.models import Keypair
     from mist.core import config
+    from mist.core.vpn.methods import destination_nat as dnat
 except ImportError:
     from mist.io import config, model
 
@@ -31,10 +32,10 @@ class MistInventory(object):
             except Exception as exc:
                 print exc
                 continue
+            ip_addr, port = dnat(self.user, ip_addr, port)
             if key_id not in self.keys:
                 keypair = Keypair.objects.get(owner=self.user, name=key_id)
                 self.keys[key_id] = keypair.private
-
             if name in self.hosts:
                 num = 2
                 while ('%s-%d' % (name, num)) in self.hosts:
@@ -76,11 +77,14 @@ class MistInventory(object):
             if machine['id'] == machine_id:
                 name = machine['name'].replace(' ', '_')
                 ips = [ip for ip in machine['public_ips'] if ':' not in ip]
+                # in case ips is empty search for private IPs
+                if not ips:
+                    ips = [ip for ip in machine['private_ips'] if ':' not in ip]
                 if not name:
                     name = machine_id
                 if not ips:
                     raise Exception('Machine ip not found in list machines')
-                ip_addr = ips[0] if ips else ''
+                ip_addr = ips[0] if ips else ''  # can be either public or priv
                 return name, ip_addr
         raise Exception('Machine not found in list_machines')
 
