@@ -30,8 +30,8 @@
             :host[opened] {
                 display: block;
             }
-            :host[opened="false"],
-            :host:not([opened]){
+            :host[opened="false"] .cloud-block,
+            :host:not([opened]) .cloud-block {
                 display: none;
             }
             :host .cloud-block {
@@ -96,6 +96,9 @@
             :host >::content ::selection {
                 background-color: yellow;
                 color: black;
+            }
+            paper-toast {
+                z-index: 999;
             }
         </style>
 
@@ -282,7 +285,7 @@
                     'Cloud ' + this.cloud.title + ' was disabled!';
                     this._showToast(msg);
                 },
-                _deleteCloud: function(e){                    
+                _deleteCloud: function(e){
                     this.$.cloudDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.cloudDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.cloudDeleteAjaxRequest.generateRequest();
@@ -290,10 +293,10 @@
                 _handleCloudDeletionAjaxResponse: function(e){
                     var msg = 'Cloud ' + this.cloud.title + ' was deleted';
                     this._showToast(msg);
+                    this.set('opened', false);
+                    this.fire('close-cloud-info');
                 },
                 _handleCloudDeletionAjaxError: function(e){
-                    console.log(e);
-                    
                     var msg = 'There was an error deleting ' + this.cloud.title + '.';
                     this._showToast(msg);  
                 },
