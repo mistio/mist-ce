@@ -185,6 +185,7 @@
                 <paper-tooltip for="runScriptFab" position="top">Run Script</paper-tooltip>
             </div> -->
         </div>
+        <tunnel-edit tunnel="[[tunnel]]"></tunnel-edit>
         <iron-ajax id="tunnelDeleteAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]" method="DELETE" on-response="_handleTunnelDeleteAjaxResponse" on-error="_handleTunnelDeleteAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
