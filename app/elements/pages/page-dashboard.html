@@ -231,9 +231,9 @@
         <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
         <template is="dom-if" if="[[showDashboard]]">
                 <div class="clouds top flexchild-wide-top">
-                    <div class="flex">
+                    <div id="cloudslist" class="flex">
                         <template is="dom-repeat" items="[[model.cloudsArray]]">
-                            <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" on-tap="_showCloudInfoDialog" id$="[[item.id]]">
+                            <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" index$=[[index]] on-tap="_showCloudInfoDialog" id$="[[item.id]]">
                                 <div class="icon"></div>
                                 <!-- src="[[_computeProviderLogo(item.provider)]]" -->
                                 <h1 class="cloud-title">[[item.title]]</h1>
@@ -343,8 +343,16 @@ Polymer({
              type: Boolean,
              computed: '_computeHasIncidents(model.incidents.*)',
              value: false
-         }
+        },
+        sidebarIsOpen: {
+            type: Boolean,
+            value: true
+        },
+        matrix: Array
     },
+    observers: [
+        'cloudLayoutMatrix(model.clouds.*, sidebarIsOpen)'
+    ],
     listeners: {
         'close-cloud-info': '_closeCloudChips'
     },
@@ -426,6 +434,7 @@ Polymer({
                 that.querySelector('dashboard-panel').resize();
 
         }, 5000);
+        //this.cloudLayoutMatrix();
     },
     isOnline: function(cloud) {
         return cloud.state == 'online' && 'online';
@@ -442,7 +451,6 @@ Polymer({
          }
      },
     _computeshowDashboard: function(cloudslength, isLoadingClouds) {
-        // console.log("HERERE", cloudslength, isLoadingClouds);
         var show;
         if (cloudslength > 0 && isLoadingClouds == false) {
             show =  true;
@@ -462,6 +470,7 @@ Polymer({
             sidebar.classList.add('close');
             content.classList.add('center');
         }, 2400);
+        this.set('sidebarIsOpen', false);
     },
     _computeProviderLogo: function(className) {
         return '../assets/providers/provider-' + className.split('_')[0] + '.png';
@@ -479,11 +488,23 @@ Polymer({
     _showCloudInfoDialog: function(e) {
         var cloudId = e.currentTarget.getAttribute('id');
         var dialog = this.querySelector('cloud-info');
+        var parent = this.querySelector('#cloudslist');
+        var target = e.currentTarget;
+        var lastInd = this.indexOfLast(parseInt(target.attributes.index.value))
+
+        // find the cloud chip node with index=lastInd
+        var last = [].find.call(parent.children, function(c, index){
+            if (c.attributes.index) {
+                return c.attributes.index.value == lastInd;
+            }
+            return false;
+        });
+        //insert cloud-info before last node
+        Polymer.dom(parent).insertBefore(dialog, last);
 
         if (this.openedCloud && this.openedCloud == cloudId) {
             dialog.removeAttribute('opened');
-            this._closeCloudChips();
-            this.set('openedCloud', '');
+            this._closeCloudChips();            
         }
         else {
             var cloudChips = this.querySelectorAll('cloud-chip'),
@@ -508,6 +529,7 @@ Polymer({
         [].forEach.call(cloudChips, function(el, index) {
             el.removeAttribute('opened');
         });
+        this.set('openedCloud', '');
     },
     showSidebar: function(){
         //show sidebar for navigation
@@ -517,6 +539,30 @@ Polymer({
             sidebar.classList.remove('close');
             content.classList.remove('center');
         }, 200);
+        this.set('sidebarIsOpen', true);
+    },
+    cloudLayoutMatrix: function(clouds, sidebarOpen){
+        //construct a reference matrix of the chips offsetTops
+        var chips = document.querySelectorAll('cloud-chip');
+        var matrix = [];
+        chips.forEach(function(c){
+            matrix.push(c.offsetTop);
+        });
+        this.set('matrix', matrix);
+    },
+    indexOfLast: function(index){
+        //calculate the index of the first chip of the next row
+        var ref = this.matrix[index];
+        var targetIndex;
+        var nextInd = this.matrix.find(function(n, index){
+            targetIndex = index;
+            return n > ref;
+        }, this);
+        // or if the first chip of the next row does not exist, set index to the last chip
+        if (!nextInd){
+            targetIndex = this.matrix.length
+        }
+        return targetIndex;
     }
 });
 </script>
