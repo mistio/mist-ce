@@ -4442,8 +4442,8 @@ def machine_cost_calculator(m):
     straightforward way to get this info
 
     Supported providers:
-        GCE, Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr
-    TODO: Azure, NephoScale, HostVirtual
+        GCE, Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr, Azure
+    TODO: NephoScale, HostVirtual
     """
     cost = {'cost_per_hour': 0, 'cost_per_month': 0}
     now = datetime.now()
@@ -4468,6 +4468,19 @@ def machine_cost_calculator(m):
                 # just need the float value
                 cost['cost_per_hour'] = plan_price
                 cost['cost_per_month'] = float(plan_price) * 24 * month_days
+    if m.driver.type == Provider.AZURE:
+        # TODO: get prices per location
+        location = m.extra.get('location')
+        os_type = m.extra.get('os_type', 'linux')
+        size = m.extra.get('instance_size')
+        price = get_size_price(driver_type='compute', driver_name='azure', size_id=size)
+        if price:
+            plan_price = price.get(os_type, 0)
+            if not plan_price:
+                plan_price = price.get('linux')
+            cost['cost_per_hour'] = float(plan_price)
+            cost['cost_per_month'] = float(plan_price) * 24 * month_days
+
     if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
         # Need to get image in order to specify the OS type
         # out of the image id
