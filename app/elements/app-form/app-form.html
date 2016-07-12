@@ -395,15 +395,14 @@
                 /*validate ip type in progress*/
                 validateip: function(value) {
                   /*validate ip type 172.1.2.0,185.4.5.6 with comma split or new line split in progress*/
-                  ('/n')
-                  if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(value))
-                  {
-                    return (true)
+                  var ipArray = document.getElementById('textarea').value.split('\n');
+                  for(i=1;i<ipArray.length;i++){
+                    if (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(value))
+                    {
+                      return (true)
+                    }
+                    return (false)
                   }
-                  //alert("You have entered an invalid IP address!")
-                  return (false)
-                  // this regex validates incomplete ip's (by design)
-                  //return !value || value.match(/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/);
                 },
             });
         })();
