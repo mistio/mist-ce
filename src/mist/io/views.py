@@ -1198,6 +1198,9 @@ def machine_rdp(request):
     except:
         rdp_port = 3389
 
+    from mist.core.vpn.methods import destination_nat
+    host, rdp_port = destination_nat(auth_context.owner, host, rdp_port)
+
     rdp_content = 'full address:s:%s:%s\nprompt for credentials:i:1' % \
                   (host, rdp_port)
     return Response(content_type='application/octet-stream',
@@ -1668,7 +1671,7 @@ def update_monitoring(request):
 
     action = params.get('action') or 'enable'
     name = params.get('name', '')
-    public_ips = params.get('public_ips', [])
+    public_ips = params.get('public_ips', [])  # TODO priv IPs?
     dns_name = params.get('dns_name', '')
     no_ssh = bool(params.get('no_ssh', False))
     dry = bool(params.get('dry', False))
