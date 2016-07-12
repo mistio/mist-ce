@@ -4450,8 +4450,8 @@ def machine_cost_calculator(m):
     straightforward way to get this info
 
     Supported providers:
-        GCE, Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr
-    TODO: Azure, NephoScale, HostVirtual
+        GCE, Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr, Azure
+    TODO: NephoScale, HostVirtual
     """
     cost = {'cost_per_hour': 0, 'cost_per_month': 0}
     now = datetime.now()
@@ -4476,6 +4476,19 @@ def machine_cost_calculator(m):
                 # just need the float value
                 cost['cost_per_hour'] = plan_price
                 cost['cost_per_month'] = float(plan_price) * 24 * month_days
+    if m.driver.type == Provider.AZURE:
+        # TODO: get prices per location
+        location = m.extra.get('location')
+        os_type = m.extra.get('os_type', 'linux')
+        size = m.extra.get('instance_size')
+        price = get_size_price(driver_type='compute', driver_name='azure', size_id=size)
+        if price:
+            plan_price = price.get(os_type, 0)
+            if not plan_price:
+                plan_price = price.get('linux')
+            cost['cost_per_hour'] = float(plan_price)
+            cost['cost_per_month'] = float(plan_price) * 24 * month_days
+
     if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
         # Need to get image in order to specify the OS type
         # out of the image id
@@ -4561,12 +4574,30 @@ def machine_cost_calculator(m):
     if m.driver.type == Provider.VULTR:
         cost['cost_per_month'] = m.extra.get('cost_per_month')
     if m.driver.type == Provider.SOFTLAYER:
+        # SoftLayer includes recurringFee on the VM metadata but *STRANGELY*
+        # this is only for the compute - CPU pricing
+        # it does not include RAM pricing and also other costs
+
+        # TODO: ram pricing slightly differs per location
+        # TODO: add bandwidth pricing
+        # TODO: add image pricing
+
+        from libcloud.compute.drivers.softlayer import VS_HOURLY_RAM, VS_MONTHLY_RAM
+        mem = m.extra.get('maxMemory')
         if not m.extra.get('hourlyRecurringFee'):
-            cost['cost_per_month'] = m.extra.get('recurringFee')
+            try:
+                mem_price = VS_MONTHLY_RAM[mem]
+            except:
+                mem_price = 0
+            cost['cost_per_month'] = float(m.extra.get('recurringFee')) + mem_price
         else:
             # m.extra.get('recurringFee') here will show what it has
             # cost for the current month, up to now
-            cost_per_hour = m.extra.get('hourlyRecurringFee')
+            try:
+                mem_price = VS_HOURLY_RAM[mem]
+            except:
+                mem_price = 0
+            cost_per_hour = float(m.extra.get('hourlyRecurringFee')) + mem_price
             cost['cost_per_hour'] = cost_per_hour
             cost['cost_per_month'] = float(cost_per_hour) * 24 * month_days
 
