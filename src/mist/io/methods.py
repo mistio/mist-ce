@@ -4553,17 +4553,27 @@ def machine_cost_calculator(m):
     if m.driver.type == Provider.VULTR:
         cost['cost_per_month'] = m.extra.get('cost_per_month')
     if m.driver.type == Provider.SOFTLAYER:
+        # SoftLayer includes recurringFee on the VM metadata but *STRANGELY*
+        # this is only for the compute - CPU pricing
+        # it does not include RAM pricing and also other costs
+
+        # TODO: ram pricing slightly differs per location
+        # TODO: add bandwidth pricing
+        # TODO: add image pricing
+
+        from libcloud.compute.drivers.softlayer import VS_HOURLY_RAM, VS_MONTHLY_RAM
+        mem = m.extra.get('maxMemory')
         if not m.extra.get('hourlyRecurringFee'):
-            cost['cost_per_month'] = m.extra.get('recurringFee')
+            try:
+                mem_price = VS_MONTHLY_RAM[mem]
+            except:
+                mem_price = 0
+            cost['cost_per_month'] = float(m.extra.get('recurringFee')) + mem_price
         else:
             # m.extra.get('recurringFee') here will show what it has
             # cost for the current month, up to now
-            # very strange but recurringFee is only the compute - CPU pricing
-            # and does not include RAM pricing :(
-            from libcloud.compute.drivers.softlayer import VS_RAM_PRICES
             try:
-                mem = m.extra.get('maxMemory')
-                mem_price = VS_RAM_PRICES[mem]
+                mem_price = VS_HOURLY_RAM[mem]
             except:
                 mem_price = 0
             cost_per_hour = float(m.extra.get('hourlyRecurringFee')) + mem_price
