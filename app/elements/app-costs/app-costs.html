@@ -90,6 +90,19 @@
             color: rgba(0,0,0,0.32);
             display: block;
         }
+        .zero-clouds {
+            padding: 0 12px 12px;
+            font-size: 0.9em;
+            opacity: 0.54;
+        }
+        .zero-cloud:after {
+            position: relative;
+            content: ", ";
+        }
+        .zero-cloud:last-of-type:after {
+            position: relative;
+            content: ".";
+        }
         </style>
 
         <div class="flex">
@@ -110,6 +123,12 @@
                     </tr>
                 </template>
             </table>
+            <div class="zero-clouds" hidden$="[[!zeroCostClouds.length]]">
+                and [[zeroCostClouds.length]] more clouds of $0 cost: 
+                <template is="dom-repeat" items="[[zeroCostClouds]]">
+                    <span class="zero-cloud">[[item.name]]</span>
+                </template>
+            </div>
         </paper-material>
     </template>
 </dom-module>
@@ -130,6 +149,9 @@ Polymer({
         topClouds: {
             type: Array,
             computed: '_computeTopClouds(model.cloudsArray.*, model.machinesArray.*)'
+        },
+        zeroCostClouds: {
+            type: Array
         }
     },
     attached: function() {
@@ -161,6 +183,7 @@ Polymer({
     },
     _computeTopClouds: function(clouds, machines) {
         var topCloudsArray = [];
+        var zeroCostClouds = [];
         if (clouds.base.length > 0) {
             this.model.cloudsArray.forEach(function(c){
                 var cloudCost = 0;
@@ -184,9 +207,14 @@ Polymer({
                     cloud.name = c.title;
                     cloud.cost = Math.round(cloudCost);
                     cloud.machinesCount = machinesCount;
-                topCloudsArray.push(cloud);
+                if (cloud.cost > 0)
+                    topCloudsArray.push(cloud);
+                else {
+                    zeroCostClouds.push(cloud);
+                }
             });
         }
+        this.set('zeroCostClouds', zeroCostClouds);
         // sort by cost
         topCloudsArray.sort(function (a, b) {
             if (a.cost > b.cost) { return -1; }
