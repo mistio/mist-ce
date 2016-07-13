@@ -87,7 +87,7 @@
                 </div>
             </paper-material>
             <paper-material>
-                <app-form model=[[model]] fields="[[fields]]" templateid="[[template.id]]" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
+                <app-form model=[[model]] fields="{{fields}}" templateid="[[template.id]]" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
             </paper-material>
         </div>
 
@@ -153,7 +153,13 @@
 
                 observers: [
                     '_computeFields(template, model.templates.*)',
+                    // '_updateFields(fields.*)'
                 ],
+
+                listeners: {
+                    'change' : '_updateFields',
+                    'iron-select' : '_updateFields',
+                },
 
                 _fromTemplate: function(params, templates) {
                     if (params.id && this.model.templates) {
@@ -164,7 +170,12 @@
                         }
                     }
                 },
-
+                _changeEvent: function(e){
+                    console.log('_changeEvent',e);
+                },
+                _changeSelect: function(e){
+                    console.log('_changeSelect',e);
+                },
                 _computeFields: function(template) {
                     var yaml_inputs = '', yaml_array = [];
                     if (this.template.inputs) {
@@ -245,29 +256,37 @@
 
                             // make key dropdown
                             if(inp.name == "key") {
-                                inp.type = 'dropdown';
-                                inp.query = ["keysArray"];
+                                inp.type = 'ssh_key';
+                                // inp.type = 'dropdown';
+                                inp.helptext = 'Choose your mist key';
+                                inp.options = this.model.keysArray;
                             }
 
                             // make cloud dropdown
                             if(inp.name == "cloud_id") {
-                                inp.type = 'dropdown';
-                                inp.query = ["cloudsArray"];
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Choose your mist cloud';
+                                inp.options = this.model.cloudsArray;
                             }
 
                             // make image dropdown & dependent on cloud
                             if(inp.name == "image_id") {
                                 inp.show = false;
-                                inp.type = 'dropdown';
-                                inp.query = ["clouds","$.cloud_id", "imagesArray"],
-                                inp.andshowIf = {
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Choose the image of your cloud';
+                                inp.showIf = {
                                     fieldName: "cloud_id",
-                                    fieldExists: true
+                                    fieldExists: true,
+                                    // fieldQuery: {
+                                    //     key :'options',
+                                    //     query_a: 'clouds',
+                                    //     query_a: 'imagesArray'
+                                    // }
                                 }
                             }
 
                             ret.push(inp);
-                        });
+                        }, this);
                     }
 
                     ret.push({
@@ -286,7 +305,27 @@
                     this.set('fields', ret);
 
                 },
-
+                _updateFields: function(){
+                    console.log('_updateFields');
+                    var cloud = this.fields.find(function(f){
+                        return f.name == 'cloud_id';
+                    });
+                    var cloudId = cloud.value;
+                    if (cloudId){
+                        this.fields.forEach(function(inp) {
+                            if(inp.name == "location_id") {
+                                inp.options = this.model.clouds[cloudId].locationsArray;
+                            }
+                            if(inp.name == "image_id") {
+                                inp.options = this.model.clouds[cloudId].imagesArray;
+                                console.log(inp.options.length);
+                            }
+                            if(inp.name == "size_id") {
+                                inp.options = this.model.clouds[cloudId].sizesArray;
+                            }
+                        }, this);               
+                    }
+                },
                 _handleRequest: function(e) {
 
                 },

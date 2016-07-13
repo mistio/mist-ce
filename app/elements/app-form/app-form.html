@@ -108,11 +108,20 @@
                             </paper-menu>
                         </paper-dropdown-menu>
                     </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'mist_dropdown', field.show)]]">
+                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]">
+                            <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                <template is="dom-repeat" items="[[field.options]]" as="option">
+                                    <paper-item value="[[option.id]]">[[option.title]] [[option.name]]</paper-item>
+                                </template>
+                            </paper-menu>
+                        </paper-dropdown-menu>
+                    </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'ssh_key', field.show)]]">
                         <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left">
                             <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
                                 <template is="dom-repeat" items="[[field.options]]" as="option">
-                                    <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                    <paper-item value="[[option.id]]">[[option.name]]</paper-item>
                                 </template>
                             </paper-menu>
                         </paper-dropdown-menu>
@@ -288,7 +297,7 @@
                             if (el.showIf) {
                                 if (el.showIf.fieldExists) {
                                     dependency = form[el.showIf.fieldName],
-                                        show = dependency;
+                                          show = dependency;
                                     this.set('fields.' + index + '.show', show);
                                 } else {
                                     dependency = form[el.showIf.fieldName],
