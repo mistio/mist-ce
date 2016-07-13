@@ -251,8 +251,8 @@
                                 fieldName: "yaml_or_form",
                                 fieldValues: ["form"]
                             }
-                            inp['value'] = yaml_array[inp.name];
-                            inp['defaultValue'] = yaml_array[inp.name];
+                            inp['label'] = inp.name;
+                            inp['defaultValue'] = inp.value;
 
                             // make key dropdown
                             if(inp.name == "key") {
@@ -276,12 +276,7 @@
                                 inp.helptext = 'Choose the image of your cloud';
                                 inp.showIf = {
                                     fieldName: "cloud_id",
-                                    fieldExists: true,
-                                    // fieldQuery: {
-                                    //     key :'options',
-                                    //     query_a: 'clouds',
-                                    //     query_a: 'imagesArray'
-                                    // }
+                                    fieldExists: true
                                 }
                             }
 
@@ -305,14 +300,15 @@
                     this.set('fields', ret);
 
                 },
-                _updateFields: function(){
+                _updateFields: function(e){
                     console.log('_updateFields');
                     var cloud = this.fields.find(function(f){
                         return f.name == 'cloud_id';
                     });
-                    var cloudId = cloud.value;
-                    if (cloudId){
+                    if (cloud && cloud.value){
+                        var cloudId = cloud.value;
                         this.fields.forEach(function(inp) {
+                            //TODO change to mist_NAME when backend changes
                             if(inp.name == "location_id") {
                                 inp.options = this.model.clouds[cloudId].locationsArray;
                             }
