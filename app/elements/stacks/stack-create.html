@@ -87,7 +87,7 @@
                 </div>
             </paper-material>
             <paper-material>
-                <app-form model=[[model]] fields="{{fields}}" templateid="[[template.id]]" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
+                <app-form fields="{{fields}}" templateid="[[template.id]]" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
             </paper-material>
         </div>
 
@@ -148,11 +148,11 @@
                     uri: {
                         type: String,
                         computed: "_uri(model)"
-                    },
+                    }
                 },
 
                 observers: [
-                    '_computeFields(template, model.templates.*)',
+                    '_computeFields(template, model.templates.*, model.clouds.*, model.keys.*)',
                     // '_updateFields(fields.*)'
                 ],
 
@@ -176,7 +176,7 @@
                 _changeSelect: function(e){
                     console.log('_changeSelect',e);
                 },
-                _computeFields: function(template) {
+                _computeFields: function(template, modelTemplates, clouds, keys) {
                     var yaml_inputs = '', yaml_array = [];
                     if (this.template.inputs) {
                         for (var i = 0; i < this.template.inputs.length; i++) {
@@ -188,6 +188,16 @@
                             }
                         }
                     }
+
+                    var yaml_or_form;
+                    var yf= this.fields.find(function(f){
+                            return f.name == 'yaml_or_form'
+                        }, this);
+                    if (yf && yf.value)
+                        yaml_or_form = yf.value;
+                    else
+                        yaml_or_form = 'yaml';
+
 
                     var ret = [{
                         name: "name",
@@ -215,7 +225,7 @@
                         name: "yaml_or_form",
                         label: "YAML or form",
                         type: "radio",
-                        value: "yaml",
+                        value: yaml_or_form,
                         defaultValue: "yaml",
                         helptext: "Choose the way you want to insert inputs",
                         errorMessage: "Choose an input format",
@@ -246,12 +256,23 @@
                     }];
 
                     if (template && template.inputs) {
+                        //sort inputs
+                        var arr = ['key','size_id','location_id','image_id','cloud_id'];
+                        template.inputs.sort(function (a, b) {
+                            if (arr.indexOf(a.name) > arr.indexOf(b.name)) {
+                                return -1;
+                            }
+                            if (arr.indexOf(a.name) < arr.indexOf(b.name)) {
+                                return 1;
+                            }
+                            return 0;
+                        });
                         template.inputs.forEach(function(inp) {
                             inp['showIf'] = {
                                 fieldName: "yaml_or_form",
                                 fieldValues: ["form"]
                             }
-                            inp['label'] = inp.name;
+                            inp['label'] = inp.name.replace('_',' ');
                             inp['defaultValue'] = inp.value;
 
                             // make key dropdown
@@ -280,9 +301,31 @@
                                 }
                             }
 
+                            // make image location & dependent on cloud
+                            if(inp.name == "location_id") {
+                                inp.show = false;
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Choose the location of your cloud';
+                                inp.showIf = {
+                                    fieldName: "cloud_id",
+                                    fieldExists: true
+                                }
+                            }
+
+                            // make image location & dependent on cloud
+                            if(inp.name == "size_id") {
+                                inp.show = false;
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Choose the size of your cloud';
+                                inp.showIf = {
+                                    fieldName: "cloud_id",
+                                    fieldExists: true
+                                }
+                            }
+
                             ret.push(inp);
                         }, this);
-                    }
+                    }                    
 
                     ret.push({
                         name: "deploy",
