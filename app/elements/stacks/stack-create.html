@@ -169,6 +169,16 @@
                 _fromTemplate: function(params, templates) {
                     if (params.id && this.model.templates) {
                         var yaml_inputs = '';
+                        var arr = ['key', 'key_id','size_id','location_id','image_id','cloud_id'];
+                        this.model.templates[params.id].inputs.sort(function (a, b) {
+                            if (arr.indexOf(a.name) > arr.indexOf(b.name)) {
+                                return -1;
+                            }
+                            if (arr.indexOf(a.name) < arr.indexOf(b.name)) {
+                                return 1;
+                            }
+                            return 0;
+                        });
                         this.model.templates[params.id].inputs.forEach(function(inp) {
                             if (['name', 'description', 'yaml_or_form','stackinputs', 'deploy'].indexOf(inp.name) == -1) {
                                 yaml_inputs += inp.name+ ': ';
@@ -254,7 +264,7 @@
 
                     if (template && template.inputs) {
                         //sort inputs
-                        var arr = ['key','size_id','location_id','image_id','cloud_id'];
+                        var arr = ['key','key_id','size_id','location_id','image_id','cloud_id'];
                         template.inputs.sort(function (a, b) {
                             if (arr.indexOf(a.name) > arr.indexOf(b.name)) {
                                 return -1;
@@ -273,7 +283,7 @@
                             inp['defaultValue'] = inp.value;
 
                             // make key dropdown
-                            if(inp.name == "key") {
+                            if(inp.name == "key" || inp.name == "key_id") {
                                 inp.type = 'ssh_key';
                                 // inp.type = 'dropdown';
                                 inp.helptext = 'Choose your mist key';
