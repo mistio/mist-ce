@@ -168,7 +168,16 @@
                 },
                 _fromTemplate: function(params, templates) {
                     if (params.id && this.model.templates) {
-                        return this.model.templates[params.id]
+                        var yaml_inputs;
+                        this.model.templates[params.id].inputs.forEach(function(inp) {
+                            if (['name', 'description', 'yaml_or_form','stackinputs', 'deploy'].indexOf(inp.name) == -1) {
+                                yaml_inputs += inp.name+ ': ';
+                                var val = inp.value || inp.defaultValue;
+                                yaml_inputs += val+'\n';
+                            }
+                        }, this);
+                        this.set('yaml_inputs', yaml_inputs);
+                        return this.model.templates[params.id];
                     } else {
                         return {
                             name: "Template is missing"
@@ -176,15 +185,16 @@
                     }
                 },
                 _computeFields: function(template, modelTemplates, clouds, keys) {
-                    var yaml_or_form;
-                    var yf = this.fields.find(function(f){
-                            return f.name == 'yaml_or_form'
-                        });
-                    if (yf && yf.value)
-                        yaml_or_form = yf.value;
-                    else
-                        yaml_or_form = 'yaml';
-
+                    var yaml_or_form = 'yaml';
+                    if (this.fields) {
+                        var yf = this.fields.find(function(f){
+                                return f.name == 'yaml_or_form'
+                            });
+                        if (yf && yf.value)
+                            yaml_or_form = yf.value;
+                        else
+                            yaml_or_form = 'yaml';
+                    }
 
                     var ret = [{
                         name: "name",
@@ -230,7 +240,7 @@
                         label: "Stack Inputs YAML",
                         type: "textarea",
                         value: this.yaml_inputs,
-                        defaultValue: '',
+                        defaultValue: this.yaml_inputs,
                         placeholder: '',
                         helptext: "Enter the stack inputs in yaml format",
                         errorMessage: "Please enter stacks's inputs",
