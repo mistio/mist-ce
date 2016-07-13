@@ -55,6 +55,9 @@
             }
 
             *:not(paper-button)[disabled] {
+                /*display: none;*/
+            }
+            *:not(paper-button)[hidden] {
                 display: none;
             }
             paper-icon-button.docs {
@@ -84,23 +87,23 @@
             <template is="dom-repeat" items="{{fields}}" as="field">
                 <template is="dom-if" if="[[field.show]]">
                     <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-                        <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-input>
+                        <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]" hidden="[[field.hidden]]"></paper-input>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'password', field.show)]]">
                         <paper-input  class="xs12 m6" id="[[field.name]]" type="password" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-textarea>
+                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]" hidden="[[field.hidden]]"></paper-textarea>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
-                        <paper-radio-group selected="{{field.value}}" class="xs12 m6" disabled="[[field.disabled]]">
+                        <paper-radio-group selected="{{field.value}}" class="xs12 m6" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
                             <template is="dom-repeat" items="[[field.options]]" as="option">
                                 <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
                             </template>
                         </paper-radio-group>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]">
+                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
                             <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
                                 <template is="dom-repeat" items="[[field.options]]" as="option">
                                     <paper-item value="[[option.val]]">[[option.title]]</paper-item>
@@ -109,7 +112,7 @@
                         </paper-dropdown-menu>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'mist_dropdown', field.show)]]">
-                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]">
+                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
                             <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
                                 <template is="dom-repeat" items="[[field.options]]" as="option">
                                     <paper-item value="[[option.id]]">[[option.title]] [[option.name]]</paper-item>
@@ -128,10 +131,10 @@
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'toggle', field.show)]]">
                         <div class="xs12 m6">
-                            <paper-toggle-button checked="{{field.value}}" disabled="[[field.disabled]]">[[field.name]]</paper-toggle-button>
+                            <paper-toggle-button checked="{{field.value}}" disabled="[[field.disabled]]" hidden="[[field.hidden]]">[[field.name]]</paper-toggle-button>
                         </div>
                     </template>
-                    <div class="field-helptext xs12 m6">[[field.helptext]]
+                    <div class="field-helptext xs12 m6" hidden="[[field.hidden]]">[[field.helptext]]
                         <a hidden$="[[!field.helpHref]]" href$="[[field.helpHref]]" target="new" class="helpHref">
                             <paper-icon-button suffix icon="icons:help" alt="open docs" title="open docs" class="docs">
                             </paper-icon-button>
@@ -261,8 +264,8 @@
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
                 },
-                _computeFieldType: function(field, value) {
-                    return field.type == value;
+                _computeFieldType: function(field, value, show) {
+                        return field.type == value;
                 },
                 _handleRequest: function(e) {
                     this.fire("request", e.detail)
