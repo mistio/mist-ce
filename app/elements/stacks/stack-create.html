@@ -148,19 +148,24 @@
                     uri: {
                         type: String,
                         computed: "_uri(model)"
+                    },
+                    yaml_inputs: {
+                        type: String
                     }
                 },
 
                 observers: [
                     '_computeFields(template, model.templates.*, model.clouds.*, model.keys.*)',
-                    // '_updateFields(fields.*)'
+                    '_yaml_inputsChanged(yaml_inputs)'
                 ],
 
                 listeners: {
                     'change' : '_updateFields',
                     'iron-select' : '_updateFields',
                 },
-
+                _yaml_inputsChanged: function(yaml_inputs){
+                    console.log('_yaml_inputsChanged');
+                },
                 _fromTemplate: function(params, templates) {
                     if (params.id && this.model.templates) {
                         return this.model.templates[params.id]
@@ -171,16 +176,6 @@
                     }
                 },
                 _computeFields: function(template, modelTemplates, clouds, keys) {
-                    var yaml_inputs = '', yaml_array = [];
-                    if (this.template.inputs) {
-                        for (var i = 0; i < this.template.inputs.length; i++) {
-                            yaml_inputs += this.template.inputs[i].name + ': ';
-                            yaml_inputs += this.template.inputs[i].default+'\n';
-
-                            yaml_array[this.template.inputs[i].name] = this.template.inputs[i].default;
-                        }
-                    }
-
                     var yaml_or_form;
                     var yf = this.fields.find(function(f){
                             return f.name == 'yaml_or_form'
@@ -234,9 +229,9 @@
                         name: "stackinputs",
                         label: "Stack Inputs YAML",
                         type: "textarea",
-                        value: yaml_inputs,
-                        defaultValue: yaml_inputs,
-                        placeholder: "",
+                        value: this.yaml_inputs,
+                        defaultValue: '',
+                        placeholder: '',
                         helptext: "Enter the stack inputs in yaml format",
                         errorMessage: "Please enter stacks's inputs",
                         show: true,
@@ -341,14 +336,37 @@
                     this.set('fields', ret);
 
                 },
+                _computeInitialYamlValues: function(){
+                    var yaml_inputs = '', yaml_array = [];
+                    if (this.template.inputs) {
+                        for (var i = 0; i < this.template.inputs.length; i++) {
+                            yaml_inputs += this.template.inputs[i].name + ': ';
+                            yaml_inputs += this.template.inputs[i].default+'\n';
+
+                            yaml_array[this.template.inputs[i].name] = this.template.inputs[i].default;
+                        }
+                    }
+                    return yaml_inputs;
+                },
                 _updateFields: function(e){
+                    console.log('_updateFields');
                     var cloud = this.fields.find(function(f){
                         return f.name == 'cloud_id';
                     });
+                    var yaml_inputs = '';
+                    var yaml_array = [];
+                    this.fields.forEach(function(inp) {
 
-                    if (cloud && cloud.value){
-                        var cloudId = cloud.value;
-                        this.fields.forEach(function(inp) {
+                        if (['name', 'description', 'yaml_or_form','stackinputs', 'deploy'].indexOf(inp.name) == -1) {
+                            yaml_inputs += inp.name+ ': ';
+                            var val = inp.value || inp.defaultValue;
+                            yaml_inputs += val+'\n';
+
+
+                        }
+
+                        if (cloud && cloud.value){
+                            var cloudId = cloud.value;
                             //TODO change to mist_NAME when backend changes
                             if(inp.name == "location_id") {
                                 inp.options = this.model.clouds[cloudId].locationsArray;
@@ -359,8 +377,11 @@
                             if(inp.name == "size_id") {
                                 inp.options = this.model.clouds[cloudId].sizesArray;
                             }
-                        }, this);               
-                    }
+                        }
+                    }, this);
+                    this.set('yaml_inputs', yaml_inputs);
+
+                    // console.log(e, e.target)
                 },
                 _handleRequest: function(e) {
 
