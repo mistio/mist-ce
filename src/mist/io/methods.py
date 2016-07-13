@@ -4574,32 +4574,29 @@ def machine_cost_calculator(m):
     if m.driver.type == Provider.VULTR:
         cost['cost_per_month'] = m.extra.get('cost_per_month')
     if m.driver.type == Provider.SOFTLAYER:
-        # SoftLayer includes recurringFee on the VM metadata but *STRANGELY*
+        # SoftLayer includes recurringFee on the VM metadata but
         # this is only for the compute - CPU pricing
-        # it does not include RAM pricing and also other costs
+        # other costs (ram, bandwidth, image) are included
+        # on billingItemChildren
+        extra_recurring_fee = 0
 
-        # TODO: ram pricing slightly differs per location
-        # TODO: add bandwidth pricing
-        # TODO: add image pricing
-
-        from libcloud.compute.drivers.softlayer import VS_HOURLY_RAM, VS_MONTHLY_RAM
-        mem = m.extra.get('maxMemory')
         if not m.extra.get('hourlyRecurringFee'):
-            try:
-                mem_price = VS_MONTHLY_RAM[mem]
-            except:
-                mem_price = 0
-            cost['cost_per_month'] = float(m.extra.get('recurringFee')) + mem_price
+            for billing_item in m.extra.get('billingItemChildren', []):
+                # don't calculate billing that is cancelled
+                if not billing_item.get('cancellationDate'):
+                    extra_recurring_fee += float(billing_item.get('recurringFee'))
+            cost['cost_per_month'] = float(m.extra.get('recurringFee')) + extra_recurring_fee
         else:
             # m.extra.get('recurringFee') here will show what it has
             # cost for the current month, up to now
-            try:
-                mem_price = VS_HOURLY_RAM[mem]
-            except:
-                mem_price = 0
-            cost_per_hour = float(m.extra.get('hourlyRecurringFee')) + mem_price
+            for billing_item in m.extra.get('billingItemChildren', []):
+                # don't calculate billing that is cancelled
+                if not billing_item.get('cancellationDate'):
+                    extra_recurring_fee += float(billing_item.get('hourlyRecurringFee'))
+
+            cost_per_hour = float(m.extra.get('hourlyRecurringFee')) + float(extra_recurring_fee)
             cost['cost_per_hour'] = cost_per_hour
-            cost['cost_per_month'] = float(cost_per_hour) * 24 * month_days
+            cost['cost_per_month'] = cost_per_hour * 24 * month_days
 
     for key, value in cost.items():
         if value and not isinstance(value, int):
