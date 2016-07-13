@@ -168,11 +168,11 @@
                 },
                 _fromTemplate: function(params, templates) {
                     if (params.id && this.model.templates) {
-                        var yaml_inputs;
+                        var yaml_inputs = '';
                         this.model.templates[params.id].inputs.forEach(function(inp) {
                             if (['name', 'description', 'yaml_or_form','stackinputs', 'deploy'].indexOf(inp.name) == -1) {
                                 yaml_inputs += inp.name+ ': ';
-                                var val = inp.value || inp.defaultValue;
+                                var val = inp.value =! undefined ? inp.value : inp.defaultValue;
                                 yaml_inputs += val+'\n';
                             }
                         }, this);

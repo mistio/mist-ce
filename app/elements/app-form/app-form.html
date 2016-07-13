@@ -93,7 +93,7 @@
                         <paper-input  class="xs12 m6" id="[[field.name]]" type="password" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]" hidden="[[field.hidden]]"></paper-textarea>
+                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]" hidden="[[field.hidden]]"></paper-textarea>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
                         <paper-radio-group selected="{{field.value}}" class="xs12 m6" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
