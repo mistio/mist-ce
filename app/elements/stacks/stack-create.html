@@ -170,29 +170,21 @@
                         }
                     }
                 },
-                _changeEvent: function(e){
-                    console.log('_changeEvent',e);
-                },
-                _changeSelect: function(e){
-                    console.log('_changeSelect',e);
-                },
                 _computeFields: function(template, modelTemplates, clouds, keys) {
                     var yaml_inputs = '', yaml_array = [];
                     if (this.template.inputs) {
                         for (var i = 0; i < this.template.inputs.length; i++) {
-                            if (['mist_uri', 'api_token'].indexOf(this.template.inputs[i].name) == -1) {
-                                yaml_inputs += this.template.inputs[i].name + ': ';
-                                yaml_inputs += this.template.inputs[i].default+'\n';
+                            yaml_inputs += this.template.inputs[i].name + ': ';
+                            yaml_inputs += this.template.inputs[i].default+'\n';
 
-                                yaml_array[this.template.inputs[i].name] = this.template.inputs[i].default;
-                            }
+                            yaml_array[this.template.inputs[i].name] = this.template.inputs[i].default;
                         }
                     }
 
                     var yaml_or_form;
-                    var yf= this.fields.find(function(f){
+                    var yf = this.fields.find(function(f){
                             return f.name == 'yaml_or_form'
-                        }, this);
+                        });
                     if (yf && yf.value)
                         yaml_or_form = yf.value;
                     else
@@ -272,7 +264,7 @@
                                 fieldName: "yaml_or_form",
                                 fieldValues: ["form"]
                             }
-                            inp['label'] = inp.name.replace('_',' ');
+                            inp['label'] = inp.name.replace(/_/g,' ');
                             inp['defaultValue'] = inp.value;
 
                             // make key dropdown
@@ -323,6 +315,12 @@
                                 }
                             }
 
+                            //hide api_token && mist_uri
+                            if(inp.name == "api_token" || inp.name == "mist_uri" ) {
+                                inp.hidden = true;
+                                inp.required = false;
+                            }
+
                             ret.push(inp);
                         }, this);
                     }                    
@@ -344,10 +342,10 @@
 
                 },
                 _updateFields: function(e){
-                    console.log('_updateFields');
                     var cloud = this.fields.find(function(f){
                         return f.name == 'cloud_id';
                     });
+
                     if (cloud && cloud.value){
                         var cloudId = cloud.value;
                         this.fields.forEach(function(inp) {
@@ -357,7 +355,6 @@
                             }
                             if(inp.name == "image_id") {
                                 inp.options = this.model.clouds[cloudId].imagesArray;
-                                console.log(inp.options.length);
                             }
                             if(inp.name == "size_id") {
                                 inp.options = this.model.clouds[cloudId].sizesArray;

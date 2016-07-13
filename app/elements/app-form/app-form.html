@@ -298,15 +298,33 @@
                         // Update show field flag after calculating dependencies
                         fields.base.forEach(function(el, index) {
                             if (el.showIf) {
+
+                                dependency = form[el.showIf.fieldName];
                                 if (el.showIf.fieldExists) {
-                                    dependency = form[el.showIf.fieldName],
-                                          show = dependency;
-                                    this.set('fields.' + index + '.show', show);
+                                    show = dependency ? true : false;
                                 } else {
-                                    dependency = form[el.showIf.fieldName],
-                                        show = el.showIf.fieldValues.indexOf(dependency) != -1;
-                                    this.set('fields.' + index + '.show', show);
+                                    show = el.showIf.fieldValues.indexOf(dependency) != -1;
+                                }                                
+
+                                //check for second level dependency
+                                var parent = this.fields.find(function(f){
+                                    return f.name == el.showIf.fieldName;
+                                });
+
+                                if (parent && parent.showIf){
+                                    var parentShow,
+                                        parentDependency = form[parent.showIf.fieldName];
+
+                                    if (parent.showIf.fieldExists){
+                                        parentShow = parentDependency ? true : false;
+                                    }
+                                    else { 
+                                        parentShow = parent.showIf.fieldValues.indexOf(parentDependency) != -1;
+                                    }
+                                    show = show && parentShow;
                                 }
+
+                                this.set('fields.' + index + '.show', show);
 
                                 if (!show && reset) {
                                     this._resetField(el, index);
