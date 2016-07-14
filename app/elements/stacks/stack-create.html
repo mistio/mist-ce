@@ -87,7 +87,7 @@
                 </div>
             </paper-material>
             <paper-material>
-                <app-form fields="{{fields}}" templateid="[[template.id]]" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
+                <app-form fields="{{fields}}" templateid="{{template.id}}" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
             </paper-material>
         </div>
 
@@ -127,7 +127,6 @@
                     },
                     template: {
                         type: Object,
-                        value: {},
                         computed: '_fromTemplate(params, model.templates.*)'
                     },
                     fields: {
@@ -156,7 +155,7 @@
                 },
 
                 observers: [
-                    '_computeFields(template, model.templates.*, model.clouds.*, model.keys.*)'
+                    '_computeFields(template, template.inputs, template.inputs.*, model.templatesArray.*, model.cloudsArray.*, model.keysArray.*, params)'
                 ],
 
                 listeners: {
@@ -177,11 +176,11 @@
                             return 0;
                         });
                         this.model.templates[params.id].inputs.forEach(function(inp) {
-                            if (['name', 'description', 'yaml_or_form','stackinputs', 'deploy'].indexOf(inp.name) == -1) {
-                                yaml_inputs += inp.name+ ': ';
-                                var val = inp.value =! undefined ? inp.value : inp.defaultValue;
-                                yaml_inputs += val+'\n';
-                            }
+                            yaml_inputs += inp.name+ ': ';
+                            var val = inp.value =! undefined ? inp.value : inp.defaultValue;
+                            yaml_inputs += val+'\n';
+
+
                         }, this);
                         this.set('yaml_inputs', yaml_inputs);
                         // pass values into form's stackinputs default value
@@ -190,17 +189,20 @@
                             ind=index;
                             return f.name == "stackinputs";
                         });
-
                         this.set('fields.'+ind+'.defaultValue', this.yaml_inputs);
+                        console.log('template is redefined');
                         return this.model.templates[params.id];
                     } else {
                         return {
                             name: "Template is missing"
                         }
+                        console.log('template is missing');
                     }
                 },
-                _computeFields: function(template, modelTemplates, clouds, keys) {
+                _computeFields: function(template, templateInps, templateInputs, modelTemplates, clouds, keys, params) {
                     var yaml_or_form = 'yaml';
+                    console.log('Computing Fields started');
+
                     if (this.fields) {
                         var yf = this.fields.find(function(f){
                                 return f.name == 'yaml_or_form'
@@ -357,7 +359,7 @@
                         show: true,
                         required: false
                     });
-
+                    console.log("computing fields")
                     this.set('fields', ret);
                 },                
                 _updateFields: function(e){
