@@ -150,21 +150,18 @@
                         computed: "_uri(model)"
                     },
                     yaml_inputs: {
-                        type: String
+                        type: String,
+                        notify: true
                     }
                 },
 
                 observers: [
-                    '_computeFields(template, model.templates.*, model.clouds.*, model.keys.*)',
-                    '_yaml_inputsChanged(yaml_inputs)'
+                    '_computeFields(template, model.templates.*, model.clouds.*, model.keys.*)'
                 ],
 
                 listeners: {
                     'change' : '_updateFields',
                     'iron-select' : '_updateFields',
-                },
-                _yaml_inputsChanged: function(yaml_inputs){
-                    console.log('_yaml_inputsChanged');
                 },
                 _fromTemplate: function(params, templates) {
                     if (params.id && this.model.templates) {
@@ -187,6 +184,14 @@
                             }
                         }, this);
                         this.set('yaml_inputs', yaml_inputs);
+                        // pass values into form's stackinputs default value
+                        var ind;
+                        var stackinputsField = this.fields.find(function(f, index){
+                            ind=index;
+                            return f.name == "stackinputs";
+                        });
+
+                        this.set('fields.'+ind+'.defaultValue', this.yaml_inputs);
                         return this.model.templates[params.id];
                     } else {
                         return {
@@ -354,7 +359,6 @@
                     });
 
                     this.set('fields', ret);
-
                 },                
                 _updateFields: function(e){
                     var changeInYaml = e.path.indexOf(document.querySelector("paper-textarea#stackinputs")) >-1
@@ -403,11 +407,19 @@
                                 }
                             }
                         }, this);
+
                         this.set('yaml_inputs', yaml_inputs);
+
+                        // pass values into form's stackinputs value
+                        var ind;
+                        var stackinputsField = this.fields.find(function(f, index){
+                            ind=index;
+                            return f.name == "stackinputs";
+                        });
+
+                        this.set('fields.'+ind+'.value', this.yaml_inputs);
                     }
                     
-
-                    // console.log(e.path)
                 },
                 _handleRequest: function(e) {
 
