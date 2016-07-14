@@ -2913,6 +2913,9 @@ def list_images(user, cloud_id, term=None):
         elif conn.type in config.EC2_PROVIDERS and term:
             images = CloudImage.objects( me.Q(cloud_provider=conn.type, image_id__icontains=term) | me.Q(cloud_provider=conn.type, name__icontains=term))[:200]
             images = [NodeImage(id=image.image_id, name=image.name, driver=conn, extra={}) for image in images]
+            if not images:
+                # actual search on ec2
+                images = conn.list_images(ex_filters={'name': '*%s*' % term})
         elif conn.type == Provider.GCE:
             rest_images = conn.list_images()
             for gce_image in rest_images:
