@@ -203,7 +203,7 @@
                             [[template.name]]
                         </h2>
                     <div class="subtitle">
-                        <span hidden$="[[!isInline]]">Inline Script</span>
+                        <span hidden$="[[!isInline]]">Inline Template</span>
                         <span hidden$="[[isInline]]">Script source <a href$="[[template.template]]" target="_blank" class="regular"> [[template.template]] <iron-icon icon="icons:link"></iron-icon>
                                 </a>
                             </span>
@@ -263,6 +263,18 @@
                     </div>
                 </div>
             </div>
+            <template is="dom-if" if="[[isInline]]">
+                <div class="page">
+                    <div class="section">
+                        <h3 class="smallcaps">Inline Template</h3>
+                        <div class="command-container">
+                        <pre><code>
+[[template.template]]
+                        </code></pre>
+                        </div>
+                    </div>
+                </div>
+            </template>
             <div class="page section">
                 <h3 class="smallcaps">Metadata</h3>
                 <paper-material>
@@ -291,7 +303,7 @@
                                 </div>
                             </template>
                             <template is="dom-if" if="[[template.template]]">
-                                <div class="info-item flex-horizontal-with-ratios">
+                                <div class="info-item flex-horizontal-with-ratios" hidden$="[[isInline]]">
                                     <div class="flexchild">Template</div>
                                     <div class$="flexchild [[class]]">
                                         <a href="[[template.template]]" class="blue-link regular" target="_blank">
@@ -393,7 +405,7 @@
                     },
                     isInline: {
                         type: Boolean,
-                        computed: '_computeIsInline(template.source)'
+                        computed: '_computeIsInline(template.location_type)'
                     },
                     class: {
                         type: String,
