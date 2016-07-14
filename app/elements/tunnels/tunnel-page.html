@@ -120,6 +120,9 @@
             <div class="columns">
                 <div id="leftcolumn" class="left command-container">
                     <div class="pad2">
+                        <paper-button hidden$="[[!script]]" on-tap="copyScript" class="right link">Copy <span class="wide">script</span>
+                            <iron-icon icon="content-copy"></iron-icon>
+                        </paper-button>
                         <pre><code>[[tunnel.script]]</code></pre>
                     </div>
                 </div>
@@ -302,7 +305,21 @@
             },
             _goBack: function(){
                 history.back();
-            }
+            },
+            copyScript: function(e) {
+                this.$.tunnel.script.select();
+                document.execCommand('copy');
+                this._showToast('The Script was copied to clipboard!');
+            },
+            _showToast: function(msg) {
+                var toast = this.querySelector('paper-toast');
+                toast.text = msg;
+                toast.show();
+                var newnot = {};
+                newnot["text"] = msg;
+                newnot["type"] = 'green';
+                document.querySelector("notifications-element").notifications.push(newnot);
+            },
         });
     })();
     </script>
