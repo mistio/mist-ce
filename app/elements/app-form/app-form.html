@@ -126,6 +126,7 @@
                                 <template is="dom-repeat" items="[[field.options]]" as="option">
                                     <paper-item value="[[option.id]]">[[option.name]]</paper-item>
                                 </template>
+                                <paper-button on-tap="_addKey" class="blue">Add Key</paper-button>
                             </paper-menu>
                         </paper-dropdown-menu>
                     </template>
@@ -256,7 +257,10 @@
                     },
                     workflow: {
                         type: String
-                    }
+                    },
+                    referral:  {
+                        type: String
+                    },
                 },
                 observers: [
                     '_fieldsChanged(fields.*, sendingData)',
@@ -412,6 +416,11 @@
                         }
                     }, this);
                 },
+                _addKey: function(){
+                    //set attribute origin
+                    var origin = window.location.pathname;
+                    page("/add-key?origin="+origin);
+                }
             });
         })();
     </script>
