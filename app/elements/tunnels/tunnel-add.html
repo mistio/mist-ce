@@ -115,27 +115,27 @@
                         required: false
                     },{
                         name: "cidrs",
-                        label: "Cidrs *",
+                        label: "CIDRs *",
                         type: "ip_textarea",
                         value: "",
                         defaultValue: "",
                         errorMessage: "Please enter tunnel's cidrs",
-                        helptext: "These cidrs ..",
+                        helptext: "These are the IPv4 address ranges that Mist.io will be able to access through the tunnel",
                         show: true,
                         required: true
                     }, {
                         name: "excluded_cidrs",
-                        label: "Excluded Cidrs",
+                        label: "Excluded CIDRs",
                         type: "ip_textarea",
                         value: "",
                         defaultValue: "",
                         errorMessage: "Please enter tunnel's cidrs",
-                        helptext: "Optional. These cidrs will be excluded from ",
+                        helptext: "Mist.io will choose 2 random IPv4 address for the end points of the VPN tunnel. Optionally define CIDRs to exclude from the random selection, in order to avoid conflicts.",
                         show: true,
                         required: false
                     },{
                         name: "Αctive",
-                        label: "Active",
+                        label: "Enabled",
                         type: "toggle",
                         value: "true",
                         defaultValue: "",
