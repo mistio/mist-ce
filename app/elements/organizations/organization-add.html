@@ -8,10 +8,12 @@
             :host {
                 display: block;
                 width: 100%;
+                z-index: 9999999999;
+                position: inherit;
             }
         </style>
 
-        <paper-dialog id="organizationAddModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+        <paper-dialog id="organizationAddModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
             <h2>Add Organization</h2>
             <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
