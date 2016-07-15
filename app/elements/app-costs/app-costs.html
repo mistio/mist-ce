@@ -103,6 +103,12 @@
             position: relative;
             content: ".";
         }
+        iron-icon#costdocs {
+            width: 20px;
+            height: 20px;
+            opacity: 0.54;
+            float: right;
+        }                
         </style>
 
         <div class="flex">
@@ -113,7 +119,9 @@
             </div>
         </div>
         <paper-material class="flex3child">
-            <h3>monthly cost per cloud</h3>
+            <h3>monthly cost per cloud
+                <a href="http://docs.mist.io/article/103-cost-reporting-with-mist-io" target="new"> <iron-icon id="costdocs" icon="help" position="left"></iron-icon></a>
+            </h3>
             <table>
                 <template is="dom-repeat" items="[[topClouds]]">
                     <tr>
