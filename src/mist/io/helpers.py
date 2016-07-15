@@ -383,3 +383,106 @@ def transform_key_machine_associations(machines, key):
                                         key_assoc.sudo,
                                         key_assoc.port])
     return key_associations
+
+
+def transform_json_to_schema():
+    """
+    Create a json schema from providers.json
+    For each provider we build the equivalent schema
+    :return: list
+    """
+    map_words = {
+        'Azure': {'subscription_id': 'apikey', 'certificate':'apisecret'},
+        'Digital Ocean': { 'token': 'apikey'},
+        'Docker':{'docker_host': 'apiurl'},
+        'AWS': {'region': 'provider', 'api_key':'apikey','api_secret':'apisecret'},
+        'GCE': {'project_id': 'tenant_name', 'private_key': 'apisecret'},
+        'Indonesian Cloud': {'username': 'apikey', 'password': 'apisecret',
+                             'host': 'apiurl'},
+        'KVM (via libvirt)': {'machine_hostname': 'apiurl'},
+        'NephoScale': {'username':'apikey', 'password': 'apisecret'},
+        'Openstack': {'username': 'apikey', 'password': 'apisecret',
+                      'auth_url': 'apiurl'},
+        'Rackspace': {'username':'apikey', 'api_key': 'apisecret'},
+        'SoftLayer': {'username': 'apikey', 'api_key': 'apisecret'},
+        'VMWare vCloud': {'username': 'apikey', 'password': 'apisecret',
+                          'host': 'apiurl'},
+        'VMWare vSphere': {'username': 'apikey', 'password': 'apisecret'},
+        }
+    # 'Other Server': {'remote_desktop_port': ''}
+    schema_list = []
+    with open('/mist.core/src/mist.io/app/elements/providers.json') as data_f:
+        data = json.load(data_f)
+        data_f.close()
+
+        for prov in data['providers']:
+            j_schema = {}
+
+            # options = prov['options']
+            for k, v in prov.iteritems():
+                if k == 'title':
+                    j_schema['title'] = prov['title']
+                    j_schema['type'] = 'object'
+                if k == 'options':
+                    j_properties = {}
+                    required = []
+                    for o in prov['options']:
+
+                        if o['type'] in ['text', 'textarea', 'dropdown',
+                                         'password', 'ssh_key']:
+                            o['type'] = 'string'
+
+                        if o['type'] == 'switch':
+                            o['type'] = 'boolean'
+
+                        if o['name'] == 'region' and 'options' in o:
+                            one_of = []
+                            for oo in o['options']:
+                                # one_of.append({"format": v for k,v in
+                                #                oo.iteritems() if k == 'val'})
+                                # one_of.append({"format": v for k, v in
+                                #            oo.iteritems() if k == 'val'})
+
+                                one_of.append(oo['val'])
+
+                            j_properties.update(
+                                # {o['name']: {"type": o['type'], "oneOf": one_of }})
+                                {o['name']: {"type": o['type'],"enum": one_of}})
+                        # maybe to use integer or number
+                        else:
+                            j_properties.update({o['name']: {"type": o['type']}})
+
+                        if o['required']:
+                            required.append(o['name'])
+
+                    j_schema['properties'] = j_properties
+                    j_schema['required'] = required
+
+            schema_list.append({j_schema['title']:j_schema})
+
+    for d in schema_list:
+        for k,v in d.iteritems():
+
+            if k in map_words.keys():
+                for x,y in map_words[k].iteritems():
+                    v['properties'][y] = v['properties'].pop(x)
+                    v['required'] = [w.replace(x,y) for w in v['required']]
+
+    return schema_list
+
+
+def schema_by_provider(provider_type):
+    """
+    call the current schema from provider_type
+    :param provider_type:
+    :return:
+    """
+    schema_list = transform_json_to_schema()
+    for schema in schema_list:
+        for k, v in schema.iteritems():
+            if k == provider_type:
+                current_schema = v
+                break
+
+    return current_schema
+
