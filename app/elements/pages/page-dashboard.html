@@ -229,16 +229,17 @@
         }
         .notice {
             background-color: #ffff8d;
-            padding: 16px;
-            margin-bottom: 32px;
+            padding: 2px 16px;
+            margin: 0 32px 32px 38px;
+            z-index: 99;
         }
         </style>
         <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
+        <div class="notice">
+            <p><strong>Note:</strong> Hello! Here you can have a peak at the new Mist.io UI. Keep in mind that this is an early preview undergoing heavy development and not all functionalities are yet available. We will appreciate your feedback! Email us at <a href="mailto:info@mist.io">info@mist.io</a></p>
+        </div>
         <template is="dom-if" if="[[showDashboard]]">
-                <div class="clouds top flexchild-wide-top">
-                    <div class="notice">
-                        <p><strong>Note:</strong> Hello! Here you can have a peak at the new Mist.io UI. Keep in mind that this is an early preview undergoing heavy development and not all functionalities are complete. We will appreciate your feedback! Email us at <a href="mailto:info@mist.io">info@mist.io</a></p>
-                    </div>
+                <div class="clouds top flexchild-wide-top">                    
                     <div id="cloudslist" class="flex">
                         <template is="dom-repeat" items="[[model.cloudsArray]]">
                             <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" index$=[[index]] on-tap="_showCloudInfoDialog" id$="[[item.id]]">
