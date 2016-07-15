@@ -99,11 +99,13 @@
                     this.querySelector('paper-dialog').open();
                     this.set('success', false);
                     this.set('newOrgId','');
+                    this._formReset();
                 },
                 _closeDialog: function(e) {
                     this.querySelector('paper-dialog').close();
                     this.set('success', false);
                     this.set('newOrgId','');
+                    this._formReset();
                 },
                 _submitForm: function() {
                     this.$.organizationAddAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -118,7 +120,6 @@
                 _handleOrganizationAddAjaxResponse: function(e) {
                     this.set('sendingData', false);
                     this._formReset();
-                    console.log(e);
                     this.set('newOrgId',e.detail.xhr.response.id);
                     this.set('success', true);
                 },
@@ -126,7 +127,6 @@
                     window.location.href = this.newOrgId ? '/switch_context/' + this.newOrgId : '/switch_context';
                 },
                 _handleOrganizationAddAjaxError: function(e){
-                    console.log(e);
                     this.set("fail", true);
                     this.set('sendingData', false);
                     // TODO: should be e.detail.request.xhr.responseText which is more descriptive
