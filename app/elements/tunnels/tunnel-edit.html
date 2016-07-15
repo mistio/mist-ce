@@ -28,7 +28,8 @@
             <paper-dialog-scrollable>
                 <p>
                     <paper-input id="name" label="Name" error-message="Please enter tunnel's name" value="{{newTunnel.name}}"></paper-input>
-                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter tunnel's description" value="{{newTunnel.description}}"></paper-textarea>
+                    <paper-textarea id="description" label="Description (optional)" rows="1" max-rows="5" error-message="Please enter tunnel's description" value="{{newTunnel.description}}"></paper-textarea>
+                    <paper-textarea id="cidrs™" label="CIDRs" rows="3" max-rows="5" error-message="Please enter tunnel's description" value="{{newTunnel.cidrs}}" disabled></paper-textarea>
                 </p>
                 <div class="clearfix btn-group">
                     <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
@@ -61,7 +62,7 @@
                     },
                     formReady: {
                         type: Boolean,
-                        computed: '_computeFormReady(newTunnel.name, sendingData)'
+                        computed: '_computeFormReady(newTunnel.name, newTunnel.cidrs, sendingData)'
                     }
                 },
                 listeners: {
@@ -70,13 +71,14 @@
                 _computeNewTunnel: function(tunnel) {
                     return {
                         name: tunnel.name,
-                        description: tunnel.description
+                        description: tunnel.description,
+                        cidrs: tunnel.cidrs
                     };
                 },
-                _computeFormReady: function(name, sendingData) {
+                _computeFormReady: function(name, cidrs, sendingData) {
                     var formReady = false;
 
-                    if (name) {
+                    if (name && cidrs) {
                         formReady = true;
                     }
 
