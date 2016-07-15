@@ -966,7 +966,7 @@ def create_machine(request):
     else:
         image_id = params.get('image')
         if not image_id:
-            raise RequiredParameterMissingError("machine_name")
+            raise RequiredParameterMissingError("image_id")
         disk_size = disk_path = None
     size_id = params['size']
     # deploy_script received as unicode, but ScriptDeployment wants str

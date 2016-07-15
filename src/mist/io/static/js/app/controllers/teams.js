@@ -1,10 +1,10 @@
-define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team', 'app/models/policy_rule'],
+define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team', 'app/models/member', 'app/models/policy_rule'],
     //
     //  Teams Controller
     //
     //  @returns Class
     //
-    function(BaseArrayController, TeamModel, PolicyRuleModel) {
+    function(BaseArrayController, TeamModel, MemberModel, PolicyRuleModel) {
 
         'use strict';
 
@@ -161,9 +161,11 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
                     .POST('/api/v1/org/' + args.team.organization.id + '/teams/' + args.team.id + '/members', {
                         'emails': args.member.email
                     })
-                    .success(function(member) {
+                    .success(function(members) {
+                        var member = members[0];
                         Mist.notificationController.notify('An invitation was sent to user with email: ' + args.member.email);
                         that._addMember(args.team, member);
+                        Mist.memberAddController.close()
                     })
                     .error(function(message) {
                         Mist.notificationController.notify(message);
@@ -345,7 +347,7 @@ define('app/controllers/teams', ['app/controllers/base_array', 'app/models/team'
             },
 
             _addMember: function(team, member) {
-                var newMember = Ember.Object.create({
+                var newMember = MemberModel.create({
                     id: member.id,
                     name: member.name,
                     email: member.email,

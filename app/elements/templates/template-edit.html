@@ -23,8 +23,8 @@
 
         </style>
 
-        <paper-dialog id="editScriptModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
-            <h2>Edit Script</h2>
+        <paper-dialog id="editTemplateModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Edit Template</h2>
             <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
                 <p>
@@ -37,7 +37,7 @@
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <iron-ajax id="editScriptAjax" url="/templates/[[template._id]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+        <iron-ajax id="editTemplateAjax" url="/templates/[[template._id]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
     </template>
 
     <script>
@@ -84,31 +84,31 @@
 
                     return formReady;
                 },
-                _openEditScriptModal: function(e) {
-                    this.$.editScriptModal.open();
+                _openEditTemplateModal: function(e) {
+                    this.$.editTemplateModal.open();
                 },
-                _closeEditScriptModal: function(e) {
-                    this.$.editScriptModal.close();
+                _closeEditTemplateModal: function(e) {
+                    this.$.editTemplateModal.close();
                 },
                 _modalClosed: function() {
                     this._formReset();
                 },
                 _submitForm: function(e) {
-                    this.fire('updateSelectedScript', {
+                    this.fire('updateSelectedTemplate', {
                         template: this.template
                     });
-                    this._closeEditScriptModal();
+                    this._closeEditTemplateModal();
                 },
                 _formReset: function() {
                     //   this.set('template.id', '');
                 },
-                _editScriptAjax: function(e) {
-                    //   this.$.editScriptAjax.generateRequest();
+                _editTemplateAjax: function(e) {
+                    //   this.$.editTemplateAjax.generateRequest();
                 },
-                _editScriptRequest: function() {
+                _editTemplateRequest: function() {
                     this.set('sendingData', true);
                 },
-                _editScriptResponse: function(e) {
+                _editTemplateResponse: function(e) {
                     this.set('sendingData', false);
                 }
             });
