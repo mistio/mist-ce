@@ -473,7 +473,7 @@ def transform_json_to_schema():
 
 def schema_by_provider(provider_type):
     """
-    call the current schema from provider_type
+    Call the current schema from provider_type
     :param provider_type:
     :return:
     """
