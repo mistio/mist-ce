@@ -203,17 +203,25 @@
                             [[template.name]]
                         </h2>
                     <div class="subtitle">
-                        <span hidden$="[[!isInline]]">Inline Script</span>
+                        <span hidden$="[[!isInline]]">Inline Template</span>
                         <span hidden$="[[isInline]]">Script source <a href$="[[template.template]]" target="_blank" class="regular"> [[template.template]] <iron-icon icon="icons:link"></iron-icon>
                                 </a>
                             </span>
                     </div>
                 </div>
+
                 <div class="item-actions">
-                    <paper-button on-tap="_createStack" class="simple"> Create Stack
-                        <iron-icon icon="av:play-arrow"></iron-icon>
-                    </paper-button>
+                    <!-- <paper-button on-tap="_editTags" class="simple">tags</paper-button> -->
+                    <paper-menu-button horizontal-align="right">
+                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu id="machine_actions" class="dropdown-content">
+                            <paper-button on-tap="_editTemplate" class="simple">Edit Template</paper-button>
+                            <paper-button on-tap="_deleteTemplate" class="simple">Delete Template</paper-button>
+                        </paper-menu>
+                    </paper-menu-button>
+                    <paper-button on-tap="_createStack" class="simple white right-icon" style$="color: [[section.color]]"> Create Stack <iron-icon icon="av:play-arrow" style$="color: [[section.color]]"></iron-icon></paper-button>
                 </div>
+
             </paper-material>
             <paper-material class="parsing-loader" hidden$="[[hideprogress]]">
                 <h3>Parsing template [[template.name]]</h3>
@@ -263,6 +271,18 @@
                     </div>
                 </div>
             </div>
+            <template is="dom-if" if="[[isInline]]">
+                <div class="page">
+                    <div class="section">
+                        <h3 class="smallcaps">Inline Template</h3>
+                        <div class="command-container">
+                        <pre><code>
+[[template.template]]
+                        </code></pre>
+                        </div>
+                    </div>
+                </div>
+            </template>
             <div class="page section">
                 <h3 class="smallcaps">Metadata</h3>
                 <paper-material>
@@ -291,9 +311,9 @@
                                 </div>
                             </template>
                             <template is="dom-if" if="[[template.template]]">
-                                <div class="info-item flex-horizontal-with-ratios">
+                                <div class="info-item flex-horizontal-with-ratios" hidden$="[[isInline]]">
                                     <div class="flexchild">Template</div>
-                                    <div class$="flexchild [[class]]">
+                                    <div class$="flexchild">
                                         <a href="[[template.template]]" class="blue-link regular" target="_blank">
                                             [[template.template]]
                                         </a>
@@ -369,10 +389,6 @@
                     section: {
                         type: Object
                     },
-                    color: {
-                        type: String,
-                        computed: '_getHeaderStyle(section)'
-                    },
                     params: {
                         type: Object
                     },
@@ -393,7 +409,7 @@
                     },
                     isInline: {
                         type: Boolean,
-                        computed: '_computeIsInline(template.source)'
+                        computed: '_computeIsInline(template.location_type)'
                     },
                     class: {
                         type: String,
@@ -421,9 +437,6 @@
                     return new Date(created_at).toLocaleString('en-US', {
                         timeZoneName: 'short'
                     });
-                },
-                _getHeaderStyle: function(section) {
-                    return 'background-color: ' + section.color + '; color: #fff;';
                 },
                 _hasStacks: function(stacks) {
                     return stacks.base.length > 0;

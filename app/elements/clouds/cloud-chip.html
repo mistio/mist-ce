@@ -104,12 +104,16 @@
       min-width: 100%;
       overflow: hidden;
     }
+    /* retain width on opened state, while having padding */
+    :host #chip {
+      box-sizing: border-box;
+    }
     :host([opened]) #chip {
       height: 48px;
+      padding-left: 8px;
     }
     :host([opened]) #chip,
     :host([opened]) #content ::content > * {
-      padding: 8px 12px;
       background-color: #424242;
       color: #fff;
     }
@@ -125,8 +129,8 @@
     :host([opened]) #icon ::content .icon,
     :host([opened]) #icon ::content iron-icon.icon svg {
       font-size: 20px;
-      width: 30px;
-      height: 30px;
+      width: 28px;
+      height: 28px;
       line-height: 30px;
     }
 

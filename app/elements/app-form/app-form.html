@@ -55,6 +55,9 @@
             }
 
             *:not(paper-button)[disabled] {
+                /*display: none;*/
+            }
+            *:not(paper-button)[hidden] {
                 display: none;
             }
             paper-icon-button.docs {
@@ -84,29 +87,38 @@
             <template is="dom-repeat" items="{{fields}}" as="field">
                 <template is="dom-if" if="[[field.show]]">
                     <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-                        <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-input>
+                        <paper-input class="xs12 m6" id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]" hidden="[[field.hidden]]"></paper-input>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'password', field.show)]]">
                         <paper-input  class="xs12 m6" id="[[field.name]]" type="password" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-textarea>
+                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]" hidden="[[field.hidden]]"></paper-textarea>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'ip_textarea', field.show)]]">
                         <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-textarea>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
-                        <paper-radio-group selected="{{field.value}}" class="xs12 m6" disabled="[[field.disabled]]">
+                        <paper-radio-group selected="{{field.value}}" class="xs12 m6" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
                             <template is="dom-repeat" items="[[field.options]]" as="option">
                                 <paper-radio-button name="[[option.val]]">[[option.title]]</paper-radio-button>
                             </template>
                         </paper-radio-group>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]">
+                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
                             <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
                                 <template is="dom-repeat" items="[[field.options]]" as="option">
                                     <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                </template>
+                            </paper-menu>
+                        </paper-dropdown-menu>
+                    </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'mist_dropdown', field.show)]]">
+                        <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
+                            <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                <template is="dom-repeat" items="[[field.options]]" as="option">
+                                    <paper-item value="[[option.id]]">[[option.title]] [[option.name]]</paper-item>
                                 </template>
                             </paper-menu>
                         </paper-dropdown-menu>
@@ -115,17 +127,18 @@
                         <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left">
                             <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
                                 <template is="dom-repeat" items="[[field.options]]" as="option">
-                                    <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                    <paper-item value="[[option.id]]">[[option.name]]</paper-item>
                                 </template>
+                                <paper-button on-tap="_addKey" class="blue">Add Key</paper-button>
                             </paper-menu>
                         </paper-dropdown-menu>
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'toggle', field.show)]]">
                         <div class="xs12 m6">
-                            <paper-toggle-button checked="{{field.value}}" disabled="[[field.disabled]]">[[field.name]]</paper-toggle-button>
+                            <paper-toggle-button checked="{{field.value}}" disabled="[[field.disabled]]" hidden="[[field.hidden]]">[[field.name]]</paper-toggle-button>
                         </div>
                     </template>
-                    <div class="field-helptext xs12 m6">[[field.helptext]]
+                    <div class="field-helptext xs12 m6" hidden="[[field.hidden]]">[[field.helptext]]
                         <a hidden$="[[!field.helpHref]]" href$="[[field.helpHref]]" target="new" class="helpHref">
                             <paper-icon-button suffix icon="icons:help" alt="open docs" title="open docs" class="docs">
                             </paper-icon-button>
@@ -247,7 +260,10 @@
                     },
                     workflow: {
                         type: String
-                    }
+                    },
+                    referral:  {
+                        type: String
+                    },
                 },
                 observers: [
                     '_fieldsChanged(fields.*, sendingData)',
@@ -255,8 +271,8 @@
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
                 },
-                _computeFieldType: function(field, value) {
-                    return field.type == value;
+                _computeFieldType: function(field, value, show) {
+                        return field.type == value;
                 },
                 _handleRequest: function(e) {
                     this.fire("request", e.detail)
@@ -289,18 +305,36 @@
                         // Update show field flag after calculating dependencies
                         fields.base.forEach(function(el, index) {
                             if (el.showIf) {
+
+                                dependency = form[el.showIf.fieldName];
                                 if (el.showIf.fieldExists) {
-                                    dependency = form[el.showIf.fieldName],
-                                        show = dependency;
-                                    this.set('fields.' + index + '.show', show);
+                                    show = dependency ? true : false;
                                 } else {
-                                    dependency = form[el.showIf.fieldName],
-                                        show = el.showIf.fieldValues.indexOf(dependency) != -1;
-                                    this.set('fields.' + index + '.show', show);
+                                    show = el.showIf.fieldValues.indexOf(dependency) != -1;
+                                }                                
+
+                                //check for second level dependency
+                                var parent = this.fields.find(function(f){
+                                    return f.name == el.showIf.fieldName;
+                                });
+
+                                if (parent && parent.showIf){
+                                    var parentShow,
+                                        parentDependency = form[parent.showIf.fieldName];
+
+                                    if (parent.showIf.fieldExists){
+                                        parentShow = parentDependency ? true : false;
+                                    }
+                                    else { 
+                                        parentShow = parent.showIf.fieldValues.indexOf(parentDependency) != -1;
+                                    }
+                                    show = show && parentShow;
                                 }
 
+                                this.set('fields.' + index + '.show', show);
+
                                 if (!show && reset) {
-                                    this._resetField(el, index);
+                                    // this._resetField(el, index);
                                 } else {
                                     this.set('form.' + el.name, el.value);
                                 }
@@ -390,15 +424,23 @@
                         }
                     }, this);
                 },
+
                 validateip: function(value) {
                   var ipArray = value.split('\n');
                   for(var i=0;i<ipArray.length;i++){
                     if (!(/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipArray[i])))
-                    {
-                      return false;
+                        {
+                        return false;
+                        }
                     }
-                  }
-                  return true;
+                    return true;
+                },
+
+                _addKey: function(){
+                    //set attribute origin
+                    var origin = window.location.pathname;
+                    page("/add-key?origin="+origin);
+
                 }
             });
         })();

@@ -275,6 +275,10 @@
                 var dataKeys = Object.keys(data[i]),
                     modelKeys = Object.keys(item);
                 for (var k = 0; k < dataKeys.length; k++) {
+                    // Do not update model just for the last_seen property
+                    if (dataKeys[k] == 'last_seen') {
+                        continue;
+                    }
                     if (modelKeys.indexOf(dataKeys[k]) == -1) {
                         // If something is missing the model needs to be updated
                         changed = true;

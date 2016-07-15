@@ -109,10 +109,14 @@
                     showProgress: {
                         type: Boolean,
                         computed: '_computeShowProgress(sendingData)'
+                    },
+                    origin: {
+                        type: String
                     }
                 },
                 ready: function() {
                     this.querySelector('custom-validator').validate = this.isUniqueValidator.bind(this);
+                    this.set('origin',this.getURLParameter('origin'));
                 },
                 listeners: {
                     'iron-overlay-closed': '_modalClosed',
@@ -177,9 +181,13 @@
                 },
                 _handleKeyAddAjaxResponse: function(e) {
                     this.set('sendingData', false);
-
-                    var keyID = e.detail.response.id;
-                    page('/keys/' + keyID);
+                    if (!this.origin) {
+                        var keyID = e.detail.response.id;
+                        page('/keys/' + keyID);
+                    }
+                    else {
+                        page(this.origin);
+                    }
 
                     this.debounce('formReset', function() {
                         this._formReset();
@@ -215,6 +223,9 @@
                 },
                 _handleKeyGenerateAjaxError: function(e) {
                     this.set('sendingData', false);
+                },
+                getURLParameter: function(name) {
+                    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
                 }
             });
         })();
