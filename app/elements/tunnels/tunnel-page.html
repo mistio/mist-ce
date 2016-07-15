@@ -127,10 +127,12 @@
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
+                            <paper-button on-tap="_disableTunnel" class="simple" hidden$="[[!tunnel.active]]" disabled>Disable Tunnel</paper-button>
                             <paper-button on-tap="_editTunnel" class="simple">Edit Tunnel</paper-button>
                             <paper-button on-tap="_deleteTunnel" class="simple">Delete Tunnel</paper-button>
-                        </paper-menu>
+                        </paper-menu>                        
                     </paper-menu-button>
+                    <paper-button on-tap="_enableTunnel" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[tunnel.active]]" disabled> Enable Tunnel <iron-icon icon="av:play-arrow" style$="color: [[section.color]]"></iron-icon></paper-button>
                 </div>
             </paper-material>
             <div class="columns">
@@ -148,10 +150,6 @@
                             <div class="flexchild">[[tunnel.id]]</div>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
-                            <div class="flexchild">OWNER</div>
-                            <div class="flexchild">[[tunnel.owner]]</div>
-                        </div>
-                        <div class="info-item flex-horizontal-with-ratios">
                             <div class="flexchild">TUNNEL ID</div>
                             <div class="flexchild">[[tunnel.tunnel_id]]</div>
                         </div>
@@ -163,7 +161,6 @@
                                 <template is="dom-if" if="[[!tunnel.tags]]">
                                     <span class="id">(0)</span>
                                 </template>
-
                             </h4>
                             <template is="dom-if" if="[[tunnel.tags]]">
                                 <template is="dom-repeat" items="[[tunnel.tags]]">
@@ -178,7 +175,7 @@
                             </template>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
-                            <div class="flexchild">ACTIVE</div>
+                            <div class="flexchild">Enabled</div>
                             <div class="flexchild">[[tunnel.active]]</div>
                         </div>
                     </div>
@@ -321,6 +318,12 @@
                 toast.text = msg;
                 toast.show();
             },
+            _enableTunnel: function(){
+
+            },
+            _disableTunnel: function(){
+                
+            }
         });
     })();
     </script>
