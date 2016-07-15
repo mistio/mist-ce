@@ -15,11 +15,21 @@
             <h2>Add Organization</h2>
             <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
-                <p>
-                    <paper-input id="name" label="Name" error-message="Please enter organization's name" value="{{newOrganization.name}}"></paper-input>
-                </p>
-                <div class="clearfix btn-group">
-                    <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
+                <div class="" hidden$="[[success]]">
+                    <p>
+                        <paper-input id="name" label="Name" error-message="Please enter organization's name" value="{{newOrganization.name}}"></paper-input>
+                    </p>
+                    <div class="clearfix btn-group">
+                        <paper-button class="submit-btn btn-block blue" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
+                    </div>
+                </div>
+                <div class="" hidden$="[[!success]]">
+                    <p>
+                        New organisation created successfully. You can switch to the new organizatiom context.
+                    </p>
+                    <p>
+                       <paper-button class="submit-btn btn-block blue" on-tap="_switchOrg">Switch</paper-button> 
+                    </p>
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
@@ -48,7 +58,12 @@
                     formReady: {
                         type: Boolean,
                         computed: '_computeFormReady(newOrganization.name, sendingData)'
-                    }
+                    },
+                    success: {
+                        type: Boolean,
+                        value: false
+                    },
+                    newOrgId: String
                 },
                 listeners: {
                     'iron-overlay-closed': '_modalClosed'
@@ -74,9 +89,13 @@
                 },
                 openDialog: function(e) {
                     this.querySelector('paper-dialog').open();
+                    this.set('success', false);
+                    this.set('newOrgId','');
                 },
                 _closeDialog: function(e) {
                     this.querySelector('paper-dialog').close();
+                    this.set('success', false);
+                    this.set('newOrgId','');
                 },
                 _submitForm: function() {
                     this.$.organizationAddAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -88,9 +107,14 @@
 
                     this.set('sendingData', true);
                 },
-                _handleOrganizationAddAjaxResponse: function() {
+                _handleOrganizationAddAjaxResponse: function(e) {
                     this.set('sendingData', false);
-                    this._formReset();
+                    this._formReset();        
+                    this.set('newOrgId',e.detail.response.id);
+                    this.set('success', true);
+                },
+                _switchOrg: function(){
+                    window.location.href = this.newOrgId ? '/switch_context/' + this.newOrgId : '/switch_context';
                 },
                 _modalClosed: function(e) {
                     if (e.srcElement.id == 'organizationAddModal') {
