@@ -152,12 +152,8 @@
                             <div class="flexchild">[[tunnel.owner]]</div>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
-                            <div class="flexchild">CLIENT</div>
-                            <div class="flexchild">[[tunnel.client]]</div>
-                        </div>
-                        <div class="info-item flex-horizontal-with-ratios">
-                            <div class="flexchild">SERVER</div>
-                            <div class="flexchild">[[tunnel.server]]</div>
+                            <div class="flexchild">TUNNEL ID</div>
+                            <div class="flexchild">[[tunnel.tunnel_id]]</div>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
                         <h4 class="id tags">TAGS
@@ -178,20 +174,12 @@
                         <div class="info-item flex-horizontal-with-ratios">
                             <div class="flexchild">CIDRS</div>
                             <template is="dom-repeat" items=[[tunnel.cidrs]]>
-                              <div class="flexchild">[[tunnel.cidrs]]</div>
+                                [[item]]<br/>
                             </template>
-                        </div>
-                        <div class="info-item flex-horizontal-with-ratios">
-                            <div class="flexchild">TUNNEL ID</div>
-                            <div class="flexchild">[[tunnel.tunnel_id]]</div>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
                             <div class="flexchild">ACTIVE</div>
                             <div class="flexchild">[[tunnel.active]]</div>
-                        </div>
-                        <div class="info-item flex-horizontal-with-ratios">
-                            <div class="flexchild">ACCESSED AT</div>
-                            <div class="flexchild">[[tunnel.accessed_at]]</div>
                         </div>
                     </div>
                 </div>
