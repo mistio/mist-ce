@@ -143,6 +143,11 @@
                             <paper-icon-button suffix icon="icons:help" alt="open docs" title="open docs" class="docs">
                             </paper-icon-button>
                         </a>
+                        <p hidden$="[[!field.warning]]">
+                            <iron-icon icon="warning"></iron-icon>
+                            [[field.warning]]
+                        </p>
+                        <div id="warningmsg"></div>
                     </div>
                     <template is="dom-if" if="[[field.isLead]]">
                         <hr class="xs12" />
@@ -350,7 +355,7 @@
 
                         var valid = fields.base.every(function(el, index) {
                            if(el.type == "ip_textarea") {
-                             return el.show && el.required ? this.validatecidr(el.value) : true;
+                             return el.show ? this.validatecidr(el.value, index) : true;
                            }
                            else {
                              return el.show && el.required ? el.value : true;
@@ -425,25 +430,28 @@
                     }, this);
                 },
 
-                validateip: function(value) {
+                validateip: function(value, field) {
                   var ipArray = value.split('\n');
                   for(var i=0;i<ipArray.length;i++){
-                    // console.log(ipArray[i]);
                     if (!(/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipArray[i].trim()))){
-                            console.log("ip FALSE at line",i, ipArray[i])
                             return false;
                         }
                     }
                     return true;
                 },
-                validatecidr: function(value) {
-                  var ipArray = value.split('\n');
-                  for(var i=0;i<ipArray.length;i++){
-                    // console.log(ipArray[i]);
-                    if (ipArray[i] && !(/^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/.test(ipArray[i].trim()))){
-                            console.log("cidr FALSE at line",i, ipArray[i])
+                validatecidr: function(value, index) {
+                    var ipArray = value.split('\n');
+                    for(var i=0;i<ipArray.length;i++){
+                        if (ipArray[i] && !(/^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/.test(ipArray[i].trim()))){
                             return false;
                         }
+
+                    }
+                    if(value.indexOf('/0') > -1 ) {
+                        this.set('fields.'+index+'.warning', 'A CIDR with /0 will redirect ALL your traffic through the tunnel. Be certain you want this to happen');
+                    }
+                    else {
+                        this.set('fields.'+index+'.warning', false);
                     }
                     return true;
                 },
