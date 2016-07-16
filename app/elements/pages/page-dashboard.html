@@ -227,10 +227,21 @@
             margin: 10% auto;
             display: block;
         }
+        .notice {
+            background-color: #ffff8d;
+            padding: 2px 16px;
+            margin: 0 16px;
+            z-index: 99;
+        }
         </style>
         <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
+        <div class="notice">
+            <p><strong>Note:</strong> Hello! We are providing an early preview of the new Mist.io UI. Much of the functionality is under heavy development and, as a result, not functional. We would appreciate your feedback! Send suggestions to <a href="mailto:info@mist.io">info@mist.io</a>.
+            <a href="javascript:void(0)" on-tap="_toggleUI" class="flex">Return to old UI</a>
+            </p>
+        </div>
         <template is="dom-if" if="[[showDashboard]]">
-                <div class="clouds top flexchild-wide-top">
+                <div class="clouds top flexchild-wide-top">                    
                     <div id="cloudslist" class="flex">
                         <template is="dom-repeat" items="[[model.cloudsArray]]">
                             <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" index$=[[index]] on-tap="_showCloudInfoDialog" id$="[[item.id]]">
@@ -565,6 +576,9 @@ Polymer({
             targetIndex = this.matrix.length
         }
         return targetIndex;
-    }
+    },
+    _toggleUI: function() {
+        window.location.href = '/toggle-ui/legacy';
+    },
 });
 </script>
