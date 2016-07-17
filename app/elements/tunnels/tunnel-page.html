@@ -303,14 +303,13 @@
                 dialog._openDialog();
             },
             copyScript: function(e) {
-                //get element with id='tunnelscript'
-                var script = this.$.tunnelscript;
-                var range = document.createRange();  
-                    range.selectNode(script);  
-                    window.getSelection().addRange(range);                
+                this.clearSelection();
 
+                var el = this.$.tunnelscript;
+                this.setSelection(el);            
                 var successful = document.execCommand('copy');
                 var msg = successful ? 'The script was copied to clipboard!' : 'There was an error copying to clipboard!';
+
                 this._showToast(msg);
             },
             _showToast: function(msg) {
@@ -323,6 +322,28 @@
             },
             _disableTunnel: function(){
                 
+            },
+            clearSelection: function(){
+                if (window.getSelection) {
+                    if (window.getSelection().empty) {  // Chrome
+                        window.getSelection().empty();
+                    } else if (window.getSelection().removeAllRanges) {  // Firefox
+                        window.getSelection().removeAllRanges();
+                    }
+                } else if (document.selection) {  // IE?
+                    document.selection.empty();
+                }
+            },
+            setSelection: function(el){
+                if (document.selection) {
+                    var range = document.body.createTextRange();
+                        range.moveToElementText(el);
+                    range.select();
+                } else if (window.getSelection) {
+                    var range = document.createRange();
+                    range.selectNode(el);
+                    window.getSelection().addRange(range);
+                }
             }
         });
     })();
