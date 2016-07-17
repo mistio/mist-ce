@@ -104,18 +104,19 @@
                     this._formReset();
                 },
                 _submitForm: function(e) {
-                    if (typeof(this.$.cidrs.value) == 'array'){
-                        var cidrs = this.$.cidrs.value;
-                    }
-                    else {
-                        var cidrs = this.$.cidrs.value.split('\n');
-                    }
+                    // var val = this.$.cidrs
+                    // if (typeof(this.$.cidrs.value) == 'array'){
+                    //     var cidrs = this.$.cidrs.value;
+                    // }
+                    // else {
+                    //     var cidrs = this.$.cidrs.value.split('\n');
+                    // }
                     this.$.tunnelEditAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.tunnelEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.tunnelEditAjaxRequest.body = {
                         name: this.newTunnel.name,
                         description: this.newTunnel.description,
-                        cidrs: cidrs
+                        cidrs: this.newTunnel.cidrs
                     };
                     
                     console.log('CIDRS',cidrs);
