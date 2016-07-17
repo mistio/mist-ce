@@ -214,6 +214,7 @@ class MainConnection(MistConnection):
         self.list_scripts()
         self.list_templates()
         self.list_stacks()
+        self.list_tunnels()
         self.list_clouds()
         self.check_monitoring()
 
@@ -248,6 +249,12 @@ class MainConnection(MistConnection):
     def list_stacks(self):
         self.send('list_stacks',
                   orchestration_methods.filter_list_stacks(self.auth_context))
+
+    def list_tunnels(self):
+        if self.auth_context.is_owner():
+            tunnels = [tunnel.as_dict()
+                       for tunnel in Tunnel.objects(owner=self.auth_context.owner)]
+            self.send('list_tunnels', tunnels)
 
     def list_clouds(self):
         self.send('list_clouds',
@@ -403,6 +410,8 @@ class MainConnection(MistConnection):
                 self.list_teams()
             if 'tags' in sections:
                 self.list_tags()
+            if 'tunnels' in sections:
+                self.list_tunnels()
             if 'monitoring' in sections:
                 self.check_monitoring()
             if 'user' in sections:
