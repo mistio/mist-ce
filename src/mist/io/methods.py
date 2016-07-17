@@ -2895,7 +2895,6 @@ def list_images(user, cloud_id, term=None):
     the community images
 
     """
-
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     conn = connect_provider(cloud)
     try:
@@ -2911,9 +2910,12 @@ def list_images(user, cloud_id, term=None):
             for image in ec2_images:
                 image.name = config.EC2_IMAGES[conn.type].get(image.id, image.name)
             ec2_images += conn.list_images(ex_owner="self")
-            ec2_images += conn.list_images(ex_owner="amazon")
         elif conn.type in config.EC2_PROVIDERS and term:
-            ec2_images += conn.list_images()
+            images = CloudImage.objects( me.Q(cloud_provider=conn.type, image_id__icontains=term) | me.Q(cloud_provider=conn.type, name__icontains=term))[:200]
+            images = [NodeImage(id=image.image_id, name=image.name, driver=conn, extra={}) for image in images]
+            if not images:
+                # actual search on ec2
+                images = conn.list_images(ex_filters={'name': '*%s*' % term})
         elif conn.type == Provider.GCE:
             rest_images = conn.list_images()
             for gce_image in rest_images:
@@ -2943,12 +2945,12 @@ def list_images(user, cloud_id, term=None):
             starred_images = [image for image in rest_images
                               if image.id in starred]
 
-        images = starred_images + ec2_images + rest_images
-        images = [img for img in images
-                  if img.name and img.id[:3] not in ['aki', 'ari']
-                  and 'windows' not in img.name.lower()]
-
-        if term and term is not None:
+        if not term:
+            images = starred_images + ec2_images + rest_images
+            images = [img for img in images
+                      if img.name and img.id[:3] not in ['aki', 'ari']
+                      and 'windows' not in img.name.lower()]
+        elif term and term is not None:
             term = term.lower()
             if conn.type == Provider.LIBVIRT:
             # fetch a new listing of the images and search for the term
@@ -2956,10 +2958,7 @@ def list_images(user, cloud_id, term=None):
             elif conn.type == 'docker':
                 images = conn.search_images(term=term)[:100]
             #search directly on docker registry for the query
-            elif conn.type in config.EC2_PROVIDERS:
-                images = [img for img in images
-                          if term in img.id.lower()
-                          or img.name and term in img.name.lower()][:100]
+
     except Exception as e:
         log.error(repr(e))
         raise CloudUnavailableError(cloud_id, e)
