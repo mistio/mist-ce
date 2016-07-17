@@ -521,7 +521,7 @@ Polymer({
             return ['name', 'cloud', 'state', 'id', 'public']
         }
         if (this.isTunnels(this.section)) {
-            return ['name', 'owner', 'id']
+            return ['name', 'cidrs', 'id']
         }
         if (this.isScripts(this.section)) {
             return ['name', 'id', 'exec_type', 'location_type'];
