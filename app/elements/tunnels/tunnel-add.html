@@ -151,11 +151,11 @@
             _addTunnelAjaxRequest: function() {
             },
             _addTunnelAjaxResponse: function(e) {
-                var response = e.detail.response;
+                var response = e.detail.xhr.response;            
                 if (response.id) {
                     page('/tunnels/'+ response.id);
                 }
-                else{
+                else {
                     page('/tunnels/');
                 }
             },
