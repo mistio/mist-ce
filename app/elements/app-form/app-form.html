@@ -227,7 +227,7 @@
                                 if (this.fields[field].defaultValue) {
                                     uniqueFields[this.fields[field].name] = this.fields[field].defaultValue
                                 } else {
-                                    uniqueFields[this.fields[field].name] = ''
+                                    uniqueFields[this.fields[field].name] = null
                                 }
 
                             }
@@ -350,7 +350,13 @@
                                     }
                                 }
                             } else {
-                                this.set('form.' + el.name, el.value);
+                                if(el.type == "ip_textarea") {
+                                    var cidrsArray = el.value.split('\n');
+                                    this.set('form.' + el.name, cidrsArray);
+                                }
+                                else {
+                                    this.set('form.' + el.name, el.value);
+                                }
                             }
 
                             if (el.placeholderIf) {
