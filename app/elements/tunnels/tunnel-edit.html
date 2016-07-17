@@ -32,7 +32,7 @@
                 <p>
                     <paper-input id="name" label="Name" error-message="Please enter tunnel's name" value="{{newTunnel.name}}"></paper-input>
                     <paper-textarea id="description" label="Description (optional)" rows="1" max-rows="5" error-message="Please enter tunnel's description" value="{{newTunnel.description}}"></paper-textarea>
-                    <paper-textarea id="cidrs™" label="CIDRs" rows="3" max-rows="5" error-message="Please enter tunnel's description" value="{{newTunnel.cidrs}}" disabled></paper-textarea>
+                    <paper-textarea id="cidrs™" label="CIDRs" rows="3" max-rows="5" error-message="Please enter tunnel's description" value="{{newTunnel.cidrs}}"></paper-textarea>
                     <div id="errormsg" hidden$="[[!fail]]"></div>
                 </p>
                 <div class="clearfix btn-group">
@@ -104,12 +104,15 @@
                     this._formReset();
                 },
                 _submitForm: function(e) {
+                    var cidrs = this.newTunnel.cidrs;
+                    var cidrsArray = cidrs.split('\n');
+
                     this.$.tunnelEditAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.tunnelEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.tunnelEditAjaxRequest.body = {
-                        new_name: this.newTunnel.name,
-                        new_description: this.newTunnel.description,
-                        // new_cidrs: this.newTunnel.cidrs
+                        name: this.newTunnel.name,
+                        description: this.newTunnel.description,
+                        cidrs: cidrsArray
                     };
                     this.$.tunnelEditAjaxRequest.generateRequest();
 
