@@ -73,10 +73,11 @@
                     'iron-overlay-closed': '_modalClosed'
                 },
                 _computeNewTunnel: function(tunnel) {
+                    var cidrs = this.tunnel.cidrs.join('\n');
                     return {
                         name: tunnel.name,
                         description: tunnel.description,
-                        cidrs: tunnel.cidrs
+                        cidrs: cidrs
                     };
                 },
                 _computeFormReady: function(name, cidrs, sendingData) {
