@@ -293,6 +293,7 @@
                 _handleError: function(e,d) {
                     this.set('sendingData', false);
                     this.set('formError', true);
+                    console.log('FAIL', e)
                     // this.$.errormsg.textContent = e.detail.request.xhr.response.body.innerText;
                     this.$.errormsg.textContent = e.detail.request.xhr.responseText;
                 },
