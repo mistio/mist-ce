@@ -341,7 +341,13 @@
                                 if (!show && reset) {
                                     // this._resetField(el, index);
                                 } else {
-                                    this.set('form.' + el.name, el.value);
+                                    if(el.type == "ip_textarea") {
+                                        var cidrsArray = el.value.split('\n');
+                                        this.set('form.' + el.name, cidrsArray);
+                                    }
+                                    else {
+                                        this.set('form.' + el.name, el.value);
+                                    }
                                 }
                             } else {
                                 this.set('form.' + el.name, el.value);
