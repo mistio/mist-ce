@@ -175,7 +175,7 @@
             </div>
         </div>
 
-        <iron-ajax id="formAjax" url="[[url]]" contentType="application/json" handle-as="xml" method="[[method]]" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="formAjax" url="[[url]]" contentType="application/json" handle-as="{{handleas}}" method="[[method]]" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
     </template>
     <script>
         (function() {
@@ -218,6 +218,10 @@
                     },
                     templateid: {
                         type: String
+                    },
+                    handleas: {
+                        type: String,
+                        value: "xml"
                     },
                     form: {
                         type: Object,
