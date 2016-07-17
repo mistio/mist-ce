@@ -295,6 +295,11 @@
             _handleTunnelDeleteAjaxResponse: function(e) {
                 page.show('/tunnels');
             },
+            _handleTunnelDeleteAjaxError: function(e) {
+                var toast = this.querySelector('paper-toast');
+                toast.text = "There was a problem deleting the tunnel";
+                toast.show();
+            },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element');
                 for (var i in info) {
