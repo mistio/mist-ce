@@ -19,7 +19,10 @@
                 background-color: var(--mist-blue);
                 color: #fff;
             }
-
+            #errormsg {
+                padding: 0 24px 24px 24px;
+                color: var(--red-color);
+            }
         </style>
 
         <paper-dialog id="editTunnelModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
@@ -30,6 +33,7 @@
                     <paper-input id="name" label="Name" error-message="Please enter tunnel's name" value="{{newTunnel.name}}"></paper-input>
                     <paper-textarea id="description" label="Description (optional)" rows="1" max-rows="5" error-message="Please enter tunnel's description" value="{{newTunnel.description}}"></paper-textarea>
                     <paper-textarea id="cidrs™" label="CIDRs" rows="3" max-rows="5" error-message="Please enter tunnel's description" value="{{newTunnel.cidrs}}" disabled></paper-textarea>
+                    <div id="errormsg" hidden$="[[!fail]]"></div>
                 </p>
                 <div class="clearfix btn-group">
                     <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
@@ -37,7 +41,7 @@
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <iron-ajax id="tunnelEditAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]" method="PUT" on-response="_handleTunnelEditAjaxResponse" on-error="_handleTunnelEditAjaxError"></iron-ajax>
+        <iron-ajax id="tunnelEditAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]" method="PUT" handle-as="json" on-response="_handleTunnelEditAjaxResponse" on-error="_handleTunnelEditAjaxError"></iron-ajax>
     </template>
 
     <script>
@@ -90,9 +94,11 @@
                 },
                 _openEditTunnelModal: function(e) {
                     this.$.editTunnelModal.open();
+                    this._formReset();
                 },
                 _closeEditTunnelModal: function(e) {
                     this.$.editTunnelModal.close();
+                    this._formReset();
                 },
                 _modalClosed: function() {
                     this._formReset();
@@ -102,18 +108,35 @@
                     this.$.tunnelEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.tunnelEditAjaxRequest.body = {
                         new_name: this.newTunnel.name,
-                        new_description: this.newTunnel.description
+                        new_description: this.newTunnel.description,
+                        // new_cidrs: this.newTunnel.cidrs
                     };
                     this.$.tunnelEditAjaxRequest.generateRequest();
 
                     this.set('sendingData', true);
                 },
                 _formReset: function() {
-                    //   this.set('tunnel.id', '');
+                    this.set('tunnel', {
+                        name: this.tunnel.name,
+                        id: this.tunnel.id,
+                        description: this.tunnel.description,
+                        cidrs: this.tunnel.cidrs
+                    })
+                    this.set('sendingData', false);
+                    this.set("fail", false);
                 },
                 _handleTunnelEditAjaxResponse: function(e) {
                     this.set('sendingData', false);
                     this._closeEditTunnelModal();
+                },
+                _handleTunnelEditAjaxError: function(e){
+                    var msg404;
+                    if (e.detail.error.message.indexOf('404')> -1){
+                        msg404 = 'Tunnel seems deleted';
+                    }
+                    this.$.errormsg.textContent = e.detail.error.message+' '+msg404;
+                    this.set('sendingData', true);
+                    this.set("fail", true);
                 }
             });
         })();
