@@ -123,6 +123,11 @@
                             // console.debug('list_networks', data);
                         }, 250);
                     },
+                    list_tunnels: function(data) {
+                        that.debounce(that._updateTunnels(data), function() {
+                            // console.debug('list_networks', data);
+                        }, 250);
+                    },
                     list_projects: function(data) {
                         that.debounce(that._updateProjects(data), function() {
                             // console.debug('list_projects', data);
@@ -462,6 +467,9 @@
                 );
             }
             this.set('model.networksArray', allNetworks);
+        },
+        _updateTunnels: function(data) {
+            return this._updateModel('tunnels', data);
         },
 
         _updateProjects: function(data) {
