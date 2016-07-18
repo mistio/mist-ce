@@ -37,7 +37,7 @@
                     <p>
                        <paper-button class="submit-btn btn-block blue" on-tap="_switchOrg">Switch</paper-button> 
                     </p>
-                </div>                
+                </div>    
             </paper-dialog-scrollable>
         </paper-dialog>
 
@@ -97,14 +97,10 @@
                 },
                 openDialog: function(e) {
                     this.querySelector('paper-dialog').open();
-                    this.set('success', false);
-                    this.set('newOrgId','');
                     this._formReset();
                 },
                 _closeDialog: function(e) {
                     this.querySelector('paper-dialog').close();
-                    this.set('success', false);
-                    this.set('newOrgId','');
                     this._formReset();
                 },
                 _submitForm: function() {
@@ -138,6 +134,8 @@
                 },
                 _formReset: function() {
                     this.set('newOrganization.name', '');
+                    this.set('success', false);
+                    this.set('newOrgId','');
                     this.set("fail", false);
                 }
             });

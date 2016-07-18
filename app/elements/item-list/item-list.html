@@ -320,6 +320,10 @@ Polymer({
             type: Boolean,
             computed: "isNetworks(section)"
         },
+        istunnels: {
+            type: Boolean,
+            computed: "isTunnels(section)"
+        },
         isscripts: {
             type: Boolean,
             computed: "isScripts(section)"
@@ -390,7 +394,7 @@ Polymer({
         var wh = document.getElementById('mainPanel').offsetHeight - 24 - 54; //#mainPanel height - top padding - header height
         var itemHeight = 64 + 1; //list item height + border
         var criticalNumofItems = Math.floor(wh/itemHeight) - 1;
-        
+
         // console.log( wh, ' / ', itemHeight, ' -1 = ' , criticalNumofItems, '|', this.items.length, ' * 64 = ', itemHeight * this.items.length );
 
         if (that.items.length > criticalNumofItems){
@@ -467,7 +471,9 @@ Polymer({
     isNetworks: function(section) {
         return section && section.id == "networks";
     },
-
+    isTunnels: function(section) {
+        return section && section.id == "tunnels";
+    },
     isScripts: function(section) {
         return section && section.id == "scripts";
     },
@@ -513,6 +519,9 @@ Polymer({
         }
         if (this.isNetworks(this.section)) {
             return ['name', 'cloud', 'state', 'id', 'public']
+        }
+        if (this.isTunnels(this.section)) {
+            return ['name', 'cidrs', 'id']
         }
         if (this.isScripts(this.section)) {
             return ['name', 'id', 'exec_type', 'location_type'];
