@@ -595,7 +595,7 @@ PROVIDERS.push({
         errorMessage: "Please enter password"
     }, {
         name: "auth_url",
-        label: "Title *",
+        label: "Auth Url *",
         type: "text",
         value: "OpenStack",
         defaultValue: "OpenStack",

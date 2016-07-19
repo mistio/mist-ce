@@ -23,6 +23,7 @@ from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import ServiceUnavailableError
 
 from mist.io.helpers import trigger_session_update
+from mist.io.helpers import sanitize_host
 
 try:
     from mist.core.user.models import User
@@ -32,7 +33,10 @@ try:
 except ImportError:
     from mist.io import config
 
+from mist.core.vpn.methods import destination_nat as dnat
+
 import logging
+
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
@@ -226,15 +230,14 @@ class ParamikoShell(object):
         username used to connect.
 
         """
-
         log.info("autoconfiguring Shell for machine %s:%s",
                  cloud_id, machine_id)
+
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
         try:
             machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
         except me.DoesNotExist:
             machine = Machine(cloud=cloud, machine_id=machine_id)
-
         if key_id:
             keys = [Keypair.objects.get(owner=user, id=key_id)]
         else:
@@ -259,10 +262,16 @@ class ParamikoShell(object):
                               for key_assoc in machine.key_associations]))
         if 22 not in ports:
             ports.append(22)
+        # store the original destination IP to prevent rewriting it when NATing
+        ssh_host = self.host
         for key in keys:
             for ssh_user in users:
                 for port in ports:
                     try:
+                        # store the original ssh port in case of NAT
+                        # by the OpenVPN server
+                        ssh_port = port
+                        self.host, port = dnat(user, ssh_host, port)
                         log.info("ssh -i %s %s@%s:%s",
                                  key.name, ssh_user, self.host, port)
                         self.connect(username=ssh_user,
@@ -290,7 +299,7 @@ class ParamikoShell(object):
                             ssh_user = new_ssh_user
                         except MachineUnauthorizedError:
                             continue
-                    # we managed to connect succesfully, return
+                    # we managed to connect successfully, return
                     # but first update key
                     updated = False
                     for key_assoc in machine.key_associations:
@@ -301,9 +310,12 @@ class ParamikoShell(object):
                             break
                     if not updated:
                         trigger_session_update_flag = True
+                        # in case of a private host do NOT update the key
+                        # associations with the port allocated by the OpenVPN
+                        # server, instead use the original ssh_port
                         key_assoc = KeyAssociation(keypair=key,
                                                    ssh_user=ssh_user,
-                                                   port=port,
+                                                   port=ssh_port,
                                                    sudo=self.check_sudo())
                         machine.key_associations.append(key_assoc)
                     machine.save()
@@ -335,6 +347,8 @@ class DockerShell(object):
                  cloud_id, machine_id)
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
         docker_port = cloud.docker_port
+
+        self.host, docker_port = dnat(user, self.host, docker_port)
 
         # For basic auth
         if cloud.apikey and cloud.apisecret:

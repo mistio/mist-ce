@@ -87,7 +87,7 @@
                 </div>
             </paper-material>
             <paper-material>
-                <app-form model=[[model]] fields="[[fields]]" templateid="[[template.id]]" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
+                <app-form fields="{{fields}}" templateid="{{template.id}}" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
             </paper-material>
         </div>
 
@@ -127,7 +127,6 @@
                     },
                     template: {
                         type: Object,
-                        value: {},
                         computed: '_fromTemplate(params, model.templates.*)'
                     },
                     fields: {
@@ -149,33 +148,69 @@
                         type: String,
                         computed: "_uri(model)"
                     },
+                    yaml_inputs: {
+                        type: String,
+                        notify: true
+                    }
                 },
 
                 observers: [
-                    '_computeFields(template, model.templates.*)',
+                    '_computeFields(template, template.inputs, template.inputs.*, model.templatesArray.*, model.cloudsArray.*, model.keysArray.*, params)'
                 ],
 
+                listeners: {
+                    'change' : '_updateFields',
+                    'iron-select' : '_updateFields',
+                },
                 _fromTemplate: function(params, templates) {
                     if (params.id && this.model.templates) {
-                        return this.model.templates[params.id]
+                        var yaml_inputs = '';
+                        var arr = ['key', 'key_id','size_id','location_id','image_id','cloud_id'];
+                        this.model.templates[params.id].inputs.sort(function (a, b) {
+                            if (arr.indexOf(a.name) > arr.indexOf(b.name)) {
+                                return -1;
+                            }
+                            if (arr.indexOf(a.name) < arr.indexOf(b.name)) {
+                                return 1;
+                            }
+                            return 0;
+                        });
+                        this.model.templates[params.id].inputs.forEach(function(inp) {
+                            yaml_inputs += inp.name+ ': ';
+                            var val = inp.value =! undefined ? inp.value : inp.defaultValue;
+                            yaml_inputs += val+'\n';
+
+
+                        }, this);
+                        this.set('yaml_inputs', yaml_inputs);
+                        // pass values into form's stackinputs default value
+                        var ind;
+                        var stackinputsField = this.fields.find(function(f, index){
+                            ind=index;
+                            return f.name == "stackinputs";
+                        });
+                        this.set('fields.'+ind+'.defaultValue', this.yaml_inputs);
+                        console.log('template is redefined');
+                        return this.model.templates[params.id];
                     } else {
                         return {
                             name: "Template is missing"
                         }
+                        console.log('template is missing');
                     }
                 },
+                _computeFields: function(template, templateInps, templateInputs, modelTemplates, clouds, keys, params) {
+                    var yaml_or_form = 'yaml';
+                    console.log('Computing Fields started');
 
-                _computeFields: function(template) {
-                    var yaml_inputs = '', yaml_array = [];
-                    if (this.template.inputs) {
-                        for (var i = 0; i < this.template.inputs.length; i++) {
-                            if (['mist_uri', 'api_token'].indexOf(this.template.inputs[i].name) == -1) {
-                                yaml_inputs += this.template.inputs[i].name + ': ';
-                                yaml_inputs += this.template.inputs[i].default+'\n';
-
-                                yaml_array[this.template.inputs[i].name] = this.template.inputs[i].default;
-                            }
-                        }
+                    if (this.fields) {
+                        var yf = this.fields.find(function(f){
+                                return f.name == 'yaml_or_form'
+                            });
+                        if (yf && yf.value)
+                            yaml_or_form = yf.value;
+                        else
+                            yaml_or_form = 'yaml';
                     }
 
                     var ret = [{
@@ -204,7 +239,7 @@
                         name: "yaml_or_form",
                         label: "YAML or form",
                         type: "radio",
-                        value: "yaml",
+                        value: yaml_or_form,
                         defaultValue: "yaml",
                         helptext: "Choose the way you want to insert inputs",
                         errorMessage: "Choose an input format",
@@ -221,9 +256,9 @@
                         name: "stackinputs",
                         label: "Stack Inputs YAML",
                         type: "textarea",
-                        value: yaml_inputs,
-                        defaultValue: yaml_inputs,
-                        placeholder: "",
+                        value: this.yaml_inputs,
+                        defaultValue: this.yaml_inputs,
+                        placeholder: '',
                         helptext: "Enter the stack inputs in yaml format",
                         errorMessage: "Please enter stacks's inputs",
                         show: true,
@@ -235,40 +270,83 @@
                     }];
 
                     if (template && template.inputs) {
+                        //sort inputs
+                        var arr = ['key','key_id','size_id','location_id','image_id','cloud_id'];
+                        template.inputs.sort(function (a, b) {
+                            if (arr.indexOf(a.name) > arr.indexOf(b.name)) {
+                                return -1;
+                            }
+                            if (arr.indexOf(a.name) < arr.indexOf(b.name)) {
+                                return 1;
+                            }
+                            return 0;
+                        });
                         template.inputs.forEach(function(inp) {
                             inp['showIf'] = {
                                 fieldName: "yaml_or_form",
                                 fieldValues: ["form"]
                             }
-                            inp['value'] = yaml_array[inp.name];
-                            inp['defaultValue'] = yaml_array[inp.name];
+                            inp['label'] = inp.name.replace(/_/g,' ');
+                            inp['defaultValue'] = inp.value;
 
                             // make key dropdown
-                            if(inp.name == "key") {
-                                inp.type = 'dropdown';
-                                inp.query = ["keysArray"];
+                            if(inp.name == "key" || inp.name == "key_id") {
+                                inp.type = 'ssh_key';
+                                // inp.type = 'dropdown';
+                                inp.helptext = 'Choose your mist key';
+                                inp.options = this.model.keysArray;
                             }
 
                             // make cloud dropdown
                             if(inp.name == "cloud_id") {
-                                inp.type = 'dropdown';
-                                inp.query = ["cloudsArray"];
+                                inp.label = 'cloud';
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Choose your mist cloud';
+                                inp.options = this.model.cloudsArray;
                             }
 
                             // make image dropdown & dependent on cloud
                             if(inp.name == "image_id") {
                                 inp.show = false;
-                                inp.type = 'dropdown';
-                                inp.query = ["clouds","$.cloud_id", "imagesArray"],
-                                inp.andshowIf = {
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Choose the image of your cloud';
+                                inp.showIf = {
                                     fieldName: "cloud_id",
                                     fieldExists: true
                                 }
                             }
 
+                            // make image location & dependent on cloud
+                            if(inp.name == "location_id") {
+                                inp.show = false;
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Choose the location of your cloud';
+                                inp.showIf = {
+                                    fieldName: "cloud_id",
+                                    fieldExists: true
+                                }
+                            }
+
+                            // make image location & dependent on cloud
+                            if(inp.name == "size_id") {
+                                inp.show = false;
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Choose the size of your cloud';
+                                inp.showIf = {
+                                    fieldName: "cloud_id",
+                                    fieldExists: true
+                                }
+                            }
+
+                            //hide api_token && mist_uri
+                            if(inp.name == "api_token" || inp.name == "mist_uri" ) {
+                                inp.hidden = true;
+                                inp.required = false;
+                            }
+
                             ret.push(inp);
-                        });
-                    }
+                        }, this);
+                    }                    
 
                     ret.push({
                         name: "deploy",
@@ -282,11 +360,70 @@
                         show: true,
                         required: false
                     });
-
+                    console.log("computing fields")
                     this.set('fields', ret);
+                },                
+                _updateFields: function(e){
+                    var changeInYaml = e.path.indexOf(document.querySelector("paper-textarea#stackinputs")) >-1
+                    if (changeInYaml) {
+                        var yaml = document.querySelector("paper-textarea#stackinputs").value;
+                        var yaml_array = yaml.split('\n');
+                        var inputs = [];
+                        yaml_array.forEach(function(line){
 
+                            var name = line.split(':')[0].trim();
+                            var value = line.split(':')[1];
+                            if (value)
+                                value = value.trim();
+                            inputs[name] = value;
+                        });
+
+                        this.fields.forEach(function(f, index){
+                            if (inputs[f.name])
+                                this.set('fields.'+index+'.value', inputs[f.name])
+                        }, this)
+                    }
+                    else {
+                        var cloud = this.fields.find(function(f){
+                            return f.name == 'cloud_id';
+                        });
+                        var yaml_inputs = '';
+                        this.fields.forEach(function(inp) {
+
+                            if (['name', 'description', 'yaml_or_form','stackinputs', 'deploy'].indexOf(inp.name) == -1) {
+                                yaml_inputs += inp.name+ ': ';
+                                var val = inp.value || inp.defaultValue;
+                                yaml_inputs += val+'\n';
+                            }
+
+                            if (cloud && cloud.value){
+                                var cloudId = cloud.value;
+                                //TODO change to mist_NAME when backend changes
+                                if(inp.name == "location_id") {
+                                    inp.options = this.model.clouds[cloudId].locationsArray;
+                                }
+                                if(inp.name == "image_id") {
+                                    inp.options = this.model.clouds[cloudId].imagesArray;
+                                }
+                                if(inp.name == "size_id") {
+                                    inp.options = this.model.clouds[cloudId].sizesArray;
+                                }
+                            }
+                        }, this);
+
+                        this.set('yaml_inputs', yaml_inputs);
+
+                        // pass values into form's stackinputs value
+                        var ind;
+                        var stackinputsField = this.fields.find(function(f, index){
+                            ind=index;
+                            return f.name == "stackinputs";
+                        });
+
+                        this.set('fields.'+ind+'.value', this.yaml_inputs);
+                    }
+                    
                 },
-
                 _handleRequest: function(e) {
 
                 },

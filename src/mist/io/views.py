@@ -105,6 +105,7 @@ def exception_handler_mist(exc, request):
 @view_config(route_name='key', request_method='GET')
 @view_config(route_name='networks', request_method='GET')
 @view_config(route_name='network', request_method='GET')
+
 def home(request):
     """Home page view"""
     params = params_from_request(request)
@@ -1003,7 +1004,7 @@ def create_machine(request):
     else:
         image_id = params.get('image')
         if not image_id:
-            raise RequiredParameterMissingError("machine_name")
+            raise RequiredParameterMissingError("image_id")
         disk_size = disk_path = None
     size_id = params['size']
     # deploy_script received as unicode, but ScriptDeployment wants str
@@ -1232,6 +1233,9 @@ def machine_rdp(request):
         1 < int(rdp_port) < 65535
     except:
         rdp_port = 3389
+
+    from mist.core.vpn.methods import destination_nat
+    host, rdp_port = destination_nat(auth_context.owner, host, rdp_port)
 
     rdp_content = 'full address:s:%s:%s\nprompt for credentials:i:1' % \
                   (host, rdp_port)
@@ -1703,7 +1707,7 @@ def update_monitoring(request):
 
     action = params.get('action') or 'enable'
     name = params.get('name', '')
-    public_ips = params.get('public_ips', [])
+    public_ips = params.get('public_ips', [])  # TODO priv IPs?
     dns_name = params.get('dns_name', '')
     no_ssh = bool(params.get('no_ssh', False))
     dry = bool(params.get('dry', False))

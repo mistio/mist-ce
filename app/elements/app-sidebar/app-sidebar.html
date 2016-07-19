@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+ou<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
 
 <link rel="import" href="../section-symbol/section-symbol.html">
@@ -31,7 +31,16 @@
             left: 0;
             transition: left 350ms ease-in-out;
         }
-        :host[smallscreen],
+        :host[smallscreen]{
+            left: 0;
+            top: 56px;
+            padding-top: 16px;
+            background: #fff;
+            @apply(--shadow-elevation-4dp);
+            z-index: 99;
+        }
+
+        :host[smallscreen].close,
         :host.close {
             left: -210px;
         }
@@ -225,6 +234,15 @@
                             <span class="title flex">
                                 <span>networks</span>
                             <span class="count">[[model.networksArray.length]]</span>
+                            </span>
+                        </div>
+                    </a>
+                    <a id="tunnels" class="section" is="pushstate-anchor" href="/tunnels" active$="[[_isEqual(current, 'tunnels')]]" tabindex="1" style$="[[style(sections.tunnels.color)]]">
+                        <div class="layout horizontal center">
+                            <section-symbol aria-hidden="true" icon="[[sections.tunnels.icon]]" color="[[sections.tunnels.color]]"></section-symbol>
+                            <span class="title flex">
+                                <span>tunnels</span>
+                            <span class="count">[[model.tunnelsArray.length]]</span>
                             </span>
                         </div>
                     </a>

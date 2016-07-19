@@ -14,15 +14,19 @@ import json
 import random
 import traceback
 import datetime
+import netaddr
 
 from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
 
 try:
+    from mist.io import config as ioconfig
     from mist.core import config
     from mist.core.methods import get_stats
     from mist.core.cloud.models import Cloud, Machine
     from mist.core.keypair.models import Keypair
+    from mist.core.vpn.models import Tunnel
+    from mist.core.vpn.methods import get_tunnel
     multi_user = True
 except ImportError:
     from mist.io import config
@@ -210,6 +214,7 @@ class MainConnection(MistConnection):
         self.list_scripts()
         self.list_templates()
         self.list_stacks()
+        self.list_tunnels()
         self.list_clouds()
         self.check_monitoring()
 
@@ -244,6 +249,12 @@ class MainConnection(MistConnection):
     def list_stacks(self):
         self.send('list_stacks',
                   orchestration_methods.filter_list_stacks(self.auth_context))
+
+    def list_tunnels(self):
+        if self.auth_context.is_owner():
+            tunnels = [tunnel.as_dict()
+                       for tunnel in Tunnel.objects(owner=self.auth_context.owner)]
+            self.send('list_tunnels', tunnels)
 
     def list_clouds(self):
         self.send('list_clouds',
@@ -352,7 +363,15 @@ class MainConnection(MistConnection):
                     ips = filter(lambda ip: ':' not in ip,
                                  machine.get('public_ips', []))
                     if not ips:
-                        continue
+                        # if not public IPs, search for private IPs with an
+                        # associated Tunnel, otherwise continue iterating over
+                        # the list of machines
+                        ips = filter(lambda ip: ':' not in ip,
+                                     machine.get('private_ips', []))
+                        tunnel = get_tunnel(self.owner, ips[0])
+                        if not tunnel:
+                            if ips[0] not in ioconfig.EXCLUDED_PRIVATE_ADDRESSES:
+                                continue
 
                     has_key = False
                     keypairs = Keypair.objects(owner=self.owner)
@@ -391,6 +410,8 @@ class MainConnection(MistConnection):
                 self.list_teams()
             if 'tags' in sections:
                 self.list_tags()
+            if 'tunnels' in sections:
+                self.list_tunnels()
             if 'monitoring' in sections:
                 self.check_monitoring()
             if 'user' in sections:

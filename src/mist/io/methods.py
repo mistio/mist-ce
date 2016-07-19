@@ -19,7 +19,6 @@ from datetime import datetime
 from hashlib import sha256
 from StringIO import StringIO
 from tempfile import NamedTemporaryFile
-from netaddr import IPSet, IPNetwork
 from xml.sax.saxutils import escape
 
 from libcloud.compute.providers import get_driver
@@ -54,9 +53,9 @@ from mist.core import config
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
-from mist.io.helpers import parse_ping
 from mist.io.bare_metal import BareMetalDriver, CoreOSDriver
-from mist.io.helpers import check_host, sanitize_host, transform_key_machine_associations
+from mist.io.helpers import check_host, sanitize_host
+from mist.io.helpers import transform_key_machine_associations
 from mist.io.exceptions import *
 
 
@@ -66,6 +65,9 @@ from mist.io.helpers import StdStreamCapture
 
 import mist.io.tasks
 import mist.io.inventory
+
+from mist.core.vpn.methods import destination_nat as dnat
+from mist.core.vpn.methods import super_ping
 
 
 import logging
@@ -322,7 +324,7 @@ def add_cloud_v_2(user, title, provider, params):
     if provider == 'libvirt' and cloud.apisecret:
     # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
         key_id = params.get('machine_key')
-        node_id = cloud.apiurl # id of the hypervisor is the hostname provided
+        node_id = cloud.apiurl  # id of the hypervisor is the hostname provided
         username = cloud.apikey
         associate_key(user, key_id, cloud_id, node_id, username=username)
 
@@ -379,8 +381,11 @@ def _add_cloud_bare_metal(user, title, provider, params):
     machine.ssh_port = port
     machine.remote_desktop_port = rdp_port
     if machine_hostname:
-        machine.dns_name = machine_hostname
-        machine.public_ips = [machine_hostname]
+        if is_private_subnet(socket.gethostbyname(machine_hostname)):
+            machine.private_ips = [machine_hostname]
+        else:
+            machine.dns_name = machine_hostname
+            machine.public_ips = [machine_hostname]
     machine.machine_id = title.replace('.', '').replace(' ', '')
     machine.name = title
     machine.os_type = os_type
@@ -399,6 +404,7 @@ def _add_cloud_bare_metal(user, title, provider, params):
             Cloud.objects.get(owner=user, id=cloud.id).delete()
             raise CloudUnauthorizedError(exc)
         except ServiceUnavailableError as exc:
+            Cloud.objects.get(owner=user, id=cloud.id).delete()
             raise MistError("Couldn't connect to host '%s'."
                             % machine_hostname)
     if params.get('monitoring'):
@@ -452,8 +458,11 @@ def _add_cloud_coreos(user, title, provider, params):
     machine = Machine()
     machine.ssh_port = port
     if machine_hostname:
-        machine.dns_name = machine_hostname
-        machine.public_ips = [machine_hostname]
+        if is_private_subnet(socket.gethostbyname(machine_hostname)):
+            machine.private_ips = [machine_hostname]
+        else:
+            machine.dns_name = machine_hostname
+            machine.public_ips = [machine_hostname]
     machine.machine_id = machine_hostname.replace('.', '').replace(' ', '')
     machine.name = title
     machine.os_type = os_type
@@ -472,6 +481,7 @@ def _add_cloud_coreos(user, title, provider, params):
             Cloud.objects.get(owner=user, id=cloud.id).delete()
             raise CloudUnauthorizedError(exc)
         except ServiceUnavailableError as exc:
+            Cloud.objects.get(owner=user, id=cloud.id).delete()
             raise MistError("Couldn't connect to host '%s'."
                             % machine_hostname)
 
@@ -1311,11 +1321,12 @@ def connect_provider(cloud):
         temp_key_file.close()
         conn = driver(cloud.apikey, temp_key_file.name)
     elif cloud.provider == Provider.OPENSTACK:
+        auth_url = dnat(cloud.owner, cloud.apiurl)
         conn = driver(
             cloud.apikey,
             cloud.apisecret,
             ex_force_auth_version=cloud.auth_version or '2.0_password',
-            ex_force_auth_url=cloud.apiurl,
+            ex_force_auth_url=auth_url,
             ex_tenant_name=cloud.tenant_name,
             ex_force_service_region=cloud.region,
             ex_force_base_url=cloud.compute_endpoint,
@@ -1330,6 +1341,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.GCE:
         conn = driver(cloud.apikey, cloud.apisecret, project=cloud.tenant_name)
     elif cloud.provider == Provider.DOCKER:
+        docker_host, docker_port = dnat(cloud.owner, cloud.apiurl, cloud.docker_port)
         if cloud.key_file and cloud.cert_file:
             # tls auth, needs to pass the key and cert as files
             key_temp_file = NamedTemporaryFile(delete=False)
@@ -1339,33 +1351,31 @@ def connect_provider(cloud):
             cert_temp_file.write(cloud.cert_file)
             cert_temp_file.close()
             if cloud.ca_cert_file:
-                # docker started with tlsverify
+                # docker started with tls verify
                 ca_cert_temp_file = NamedTemporaryFile(delete=False)
                 ca_cert_temp_file.write(cloud.ca_cert_file)
                 ca_cert_temp_file.close()
-                conn = driver(host=cloud.apiurl,
-                              port=cloud.docker_port,
+                conn = driver(host=docker_host,
+                              port=docker_port,
                               key_file=key_temp_file.name,
                               cert_file=cert_temp_file.name,
                               ca_cert=ca_cert_temp_file.name,
                               verify_match_hostname=False)
             else:
-                conn = driver(host=cloud.apiurl,
-                                  port=cloud.docker_port,
-                                  key_file=key_temp_file.name,
-                                  cert_file=cert_temp_file.name,
-                                  verify_match_hostname=False)
-
+                conn = driver(host=docker_host,
+                              port=docker_port,
+                              key_file=key_temp_file.name,
+                              cert_file=cert_temp_file.name,
+                              verify_match_hostname=False)
         else:
-            conn = driver(cloud.apikey, cloud.apisecret, cloud.apiurl, cloud.docker_port)
-    elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN,
-                              Provider.RACKSPACE]:
-        conn = driver(cloud.apikey, cloud.apisecret,
-                      region=cloud.region)
+            conn = driver(cloud.apikey, cloud.apisecret, docker_host, docker_port)
+    elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
+        conn = driver(cloud.apikey, cloud.apisecret, region=cloud.region)
     elif cloud.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
         conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        conn = driver(cloud.apikey, cloud.apisecret, host=cloud.apiurl, verify_match_hostname=False)
+        api_url = dnat(cloud.owner, cloud.apiurl)
+        conn = driver(cloud.apikey, cloud.apisecret, host=api_url, verify_match_hostname=False)
     elif cloud.provider == Provider.DIGITAL_OCEAN:
         if cloud.apikey == cloud.apisecret:  # API v2
             conn = driver(cloud.apisecret)
@@ -1373,7 +1383,8 @@ def connect_provider(cloud):
             driver = get_driver('digitalocean_first_gen')
             conn = driver(cloud.apikey, cloud.apisecret)
     elif cloud.provider == Provider.VSPHERE:
-        conn = driver(host=cloud.apiurl, username=cloud.apikey, password=cloud.apisecret)
+        api_url = dnat(cloud.owner, cloud.apiurl)
+        conn = driver(host=api_url, username=cloud.apikey, password=cloud.apisecret)
     elif cloud.provider == 'bare_metal':
         conn = BareMetalDriver(Machine.objects(cloud=cloud))
     elif cloud.provider == 'coreos':
@@ -1381,9 +1392,13 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.LIBVIRT:
         # support the three ways to connect: local system, qemu+tcp, qemu+ssh
         if cloud.apisecret:
-           conn = driver(cloud.apiurl, user=cloud.apikey, ssh_key=cloud.apisecret, ssh_port=cloud.ssh_port)
+            host, port = dnat(cloud.owner, cloud.apiurl, cloud.ssh_port)
+            conn = driver(host, hypervisor=cloud.apiurl, user=cloud.apikey,
+                          ssh_key=cloud.apisecret, ssh_port=port)
         else:
-            conn = driver(cloud.apiurl, user=cloud.apikey)
+            api_url, tcp_port = dnat(cloud.owner, cloud.apiurl, 5000)
+            conn = driver(api_url, hypervisor=cloud.apiurl, user=cloud.apikey,
+                          tcp_port=tcp_port)
     else:
         # ec2
         conn = driver(cloud.apikey, cloud.apisecret)
@@ -2688,7 +2703,6 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
         elif action is 'resume':
             if conn.type == 'libvirt':
                 conn.ex_resume_node(machine)
-
         elif action is 'resize':
             conn.ex_resize_node(node, plan_id)
         elif action is 'rename':
@@ -2696,7 +2710,8 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
         elif action is 'reboot':
             if bare_metal:
                 try:
-                    hostname = Machine.objects.get(cloud=cloud, machine_id=machine_id).public_ips[0]
+                    machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
+                    hostname = machine.public_ips[0] if machine.public_ips else machine.private_ips[0]
                     command = '$(command -v sudo) shutdown -r now'
                     ssh_command(user, cloud_id, machine_id, hostname, command)
                     return True
@@ -2705,9 +2720,9 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
             else:
                 if conn.type == 'libvirt':
                     if machine.extra.get('tags', {}).get('type', None) == 'hypervisor':
-                         # issue an ssh command for the libvirt hypervisor
+                        # issue an ssh command for the libvirt hypervisor
                         try:
-                            hostname = machine.public_ips[0]
+                            hostname = machine.public_ips[0] if machine.public_ips else machine.private_ips[0]
                             command = '$(command -v sudo) shutdown -r now'
                             ssh_command(user, cloud_id, machine_id, hostname, command)
                             return True
@@ -2880,7 +2895,6 @@ def list_images(user, cloud_id, term=None):
     the community images
 
     """
-
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
     conn = connect_provider(cloud)
     try:
@@ -2896,9 +2910,12 @@ def list_images(user, cloud_id, term=None):
             for image in ec2_images:
                 image.name = config.EC2_IMAGES[conn.type].get(image.id, image.name)
             ec2_images += conn.list_images(ex_owner="self")
-            ec2_images += conn.list_images(ex_owner="amazon")
         elif conn.type in config.EC2_PROVIDERS and term:
-            ec2_images += conn.list_images()
+            images = CloudImage.objects( me.Q(cloud_provider=conn.type, image_id__icontains=term) | me.Q(cloud_provider=conn.type, name__icontains=term))[:200]
+            images = [NodeImage(id=image.image_id, name=image.name, driver=conn, extra={}) for image in images]
+            if not images:
+                # actual search on ec2
+                images = conn.list_images(ex_filters={'name': '*%s*' % term})
         elif conn.type == Provider.GCE:
             rest_images = conn.list_images()
             for gce_image in rest_images:
@@ -2928,12 +2945,12 @@ def list_images(user, cloud_id, term=None):
             starred_images = [image for image in rest_images
                               if image.id in starred]
 
-        images = starred_images + ec2_images + rest_images
-        images = [img for img in images
-                  if img.name and img.id[:3] not in ['aki', 'ari']
-                  and 'windows' not in img.name.lower()]
-
-        if term and term is not None:
+        if not term:
+            images = starred_images + ec2_images + rest_images
+            images = [img for img in images
+                      if img.name and img.id[:3] not in ['aki', 'ari']
+                      and 'windows' not in img.name.lower()]
+        elif term and term is not None:
             term = term.lower()
             if conn.type == Provider.LIBVIRT:
             # fetch a new listing of the images and search for the term
@@ -2941,10 +2958,7 @@ def list_images(user, cloud_id, term=None):
             elif conn.type == 'docker':
                 images = conn.search_images(term=term)[:100]
             #search directly on docker registry for the query
-            elif conn.type in config.EC2_PROVIDERS:
-                images = [img for img in images
-                          if term in img.id.lower()
-                          or img.name and term in img.name.lower()][:100]
+
     except Exception as e:
         log.error(repr(e))
         raise CloudUnavailableError(cloud_id, e)
@@ -3803,18 +3817,16 @@ def disable_monitoring(user, cloud_id, machine_id, no_ssh=False):
     trigger_session_update(user, ['monitoring'])
 
 
+# TODO deprecate this!
+# We should decouple probe_ssh_only from ping.
+# Use them as two separate functions instead & through celery
 def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
     """Ping and SSH to machine and collect various metrics."""
 
     if not host:
         raise RequiredParameterMissingError('host')
 
-    # start pinging the machine in the background
-    log.info("Starting ping in the background for host %s", host)
-    ping = subprocess.Popen(
-        ["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host],
-        stdout=subprocess.PIPE
-    )
+    ping = super_ping(owner=user, host=host)
     try:
         ret = probe_ssh_only(user, cloud_id, machine_id, host,
                              key_id=key_id, ssh_user=ssh_user)
@@ -3822,10 +3834,8 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
         log.error(exc)
         log.warning("SSH failed when probing, let's see what ping has to say.")
         ret = {}
-    ping_out = ping.stdout.read()
-    ping.wait()
-    log.info("ping output: %s" % ping_out)
-    ret.update(parse_ping(ping_out))
+
+    ret.update(ping)
     return ret
 
 
@@ -3865,7 +3875,6 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
                                  host, command, key_id=key_id)
     else:
         retval, cmd_output = shell.command(command)
-
     cmd_output = cmd_output.replace('\r','').split('--------')
     log.warn(cmd_output)
     uptime_output = cmd_output[1]
@@ -3879,7 +3888,11 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
         ips.remove('127.0.0.1')
     macs = {}
     for i in range(0, len(ips)):
-        macs[ips[i]] = m[i]
+        try:
+            macs[ips[i]] = m[i]
+        except IndexError:
+            # in case of interfaces, such as VPN tunnels, with a dummy MAC addr
+            continue
     pub_ips = find_public_ips(ips)
     priv_ips = [ip for ip in ips if ip not in pub_ips]
 
@@ -3896,20 +3909,14 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
     }
 
 
-def ping(host):
-    ping = subprocess.Popen(
-        ["ping", "-c", "10", "-i", "0.4", "-W", "1", "-q", host],
-        stdout=subprocess.PIPE
-    )
-    ping_out = ping.stdout.read()
-    ping.wait()
-    return parse_ping(ping_out)
+def ping(host, user=None):
+    return super_ping(user, host=host)
 
 
 def find_public_ips(ips):
     public_ips = []
     for ip in ips:
-        #is_private_subnet does not check for ipv6
+        # is_private_subnet does not check for ipv6
         try:
             if not is_private_subnet(ip):
                 public_ips.append(ip)
@@ -4442,8 +4449,8 @@ def machine_cost_calculator(m):
     straightforward way to get this info
 
     Supported providers:
-        GCE, Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr
-    TODO: Azure, NephoScale, HostVirtual
+        GCE, Packet.net, DigitalOcean, SoftLayer, AWS, Rackspace, Linode, Vultr, Azure
+    TODO: NephoScale, HostVirtual
     """
     cost = {'cost_per_hour': 0, 'cost_per_month': 0}
     now = datetime.now()
@@ -4468,6 +4475,19 @@ def machine_cost_calculator(m):
                 # just need the float value
                 cost['cost_per_hour'] = plan_price
                 cost['cost_per_month'] = float(plan_price) * 24 * month_days
+    if m.driver.type == Provider.AZURE:
+        # TODO: get prices per location
+        location = m.extra.get('location')
+        os_type = m.extra.get('os_type', 'linux')
+        size = m.extra.get('instance_size')
+        price = get_size_price(driver_type='compute', driver_name='azure', size_id=size)
+        if price:
+            plan_price = price.get(os_type, 0)
+            if not plan_price:
+                plan_price = price.get('linux')
+            cost['cost_per_hour'] = float(plan_price)
+            cost['cost_per_month'] = float(plan_price) * 24 * month_days
+
     if m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
         # Need to get image in order to specify the OS type
         # out of the image id
@@ -4553,14 +4573,29 @@ def machine_cost_calculator(m):
     if m.driver.type == Provider.VULTR:
         cost['cost_per_month'] = m.extra.get('cost_per_month')
     if m.driver.type == Provider.SOFTLAYER:
+        # SoftLayer includes recurringFee on the VM metadata but
+        # this is only for the compute - CPU pricing
+        # other costs (ram, bandwidth, image) are included
+        # on billingItemChildren
+        extra_recurring_fee = 0
+
         if not m.extra.get('hourlyRecurringFee'):
-            cost['cost_per_month'] = m.extra.get('recurringFee')
+            for billing_item in m.extra.get('billingItemChildren', []):
+                # don't calculate billing that is cancelled
+                if not billing_item.get('cancellationDate'):
+                    extra_recurring_fee += float(billing_item.get('recurringFee'))
+            cost['cost_per_month'] = float(m.extra.get('recurringFee')) + extra_recurring_fee
         else:
             # m.extra.get('recurringFee') here will show what it has
             # cost for the current month, up to now
-            cost_per_hour = m.extra.get('hourlyRecurringFee')
+            for billing_item in m.extra.get('billingItemChildren', []):
+                # don't calculate billing that is cancelled
+                if not billing_item.get('cancellationDate'):
+                    extra_recurring_fee += float(billing_item.get('hourlyRecurringFee'))
+
+            cost_per_hour = float(m.extra.get('hourlyRecurringFee')) + float(extra_recurring_fee)
             cost['cost_per_hour'] = cost_per_hour
-            cost['cost_per_month'] = float(cost_per_hour) * 24 * month_days
+            cost['cost_per_month'] = cost_per_hour * 24 * month_days
 
     for key, value in cost.items():
         if value and not isinstance(value, int):

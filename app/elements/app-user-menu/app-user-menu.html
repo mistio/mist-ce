@@ -38,6 +38,11 @@
                 margin-right: 26px;
             }
 
+            :host {
+                position: relative;
+                z-index: 1000;
+            }
+
             .add-org {
                 opacity: 0.54;
                 margin-top: 0;
@@ -214,7 +219,8 @@
         is: 'app-user-menu',
         properties: {
             user: {
-                type: Object
+                type: Object,
+                notify: true
             },
             org: {
                 type: Object
@@ -246,14 +252,16 @@
                 computed: '_computeGravatarName(user.first_name, user.last_name, user.email)'
             },
             organizationsList: {
-                type: Array,
-                computed: '_computeOrganizationsList(user.orgs, isPersonal)'
+                type: Array                
             },
             memberOfTeamsText: {
                 type: String,
                 computed: '_computeMemberOfTeamsText(user.orgs)'
             }
         },
+        observers: [
+            '_computeOrganizationsList(user.orgs.*, isPersonal, user.orgs.*)'
+        ],
         _computeGravatar: function(email, size, placeholder) {
             var avatarString = md5(email),
                 url = 'http://www.gravatar.com/avatar/' + avatarString + '.jpg?s=' + size + '&d=' + placeholder;
@@ -265,13 +273,13 @@
         _computeIsPersonal: function(org) {
             return org ? false : true;
         },
-        _computeOrganizationsList: function(orgs, isPersonal) {
-            if (orgs) {
+        _computeOrganizationsList: function(orgs, isPersonal, userOrgs) {
+            if (orgs.base) {
                 var curOrgName = '';
                 if (!isPersonal) {
                     curOrgName = this.org.name;
                 }
-                var organizations = orgs.filter(function(o) {
+                var organizations = orgs.base.filter(function(o) {
                         return o.name != curOrgName;
                     }, this).sort(function(a, b) {
                         if (a.name > b.name) {
@@ -291,7 +299,7 @@
                 }
             }
 
-            return organizations || [];
+            this.set('organizationsList', organizations);
         },
         _computeOrganizationIcon: function(organization) {
             return organization.id ? 'social:group' : 'social:person';

@@ -30,8 +30,8 @@
             :host[opened] {
                 display: block;
             }
-            :host[opened="false"],
-            :host:not([opened]){
+            :host[opened="false"] .cloud-block,
+            :host:not([opened]) .cloud-block {
                 display: none;
             }
             :host .cloud-block {
@@ -97,6 +97,9 @@
                 background-color: yellow;
                 color: black;
             }
+            paper-toast {
+                z-index: 999;
+            }
         </style>
 
         <div class="cloud-block">
@@ -114,10 +117,15 @@
                         <paper-toggle-button checked$="[[isEnabled]]" on-tap="_changeState">[[cloud.state]]</paper-toggle-button>
                     </div>
                 </div>
-                <div class="cloud-overview-item last">
+                <div class="cloud-overview-item">
                     <paper-input class="flex" id="cloudId" label="ID" value="[[cloud.id]]"></paper-input>
                     <div class="button">
                         <paper-button on-tap="_copyId" class="blue">Copy Id</paper-button>
+                    </div>
+                </div>
+                <div class="cloud-overview-item last">
+                    <div class="button">
+                        <paper-button on-tap="_deleteCloud" class="red">Delete Cloud</paper-button>
                     </div>
                 </div>
             </div>
@@ -128,6 +136,7 @@
 
         <iron-ajax id="cloudEditAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="PUT" on-response="_handleCloudEditAjaxResponse" on-error="_handleCloudEditAjaxError"></iron-ajax>
         <iron-ajax id="cloudStateAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="POST" on-response="_handleCloudStateAjaxResponse" on-error="_handleCloudStateAjaxError"></iron-ajax>
+        <iron-ajax id="cloudDeleteAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="DELETE" on-response="_handleCloudDeletionAjaxResponse" on-error="_handleCloudDeletionAjaxError"></iron-ajax>
         <paper-toast></paper-toast>
     </template>
 
@@ -275,6 +284,21 @@
                     var msg = this.cloud.enabled ? 'Cloud ' + this.cloud.title + ' was enabled!' :
                     'Cloud ' + this.cloud.title + ' was disabled!';
                     this._showToast(msg);
+                },
+                _deleteCloud: function(e){
+                    this.$.cloudDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.cloudDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.cloudDeleteAjaxRequest.generateRequest();
+                },
+                _handleCloudDeletionAjaxResponse: function(e){
+                    var msg = 'Cloud ' + this.cloud.title + ' was deleted';
+                    this._showToast(msg);
+                    this.set('opened', false);
+                    this.fire('close-cloud-info');
+                },
+                _handleCloudDeletionAjaxError: function(e){
+                    var msg = 'There was an error deleting ' + this.cloud.title + '.';
+                    this._showToast(msg);  
                 },
                 _copyId: function() {
                     this.querySelector('#cloudId input').select();
