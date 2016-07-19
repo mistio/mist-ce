@@ -4631,7 +4631,7 @@ def machine_launch_date(m):
     if m.driver.type in config.EC2_PROVIDERS:
         launch_date = m.created_at
         launch_date = launch_date.strftime("%d %m %Y %I:%M")
-    elif m.driver.type in [Provider.DIGITAL_OCEAN, Provider.PACKET]
+    elif m.driver.type in [Provider.DIGITAL_OCEAN, Provider.PACKET]:
         launch_date = m.extra.get('created_at')
         launch_date = iso8601.parse_date(launch_date)
         launch_date = launch_date.strftime("%d %m %Y %I:%M")
