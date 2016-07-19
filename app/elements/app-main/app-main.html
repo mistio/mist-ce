@@ -73,6 +73,11 @@
             <iron-route path="/networks/:name" title="network" current="networks" href="../networks/network-page.html"></iron-route>
             <iron-route path="/add-network" title="add network" current="networks" href="../networks/network-add.html"></iron-route>
 
+            <!-- tunnels -->
+            <iron-route path="/tunnels" title="tunnels" current="tunnels" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/tunnels/:id" title="tunnel" current="tunnels" href="../tunnels/tunnel-page.html"></iron-route>
+            <iron-route path="/add-tunnel" title="add tunnel" current="tunnels" href="../tunnels/tunnel-add.html"></iron-route>
+
             <!-- templates -->
             <iron-route path="/templates" title="templates" current="templates" href="../pages/page-items.html"></iron-route>
             <iron-route path="/templates/:id" title="template" current="templates" href="../templates/template-page.html"></iron-route>
@@ -126,6 +131,10 @@
                 <page-items q="[[q]]" class="networks" model="[[model]]" sections="[[sections]]" section="[[sections.networks]]" items="[[model.networksArray]]"></page-items>
                 <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
                 <network-add model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
+                <!-- tunnels-->
+                <page-items q="[[q]]" model="[[model]]" sections="[[sections]]" section="[[sections.tunnels]]" items="[[model.tunnelsArray]]"></page-items>
+                <tunnel-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.tunnels]]"></tunnel-page>
+                <tunnel-add model="[[model]]" sections="[[sections]]" section="[[sections.tunnels]]"></tunnel-add>
                 <!-- templates -->
                 <page-items q="[[q]]" class="templates" model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" items="[[model.templatesArray]]"></page-items>
                 <template-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.templates]]"></template-page>
@@ -225,6 +234,7 @@
                 imagesArray: [],
                 keysArray: [],
                 networksArray: [],
+                tunnelsArray: [],
                 scriptsArray: [],
                 stacksArray: [],
                 templatesArray: [],
@@ -343,6 +353,12 @@
                 icon: 'hardware:device-hub',
                 count: '0',
                 add: '/add-network'
+            },{
+                id: 'tunnels',
+                color: '#795548',
+                icon: 'editor:merge-type',
+                count: '0',
+                add: '/add-tunnel'
             }, {
                 id: 'scripts',
                 color: '#D48900',
@@ -405,8 +421,8 @@
                 }
             }
             // updateDocTitle function was overriden
-            if (details.item.title && details.item.title.length) {
-                document.title = details.item.title + " - mist.io";
+            if (e.detail.item.title && e.detail.item.title.length) {
+                document.title = e.detail.item.title + " - mist.io";
             } else {
                 document.title = "mist.io";
             }
@@ -429,12 +445,12 @@
             }
         },
 
-        showToast: function(e, detail) {
+        showToast: function(e) {
             if (!this._toast) {
                 this._toast = document.createElement('paper-toast');
                 Polymer.dom(this.$.router).appendChild(this._toast);
             }
-            this._toast.text = detail.text;
+            this._toast.text = e.detail.text;
             this.async(this._toast.show.bind(this._toast), 1);
         },
 

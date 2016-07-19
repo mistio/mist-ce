@@ -95,6 +95,9 @@
                     <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
                         <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]" hidden="[[field.hidden]]"></paper-textarea>
                     </template>
+                    <template is="dom-if" if="[[_computeFieldType(field, 'ip_textarea', field.show)]]">
+                        <paper-textarea class="xs12 m6" id="[[field.name]]" label="[[field.label]]" rows="2" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" disabled="[[field.disabled]]"></paper-textarea>
+                    </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'radio', field.show)]]">
                         <paper-radio-group selected="{{field.value}}" class="xs12 m6" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
                             <template is="dom-repeat" items="[[field.options]]" as="option">
@@ -140,6 +143,11 @@
                             <paper-icon-button suffix icon="icons:help" alt="open docs" title="open docs" class="docs">
                             </paper-icon-button>
                         </a>
+                        <p hidden$="[[!field.warning]]">
+                            <iron-icon icon="warning"></iron-icon>
+                            [[field.warning]]
+                        </p>
+                        <div id="warningmsg"></div>
                     </div>
                     <template is="dom-if" if="[[field.isLead]]">
                         <hr class="xs12" />
@@ -167,7 +175,7 @@
             </div>
         </div>
 
-        <iron-ajax id="formAjax" url="[[url]]" contentType="application/json" handle-as="xml" method="[[method]]" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="formAjax" url="[[url]]" contentType="application/json" handle-as="{{handleas}}" method="[[method]]" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
     </template>
     <script>
         (function() {
@@ -211,6 +219,10 @@
                     templateid: {
                         type: String
                     },
+                    handleas: {
+                        type: String,
+                        value: "xml"
+                    },
                     form: {
                         type: Object,
                         value: function() {
@@ -219,7 +231,7 @@
                                 if (this.fields[field].defaultValue) {
                                     uniqueFields[this.fields[field].name] = this.fields[field].defaultValue
                                 } else {
-                                    uniqueFields[this.fields[field].name] = ''
+                                    uniqueFields[this.fields[field].name] = null
                                 }
 
                             }
@@ -281,6 +293,7 @@
                 _handleError: function(e,d) {
                     this.set('sendingData', false);
                     this.set('formError', true);
+                    console.log('FAIL', e)
                     // this.$.errormsg.textContent = e.detail.request.xhr.response.body.innerText;
                     this.$.errormsg.textContent = e.detail.request.xhr.responseText;
                 },
@@ -333,10 +346,22 @@
                                 if (!show && reset) {
                                     // this._resetField(el, index);
                                 } else {
-                                    this.set('form.' + el.name, el.value);
+                                    if(el.type == "ip_textarea") {
+                                        var cidrsArray = el.value.split('\n');
+                                        this.set('form.' + el.name, cidrsArray);
+                                    }
+                                    else {
+                                        this.set('form.' + el.name, el.value);
+                                    }
                                 }
                             } else {
-                                this.set('form.' + el.name, el.value);
+                                if(el.type == "ip_textarea") {
+                                    var cidrsArray = el.value.split('\n');
+                                    this.set('form.' + el.name, cidrsArray);
+                                }
+                                else {
+                                    this.set('form.' + el.name, el.value);
+                                }
                             }
 
                             if (el.placeholderIf) {
@@ -346,7 +371,12 @@
                         }, this);
 
                         var valid = fields.base.every(function(el, index) {
-                            return el.show && el.required ? el.value : true;
+                           if(el.type == "ip_textarea") {
+                             return el.show ? this.validatecidr(el.value, index) : true;
+                           }
+                           else {
+                             return el.show && el.required ? el.value : true;
+                           }
                         }, this);
 
                         this.set('form', form);
@@ -416,10 +446,38 @@
                         }
                     }, this);
                 },
+
+                validateip: function(value, field) {
+                  var ipArray = value.split('\n');
+                  for(var i=0;i<ipArray.length;i++){
+                    if (!(/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipArray[i].trim()))){
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                validatecidr: function(value, index) {
+                    var ipArray = value.split('\n');
+                    for(var i=0;i<ipArray.length;i++){
+                        if (ipArray[i] && !(/^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/.test(ipArray[i].trim()))){
+                            return false;
+                        }
+
+                    }
+                    if(value.indexOf('/0') > -1 ) {
+                        this.set('fields.'+index+'.warning', 'A CIDR with /0 will redirect ALL your traffic through the tunnel. Be certain you want this to happen');
+                    }
+                    else {
+                        this.set('fields.'+index+'.warning', false);
+                    }
+                    return true;
+                },
+
                 _addKey: function(){
                     //set attribute origin
                     var origin = window.location.pathname;
                     page("/add-key?origin="+origin);
+
                 }
             });
         })();
