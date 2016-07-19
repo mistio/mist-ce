@@ -4626,14 +4626,6 @@ def machine_cost_calculator(m):
 def machine_launch_date(m):
     """
     Returns the launch date out of the VM metadata
-    TODO: GCE,
-        Rackspace,
-        Linode,
-        Vultr,
-        Azure,
-        Rackspace,
-        NephoScale,
-        HostVirtual
     """
     launch_date = None
     if m.driver.type in config.EC2_PROVIDERS:
@@ -4644,22 +4636,24 @@ def machine_launch_date(m):
         launch_date = iso8601.parse_date(launch_date)
         launch_date = launch_date.strftime("%d %m %Y %I:%M")
     elif m.driver.type == Provider.LINODE:
-        launch_date = m.extra.get('launch_date')
-    elif m.driver.type == Provider.SOFTLAYER:
+        launch_date = m.extra.get('CREATE_DT')
+        launch_date = iso8601.parse_date(launch_date)
+        launch_date = launch_date.strftime("%d %m %Y %I:%M")
+    elif m.driver.type in [Provider.SOFTLAYER, Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
         launch_date = m.extra.get('created')
         launch_date = iso8601.parse_date(launch_date)
         launch_date = launch_date.strftime("%d %m %Y %I:%M")
-    elif m.driver.type == Provider.GCE:
-        launch_date = m.extra.get('launch_date')
-    elif m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
-        launch_date = m.extra.get('launch_date')
-    elif m.driver.type == Provider.VULTR:
-        launch_date = m.extra.get('launch_date')
-    elif m.driver.type == Provider.AZURE:
-        launch_date = m.extra.get('launch_date')
     elif m.driver.type == Provider.NEPHOSCALE:
-        launch_date = m.extra.get('launch_date')
-    elif m.driver.type == Provider.HOSTVIRTUAL:
+        launch_date = m.extra.get('create_time')
+        launch_date = iso8601.parse_date(launch_date)
+        launch_date = launch_date.strftime("%d %m %Y %I:%M")
+    elif m.driver.type == Provider.VULTR:
+        launch_date = m.extra.get('date_created')
+        launch_date = iso8601.parse_date(launch_date)
+        launch_date = launch_date.strftime("%d %m %Y %I:%M")
+
+    # TODO
+    elif m.driver.type == Provider.GCE:
         launch_date = m.extra.get('launch_date')
     elif m.driver.type == Provider.DOCKER:
         launch_date = m.extra.get('launch_date')
