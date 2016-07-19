@@ -4626,6 +4626,11 @@ def machine_cost_calculator(m):
 def machine_launch_date(m):
     """
     Returns the launch date out of the VM metadata
+    Supports:
+        AWS, DigitalOcean, Packet.net, Linode, SoftLayer, Rackspace Cloud,
+        OpenStack, Nephoscale, Vultr, GCE, Docker
+    TODO:
+        Azure, vCloud, vSphere
     """
     launch_date = None
     if m.driver.type in config.EC2_PROVIDERS:
