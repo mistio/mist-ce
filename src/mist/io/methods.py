@@ -10,6 +10,7 @@ import subprocess
 import re
 import calendar
 import ssl
+import iso8601
 
 import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError, DoesNotExist
@@ -1672,6 +1673,20 @@ def list_machines(user, cloud_id):
 
         # the reason this goes down is that we want to allow
         # cost_per_hour/cost_per_month to be overrided by users
+
+        if machine_entry.created:
+            launch_date = created
+        else:
+            try:
+                launch_date = machine_launch_date(m)
+            except:
+                launch_date = None
+            else:
+                machine_entry.created = launch_date
+                machine_entry.save()
+
+        if launch_date:
+            extra['machine_launch_date'] = launch_date
 
         all_tags = tags_from_provider
 
@@ -4607,6 +4622,52 @@ def machine_cost_calculator(m):
                 cost[key] = 0
     return cost
 
+
+def machine_launch_date(m):
+    """
+    Returns the launch date out of the VM metadata
+    TODO: GCE,
+        Rackspace,
+        Linode,
+        Vultr,
+        Azure,
+        Rackspace,
+        NephoScale,
+        HostVirtual
+    """
+    launch_date = None
+    if m.driver.type in config.EC2_PROVIDERS:
+        launch_date = m.created_at
+        launch_date = launch_date.strftime("%d %m %Y %I:%M")
+    elif m.driver.type in [Provider.DIGITAL_OCEAN, Provider.PACKET]
+        launch_date = m.extra.get('created_at')
+        launch_date = iso8601.parse_date(launch_date)
+        launch_date = launch_date.strftime("%d %m %Y %I:%M")
+    elif m.driver.type == Provider.LINODE:
+        launch_date = m.extra.get('launch_date')
+    elif m.driver.type == Provider.SOFTLAYER:
+        launch_date = m.extra.get('created')
+        launch_date = iso8601.parse_date(launch_date)
+        launch_date = launch_date.strftime("%d %m %Y %I:%M")
+    elif m.driver.type == Provider.GCE:
+        launch_date = m.extra.get('launch_date')
+    elif m.driver.type in [Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
+        launch_date = m.extra.get('launch_date')
+    elif m.driver.type == Provider.VULTR:
+        launch_date = m.extra.get('launch_date')
+    elif m.driver.type == Provider.AZURE:
+        launch_date = m.extra.get('launch_date')
+    elif m.driver.type == Provider.NEPHOSCALE:
+        launch_date = m.extra.get('launch_date')
+    elif m.driver.type == Provider.HOSTVIRTUAL:
+        launch_date = m.extra.get('launch_date')
+    elif m.driver.type == Provider.DOCKER:
+        launch_date = m.extra.get('launch_date')
+    elif m.driver.type == Provider.OPENSTACK:
+        launch_date = m.extra.get('launch_date')
+    elif m.driver.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+        launch_date = m.extra.get('launch_date')
+    return launch_date
 
 def machine_name_validator(provider, name):
     """
