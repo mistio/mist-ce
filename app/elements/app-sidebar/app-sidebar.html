@@ -29,6 +29,7 @@ ou<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-b
             top: 80px;
             margin-right: 24px;
             left: 0;
+            transition: left 350ms ease-in-out;
         }
         :host[smallscreen]{
             left: 0;
@@ -93,12 +94,29 @@ ou<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-b
             transition: var(--material-curve-320);
         }
 
+        #section-tagline {
+            margin: 0;
+            padding-right: 80px;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            font-size: 13px;
+            line-height: 20px;
+        }
+
         #section-desc {
             margin: 0;
         }
 
         [size=xs] #section-title {
             margin-bottom: 0;
+        }
+
+        [size=xs] #section-tagline {
+            display: none;
+        }
+
+        [size=xs] #section-tagline {
+            margin-top: 0;
         }
 
         #section-list {
