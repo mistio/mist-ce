@@ -4630,37 +4630,29 @@ def machine_launch_date(m):
     launch_date = None
     if m.driver.type in config.EC2_PROVIDERS:
         launch_date = m.created_at
-        launch_date = launch_date.strftime("%d %m %Y %I:%M")
     elif m.driver.type in [Provider.DIGITAL_OCEAN, Provider.PACKET]:
         launch_date = m.extra.get('created_at')
         launch_date = iso8601.parse_date(launch_date)
-        launch_date = launch_date.strftime("%d %m %Y %I:%M")
     elif m.driver.type == Provider.LINODE:
         launch_date = m.extra.get('CREATE_DT')
         launch_date = iso8601.parse_date(launch_date)
-        launch_date = launch_date.strftime("%d %m %Y %I:%M")
-    elif m.driver.type in [Provider.SOFTLAYER, Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN]:
+    elif m.driver.type in [Provider.SOFTLAYER, Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN, Provider.OPENSTACK]:
         launch_date = m.extra.get('created')
         launch_date = iso8601.parse_date(launch_date)
-        launch_date = launch_date.strftime("%d %m %Y %I:%M")
     elif m.driver.type == Provider.NEPHOSCALE:
         launch_date = m.extra.get('create_time')
         launch_date = iso8601.parse_date(launch_date)
-        launch_date = launch_date.strftime("%d %m %Y %I:%M")
     elif m.driver.type == Provider.VULTR:
         launch_date = m.extra.get('date_created')
         launch_date = iso8601.parse_date(launch_date)
-        launch_date = launch_date.strftime("%d %m %Y %I:%M")
-
-    # TODO
     elif m.driver.type == Provider.GCE:
-        launch_date = m.extra.get('launch_date')
+        launch_date = m.extra.get('creationTimestamp')
+        launch_date = iso8601.parse_date(launch_date)
     elif m.driver.type == Provider.DOCKER:
-        launch_date = m.extra.get('launch_date')
-    elif m.driver.type == Provider.OPENSTACK:
-        launch_date = m.extra.get('launch_date')
-    elif m.driver.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        launch_date = m.extra.get('launch_date')
+        launch_date = m.created_at
+        launch_date = datetime.fromtimestamp(launch_date / 1e3)
+
+    launch_date = launch_date.strftime("%d %m %Y %I:%M")
     return launch_date
 
 def machine_name_validator(provider, name):
