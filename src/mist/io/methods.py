@@ -15,7 +15,7 @@ import iso8601
 import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError, DoesNotExist
 
-from time import sleep, time
+from time import sleep, time, mktime
 from datetime import datetime
 from hashlib import sha256
 from StringIO import StringIO
@@ -1673,20 +1673,31 @@ def list_machines(user, cloud_id):
 
         # the reason this goes down is that we want to allow
         # cost_per_hour/cost_per_month to be overrided by users
-
+        create_date_timestamp = None
+        create_date = None
         if machine_entry.created:
-            launch_date = machine_entry.created
+            create_date_timestamp = machine_entry.created
+            try:
+                create_date = datetime.fromtimestamp(create_date_timestamp).strftime("%b %d, %Y at %I:%M:%S %p")
+            except:
+                pass
         else:
             try:
-                launch_date = machine_launch_date(m)
+                create_date = machine_create_date(m)
+                create_date_timestamp = create_date.get('create_date_timestamp')
+                create_date = create_date.get('create_date')
             except:
-                launch_date = None
+                pass
             else:
-                machine_entry.created = launch_date
-                machine_entry.save()
-
-        if launch_date:
-            machine['extra']['machine_launch_date'] = launch_date
+                try:
+                    machine_entry.created = create_date_timestamp
+                    machine_entry.save()
+                except:
+                    pass
+        if create_date:
+            machine['extra']['create_date'] = create_date
+        if create_date_timestamp:
+            machine['extra']['create_date_timestamp'] = create_date_timestamp
 
         all_tags = tags_from_provider
 
@@ -4623,42 +4634,49 @@ def machine_cost_calculator(m):
     return cost
 
 
-def machine_launch_date(m):
+def machine_create_date(m):
     """
-    Returns the launch date out of the VM metadata
+    Returns the create date out of the VM metadata
     Supports:
         AWS, DigitalOcean, Packet.net, Linode, SoftLayer, Rackspace Cloud,
         OpenStack, Nephoscale, Vultr, GCE, Docker
     TODO:
         Azure, vCloud, vSphere
     """
-    launch_date = None
     if m.driver.type in config.EC2_PROVIDERS:
-        launch_date = m.created_at
+        create_date = m.created_at
     elif m.driver.type in [Provider.DIGITAL_OCEAN, Provider.PACKET]:
-        launch_date = m.extra.get('created_at')
-        launch_date = iso8601.parse_date(launch_date)
+        create_date = m.extra.get('created_at')
+        create_date = iso8601.parse_date(create_date)
     elif m.driver.type == Provider.LINODE:
-        launch_date = m.extra.get('CREATE_DT')
-        launch_date = iso8601.parse_date(launch_date)
+        create_date = m.extra.get('CREATE_DT')
+        create_date = iso8601.parse_date(create_date)
     elif m.driver.type in [Provider.SOFTLAYER, Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN, Provider.OPENSTACK]:
-        launch_date = m.extra.get('created')
-        launch_date = iso8601.parse_date(launch_date)
+        create_date = m.extra.get('created')
+        create_date = iso8601.parse_date(create_date)
     elif m.driver.type == Provider.NEPHOSCALE:
-        launch_date = m.extra.get('create_time')
-        launch_date = iso8601.parse_date(launch_date)
+        create_date = m.extra.get('create_time')
+        create_date = iso8601.parse_date(create_date)
     elif m.driver.type == Provider.VULTR:
-        launch_date = m.extra.get('date_created')
-        launch_date = iso8601.parse_date(launch_date)
+        create_date = m.extra.get('date_created')
+        create_date = iso8601.parse_date(create_date)
     elif m.driver.type == Provider.GCE:
-        launch_date = m.extra.get('creationTimestamp')
-        launch_date = iso8601.parse_date(launch_date)
+        create_date = m.extra.get('creationTimestamp')
+        create_date = iso8601.parse_date(create_date)
     elif m.driver.type == Provider.DOCKER:
-        launch_date = m.created_at
-        launch_date = datetime.fromtimestamp(launch_date / 1e3)
+        create_date = m.created_at
+        create_date = datetime.fromtimestamp(create_date / 1e3)
+    else:
+        return {}
 
-    launch_date = launch_date.strftime("%d %m %Y %I:%M")
-    return launch_date
+    create_date_timestamp = mktime(create_date.timetuple())
+    create_date = create_date.strftime("%b %d, %Y at %I:%M:%S %p")
+    create_date = {
+        'create_date': create_date,
+        'create_date_timestamp': create_date_timestamp
+    }
+
+    return create_date
 
 def machine_name_validator(provider, name):
     """
