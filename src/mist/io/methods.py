@@ -1675,7 +1675,7 @@ def list_machines(user, cloud_id):
         # cost_per_hour/cost_per_month to be overrided by users
 
         if machine_entry.created:
-            launch_date = created
+            launch_date = machine_entry.created
         else:
             try:
                 launch_date = machine_launch_date(m)
@@ -1686,7 +1686,7 @@ def list_machines(user, cloud_id):
                 machine_entry.save()
 
         if launch_date:
-            extra['machine_launch_date'] = launch_date
+            machine['extra']['machine_launch_date'] = launch_date
 
         all_tags = tags_from_provider
 
