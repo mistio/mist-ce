@@ -195,7 +195,7 @@
         <iron-media-query query="(min-width: 1400px)" query-matches="{{wideViewport}}"></iron-media-query>
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <div class="header" style$="[[_getHeaderStyle(section.color, selectedItems.length)]]">
+        <div class="header" style$="[[_getHeaderStyle(section.color, currentSelectedItems)]]">
             <template is="dom-if" if="[[!isimages]]">
                 <app-check class="check-all" selected="[[allselected]]" on-tap="_onSelectAll">
                     <template is="dom-if" if="[[!currentSelectedItems]]">
@@ -211,7 +211,7 @@
                     <iron-icon icon="star"></iron-icon>
                 </app-check>
             </template>
-            <template is="dom-if" if="[[!selectedItems.length]]">
+            <template is="dom-if" if="[[!currentSelectedItems]]">
               <template is="dom-repeat" items="[[fields]]">
                   <div class$="[[item]] field field[[index]] [[_isSortedBy(item, sortBy, sortOrder)]]" on-tap="_changeSortOrder">
                       [[item]]
@@ -680,8 +680,13 @@ Polymer({
                     this.push('selectedItems', this.itemUid(this.items[i]));
             }
         } else {
-            while (this.get('selectedItems.length')) {
-                this.pop('selectedItems');
+            for (var i=this.selectedItems.length-1; i>=0; i--) {
+                var item = this.selectedItems[i];
+                var t = item.split(':')[0];
+                // pop items of the current section
+                if (this.section.id.indexOf(t) > -1){
+                    this.splice('selectedItems',i,1);
+                }
             }
         }
 

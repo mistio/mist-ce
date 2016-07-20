@@ -258,6 +258,7 @@ Polymer({
             var itemtype = i.split(':')[0];
             return this.section.id.indexOf(itemtype) > -1;
         }, this);
+        console.log('selectedOfCurrent.length =',selectedOfCurrent.length);
         this.fire('selected-of-current-section-length', {'itemLength': selectedOfCurrent.length})
         return selectedOfCurrent;
     },
@@ -299,7 +300,6 @@ Polymer({
         else {
             multiActions = actionDetails(actions.items());
         }
-        console.log('multiActions',multiActions);
         this.set('actions', multiActions);
     },
 
@@ -403,7 +403,7 @@ Polymer({
             this.$['confirmation'].toggle();
         else {
             var items = [];
-            items.push(this.selectedItem)
+            items.push(this.selectedItem);
             this._performAction(this.selectedAction, items);
         }
         this.$['select-action'].close();
@@ -414,6 +414,14 @@ Polymer({
         this.set('multi', true);
         if (event.model.item.confirm)
             this.$['confirmation'].toggle();
+        else {
+            var items = [];
+            this.selectedItems.forEach(function(si){
+                var ind = this.itemIndex(si);
+                items.push(this.items[ind]);
+            }, this);
+            this._performAction(this.selectedAction, items);
+        }
         this.$['select-action'].close();
     },
 
