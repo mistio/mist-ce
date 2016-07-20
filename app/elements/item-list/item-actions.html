@@ -16,7 +16,7 @@
             }
 
             #select-action {
-                width: 130px;
+                width: 200px;
             }
             #select-action paper-listbox {
                 margin-top: 0;
@@ -26,7 +26,8 @@
                 vertical-align: top;
             }
             #select-action paper-button {width: 100%; text-align: left;}
-            #select-action paper-item {padding: 0; margin: 0; width: 130px;}
+            #select-action paper-item {padding: 0 8px; margin: 0; width: 200px;}
+            #select-action paper-item iron-icon {padding: 8px;}
 
             div.actions {
                 width: 100%;
@@ -79,7 +80,7 @@
           <paper-dialog id="select-action">
             <paper-listbox class="dropdown-content">
               <template is="dom-repeat" items="[[itemActionsDetails(selectedItem)]]">
-                  <paper-item><paper-button on-tap="_selectAction"><iron-icon icon="[[item.icon]]"></iron-icon> [[item.name]]</paper-button></paper-item>
+                  <paper-item on-tap="_selectAction"><iron-icon icon="[[item.icon]]"></iron-icon> [[item.name]]</paper-item>
               </template>
             </paper-listbox>
           </paper-dialog>
@@ -140,6 +141,24 @@ ACTIONS = {
     'icon': 'delete',
     'confirm': true,
     'multi': true
+  },
+  'star': {
+    'name': 'star',
+    'icon': 'star',
+    'confirm': false,
+    'multi': true
+  },
+  'unstar': {
+    'name': 'unstar',
+    'icon': 'star-border',
+    'confirm': false,
+    'multi': true
+  },
+  'make_default': {
+    'name': 'make Default',
+    'icon': 'star-border',
+    'confirm': false,
+    'multi': false
   },
   'delete': {
     'name': 'delete',
@@ -274,7 +293,8 @@ Polymer({
 
     itemActions: function(itemUid) {
         // the list of available actions for this item based on the itemUid
-
+        console.log('itemUid',itemUid);
+        
         if (!itemUid)
             return [];
 
@@ -300,15 +320,29 @@ Polymer({
             }
             ret.push('destroy');
         } else if (item.type == 'image') {
+            if (item.star) {
+                ret.push('unstar');
+            }
+            else {
+                ret.push('star');
+            }
             return ret;
         } else if (item.type == 'key') {
+            if (!item.isDefault) {
+                ret.push('make_default');
+            }
+            ret.push('delete');
+        } else if (item.type == 'network') {
+            ret.push('delete');
+        } else if (item.type == 'tunnel') {
             ret.push('delete');
         } else if (item.type == 'template') {
             ret.push('delete');
         } else if (item.type == 'stack') {
             ret.push('delete');
+        } else if (item.type == 'team') {
+            ret.push('delete');
         }
-
         return ret;
     },
 
