@@ -258,7 +258,6 @@ Polymer({
             var itemtype = i.split(':')[0];
             return this.section.id.indexOf(itemtype) > -1;
         }, this);
-        console.log('selectedOfCurrent.length =',selectedOfCurrent.length);
         this.fire('selected-of-current-section-length', {'itemLength': selectedOfCurrent.length})
         return selectedOfCurrent;
     },
@@ -476,7 +475,7 @@ Polymer({
                 uri = '/api/v1/teams/' + item.id;
                 method = 'DELETE';
             //images
-            } else if (action.name == 'star' || action.name == 'unstar' && item.type == 'image') {
+            } else if (action.name == 'star' || action.name == 'unstar' && item && item.type == 'image') {
                 uri = '/api/v1/clouds/'+item.cloud.id+'/images/'+item.id;
                 method = 'POST';
             //networks
