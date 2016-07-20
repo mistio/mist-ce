@@ -25,9 +25,9 @@
             #select-action paper-listbox ::content iron-icon {
                 vertical-align: top;
             }
-            #select-action paper-button {width: 100%; text-align: left;}
-            #select-action paper-item {padding: 0 8px; margin: 0; width: 200px;}
-            #select-action paper-item iron-icon {padding: 8px;}
+            #select-action paper-button {text-align: left;}
+            #select-action paper-item {padding: 0; margin: 0; width: 200px;}
+            #select-action paper-item iron-icon {padding: 0 8px;}
 
             div.actions {
                 width: 100%;
@@ -80,7 +80,7 @@
           <paper-dialog id="select-action">
             <paper-listbox class="dropdown-content">
               <template is="dom-repeat" items="[[itemActionsDetails(selectedItem)]]">
-                  <paper-item on-tap="_selectAction"><iron-icon icon="[[item.icon]]"></iron-icon> [[item.name]]</paper-item>
+                  <paper-item><paper-button on-tap="_selectAction"><iron-icon icon="[[item.icon]]"></iron-icon> [[item.name]]</paper-button></paper-item>
               </template>
             </paper-listbox>
           </paper-dialog>
@@ -107,7 +107,7 @@
             </template>
             <div class="buttons clearfix btn-group">
               <paper-button dialog-dismiss>Cancel</paper-button>
-              <paper-button dialog-confirm class="red" on-tap="_confirmAction">Accept</paper-button>
+              <paper-button dialog-confirm class="red" on-tap="_confirmAction">Proceed</paper-button>
             </div>
           </paper-dialog>
           <dialog-element></dialog-element>
@@ -155,10 +155,28 @@ ACTIONS = {
     'multi': true
   },
   'make_default': {
-    'name': 'make Default',
-    'icon': 'star-border',
+    'name': 'make default',
+    'icon': 'star',
     'confirm': false,
     'multi': false
+  },
+  'run': {
+    'name': 'run',
+    'icon': 'av:play-arrow',
+    'confirm': true,
+    'multi': false
+  },
+  'enable': {
+    'name': 'enable',
+    'icon': 'av:fiber-manual-record',
+    'confirm': false,
+    'multi': true
+  },
+  'disable': {
+    'name': 'disable',
+    'icon': 'av:pause-circle-outline',
+    'confirm': false,
+    'multi': true
   },
   'delete': {
     'name': 'delete',
@@ -293,8 +311,6 @@ Polymer({
 
     itemActions: function(itemUid) {
         // the list of available actions for this item based on the itemUid
-        console.log('itemUid',itemUid);
-        
         if (!itemUid)
             return [];
 
@@ -332,9 +348,16 @@ Polymer({
                 ret.push('make_default');
             }
             ret.push('delete');
+        } else if (item.type == 'script') {
+            ret.push('run');
+            ret.push('delete');
         } else if (item.type == 'network') {
             ret.push('delete');
         } else if (item.type == 'tunnel') {
+            if(item.active)
+                ret.push('disable');
+            if(!item.active)
+                ret.push('enable');
             ret.push('delete');
         } else if (item.type == 'template') {
             ret.push('delete');
@@ -350,16 +373,22 @@ Polymer({
         return actionDetails(this.itemActions(itemUid(item)));
     },
 
-    _selectAction: function (event) {
+    _selectAction: function (event, item) {
+        console.log("Select Action", event, item);
+
         this.set('selectedAction', event.model.item);
         this.set('multi', false);
         if (event.model.item.confirm)
             this.$['confirmation'].toggle();
+        else {
+            var items = [];
+            items.push(this.selectedItem)
+            this._performAction(this.selectedAction, items);
+        }
         this.$['select-action'].close();
     },
 
     _selectMultiAction: function (event) {
-        console.warn('selected', event, this.selectedItems);
         this.set('selectedAction', event.model.item);
         this.set('multi', true);
         if (event.model.item.confirm)
@@ -400,6 +429,12 @@ Polymer({
             } else if (action.name == 'delete' && item.type == 'stack') {
                 uri = '/api/v1/stacks/' + item.id;
                 method = 'DELETE';
+            } else if (action.name == 'delete' && item.type == 'key') {
+                uri = '/api/v1/keys/' + item.id;
+                method = 'DELETE';
+            } else if (action.name == 'make default' && item.type == 'key') {
+                uri = '/api/v1/keys/' + item.id;
+                method = 'POST';
             } else {
                 console.error('unknown action', action, 'on item', item );
             }
