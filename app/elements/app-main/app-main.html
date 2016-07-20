@@ -111,7 +111,7 @@
             <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
             <app-header model="[[model]]" title="{{title}}" class="paper-header" style$="[[style]]"></app-header>
 
-            <iron-pages id="app-main" main smallscreen$={{smallscreen}}>
+            <iron-pages id="app-main" main smallscreen$={{smallscreen}} selected="0">
                 <!-- dashboard -->
                 <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]" onboarding="[[onboarding]]"></page-dashboard>
                 <cloud-add providers="[[providers]]" keys="[[model.keysArray]]" section="[[sections.clouds]]"></cloud-add>
