@@ -415,7 +415,7 @@ Polymer({
     _performAction: function(action, items) {
         var run = function() {
             var uri, payload, item = items.shift(), method = 'POST';
-
+            //machines
             if (action.name == 'reboot') {
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
                 payload = {'action': 'reboot'};
@@ -423,18 +423,41 @@ Polymer({
             } else if (action.name == 'destroy') {
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
                 payload = {'action': 'destroy'};
+            //templates                
             } else if (action.name == 'delete' && item.type == 'template') {
                 uri = '/api/v1/templates/' + item.id;
                 method = 'DELETE';
+            //stacks
             } else if (action.name == 'delete' && item.type == 'stack') {
                 uri = '/api/v1/stacks/' + item.id;
                 method = 'DELETE';
+            //keys
             } else if (action.name == 'delete' && item.type == 'key') {
                 uri = '/api/v1/keys/' + item.id;
                 method = 'DELETE';
             } else if (action.name == 'make default' && item.type == 'key') {
                 uri = '/api/v1/keys/' + item.id;
                 method = 'POST';
+            //scripts
+            } else if (action.name == 'delete' && item.type == 'script') {
+                uri = '/api/v1/scripts/' + item.id;
+                method = 'DELETE';
+            //teams
+            } else if (action.name == 'delete' && item.type == 'team') {
+                uri = '/api/v1/teams/' + item.id;
+                method = 'DELETE';
+            //images
+            } else if (action.name == 'star' || action.name == 'unstar' && item.type == 'image') {
+                uri = '/api/v1/clouds/'+item.cloud.id+'/images/'+item.id;
+                method = 'POST';
+            //networks
+            } else if (action.name == 'delete' && item.type == 'network') {
+                uri = '/api/v1/networks/' + item.id;
+                method = 'DELETE';
+            //tunnels
+            } else if (action.name == 'delete' && item.type == 'tunnel') {
+                uri = '/api/v1/tunnels/' + item.id;
+                method = 'DELETE';
             } else {
                 console.error('unknown action', action, 'on item', item );
             }
