@@ -140,6 +140,10 @@ Polymer({
         if (field == 'template')
             return document.querySelector('app-main').model.templates[ret].name;
 
+        // some providers dont provide this info
+        if (field == 'create_date' && !ret && item.extra && !item.extra[field]) {
+            return '';
+        }
         // field could be in the 'extra' section
         if (!ret && item.extra && item.extra[field])
             ret = item.extra[field];
