@@ -4639,9 +4639,9 @@ def machine_create_date(m):
     Returns the create date out of the VM metadata
     Supports:
         AWS, DigitalOcean, Packet.net, Linode, SoftLayer, Rackspace Cloud,
-        OpenStack, Nephoscale, Vultr, GCE, Docker
+        OpenStack, Nephoscale, Vultr, GCE, Docker, Azure
     TODO:
-        Azure, vCloud, vSphere
+        vCloud, vSphere
     """
     if m.driver.type in config.EC2_PROVIDERS:
         create_date = m.created_at
@@ -4666,6 +4666,9 @@ def machine_create_date(m):
     elif m.driver.type == Provider.DOCKER:
         create_date = m.created_at
         create_date = datetime.fromtimestamp(create_date / 1e3)
+    if m.driver.type == Provider.AZURE:
+        create_date = m.created_at
+        create_date = iso8601.parse_date(create_date)
     else:
         return {}
 
