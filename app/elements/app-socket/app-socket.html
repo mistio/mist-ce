@@ -3,7 +3,7 @@
     DEBUG_SOCKET = false;
     Polymer({
         is: 'app-socket',
-        url: '/socket',
+        url: 'http://192.168.65.32/socket',
         properties: {
             socket: {
                 type: Object,
@@ -28,12 +28,14 @@
 
         ready: function() {
             // Create the socket if it does not exist
+            console.warn('ready');
             if (this.socket)
                 return;
             this.connect();
         },
 
         connect: function() {
+            console.warn('connecting at ', this.url);
             // Create the SockJS object
             this.socket = new SockJS(this.url, null, {
                 'transports': ['websocket', 'xhr-polling']

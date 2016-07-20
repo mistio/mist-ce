@@ -8,6 +8,7 @@
 <link rel="import" href="../../styles/app-theme.html">
 <link rel="import" href="../../styles/shared-styles.html">
 
+<link rel="import" href="../mist-header/mist-header.html">
 <link rel="import" href="../app-styles/app-styles.html">
 <link rel="import" href="../app-socket/app-socket.html">
 <link rel="import" href="../app-icons/app-icons.html">
@@ -109,7 +110,7 @@
 
         <paper-header-panel mode="standard" class="fit">
             <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
-            <app-header model="[[model]]" title="{{title}}" class="paper-header" style$="[[style]]"></app-header>
+            <mist-header model="[[model]]" title="{{title}}" class="paper-header" style$="[[style]]"></mist-header>
 
             <iron-pages id="app-main" main smallscreen$={{smallscreen}}>
                 <!-- dashboard -->
