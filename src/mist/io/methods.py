@@ -4666,9 +4666,6 @@ def machine_create_date(m):
     elif m.driver.type == Provider.DOCKER:
         create_date = m.created_at
         create_date = datetime.fromtimestamp(create_date / 1e3)
-    if m.driver.type == Provider.AZURE:
-        create_date = m.created_at
-        create_date = iso8601.parse_date(create_date)
     else:
         return {}
 
