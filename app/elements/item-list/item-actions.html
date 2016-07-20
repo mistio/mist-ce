@@ -255,10 +255,7 @@ Polymer({
     computeSelectedOfCurrent: function(selected, section){
         var selectedOfCurrent = [];
         selectedOfCurrent = this.selectedItems.filter(function(i){
-            console.log(i, i.split(':')[0], i.split(':')[0].indexOf(section.id));
-
             var itemtype = i.split(':')[0];
-
             return this.section.id.indexOf(itemtype) > -1;
         }, this);
         this.fire('selected-of-current-section-length', {'itemLength': selectedOfCurrent.length})
@@ -293,8 +290,17 @@ Polymer({
             actions.clear();
             actions.addItems(isection.items());
         }
-
-        this.set('actions', actionDetails(actions.items()));
+        var multiActions;
+        if (this.selectedItemsOfCurrentSection.length > 1) {
+            multiActions = actionDetails(actions.items()).filter(function(a){
+                return a.multi;
+            });
+        }
+        else {
+            multiActions = actionDetails(actions.items());
+        }
+        console.log('multiActions',multiActions);
+        this.set('actions', multiActions);
     },
 
     selectedItemsDetails: function(s) {
@@ -391,8 +397,6 @@ Polymer({
     },
 
     _selectAction: function (event, item) {
-        console.log("Select Action", event, item);
-
         this.set('selectedAction', event.model.item);
         this.set('multi', false);
         if (event.model.item.confirm)
