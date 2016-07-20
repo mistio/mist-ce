@@ -96,10 +96,10 @@
             </template>
 
             <template is="dom-if" if="[[multi]]">
-              <h2>[[selectedAction.name]] [[selectedItems.length]] {{selectedItemsType(selectedItems.length, items.length)}} ?</h2>
+              <h2>[[selectedAction.name]] [[selectedItemsOfCurrentSection.length]] {{selectedItemsOfCurrentSectionType(selectedItemsOfCurrentSection.length, items.length)}} ?</h2>
               <paper-dialog-scrollable>
                 <p>
-                    <template is="dom-repeat" items="{{selectedItemsDetails(selectedItems.length)}}">
+                    <template is="dom-repeat" items="{{selectedItemsDetails(selectedItemsOfCurrentSection.length)}}">
                       [[item.name]]
                     </template>
                 </p>
@@ -214,13 +214,19 @@ Polymer({
     is: 'item-actions',
 
     properties: {
+        section: Object,
         items: {
             type: Array,
             value: [],
             notify: true
         },
         selectedItems: {
-            type: Array
+            type: Array,
+            notify: true
+        },
+        selectedItemsOfCurrentSection: {
+            type: Array,
+            computed: 'computeSelectedOfCurrent(selectedItems.*, section)'
         },
         actions: {
             type: Array,
@@ -246,7 +252,18 @@ Polymer({
 
     ready: function () {
     },
+    computeSelectedOfCurrent: function(selected, section){
+        var selectedOfCurrent = [];
+        selectedOfCurrent = this.selectedItems.filter(function(i){
+            console.log(i, i.split(':')[0], i.split(':')[0].indexOf(section.id));
 
+            var itemtype = i.split(':')[0];
+
+            return this.section.id.indexOf(itemtype) > -1;
+        }, this);
+        this.fire('selected-of-current-section-length', {'itemLength': selectedOfCurrent.length})
+        return selectedOfCurrent;
+    },
     openItemActions: function (item, y) {
         // ugly hack that displays dialog only after it is correctly positioned
         var selectActionDialog = this.$['select-action'];
@@ -266,13 +283,13 @@ Polymer({
     selectedItemsChanged: function (changeRecord) {
         // recompute the actions array property as the intersection
         // of the available actions of the selected items
-        if (!this.selectedItems || !this.selectedItems.length)
+        if (!this.selectedItemsOfCurrentSection || !this.selectedItemsOfCurrentSection.length)
             this.set('actions', []);
         var actions = new swiftSet.Set(), isection = new swiftSet.Set();
-        actions.addItems(this.itemActions(this.selectedItems[0]) || []);
-        for (var i=1; i<this.selectedItems.length; i++) {
+        actions.addItems(this.itemActions(this.selectedItemsOfCurrentSection[0]) || []);
+        for (var i=1; i<this.selectedItemsOfCurrentSection.length; i++) {
             isection.clear()
-            isection.addItems(actions.intersection(this.itemActions(this.selectedItems[i])));
+            isection.addItems(actions.intersection(this.itemActions(this.selectedItemsOfCurrentSection[i])));
             actions.clear();
             actions.addItems(isection.items());
         }
@@ -282,15 +299,15 @@ Polymer({
 
     selectedItemsDetails: function(s) {
         var ret = [];
-        for (var i=0; i<this.selectedItems.length; i++) {
-            ret.push(this.items[this.itemIndex(this.selectedItems[i])]);
+        for (var i=0; i<this.selectedItemsOfCurrentSection.length; i++) {
+            ret.push(this.items[this.itemIndex(this.selectedItemsOfCurrentSection[i])]);
         }
         return ret;
     },
 
     selectedItemsType: function(s) {
-        var item_type = this.selectedItems.length && this.items[this.itemIndex(this.selectedItems[0])] && this.items[this.itemIndex(this.selectedItems[0])].type;
-        if (this.get('selectedItems.length') != 1)
+        var item_type = this.selectedItemsOfCurrentSection.length && this.items[this.itemIndex(this.selectedItemsOfCurrentSection[0])] && this.items[this.itemIndex(this.selectedItemsOfCurrentSection[0])].type;
+        if (this.get('selectedItemsOfCurrentSection.length') != 1)
             item_type+='s';
         return item_type;
     },
@@ -404,7 +421,7 @@ Polymer({
 
         if (this.multi) {
             //console.error('not implemented');
-            console.info(this.selectedAction, this.selectedItems);
+            console.info(this.selectedAction, this.selectedItemsOfCurrentSection);
             this._performAction(this.selectedAction, this.selectedItemsDetails());
         } else {
             console.info(this.selectedAction, this.selectedItem);

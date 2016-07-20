@@ -198,11 +198,11 @@
         <div class="header" style$="[[_getHeaderStyle(section.color, selectedItems.length)]]">
             <template is="dom-if" if="[[!isimages]]">
                 <app-check class="check-all" selected="[[allselected]]" on-tap="_onSelectAll">
-                    <template is="dom-if" if="[[!selectedItems.length]]">
+                    <template is="dom-if" if="[[!currentSelectedItems]]">
                         <iron-icon icon="check"></iron-icon>
                     </template>
-                    <template is="dom-if" if="[[selectedItems.length]]">
-                        <strong>[[selectedItems.length]]</strong>
+                    <template is="dom-if" if="[[currentSelectedItems]]">
+                        <strong>[[currentSelectedItems]]</strong>
                     </template>
                 </app-check>
             </template>
@@ -231,7 +231,7 @@
                   </paper-dropdown-menu>[[_isSortedBy(sortBy, sortBy, sortOrder)]]
               </div>
             </template>
-            <item-actions id="actions" items="[[items]]" selected-items="[[selectedItems]]"></item-actions>
+            <item-actions id="actions" items="[[items]]" selected-items="[[selectedItems]]" section="[[section]]"></item-actions>
         </div>
         <div class="row no-data" hidden$="[[items.length]]">
             no data yet
@@ -335,17 +335,23 @@ Polymer({
         vpHeight: {
             type: String,
             notify: true
+        },
+        currentSelectedItems: {
+            type: Number,
+            value: 0
         }
     },
 
     listeners: {
-
+        'selected-of-current-section-length' : 'updateNumber'
     },
 
     observers: [
       'itemsChanged(items.splices)',
     ],
-
+    updateNumber: function(e){
+        this.set('currentSelectedItems', e.detail.itemLength);
+    },
     ready: function() {
         var topOfset = 142;
         var wh = window.innerHeight - topOfset;
