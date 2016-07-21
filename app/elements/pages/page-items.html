@@ -146,14 +146,20 @@
         [view=table] #item-cards {
             display: none;
         }
+        .search-notice {
+            padding-left: 0.5em;
+        }
         </style>
 
         <div id="content">
             <div hidden$="[[!showEmptyScreen]]">
                 <empty-pages clouds="[[model.cloudsArray]]" section="[[section]]"></empty-pages>
             </div>
-            <div hidden$="[[showEmptyScreen]]">
+            <div hidden$="[[showEmptyScreen]]">                
                 <div id="section-heading" hidden$="[[!section]]">
+                    <div class="search-notice" hidden$="[[!section.q.length]]">
+                        <h2>[[filteredItems.length]] "[[section.q]]" [[section.id]] <paper-icon-button icon="close" on-tap="clearSearch"></paper-icon-button></h2>
+                    </div>
                     <div class="description">[[section.description]]</div>
                 </div>
                 <template is="dom-if" if="[[_stampCards(view)]]">
@@ -181,7 +187,10 @@
         properties: {
             model: Object,
             sections: Object,
-            section: Object,
+            section: {
+                type: Object,
+                observer: '_qChanged'
+            },
             pageTitle: String,
             showEmptyScreen: {
                 type: Boolean,
@@ -209,15 +218,11 @@
             },
             filteredItems: {
                 type: Array
-            },
-            q: { // search query
-                type: String,
-                observer: '_qChanged'
             }
         },
 
         observers: [
-            'sortingObserver(items.*, sortBy, sortOrder, q)',
+            'sortingObserver(items.*, sortBy, sortOrder, section.q.*)',
         ],
         ready: function() {
 
@@ -248,8 +253,8 @@
         },
 
         updateMeta: function(section) {
-            if (this.q && this.q.length) {
-                var t = "'" + this.q + "' ";
+            if (this.section.q && this.section.q.length) {
+                var t = "'" + this.section.q + "' ";
                 t += (section && section.id) ? section.id : "";
                 this.pageTitle = t;
             } else if (section && section.id) {
@@ -284,7 +289,7 @@
         },
 
         filterItem: function(item, index) {
-            var q = this.q, queryTerms = this.q.split(' ');
+            var q = this.section.q, queryTerms = this.section.q.split(' ');
 
             // Check if all terms exist in stringified item
             for (var i=0; i<queryTerms.length; i++) {
@@ -353,6 +358,10 @@
 
         _getMode: function(narrow) {
             return narrow ? 'waterfall' : 'scroll';
+        },
+        clearSearch: function(e){
+            this.set('section.q', '');
+            document.querySelector('#query').value = '';
         }
     });
 })();
