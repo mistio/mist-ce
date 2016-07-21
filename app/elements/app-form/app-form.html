@@ -421,6 +421,8 @@
                         // Reset Form Fields Validation
                         this._resetField(el, index);
                     }, this);
+
+                    this.fire('reset-form');
                 },
                 _resetField: function(el, index) {
                     this.set('fields.' + index + '.value', el.defaultValue);

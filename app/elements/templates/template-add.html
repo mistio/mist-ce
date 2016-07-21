@@ -51,23 +51,26 @@
                 </div>
             </paper-material>
             <paper-material>
-                <h4>Catalog</h4>
-                <p>You can optionally select from our template catalogue.
-                <paper-icon-button icon="add" on-tap="fillForKub"></paper-icon-button> Choose suggested Kubernetes template
-                <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
-                    <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
-                        <template is="dom-repeat" items="[[field.options]]" as="option">
-                            <paper-item value="[[option.val]]">[[option.title]]</paper-item>
-                        </template>
-                    </paper-menu>
-                </paper-dropdown-menu>
+                <div class="grid-row">
+                    <div class="xs12 m6">
+                        <strong>Catalog</strong><br/>
+                        <br/>You can optionally select from our template catalogue.
+                    </div>
+                    <paper-dropdown-menu class="xs12 m6" label="Catalogue Templates" horizontal-align="left">
+                        <paper-menu attr-for-selected="value" selected="{{selected}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[defaultTemplates]]" as="defaultTemplate">
+                                <paper-item value="[[index]]">[[defaultTemplate.name]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+                </div>
                 <hr/>
                 <app-form fields="{{fields}}" method="POST" form="[[template]]" url="/api/v1/templates" on-request="_addTemplateAjaxRequest" on-response="_addTemplateAjaxResponse" on-error="_addTemplateAjaxError"></app-form>
             </paper-material>
         </div>
     </template>
     <script>
-    var defaultTemplates = [
+    var defaultTemplatesJS = [
         {
             name: 'Mist Cloudify Kubernetes Cluster Example',
             description: 'This template contains a blueprint for installing a kubernetes cluster through mist.io.The aforementioned kubernetes cluster consists of: a kubernetes master and a kubernetes minion (worker)',
@@ -94,6 +97,10 @@
                     color: {
                         type: String,
                         computed: '_getHeaderStyle(section)'
+                    },
+                    selected: {
+                        type: Number,
+                        notify: true
                     },
                     template: {
                         type: Object,
@@ -233,7 +240,17 @@
                             errorMessage: "Please enter entry point",
                             helptext: "Please enter entry point"
                         }]
-                    }
+                    },
+                    defaultTemplates: Array
+                },
+                observers: [
+                    'useCatalogueTemplate(selected)'
+                ],
+                listeners: {
+                    'reset-form' : 'clearDropDown'
+                },
+                ready: function(){
+                    this.defaultTemplates = defaultTemplatesJS;
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
@@ -278,12 +295,15 @@
                         input.invalid = false;
                     }
                 },
-                fillForKub: function(e){
+                useCatalogueTemplate: function(selected){
                     this.fields.forEach(function(f, index){
                         var key = f.name;
-                        if (defaultTemplates[0][key])
-                            this.set('fields.'+index+'.value', defaultTemplates[0][key]);
+                        if (this.defaultTemplates[selected][key])
+                            this.set('fields.'+index+'.value', this.defaultTemplates[selected][key]);
                     }, this);
+                },
+                clearDropDown: function(){
+                    this.set('selected', null)
                 }
             });
         })();
