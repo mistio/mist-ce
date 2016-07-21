@@ -16,7 +16,7 @@
             }
 
             #select-action {
-                width: 130px;
+                width: 200px;
             }
             #select-action paper-listbox {
                 margin-top: 0;
@@ -25,8 +25,9 @@
             #select-action paper-listbox ::content iron-icon {
                 vertical-align: top;
             }
-            #select-action paper-button {width: 100%; text-align: left;}
-            #select-action paper-item {padding: 0; margin: 0; width: 130px;}
+            #select-action paper-button {text-align: left;}
+            #select-action paper-item {padding: 0; margin: 0; width: 200px;}
+            #select-action paper-item iron-icon {padding: 0 8px;}
 
             div.actions {
                 width: 100%;
@@ -95,10 +96,10 @@
             </template>
 
             <template is="dom-if" if="[[multi]]">
-              <h2>[[selectedAction.name]] [[selectedItems.length]] {{selectedItemsType(selectedItems.length, items.length)}} ?</h2>
+              <h2>[[selectedAction.name]] [[selectedItemsOfCurrentSection.length]] {{selectedItemsOfCurrentSectionType(selectedItemsOfCurrentSection.length, items.length)}} ?</h2>
               <paper-dialog-scrollable>
                 <p>
-                    <template is="dom-repeat" items="{{selectedItemsDetails(selectedItems.length)}}">
+                    <template is="dom-repeat" items="{{selectedItemsDetails(selectedItemsOfCurrentSection.length)}}">
                       [[item.name]]
                     </template>
                 </p>
@@ -106,7 +107,7 @@
             </template>
             <div class="buttons clearfix btn-group">
               <paper-button dialog-dismiss>Cancel</paper-button>
-              <paper-button dialog-confirm class="red" on-tap="_confirmAction">Accept</paper-button>
+              <paper-button dialog-confirm class="red" on-tap="_confirmAction">Proceed</paper-button>
             </div>
           </paper-dialog>
           <dialog-element></dialog-element>
@@ -139,6 +140,42 @@ ACTIONS = {
     'name': 'destroy',
     'icon': 'delete',
     'confirm': true,
+    'multi': true
+  },
+  'star': {
+    'name': 'star',
+    'icon': 'star',
+    'confirm': false,
+    'multi': true
+  },
+  'unstar': {
+    'name': 'unstar',
+    'icon': 'star-border',
+    'confirm': false,
+    'multi': true
+  },
+  'make_default': {
+    'name': 'make default',
+    'icon': 'star',
+    'confirm': false,
+    'multi': false
+  },
+  'run': {
+    'name': 'run',
+    'icon': 'av:play-arrow',
+    'confirm': true,
+    'multi': false
+  },
+  'enable': {
+    'name': 'enable',
+    'icon': 'av:fiber-manual-record',
+    'confirm': false,
+    'multi': true
+  },
+  'disable': {
+    'name': 'disable',
+    'icon': 'av:pause-circle-outline',
+    'confirm': false,
     'multi': true
   },
   'delete': {
@@ -177,13 +214,19 @@ Polymer({
     is: 'item-actions',
 
     properties: {
+        section: Object,
         items: {
             type: Array,
             value: [],
             notify: true
         },
         selectedItems: {
-            type: Array
+            type: Array,
+            notify: true
+        },
+        selectedItemsOfCurrentSection: {
+            type: Array,
+            computed: 'computeSelectedOfCurrent(selectedItems.*, section)'
         },
         actions: {
             type: Array,
@@ -209,7 +252,15 @@ Polymer({
 
     ready: function () {
     },
-
+    computeSelectedOfCurrent: function(selected, section){
+        var selectedOfCurrent = [];
+        selectedOfCurrent = this.selectedItems.filter(function(i){
+            var itemtype = i.split(':')[0];
+            return this.section.id.indexOf(itemtype) > -1;
+        }, this);
+        this.fire('selected-of-current-section-length', {'itemLength': selectedOfCurrent.length})
+        return selectedOfCurrent;
+    },
     openItemActions: function (item, y) {
         // ugly hack that displays dialog only after it is correctly positioned
         var selectActionDialog = this.$['select-action'];
@@ -229,31 +280,39 @@ Polymer({
     selectedItemsChanged: function (changeRecord) {
         // recompute the actions array property as the intersection
         // of the available actions of the selected items
-        if (!this.selectedItems || !this.selectedItems.length)
+        if (!this.selectedItemsOfCurrentSection || !this.selectedItemsOfCurrentSection.length)
             this.set('actions', []);
         var actions = new swiftSet.Set(), isection = new swiftSet.Set();
-        actions.addItems(this.itemActions(this.selectedItems[0]) || []);
-        for (var i=1; i<this.selectedItems.length; i++) {
+        actions.addItems(this.itemActions(this.selectedItemsOfCurrentSection[0]) || []);
+        for (var i=1; i<this.selectedItemsOfCurrentSection.length; i++) {
             isection.clear()
-            isection.addItems(actions.intersection(this.itemActions(this.selectedItems[i])));
+            isection.addItems(actions.intersection(this.itemActions(this.selectedItemsOfCurrentSection[i])));
             actions.clear();
             actions.addItems(isection.items());
         }
-
-        this.set('actions', actionDetails(actions.items()));
+        var multiActions;
+        if (this.selectedItemsOfCurrentSection.length > 1) {
+            multiActions = actionDetails(actions.items()).filter(function(a){
+                return a.multi;
+            });
+        }
+        else {
+            multiActions = actionDetails(actions.items());
+        }
+        this.set('actions', multiActions);
     },
 
     selectedItemsDetails: function(s) {
         var ret = [];
-        for (var i=0; i<this.selectedItems.length; i++) {
-            ret.push(this.items[this.itemIndex(this.selectedItems[i])]);
+        for (var i=0; i<this.selectedItemsOfCurrentSection.length; i++) {
+            ret.push(this.items[this.itemIndex(this.selectedItemsOfCurrentSection[i])]);
         }
         return ret;
     },
 
     selectedItemsType: function(s) {
-        var item_type = this.selectedItems.length && this.items[this.itemIndex(this.selectedItems[0])] && this.items[this.itemIndex(this.selectedItems[0])].type;
-        if (this.get('selectedItems.length') != 1)
+        var item_type = this.selectedItemsOfCurrentSection.length && this.items[this.itemIndex(this.selectedItemsOfCurrentSection[0])] && this.items[this.itemIndex(this.selectedItemsOfCurrentSection[0])].type;
+        if (this.get('selectedItemsOfCurrentSection.length') != 1)
             item_type+='s';
         return item_type;
     },
@@ -274,7 +333,6 @@ Polymer({
 
     itemActions: function(itemUid) {
         // the list of available actions for this item based on the itemUid
-
         if (!itemUid)
             return [];
 
@@ -300,15 +358,36 @@ Polymer({
             }
             ret.push('destroy');
         } else if (item.type == 'image') {
+            if (item.star) {
+                ret.push('unstar');
+            }
+            else {
+                ret.push('star');
+            }
             return ret;
         } else if (item.type == 'key') {
+            if (!item.isDefault) {
+                ret.push('make_default');
+            }
+            ret.push('delete');
+        } else if (item.type == 'script') {
+            ret.push('run');
+            ret.push('delete');
+        } else if (item.type == 'network') {
+            ret.push('delete');
+        } else if (item.type == 'tunnel') {
+            if(item.active)
+                ret.push('disable');
+            if(!item.active)
+                ret.push('enable');
             ret.push('delete');
         } else if (item.type == 'template') {
             ret.push('delete');
         } else if (item.type == 'stack') {
             ret.push('delete');
+        } else if (item.type == 'team') {
+            ret.push('delete');
         }
-
         return ret;
     },
 
@@ -316,20 +395,32 @@ Polymer({
         return actionDetails(this.itemActions(itemUid(item)));
     },
 
-    _selectAction: function (event) {
+    _selectAction: function (event, item) {
         this.set('selectedAction', event.model.item);
         this.set('multi', false);
         if (event.model.item.confirm)
             this.$['confirmation'].toggle();
+        else {
+            var items = [];
+            items.push(this.selectedItem);
+            this._performAction(this.selectedAction, items);
+        }
         this.$['select-action'].close();
     },
 
     _selectMultiAction: function (event) {
-        console.warn('selected', event, this.selectedItems);
         this.set('selectedAction', event.model.item);
         this.set('multi', true);
         if (event.model.item.confirm)
             this.$['confirmation'].toggle();
+        else {
+            var items = [];
+            this.selectedItems.forEach(function(si){
+                var ind = this.itemIndex(si);
+                items.push(this.items[ind]);
+            }, this);
+            this._performAction(this.selectedAction, items);
+        }
         this.$['select-action'].close();
     },
 
@@ -341,7 +432,7 @@ Polymer({
 
         if (this.multi) {
             //console.error('not implemented');
-            console.info(this.selectedAction, this.selectedItems);
+            console.info(this.selectedAction, this.selectedItemsOfCurrentSection);
             this._performAction(this.selectedAction, this.selectedItemsDetails());
         } else {
             console.info(this.selectedAction, this.selectedItem);
@@ -352,7 +443,7 @@ Polymer({
     _performAction: function(action, items) {
         var run = function() {
             var uri, payload, item = items.shift(), method = 'POST';
-
+            //machines
             if (action.name == 'reboot') {
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
                 payload = {'action': 'reboot'};
@@ -360,11 +451,40 @@ Polymer({
             } else if (action.name == 'destroy') {
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
                 payload = {'action': 'destroy'};
+            //templates                
             } else if (action.name == 'delete' && item.type == 'template') {
                 uri = '/api/v1/templates/' + item.id;
                 method = 'DELETE';
+            //stacks
             } else if (action.name == 'delete' && item.type == 'stack') {
                 uri = '/api/v1/stacks/' + item.id;
+                method = 'DELETE';
+            //keys
+            } else if (action.name == 'delete' && item.type == 'key') {
+                uri = '/api/v1/keys/' + item.id;
+                method = 'DELETE';
+            } else if (action.name == 'make default' && item.type == 'key') {
+                uri = '/api/v1/keys/' + item.id;
+                method = 'POST';
+            //scripts
+            } else if (action.name == 'delete' && item.type == 'script') {
+                uri = '/api/v1/scripts/' + item.id;
+                method = 'DELETE';
+            //teams
+            } else if (action.name == 'delete' && item.type == 'team') {
+                uri = '/api/v1/teams/' + item.id;
+                method = 'DELETE';
+            //images
+            } else if (action.name == 'star' || action.name == 'unstar' && item && item.type == 'image') {
+                uri = '/api/v1/clouds/'+item.cloud.id+'/images/'+item.id;
+                method = 'POST';
+            //networks
+            } else if (action.name == 'delete' && item.type == 'network') {
+                uri = '/api/v1/networks/' + item.id;
+                method = 'DELETE';
+            //tunnels
+            } else if (action.name == 'delete' && item.type == 'tunnel') {
+                uri = '/api/v1/tunnels/' + item.id;
                 method = 'DELETE';
             } else {
                 console.error('unknown action', action, 'on item', item );
