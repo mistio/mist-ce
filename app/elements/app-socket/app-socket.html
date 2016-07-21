@@ -451,6 +451,7 @@
         },
 
         _updateNetworks: function(data) {
+            this.set('onboarding.isLoadingNetworks', false);
             var changed = this._updateModel('clouds.' + data.cloud_id + '.networks', data.networks);
             if (!changed)
                 return false;
