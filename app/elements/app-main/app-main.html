@@ -437,7 +437,7 @@
             }
 
             // updateDocTitle function was overriden
-            if (e.detail.item.title && e.detail.item.title.length) {
+            if (e.detail && e.detail.item && e.detail.item.title && e.detail.item.title.length) {
                 document.title = e.detail.item.title + " - mist.io";
             } else {
                 document.title = "mist.io";
