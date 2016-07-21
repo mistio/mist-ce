@@ -112,7 +112,7 @@
             <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
             <mist-header model="[[model]]" title="{{title}}" class="paper-header" style$="[[style]]"></mist-header>
 
-            <iron-pages id="app-main" main smallscreen$={{smallscreen}}>
+            <iron-pages id="app-main" main smallscreen$={{smallscreen}} selected="{{selected}}">
                 <!-- dashboard -->
                 <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]" onboarding="[[onboarding]]"></page-dashboard>
                 <cloud-add providers="[[providers]]" keys="[[model.keysArray]]" section="[[sections.clouds]]"></cloud-add>
@@ -209,6 +209,10 @@
                 computed: "_style(current, sections)",
                 value: "background-color: #424242;",
                 notify: true
+            },
+            selected: {
+                type: Number,
+                value: 0
             },
             tag: String
         },
@@ -410,17 +414,29 @@
 
         updateCurrent: function(e) {
             // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
-            var el = e.detail.item;
             var details = e.detail;
-            if (el.nodeName == 'IRON-ROUTE' && el.title && el.getAttribute("current")) {
+            if (e == 'show-dashboard'){
+                this.selected = 0;
+                page('/');
+                this.current = "dashboard";
+                this.title = "dashboard";
+            }
+            else if (details && 
+                details.item && 
+                details.item.nodeName != 'IRON-SELECT' && 
+                details.item.title && 
+                details.item.getAttribute("current")) {
+
+                var el = e.detail.item;
                 this.current = el.getAttribute("current");
                 this.title = el.title;
-                // console.log("el", e.detail);
+                
                 if (el.nodeName == 'IRON-ROUTE') {
                     this.current = el.getAttribute("current");
                     this.title = el.title;
                 }
             }
+
             // updateDocTitle function was overriden
             if (e.detail.item.title && e.detail.item.title.length) {
                 document.title = e.detail.item.title + " - mist.io";

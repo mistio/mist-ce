@@ -556,10 +556,12 @@ Polymer({
         //construct a reference matrix of the chips offsetTops
         var chips = document.querySelectorAll('cloud-chip');
         var matrix = [];
-        [].forEach.call(chips, function(c){
-            matrix.push(c.offsetTop);
-        });
-        this.set('matrix', matrix);
+        if(chips) {
+            [].forEach.call(chips, function(c){
+                matrix.push(c.offsetTop);
+            });
+            this.set('matrix', matrix);
+        }
     },
     indexOfLast: function(index){
         //calculate the index of the first chip of the next row
