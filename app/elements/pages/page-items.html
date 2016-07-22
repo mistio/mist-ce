@@ -318,7 +318,7 @@
             return function(a, b) {
                 console.log('comparison', a[property], b[property]);
                 // string compare on fields other than members machines and cost, image ids, default
-                if (['members', 'machines', 'cost', 'image', 'image', 'default', 'cloud' ].indexOf(property) == -1) {
+                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private' ].indexOf(property) == -1) {
                     //if both properties exist
                     if(JSON.stringify(a[property]) && JSON.stringify(b[property])) {
                         if (JSON.stringify(a[property]).toLowerCase() < JSON.stringify(b[property]).toLowerCase()) {
@@ -404,6 +404,19 @@
                     //if both properties exist
                     var ta = a.isDefault ? 1 : 0,
                         tb = b.isDefault ? 1 : 0;
+                    if (ta > tb) {
+                        return -1 * order;
+                    }
+                    if (ta < tb) {
+                        return 1 * order;
+                    }
+                    return 0;
+                }
+                // compare boolean private
+                else if (property == 'private'){
+                    //if both properties exist
+                    var ta = a[property] ? 1 : 0,
+                        tb = b[property] ? 1 : 0;
                     if (ta > tb) {
                         return -1 * order;
                     }
