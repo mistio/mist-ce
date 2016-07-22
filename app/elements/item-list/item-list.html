@@ -183,9 +183,16 @@
         }
         .field #sortarrow {
             display: none;
+            transition: transform 300ms ease-in-out 100ms;
         }
         .field.asc #sortarrow, .field.desc #sortarrow {
             display: inline-block;
+        }
+        .field.asc #sortarrow {
+            transform: rotate3d(0, 0, 1, 0);
+        }
+        .field.desc #sortarrow {
+            transform: rotate3d(0, 0, 1, 180deg);
         }
 
         </style>
@@ -595,22 +602,26 @@ Polymer({
     },
 
     _changeSortOrder: function(e, g) {
-        console.warn('sort order', e.model.item);
+        console.warn('sort order', this.sortBy , e.model.item);
+
         if (this.get('sortBy') != e.model.item) {
+            //new sortBy event
             this.set('sortBy', e.model.item);
-            this.set('sortOrder', 0);
-        } else if (!this.get('sortOrder')){
             this.set('sortOrder', 1);
-        } else {
-            //this.set('sortBy', 'default');
-            this.set('sortOrder', 0);
-        }
+
+        } else if (this.get('sortBy') == e.model.item){
+            //same sortBy event 
+            var newSortOrder = this.get('sortOrder')*(-1)
+            this.set('sortOrder', newSortOrder);
+
+        } 
     },
 
     _isSortedBy: function (e) {
-        console.info(e, this.sortBy, e == this.sortBy && (this.sortOrder ? 'desc' : 'asc'));
+        console.info('_isSortedBy',e, this.sortBy, e == this.sortBy) //this.sortBy, e == this.sortBy && (this.sortOrder ? 'desc' : 'asc'));
+
         if (e == this.sortBy)
-          return this.sortOrder ? 'desc' : 'asc';
+          return this.sortOrder == 1 ? 'desc' : 'asc';
     },
 
     _currentRowIndex: -1,

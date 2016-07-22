@@ -313,11 +313,41 @@
         },
 
         _computeSort: function(property, order) {
+            console.log('_computeSort', property, order);
+
             return function(a, b) {
-                if (a[property] === b[property]) {
+                // console.log('comparison', a[property].length, b[property].length);
+                if (property != 'members') {
+                    // string compare on fields of type string
+                    if(JSON.stringify(a[property]) && JSON.stringify(b[property])) {
+                        if (JSON.stringify(a[property]).toLowerCase() < JSON.stringify(b[property]).toLowerCase()) {
+                            return -1 * order;
+                        }
+                        else if (JSON.stringify(a[property]).toLowerCase() > JSON.stringify(b[property]).toLowerCase()) {
+                            return 1 * order;
+                        }
+                        else {
+                            return 0;
+                        }
+                    }
+                    else {
+                        if (!JSON.stringify(a[property]))
+                            return 1;   
+                        else
+                            return -1
+                    }
+                }
+                // number compare on members members.length
+                else {
+                    if (a[property].length < b[property].length) {
+                        return -1 * order;
+                    }
+                    if (a[property].length > b[property].length) {
+                        return 1 * order;
+                    }
+                      // a must be equal to b
                     return 0;
                 }
-                return (order * (a[property] > b[property] ? 1 : -1));
             };
         },
 
