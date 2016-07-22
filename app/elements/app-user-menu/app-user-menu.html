@@ -90,6 +90,7 @@
                 color: rgba(0, 0, 0, 0.87);
                 padding-top: 30px;
                 padding-bottom: 30px;
+                overflow: hidden;
             }
 
             .current iron-icon {
@@ -149,7 +150,6 @@
                     <div class="logo xs4">
                         <iron-icon class="user-menu-icon" icon="social:person"></iron-icon>
                     </div>
-                    <template is="dom-if" if="[[!isPersonal]]">
                         <div class="org xs8">
                             <h4>[[org.name]]</h4>
                             <div>[[user.email]]</div>
@@ -157,13 +157,7 @@
                                 <span class="current-org-teams">[[item.name]]</span>
                             </template>
                         </div>
-                    </template>
-                    <template is="dom-if" if="[[isPersonal]]">
-                        <div class="org xs8">
-                            <h4>Personal Account</h4>
-                            <span>[[user.email]]</span>
-                        </div>
-                    </template>
+
                 </div>
                 <paper-menu>
                     <template is="dom-repeat" items="[[organizationsList]]" as="organization">
@@ -225,11 +219,6 @@
             org: {
                 type: Object
             },
-            isPersonal: {
-                type: Boolean,
-                computed: '_computeIsPersonal(org)',
-                value: true
-            },
             size: {
                 type: Number,
                 value: function() {
@@ -260,7 +249,7 @@
             }
         },
         observers: [
-            '_computeOrganizationsList(user.orgs.*, isPersonal, user.orgs.*)'
+            '_computeOrganizationsList(user.orgs.*, org)'
         ],
         _computeGravatar: function(email, size, placeholder) {
             var avatarString = md5(email),
@@ -270,15 +259,9 @@
         _computeGravatarName: function(first_name, last_name, email) {
             return first_name && last_name ? first_name + ' ' + last_name : email;
         },
-        _computeIsPersonal: function(org) {
-            return org ? false : true;
-        },
-        _computeOrganizationsList: function(orgs, isPersonal, userOrgs) {
+        _computeOrganizationsList: function(orgs, org) {
             if (orgs.base) {
-                var curOrgName = '';
-                if (!isPersonal) {
-                    curOrgName = this.org.name;
-                }
+                var curOrgName = this.org.name;
                 var organizations = orgs.base.filter(function(o) {
                         return o.name != curOrgName;
                     }, this).sort(function(a, b) {
@@ -290,13 +273,6 @@
                         }
                         return 0;
                     });
-
-                if (!isPersonal) {
-                    organizations.unshift({
-                        id: '',
-                        name: 'Personal'
-                    });
-                }
             }
 
             this.set('organizationsList', organizations);
