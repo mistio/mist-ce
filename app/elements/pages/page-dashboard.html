@@ -49,6 +49,8 @@
             -webkit-overflow-scrolling: touch;
             padding: 0 36px 80px 36px;
             padding: 0 0 80px;
+
+            position: relative;
         }
 
         .flexchild {
@@ -160,6 +162,10 @@
                 @apply(--layout-horizontal);
                 flex-wrap: wrap;
             }
+            .onb-true.flex-horizontal-wide {
+                @apply(--layout-none);
+                display: block;
+            }
             .flexchild-wide-top {
                 flex: 1 100%;
             }
@@ -213,11 +219,11 @@
         }
         .is-loading {
             position: absolute;
-            top: 20px;
-            left: 200px;
+            top: 0;
+            left: 0;
             right: 0;
             bottom: 0;
-            width: calc(100% - 200px);
+            width: 100%;
             height: 100vh;
             z-index: 98;
             background-color: #eee;
@@ -232,7 +238,12 @@
             background-color: #ffff8d;
             padding: 2px 16px;
             margin: 0 16px;
-            z-index: 99;
+            z-index: 98;
+        }
+        .onb-true .notice {
+            flex: 0 0;
+            width: auto;
+            max-width: 100%;
         }
         </style>
         <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
