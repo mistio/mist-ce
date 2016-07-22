@@ -21,3 +21,4 @@ sphinx-bootstrap-theme==0.4.7
 sphinx-rtd-theme==0.1.8
 sphinxcontrib-httpdomain==1.4.0
 websocket-client==0.29.0
+iso8601
