@@ -1673,31 +1673,26 @@ def list_machines(user, cloud_id):
 
         # the reason this goes down is that we want to allow
         # cost_per_hour/cost_per_month to be overrided by users
-        create_date_timestamp = None
-        create_date = None
+        if not machine_entry.created:
+            # if the machine has no created value then try to get one from the
+            # provider
+            try:
+                create_date, create_date_timestamp = machine_create_date(m)
+                if create_date_timestamp:
+                    machine_entry.created = create_date_timestamp
+                    machine_entry.save()
+            except:
+                pass
+
         if machine_entry.created:
+            # if a value is available then send it to the ui
             create_date_timestamp = machine_entry.created
             try:
                 create_date = datetime.fromtimestamp(create_date_timestamp).strftime("%b %d, %Y at %I:%M:%S %p")
+                machine['extra']['create_date'] = create_date
+                machine['extra']['create_date_timestamp'] = create_date_timestamp
             except:
                 pass
-        else:
-            try:
-                create_date = machine_create_date(m)
-                create_date_timestamp = create_date.get('create_date_timestamp')
-                create_date = create_date.get('create_date')
-            except:
-                pass
-            else:
-                try:
-                    machine_entry.created = create_date_timestamp
-                    machine_entry.save()
-                except:
-                    pass
-        if create_date:
-            machine['extra']['create_date'] = create_date
-        if create_date_timestamp:
-            machine['extra']['create_date_timestamp'] = create_date_timestamp
 
         all_tags = tags_from_provider
 
@@ -4667,16 +4662,13 @@ def machine_create_date(m):
         create_date = m.created_at
         create_date = datetime.fromtimestamp(create_date / 1e3)
     else:
-        return {}
+        return None, None
 
     create_date_timestamp = mktime(create_date.timetuple())
     create_date = create_date.strftime("%b %d, %Y at %I:%M:%S %p")
-    create_date = {
-        'create_date': create_date,
-        'create_date_timestamp': create_date_timestamp
-    }
 
-    return create_date
+    return create_date, create_date_timestamp
+
 
 def machine_name_validator(provider, name):
     """
