@@ -316,8 +316,8 @@
             console.log('_computeSort', property, order);
 
             return function(a, b) {
-                // console.log('comparison', a[property].length, b[property].length);
-                if (property != 'members') {
+                // console.log('comparison', a, b);
+                if (property != 'members' && property != 'machines' && property != 'cost') {
                     // string compare on fields of type string
                     if(JSON.stringify(a[property]) && JSON.stringify(b[property])) {
                         if (JSON.stringify(a[property]).toLowerCase() < JSON.stringify(b[property]).toLowerCase()) {
@@ -338,7 +338,7 @@
                     }
                 }
                 // number compare on members members.length
-                else {
+                else if (property != 'cost') {
                     if (a[property].length < b[property].length) {
                         return -1 * order;
                     }
@@ -347,6 +347,25 @@
                     }
                       // a must be equal to b
                     return 0;
+                }
+                // compare costs
+                else {
+                    if (a.extra.cost_per_month && b.extra.cost_per_month){
+                        if (parseInt(a.extra.cost_per_month) < parseInt(b.extra.cost_per_month)) {
+                            return -1 * order;
+                        }
+                        if (parseInt(a.extra.cost_per_month) > parseInt(b.extra.cost_per_month)) {
+                            return 1 * order;
+                        }
+                          // a must be equal to b
+                        return 0;
+                    }
+                    else {
+                        if (!a.extra.cost_per_month)
+                            return 1;   
+                        else
+                            return -1
+                    }
                 }
             };
         },
