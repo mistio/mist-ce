@@ -316,7 +316,7 @@
             console.log('_computeSort', property, order);
 
             return function(a, b) {
-                console.log('comparison', a[property], b[property]);
+                // console.log('comparison', a[property], b[property]);
                 // string compare on fields other than members machines and cost, image ids, default
                 if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size' ].indexOf(property) == -1) {
                     //if both properties exist
@@ -391,8 +391,9 @@
                 }
                 // compare sizes by name
                 else if (property == 'size'){
-                    var ta = a[property] ? a[property] : a.extra.instance_type,
-                        tb = b[property] ? b[property] : b.extra.instance_type;
+                    var ta = a[property] || a.extra.instance_type || extra.instance_size || item.extra.maxCpu+item.extra.maxMemory || a.extra.PLANID || item.extra.maxCpu+item.extra.maxMemory,
+                        tb = b[property] || b.extra.instance_type || extra.instance_size || item.extra.maxCpu+item.extra.maxMemory || b.extra.PLANID || item.extra.maxCpu+item.extra.maxMemory;
+                    console.log('comparison', ta, tb);
                     if (ta < tb) {
                         return -1 * order;
                     }
