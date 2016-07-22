@@ -318,7 +318,7 @@
             return function(a, b) {
                 // console.log('comparison', a[property], b[property]);
                 // string compare on fields other than members machines and cost, image ids, default
-                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size' ].indexOf(property) == -1) {
+                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size', 'create_date' ].indexOf(property) == -1) {
                     //if both properties exist
                     if(JSON.stringify(a[property]) && JSON.stringify(b[property])) {
                         if (JSON.stringify(a[property]).toLowerCase() < JSON.stringify(b[property]).toLowerCase()) {
@@ -438,6 +438,26 @@
                     }
                     return 0;
                 }
+                //compare created date
+                else if (property == 'create_date'){
+                    //if both properties exist
+                    if (a.extra.create_date_timestamp && b.extra.create_date_timestamp){
+                        if (a.extra.create_date_timestamp > b.extra.create_date_timestamp) {
+                            return -1 * order;
+                        }
+                        if (a.extra.create_date_timestamp < b.extra.create_date_timestamp) {
+                            return 1 * order;
+                        }
+                        return 0;
+                    }
+                    else {
+                        if (!a.extra.create_date_timestamp)
+                            return 1;   
+                        else
+                            return -1
+                    }
+                }
+                
             };
         },
 
