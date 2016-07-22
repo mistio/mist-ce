@@ -26,7 +26,6 @@ try:
     from mist.core.cloud.models import Cloud, Machine
     from mist.core.keypair.models import Keypair
     from mist.core.vpn.models import Tunnel
-    from mist.core.vpn.methods import to_tunnel
     multi_user = True
 except ImportError:
     from mist.io import config
