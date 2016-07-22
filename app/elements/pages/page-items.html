@@ -318,7 +318,7 @@
             return function(a, b) {
                 console.log('comparison', a[property], b[property]);
                 // string compare on fields other than members machines and cost, image ids, default
-                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private' ].indexOf(property) == -1) {
+                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size' ].indexOf(property) == -1) {
                     //if both properties exist
                     if(JSON.stringify(a[property]) && JSON.stringify(b[property])) {
                         if (JSON.stringify(a[property]).toLowerCase() < JSON.stringify(b[property]).toLowerCase()) {
@@ -388,6 +388,18 @@
                         else
                             return -1
                     }
+                }
+                // compare sizes by name
+                else if (property == 'size'){
+                    var ta = a[property] ? a[property] : a.extra.instance_type,
+                        tb = b[property] ? b[property] : b.extra.instance_type;
+                    if (ta < tb) {
+                        return -1 * order;
+                    }
+                    if (ta > tb) {
+                        return 1 * order;
+                    }
+                    return 0;
                 }
                 // compare clouds by title
                 else if (property == 'cloud'){
