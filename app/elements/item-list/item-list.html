@@ -546,7 +546,7 @@ Polymer({
             return ['name', 'template', 'description', 'stack state']
         }
         if (this.isTeams(this.section)) {
-            return ['name', 'description', 'organisation', 'members']
+            return ['name', 'description', 'members']
         }
         if (this.isIncidents(this.section)) {
             return ['incident_id', 'machine_id', 'cloud_id', 'rule_id', 'started_at', 'finished_at']
@@ -602,18 +602,15 @@ Polymer({
     },
 
     _changeSortOrder: function(e, g) {
-        console.warn('sort order', this.sortBy , e.model.item);
-
         if (this.get('sortBy') != e.model.item) {
-            //new sortBy event
+            //new sortBy chosen
             this.set('sortBy', e.model.item);
             this.set('sortOrder', 1);
 
         } else if (this.get('sortBy') == e.model.item){
-            //same sortBy event 
+            //same sortBy chosen 
             var newSortOrder = this.get('sortOrder')*(-1)
             this.set('sortOrder', newSortOrder);
-
         } 
     },
 
