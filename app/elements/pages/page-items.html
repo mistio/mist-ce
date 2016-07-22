@@ -316,9 +316,10 @@
             console.log('_computeSort', property, order);
 
             return function(a, b) {
-                // console.log('comparison', a, b);
-                if (property != 'members' && property != 'machines' && property != 'cost') {
-                    // string compare on fields of type string
+                console.log('comparison', a, b);
+                // string compare on fields other than members machines and cost
+                if (property != 'members' && property != 'machines' && property != 'cost' && property != 'image') {
+                    //if both properties exist
                     if(JSON.stringify(a[property]) && JSON.stringify(b[property])) {
                         if (JSON.stringify(a[property]).toLowerCase() < JSON.stringify(b[property]).toLowerCase()) {
                             return -1 * order;
@@ -330,6 +331,7 @@
                             return 0;
                         }
                     }
+                    //if some property misses, move it down
                     else {
                         if (!JSON.stringify(a[property]))
                             return 1;   
@@ -337,19 +339,19 @@
                             return -1
                     }
                 }
-                // number compare on members members.length
-                else if (property != 'cost') {
+                // number compare on members and machines based on array length
+                else if (property != 'cost' && property != 'image') {
                     if (a[property].length < b[property].length) {
                         return -1 * order;
                     }
                     if (a[property].length > b[property].length) {
                         return 1 * order;
                     }
-                      // a must be equal to b
                     return 0;
                 }
                 // compare costs
-                else {
+                else if (property != 'image'){
+                    //if both properties exist
                     if (a.extra.cost_per_month && b.extra.cost_per_month){
                         if (parseInt(a.extra.cost_per_month) < parseInt(b.extra.cost_per_month)) {
                             return -1 * order;
@@ -357,11 +359,31 @@
                         if (parseInt(a.extra.cost_per_month) > parseInt(b.extra.cost_per_month)) {
                             return 1 * order;
                         }
-                          // a must be equal to b
                         return 0;
                     }
+                    //if some property misses, move it down
                     else {
                         if (!a.extra.cost_per_month)
+                            return 1;   
+                        else
+                            return -1
+                    }
+                }
+                // compare images id
+                else {
+                    //if both properties exist
+                    if (a.extra.image_id && b.extra.image_id){
+                        if (a.extra.image_id < b.extra.image_id) {
+                            return -1 * order;
+                        }
+                        if (a.extra.image_id > b.extra.image_id) {
+                            return 1 * order;
+                        }
+                        return 0;
+                    }
+                    //if some property misses, move it down
+                    else {
+                        if (!a.extra.image_id)
                             return 1;   
                         else
                             return -1
