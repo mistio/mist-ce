@@ -115,42 +115,42 @@
                 <!-- dashboard -->
                 <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]" onboarding="[[onboarding]]"></page-dashboard>
                 <cloud-add providers="[[providers]]" keys="[[model.keysArray]]" section="[[sections.clouds]]"></cloud-add>
-                <page-items q="[[q]]" class="incidents" model="[[model]]" items="[[model.incidents]]" sections="[[sections]]" section="[[sections.incidents]]"></page-items>
+                <page-items class="incidents" model="[[model]]" items="[[model.incidents]]" sections="[[sections]]" section="[[sections.incidents]]" onboarding="[[onboarding]]"></page-items>
                 <!-- machines -->
-                <page-items q="[[q]]" class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
+                <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]" onboarding="[[onboarding]]"></page-items>
                 <machine-page params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-page>
                 <machine-create model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-create>
                 <!-- images -->
-                <page-items q="[[q]]" class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
+                <page-items class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]" onboarding="[[onboarding]]"></page-items>
                 <image-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.images]]"></image-page>
                 <!-- keys -->
-                <page-items q="[[q]]" class="keys" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.keysArray]]"></page-items>
+                <page-items class="keys" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.keysArray]]" onboarding="[[onboarding]]"></page-items>
                 <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
                 <key-add model="[[model]]" sections="[[sections]]" section="[[sections.keys]]"></key-add>
                 <!-- networks -->
-                <page-items q="[[q]]" class="networks" model="[[model]]" sections="[[sections]]" section="[[sections.networks]]" items="[[model.networksArray]]"></page-items>
+                <page-items class="networks" model="[[model]]" sections="[[sections]]" section="[[sections.networks]]" items="[[model.networksArray]]" onboarding="[[onboarding]]"></page-items>
                 <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
                 <network-add model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
                 <!-- tunnels-->
-                <page-items q="[[q]]" model="[[model]]" sections="[[sections]]" section="[[sections.tunnels]]" items="[[model.tunnelsArray]]"></page-items>
+                <page-items model="[[model]]" sections="[[sections]]" section="[[sections.tunnels]]" items="[[model.tunnelsArray]]" onboarding="[[onboarding]]"></page-items>
                 <tunnel-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.tunnels]]"></tunnel-page>
                 <tunnel-add model="[[model]]" sections="[[sections]]" section="[[sections.tunnels]]"></tunnel-add>
                 <!-- templates -->
-                <page-items q="[[q]]" class="templates" model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" items="[[model.templatesArray]]"></page-items>
+                <page-items class="templates" model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" items="[[model.templatesArray]]" onboarding="[[onboarding]]"></page-items>
                 <template-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.templates]]"></template-page>
                 <template-add model="[[model]]" sections="[[sections]]" section="[[sections.templates]]"></template-add>
                 <!-- stacks -->
                 <stack-create model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" params="[[params]]" restamp="true"></stack-create>
-                <page-items q="[[q]]" class="stacks" model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" items="[[model.stacksArray]]"></page-items>
+                <page-items class="stacks" model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" items="[[model.stacksArray]]" onboarding="[[onboarding]]"></page-items>
                 <stack-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.stacks]]" restamp="true"></stack-page>
                 <!-- teams -->
-                <page-items q="[[q]]" class="teams" model="[[model]]" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]"></page-items>
+                <page-items class="teams" model="[[model]]" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]" onboarding="[[onboarding]]"></page-items>
                 <team-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></team-page>
                 <member-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-page>
                 <members-add model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></members-add>
                 <member-add-in-teams model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-add-in-teams>
                 <!-- scripts - leave scipts last due to editors highlighting problem -->
-                <page-items q="[[q]]" model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
+                <page-items model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]" onboarding="[[onboarding]]"></page-items>
                 <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
                 <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
 
@@ -199,11 +199,6 @@
                 observer: '_currentChanged',
                 notify: true
             },
-            q: { // search query
-                type: String,
-                value: '',
-                notify: true
-            },
             style: {
                 computed: "_style(current, sections)",
                 value: "background-color: #424242;",
@@ -226,7 +221,9 @@
         },
         _toast: null,
         updateSearchQuery: function(e){
-            this.set('q',e.detail);
+            var page = this.querySelector('iron-pages').selectedItem;
+            var section = page['section'];
+            this.set('sections.'+section.id+'.q',e.detail);
         },
         _currentChanged: function() {
             // console.log('current: ', this.current);
@@ -331,64 +328,75 @@
             this.sectionsArray = [{
                 id: 'dashboard',
                 color: '#424242',
+                q: ''
             }, {
                 id: 'incidents',
                 color: '#d96557',
+                q: ''
             }, {
                 id: 'machines',
                 color: '#8c76d1',
                 icon: 'hardware:computer',
                 count: '0',
-                add: '/create-machine'
+                add: '/create-machine',
+                q: ''
             }, {
                 id: 'images',
                 color: '#0099cc',
                 icon: 'image:photo',
-                count: '0'
+                count: '0',
+                q: ''
             }, {
                 id: 'keys',
                 color: '#009688',
                 icon: 'communication:vpn-key',
                 count: '0',
-                add: '/add-key'
+                add: '/add-key',
+                q: ''
             }, {
                 id: 'networks',
                 color: '#795548',
                 icon: 'hardware:device-hub',
                 count: '0',
-                add: '/add-network'
+                add: '/add-network',
+                q: ''
             },{
                 id: 'tunnels',
                 color: '#795548',
                 icon: 'editor:merge-type',
                 count: '0',
-                add: '/add-tunnel'
+                add: '/add-tunnel',
+                q: ''
             }, {
                 id: 'scripts',
                 color: '#D48900',
                 icon: 'image:movie-creation',
                 count: '0',
-                add: '/add-script'
+                add: '/add-script',
+                q: ''
             }, {
                 id: 'templates',
                 color: '#0097A7',
                 icon: 'av:art-track',
                 count: '0',
-                add: '/add-template'
+                add: '/add-template',
+                q: ''
             }, {
                 id: 'teams',
                 color: '#607D8B',
                 icon: 'social:people',
-                count: '0'
+                count: '0',
+                q: ''
             }, {
                 id: 'stacks',
                 color: '#0277BD',
                 icon: 'maps:layers',
-                count: '0'
+                count: '0',
+                q: ''
             }, {
                 id: 'account',
                 color: '#2F2F3E',
-                icon: 'accont-circle',
+                icon: 'account-circle',
                 count: null
             }];
 
@@ -437,14 +445,13 @@
             }
 
             // updateDocTitle function was overriden
-            if (e.detail.item.title && e.detail.item.title.length) {
+            if (e.detail && e.detail.item && e.detail.item.title && e.detail.item.title.length) {
                 document.title = e.detail.item.title + " - mist.io";
             } else {
                 document.title = "mist.io";
             }
-            // cleanup search query from page to page
-            this.set('q', '');
-            document.querySelector('#query').value = '';
+            // update search query from page to page
+            this._updateSearchField();
         },
 
         _style: function(current, sections) {
@@ -484,13 +491,23 @@
 
         scrollToTop: function() {
             // cleanup search query from page to page
-            this.set('q', '');
-            document.querySelector('#query').value = '';
+            this._updateSearchField();
             // TODO: scroll to top on iron-navigate
             // https://groups.google.com/forum/#!topic/polymer-dev/tDetYDnxG48
             // https://github.com/Polymer/docs/blob/master/js/app.js#L141:L147
             // scrollIntoViewIfNeeded
             // document.querySelector('#mainContainer').scrollTop();
+        },
+        _updateSearchField: function(){
+            this.async(function(){
+                document.querySelector('#query').value = '';
+                var page = this.querySelector('iron-pages').selectedItem;
+                var section = page['section'];
+                if (section.id) {
+                    var q = this.get('sections.'+section.id+'.q');
+                    document.querySelector('#query').value = q;
+                }
+            },50);
         }
     });
 </script>
