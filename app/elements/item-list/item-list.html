@@ -365,8 +365,6 @@ Polymer({
         var itemHeight = 65;
         var criticalNumofItems = Math.floor(wh/itemHeight) + 1 ;
 
-        // console.log('HEHEHEHE',criticalNumofItems,' , ', this.items.length);
-
         this.vpHeight = 'height:65px;';
 
         // if (this.items.length > criticalNumofItems){
@@ -615,7 +613,7 @@ Polymer({
     },
 
     _isSortedBy: function (e) {
-        console.info('_isSortedBy',e, this.sortBy, e == this.sortBy) //this.sortBy, e == this.sortBy && (this.sortOrder ? 'desc' : 'asc'));
+        // console.info('_isSortedBy',e, this.sortBy, e == this.sortBy) 
 
         if (e == this.sortBy)
           return this.sortOrder == 1 ? 'desc' : 'asc';
