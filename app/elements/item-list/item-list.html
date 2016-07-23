@@ -183,9 +183,16 @@
         }
         .field #sortarrow {
             display: none;
+            transition: transform 300ms ease-in-out 100ms;
         }
         .field.asc #sortarrow, .field.desc #sortarrow {
             display: inline-block;
+        }
+        .field.asc #sortarrow {
+            transform: rotate3d(0, 0, 1, 0);
+        }
+        .field.desc #sortarrow {
+            transform: rotate3d(0, 0, 1, 180deg);
         }
 
         </style>
@@ -358,8 +365,6 @@ Polymer({
         var itemHeight = 65;
         var criticalNumofItems = Math.floor(wh/itemHeight) + 1 ;
 
-        // console.log('HEHEHEHE',criticalNumofItems,' , ', this.items.length);
-
         this.vpHeight = 'height:65px;';
 
         // if (this.items.length > criticalNumofItems){
@@ -507,7 +512,7 @@ Polymer({
     displayedFields: function (section) {
         if (this.isMachines(this.section)){
             if (this.get('xxwideViewport'))
-                return ['name', 'state', 'cloud', 'cost', 'size', 'image', 'id'];
+                return ['name', 'state', 'cloud', 'cost', 'create_date', 'size', 'image', 'id'];
             if (this.get('xwideViewport'))
                 return ['name', 'state', 'cloud', 'cost', 'size', 'image']
             if (this.get('wideViewport'))
@@ -539,10 +544,7 @@ Polymer({
             return ['name', 'template', 'description', 'stack state']
         }
         if (this.isTeams(this.section)) {
-            return ['name', 'description', 'organisation', 'members']
-        }
-        if (this.isIncidents(this.section)) {
-            return ['incident_id', 'machine_id', 'cloud_id', 'rule_id', 'started_at', 'finished_at']
+            return ['name', 'description', 'members']
         }
         if (this.isIncidents(this.section)) {
             return ['incident_id', 'machine_id', 'cloud_id', 'rule_id', 'started_at', 'finished_at']
@@ -595,22 +597,23 @@ Polymer({
     },
 
     _changeSortOrder: function(e, g) {
-        console.warn('sort order', e.model.item);
         if (this.get('sortBy') != e.model.item) {
+            //new sortBy chosen
             this.set('sortBy', e.model.item);
-            this.set('sortOrder', 0);
-        } else if (!this.get('sortOrder')){
             this.set('sortOrder', 1);
-        } else {
-            //this.set('sortBy', 'default');
-            this.set('sortOrder', 0);
-        }
+
+        } else if (this.get('sortBy') == e.model.item){
+            //same sortBy chosen 
+            var newSortOrder = this.get('sortOrder')*(-1)
+            this.set('sortOrder', newSortOrder);
+        } 
     },
 
     _isSortedBy: function (e) {
-        console.info(e, this.sortBy, e == this.sortBy && (this.sortOrder ? 'desc' : 'asc'));
+        // console.info('_isSortedBy',e, this.sortBy, e == this.sortBy) 
+
         if (e == this.sortBy)
-          return this.sortOrder ? 'desc' : 'asc';
+          return this.sortOrder == 1 ? 'desc' : 'asc';
     },
 
     _currentRowIndex: -1,
