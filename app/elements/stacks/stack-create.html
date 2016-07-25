@@ -177,7 +177,7 @@
                         });
                         this.model.templates[params.id].inputs.forEach(function(inp) {
                             yaml_inputs += inp.name+ ': ';
-                            var val = inp.value =! undefined ? inp.value : inp.defaultValue;
+                            var val = inp.value =! undefined ? inp.value : inp.defaultValue || inp.default;
                             yaml_inputs += val+'\n';
 
 
@@ -287,7 +287,12 @@
                                 fieldValues: ["form"]
                             }
                             inp['label'] = inp.name.replace(/_/g,' ');
-                            inp['defaultValue'] = inp.value;
+                            inp['value'] = inp['defaultValue'] = inp.default;
+
+                            if (inp.default == '' || inp.default == [] ) {
+                                inp.required = true;
+                                inp.label = inp.label+' *';
+                            }
 
                             // make key dropdown
                             if(inp.name == "key" || inp.name == "key_id") {
