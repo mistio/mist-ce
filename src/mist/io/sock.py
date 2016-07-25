@@ -19,12 +19,11 @@ import netaddr
 from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
 
-from mist.io.clouds.models import Cloud, Machine
-
 try:
     from mist.io import config as ioconfig
     from mist.core import config
     from mist.core.methods import get_stats
+    from mist.core.cloud.models import Cloud, Machine
     from mist.core.keypair.models import Keypair
     from mist.core.vpn.models import Tunnel
     from mist.core.vpn.methods import get_tunnel
