@@ -355,7 +355,8 @@
             this.set('model.user', data);
         },
 
-        _updateOrg: function(data) {
+        _updateOrg: function(data) { 
+            this.set('onboarding.isLoadingTeams', false);
             this._updateModel('teams', data.teams);
             this._updateModel('members', data.members);
             data.teams = data.members = undefined;
