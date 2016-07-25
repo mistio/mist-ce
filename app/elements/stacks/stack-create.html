@@ -300,10 +300,13 @@
                             inp['label'] = inp.name.replace(/_/g,' ');
                             inp['value'] = inp['defaultValue'] = inp.default;
 
-                            if (inp.default == '' || inp.default == [] ) {
-                                inp.required = true;
-                                inp.label = inp.label+' *';
-                            }
+                            // Temp, before Tosca uses 'required' key
+                            inp.required = false;
+
+                            // Uncomment when TOSCA uses 'required' key
+                            // if (!inp.required){
+                            //     inp.required = false;
+                            // }
 
                             // make key dropdown
                             if(inp.name == "key" || inp.name == "key_id") {
