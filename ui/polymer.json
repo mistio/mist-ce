@@ -1,9 +1,9 @@
 {
   "entrypoint": "index.html",
-  "shell": "src/my-app.html",
+  "shell": "src/mist-app.html",
   "fragments": [
-    "src/my-view1.html",
-    "src/my-view2.html",
-    "src/my-view3.html"
+    "src/page-dashboard.html",
+    "src/page-machines.html",
+    "src/page-images.html"
   ]
 }

@@ -1,0 +1,61 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-datatable/paper-datatable.html">
+<link rel="import" href="../bower_components/iron-data-table/iron-data-table.html">
+
+<dom-module id="page-machines">
+
+  <template>
+
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    machines
+    <!--paper-datatable data="{{items}}" selectable multi-selection>
+        <paper-datatable-column header="Name" property="name" sortable>
+        </paper-datatable-column>
+        <paper-datatable-column header="State" property="state" sortable>
+        </paper-datatable-column>
+    </paper-datatable-->
+    <iron-data-table selection-enabled multi-selection items="[[items]]" on-selecting-item="_itemSelected">
+      <data-table-column name="Name" sort-by="name" on-selecting-item="_itemSelected"><template>[[item.name]]</template></data-table-column>
+      <data-table-column name="State" sort-by="state"><template>[[item.state]]</template></data-table-column>
+    </iron-data-table>
+  </template>
+
+  <script>
+
+    Polymer({
+
+      is: 'page-machines',
+
+      properties: {
+        model: Object,
+        items: Array
+      },
+
+      listeners: {
+        'selecting-item': '_itemSelected'
+      },
+
+      _itemSelected: function(e) {
+        console.log('itemSelected', e);
+      }
+
+    });
+
+  </script>
+
+</dom-module>

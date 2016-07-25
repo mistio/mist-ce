@@ -24,12 +24,19 @@
     "sockjs-client": "^1.1.1",
     "md5": "~0.3.0",
     "swiftSet": "jabney/swiftSet#^0.9.15",
-    "polyana-dashboard": "mistio/polyana-dashboard#^0.1.5"
+    "polyana-dashboard": "mistio/polyana-dashboard#^0.1.5",
+    "paper-datatable": "^0.9.8",
+    "vaadin-grid": "^1.1.1",
+    "vaadin-combo-box": "^1.1.1",
+    "iron-data-table": "^1.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
   },
   "resolutions": {
-    "polymer": "^1.6.0"
+    "polymer": "^1.6.0",
+    "paper-styles": "^1.1.4",
+    "paper-item": "^1.1.4",
+    "iron-list": "^1.2.0"
   }
 }
