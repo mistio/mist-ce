@@ -467,7 +467,15 @@ Polymer({
     },
     _computeHasIncidents: function(incidents){
          if (incidents.base){
-             return incidents.base.length > 0 ? true : false;
+            if (incidents.base.length > 0) {
+                var unclosedInc = incidents.base.find(function(inc){
+                    return !inc.finished_at;
+                });
+                return unclosedInc ? true : false;
+            }
+            else {
+                return false;
+            }
          }
          else {
              return false;
