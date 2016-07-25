@@ -17,6 +17,8 @@ import ssl
 import tempfile
 import mongoengine as me
 
+from mist.io.clouds.models import Cloud, Machine, KeyAssociation
+
 from mist.io.exceptions import CloudNotFoundError, KeyNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
@@ -27,7 +29,6 @@ from mist.io.helpers import sanitize_host
 
 try:
     from mist.core.user.models import User
-    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
     from mist.core.keypair.models import Keypair
     from mist.core import config
 except ImportError:

@@ -1,6 +1,7 @@
+from mist.io.clouds.models import Cloud, Machine, KeyAssociation
+
 try:
     from mist.core.user.models import User
-    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
     from mist.core.keypair.models import Keypair
     from mist.core import config
     from mist.core.vpn.methods import destination_nat as dnat

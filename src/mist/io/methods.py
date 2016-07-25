@@ -44,12 +44,14 @@ import ansible.constants
 # try:
 # from mist.core.user.models import User
 from mist.core.tag.models import Tag
-from mist.core.cloud.models import Cloud, Machine, KeyAssociation, CloudSize, CloudImage
 from mist.core.keypair.models import Keypair
 from mist.core import config
 # except ImportError:
 #     print "Seems to be on IO version"
 #     from mist.io import config, model
+
+from mist.io.clouds.models import Cloud, Machine
+from mist.io.clouds.models import KeyAssociation, CloudSize, CloudImage
 
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
