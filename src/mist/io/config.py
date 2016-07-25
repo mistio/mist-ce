@@ -16,9 +16,15 @@ from libcloud.compute.types import NodeState
 
 # Parse user defined settings from settings.py in the top level project dir
 log = logging.getLogger(__name__)
+
+# If SETTINGS_FILE ebv variable exists, it will point to a mounted
+# file that hosts the configuration option of our Kubernetes
+# configMap.
+settings_file = os.getenv('SETTINGS_FILE') or 'settings.py'
+
 settings = {}
 try:
-    execfile("settings.py", settings)
+    execfile(settings_file, settings)
 except IOError:
     log.warning("No settings.py file found.")
 except Exception as exc:

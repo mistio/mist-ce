@@ -173,18 +173,12 @@
                 },
                 _keysChanged: function(keys, providerFields) {
                     // Set list of keys in providerFields when model keys change
-                    var keysOptions = keys.base.map(function(key) {
-                        var obj = {};
-                        obj['title'] = key.name;
-                        obj['val'] = key;
-                        return obj;
-                    });
 
                     var index = this.providerFields.findIndex(function(field) {
                         return field.type == "ssh_key";
                     }, this);
 
-                    this.set('providerFields.' + index + '.options', keysOptions);
+                    this.set('providerFields.' + index + '.options', this.keys);
                     this.set('providerFields.' + index + '.value', '');
                 },
                 _providerReset: function() {

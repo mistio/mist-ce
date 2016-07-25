@@ -20,7 +20,15 @@
             onboarding: {
                 type: Object,
                 value: {
-                    isLoadingClouds: true
+                    isLoadingClouds: true,
+                    isLoadingImages: true,
+                    isLoadingKeys: true,
+                    isLoadingNetworks: true,
+                    isLoadingTunnels: true,
+                    isLoadingScripts: true,
+                    isLoadingTemplates: true,
+                    isLoadingStacks: true,
+                    isLoadingTeams: true
                 },
                 notify: true
             }
@@ -354,19 +362,23 @@
             this.set('model.org', data);
         },
 
-        _updateKeys: function(data) {
+        _updateKeys: function(data) {            
+            this.set('onboarding.isLoadingKeys', false);
             return this._updateModel('keys', data);
         },
 
         _updateScripts: function(data) {
+            this.set('onboarding.isLoadingScripts', false);
             return this._updateModel('scripts', data);
         },
 
         _updateTemplates: function(data) {
+            this.set('onboarding.isLoadingTemplates', false);
             return this._updateModel('templates', data);
         },
 
         _updateStacks: function(data) {
+            this.set('onboarding.isLoadingStacks', false);
             return this._updateModel('stacks', data);
         },
 
@@ -379,6 +391,7 @@
         },
 
         _updateImages: function(data) {
+            this.set('onboarding.isLoadingImages', false);
             var changed = this._updateModel('clouds.' + data.cloud_id + '.images', data.images);
             if (!changed)
                 return false;
@@ -432,11 +445,13 @@
             if (data.length && this.get('model.onboarding.hasMachines') != true)
                 this.set('model.onboarding.hasMachines', true);
 
+            this.set('onboarding.isLoadingMachines', false);
             this.set('model.machinesArray', allMachines);
             this.set('machinesArray', allMachines);
         },
 
         _updateNetworks: function(data) {
+            this.set('onboarding.isLoadingNetworks', false);
             var changed = this._updateModel('clouds.' + data.cloud_id + '.networks', data.networks);
             if (!changed)
                 return false;
@@ -469,6 +484,7 @@
             this.set('model.networksArray', allNetworks);
         },
         _updateTunnels: function(data) {
+            this.set('onboarding.isLoadingTunnels', false);
             return this._updateModel('tunnels', data);
         },
 

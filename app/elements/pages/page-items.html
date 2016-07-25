@@ -11,6 +11,7 @@
         <style>
         :host {
             background: #fafafa;
+            position: relative;
         }
 
         a {
@@ -146,14 +147,37 @@
         [view=table] #item-cards {
             display: none;
         }
+        .search-notice {
+            padding-left: 0.5em;
+        }
+        .is-loading {
+            top: 15px;
+            left: 200px;
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            display: block;
+            width: 100%;
+            height: 100vh;
+            background-color: #eee;
+        }
+        paper-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 10% auto;
+            display: block;
+        }
         </style>
 
         <div id="content">
             <div hidden$="[[!showEmptyScreen]]">
                 <empty-pages clouds="[[model.cloudsArray]]" section="[[section]]"></empty-pages>
             </div>
-            <div hidden$="[[showEmptyScreen]]">
+            <div hidden$="[[showEmptyScreen]]">                
                 <div id="section-heading" hidden$="[[!section]]">
+                    <div class="search-notice" hidden$="[[!section.q.length]]">
+                        <h2>[[filteredItems.length]] "[[section.q]]" [[section.id]] <paper-icon-button icon="close" on-tap="clearSearch"></paper-icon-button></h2>
+                    </div>
                     <div class="description">[[section.description]]</div>
                 </div>
                 <template is="dom-if" if="[[_stampCards(view)]]">
@@ -163,11 +187,15 @@
                     <item-list sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-list>
                 </template>
             </div>
+            <div class="is-loading" hidden$="[[!isLoading]]">
+                <paper-spinner active></paper-spinner>
+            </div>
         </div>
 
         <div class="absolute-bottom-right">
             <paper-fab icon="add" on-tap="_fabAction" hidden$="[[!section.add]]"></paper-fab>
         </div>
+        
     </template>
 </dom-module>
 <script>
@@ -180,8 +208,12 @@
 
         properties: {
             model: Object,
+            onboarding: Object,
             sections: Object,
-            section: Object,
+            section: {
+                type: Object,
+                observer: '_qChanged'
+            },
             pageTitle: String,
             showEmptyScreen: {
                 type: Boolean,
@@ -210,17 +242,21 @@
             filteredItems: {
                 type: Array
             },
-            q: { // search query
-                type: String,
-                observer: '_qChanged'
+            isLoading: {
+                type: Boolean,
+                computed: '_computeIsloading(onboarding.*, section.id)'
             }
         },
 
         observers: [
-            'sortingObserver(items.*, sortBy, sortOrder, q)',
+            'sortingObserver(items.*, sortBy, sortOrder, section.q.*)',
         ],
         ready: function() {
 
+        },
+        _computeIsloading: function(onboarding, section){
+            var s = section.charAt(0).toUpperCase()+section.slice(1);
+            return this.onboarding['isLoading'+s];
         },
         computeShowEmptyScreen: function(items, section){
             if (items.length > 0 && section){
@@ -239,6 +275,8 @@
                 this.set('sortBy', 'name');
             else if (this.section.id == 'teams')
                 this.set('sortBy', 'name');
+            else if (this.section.id == 'stacks')
+                this.set('sortBy', 'name');
             else if (this.section.id == 'incidents')
                 this.set('sortBy', 'started_at');
             else
@@ -246,8 +284,8 @@
         },
 
         updateMeta: function(section) {
-            if (this.q && this.q.length) {
-                var t = "'" + this.q + "' ";
+            if (this.section.q && this.section.q.length) {
+                var t = "'" + this.section.q + "' ";
                 t += (section && section.id) ? section.id : "";
                 this.pageTitle = t;
             } else if (section && section.id) {
@@ -282,7 +320,7 @@
         },
 
         filterItem: function(item, index) {
-            var q = this.q, queryTerms = this.q.split(' ');
+            var q = this.section.q, queryTerms = this.section.q.split(' ');
 
             // Check if all terms exist in stringified item
             for (var i=0; i<queryTerms.length; i++) {
@@ -311,11 +349,151 @@
         },
 
         _computeSort: function(property, order) {
+            console.log('_computeSort', property, order);
+
             return function(a, b) {
-                if (a[property] === b[property]) {
+                // console.log('comparison', a[property], b[property]);
+                // string compare on fields other than members machines and cost, image ids, default
+                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size', 'create_date' ].indexOf(property) == -1) {
+                    //if both properties exist
+                    if(JSON.stringify(a[property]) && JSON.stringify(b[property])) {
+                        if (JSON.stringify(a[property]).toLowerCase() < JSON.stringify(b[property]).toLowerCase()) {
+                            return -1 * order;
+                        }
+                        else if (JSON.stringify(a[property]).toLowerCase() > JSON.stringify(b[property]).toLowerCase()) {
+                            return 1 * order;
+                        }
+                        else {
+                            return 0;
+                        }
+                    }
+                    //if some property misses, move it down
+                    else {
+                        if (!JSON.stringify(a[property]))
+                            return 1;   
+                        else
+                            return -1
+                    }
+                }
+                // number compare on members and machines based on array length
+                else if (['members', 'machines'].indexOf(property)>-1) {
+                    if (a[property].length < b[property].length) {
+                        return -1 * order;
+                    }
+                    if (a[property].length > b[property].length) {
+                        return 1 * order;
+                    }
                     return 0;
                 }
-                return (order * (a[property] > b[property] ? 1 : -1));
+                // compare costs
+                else if (property == 'cost'){
+                    //if both properties exist
+                    if (a.extra.cost_per_month && b.extra.cost_per_month){
+                        if (parseInt(a.extra.cost_per_month) < parseInt(b.extra.cost_per_month)) {
+                            return -1 * order;
+                        }
+                        if (parseInt(a.extra.cost_per_month) > parseInt(b.extra.cost_per_month)) {
+                            return 1 * order;
+                        }
+                        return 0;
+                    }
+                    //if some property misses, move it down
+                    else {
+                        if (!a.extra.cost_per_month)
+                            return 1;   
+                        else
+                            return -1
+                    }
+                }
+                // compare images id
+                else if (property == 'image'){
+                    //if both properties exist
+                    if (a.extra.image_id && b.extra.image_id){
+                        if (a.extra.image_id < b.extra.image_id) {
+                            return -1 * order;
+                        }
+                        if (a.extra.image_id > b.extra.image_id) {
+                            return 1 * order;
+                        }
+                        return 0;
+                    }
+                    //if some property misses, move it down
+                    else {
+                        if (!a.extra.image_id)
+                            return 1;   
+                        else
+                            return -1
+                    }
+                }
+                // compare sizes by name
+                else if (property == 'size'){
+                    var ta = a[property] || a.extra.instance_type || extra.instance_size || item.extra.maxCpu+item.extra.maxMemory || a.extra.PLANID || item.extra.maxCpu+item.extra.maxMemory,
+                        tb = b[property] || b.extra.instance_type || extra.instance_size || item.extra.maxCpu+item.extra.maxMemory || b.extra.PLANID || item.extra.maxCpu+item.extra.maxMemory;
+                    console.log('comparison', ta, tb);
+                    if (ta < tb) {
+                        return -1 * order;
+                    }
+                    if (ta > tb) {
+                        return 1 * order;
+                    }
+                    return 0;
+                }
+                // compare clouds by title
+                else if (property == 'cloud'){
+                    if (a[property].title < b[property].title) {
+                        return -1 * order;
+                    }
+                    if (a[property].title > b[property].title) {
+                        return 1 * order;
+                    }
+                    return 0;
+                }
+                // compare boolean default
+                else if (property == 'default'){
+                    //if both properties exist
+                    var ta = a.isDefault ? 1 : 0,
+                        tb = b.isDefault ? 1 : 0;
+                    if (ta > tb) {
+                        return -1 * order;
+                    }
+                    if (ta < tb) {
+                        return 1 * order;
+                    }
+                    return 0;
+                }
+                // compare boolean private
+                else if (property == 'private'){
+                    //if both properties exist
+                    var ta = a[property] ? 1 : 0,
+                        tb = b[property] ? 1 : 0;
+                    if (ta > tb) {
+                        return -1 * order;
+                    }
+                    if (ta < tb) {
+                        return 1 * order;
+                    }
+                    return 0;
+                }
+                //compare created date
+                else if (property == 'create_date'){
+                    //if both properties exist
+                    if (a.extra.create_date_timestamp && b.extra.create_date_timestamp){
+                        if (a.extra.create_date_timestamp > b.extra.create_date_timestamp) {
+                            return -1 * order;
+                        }
+                        if (a.extra.create_date_timestamp < b.extra.create_date_timestamp) {
+                            return 1 * order;
+                        }
+                        return 0;
+                    }
+                    else {
+                        if (!a.extra.create_date_timestamp)
+                            return 1;   
+                        else
+                            return -1
+                    }
+                }
+                
             };
         },
 
@@ -351,6 +529,10 @@
 
         _getMode: function(narrow) {
             return narrow ? 'waterfall' : 'scroll';
+        },
+        clearSearch: function(e){
+            this.set('section.q', '');
+            document.querySelector('#query').value = '';
         }
     });
 })();

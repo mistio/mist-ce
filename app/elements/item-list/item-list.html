@@ -183,9 +183,16 @@
         }
         .field #sortarrow {
             display: none;
+            transition: transform 300ms ease-in-out 100ms;
         }
         .field.asc #sortarrow, .field.desc #sortarrow {
             display: inline-block;
+        }
+        .field.asc #sortarrow {
+            transform: rotate3d(0, 0, 1, 0);
+        }
+        .field.desc #sortarrow {
+            transform: rotate3d(0, 0, 1, 180deg);
         }
 
         </style>
@@ -195,14 +202,14 @@
         <iron-media-query query="(min-width: 1400px)" query-matches="{{wideViewport}}"></iron-media-query>
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <div class="header" style$="[[_getHeaderStyle(section.color, selectedItems.length)]]">
+        <div class="header" style$="[[_getHeaderStyle(section.color, currentSelectedItems)]]">
             <template is="dom-if" if="[[!isimages]]">
                 <app-check class="check-all" selected="[[allselected]]" on-tap="_onSelectAll">
-                    <template is="dom-if" if="[[!selectedItems.length]]">
+                    <template is="dom-if" if="[[!currentSelectedItems]]">
                         <iron-icon icon="check"></iron-icon>
                     </template>
-                    <template is="dom-if" if="[[selectedItems.length]]">
-                        <strong>[[selectedItems.length]]</strong>
+                    <template is="dom-if" if="[[currentSelectedItems]]">
+                        <strong>[[currentSelectedItems]]</strong>
                     </template>
                 </app-check>
             </template>
@@ -211,7 +218,7 @@
                     <iron-icon icon="star"></iron-icon>
                 </app-check>
             </template>
-            <template is="dom-if" if="[[!selectedItems.length]]">
+            <template is="dom-if" if="[[!currentSelectedItems]]">
               <template is="dom-repeat" items="[[fields]]">
                   <div class$="[[item]] field field[[index]] [[_isSortedBy(item, sortBy, sortOrder)]]" on-tap="_changeSortOrder">
                       [[item]]
@@ -231,7 +238,7 @@
                   </paper-dropdown-menu>[[_isSortedBy(sortBy, sortBy, sortOrder)]]
               </div>
             </template>
-            <item-actions id="actions" items="[[items]]" selected-items="[[selectedItems]]"></item-actions>
+            <item-actions id="actions" items="[[items]]" selected-items="[[selectedItems]]" section="[[section]]"></item-actions>
         </div>
         <div class="row no-data" hidden$="[[items.length]]">
             no data yet
@@ -335,24 +342,28 @@ Polymer({
         vpHeight: {
             type: String,
             notify: true
+        },
+        currentSelectedItems: {
+            type: Number,
+            value: 0
         }
     },
 
     listeners: {
-
+        'selected-of-current-section-length' : 'updateNumber'
     },
 
     observers: [
       'itemsChanged(items.splices)',
     ],
-
+    updateNumber: function(e){
+        this.set('currentSelectedItems', e.detail.itemLength);
+    },
     ready: function() {
         var topOfset = 142;
         var wh = window.innerHeight - topOfset;
         var itemHeight = 65;
         var criticalNumofItems = Math.floor(wh/itemHeight) + 1 ;
-
-        // console.log('HEHEHEHE',criticalNumofItems,' , ', this.items.length);
 
         this.vpHeight = 'height:65px;';
 
@@ -501,7 +512,7 @@ Polymer({
     displayedFields: function (section) {
         if (this.isMachines(this.section)){
             if (this.get('xxwideViewport'))
-                return ['name', 'state', 'cloud', 'cost', 'size', 'image', 'id'];
+                return ['name', 'state', 'cloud', 'cost', 'create_date', 'size', 'image', 'id'];
             if (this.get('xwideViewport'))
                 return ['name', 'state', 'cloud', 'cost', 'size', 'image']
             if (this.get('wideViewport'))
@@ -533,10 +544,7 @@ Polymer({
             return ['name', 'template', 'description', 'stack state']
         }
         if (this.isTeams(this.section)) {
-            return ['name', 'description', 'organisation', 'members']
-        }
-        if (this.isIncidents(this.section)) {
-            return ['incident_id', 'machine_id', 'cloud_id', 'rule_id', 'started_at', 'finished_at']
+            return ['name', 'description', 'members']
         }
         if (this.isIncidents(this.section)) {
             return ['incident_id', 'machine_id', 'cloud_id', 'rule_id', 'started_at', 'finished_at']
@@ -589,22 +597,23 @@ Polymer({
     },
 
     _changeSortOrder: function(e, g) {
-        console.warn('sort order', e.model.item);
         if (this.get('sortBy') != e.model.item) {
+            //new sortBy chosen
             this.set('sortBy', e.model.item);
-            this.set('sortOrder', 0);
-        } else if (!this.get('sortOrder')){
             this.set('sortOrder', 1);
-        } else {
-            //this.set('sortBy', 'default');
-            this.set('sortOrder', 0);
-        }
+
+        } else if (this.get('sortBy') == e.model.item){
+            //same sortBy chosen 
+            var newSortOrder = this.get('sortOrder')*(-1)
+            this.set('sortOrder', newSortOrder);
+        } 
     },
 
     _isSortedBy: function (e) {
-        console.info(e, this.sortBy, e == this.sortBy && (this.sortOrder ? 'desc' : 'asc'));
+        // console.info('_isSortedBy',e, this.sortBy, e == this.sortBy) 
+
         if (e == this.sortBy)
-          return this.sortOrder ? 'desc' : 'asc';
+          return this.sortOrder == 1 ? 'desc' : 'asc';
     },
 
     _currentRowIndex: -1,
@@ -674,8 +683,13 @@ Polymer({
                     this.push('selectedItems', this.itemUid(this.items[i]));
             }
         } else {
-            while (this.get('selectedItems.length')) {
-                this.pop('selectedItems');
+            for (var i=this.selectedItems.length-1; i>=0; i--) {
+                var item = this.selectedItems[i];
+                var t = item.split(':')[0];
+                // pop items of the current section
+                if (this.section.id.indexOf(t) > -1){
+                    this.splice('selectedItems',i,1);
+                }
             }
         }
 
