@@ -1516,6 +1516,8 @@ def get_machine_actions(machine_from_api, conn, extra):
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
+    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_machines()
+
     try:
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
     except Cloud.DoesNotExist:
