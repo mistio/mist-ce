@@ -332,6 +332,9 @@
             margin: 0 auto;
             width: 70%;
         }
+        .error {
+            color: var(--red-color);
+        }
         .parsing-loader paper-progress {
             width: 100%;
             margin-bottom: 32px;
@@ -437,7 +440,6 @@
                         <template is="dom-if" if="[[stack.tags]]">
                             <template is="dom-repeat" items="[[stack.tags]]">
                                 <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
-                                <span class="id tag">test = tag</span>
                             </template>
                         </template>
                     </div>
@@ -564,6 +566,15 @@
             </div>
             <!-- </template> -->
 
+            <!-- <template is="dom-if" if="[[ok]]"> -->
+            <!-- <div id="outputs" class="page">
+                <h3 class="smallcaps">Job Logs</h3>
+                <template is="dom-repeat" items="[[joblogs]]" as="log">
+                    <p>[[log.action]] <span class="error" hidden="[[!log.error]]">error</span></p>
+                </template>
+            </div> -->
+            <!-- </template> -->
+
             <div id="state" class="page" hidden$="[[!hasNodeInstances]]">
                 <h3 class="smallcaps">Runtime properties</h3>
                 <template is="dom-repeat" items="[[stack.node_instances]]">
@@ -601,6 +612,7 @@
         <dialog-element></dialog-element>
         <iron-ajax id="workflowRequest" method="POST" url="" on-response="handleWorkflowResponse" on-error="handleWorkflowError"></iron-ajax>
         <iron-ajax id="cancelJob" method="DELETE" url="/api/v1/jobs/[[stack.job_id]]" on-response="handleCanceled" on-error=""></iron-ajax>
+        <iron-ajax id="getJobLog" method="GET" auto url="/api/v1/jobs/[[stack.job_id]]" handle-as="json" on-response="handleGetJobLog" on-error=""></iron-ajax>
     </template>
     <script>
         (function() {
@@ -714,7 +726,8 @@
                         type: Boolean,
                         value: true,
                         computed: 'is_ok(stack)'
-                    }
+                    },
+                    joblogs: Array
                 },
                 observers: [
                     // '_runtimePropertiesChanged(stack.*,runtimeProperties.*)'
@@ -725,6 +738,12 @@
                     // 'updateSelectedStack': '_updateStack',
                     // 'stackChanged': '_stackChanged'
                     // 'hasNodeInstancesChanged' : '_hasNodeInstancesChanged'
+                },
+                ready: function(){
+                    this.$.getJobLog.headers = {
+                        "csrf-token": CSRF_TOKEN,
+                        "Content-Type": "application/json"
+                    };
                 },
                 test: function() {
                     var newmach = {
@@ -741,22 +760,6 @@
 
                     if (stack) {
                         console.log('Stack',stack);
-                        // REMEMBER TO REMOVE V
-                        // stack.status = 'ok';
-                        // stack.deploy = true;
-                        // stack.node_instances = [
-                        //     {
-                        //         mist_type: "machine",
-                        //         info: this.model.machinesArray[0]
-                        //     },{
-                        //         mist_type: "machine",
-                        //         info: this.model.machinesArray[1]
-                        //     },{
-                        //         mist_type: "keypair",
-                        //         info: this.model.keysArray[0]
-                        //     }
-                        // ];
-                        // REMEMBER TO REMOVE ^
                         return stack;
                     } else {
                         return {
@@ -1089,7 +1092,11 @@
                 handleCanceled: function(e) {},
                 handleWorkflowRequest: function(e) {},
                 handleWorkflowResponse: function(e) {},
-                handleWorkflowError: function(e) {}
+                handleWorkflowError: function(e) {},
+                handleGetJobLog: function(e) {
+                    console.log('getJobLog',e.detail.xhr.response.logs);
+                    this.set('joblogs', e.detail.xhr.response.logs)
+                }
             });
         })();
     </script>
