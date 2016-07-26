@@ -554,12 +554,14 @@
             </template>
 
             <!-- <template is="dom-if" if="[[ok]]"> -->
-                <div>
-                    <h3 class="smallcaps">Outputs</h3>
-                    <template is="dom-repeat" items="[[stack.outputs]]">
-                        <div>output [[index]]: [[item]]</div>
-                    </template>
-                </div>
+            <div id="outputs" class="page" hidden$="[[!stack.outputs]]">
+                <h3 class="smallcaps">Outputs</h3>
+                <paper-material class="no-pad">
+
+                        <element-for-in content="[[stack.outputs]]"></element-for-in>
+
+                </paper-material>
+            </div>
             <!-- </template> -->
 
             <div id="state" class="page" hidden$="[[!hasNodeInstances]]">
@@ -764,6 +766,9 @@
                 },
                 _computeHasNodeInstances: function(node_instances) {
                     return node_instances.base && node_instances.base.length;
+                },
+                _computeOutputs: function(outputs) {
+                    return Object.keys(outputs).map(function(key) {return {name: key, value: outputs[key]}});
                 },
                 // _hasNodeInstancesChanged: function(){
                 //     console.log("_hasNodeInstancesChanged");
