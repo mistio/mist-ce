@@ -164,16 +164,6 @@ Polymer({
             return item.extra[field+'_id'] || item.imageId || item.extra.image.slug || item.extra.image.name || 'not found';
         }
 
-        // if ( field == 'image' && !ret && item.extra && item.extra.image){
-        //     console.log('DigitalOcean',item.name, item.extra.image);
-        //     return item.extra.image.slug || 'not found';
-        // }
-        
-        // if ( field == 'image' && !ret && item.imageId){
-        //     console.log('Openstack',item.name, item.imageId);
-        //     return item.imageId || 'not found';
-        // }
-
         // size info could be in all sorts of places
         //  - Azure: extra.instance_size
         //  - EC2: extra.instance_type
