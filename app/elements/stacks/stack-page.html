@@ -553,6 +553,15 @@
                 </div>
             </template>
 
+            <!-- <template is="dom-if" if="[[ok]]"> -->
+                <div>
+                    <h3 class="smallcaps">Outputs</h3>
+                    <template is="dom-repeat" items="[[stack.outputs]]">
+                        <div>output [[index]]: [[item]]</div>
+                    </template>
+                </div>
+            <!-- </template> -->
+
             <div id="state" class="page" hidden$="[[!hasNodeInstances]]">
                 <h3 class="smallcaps">Runtime properties</h3>
                 <template is="dom-repeat" items="[[stack.node_instances]]">
