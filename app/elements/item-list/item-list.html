@@ -554,15 +554,15 @@ Polymer({
     },
 
     _openItemActions: function (e) {
-        console.log('_openItemActions in list',e)
         var actionsItem = this.$.actions;
         var bodyRect = document.body.getBoundingClientRect(),
             elemRect =  e.target.tagName == 'PAPER-BUTTON' ?
                         e.target.getBoundingClientRect() :
                         e.target.parentNode.getBoundingClientRect(),
-            offset   = elemRect.top - bodyRect.top;
+            offsetTop   = elemRect.top - bodyRect.top,
+            offsetRight   = elemRect.right - bodyRect.right;
         e.model.item.type = e.model.item.type || (this.section && this.section.id.slice(0,-1));
-        actionsItem.openItemActions(e.model.item, offset - 23);
+        actionsItem.openItemActions(e.model.item, offsetTop, - offsetRight);
     },
 
     _computeItemImage: function (item) {
