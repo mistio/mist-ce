@@ -28,7 +28,8 @@
                     isLoadingScripts: true,
                     isLoadingTemplates: true,
                     isLoadingStacks: true,
-                    isLoadingTeams: true
+                    isLoadingTeams: true,
+                    isLoadingIncidents: true
                 },
                 notify: true
             }
@@ -191,6 +192,7 @@
                         }
                     },
                     open_incidents: function(data) {
+                        this.set('isLoadingIncidents', false);
                         if (DEBUG_SOCKET)
                             console.debug('got incidents', data);
                         that.set('model.incidents', data);
