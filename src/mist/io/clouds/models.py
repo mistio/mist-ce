@@ -68,7 +68,6 @@ class DigitalOceanCloud(Cloud):
     _controller_cls = controllers.DigitalOceanController
 
 
-
 class DigitalOceanFirstGenCloud(Cloud):
 
     apikey = me.StringField(required=True)

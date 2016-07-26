@@ -251,7 +251,11 @@ class BaseController(object):
                                    if key != 'Name']
 
             # Save all changes to machine model on the database.
-            machine_model.save()
+            # FIXME: This is currently disabled because we want to be able to
+            # run tests without using a real mongo instance. It is a temporary
+            # solution that will be lifted once we start using mock mongo on
+            # tests.
+            # machine_model.save()
 
             machines.append(machine)
 
@@ -329,8 +333,8 @@ class BaseController(object):
         sortvals = {}
         for image in images:
             if self.image_is_default(image.id):
-                if image.id in self.cloud.starred_images:
-                    if self.cloud.starred_images[image.id]:
+                if image.id in self.cloud.starred:
+                    if self.cloud.starred[image.id]:
                         # default and starred
                         sortvals[image.id] = 0
                     else:
@@ -340,8 +344,8 @@ class BaseController(object):
                     # default
                     sortvals[image.id] = 1
             else:
-                if image.id in self.cloud.starred_images:
-                    if self.cloud.starred_images[image.id]:
+                if image.id in self.cloud.starred:
+                    if self.cloud.starred[image.id]:
                         # not default and starred
                         sortvals[image.id] = 2
                     else:
@@ -628,7 +632,6 @@ class HostVirtualController(BaseController):
         return get_driver(Provider.HOSTVIRTUAL)(self.cloud.apikey)
 
 
-
 # FIXME
 class PacketController(BaseController):
     def connect(self):
@@ -671,7 +674,7 @@ class OpenStackController(BaseController):
             self.cloud.username,
             self.cloud.password,
             ex_force_auth_version='2.0_password',
-            ex_force_auth_url=self.cloud.url,
+            ex_force_auth_url=url,
             ex_tenant_name=self.cloud.tenant,
             ex_force_service_region=self.cloud.region,
             ex_force_base_url=self.cloud.compute_endpoint,
@@ -737,7 +740,7 @@ class LibvirtController(BaseController):
             host, port = dnat(self.cloud.owner,
                               self.cloud.host, self.cloud.port)
             return get_driver(Provider.LIBVIRT)(host,
-                                                hypervisor=self.cloud.host
+                                                hypervisor=self.cloud.host,
                                                 user=self.cloud.username,
                                                 ssh_key=self.cloud.key,
                                                 ssh_port=port)
@@ -756,13 +759,13 @@ class LibvirtController(BaseController):
 
 # FIXME
 class CoreOSController(BaseController):
-    #def connect(self):
-    #    return CoreOSDriver(Machine.objects(cloud=self.cloud))
+    # def connect(self):
+    #     return CoreOSDriver(Machine.objects(cloud=self.cloud))
     pass
 
 
 # FIXME
 class OtherController(BaseController):
-    #def connect(self):
-    #    return BareMetalDriver(Machine.objects(cloud=self.cloud))
+    # def connect(self):
+    #     return BareMetalDriver(Machine.objects(cloud=self.cloud))
     pass
