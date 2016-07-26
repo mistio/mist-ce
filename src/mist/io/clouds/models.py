@@ -1,55 +1,11 @@
 """Definition of Cloud models"""
 
-import json
-
-from uuid import uuid4
-
 import mongoengine as me
 
-from mist.core.user.models import Organization
 from mist.core.keypair.models import Keypair
-from mist.core.tag.models import Tag
 
+from mist.io.clouds.base import Cloud
 import mist.io.clouds.controllers as controllers
-
-
-class Cloud(me.Document):
-    """Base class for every cloud/provider"""
-
-    id = me.StringField(primary_key=True, default=lambda: uuid4().hex)
-    owner = me.ReferenceField(Organization, required=True)
-
-    title = me.StringField(required=True, unique_with="owner")
-    enabled = me.BooleanField(default=True)
-
-    machine_count = me.IntField(default=0)
-
-    starred = me.ListField()
-    unstarred = me.ListField()
-
-    meta = {'allow_inheritance': True}
-    # FIXME: use a different collection name to avoid conflicts when migrating
-    # previous models.
-    # TODO: Add index on owner
-
-    _controller_cls = None
-
-    def __init__(self, *args, **kwargs):
-        super(Cloud, self).__init__(*args, **kwargs)
-        if self._controller_cls is None:
-            raise NotImplementedError()
-        self.ctl = self._controller_cls(self)
-
-    def delete(self):
-        super(Cloud, self).delete()
-        Tag.objects(resource=self).delete()
-
-    def as_dict(self):
-        return json.loads(self.to_json())
-
-    def __str__(self):
-        return '%s cloud %s (%s) of %s' % (type(self), self.title,
-                                           self.id, self.owner)
 
 
 class AmazonCloud(Cloud):
