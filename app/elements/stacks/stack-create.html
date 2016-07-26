@@ -173,25 +173,14 @@
                     'change' : '_updateFields',
                     'iron-select' : '_updateFields',
                 },
+
                 _fromTemplate: function(params, templates) {
                     if (params.id && this.model.templates) {
                         var yaml_inputs = '';
-                        var arr = ['key', 'key_id','size_id','location_id','image_id','cloud_id'];
-                        this.model.templates[params.id].inputs.sort(function (a, b) {
-                            if (arr.indexOf(a.name) > arr.indexOf(b.name)) {
-                                return -1;
-                            }
-                            if (arr.indexOf(a.name) < arr.indexOf(b.name)) {
-                                return 1;
-                            }
-                            return 0;
-                        });
                         this.model.templates[params.id].inputs.forEach(function(inp) {
                             yaml_inputs += inp.name+ ': ';
                             var val = inp.value =! undefined ? inp.value : inp.defaultValue || inp.default;
                             yaml_inputs += val+'\n';
-
-
                         }, this);
                         this.set('yaml_inputs', yaml_inputs);
                         // pass values into form's stackinputs default value
@@ -210,6 +199,7 @@
                         console.log('template is missing');
                     }
                 },
+
                 _computeFields: function(template, templateInps, templateInputs, modelTemplates, clouds, keys, params) {
                     var yaml_or_form = 'yaml';
                     console.log('Computing Fields started');
@@ -281,17 +271,6 @@
                     }];
 
                     if (template && template.inputs) {
-                        //sort inputs
-                        var arr = ['key','key_id','size_id','location_id','image_id','cloud_id'];
-                        template.inputs.sort(function (a, b) {
-                            if (arr.indexOf(a.name) > arr.indexOf(b.name)) {
-                                return -1;
-                            }
-                            if (arr.indexOf(a.name) < arr.indexOf(b.name)) {
-                                return 1;
-                            }
-                            return 0;
-                        });
                         template.inputs.forEach(function(inp) {
                             inp['showIf'] = {
                                 fieldName: "yaml_or_form",
@@ -309,63 +288,66 @@
                             // }
 
                             // make key dropdown
-                            if(inp.name == "key" || inp.name == "key_id") {
+                            if (inp.name.startsWith('mist_key')) {
                                 inp.type = 'ssh_key';
                                 // inp.type = 'dropdown';
-                                inp.helptext = 'Choose your mist key';
+                                inp.helptext = 'Select key';
                                 inp.options = this.model.keysArray;
                             }
 
                             // make cloud dropdown
-                            if(inp.name == "cloud_id") {
+                            if (inp.name.startsWith('mist_cloud')) {
                                 inp.label = 'cloud';
                                 inp.type = 'mist_dropdown';
-                                inp.helptext = 'Choose your mist cloud';
+                                inp.helptext = 'Select cloud';
                                 inp.options = this.model.cloudsArray;
                             }
 
                             // make image dropdown & dependent on cloud
-                            if(inp.name == "image_id") {
+                            if (inp.name.startsWith("mist_image")) {
+                                var xid = inp.name.split("mist_image")[0]
                                 inp.show = false;
                                 inp.type = 'mist_dropdown';
-                                inp.helptext = 'Choose the image of your cloud';
+                                inp.helptext = 'Select image';
                                 inp.showIf = {
-                                    fieldName: "cloud_id",
+                                    fieldName: "mist_cloud" + xid,
                                     fieldExists: true
                                 }
                             }
 
                             // make image location & dependent on cloud
-                            if(inp.name == "location_id") {
+                            if (inp.name.startsWith("mist_location")) {
+                                var xid = inp.name.split("mist_location")[0]
                                 inp.show = false;
                                 inp.type = 'mist_dropdown';
-                                inp.helptext = 'Choose the location of your cloud';
+                                inp.helptext = 'Select location';
                                 inp.showIf = {
-                                    fieldName: "cloud_id",
+                                    fieldName: "mist_cloud" + xid,
                                     fieldExists: true
                                 }
                             }
 
                             // make image location & dependent on cloud
-                            if(inp.name == "size_id") {
+                            if (inp.name.startsWith("mist_size")) {
+                                var xid = inp.name.split("mist_size")[0]
                                 inp.show = false;
                                 inp.type = 'mist_dropdown';
                                 inp.helptext = 'Choose the size of your cloud';
                                 inp.showIf = {
-                                    fieldName: "cloud_id",
+                                    fieldName: "mist_cloud" + xid,
                                     fieldExists: true
                                 }
                             }
 
-                            //hide api_token && mist_uri
-                            if(inp.name == "api_token" || inp.name == "mist_uri" ) {
+                            // hide mist api credential inputs
+                            if (inp.name == "mist_token" || inp.name == "mist_uri" || inp.name == "mist_username" || inp.name == "mist_password") {
                                 inp.hidden = true;
                                 inp.required = false;
                             }
 
                             ret.push(inp);
                         }, this);
-                    }                    
+                    }
 
                     ret.push({
                         name: "deploy",
@@ -381,7 +363,8 @@
                     });
                     console.log("computing fields")
                     this.set('fields', ret);
-                },                
+                },
+
                 _updateFields: function(e){
                     var changeInYaml = e.path.indexOf(document.querySelector("paper-textarea#stackinputs")) >-1
                     if (changeInYaml) {
@@ -389,7 +372,6 @@
                         var yaml_array = yaml.split('\n');
                         var inputs = [];
                         yaml_array.forEach(function(line){
-
                             var name = line.split(':')[0].trim();
                             var value = line.split(':')[1];
                             if (value)
@@ -399,15 +381,15 @@
 
                         this.fields.forEach(function(f, index){
                             if (inputs[f.name])
-                                this.set('fields.'+index+'.value', inputs[f.name])
+                                this.set('fields.' + index + '.value', inputs[f.name])
                         }, this)
-                    }
-                    else {
+                    } else {
                         var cloud = this.fields.find(function(f){
-                            return f.name == 'cloud_id';
+                            return f.name.startsWith("mist_cloud");
                         });
                         var yaml_inputs = '';
                         this.fields.forEach(function(inp) {
+                            var fieldCloud;
 
                             if (['name', 'description', 'yaml_or_form','stackinputs', 'deploy'].indexOf(inp.name) == -1) {
                                 yaml_inputs += inp.name+ ': ';
@@ -416,16 +398,34 @@
                             }
 
                             if (cloud && cloud.value){
-                                var cloudId = cloud.value;
-                                //TODO change to mist_NAME when backend changes
-                                if(inp.name == "location_id") {
-                                    inp.options = this.model.clouds[cloudId].locationsArray;
+                                if(inp.name.startsWith("mist_location")) {
+                                    var xid = inp.name.split("mist_location")[0];
+                                    fieldCloud = this.fields.find(function(f){
+                                        return f.name.startsWith("mist_cloud" + xid);
+                                    }) || cloud;
+                                    var cloudId = fieldCloud.value;
+                                    if (cloudId)
+                                        inp.options = this.model.clouds[cloudId].locationsArray;
                                 }
-                                if(inp.name == "image_id") {
-                                    inp.options = this.model.clouds[cloudId].imagesArray;
+                                if(inp.name.startsWith("mist_image")) {
+                                  var xid = inp.name.split("mist_image")[0];
+                                  fieldCloud = this.fields.find(function(f){
+                                      return f.name.startsWith("mist_cloud" + xid);
+                                  }) || cloud;
+                                  var cloudId = fieldCloud.value;
+                                  if (cloudId)
+                                      inp.options = this.model.clouds[cloudId].imagesArray;
                                 }
-                                if(inp.name == "size_id") {
-                                    inp.options = this.model.clouds[cloudId].sizesArray;
+                                if(inp.name.startsWith("mist_size")) {
+                                    console.warn('mist_size');
+                                    var xid = inp.name.split("mist_size")[0];
+                                    fieldCloud = this.fields.find(function(f){
+                                        return f.name.startsWith("mist_cloud" + xid);
+                                    }) || cloud;
+                                    var cloudId = fieldCloud.value;
+                                    console.warn('xid', xid, 'cloud', fieldCloud);
+                                    if (cloudId)
+                                        inp.options = this.model.clouds[cloudId].sizesArray;
                                 }
                             }
                         }, this);
@@ -439,10 +439,10 @@
                             return f.name == "stackinputs";
                         });
 
-                        this.set('fields.'+ind+'.value', this.yaml_inputs);
+                        this.set('fields.' + ind + '.value', this.yaml_inputs);
                     }
-                    
                 },
+
                 _handleRequest: function(e) {
 
                 },
@@ -451,7 +451,7 @@
                     // console.log('create stack ', e);
                     var response = YAML.parse(e.detail.xhr.response);
                     var sid = response.stack.id;
-                    page('/stacks/' + sid);                
+                    page('/stacks/' + sid);
 
                     this.debounce('resetForm', function() {
                         this._resetForm();
