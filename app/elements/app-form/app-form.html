@@ -117,7 +117,7 @@
                     <template is="dom-if" if="[[_computeFieldType(field, 'mist_dropdown', field.show)]]">
                         <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
                             <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
-                                <template is="dom-repeat" items="[[field.options]]" as="option">
+                                <template is="dom-repeat" items="{{field.options}}" as="option">
                                     <paper-item value="[[option.id]]">[[option.title]] [[option.name]]</paper-item>
                                 </template>
                             </paper-menu>
@@ -241,7 +241,6 @@
                     },
                     fields: {
                         type: Array,
-                        value: [],
                         notify: true
                     },
                     method: {
@@ -277,12 +276,13 @@
                 observers: [
                     '_fieldsChanged(fields.*, sendingData)',
                 ],
+                ready: function(){
+                    this.fields = [];
+                },
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
                 },
                 _computeFieldType: function(field, value, show) {
-                    if(field.type == value)
-                        console.log('_computeFieldType', field.name, field.type, value)
                     return field.type == value;
                 },
                 _handleRequest: function(e) {
@@ -316,6 +316,7 @@
 
                         // Update show field flag after calculating dependencies
                         fields.base.forEach(function(el, index) {
+                            // if field has a dependency
                             if (el.showIf) {
 
                                 dependency = form[el.showIf.fieldName];
@@ -366,6 +367,17 @@
                                 }
                             }
 
+                            // if field is a dependency of another field
+                            this.fields.forEach(function(depel, index) {
+                                if (depel.showIf && 
+                                    depel.showIf.fieldName != 'yaml_or_form' && 
+                                    depel.showIf.fieldName == el.name){
+                                        if (depel.options){
+                                            this.set('fields.' + index + '.options', depel.options);
+                                        }
+                                }
+                            }, this);
+
                             if (el.placeholderIf) {
                                 dependency = form[el.placeholderIf.fieldName];
                                 this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
@@ -400,6 +412,7 @@
                     } else {
                         payload = this.form;
                     }
+                    // console.log('Payload',payload);
 
                     this.$.formAjax.headers["Content-Type"] = 'application/json';
                     this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
