@@ -192,7 +192,7 @@
                         }
                     },
                     open_incidents: function(data) {
-                        this.set('isLoadingIncidents', false);
+                        that.set('onboarding.isLoadingIncidents', false);
                         if (DEBUG_SOCKET)
                             console.debug('got incidents', data);
                         that.set('model.incidents', data);
