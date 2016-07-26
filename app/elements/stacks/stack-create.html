@@ -298,7 +298,7 @@
                             // make cloud dropdown
                             if (inp.name.startsWith('mist_cloud')) {
                                 inp.label = 'cloud';
-                                inp.type = 'mist_dropdown';
+                                inp.type = 'dropdown';
                                 inp.helptext = 'Select cloud';
                                 inp.options = this.model.cloudsArray;
                             }
@@ -307,7 +307,7 @@
                             if (inp.name.startsWith("mist_image")) {
                                 var xid = inp.name.split("mist_image")[0]
                                 inp.show = false;
-                                inp.type = 'mist_dropdown';
+                                inp.type = 'dropdown';
                                 inp.helptext = 'Select image';
                                 inp.showIf = {
                                     fieldName: "mist_cloud" + xid,
@@ -319,7 +319,7 @@
                             if (inp.name.startsWith("mist_location")) {
                                 var xid = inp.name.split("mist_location")[0]
                                 inp.show = false;
-                                inp.type = 'mist_dropdown';
+                                inp.type = 'dropdown';
                                 inp.helptext = 'Select location';
                                 inp.showIf = {
                                     fieldName: "mist_cloud" + xid,
@@ -331,7 +331,7 @@
                             if (inp.name.startsWith("mist_size")) {
                                 var xid = inp.name.split("mist_size")[0]
                                 inp.show = false;
-                                inp.type = 'mist_dropdown';
+                                inp.type = 'dropdown';
                                 inp.helptext = 'Choose the size of your cloud';
                                 inp.showIf = {
                                     fieldName: "mist_cloud" + xid,
@@ -361,7 +361,9 @@
                         show: true,
                         required: false
                     });
-                    console.log("computing fields")
+                    console.log("computing fields", ret.find(function(inp){
+                        return inp.type == 'dropdown'
+                    }))
                     this.set('fields', ret);
                 },
 

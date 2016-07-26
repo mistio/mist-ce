@@ -281,7 +281,9 @@
                     return sendingData;
                 },
                 _computeFieldType: function(field, value, show) {
-                        return field.type == value;
+                    if(field.type == value)
+                        console.log('_computeFieldType', field.name, field.type, value)
+                    return field.type == value;
                 },
                 _handleRequest: function(e) {
                     this.fire("request", e.detail)
