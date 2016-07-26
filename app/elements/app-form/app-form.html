@@ -346,16 +346,13 @@
 
                                 this.set('fields.' + index + '.show', show);
 
-                                if (!show && reset) {
-                                    // this._resetField(el, index);
-                                } else {
-                                    if(el.type == "ip_textarea") {
-                                        var cidrsArray = el.value.split('\n');
-                                        this.set('form.' + el.name, cidrsArray);
-                                    }
-                                    else {
-                                        this.set('form.' + el.name, el.value);
-                                    }
+                                // update form values regardless of el.show
+                                if(el.type == "ip_textarea") {
+                                    var cidrsArray = el.value.split('\n');
+                                    this.set('form.' + el.name, cidrsArray);
+                                }
+                                else {
+                                    this.set('form.' + el.name, el.value);
                                 }
                             } else {
                                 if(el.type == "ip_textarea") {
@@ -396,6 +393,12 @@
                         this.set('form', form);
                         this.set('formReady', valid && !sendingData);
                     });
+
+                    //console
+                    // for (var p in this.form){
+                    //     console.log('f ', p, this.form[p]);
+                    // }
+                    // console.log(this.form.stackinputs);
                 },
                 _submitForm: function() {
                     var payload;
