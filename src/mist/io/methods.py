@@ -1298,114 +1298,10 @@ def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
 def connect_provider(cloud):
     """Establishes cloud connection using the credentials specified.
 
-    It has been tested with:
-
-        * EC2, and the alternative providers like EC2_EU,
-        * Rackspace, old style and the new Nova powered one,
-        * Openstack Diablo through Trystack, should also try Essex,
-        * Linode
-
-    Cloud is expected to be a mist.io.Cloud
+    Cloud is expected to be a cloud mongoengine model instance.
 
     """
-    if cloud.provider == Provider.LIBVIRT:
-        import libcloud.compute.drivers.libvirt_driver
-        libcloud.compute.drivers.libvirt_driver.ALLOW_LIBVIRT_LOCALHOST = config.ALLOW_LIBVIRT_LOCALHOST
-    if cloud.provider not in ['bare_metal', 'coreos']:
-        driver = get_driver(cloud.provider)
-    if cloud.provider == Provider.AZURE:
-        # create a temp file and output the cert there, so that
-        # Azure driver is instantiated by providing a string with the key instead of
-        # a cert file
-        temp_key_file = NamedTemporaryFile(delete=False)
-        temp_key_file.write(cloud.apisecret)
-        temp_key_file.close()
-        conn = driver(cloud.apikey, temp_key_file.name)
-    elif cloud.provider == Provider.OPENSTACK:
-        auth_url = dnat(cloud.owner, cloud.apiurl)
-        conn = driver(
-            cloud.apikey,
-            cloud.apisecret,
-            ex_force_auth_version=cloud.auth_version or '2.0_password',
-            ex_force_auth_url=auth_url,
-            ex_tenant_name=cloud.tenant_name,
-            ex_force_service_region=cloud.region,
-            ex_force_base_url=cloud.compute_endpoint,
-        )
-    elif cloud.provider in [Provider.LINODE, Provider.HOSTVIRTUAL, Provider.VULTR]:
-        conn = driver(cloud.apisecret)
-    elif cloud.provider == Provider.PACKET:
-        if cloud.tenant_name:
-            conn = driver(cloud.apisecret, project=cloud.tenant_name)
-        else:
-            conn = driver(cloud.apisecret)
-    elif cloud.provider == Provider.GCE:
-        conn = driver(cloud.apikey, cloud.apisecret, project=cloud.tenant_name)
-    elif cloud.provider == Provider.DOCKER:
-        docker_host, docker_port = dnat(cloud.owner, cloud.apiurl, cloud.docker_port)
-        if cloud.key_file and cloud.cert_file:
-            # tls auth, needs to pass the key and cert as files
-            key_temp_file = NamedTemporaryFile(delete=False)
-            key_temp_file.write(cloud.key_file)
-            key_temp_file.close()
-            cert_temp_file = NamedTemporaryFile(delete=False)
-            cert_temp_file.write(cloud.cert_file)
-            cert_temp_file.close()
-            if cloud.ca_cert_file:
-                # docker started with tls verify
-                ca_cert_temp_file = NamedTemporaryFile(delete=False)
-                ca_cert_temp_file.write(cloud.ca_cert_file)
-                ca_cert_temp_file.close()
-                conn = driver(host=docker_host,
-                              port=docker_port,
-                              key_file=key_temp_file.name,
-                              cert_file=cert_temp_file.name,
-                              ca_cert=ca_cert_temp_file.name,
-                              verify_match_hostname=False)
-            else:
-                conn = driver(host=docker_host,
-                              port=docker_port,
-                              key_file=key_temp_file.name,
-                              cert_file=cert_temp_file.name,
-                              verify_match_hostname=False)
-        else:
-            conn = driver(cloud.apikey, cloud.apisecret, docker_host, docker_port)
-    elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
-        conn = driver(cloud.apikey, cloud.apisecret, region=cloud.region)
-    elif cloud.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
-        conn = driver(cloud.apikey, cloud.apisecret)
-    elif cloud.provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        api_url = dnat(cloud.owner, cloud.apiurl)
-        conn = driver(cloud.apikey, cloud.apisecret, host=api_url, verify_match_hostname=False)
-    elif cloud.provider == Provider.DIGITAL_OCEAN:
-        if cloud.apikey == cloud.apisecret:  # API v2
-            conn = driver(cloud.apisecret)
-        else:   # API v1
-            driver = get_driver('digitalocean_first_gen')
-            conn = driver(cloud.apikey, cloud.apisecret)
-    elif cloud.provider == Provider.VSPHERE:
-        api_url = dnat(cloud.owner, cloud.apiurl)
-        conn = driver(host=api_url, username=cloud.apikey, password=cloud.apisecret)
-    elif cloud.provider == 'bare_metal':
-        conn = BareMetalDriver(Machine.objects(cloud=cloud))
-    elif cloud.provider == 'coreos':
-        conn = CoreOSDriver(Machine.objects(cloud=cloud))
-    elif cloud.provider == Provider.LIBVIRT:
-        # support the three ways to connect: local system, qemu+tcp, qemu+ssh
-        if cloud.apisecret:
-            host, port = dnat(cloud.owner, cloud.apiurl, cloud.ssh_port)
-            conn = driver(host, hypervisor=cloud.apiurl, user=cloud.apikey,
-                          ssh_key=cloud.apisecret, ssh_port=port)
-        else:
-            api_url, tcp_port = dnat(cloud.owner, cloud.apiurl, 5000)
-            conn = driver(api_url, hypervisor=cloud.apiurl, user=cloud.apikey,
-                          tcp_port=tcp_port)
-    else:
-        # ec2
-        conn = driver(cloud.apikey, cloud.apisecret)
-        # Account for sub-provider regions (EC2_US_WEST, EC2_US_EAST etc.)
-        conn.type = cloud.provider
-    return conn
+    return cloud.ctl.connect()
 
 
 def get_machine_actions(machine_from_api, conn, extra):
@@ -1516,152 +1412,18 @@ def get_machine_actions(machine_from_api, conn, extra):
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
+
+    # FIXME: Code left below hasn't yet been migrated to clouds.handlers.
     return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_machines()
 
-    try:
-        cloud = Cloud.objects.get(owner=user, id=cloud_id)
-    except Cloud.DoesNotExist:
-        raise NotFoundError("Unknown cloud with id %s" % cloud_id)
-    try:
-        conn = connect_provider(cloud)
-        machines_from_provider = conn.list_nodes()
-    except InvalidCredsError:
-        raise CloudUnauthorizedError()
-    except ssl.SSLError as exc:
-        traceback.print_exc()
-        log.error("SSLError while running list_nodes on provider %s: %r, %s" % (cloud.provider, exc, type(exc)))
-        raise CloudUnavailableError(exc=exc)
-    except Exception as exc:
-        traceback.print_exc()
-        log.error("Error while running list_nodes on provider %s: %r, %s" % (cloud.provider, exc, type(exc)))
-        raise CloudUnavailableError(exc=exc)
-
-
-    # create a dict with the machines from the db with key the machine_id
-    machines_from_db = {machine.machine_id: machine
-                        for machine in Machine.objects(cloud=cloud)}
-    now = datetime.utcnow()
-    ret = []
 
     for m in machines_from_provider:
-
-        machine_entry = machines_from_db.pop(m.id, None)
-        if machine_entry:
-            machine_entry.last_seen = now
-            machine_entry.missing_since = None
-            machine_entry.save()
-        else:
-            machine_entry = Machine(cloud=cloud, machine_id=m.id)
-            machine_entry.last_seen = now
-            machine_entry.missing_since = None
-            machine_entry.save()
-
-        if m.driver.type == 'gce':
-            # tags and metadata exist in GCE
-            tags_from_provider = m.extra.get('metadata', {}).get('items')
-        else:
-            tags_from_provider = m.extra.get('tags') or m.extra.get('metadata') or {}
-        # optimize for js
-        if type(tags_from_provider) == dict:
-            tags_from_provider = [{'key': key, 'value': value} for key, value in tags_from_provider.iteritems() if key != 'Name']
-        if m.extra.get('DATACENTERID', None):
-            # for Linode
-            dc = config.LINODE_DATACENTERS.get(m.extra['DATACENTERID'])
-            tags_from_provider.append({'key': 'DATACENTERID', 'value':dc})
-        elif m.extra.get('vdc', None):
-            # for vCloud
-            tags_from_provider.append({'key': 'vdc', 'value': m.extra['vdc']})
-
-        image_id = m.image or m.extra.get('imageId', None)
-        size = m.size or m.extra.get('flavorId', None)
-        size = size or m.extra.get('instancetype', None)
-
-        if m.driver.type is Provider.GCE:
-                # show specific extra metadata for GCE. Wrap in try/except
-                # to prevent from future GCE API changes
-
-                # identify Windows servers
-                os_type = 'linux'
-                try:
-                    if 'windows-cloud' in m.extra['disks'][0].get('licenses')[0]:
-                        os_type = 'windows'
-                except:
-                    pass
-                m.extra['os_type'] = os_type
-
-                # windows specific metadata including user/password
-                try:
-                    for item in m.extra.get('metadata', {}).get('items', []):
-                        if item.get('key') in ['gce-initial-windows-password', 'gce-initial-windows-user']:
-                            m.extra[item.get('key')] = item.get('value')
-                except:
-                    pass
-
-                try:
-                    if m.extra.get('boot_disk'):
-                        m.extra['boot_disk_size'] = m.extra.get('boot_disk').size
-                        m.extra['boot_disk_type'] = m.extra.get('boot_disk').extra.get('type')
-                        m.extra.pop('boot_disk')
-                except:
-                    pass
-
-                try:
-                    if m.extra.get('zone'):
-                        m.extra['zone'] = m.extra.get('zone').name
-                except:
-                    pass
-
-                try:
-                    if m.extra.get('machineType'):
-                        m.extra['machineType'] = m.extra.get('machineType').split('/')[-1]
-                except:
-                    pass
-        for k in m.extra.keys():
-            try:
-                json.dumps(m.extra[k])
-            except TypeError:
-                m.extra[k] = str(m.extra[k])
-
-        if m.driver.type is Provider.AZURE:
-            if m.extra.get('endpoints'):
-                m.extra['endpoints'] = json.dumps(m.extra.get('endpoints', {}))
 
         if m.driver.type == 'bare_metal':
             m.extra['can_reboot'] = False
             if machine_entry.key_associations:
                 m.extra['can_reboot'] = True
 
-        if m.driver.type in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
-            try:
-                if 'windows' in m.extra.get('image', '').lower():
-                    os_type = 'windows'
-                else:
-                    os_type = 'linux'
-                m.extra['os_type'] = os_type
-            except:
-                # in case this breaks
-                pass
-        if m.driver.type in config.EC2_PROVIDERS:
-            # this is windows for windows servers and None for Linux
-            m.extra['os_type'] = m.extra.get('platform', 'linux')
-
-        if m.driver.type is Provider.LIBVIRT:
-            if m.extra.get('xml_description'):
-                m.extra['xml_description'] = escape(m.extra['xml_description'])
-
-        machine = {'id': m.id,
-                   'uuid': machine_entry.id if machine_entry else '',
-                   'name': m.name,
-                   'imageId': image_id,
-                   'size': size,
-                   'state': config.STATES[m.state],
-                   'private_ips': m.private_ips,
-                   'public_ips': m.public_ips,
-                   'missing_since': str(machine_entry.missing_since)
-                        if machine_entry and machine_entry.missing_since else '',
-                   'last_seen': str(machine_entry.last_seen)
-                        if machine_entry and machine_entry.last_seen else '',
-                   'extra': m.extra}
         try:
             machine_cost = machine_cost_calculator(m)
         except:
@@ -1740,15 +1502,6 @@ def list_machines(user, cloud_id):
         machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
 
-    if conn.type == 'libvirt':
-        # close connection with libvirt
-        conn.disconnect()
-
-    # mark machines that are no longer available in list_nodes as missing
-    for machine_entry in machines_from_db.values():
-        if not machine_entry.missing_since:
-            machine_entry.missing_since = now
-            machine_entry.save()
     return ret
 
 

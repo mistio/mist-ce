@@ -54,7 +54,7 @@ class Cloud(me.Document):
 
 class AmazonCloud(Cloud):
 
-    api_key = me.StringField(required=True)
+    apikey = me.StringField(required=True)
     api_secret = me.StringField(required=True)
     region = me.StringField(required=True)
 
@@ -68,28 +68,37 @@ class DigitalOceanCloud(Cloud):
     _controller_cls = controllers.DigitalOceanController
 
 
+
+class DigitalOceanFirstGenCloud(Cloud):
+
+    apikey = me.StringField(required=True)
+    apisecret = me.StringField(required=True)
+
+    _controller_cls = controllers.DigitalOceanFirstGenController
+
+
 class LinodeCloud(Cloud):
 
-    api_key = me.StringField(required=True)
+    apikey = me.StringField(required=True)
 
     _controller_cls = controllers.LinodeController
-
-
-class SoftLayerCloud(Cloud):
-
-    username = me.StringField(required=True)
-    api_key = me.StringField(required=True)
-
-    _controller_cls = controllers.SoftLayerController
 
 
 class RackSpaceCloud(Cloud):
 
     username = me.StringField(required=True)
-    api_key = me.StringField(required=True)
+    apikey = me.StringField(required=True)
     region = me.StringField(required=True)
 
     _controller_cls = controllers.RackSpaceController
+
+
+class SoftLayerCloud(Cloud):
+
+    username = me.StringField(required=True)
+    apikey = me.StringField(required=True)
+
+    _controller_cls = controllers.SoftLayerController
 
 
 class NephoScaleCloud(Cloud):
@@ -119,14 +128,14 @@ class GoogleCloud(Cloud):
 
 class HostVirtualCloud(Cloud):
 
-    epi_key = me.StringField(required=True)
+    apikey = me.StringField(required=True)
 
     _controller_cls = controllers.HostVirtualController
 
 
 class PacketCloud(Cloud):
 
-    api_key = me.StringField(required=True)
+    apikey = me.StringField(required=True)
     project_id = me.StringField(required=False)
 
     _controller_cls = controllers.PacketController
@@ -134,7 +143,7 @@ class PacketCloud(Cloud):
 
 class VultrCloud(Cloud):
 
-    api_key = me.StringField(required=True)
+    apikey = me.StringField(required=True)
 
     _controller_cls = controllers.VultrController
 
@@ -181,14 +190,14 @@ class DockerCloud(Cloud):
     # TLS Authentication (optional)
     key_file = me.StringField(required=False)
     cert_file = me.StringField(required=False)
-    ca_certfile = me.StringField(required=False)
+    ca_cert_file = me.StringField(required=False)
 
     _controller_cls = controllers.DockerController
 
 
 class LibvirtCloud(Cloud):
 
-    hostname = me.StringField(required=True)
+    host = me.StringField(required=True)
     username = me.StringField(default='root')
     port = me.IntField(required=True, default=22)
     key = me.ReferenceField(Keypair, required=False)

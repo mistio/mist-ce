@@ -36,11 +36,12 @@ from mist.io import config
 
 from mist.io.exceptions import MistError
 from mist.io.exceptions import MachineNotFoundError
-from mist.io.exceptions import CloudUnauthorizedError
 from mist.io.exceptions import CloudUnavailableError
+from mist.io.exceptions import CloudUnauthorizedError
 
-from mist.core.cloud.models import Machine
 from mist.core.tag.models import Tag
+from mist.core.cloud.models import Machine
+from mist.core.vpn.methods import destination_nat as dnat
 
 
 log = logging.getLogger(__name__)
@@ -428,7 +429,7 @@ class BaseController(object):
 
 class AmazonController(BaseController):
     def connect(self):
-        return get_driver(Provider.EC2)(self.cloud.api_key,
+        return get_driver(Provider.EC2)(self.cloud.apikey,
                                         self.cloud.api_secret,
                                         region=self.cloud.region)
 
@@ -465,9 +466,16 @@ class DigitalOceanController(BaseController):
         return get_driver(Provider.DIGITAL_OCEAN)(self.cloud.token)
 
 
+class DigitalOceanFirstGenController(BaseController):
+    def connect(self):
+        return get_driver(Provider.DIGITAL_OCEAN_FIRST_GEN)(
+            self.cloud.apikey, self.cloud.apisecret
+        )
+
+
 class LinodeController(BaseController):
     def connect(self):
-        return get_driver(Provider.LINODE)(self.cloud.api_key)
+        return get_driver(Provider.LINODE)(self.cloud.apikey)
 
     def _post_parse_machine(self, machine, machine_model):
         datacenter = machine['extra'].get('DATACENTER')
@@ -476,25 +484,25 @@ class LinodeController(BaseController):
             machine['tags']['DATACENTERID'] = datacenter
 
 
-class SoftLayerController(BaseController):
-    def connect(self):
-        return get_driver(Provider.SOFTLAYER)(self.cloud.username,
-                                              self.cloud.api_key)
-
-    def _post_parse_machine(self, machine, machine_model):
-        machine['extra']['os_type'] = 'linux'
-        if 'windows' in str(machine['extra'].get('image', '')).lower():
-            machine['extra']['os_type'] = 'windows'
-
-
 class RackSpaceController(BaseController):
     def connect(self):
         if self.cloud.region in ('us', 'uk'):
             driver = get_driver(Provider.RACKSPACE_FIRST_GEN)
         else:
             driver = get_driver(Provider.RACKSPACE)
-        return driver(self.cloud.username, self.cloud.api_key,
+        return driver(self.cloud.username, self.cloud.apikey,
                       region=self.cloud.region)
+
+
+class SoftLayerController(BaseController):
+    def connect(self):
+        return get_driver(Provider.SOFTLAYER)(self.cloud.username,
+                                              self.cloud.apikey)
+
+    def _post_parse_machine(self, machine, machine_model):
+        machine['extra']['os_type'] = 'linux'
+        if 'windows' in str(machine['extra'].get('image', '')).lower():
+            machine['extra']['os_type'] = 'windows'
 
 
 class NephoScaleController(BaseController):
@@ -616,26 +624,41 @@ class GoogleController(BaseController):
 
 # FIXME
 class HostVirtualController(BaseController):
-    pass
+    def connect(self):
+        return get_driver(Provider.HOSTVIRTUAL)(self.cloud.apikey)
+
 
 
 # FIXME
 class PacketController(BaseController):
-    pass
+    def connect(self):
+        return get_driver(Provider.PACKET)(self.cloud.apikey,
+                                           project=self.cloud.project_id)
 
 
 # FIXME
 class VultrController(BaseController):
-    pass
+    def connect(self):
+        return get_driver(Provider.VULTR)(self.cloud.apikey)
 
 
 # FIXME
 class VSphereController(BaseController):
-    pass
+    def connect(self):
+        host = dnat(self.cloud.owner, self.cloud.host)
+        return get_driver(Provider.VSPHERE)(host=host,
+                                            username=self.cloud.username,
+                                            password=self.cloud.password)
 
 
 # FIXME
 class VCloudController(BaseController):
+    def connect(self):
+        host = dnat(self.cloud.owner, self.cloud.host)
+        return get_driver(Provider.VCLOUD)(self.cloud.username,
+                                           self.cloud.password, host=host,
+                                           verify_match_hostname=False)
+
     def _post_parse_machine(self, machine, machine_model):
         if machine['extra'].get('vdc'):
             machine['tags']['vdc'] = machine['extra']['vdc']
@@ -643,6 +666,7 @@ class VCloudController(BaseController):
 
 class OpenStackController(BaseController):
     def connect(self):
+        url = dnat(self.cloud.owner, self.cloud.url)
         return get_driver(Provider.OPENSTACK)(
             self.cloud.username,
             self.cloud.password,
@@ -656,10 +680,33 @@ class OpenStackController(BaseController):
 
 class DockerController(BaseController):
     def connect(self):
+        host, port = dnat(self.cloud.owner, self.cloud.host, self.cloud.port)
+
+        # TLS authentication.
+        if self.cloud.key_file and self.cloud.cert_file:
+            key_temp_file = tempfile.NamedTemporaryFile(delete=False)
+            key_temp_file.write(self.cloud.key_file)
+            key_temp_file.close()
+            cert_temp_file = tempfile.NamedTemporaryFile(delete=False)
+            cert_temp_file.write(self.cloud.cert_file)
+            cert_temp_file.close()
+            ca_cert = None
+            if self.cloud.ca_cert_file:
+                ca_cert_temp_file = tempfile.NamedTemporaryFile(delete=False)
+                ca_cert_temp_file.write(self.cloud.ca_cert_file)
+                ca_cert_temp_file.close()
+                ca_cert = ca_cert_temp_file.name
+            return get_driver(Provider.DOCKER)(host=host,
+                                               port=port,
+                                               key_file=key_temp_file.name,
+                                               cert_file=cert_temp_file.name,
+                                               ca_cert=ca_cert,
+                                               verify_match_hostname=False)
+
+        # Username/Password authentication.
         return get_driver(Provider.DOCKER)(self.cloud.username,
                                            self.cloud.password,
-                                           self.cloud.url,
-                                           self.cloud.port)
+                                           host, port)
 
     def list_images(self, search=None):
         mist_images = [NodeImage(id=image, name=name,
@@ -679,6 +726,28 @@ class DockerController(BaseController):
 
 # FIXME
 class LibvirtController(BaseController):
+    def connect(self):
+        """Three supported ways to connect: local system, qemu+tcp, qemu+ssh"""
+
+        import libcloud.compute.drivers.libvirt_driver
+        libvirt_driver = libcloud.compute.drivers.libvirt_driver
+        libvirt_driver.ALLOW_LIBVIRT_LOCALHOST = config.ALLOW_LIBVIRT_LOCALHOST
+
+        if self.cloud.key:
+            host, port = dnat(self.cloud.owner,
+                              self.cloud.host, self.cloud.port)
+            return get_driver(Provider.LIBVIRT)(host,
+                                                hypervisor=self.cloud.host
+                                                user=self.cloud.username,
+                                                ssh_key=self.cloud.key,
+                                                ssh_port=port)
+        else:
+            host, port = dnat(self.cloud.owner, self.cloud.host, 5000)
+            return get_driver(Provider.LIBVIRT)(host,
+                                                hypervisor=self.cloud.host,
+                                                user=self.cloud.username,
+                                                tcp_port=port)
+
     def _post_parse_machine(self, machine, machine_model):
         xml_desc = machine['extra'].get('xml_description')
         if xml_desc:
@@ -687,9 +756,13 @@ class LibvirtController(BaseController):
 
 # FIXME
 class CoreOSController(BaseController):
+    #def connect(self):
+    #    return CoreOSDriver(Machine.objects(cloud=self.cloud))
     pass
 
 
 # FIXME
 class OtherController(BaseController):
+    #def connect(self):
+    #    return BareMetalDriver(Machine.objects(cloud=self.cloud))
     pass
