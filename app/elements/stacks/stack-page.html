@@ -575,13 +575,14 @@
             </div> -->
             <!-- </template> -->
 
-            <div id="state" class="page" hidden$="[[!hasNodeInstances]]">
+            <div id="state" class="page" hidden$="[[!stack.node_instances]]">
                 <h3 class="smallcaps">Runtime properties</h3>
                 <template is="dom-repeat" items="[[stack.node_instances]]">
                     <paper-material class="no-pad info-card">
                         <h2 class="info-title">[[item.name]] <span class="info-title-id">id: [[item.id]]</span></h2>
                         <element-for-in content="[[item.runtime_properties]]"></element-for-in>
                         <element-for-in content="[[item]]"></element-for-in>
+                        <!-- [[_makeString(item)]] -->
                     </paper-material>
                 </template>
 
@@ -665,15 +666,6 @@
                         type: Array,
                         computed: '_machines(stack)',
                     },
-                    // runtimeProperties: {
-                    //     type: Array,
-                    //     computed: '_runtimeProperties(stack)'
-                    // },
-                    hasNodeInstances: {
-                        type: Boolean,
-                        computed: '_computeHasNodeInstances(stack.node_instances.*)',
-                        notify: true
-                    },
                     listMachines: {
                         type: Array,
                         computed: '_listMachines(stack.node_instances.*, model.machinesArray.*)',
@@ -740,10 +732,10 @@
                     // 'hasNodeInstancesChanged' : '_hasNodeInstancesChanged'
                 },
                 ready: function(){
-                    this.$.getJobLog.headers = {
-                        "csrf-token": CSRF_TOKEN,
-                        "Content-Type": "application/json"
-                    };
+                    // this.$.getJobLog.headers = {
+                    //     "csrf-token": CSRF_TOKEN,
+                    //     "Content-Type": "application/json"
+                    // };
                 },
                 test: function() {
                     var newmach = {
@@ -767,15 +759,9 @@
                         }
                     }
                 },
-                _computeHasNodeInstances: function(node_instances) {
-                    return node_instances.base && node_instances.base.length;
-                },
                 _computeOutputs: function(outputs) {
                     return Object.keys(outputs).map(function(key) {return {name: key, value: outputs[key]}});
                 },
-                // _hasNodeInstancesChanged: function(){
-                //     console.log("_hasNodeInstancesChanged");
-                // },
                 is_start_creation: function(stack) {
                     return stack.status == 'start_creation';
                 },
@@ -1096,7 +1082,10 @@
                 handleGetJobLog: function(e) {
                     console.log('getJobLog',e.detail.xhr.response.logs);
                     this.set('joblogs', e.detail.xhr.response.logs)
-                }
+                },
+                _makeString: function(info){
+                    return YAML.dump(info);
+                },
             });
         })();
     </script>
