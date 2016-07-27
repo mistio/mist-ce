@@ -539,10 +539,10 @@
             <div id="logs" class="page">
                 <h3 class="smallcaps">Job Logs <span class="small">job_id: [[stack.job_id]]</span></h3>
                 <paper-material>
-                    <template is="dom-repeat" items="[[joblogs]]" as="log">
-                        <iron-icon icon$="[[computeLogIcon(log,index)]]" class$="error-[[log.error]]"></iron-icon> 
-                        <span hidden$="[[!log.workflow]]">[[log.workflow]]</span> 
-                        [[log.action]] 
+                    <template is="dom-repeat" items="[[job.logs]]" as="log">
+                        <iron-icon icon$="[[computeLogIcon(log,index)]]" class$="error-[[log.error]]"></iron-icon>
+                        <span hidden$="[[!log.workflow]]">[[log.workflow]]</span>
+                        [[log.action]]
                         <span class="error" hidden="[[!log.error]]">error</span><br/>
                     </template>
                 </paper-material>
@@ -593,7 +593,7 @@
                     <paper-material class="no-pad info-card">
                         <h2 class="info-title">[[item.name]] <span class="info-title-id">id: [[item.id]]</span></h2>
                         <element-for-in content="[[item.runtime_properties]]"></element-for-in>
-                        <element-for-in content="[[item]]"></element-for-in>                        
+                        <element-for-in content="[[item]]"></element-for-in>
                     </paper-material>
                 </template>
             </div>
@@ -714,7 +714,6 @@
                         computed: 'is_ok(stack)'
                     },
                     job: Object,
-                    joblogs: Array,
                     outputsAreEmpty: {
                         type: Boolean,
                         computed: "_computeOutputsAreEmpty(stack)"
@@ -731,7 +730,6 @@
                 },
                 observers: [
                     'newJob(stack.job_id)',
-                    'jobFinished(job.job_finished_at)',
                     'stackoutputsChanged(stack.outputs)'
                 ],
                 listeners: {
@@ -739,14 +737,19 @@
                     'iron-select' : '_updateFields',
                     'iron-activate': '_handleInterval'
                 },
-                ready: function(){                    
+                ready: function(){
                 },
                 attached: function(){
                 },
                 newJob: function(id){
                     var that = this;
-                    if (!this.intervalID)
-                        this.intervalID = window.setInterval(function(that){that._updateLogs(that)}, 1000, that);
+                    if (!this.intervalID) {
+                        console.log('setting interval for job', id);
+                        this.intervalID = window.setInterval(
+                          function(that) {
+                            that._updateLogs();
+                          }, 5000, that);
+                    }
                     this.joblogs = [];
                 },
                 jobFinished: function(finished_at){
@@ -1058,6 +1061,10 @@
 
                 },
                 cancelWorkflow: function(e) {
+                    this.$.cancelJob.headers = {
+                        "csrf-token": CSRF_TOKEN,
+                        "Content-Type": "application/json"
+                    };
                     this.$.cancelJob.generateRequest();
                 },
                 handleCanceled: function(e) {},
@@ -1066,8 +1073,9 @@
                 handleWorkflowError: function(e) {},
                 handleGetJobLog: function(e) {
                     console.log('getJobLog',e.detail.xhr.response.logs);
-                    this.set('job', e.detail.xhr.response)
-                    this.set('joblogs', e.detail.xhr.response.logs)
+                    this.set('job', e.detail.xhr.response);
+                    if (this.job.finished_at > 0)
+                        this.jobFinished(this.job.finished_at);
                 },
                 stackoutputsChanged: function(outputs){
                     this.$.stackOutputs.innerHTML = this._makeString(outputs);
@@ -1087,7 +1095,7 @@
                     if (log.error) {
                         return 'icons:error-outline'
                     }
-                    else if (index == this.joblogs.length -1 && this.job.finished_at == 0){
+                    else if (index == this.job.logs.length -1 && this.job.finished_at == 0){
                         return '';
                     }
                     else {
