@@ -376,7 +376,7 @@
         }
         .info-title-id {
             color: rgba(0,0,0,0.54);
-            font-size: 0.9em;
+            font-size: 0.7em;
             padding-left: 8px;
         }
         /* TODO: better */
@@ -524,9 +524,9 @@
                 </div>
             </paper-material>
 
-            <template is="dom-if" if="[[ok]]">
+            <template is="dom-if" if="[[showAll]]">
                 <!-- If stack has resources -->
-                <div hidden$="[[!resourcelist]]">
+                <div hidden$="[[!node_instances.length]]">
                     <h3 class="smallcaps">Resources list</h3>
                     <template is="dom-if" if="[[listMachines.length]]">
                         <paper-material class="no-pad resources-list">
@@ -723,6 +723,10 @@
                     outputsAreEmpty: {
                         type: Boolean,
                         computed: "_computeOutputsAreEmpty(stack)"
+                    },
+                    showAll: {
+                        type: Boolean,
+                        computed: '_showAll(stack)'
                     }
                 },
                 observers: [
@@ -745,7 +749,7 @@
                         stack = this.model.stacks[params.id];
 
                     if (stack) {
-                        console.log('Stack',stack);
+                        // console.log('Stack',stack);
                         return stack;
                     } else {
                         return {
@@ -773,6 +777,9 @@
                 },
                 is_ok: function(stack) {
                     return stack.status == 'ok';
+                },
+                _showAll: function(stack) {
+                    return stack.status == 'ok' || stack.status == 'error';
                 },
                 _hideWorkflows: function(stack) {
                     return !stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
@@ -832,8 +839,6 @@
                     if (nis) {
                         nis.base.forEach(function(rtpy) {
                             if (rtpy.runtime_properties.mist_type == 'machine') {
-                                console.log('thing', rtpy.runtime_properties)
-
                                 var mac = this.model.machinesArray.find(function(mach) {
                                     return mach.uuid == rtpy.runtime_properties.info.uuid;
                                 });
@@ -896,8 +901,11 @@
                     return keys;
                 },
                 _computeWorkflows: function(workflows, templates) {
-                    var workflows = workflows.base;
+                    var workflows = workflows.base.filter(function(wf){
+                        return wf.name != 'scale' &&  wf.name != 'execute_operation';
+                    });
                     workflows.forEach(function(wf){
+                        console.log('_computeWorkflows', wf.name, wf.name != 'scale' && wf.name !="execute_operation" )
                         var yaml_inputs = '';
                         if (wf.params.length > 0 ) {
                             wf.params.forEach(function(wp){
