@@ -334,7 +334,7 @@
             margin: 0 auto;
             width: 70%;
         }
-        .error, iron-icon.error-true {
+        .log:not(.error-false) iron-icon, .log:not(.error-false) {
             color: var(--red-color);
         }
         .parsing-loader paper-progress {
@@ -491,6 +491,7 @@
                 </paper-material>
             </template>
 
+            <!-- If stack status workflow_started-->
             <template is="dom-if" if="[[workflow_started]]">
                 <paper-material>
                     <div class="parsing-loader">
@@ -540,10 +541,12 @@
                 <h3 class="smallcaps">Job Logs <span class="small">job_id: [[stack.job_id]]</span></h3>
                 <paper-material>
                     <template is="dom-repeat" items="[[job.logs]]" as="log">
-                        <iron-icon icon$="[[computeLogIcon(log,index)]]" class$="error-[[log.error]]"></iron-icon>
-                        <span hidden$="[[!log.workflow]]">[[log.workflow]]</span>
-                        [[log.action]]
-                        <span class="error" hidden="[[!log.error]]">error</span><br/>
+                        <div class$="log error-[[log.error]]">
+                            <iron-icon icon$="[[computeLogIcon(log,index)]]"></iron-icon> 
+                            <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>  
+                            [[log.action]]
+                            <span class="error" hidden="[[!log.error]]">error: [[log.error]]</span>
+                        </div>
                     </template>
                 </paper-material>
             </div>
