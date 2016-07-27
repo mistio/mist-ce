@@ -556,7 +556,7 @@
             </template>
 
             <!-- <template is="dom-if" if="[[ok]]"> -->
-            <div id="outputs" class="page" hidden$="[[!stack.outputs]]">
+            <div id="outputs" class="page" hidden$="[[!stack.outputs.length]]">
                 <h3 class="smallcaps">Outputs</h3>
                 <paper-material class="no-pad">
 
@@ -575,7 +575,7 @@
             </div> -->
             <!-- </template> -->
 
-            <div id="state" class="page" hidden$="[[!stack.node_instances]]">
+            <div id="state" class="page" hidden$="[[!stack.node_instances.length]]">
                 <h3 class="smallcaps">Runtime properties</h3>
                 <template is="dom-repeat" items="[[stack.node_instances]]">
                     <paper-material class="no-pad info-card">
