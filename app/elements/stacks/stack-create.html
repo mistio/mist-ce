@@ -277,7 +277,8 @@
                                 fieldValues: ["form"]
                             }
                             inp['label'] = inp.name.replace(/_/g,' ');
-                            inp['value'] = inp['defaultValue'] = inp.default;
+                            inp['defaultValue'] = inp.default;
+                            inp['value'] = inp['value'] || inp.default;
 
                             // Temp, before Tosca uses 'required' key
                             inp.required = false;
