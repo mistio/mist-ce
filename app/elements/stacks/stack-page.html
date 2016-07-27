@@ -537,7 +537,10 @@
                 <h3 class="smallcaps">Job Logs <span class="small">job_id: [[stack.job_id]]</span></h3>
                 <paper-material>
                     <template is="dom-repeat" items="[[joblogs]]" as="log">
-                        <iron-icon icon$="[[computeLogIcon(log,index)]]" class$="error-[[log.error]]"></iron-icon> [[log.action]] <span class="error" hidden="[[!log.error]]">error</span><br/>
+                        <iron-icon icon$="[[computeLogIcon(log,index)]]" class$="error-[[log.error]]"></iron-icon> 
+                        <span hidden$="[[!log.workflow]]">[[log.workflow]]</span> 
+                        [[log.action]] 
+                        <span class="error" hidden="[[!log.error]]">error</span><br/>
                     </template>
                 </paper-material>
             </div>
@@ -755,8 +758,8 @@
                 newJob: function(id){
                     var that = this;
                     if (!this.intervalID)
-                        console.log('this.intervalID', this.intervalID)
                         this.intervalID = window.setInterval(function(that){that._updateLogs(that)}, 1000, that);
+                    this.joblogs = [];
                 },
                 jobFinished: function(finished_at){
                     //update logs one last time
