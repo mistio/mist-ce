@@ -14,6 +14,7 @@
 <link rel="import" href="stack-network-item.html">
 <link rel="import" href="stack-key-item.html">
 
+
 <dom-module id="stack-page">
     <template>
         <style is="custom-style" include="lists"></style>
@@ -372,7 +373,9 @@
         #deploynow.hidden {
             display: none;
         }
+        #stackOutputs a,
         .blue-link {
+            font-size: 1em;
             color: var(--mist-blue);
         }
         .info-title-id {
@@ -580,10 +583,7 @@
             <div id="outputs" class="page" hidden$="[[outputsAreEmpty]]">
                 <h3 class="smallcaps">Outputs</h3>
                 <paper-material>
-                <!-- <element-for-in content="[[stack.outputs]]"></element-for-in> -->
-<pre>
-[[_makeString(stack.outputs)]]
-</pre>
+                    <pre id="stackOutputs"></pre>
                 </paper-material>
             </div>
 
@@ -596,27 +596,7 @@
                         <element-for-in content="[[item]]"></element-for-in>                        
                     </paper-material>
                 </template>
-
-                <!-- <template is="dom-if" if="[[stack.inputs]]">
-                    <h3 class="smallcaps">Stack Inputs </h3>
-                    <paper-material class="no-pad">
-                        <template is="dom-repeat" items="[[stack.inputs]]">
-                            <h2 class="info-title">[[item.name]]</h2>
-                            <element-for-in content="[[item]]"></element-for-in>
-                        </template>
-                    </paper-material>
-                </template> -->
-
             </div>
-
-            <!-- test show properties -->
-            <!-- <div class="text-center">
-                <template is="dom-if" if=[[stack.deploy]]> deploy? true </template>
-                <template is="dom-if" if=[[!stack.deploy]]> deploy? false </template>
-                <p> jobId: {{stack.job_id}}</p>
-                <p> status: {{stack.status}}</p>
-            </div> -->
-            <!-- <paper-button on-tap="test">test</paper-button> -->
             <div class="absolute-bottom-right">
                 <paper-fab id="install" icon="av:play-arrow" on-tap="_quickActionsNavigation" hidden$="[[ok]]" disabled$="[[disabled]]"></paper-fab>
             </div>
@@ -626,6 +606,9 @@
         <iron-ajax id="cancelJob" method="DELETE" url="/api/v1/jobs/[[stack.job_id]]" on-response="handleCanceled" on-error=""></iron-ajax>
         <iron-ajax id="getJobLog" method="GET" auto url="/api/v1/jobs/[[stack.job_id]]" handle-as="json" on-response="handleGetJobLog" on-error=""></iron-ajax>
     </template>
+
+    <script type="text/javascript" src="../../bower_components/anchorme/src/anchorme.min.js"></script>
+
     <script>
         (function() {
             'use strict';
@@ -748,7 +731,8 @@
                 },
                 observers: [
                     'newJob(stack.job_id)',
-                    'jobFinished(job.job_finished_at)'
+                    'jobFinished(job.job_finished_at)',
+                    'stackoutputsChanged(stack.outputs)'
                 ],
                 listeners: {
                     'change' : '_updateFields',
@@ -797,7 +781,6 @@
                     }
                 },
                 _computeHasResources: function(machines, networks, keys, nodeInstances){
-                    console.log('_computeHasResources',this.listMachines.length || this.networks.length || this.keys.length)
                     return this.listMachines.length || this.networks.length || this.keys.length;
                 },
                 _computeOutputsAreEmpty: function(stack) {
@@ -1086,8 +1069,13 @@
                     this.set('job', e.detail.xhr.response)
                     this.set('joblogs', e.detail.xhr.response.logs)
                 },
+                stackoutputsChanged: function(outputs){
+                    this.$.stackOutputs.innerHTML = this._makeString(outputs);
+                },
                 _makeString: function(info){
-                    return YAML.dump(info);
+                    console.log(YAML.dump(info));
+                    console.log(anchorme.js(YAML.dump(info)));
+                    return anchorme.js(YAML.dump(info).replace(/\'/g, ""));
                 },
                 _updateLogs: function(that){
                     if (that.stack && that.stack.status == 'workflow_started' || that.stack.status == 'start_creation'){
@@ -1098,6 +1086,9 @@
                 computeLogIcon: function(log, index){
                     if (log.error) {
                         return 'icons:error-outline'
+                    }
+                    else if (index == this.joblogs.length -1 && this.job.finished_at == 0){
+                        return '';
                     }
                     else {
                         return 'icons:done';
