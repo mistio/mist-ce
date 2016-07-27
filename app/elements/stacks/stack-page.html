@@ -556,12 +556,13 @@
             </template>
 
             <!-- <template is="dom-if" if="[[ok]]"> -->
-            <div id="outputs" class="page" hidden$="[[!stack.outputs.length]]">
+            <div id="outputs" class="page" hidden$="[[outputsAreEmpty]]">
                 <h3 class="smallcaps">Outputs</h3>
-                <paper-material class="no-pad">
-
-                        <element-for-in content="[[stack.outputs]]"></element-for-in>
-
+                <paper-material>
+                <!-- <element-for-in content="[[stack.outputs]]"></element-for-in> -->
+<pre>
+[[_makeString(stack.outputs)]]
+</pre>
                 </paper-material>
             </div>
             <!-- </template> -->
@@ -581,8 +582,7 @@
                     <paper-material class="no-pad info-card">
                         <h2 class="info-title">[[item.name]] <span class="info-title-id">id: [[item.id]]</span></h2>
                         <element-for-in content="[[item.runtime_properties]]"></element-for-in>
-                        <element-for-in content="[[item]]"></element-for-in>
-                        <!-- [[_makeString(item)]] -->
+                        <element-for-in content="[[item]]"></element-for-in>                        
                     </paper-material>
                 </template>
 
@@ -719,23 +719,17 @@
                         value: true,
                         computed: 'is_ok(stack)'
                     },
-                    joblogs: Array
+                    joblogs: Array,
+                    outputsAreEmpty: {
+                        type: Boolean,
+                        computed: "_computeOutputsAreEmpty(stack)"
+                    }
                 },
                 observers: [
-                    // '_runtimePropertiesChanged(stack.*,runtimeProperties.*)'
-                    // 'hasNodeInstancesChanged(stack)'
                 ],
                 listeners: {
-                    // 'confirmation': '_deleteStackResponse',
-                    // 'updateSelectedStack': '_updateStack',
-                    // 'stackChanged': '_stackChanged'
-                    // 'hasNodeInstancesChanged' : '_hasNodeInstancesChanged'
                 },
                 ready: function(){
-                    // this.$.getJobLog.headers = {
-                    //     "csrf-token": CSRF_TOKEN,
-                    //     "Content-Type": "application/json"
-                    // };
                 },
                 test: function() {
                     var newmach = {
@@ -758,6 +752,12 @@
                             name: "Stack is missing"
                         }
                     }
+                },
+                _computeOutputsAreEmpty: function(stack) {
+                    for(var p in stack.outputs){
+                        return false
+                    }
+                    return true;
                 },
                 _computeOutputs: function(outputs) {
                     return Object.keys(outputs).map(function(key) {return {name: key, value: outputs[key]}});
@@ -824,23 +824,6 @@
                 _computeJobID: function(stack) {
                     return stack.job_id ? stack.job_id : false;
                 },
-                // _runtimeProperties: function(stack){
-                //     var rtp = [];
-                //     var state = stack.node_instances;
-                //     if(state) {
-                //         for (var i = 0; i < state.length; i++) {
-                //             var rtpObj = state[i].runtime_properties;
-                //             if (rtpObj) {
-                //                 rtpObj.name = state[i].name;
-                //                 rtp.push(rtpObj);
-                //             }
-                //         }
-                //     }
-                //     return rtp;
-                // },
-                // _runtimePropertiesChanged: function(stack,changerecord){
-                //     this.updateResources(this.runtimeProperties);
-                // },
                 _machines: function(stack) {
                     return stack.machines;
                 },
@@ -912,11 +895,6 @@
                     }
                     return keys;
                 },
-                // updateLists: function (node_instances){
-                //     console.log("node_instances: ",node_instances);
-                //     var stack = this.stack;
-                //     this._listMachines(stack);
-                // },
                 _computeWorkflows: function(workflows, templates) {
                     var workflows = workflows.base;
                     workflows.forEach(function(wf){
@@ -1002,35 +980,6 @@
                     this.selected = 1;
                     this._workflowNavigation(e);
                 },
-                // updateResources: function(runtimeProperties){
-                //     var machines = [];
-                //     var keys = [];
-                //     this.async(function(){
-                //         if (runtimeProperties) {
-                //             runtimeProperties.forEach(function(rtpy) {
-                //                 if (rtpy.mist_type == 'machine'){
-                //                     var mac = this.model.machinesArray.find(function(mach){
-                //                         return mach.id == rtpy.machine_id
-                //                     }, this);
-                //                     if (mac)
-                //                         machines.push(mac);
-                //                 }
-                //                 else if (rtpy.mist_type == 'keypair') {
-                //                     var key = this.model.keysArray.find(function(key){
-                //                         return key.id == rtpy.key_id
-                //                     }, this);
-                //                     if (key)
-                //                         keys.push(key);
-                //                 }
-                //             }, this);
-                //         }
-                //         if(keys.length>0 || machines.length>0)
-                //             this.updateResourcelist('true');
-                //     });
-                // },
-                // updateResourcelist: function(val){
-                //     this.set("resourceList", true);
-                // },
                 doWorkflow: function(e) {
                     var action = e.target.id;
                     this.$.workflows.classList.add('open');
