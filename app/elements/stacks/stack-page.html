@@ -379,6 +379,9 @@
             font-size: 0.7em;
             padding-left: 8px;
         }
+        #logs {
+            line-height: 2em;
+        }
         /* TODO: better */
         .tag {
             padding: 0.5em;
@@ -524,6 +527,17 @@
                 </div>
             </paper-material>
 
+            <!-- <template is="dom-if" if="[[ok]]"> -->
+            <div id="logs" class="page">
+                <h3 class="smallcaps">Job Logs</h3>
+                <paper-material>
+                    <template is="dom-repeat" items="[[joblogs]]" as="log">
+                        [[log.action]]<span class="error" hidden="[[!log.error]]">error</span><br/>
+                    </template>
+                </paper-material>
+            </div>
+            <!-- </template> -->
+
             <template is="dom-if" if="[[showAll]]">
                 <!-- If stack has resources -->
                 <div hidden$="[[!node_instances.length]]">
@@ -555,7 +569,6 @@
                 </div>
             </template>
 
-            <!-- <template is="dom-if" if="[[ok]]"> -->
             <div id="outputs" class="page" hidden$="[[outputsAreEmpty]]">
                 <h3 class="smallcaps">Outputs</h3>
                 <paper-material>
@@ -565,16 +578,6 @@
 </pre>
                 </paper-material>
             </div>
-            <!-- </template> -->
-
-            <!-- <template is="dom-if" if="[[ok]]"> -->
-            <!-- <div id="outputs" class="page">
-                <h3 class="smallcaps">Job Logs</h3>
-                <template is="dom-repeat" items="[[joblogs]]" as="log">
-                    <p>[[log.action]] <span class="error" hidden="[[!log.error]]">error</span></p>
-                </template>
-            </div> -->
-            <!-- </template> -->
 
             <div id="state" class="page" hidden$="[[!stack.node_instances.length]]">
                 <h3 class="smallcaps">Runtime properties</h3>
@@ -613,7 +616,7 @@
         <dialog-element></dialog-element>
         <iron-ajax id="workflowRequest" method="POST" url="" on-response="handleWorkflowResponse" on-error="handleWorkflowError"></iron-ajax>
         <iron-ajax id="cancelJob" method="DELETE" url="/api/v1/jobs/[[stack.job_id]]" on-response="handleCanceled" on-error=""></iron-ajax>
-        <!-- <iron-ajax id="getJobLog" method="GET" auto url="/api/v1/jobs/[[stack.job_id]]" handle-as="json" on-response="handleGetJobLog" on-error=""></iron-ajax> -->
+        <iron-ajax id="getJobLog" method="GET" auto url="/api/v1/jobs/[[stack.job_id]]" handle-as="json" on-response="handleGetJobLog" on-error=""></iron-ajax>
     </template>
     <script>
         (function() {
@@ -1023,7 +1026,7 @@
 
                     this.$.workflowRequest.body = {
                         "workflow": action,
-                        "inputs": this.stack.inputs.install
+                        "inputs": this.stack.inputs.install.install
                     };
 
                     this.$.deploynow.classList.add('hidden');
