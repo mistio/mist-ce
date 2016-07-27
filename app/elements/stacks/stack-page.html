@@ -732,7 +732,7 @@
                     }
                 },
                 observers: [
-                    'newStackPage(params.id)',
+                    'newStackPage(stack.id)',
                     'newJob(stack.job_id)',
                     'stackoutputsChanged(stack.outputs)'
                 ],
@@ -747,14 +747,14 @@
                 },
                 newJob: function(id){
                     var that = this;
-                    if (!this.intervalID) {
-                        console.log('setting interval for job', this.stack.job_id);
+                    // if (!this.intervalID) {
                         this.intervalID = window.setInterval(
                           function(that) {
                             that._updateLogs(that);
-                          }, 5000, that);
-                    }
-                    this.joblogs = [];
+                          }, 1000, that);
+                        console.log('setting interval for job', this.intervalID);
+                    // }
+                    
                 },
                 jobFinished: function(finished_at){
                     //update logs one last time
@@ -1118,8 +1118,9 @@
 
                 },
                 newStackPage: function(id){
+                    console.log('un setting interval for', this.intervalID);
                     window.clearInterval(this.intervalID);
-                    this.intervalID = 0; 
+                    this.intervalID = null;
                 }
             });
         })();
