@@ -47,16 +47,29 @@ class AmazonController(BaseController):
 
     def list_images(self, search=None):
         default_images = config.EC2_IMAGES[self.cloud.region]
-        starred_ids = [image_id for image_id in self.cloud.starred
-                       if self.cloud.starred[image_id]
-                       and image_id not in default_images]
-        image_ids = default_images.keys() + starred_ids
-        images = self.connection.list_images(None, image_ids)
-        for image in images:
-            if image.id in default_images:
-                image.name = default_images[image.id]
-        images += self.connection.list_images(ex_owner='amazon')
-        images += self.connection.list_images(ex_owner='self')
+        image_ids = default_images.keys() + self.cloud.starred
+        if not search:
+            images = self.connection.list_images(None, image_ids)
+            for image in images:
+                if image.id in default_images:
+                    image.name = default_images[image.id]
+            images += self.connection.list_images(ex_owner='self')
+        else:
+            # FIXME:
+            # image_models = CloudImage.objects(
+            #     me.Q(cloud_provider=conn.type, image_id__icontains=term) |
+            #     me.Q(cloud_provider=conn.type, name__icontains=term)
+            # )[:200]
+            image_models = []
+            images = [NodeImage(id=image.image_id, name=image.name,
+                                driver=self.connection, extra={})
+                      for image in image_models]
+            if not images:
+                # Actual search on EC2.
+                images = self.connection.list_images(
+                    ex_filters={'name': '*%s*' % search}
+                )
+
         return self._post_parse_images(images)
 
     def list_locations(self):
@@ -150,16 +163,17 @@ class AzureController(BaseController):
     def list_images(self, search=None):
         images = self.connection.list_images()
         images = [image for image in images
-                  if 'windows' not in image.name.lower()
-                  and 'RightImage' not in image.name]
-        # there are many builds for some images eg Ubuntu).
+                  if 'RightImage' not in image.name
+                  and 'Barracude' not in image.name
+                  and 'BizTalk' not in image.name]
+        # There are many builds for some images eg Ubuntu.
         # All have the same name!
         images_dict = {}
         for image in images:
             if image.name not in images_dict:
                 images_dict[image.name] = image
-        images = sorted(images_dict.values(), key=lambda image: image.name)
-        return self._post_parse_images(images, search)
+
+        return self._post_parse_images(images_dict.values(), search)
 
 
 class GoogleController(BaseController):
@@ -170,13 +184,11 @@ class GoogleController(BaseController):
 
     def list_images(self, search=None):
         images = self.connection.list_images()
-        for project in ('debian-cloud', 'centos-cloud',
-                        'suse-cloud', 'rhel-cloud'):
-            try:
-                images += self.connection.list_images(ex_project=project)
-            except:
-                pass
-        images = [image for image in images if not image.extra['deprecated']]
+
+        # GCE has some objects in extra so we make sure they are not passed.
+        for image in images:
+            image.extra.pop('licenses', None)
+
         return self._post_parse_images(images, search)
 
     def list_sizes(self):
@@ -324,16 +336,19 @@ class DockerController(BaseController):
                                            host, port)
 
     def list_images(self, search=None):
-        mist_images = [NodeImage(id=image, name=name,
-                                 driver=self.connection, extra={})
-                       for image, name in config.DOCKER_IMAGES.items()]
+        # Fetch mist's recommended images
+        images = [NodeImage(id=image, name=name,
+                            driver=self.connection, extra={})
+                  for image, name in config.DOCKER_IMAGES.items()]
+
+        # Fetch images from libcloud (supports search).
         if search:
-            images = self.connection.search_images(term=search)
-            parsed = self._post_parse_images(mist_images, search)
-            return parsed + self._post_parse_images(images)
+            images += self.connection.search_images(term=search)[:100]
         else:
-            images = self.connection.list_images()
-            return self._post_parse_images(mist_images + images)
+            images += self.connection.list_images()
+
+        # Parse and return images
+        return self._post_parse_images(images, search)
 
     def image_is_default(self, image_id):
         return image_id in config.DOCKER_IMAGES
@@ -366,6 +381,12 @@ class LibvirtController(BaseController):
         xml_desc = machine['extra'].get('xml_description')
         if xml_desc:
             machine['extra']['xml_description'] = escape(xml_desc)
+
+    def list_images(self, search=None):
+        return self._post_parse_images(
+            self.connection.list_images(location=self.cloud.images_location),
+            search
+        )
 
 
 # FIXME

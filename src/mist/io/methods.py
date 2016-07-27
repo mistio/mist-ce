@@ -2664,87 +2664,8 @@ def ssh_command(user, cloud_id, machine_id, host, command,
 
 
 def list_images(user, cloud_id, term=None):
-    """List images from each cloud.
-
-    Furthermore if a search_term is provided, we loop through each
-    cloud and search for that term in the ids and the names of
-    the community images
-
-    """
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
-    conn = connect_provider(cloud)
-    try:
-        starred = list(cloud.starred)
-        # Initialize arrays
-        starred_images = []
-        ec2_images = []
-        rest_images = []
-        images = []
-        if conn.type in config.EC2_PROVIDERS and not term:
-            imgs = config.EC2_IMAGES[conn.type].keys() + starred
-            ec2_images = conn.list_images(None, imgs)
-            for image in ec2_images:
-                image.name = config.EC2_IMAGES[conn.type].get(image.id, image.name)
-            ec2_images += conn.list_images(ex_owner="self")
-        elif conn.type in config.EC2_PROVIDERS and term:
-            images = CloudImage.objects( me.Q(cloud_provider=conn.type, image_id__icontains=term) | me.Q(cloud_provider=conn.type, name__icontains=term))[:200]
-            images = [NodeImage(id=image.image_id, name=image.name, driver=conn, extra={}) for image in images]
-            if not images:
-                # actual search on ec2
-                images = conn.list_images(ex_filters={'name': '*%s*' % term})
-        elif conn.type == Provider.GCE:
-            rest_images = conn.list_images()
-            for gce_image in rest_images:
-                if gce_image.extra.get('licenses'):
-                    gce_image.extra['licenses'] = None
-            # GCE has some objects in extra so we make sure they are not passed
-        elif conn.type == Provider.AZURE:
-            # do not show Microsoft Windows images
-            # from Azure's response we can't know which images are default
-            rest_images = conn.list_images()
-            rest_images = [image for image in rest_images if 'windows' not in image.name.lower()
-                           and 'RightImage' not in image.name and 'Barracuda' not in image.name and 'BizTalk' not in image.name]
-            temp_dict = {}
-            for image in rest_images:
-                temp_dict[image.name] = image
-            #there are many builds for some images -eg Ubuntu). All have the same name!
-            rest_images = sorted(temp_dict.values(), key=lambda k: k.name)
-        elif conn.type == Provider.DOCKER:
-            #get mist.io default docker images from config
-            rest_images = [NodeImage(id=image, name=name, driver=conn, extra={})
-                              for image, name in config.DOCKER_IMAGES.items()]
-            rest_images += conn.list_images()
-        elif conn.type == Provider.LIBVIRT:
-            rest_images = conn.list_images(location=cloud.images_location)
-        else:
-            rest_images = conn.list_images()
-            starred_images = [image for image in rest_images
-                              if image.id in starred]
-
-        if not term:
-            images = starred_images + ec2_images + rest_images
-            images = [img for img in images
-                      if img.name and img.id[:3] not in ['aki', 'ari']
-                      and 'windows' not in img.name.lower()]
-        elif term and term is not None:
-            term = term.lower()
-            if conn.type == Provider.LIBVIRT:
-            # fetch a new listing of the images and search for the term
-                images = conn.list_images()
-            elif conn.type == 'docker':
-                images = conn.search_images(term=term)[:100]
-            #search directly on docker registry for the query
-
-    except Exception as e:
-        log.error(repr(e))
-        raise CloudUnavailableError(cloud_id, e)
-    ret = [{'id': image.id,
-            'extra': image.extra,
-            'name': image.name,
-            'star': _image_starred(user, cloud_id, image.id)}
-           for image in images]
-
-    return ret
+    """List images from each cloud"""
+    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_images()
 
 
 def _image_starred(user, cloud_id, image_id):

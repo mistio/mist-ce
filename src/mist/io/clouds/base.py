@@ -296,22 +296,34 @@ class BaseController(object):
         return True
 
     def _post_parse_images(self, images, search=None):
+
+        # Filter out invalid images.
         images = [image for image in images
                   if image.name and image.id[:3] not in ('aki', 'ari')
-                  and 'windows' not in image.name.lower()
-                  and 'hvm' not in image.name.lower()]
+                  and 'windows' not in image.name.lower()]
+
+        # Filter images based on search term.
         if search:
             search = str(search).lower()
             images = [image for image in images
                       if search in image.id.lower()
                       or search in image.name.lower()]
 
+        # Filter out duplicate images, if any.
+        seen_ids = set()
+        for i in reversed(xrange(len(images))):
+            if image.id in seen_ids:
+                images.pop(i)
+            else:
+                seen_ids.add(image.id)
+
         # sort images in following groups, then alphabetically:
-        # {0: default and starred, 1: default,
-        #  2: not default and starred, 3: default and unstarred,
-        #  4: not default, 5: not default and unstarred}
-        # if self.default_images is empty, all images are considered to be
-        # default
+        # 0: default and starred
+        # 1: not default and starred
+        # 2: default
+        # 3: default and unstarred
+        # 4: not default
+        # 5: not default and unstarred
         sortvals = {}
         for image in images:
             if self.image_is_default(image.id):
@@ -324,12 +336,12 @@ class BaseController(object):
                         sortvals[image.id] = 3
                 else:
                     # default
-                    sortvals[image.id] = 1
+                    sortvals[image.id] = 2
             else:
                 if image.id in self.cloud.starred:
                     if self.cloud.starred[image.id]:
                         # not default and starred
-                        sortvals[image.id] = 2
+                        sortvals[image.id] = 1
                     else:
                         # not default and unstarred
                         sortvals[image.id] = 5
@@ -338,9 +350,9 @@ class BaseController(object):
                     sortvals[image.id] = 4
         images.sort(key=lambda image: (sortvals[image.id], image.name.lower()))
 
-        # images with sortvals 0, 1, 2 will be labeled as actually starred
-        # these correspond to images that are either starred in the cloud
-        # or considered default
+        # Images with sortvals 0, 1, 2 will be labeled as actually starred.
+        # These correspond to images that are either starred in the cloud
+        # or considered default.
         return [{'id': image.id,
                  'name': image.name,
                  'extra': image.extra,
