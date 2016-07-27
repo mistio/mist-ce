@@ -548,7 +548,7 @@
 
             <template is="dom-if" if="[[showAll]]">
                 <!-- If stack has resources -->
-                <div hidden$="[[!node_instances.length]]">
+                <div hidden$="[[!hasResources]]">
                     <h3 class="smallcaps">Resources list</h3>
                     <template is="dom-if" if="[[listMachines.length]]">
                         <paper-material class="no-pad resources-list">
@@ -740,7 +740,11 @@
                         type: Boolean,
                         computed: '_showAll(stack)'
                     },
-                    intervalID: String
+                    intervalID: String,
+                    hasResources: {
+                        type: Boolean,
+                        computed: '_computeHasResources(listMachines.*, networks.*, keys.*, stack.node_instances.*)'
+                    }
                 },
                 observers: [
                     'newJob(stack.job_id)',
@@ -791,6 +795,10 @@
                             name: "Stack is missing"
                         }
                     }
+                },
+                _computeHasResources: function(machines, networks, keys, nodeInstances){
+                    console.log('_computeHasResources',this.listMachines.length || this.networks.length || this.keys.length)
+                    return this.listMachines.length || this.networks.length || this.keys.length;
                 },
                 _computeOutputsAreEmpty: function(stack) {
                     for(var p in stack.outputs){
