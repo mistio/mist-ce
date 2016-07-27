@@ -1,10 +1,16 @@
+"""Definition of base classes for Clouds
+
+This currently contains only BaseController. It includes basic functionality
+for a given cloud (including libcloud calls, fetching and storing information
+to database etc. Cloud specific controllers are in
+`mist.io.clouds.controllers`.
+
+"""
+
 import ssl
-import uuid
 import json
 import logging
 import datetime
-
-import mongoengine as me
 
 from libcloud.common.types import InvalidCredsError
 from libcloud.compute.base import Node, NodeLocation
@@ -18,7 +24,6 @@ from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.core.tag.models import Tag
 from mist.core.cloud.models import Machine
-from mist.core.user.models import Organization
 
 
 log = logging.getLogger(__name__)
@@ -49,45 +54,6 @@ def tags_to_dict(tags):
             elif 'key' in tag:
                 tdict[tag['key']] = tag.get('value')
     return tdict
-
-
-class Cloud(me.Document):
-    """Base class for every cloud/provider mongoengine model"""
-
-    id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
-    owner = me.ReferenceField(Organization, required=True)
-
-    title = me.StringField(required=True, unique_with="owner")
-    enabled = me.BooleanField(default=True)
-
-    machine_count = me.IntField(default=0)
-
-    starred = me.ListField()
-    unstarred = me.ListField()
-
-    meta = {'allow_inheritance': True}
-    # FIXME: use a different collection name to avoid conflicts when migrating
-    # previous models.
-    # TODO: Add index on owner
-
-    _controller_cls = None
-
-    def __init__(self, *args, **kwargs):
-        super(Cloud, self).__init__(*args, **kwargs)
-        if self._controller_cls is None:
-            raise NotImplementedError()
-        self.ctl = self._controller_cls(self)
-
-    def delete(self):
-        super(Cloud, self).delete()
-        Tag.objects(resource=self).delete()
-
-    def as_dict(self):
-        return json.loads(self.to_json())
-
-    def __str__(self):
-        return '%s cloud %s (%s) of %s' % (type(self), self.title,
-                                           self.id, self.owner)
 
 
 class BaseController(object):

@@ -16,6 +16,7 @@ accessed through a cloud model, using the `ctl` abbreviation, like this:
 
     cloud = mist.io.clouds.models.Cloud.objects.get(id=cloud_id)
     print cloud.ctl.list_machines()
+
 """
 
 
@@ -41,7 +42,7 @@ log = logging.getLogger(__name__)
 class AmazonController(BaseController):
     def connect(self):
         return get_driver(Provider.EC2)(self.cloud.apikey,
-                                        self.cloud.api_secret,
+                                        self.cloud.apisecret,
                                         region=self.cloud.region)
 
     def list_images(self, search=None):
