@@ -735,6 +735,8 @@
                 observers: [
                 ],
                 listeners: {
+                    'change' : '_updateFields',
+                    'iron-select' : '_updateFields',
                 },
                 ready: function(){
                 },
@@ -908,7 +910,6 @@
                         return wf.name != 'scale' &&  wf.name != 'execute_operation';
                     });
                     workflows.forEach(function(wf){
-                        console.log('_computeWorkflows', wf.name, wf.name != 'scale' && wf.name !="execute_operation" )
                         var yaml_inputs = '';
                         if (wf.params.length > 0 ) {
                             wf.params.forEach(function(wp){
@@ -917,7 +918,8 @@
                                     fieldName: "yaml_or_form",
                                     fieldValues: ["form"]
                                 }
-                                wp.defaultValue = wp.default;
+                                wp.label = wp.name;
+                                wp.value = wp.defaultValue = wp.default;
                             });
                             var param1 = {
                                 name: "yaml_or_form",
@@ -1008,7 +1010,7 @@
                     };
                     if (action == 'install') {
                         this.$.deploynow.classList.add('hidden');
-                        this.$.workflowRequest.body["inputs"] = this.stack.inputs;
+                        this.$.workflowRequest.body["inputs"] = this.stack.inputs.install;
                     }
                     this.$.workflowRequest.generateRequest();
                 },
@@ -1026,7 +1028,7 @@
 
                     this.$.workflowRequest.body = {
                         "workflow": action,
-                        "inputs": this.stack.inputs.install.install
+                        "inputs": this.stack.inputs.install
                     };
 
                     this.$.deploynow.classList.add('hidden');
@@ -1046,6 +1048,9 @@
                 _makeString: function(info){
                     return YAML.dump(info);
                 },
+                _updateFields: function(){
+                    
+                }
             });
         })();
     </script>
