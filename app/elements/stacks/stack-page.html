@@ -876,7 +876,7 @@
                     if (nis) {
                         nis.base.forEach(function(rtpy) {
                             if (rtpy.runtime_properties.mist_type == 'keypair') {
-                                var key = this.model.keys[rtpy.runtime_properties.mist_resource_id];
+                                var key = this.model.keys[rtpy.runtime_properties.key];
 
                                 if (key) {
                                     keys.push(key);
