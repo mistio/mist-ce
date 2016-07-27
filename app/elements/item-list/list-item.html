@@ -208,8 +208,8 @@ Polymer({
 
         if (field == 'stack state') {
             var status = document.querySelector('app-main').model.stacks[item.id].status;
-            if (status && status.startsWith('Error')){
-                return 'Error'
+            if (status && status != 'ok'){
+                return status
             }
         }
 
