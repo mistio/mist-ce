@@ -7,6 +7,7 @@
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../app-togglable/app-togglable-list.html">
 <link rel="import" href="../app-form/app-form.html">
+<link rel="import" href="../app-icons/app-icons.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 
 <link rel="import" href="stack-machine-item.html">
@@ -332,7 +333,7 @@
             margin: 0 auto;
             width: 70%;
         }
-        .error {
+        .error, iron-icon.error-true {
             color: var(--red-color);
         }
         .parsing-loader paper-progress {
@@ -386,6 +387,10 @@
         .tag {
             padding: 0.5em;
             display: inline;
+        }
+        .small {
+            text-transform: none;
+            font-size: 0.9em;
         }
         </style>
         <div id="content">
@@ -529,10 +534,10 @@
 
             <!-- <template is="dom-if" if="[[ok]]"> -->
             <div id="logs" class="page">
-                <h3 class="smallcaps">Job Logs</h3>
+                <h3 class="smallcaps">Job Logs <span class="small">job_id: [[stack.job_id]]</span></h3>
                 <paper-material>
                     <template is="dom-repeat" items="[[joblogs]]" as="log">
-                        [[log.action]]<span class="error" hidden="[[!log.error]]">error</span><br/>
+                        <iron-icon icon$="[[computeLogIcon(log,index)]]" class$="error-[[log.error]]"></iron-icon> [[log.action]] <span class="error" hidden="[[!log.error]]">error</span><br/>
                     </template>
                 </paper-material>
             </div>
@@ -722,6 +727,7 @@
                         value: true,
                         computed: 'is_ok(stack)'
                     },
+                    job: Object,
                     joblogs: Array,
                     outputsAreEmpty: {
                         type: Boolean,
@@ -730,15 +736,36 @@
                     showAll: {
                         type: Boolean,
                         computed: '_showAll(stack)'
-                    }
+                    },
+                    intervalID: String
                 },
                 observers: [
+                    'newJob(stack.job_id)',
+                    'jobFinished(job.job_finished_at)'
                 ],
                 listeners: {
                     'change' : '_updateFields',
                     'iron-select' : '_updateFields',
+                    'iron-activate': '_handleInterval'
                 },
-                ready: function(){
+                ready: function(){                    
+                },
+                attached: function(){
+                },
+                newJob: function(id){
+                    var that = this;
+                    if (!this.intervalID)
+                        console.log('this.intervalID', this.intervalID)
+                        this.intervalID = window.setInterval(function(that){that._updateLogs(that)}, 1000, that);
+                },
+                jobFinished: function(finished_at){
+                    //update logs one last time
+                    this._updateLogs(this);
+                    //clear interval
+                    if (this.job && this.job.finished_at > 0 && this.intervalID){
+                        window.clearInterval(this.intervalID);
+                        this.intervalID = null;
+                    }
                 },
                 test: function() {
                     var newmach = {
@@ -883,6 +910,7 @@
                 },
                 _listKeys: function(nis) {
                     var keys = [];
+
                     if (nis) {
                         nis.base.forEach(function(rtpy) {
                             if (rtpy.runtime_properties.mist_type == 'keypair') {
@@ -1033,6 +1061,7 @@
 
                     this.$.deploynow.classList.add('hidden');
                     this.$.workflowRequest.generateRequest();
+
                 },
                 cancelWorkflow: function(e) {
                     this.$.cancelJob.generateRequest();
@@ -1043,14 +1072,29 @@
                 handleWorkflowError: function(e) {},
                 handleGetJobLog: function(e) {
                     console.log('getJobLog',e.detail.xhr.response.logs);
+                    this.set('job', e.detail.xhr.response)
                     this.set('joblogs', e.detail.xhr.response.logs)
                 },
                 _makeString: function(info){
                     return YAML.dump(info);
                 },
+                _updateLogs: function(that){
+                    if (that.stack && that.stack.status == 'workflow_started' || that.stack.status == 'start_creation'){
+                        console.log('_updateLogs');
+                        that.$.getJobLog.generateRequest();
+                    }
+                },
+                computeLogIcon: function(log, index){
+                    if (log.error) {
+                        return 'icons:error-outline'
+                    }
+                    else {
+                        return 'icons:done';
+                    }
+                },
                 _updateFields: function(){
-                    
-                }
+
+                },
             });
         })();
     </script>
