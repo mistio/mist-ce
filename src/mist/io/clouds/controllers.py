@@ -243,26 +243,22 @@ class GoogleController(BaseController):
                           machine['uuid'], machine['name'], self.cloud)
 
 
-# FIXME
 class HostVirtualController(BaseController):
     def connect(self):
         return get_driver(Provider.HOSTVIRTUAL)(self.cloud.apikey)
 
 
-# FIXME
 class PacketController(BaseController):
     def connect(self):
         return get_driver(Provider.PACKET)(self.cloud.apikey,
                                            project=self.cloud.project_id)
 
 
-# FIXME
 class VultrController(BaseController):
     def connect(self):
         return get_driver(Provider.VULTR)(self.cloud.apikey)
 
 
-# FIXME
 class VSphereController(BaseController):
     def connect(self):
         host = dnat(self.cloud.owner, self.cloud.host)
@@ -271,7 +267,6 @@ class VSphereController(BaseController):
                                             password=self.cloud.password)
 
 
-# FIXME
 class VCloudController(BaseController):
     def connect(self):
         host = dnat(self.cloud.owner, self.cloud.host)
@@ -344,7 +339,6 @@ class DockerController(BaseController):
         return image_id in config.DOCKER_IMAGES
 
 
-# FIXME
 class LibvirtController(BaseController):
     def connect(self):
         """Three supported ways to connect: local system, qemu+tcp, qemu+ssh"""
