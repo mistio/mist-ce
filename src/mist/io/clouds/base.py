@@ -420,3 +420,6 @@ class BaseController(object):
     def resize_machine(self, machine_id, plan_id):
         self.connection.ex_resize_node(self.get_machine_node(machine_id, True),
                                        plan_id)
+
+    def __del__(self):
+        self.disconnect()
