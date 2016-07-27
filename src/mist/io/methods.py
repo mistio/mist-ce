@@ -2826,45 +2826,8 @@ def list_keys(user):
 
 
 def list_sizes(user, cloud_id):
-    """List sizes (aka flavors) from each cloud."""
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
-    conn = connect_provider(cloud)
-
-    try:
-        if conn.type == Provider.GCE:
-            initial_sizes = conn.list_sizes()
-            sizes = []
-            for size in initial_sizes:
-                zone = size.extra['zone']
-                size.extra['zone'] = {}
-                size.extra['zone']['id'] = zone.id
-                size.extra['zone']['name'] = zone.name
-                size.extra['zone']['status'] = zone.status
-                size.extra['zone']['country'] = zone.country
-                sizes.append(size)
-        elif conn.type == Provider.NEPHOSCALE:
-            sizes = conn.list_sizes(baremetal=False)
-            dedicated = conn.list_sizes(baremetal=True)
-            sizes.extend(dedicated)
-        else:
-            sizes = conn.list_sizes()
-    except Exception as exc:
-        raise CloudUnavailableError(cloud_id, exc)
-
-    ret = []
-    for size in sizes:
-        ret.append({'id': size.id,
-                    'bandwidth': size.bandwidth,
-                    'disk': size.disk,
-                    'driver': size.driver.name,
-                    'name': size.name,
-                    'price': size.price,
-                    'extra': size.extra,
-                    'ram': size.ram})
-    if conn.type == 'libvirt':
-        # close connection with libvirt
-        conn.disconnect()
-    return ret
+    """List sizes (aka flavors) from each cloud"""
+    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_sizes()
 
 
 def list_locations(user, cloud_id):

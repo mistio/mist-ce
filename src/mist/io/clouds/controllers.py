@@ -174,12 +174,15 @@ class GoogleController(BaseController):
         return self._post_parse_images(images, search)
 
     def list_sizes(self):
-        # have to get sizes for one location only, since list_sizes returns
-        # sizes for all zones (currently 88 sizes)
-        sizes = self.connection.list_sizes(location='us-central1-a')
-        # deprecated sizes for GCE
-        sizes = [size for size in sizes
-                 if size.name and not size.name.endswith('-d')]
+        sizes = self.connection.list_sizes()
+        for size in sizes:
+            zone = size.extra.pop('zone')
+            size.extra['zone'] = {
+                'id': zone.id,
+                'name': zone.name,
+                'status': zone.status,
+                'country': zone.country,
+            }
         return self._post_parse_sizes(sizes)
 
     def _post_parse_machine(self, machine, machine_model):

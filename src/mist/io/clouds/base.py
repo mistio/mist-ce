@@ -357,7 +357,8 @@ class BaseController(object):
                  'disk': size.disk,
                  'driver': size.driver.name,
                  'price': size.price,
-                 'ram': size.ram} for size in sizes]
+                 'ram': size.ram,
+                 'extra': size.extra} for size in sizes]
 
     def list_locations(self):
         try:
