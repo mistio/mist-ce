@@ -2831,44 +2831,8 @@ def list_sizes(user, cloud_id):
 
 
 def list_locations(user, cloud_id):
-    """List locations from each cloud.
-
-    Locations mean different things in each cloud. e.g. EC2 uses it as a
-    datacenter in a given availability zone, whereas Linode lists availability
-    zones. However all responses share id, name and country eventhough in some
-    cases might be empty, e.g. Openstack.
-
-    In EC2 all locations by a provider have the same name, so the availability
-    Cloud.objects.get(owner=user, id=cloud_id)
-    zones are listed instead of name.
-
-    """
-
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
-    conn = connect_provider(cloud)
-
-    try:
-        locations = conn.list_locations()
-    except:
-        locations = [NodeLocation('', name='default', country='', driver=conn)]
-
-    ret = []
-    for location in locations:
-        if conn.type in config.EC2_PROVIDERS:
-            try:
-                name = location.availability_zone.name
-            except:
-                name = location.name
-        else:
-            name = location.name
-
-        ret.append({'id': location.id,
-                    'name': name,
-                    'country': location.country})
-    if conn.type == 'libvirt':
-        # close connection with libvirt
-        conn.disconnect()
-    return ret
+    """List locations from each cloud"""
+    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_locations()
 
 
 def list_networks(user, cloud_id):

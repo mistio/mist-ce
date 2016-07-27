@@ -60,6 +60,12 @@ class AmazonController(BaseController):
         return self._post_parse_images(images)
 
     def list_locations(self):
+        """List availability zones for EC2 region
+
+        In EC2 all locations of a region have the same name, so the
+        availability zones are listed instead.
+
+        """
         locations = self.connection.list_locations()
         for location in locations:
             try:

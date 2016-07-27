@@ -361,6 +361,14 @@ class BaseController(object):
                  'extra': size.extra} for size in sizes]
 
     def list_locations(self):
+        """List locations from each cloud
+
+        Locations mean different things in each cloud. e.g. EC2 uses it as a
+        datacenter in a given availability zone, whereas Linode lists
+        availability zones. However all responses share id, name and country
+        eventhough in some cases might be empty, e.g. Openstack.
+
+        """
         try:
             locations = self.connection.list_locations()
         except:
