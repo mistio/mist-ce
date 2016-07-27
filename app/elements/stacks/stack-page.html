@@ -732,6 +732,7 @@
                     }
                 },
                 observers: [
+                    'newStackPage(params.id)',
                     'newJob(stack.job_id)',
                     'stackoutputsChanged(stack.outputs)'
                 ],
@@ -758,9 +759,12 @@
                 jobFinished: function(finished_at){
                     //update logs one last time
                     // this._updateLogs(this);
-                    if (that.stack && that.stack.status == 'workflow_started' || that.stack.status == 'start_creation'){
-                        console.log('_updateLogs');
-                        that.$.getJobLog.generateRequest();
+                    if (this.stack && this.stack.status == 'workflow_started' || this.stack.status == 'start_creation'){
+                        var that = this;
+                        this.async(function(){
+                            that.$.getJobLog.generateRequest();
+                        },5000);
+                        
                     }
                     //clear interval
                     if (this.job && this.job.finished_at > 0 && this.intervalID){
@@ -778,6 +782,7 @@
                 },
                 _computeStack: function(params) {
                     var stack = {};
+                        this.job = {};
                     if (params.id)
                         stack = this.model.stacks[params.id];
 
@@ -1112,6 +1117,10 @@
                 _updateFields: function(){
 
                 },
+                newStackPage: function(id){
+                    window.clearInterval(this.intervalID);
+                    this.intervalID = 0; 
+                }
             });
         })();
     </script>
