@@ -46,7 +46,9 @@
         .capitalize {
             text-transform: capitalize;
         }
-        
+        .flexchild.error {
+            color: var(--red-color);
+        }
         </style>
         <paper-item class="flex-horizontal-with-ratios">
             <div class="icon">
@@ -55,6 +57,7 @@
             <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/stacks/[[stack.id]]">
                 <div class="flexchild"><span class="name">[[stack.name]]</span></div>
                 <div class="flexchild">[[stack.description]]</div>
+                <div class$="flexchild [[stack.status]]">[[stack.status]]</div>
                 <!-- <div class="flexchild">[[resources]]</div> -->
             </a>
         </paper-item>
