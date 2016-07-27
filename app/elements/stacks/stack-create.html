@@ -305,7 +305,7 @@
 
                             // make image dropdown & dependent on cloud
                             if (inp.name.startsWith("mist_image")) {
-                                var xid = inp.name.split("mist_image")[0]
+                                var xid = inp.name.split("mist_image")[1];
                                 inp.show = false;
                                 inp.type = 'mist_dropdown';
                                 inp.helptext = 'Select image';
@@ -317,7 +317,7 @@
 
                             // make image location & dependent on cloud
                             if (inp.name.startsWith("mist_location")) {
-                                var xid = inp.name.split("mist_location")[0]
+                                var xid = inp.name.split("mist_location")[1];
                                 inp.show = false;
                                 inp.type = 'mist_dropdown';
                                 inp.helptext = 'Select location';
@@ -329,7 +329,7 @@
 
                             // make image location & dependent on cloud
                             if (inp.name.startsWith("mist_size")) {
-                                var xid = inp.name.split("mist_size")[0]
+                                var xid = inp.name.split("mist_size")[1];
                                 inp.show = false;
                                 inp.type = 'mist_dropdown';
                                 inp.helptext = 'Choose the size of your cloud';
@@ -338,6 +338,8 @@
                                     fieldExists: true
                                 }
                             }
+
+                            console.log('HEREEEE ',xid, inp.name.split("mist_size"));
 
                             // hide mist api credential inputs
                             if (inp.name == "mist_token" || inp.name == "mist_uri" || inp.name == "mist_username" || inp.name == "mist_password") {
@@ -394,8 +396,7 @@
                                 yaml_inputs += inp.name+ ': ';
                                 var val = inp.value || inp.defaultValue;
                                 yaml_inputs += val+'\n';
-                            }
-
+                            }                            
                             if (cloud && cloud.value){
                                 if(inp.name.startsWith("mist_location")) {
                                     var xid = inp.name.split("mist_location")[0];
