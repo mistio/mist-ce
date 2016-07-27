@@ -747,17 +747,21 @@
                 newJob: function(id){
                     var that = this;
                     if (!this.intervalID) {
-                        console.log('setting interval for job', id);
+                        console.log('setting interval for job', this.stack.job_id);
                         this.intervalID = window.setInterval(
                           function(that) {
-                            that._updateLogs();
+                            that._updateLogs(that);
                           }, 5000, that);
                     }
                     this.joblogs = [];
                 },
                 jobFinished: function(finished_at){
                     //update logs one last time
-                    this._updateLogs(this);
+                    // this._updateLogs(this);
+                    if (that.stack && that.stack.status == 'workflow_started' || that.stack.status == 'start_creation'){
+                        console.log('_updateLogs');
+                        that.$.getJobLog.generateRequest();
+                    }
                     //clear interval
                     if (this.job && this.job.finished_at > 0 && this.intervalID){
                         window.clearInterval(this.intervalID);
