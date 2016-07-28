@@ -261,7 +261,7 @@ Polymer({
         this.fire('selected-of-current-section-length', {'itemLength': selectedOfCurrent.length})
         return selectedOfCurrent;
     },
-    openItemActions: function (item, y) {
+    openItemActions: function (item, y, x) {
         // ugly hack that displays dialog only after it is correctly positioned
         var selectActionDialog = this.$['select-action'];
 
@@ -271,7 +271,7 @@ Polymer({
         selectActionDialog.open();
         setTimeout(function() {
             selectActionDialog.set('style.top', y + 'px');
-            selectActionDialog.set('style.right', 0 + 'px');
+            selectActionDialog.set('style.right', x + 'px');
             selectActionDialog.set('style.left', 'auto');
             selectActionDialog.set('hidden', false);
         }, 25);

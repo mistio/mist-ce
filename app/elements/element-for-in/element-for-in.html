@@ -65,12 +65,19 @@
             });
         },
         createTpl: function(content) {
+            function replaceURLWithHTMLLinks(text) {
+                if (!text.replace)
+                    return text;
+                var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/i;
+                return text.replace(exp,"<a href='$1' target='new'>$1</a>");
+            }
+
             var tpl = '';
 
             for (var i = 0, len = content.length; i < len; i++) {
                 tpl += "<div class='info-item flex-horizontal-with-ratios'>";
                 tpl += "<div class='flexchild key'>" + this.processKeys(content[i].key) + "</div>";
-                tpl += "<div class='flexchild'>" + content[i].value + "</div>";
+                tpl += "<div class='flexchild'>" + replaceURLWithHTMLLinks(content[i].value) + "</div>";
                 tpl += "</div>";
             }
 
