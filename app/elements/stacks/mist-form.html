@@ -46,6 +46,7 @@
                     'iron-select' : '_updateFields',
                 },
                 ready: function(){
+                	console.log("ready: Initialize stack inputs");
                 	var yaml_inputs = '';
                     this.fields.forEach(function(inp) {
                         yaml_inputs += inp.name+ ': ';
@@ -61,75 +62,11 @@
                     });
                     this.set('fields.'+ind+'.defaultValue', this.yaml_inputs);
                 },
-                initializeFields: function(fields){
-                	
-                },
-                _computeFields: function(fields, clouds, keys) {
-                    var yaml_or_form = 'yaml';
-                    console.log('Computing Fields started');
-
-                    if (this.fields) {
-                        var yf = this.fields.find(function(f){
-                                return f.name == 'yaml_or_form'
-                            });
-                        if (yf && yf.value)
-                            yaml_or_form = yf.value;
-                        else
-                            yaml_or_form = 'yaml';
-                    }
-                    var ret = [{
-                        name: "yaml_or_form",
-                        label: "YAML or form",
-                        type: "radio",
-                        value: yaml_or_form,
-                        defaultValue: "yaml",
-                        helptext: "Choose the way you want to insert inputs",
-                        errorMessage: "Choose an input format",
-                        show: true,
-                        required: true,
-                        options: [{
-                            title: "YAML",
-                            val: "yaml"
-                        }, {
-                            title: "Form",
-                            val: "form"
-                        }]
-                    }, {
-                        name: "stackinputs",
-                        label: "Stack Inputs YAML",
-                        type: "textarea",
-                        value: this.yaml_inputs,
-                        defaultValue: this.yaml_inputs,
-                        placeholder: '',
-                        helptext: "Enter the stack inputs in yaml format",
-                        errorMessage: "Please enter stacks's inputs",
-                        show: true,
-                        required: true,
-                        showIf: {
-                            fieldName: "yaml_or_form",
-                            fieldValues: ["yaml"]
-                        }
-                    }];
-
-                    
-
-                    this.set('fields', ret);
-                },
-
                 _updateFields: function(e){
-                	console.log("_updateFields");
                     var changeInYaml = e.path.indexOf(document.querySelector("paper-textarea#stackinputs")) >-1
                     var ret= [];
                     this.fields.forEach(function(inp) {
                     	if (inp.name !='yaml_or_form' && inp.name != 'stackinputs'){
-	                        
-	                        inp.showIf = {
-	                            fieldName: "yaml_or_form",
-	                            fieldValues: ["form"]
-	                        }
-	                        inp.label = inp.name;
-	                        inp.defaultValue = inp.default;
-	                        inp.value = inp.defaultValue;
 
 	                        // Temp, before Tosca uses 'required' key
 	                        inp.required = false;
@@ -202,7 +139,7 @@
                     }, this);
 
                     if (changeInYaml) {
-                        var yaml = document.querySelector("paper-textarea#stackinputs").value;
+                        var yaml = this.shadowRoot.querySelector("paper-textarea#stackinputs").value;
                         var yaml_array = yaml.split('\n');
                         var inputs = [];
                         yaml_array.forEach(function(line){
