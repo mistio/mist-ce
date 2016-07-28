@@ -12,6 +12,7 @@
 <link rel="import" href="../section-tile/section-tile.html">
 <link rel="import" href="../app-incidents/app-incidents.html">
 <link rel="import" href="../app-costs/app-costs.html">
+<link rel="import" href="../app-costs/app-costs-per-tag.html">
 
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
@@ -310,6 +311,8 @@
                         <div class="costs">
                             <app-costs model="[[model]]" sections="[[sections]]">
                             </app-costs>
+                            <app-costs-per-tag model="[[model]]" sections="[[sections]]">
+                            </app-costs-per-tag>
                         </div>
                         <paper-material id="rightcolumn" class="logs">
                             <log-list></log-list>
