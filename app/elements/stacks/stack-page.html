@@ -948,55 +948,55 @@
                     var workflows = workflows.base.filter(function(wf){
                         return wf.name != 'scale' &&  wf.name != 'execute_operation';
                     });
-                    // workflows.forEach(function(wf){
-                    //     var yaml_inputs = '';
-                    //     if (wf.params.length > 0 ) {
-                    //         wf.params.forEach(function(wp){
-                    //             yaml_inputs += wp.name+': '+ wp.default + '\n';
-                    //             wp.showIf = {
-                    //                 fieldName: "yaml_or_form",
-                    //                 fieldValues: ["form"]
-                    //             }
-                    //             wp.label = wp.name;
-                    //             wp.value = wp.defaultValue = wp.default;
-                    //         });
-                    //         var param1 = {
-                    //             name: "yaml_or_form",
-                    //             label: "YAML or form",
-                    //             type: "radio",
-                    //             value: "yaml",
-                    //             defaultValue: "yaml",
-                    //             helptext: "Choose the way you want to insert inputs",
-                    //             errorMessage: "Choose an input format",
-                    //             show: true,
-                    //             required: true,
-                    //             options: [{
-                    //                 title: "YAML",
-                    //                 val: "yaml"
-                    //             }, {
-                    //                 title: "Form",
-                    //                 val: "form"
-                    //             }]
-                    //         };
-                    //         var param2 = {
-                    //             name: "stackinputs",
-                    //             label: "Workflow Inputs YAML",
-                    //             type: "textarea",
-                    //             value: yaml_inputs,
-                    //             defaultValue: yaml_inputs,
-                    //             placeholder: "",
-                    //             helptext: "Enter the stack inputs in yaml format",
-                    //             errorMessage: "Please enter stacks's inputs",
-                    //             show: true,
-                    //             required: true,
-                    //             showIf: {
-                    //                 fieldName: "yaml_or_form",
-                    //                 fieldValues: ["yaml"]
-                    //             }
-                    //         };
-                    //         wf.params.unshift(param1,param2);
-                    //     }
-                    // });
+                    workflows.forEach(function(wf){
+                        var yaml_inputs = '';
+                        if (wf.params.length > 0 ) {
+                            wf.params.forEach(function(wp){
+                                yaml_inputs += wp.name+': '+ wp.default + '\n';
+                                wp.showIf = {
+                                    fieldName: "yaml_or_form",
+                                    fieldValues: ["form"]
+                                }
+                                wp.label = wp.name;
+                                wp.value = wp.defaultValue = wp.default;
+                            });
+                            var param1 = {
+                                name: "yaml_or_form",
+                                label: "YAML or form",
+                                type: "radio",
+                                value: "yaml",
+                                defaultValue: "yaml",
+                                helptext: "Choose the way you want to insert inputs",
+                                errorMessage: "Choose an input format",
+                                show: true,
+                                required: true,
+                                options: [{
+                                    title: "YAML",
+                                    val: "yaml"
+                                }, {
+                                    title: "Form",
+                                    val: "form"
+                                }]
+                            };
+                            var param2 = {
+                                name: "stackinputs",
+                                label: "Workflow Inputs YAML",
+                                type: "textarea",
+                                value: yaml_inputs,
+                                defaultValue: yaml_inputs,
+                                placeholder: "",
+                                helptext: "Enter the stack inputs in yaml format",
+                                errorMessage: "Please enter stacks's inputs",
+                                show: true,
+                                required: true,
+                                showIf: {
+                                    fieldName: "yaml_or_form",
+                                    fieldValues: ["yaml"]
+                                }
+                            };
+                            wf.params.unshift(param1,param2);
+                        }
+                    });
                     return workflows;
                 },
                 _getFormattedTimestamp: function(stack) {

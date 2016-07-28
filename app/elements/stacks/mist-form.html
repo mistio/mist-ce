@@ -19,10 +19,12 @@
                 is: 'mist-form',
                 properties: {
                     model: {
-                        type: Object
+                        type: Object,
+                        notify: true
                     },
                     fields: {
-                    	type: Array
+                    	type: Array,
+                    	notify: true
                     },
                     workflow: String,
                     url: String,
@@ -37,16 +39,13 @@
                 },
                 observers: [
                 	// 'initializeFields(fields)',
-                    '_computeFields(fields)'
+                    // '_computeFields(fields)'
                 ],
                 listeners: {
                     'change' : '_updateFields',
                     'iron-select' : '_updateFields',
                 },
                 ready: function(){
-                	// this.fields = [];
-                },
-                initializeFields: function(fields){
                 	var yaml_inputs = '';
                     this.fields.forEach(function(inp) {
                         yaml_inputs += inp.name+ ': ';
@@ -62,7 +61,10 @@
                     });
                     this.set('fields.'+ind+'.defaultValue', this.yaml_inputs);
                 },
-                _computeFields: function(fields) {
+                initializeFields: function(fields){
+                	
+                },
+                _computeFields: function(fields, clouds, keys) {
                     var yaml_or_form = 'yaml';
                     console.log('Computing Fields started');
 
@@ -109,6 +111,15 @@
                         }
                     }];
 
+                    
+
+                    this.set('fields', ret);
+                },
+
+                _updateFields: function(e){
+                	console.log("_updateFields");
+                    var changeInYaml = e.path.indexOf(document.querySelector("paper-textarea#stackinputs")) >-1
+                    var ret= [];
                     this.fields.forEach(function(inp) {
                     	if (inp.name !='yaml_or_form' && inp.name != 'stackinputs'){
 	                        
@@ -190,12 +201,6 @@
 	                    }
                     }, this);
 
-                    this.set('fields', ret);
-                },
-
-                _updateFields: function(e){
-                	console.log("_updateFields");
-                    var changeInYaml = e.path.indexOf(document.querySelector("paper-textarea#stackinputs")) >-1
                     if (changeInYaml) {
                         var yaml = document.querySelector("paper-textarea#stackinputs").value;
                         var yaml_array = yaml.split('\n');
