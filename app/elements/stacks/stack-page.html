@@ -1083,7 +1083,9 @@
                 },
                 handleCanceled: function(e) {},
                 handleWorkflowRequest: function(e) {},
-                handleWorkflowResponse: function(e) {},
+                handleWorkflowResponse: function(e) {
+                    this._closeworkflows();
+                },
                 handleWorkflowError: function(e) {},
                 handleGetJobLog: function(e) {
                     console.log('getJobLog',e.detail.xhr.response.logs);
