@@ -12,7 +12,7 @@
             transform: translate(0, 60px);
             opacity: 0;
             padding: 0;
-            margin: 32px 0 0 0;
+            margin: 0;
         }
 
         :host(.active) {
@@ -29,6 +29,7 @@
         }
         paper-material {
             overflow: hidden !important;
+            margin-top: 32px
         }
 
         .list-item {
@@ -118,7 +119,7 @@
                 </section-tile>
             </div>
         </div> -->
-        <paper-material class="flex3child">
+        <paper-material class="flex3child" hidden$="[[!tags.length]]">
             <h3>monthly cost per tag
                 <!-- <a href="http://docs.mist.io/article/103-cost-reporting-with-mist-io" target="new"> <iron-icon id="costdocs" icon="help" position="left"></iron-icon> --></a>
             </h3>
