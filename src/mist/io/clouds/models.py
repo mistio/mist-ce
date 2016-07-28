@@ -63,10 +63,11 @@ class Cloud(me.Document):
     starred = me.ListField()
     unstarred = me.ListField()
 
-    meta = {'allow_inheritance': True}
-    # FIXME: use a different collection name to avoid conflicts when migrating
-    # previous models.
-    # TODO: Add index on owner
+    meta = {
+        'allow_inheritance': True,
+        'collection': 'clouds',  # collection 'cloud' is used by core's model
+        'indexes': ['owner'],
+    }
 
     _controller_cls = None
 
