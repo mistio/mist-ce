@@ -162,7 +162,7 @@
                         this.fields.forEach(function(inp) {
                             var fieldCloud;
 
-                            if (['name', 'description', 'yaml_or_form','stackinputs', 'deploy'].indexOf(inp.name) == -1) {
+                            if (['yaml_or_form','stackinputs'].indexOf(inp.name) == -1) {
                                 yaml_inputs += inp.name+ ': ';
                                 var val = inp.value || inp.defaultValue;
                                 yaml_inputs += val+'\n';
