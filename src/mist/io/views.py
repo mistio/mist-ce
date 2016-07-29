@@ -341,6 +341,7 @@ def delete_cloud(request):
     return OK
 
 
+# rename as edit_cloud
 @view_config(route_name='api_v1_cloud_action', request_method='PUT')
 @view_config(route_name='cloud_action', request_method='PUT')
 def rename_cloud(request):
@@ -357,7 +358,6 @@ def rename_cloud(request):
       description: ' New name for the key (will also serve as the key''s id)'
       type: string
     """
-
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     params = params_from_request(request)
@@ -368,14 +368,18 @@ def rename_cloud(request):
         raise NotFoundError('Cloud does not exist')
 
     # the fields which can be edited by the user
-    api_fields = ['provider', 'subscription_id', 'certificate', 'token',
-                  'api_key', 'api_secret', 'region', 'project_id',
-                  'private_key', 'username', 'password', 'organization',
-                  'host', 'auth_url', 'tenant_name',
-                  'machine_hostname', 'title']
+    # api_fields = ['provider', 'subscription_id', 'certificate', 'token',
+    #               'api_key', 'api_secret', 'region', 'project_id',
+    #               'private_key', 'username', 'password', 'organization',
+    #               'host', 'auth_url', 'tenant_name',
+    #               'machine_hostname', 'title']
 
-    pt_args = {k: v for k, v in params.items()
-                   if k in api_fields}
+    api_fields = cloud._fields.keys()
+
+    # here terms must change
+    pt_args = {k: v for k, v in params.items() if k in api_fields}
+
+    # other way round, cloud.as_dict() and keys() and pt_args in keys()
 
     auth_context.check_perm('cloud', 'edit', cloud_id)
 
@@ -398,13 +402,20 @@ def rename_cloud(request):
 
     # add here an object validation with v = jsonschema.Draft4Validator(schema)
 
-    # if a param is send, i will update it
-    # what is missing, i assume that remains the same
-    try:
-        cloud.update_validate(pt_args)
-    except ValidationError as e:
-        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    if provider_type != 'Other Server':
+        # if a param is send, i will update it
+        # what is missing, i assume that remains the same
+        try:
+            cloud.update_validate(pt_args)
+        except ValidationError as e:
+            raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    else:
+        title = params.get('title')
+        provider = params.get('provider')
+        methods.edit_cloud_bare_metal(auth_context.owner, title,
+                                      provider, cloud_id, params)
 
+    # add code like methods add cloud , remove on error and after
     return OK
 
 
