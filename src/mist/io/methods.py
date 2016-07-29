@@ -993,6 +993,108 @@ def _add_cloud_vsphere(user, title, provider, params):
     return cloud.id, cloud
 
 
+def edit_cloud_bare_metal(user, title, provider, cloud_id, params):
+    """
+    Edit a bare metal cloud
+    """
+    log.info("Editing bare metal cloud: %s", cloud_id)
+
+    # attention here, tat in params or explicitly
+    machine_id = params.get('machine_id')
+
+    remove_on_error = params.get('remove_on_error', True)
+    machine_key = params.get('machine_key', '')
+    machine_user = params.get('machine_user', '')
+    is_windows = params.get('windows', False)
+    if is_windows:
+        os_type = 'windows'
+    else:
+        os_type = 'unix'
+    try:
+        port = int(params.get('machine_port', 22))
+    except:
+        port = 22
+    try:
+        rdp_port = int(params.get('remote_desktop_port', 3389))
+    except:
+        rdp_port = 3389
+    machine_hostname = params.get('machine_ip', '')
+
+    use_ssh = remove_on_error and os_type == 'unix' and machine_key
+    if use_ssh:
+        key = Keypair.objects.get(owner=user, id=machine_key)
+        if not machine_hostname:
+            raise BadRequestError("You have specified an SSH key but machine "
+                                  "hostname is empty.")
+        if not machine_user:
+            machine_user = 'root'
+
+    try:
+        cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
+    cloud.title = title
+    cloud.provider = provider
+    cloud.enabled = True
+    cloud.owner = user
+
+    try:
+        cloud.save()
+    except ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except NotUniqueError:
+        raise CloudExistsError()
+
+    # perhaps in try except block together with cloud
+    machine = Machine.objects.get(cloud=cloud, name=cloud.title)
+
+    machine.cloud = cloud
+    machine_hostname = sanitize_host(machine_hostname)
+    machine.ssh_port = port
+    machine.remote_desktop_port = rdp_port
+    if machine_hostname:
+        if is_private_subnet(socket.gethostbyname(machine_hostname)):
+            machine.private_ips = [machine_hostname]
+        else:
+            machine.dns_name = machine_hostname
+            machine.public_ips = [machine_hostname]
+    machine.machine_id = title.replace('.', '').replace(' ', '')
+    machine.name = title
+    machine.os_type = os_type
+    machine.save()
+
+    # try to connect. this will either fail and we'll delete the
+    # cloud, or it will work and it will create the association
+    if use_ssh:
+        try:
+            ssh_command(
+                user, cloud.id, machine.machine_id, machine_hostname, 'uptime',
+                key_id=machine_key, username=machine_user, password=None,
+                port=port
+            )
+        except MachineUnauthorizedError as exc:
+            Cloud.objects.get(owner=user, id=cloud.id).delete()
+            raise CloudUnauthorizedError(exc)
+        except ServiceUnavailableError as exc:
+            Cloud.objects.get(owner=user, id=cloud.id).delete()
+            raise MistError("Couldn't connect to host '%s'."
+                            % machine_hostname)
+    # if params.get('monitoring'):
+    #     try:
+    #         from mist.core.methods import enable_monitoring as _en_monitoring
+    #     except ImportError:
+    #         _en_monitoring = enable_monitoring
+    #     mon_dict = _en_monitoring(user, cloud.id, machine.machine_id,
+    #                               no_ssh=not use_ssh)
+    # else:
+    #     mon_dict = {}
+    #
+    # return cloud.id, mon_dict
+    log.info("Successfully edited bare metal cloud '%s'", cloud_id)
+    trigger_session_update(user, ['clouds'])
+
+
 def rename_cloud(owner, cloud_id, new_name):
     """Renames cloud with given cloud_id."""
 
