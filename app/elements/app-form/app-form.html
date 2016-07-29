@@ -406,13 +406,21 @@
                     var payload;
 
                     if (this.workflow) {
+                        var inps = YAML.parse(this.form.stackinputs);
+                        for (var p in inps) {
+                            if (p.startsWith('mist_location'))
+                            {
+                                inps[p] = inps[p].toString();
+                            }
+                        }
+
                         payload = {
                             deploy: this.form.deploy,
                             name: this.form.name,
                             template_id: this.templateid,
                             description: this.form.description,
                             workflow: this.workflow,
-                            inputs: YAML.parse(this.form.stackinputs)
+                            inputs: inps
                         }
                     } else {
                         payload = this.form;
