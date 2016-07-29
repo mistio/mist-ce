@@ -212,6 +212,7 @@ class MainConnection(MistConnection):
         self.list_tags()
         self.list_keys()
         self.list_scripts()
+        self.list_cronjobs()
         self.list_templates()
         self.list_stacks()
         self.list_tunnels()
@@ -241,6 +242,10 @@ class MainConnection(MistConnection):
     def list_scripts(self):
         self.send('list_scripts',
                   core_methods.filter_list_scripts(self.auth_context))
+
+    def list_cronjobs(self):
+        self.send('list_cronjobs',
+                  core_methods.filter_list_cronjobs(self.auth_context))
 
     def list_templates(self):
         self.send('list_templates',
@@ -402,6 +407,8 @@ class MainConnection(MistConnection):
                 self.list_keys()
             if 'scripts' in sections:
                 self.list_scripts()
+            if 'cronjobs' in sections:
+                self.list_cronjobs()
             if 'templates' in sections:
                 self.list_templates()
             if 'stacks' in sections:
