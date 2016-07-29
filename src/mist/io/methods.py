@@ -2784,7 +2784,11 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                 conn.destroy_node(machine)
             else:
                 machine.destroy()
-            Machine.objects(cloud=cloud, machine_id=machine_id).delete()
+            machine_in_db = Machine.objects.get(cloud=cloud, machine_id=machine_id)
+            # remove any existing key associations
+            while machine_in_db.key_associations:
+                machine_in_db.key_associations.pop()
+            machine_in_db.save()
 
     except AttributeError:
         raise BadRequestError("Action %s not supported for this machine"
