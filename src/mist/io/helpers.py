@@ -446,54 +446,96 @@ def transform_json_to_schema():
         }
     # 'Other Server': {'remote_desktop_port': ''}
     schema_list = []
-    with open('/mist.core/src/mist.io/app/elements/providers.json') as data_f:
-        data = json.load(data_f)
-        data_f.close()
+    data = config.PROVIDERS_JSON
 
-        for prov in data['providers']:
-            j_schema = {}
+    for prov in data['providers']:
+        j_schema = {}
 
-            # options = prov['options']
-            for k, v in prov.iteritems():
-                if k == 'title':
-                    j_schema['title'] = prov['title']
-                    j_schema['type'] = 'object'
-                if k == 'options':
-                    j_properties = {}
-                    required = []
-                    for o in prov['options']:
+        # options = prov['options']
+        for k, v in prov.iteritems():
+            if k == 'title':
+                # metadata keywords, optional
+                j_schema['title'] = prov['title'] + " provider"
+                j_schema['description'] = "schema for " + prov['title']
+                j_schema['type'] = 'object'
+            if k == 'options':
+                j_properties = {}
+                j_definition = {}
+                basic= {}
+                tls = {}
+                unix = {}
+                windows = {}
+                required = []
+                for o in prov['options']:
 
-                        if o['type'] in ['text', 'textarea', 'dropdown',
-                                         'password', 'ssh_key']:
-                            o['type'] = 'string'
+                    # differentiate mainly by type
 
-                        if o['type'] == 'switch':
-                            o['type'] = 'boolean'
+                    if o['type'] == 'dropdown' and 'options' in o:
+                        one_of = []
 
-                        if o['name'] == 'region' and 'options' in o:
-                            one_of = []
+                        # docker, authentication
+                        if o['name'] == "authentication":
                             for oo in o['options']:
-                                # one_of.append({"format": v for k,v in
-                                #                oo.iteritems() if k == 'val'})
-                                # one_of.append({"format": v for k, v in
-                                #            oo.iteritems() if k == 'val'})
+                                one_of.append({"$ref": "#definitions/"+oo['val']})
 
+                            j_properties.update(
+                                {o['name']: {"type": "object","oneOf": one_of}})
+                        # other server,operating system
+                        elif o['name'] == "operating_system":
+                            for oo in o['options']:
+                                one_of.append(
+                                    {"$ref": "#definitions/" + oo['val']})
+
+                            j_properties.update(
+                                {o['name']: {"type": "object",
+                                             "oneOf": one_of}})
+                        else:
+                            # for regions and others
+                            for oo in o['options']:
                                 one_of.append(oo['val'])
 
                             j_properties.update(
-                                # {o['name']: {"type": o['type'], "oneOf": one_of }})
-                                {o['name']: {"type": o['type'],"enum": one_of}})
-                        # maybe to use integer or number
-                        else:
-                            j_properties.update({o['name']: {"type": o['type']}})
+                                {o['name']: {"type": "string","enum": one_of}})
 
-                        if o['required']:
-                            required.append(o['name'])
+                    elif 'showIf' in o:
+                        if o['showIf']['fieldName'] == "authentication":
+                            if o['showIf']['fieldValues'] == ["basic"]:
+                                basic.update(
+                                    {o['name']:tr_to_json_type(o['type'])})
+                                j_definition.update(
+                                    {"basic":{"properties":basic} } )
+                            else:
+                                tls.update({
+                                    o['name']: tr_to_json_type(o['type'])})
+                                j_definition.update(
+                                    {"tls": {"properties": tls}})
+                                # this is a little trick for show if machine key
+                                # for port and user added to unix system
+                        elif o['showIf']['fieldName'] in ["operating_system",
+                                                          "machine_key"]:
+                            if o['showIf']['fieldName'] == "machine_key" or \
+                                    o['showIf']['fieldValues'] == ["unix"]:
+                                unix.update(
+                                    {o['name']: tr_to_json_type(o['type'])})
+                                j_definition.update(
+                                    {"unix": {"properties": unix}})
+                            else:
+                                windows.update({
+                                    o['name']: tr_to_json_type(o['type'])})
+                                j_definition.update(
+                                    {"windows": {"properties": windows}})
 
-                    j_schema['properties'] = j_properties
-                    j_schema['required'] = required
+                    else:
+                        j_properties.update({o['name']: tr_to_json_type(o['type'])})
 
-            schema_list.append({j_schema['title']:j_schema})
+                    if o['required']:
+                        required.append(o['name'])
+
+                j_schema['properties'] = j_properties
+                j_schema['required'] = required
+                if j_definition:
+                    j_schema['definitions'] = j_definition
+        schema_list.append({prov['title']:j_schema})
 
     for d in schema_list:
         for k,v in d.iteritems():
@@ -520,4 +562,21 @@ def schema_by_provider(provider_type):
                 break
 
     return current_schema
+
+
+def tr_to_json_type(js_type):
+    # if we want add number ex for docker port
+    # and ssh_key maxlength
+
+    type_dict = {}
+
+    if js_type == 'switch':
+        type_dict = {"type": "boolean"}
+    elif js_type == 'text':
+        type_dict = {"type": "string", "maxLength": 40}
+    elif js_type == 'textarea':
+        type_dict = {"type": "string", "maxLength": 1200}
+    else:
+        type_dict = {"type": "string"}
+    return type_dict
 
