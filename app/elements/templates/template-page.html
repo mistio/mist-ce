@@ -405,7 +405,7 @@
                     },
                     hasStacks: {
                         type: Boolean,
-                        computed: '_computeHasStacks(stacks.*)'
+                        computed: '_computeHasStacks(stacks.*, model.stacksArray.*, template.id)'
                     },
                     isInline: {
                         type: Boolean,
@@ -438,8 +438,8 @@
                         timeZoneName: 'short'
                     });
                 },
-                _hasStacks: function(stacks) {
-                    return stacks.base.length > 0;
+                _computeHasStacks: function(stacks) {
+                    return this.stacks.length > 0;
                 },
                 _computeTemplate: function(templateid, templates) {
                     return templates.base[templateid];
@@ -448,9 +448,9 @@
                     return source == 'inline';
                 },
                 _computeStacks: function(templateid, stacks) {
-                    return stacks.base.filter(function(stack) {
-                        return stack.template == templateid;
-                    });
+                    return this.model.stacksArray.filter(function(stack) {
+                        return stack.template == this.template.id;
+                    }, this);
                 },
                 _class: function(isinline) {
                     return isinline ? "command-container" : "";

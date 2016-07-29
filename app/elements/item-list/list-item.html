@@ -149,13 +149,20 @@ Polymer({
         if (field == 'create_date' && !ret && item.extra && !item.extra[field]) {
             return '';
         }
-        // field could be in the 'extra' section
-        if (!ret && item.extra && item.extra[field])
+        
+        // field could be in the 'extra' section, but should not be an object
+        if (!ret && item.extra && item.extra[field] && typeof(item.extra[field]) != 'object')
             ret = item.extra[field];
 
-        // image info stored inside extra.image_id on ec2
-        if (!ret && item.extra && item.extra[field+'_id'])
-            return item.extra[field+'_id'];
+
+        // image info stored inside: 
+        // extra.image_id on ec2, 
+        // item.extra.image.name or item.extra.image.slug in digital ocean, 
+        // item.imageId in openstack
+        // TODO: complete the above list
+        if (field == 'image' && !ret && item.extra && (item.extra[field+'_id'] || item.imageId || item.extra.image)){
+            return item.extra[field+'_id'] || item.imageId || item.extra.image.slug || item.extra.image.name || 'not found';
+        }
 
         // size info could be in all sorts of places
         //  - Azure: extra.instance_size
@@ -201,8 +208,8 @@ Polymer({
 
         if (field == 'stack state') {
             var status = document.querySelector('app-main').model.stacks[item.id].status;
-            if (status && status.startsWith('Error')){
-                return 'Error'
+            if (status && status != 'ok'){
+                return status
             }
         }
 

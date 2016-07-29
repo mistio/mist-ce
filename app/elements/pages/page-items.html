@@ -349,12 +349,12 @@
         },
 
         _computeSort: function(property, order) {
-            console.log('_computeSort', property, order);
+            // console.log('_computeSort', property, order);
 
             return function(a, b) {
                 // console.log('comparison', a[property], b[property]);
                 // string compare on fields other than members machines and cost, image ids, default
-                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size', 'create_date' ].indexOf(property) == -1) {
+                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size', 'create_date', 'stack state' ].indexOf(property) == -1) {
                     //if both properties exist
                     if(JSON.stringify(a[property]) && JSON.stringify(b[property])) {
                         if (JSON.stringify(a[property]).toLowerCase() < JSON.stringify(b[property]).toLowerCase()) {
@@ -429,7 +429,7 @@
                 else if (property == 'size'){
                     var ta = a[property] || a.extra.instance_type || extra.instance_size || item.extra.maxCpu+item.extra.maxMemory || a.extra.PLANID || item.extra.maxCpu+item.extra.maxMemory,
                         tb = b[property] || b.extra.instance_type || extra.instance_size || item.extra.maxCpu+item.extra.maxMemory || b.extra.PLANID || item.extra.maxCpu+item.extra.maxMemory;
-                    console.log('comparison', ta, tb);
+                    // console.log('comparison', ta, tb);
                     if (ta < tb) {
                         return -1 * order;
                     }
@@ -473,6 +473,26 @@
                         return 1 * order;
                     }
                     return 0;
+                }
+                // compare stack states
+                else if (property == 'stack state'){
+                    //if both properties exist && not ok
+                    if (a["status"] != 'ok' && b["status"] != 'ok'){
+                        if (a["status"] > b["status"]) {
+                            return -1 * order;
+                        }
+                        if (a["status"] < b["status"]) {
+                            return 1 * order;
+                        }
+                        return 0;
+                    }
+                    //if some status ok move down
+                    else {
+                        if (a["status"] == 'ok')
+                            return 1;   
+                        else
+                            return -1
+                    }
                 }
                 //compare created date
                 else if (property == 'create_date'){
