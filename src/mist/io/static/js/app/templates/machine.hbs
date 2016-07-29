@@ -101,6 +101,14 @@
             <table class="info-table">
                 <tbody>
                 <tr>
+                    <td>ID</td>
+                    {{#if model.uuid}}
+                    <td>{{model.uuid}}</td>
+                    {{else}}
+                    <td>{{model.id}}</td>
+                    {{/if}}
+                </tr>
+                <tr>
                     <td>Last probed</td>
                     <td> {{#if model.probing}}
                              probing... <div id="machine-probe-loader" class="ajax-loader"></div>

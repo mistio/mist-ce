@@ -32,6 +32,11 @@ def usr1_handler(sig, frame):
     for conn in list(mist.io.sock.CONNECTIONS):
         log.info(conn)
 
+def usr2_handler(sig, frame):
+    log.warning("SockJS-Tornado process received SIGUSR2. Reloading clients")
+    for conn in list(mist.io.sock.CONNECTIONS):
+        log.info(conn)
+        conn.send('reload')
 
 def heartbeat():
     now = time.time()
@@ -64,6 +69,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, sig_handler)
     signal.signal(signal.SIGINT, sig_handler)  # also catch KeyboardInterrupt
     signal.signal(signal.SIGUSR1, usr1_handler)
+    signal.signal(signal.SIGUSR2, usr2_handler)
 
     heartbeat_pc = tornado.ioloop.PeriodicCallback(heartbeat, 25 * 1000)
     heartbeat_pc.start()

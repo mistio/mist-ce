@@ -1,10 +1,10 @@
-define('app/controllers/keys', ['app/models/key' , 'ember'],
+define('app/controllers/keys', ['app/models/key', 'ember'],
     //
     //  Keys Controller
     //
     //  @returns Class
     //
-    function (Key) {
+    function(Key) {
 
         'use strict';
 
@@ -36,24 +36,21 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             //  Computed Properties
             //
 
-            sortById: Ember.computed('sortByTerm', function () {
-                return this.get('sortByTerm') == 'id';
+            sortByName: Ember.computed('sortByTerm', function() {
+                return this.get('sortByTerm') == 'name';
             }),
 
-            sortByDefault: Ember.computed('sortByTerm', function () {
+            sortByDefault: Ember.computed('sortByTerm', function() {
                 return this.get('sortByTerm') == 'default';
             }),
 
-            sortedKeys: Ember.computed('filteredKeys', 'filteredKeys.@each.id', 'filteredKeys.@each.isDefault', 'sortByTerm', function() {
-                if(this.get('filteredKeys'))
-                {
-                    if (this.get('sortById'))
-                    {
-                        return this.get('filteredKeys').sortBy('id');
+            sortedKeys: Ember.computed('filteredKeys', 'filteredKeys.@each.name', 'filteredKeys.@each.isDefault', 'sortByTerm', function() {
+                if (this.get('filteredKeys')) {
+                    if (this.get('sortByName')) {
+                        return this.get('filteredKeys').sortBy('name');
                     }
 
-                    if (this.get('sortByDefault'))
-                    {
+                    if (this.get('sortByDefault')) {
                         return this.get('filteredKeys').sortBy('isDefault').reverse();
                     }
                 }
@@ -67,7 +64,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             //
 
 
-            init: function () {
+            init: function() {
                 this._super();
                 this.set('model', []);
                 this.set('loading', true);
@@ -90,86 +87,104 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             addKey: function(args) {
                 var that = this;
                 this.set('addingKey', true);
-                Mist.ajax.PUT('/keys', {
-                    'id': args.keyId,
-                    'priv': args.keyPrivate
-                }).success(function (key) {
-                    that._addKey(key);
-                }).error(function (message) {
-                    Mist.notificationController.notify(message);
-                }).complete(function (success, key) {
-                    that.set('addingKey', false);
-                    if (args.callback)
-                        args.callback(success, that.getKey(key ? key.id : null));
-                });
+                Mist.ajax
+                    .PUT('/api/v1/keys', {
+                        'name': args.keyName,
+                        'priv': args.keyPrivate
+                    })
+                    .success(function(key) {
+                        that._addKey(key);
+                    })
+                    .error(function(err) {
+                        Mist.notificationController.notify(err);
+                    })
+                    .complete(function(success, key) {
+                        that.set('addingKey', false);
+                        if (args.callback)
+                            args.callback(success, that.getKey(key ? key.id : null));
+                    });
             },
 
 
-            renameKey: function(keyId, newKeyId, callback) {
+            renameKey: function(keyId, newKeyName, callback) {
                 var that = this;
                 this.set('renamingKey', true);
-                Mist.ajax.PUT('/keys/' + keyId, {
-                    'new_id': newKeyId
-                }).success(function() {
-                    that._renameKey(keyId, newKeyId);
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to rename key');
-                }).complete(function(success) {
-                    that.set('renamingKey', false);
-                    if (callback) callback(success);
-                });
+                Mist.ajax
+                    .PUT('/api/v1/keys/' + keyId, {
+                        'new_name': newKeyName
+                    })
+                    .success(function() {
+                        that._renameKey(keyId, newKeyName);
+                    })
+                    .error(function(err) {
+                        Mist.notificationController.notify(err);
+                    })
+                    .complete(function(success) {
+                        that.set('renamingKey', false);
+                        if (callback) callback(success);
+                    });
             },
 
 
             deleteKey: function(keyId, callback) {
                 var that = this;
                 this.set('deletingKey', true);
-                Mist.ajax.DELETE('/keys/' + keyId, {
-                }).success(function() {
-                    that._deleteKey(keyId);
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to delete key');
-                }).complete(function(success) {
-                    that.set('deletingKey', false);
-                    if (callback) callback(success);
-                });
+                Mist.ajax
+                    .DELETE('/api/v1/keys/' + keyId, {})
+                    .success(function() {
+                        that._deleteKey(keyId);
+                    })
+                    .error(function(err) {
+                        Mist.notificationController.notify(err);
+                    })
+                    .complete(function(success) {
+                        that.set('deletingKey', false);
+                        if (callback) callback(success);
+                    });
             },
 
 
             setDefaultKey: function(keyId, callback) {
                 var that = this;
                 this.set('settingDefaultKey', true);
-                Mist.ajax.POST('/keys/' + keyId, {
-                }).success(function() {
-                    that._setDefaultKey(keyId);
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to set default key');
-                }).complete(function(success) {
-                    that.set('settingDefaultKey', false);
-                    if (callback) callback(success);
-                });
+                Mist.ajax
+                    .POST('/api/v1/keys/' + keyId, {})
+                    .success(function() {
+                        that._setDefaultKey(keyId);
+                    })
+                    .error(function(err) {
+                        Mist.notificationController.notify(err);
+                    })
+                    .complete(function(success) {
+                        that.set('settingDefaultKey', false);
+                        if (callback) callback(success);
+                    });
             },
 
 
             // BIG TODO: Callback argument should be at the end of the parameters
             // We need to check every call to this function and change it (not urgent)
-            associateKey: function(keyId, machine, callback, user , port) {
+            associateKey: function(keyId, machine, callback, user, port) {
 
                 var that = this;
                 this.set('associatingKey', true);
-                Mist.ajax.PUT('/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/keys/' + keyId, {
-                    'host': machine.getHost(),
-                    'user': user,
-                    'port': port
-                }).success(function() {
-                    that._associateKey(keyId, machine);
-                }).error(function() {
-                    // Try another user/port
-                    Mist.machineKeysController.openSSH_Details();
-                }).complete(function(success) {
-                    that.set('associatingKey', false);
-                    if (callback) callback(success, machine, keyId);
-                });
+                Mist.ajax
+                    .PUT('/api/v1/clouds/' + machine.cloud.id + '/machines/' + machine.id + '/keys/' + keyId, {
+                        'host': machine.getHost(),
+                        'user': user,
+                        'port': port
+                    })
+                    .success(function() {
+                        that._associateKey(keyId, machine);
+                    })
+                    .error(function(err) {
+                        // Try another user/port
+                        Mist.machineKeysController.openSSH_Details();
+                    })
+                    .complete(function(success) {
+                        that.set('associatingKey', false);
+                        if (callback) callback(success, machine, keyId);
+                    });
             },
 
 
@@ -177,61 +192,75 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                 var cloud_id = machine.cloud.id ? machine.cloud.id : machine.cloud;
                 var that = this;
                 this.set('disassociatingKey', true);
-                Mist.ajax.DELETE('/clouds/' + cloud_id + '/machines/' + machine.id + '/keys/' + keyId, {
-                    'host': machine.getHost()
-                }).success(function() {
-                    that._disassociateKey(keyId, machine);
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to disassociate key');
-                }).complete(function(success) {
-                    that.set('disassociatingKey', false);
-                    if (callback) callback(success);
-                });
+                Mist.ajax
+                    .DELETE('/api/v1/clouds/' + cloud_id + '/machines/' + machine.id + '/keys/' + keyId, {
+                        'host': machine.getHost()
+                    })
+                    .success(function() {
+                        that._disassociateKey(keyId, machine);
+                    })
+                    .error(function(err) {
+                        Mist.notificationController.notify(err);
+                    })
+                    .complete(function(success) {
+                        that.set('disassociatingKey', false);
+                        if (callback) callback(success);
+                    });
             },
 
 
             generateKey: function(args) {
                 var that = this;
                 this.set('generatingKey', true);
-                Mist.ajax.POST('/keys', {
-                }).error(function () {
-                    Mist.notificationController.notify(
-                        'Failed to generate key');
-                }).complete(function (success, key) {
-                    that.set('generatingKey', false);
-                    if (args.callback) args.callback(success, key.priv, key.public);
-                });
+                Mist.ajax
+                    .POST('/api/v1/keys', {})
+                    .error(function(err) {
+                        Mist.notificationController.notify(err);
+                    })
+                    .complete(function(success, key) {
+                        that.set('generatingKey', false);
+                        if (args.callback) args.callback(success, key.priv, key.public);
+                    });
             },
 
 
             getPrivateKey: function(keyId, callback) {
                 var that = this;
                 this.set('gettingPrivateKey', true);
-                Mist.ajax.GET('/keys/' + keyId + '/private', {
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to get private key');
-                }).complete(function(success, keyPriv) {
-                    that.set('gettingPrivateKey', false);
-                    if (callback) callback(success, keyPriv);
-                });
+                Mist.ajax
+                    .GET('/api/v1/keys/' + keyId + '/private', {})
+                    .error(function(err) {
+                        Mist.notificationController.notify(err);
+                    })
+                    .complete(function(success, keyPriv) {
+                        that.set('gettingPrivateKey', false);
+                        if (callback) callback(success, keyPriv);
+                    });
             },
 
 
             getPublicKey: function(keyId, callback) {
                 var that = this;
                 this.set('gettingPublicKey', true);
-                Mist.ajax.GET('/keys/' + keyId + '/public', {
-                }).error(function() {
-                    Mist.notificationController.notify('Failed to get public key');
-                }).complete(function(success, keyPub) {
-                    that.set('gettingPublicKey', false);
-                    if (callback) callback(success, keyPub);
-                });
+                Mist.ajax
+                    .GET('/api/v1/keys/' + keyId + '/public', {})
+                    .error(function(err) {
+                        Mist.notificationController.notify(err);
+                    })
+                    .complete(function(success, keyPub) {
+                        that.set('gettingPublicKey', false);
+                        if (callback) callback(success, keyPub);
+                    });
             },
 
 
             getKey: function(keyId) {
                 return this.model.findBy('id', keyId);
+            },
+
+
+            getKeyByName: function(keyName) {
+                return this.model.findBy('name', keyName);
             },
 
 
@@ -244,6 +273,11 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
             keyExists: function(keyId) {
                 return !!this.getKey(keyId);
+            },
+
+
+            keyNameExists: function(keyName) {
+                return !!this.getKeyByName(keyName);
             },
 
 
@@ -266,26 +300,26 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
              *
              */
 
-            _updateModel: function (keys) {
+            _updateModel: function(keys) {
                 Ember.run(this, function() {
 
                     // Remove deleted keys
-                    this.model.forEach(function (key) {
+                    this.model.forEach(function(key) {
                         if (!keys.findBy('id', key.id))
                             this._deleteKey(key.id);
                     }, this);
 
-                    keys.forEach(function (key) {
+                    keys.forEach(function(key) {
 
                         var oldKey = this.getKey(key.id);
 
                         if (oldKey)
-                            // Update existing keys
-                            forIn(key, function (value, property) {
-                                oldKey.set(property, value);
-                            });
+                        // Update existing keys
+                            forIn(key, function(value, property) {
+                            oldKey.set(property, value);
+                        });
                         else
-                            // Add new keys
+                        // Add new keys
                             this._addKey(key);
                     }, this);
 
@@ -311,10 +345,10 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             },
 
 
-            _renameKey: function(keyId, newKeyId) {
+            _renameKey: function(keyId, newKeyName) {
                 Ember.run(this, function() {
                     if (this.keyExists(keyId))
-                        this.getKey(keyId).set('id', newKeyId);
+                        this.getKey(keyId).set('name', newKeyName);
                     this.trigger('onKeyRename');
                 });
             },
@@ -322,7 +356,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
             _setDefaultKey: function(keyId) {
                 Ember.run(this, function() {
-                    this.model.forEach(function (key) {
+                    this.model.forEach(function(key) {
                         key.set('isDefault', key.id == keyId);
                     });
                     this.trigger('onDefaultKeySet');
@@ -347,9 +381,9 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
             _disassociateKey: function(keyId, machine) {
                 Ember.run(this, function() {
                     var key = this.getKey(keyId);
-                    key.machines.some(function (key_machine) {
+                    key.machines.some(function(key_machine) {
                         if (key_machine[1] == machine.id && (key_machine[0] == machine.cloud.id ||
-                                                             key_machine[0] == machine.cloud)) { // For ghost machines
+                                key_machine[0] == machine.cloud)) { // For ghost machines
                             key.machines.removeObject(key_machine);
                             return true;
                         }
@@ -382,7 +416,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
                         this.model.forEach(function(key) {
                             var regex = new RegExp(that.searchTerm, 'i');
 
-                            if (regex.test(key.id)) {
+                            if (regex.test(key.name)) {
                                 keys.push(key);
                             } else {
                                 if (key.selected) {
@@ -418,7 +452,7 @@ define('app/controllers/keys', ['app/models/key' , 'ember'],
 
             filteredKeysObserver: function() {
                 Ember.run.once(this, '_updateFilteredKeys');
-            }.observes('model.@each.id', 'searchTerm', 'model.[]')
+            }.observes('model.@each.name', 'searchTerm', 'model.[]')
         });
     }
 );

@@ -128,25 +128,36 @@
 }
 
 .incidents.no-incidents.is-core .no-incident,
-.incidents.no-incidents.has-networks .no-incident {
+.incidents.no-incidents.has-networks .no-incident,
+.incidents.no-incidents.has-org .no-incident,
+.incidents.no-incidents.has-networks.has-org .no-incident {
     height: 135px;
     padding: 20px 0;
 }
 
 .incidents.no-incidents.is-core .no-incident h4,
-.incidents.no-incidents.has-networks .no-incident h4 {
+.incidents.no-incidents.has-networks .no-incident h4,
+.incidents.no-incidents.has-org .no-incident h4,
+.incidents.no-incidents.has-networks.has-org .no-incident h4 {
     margin: 15px 0 0 0;
 }
 
 .incidents.no-incidents.is-core .no-incident .icon-check:after,
-.incidents.no-incidents.has-networks .no-incident .icon-check:after {
+.incidents.no-incidents.has-networks .no-incident .icon-check:after,
+.incidents.no-incidents.has-networks.has-org .no-incident .icon-check:after {
     margin: 5px 0 0 0;
     font-size: 50px;
 }
 
-.incidents.no-incidents.is-core.has-networks .no-incident {
+.incidents.no-incidents.is-core.has-networks .no-incident,
+.incidents.no-incidents.is-core.has-org .no-incident {
     height: 180.594px;
     padding: 40px 0;
+}
+
+.incidents.no-incidents.is-core.has-networks.has-org .no-incident {
+    height: 226.188px;
+    padding: 60px 0;
 }
 
 .incidents .incident a {
@@ -182,8 +193,13 @@
     max-height: 135px;
 }
 
-.incidents.is-core.has-networks .ui-listview {
+.incidents.is-core.has-networks .ui-listview,
+.incidents.is-core.has-org .ui-listview {
     max-height: 180.594px;
+}
+
+.incidents.is-core.has-networks.has-org .ui-listview {
+    max-height: 226.188px;
 }
 
 .incidents .time {

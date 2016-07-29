@@ -1,0 +1,39 @@
+<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+<dom-module id="section-symbol">
+    <template>
+        <style>
+        :host {
+            display: block;
+            line-height: 34px;
+            width: 34px;
+            height: 34px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 18px;
+            outline: none;
+        }
+        
+        :host(.large) {
+            line-height: 64px;
+            width: 64px;
+            height: 64px;
+            font-size: 30px;
+        }
+        
+        iron-icon {
+            opacity: .8;
+        }
+        </style>
+        <iron-icon icon="[[icon]]"></iron-icon>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'section-symbol',
+    properties: {
+        icon: String,
+    }
+});
+</script>

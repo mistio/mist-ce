@@ -4,7 +4,7 @@ define('app/controllers/key_add', ['ember'],
     //
     //  @returns Class
     //
-    function () {
+    function() {
 
         'use strict';
 
@@ -22,7 +22,7 @@ define('app/controllers/key_add', ['ember'],
             callback: null,
             formReady: null,
 
-            keyId: null,
+            keyName: null,
             keyPrivate: null,
             keyPublic: null,
 
@@ -38,30 +38,30 @@ define('app/controllers/key_add', ['ember'],
             //
 
 
-            open: function (callback) {
+            open: function(callback) {
                 this._clear();
                 this.view.open('#add-key-btn');
                 this.set('callback', callback);
             },
 
 
-            close: function () {
+            close: function() {
                 this._clear();
                 this.view.close();
             },
 
 
-            add: function () {
+            add: function() {
                 this.set('addingKey', true);
                 Mist.keysController.addKey({
-                    keyId: this.keyId,
+                    keyName: this.keyName,
                     keyPrivate: this.keyPrivate,
                     callback: this._add,
                 });
             },
 
 
-            upload: function () {
+            upload: function() {
                 this.set('uploadingKey', true);
                 Mist.fileUploadController.uploadFile({
                     fileInput: this.view.fileInput[0],
@@ -70,7 +70,7 @@ define('app/controllers/key_add', ['ember'],
             },
 
 
-            generate: function () {
+            generate: function() {
                 this.set('generatingKey', true);
                 Mist.keysController.generateKey({
                     callback: this._generate
@@ -85,17 +85,17 @@ define('app/controllers/key_add', ['ember'],
             //
 
 
-            _clear: function () {
+            _clear: function() {
                 this.setProperties({
                     callback: null,
-                    keyId: null,
+                    keyName: null,
                     keyPrivate: null,
                     keyPublic: null
                 });
             },
 
 
-            _add: function (success, key) {
+            _add: function(success, key) {
                 var that = Mist.keyAddController;
                 that.set('addingKey', false);
                 if (that.callback)
@@ -105,7 +105,7 @@ define('app/controllers/key_add', ['ember'],
             },
 
 
-            _upload: function (success, keyPrivate) {
+            _upload: function(success, keyPrivate) {
                 var that = Mist.keyAddController;
                 that.set('uploadingKey', false);
                 if (success)
@@ -113,11 +113,11 @@ define('app/controllers/key_add', ['ember'],
             },
 
 
-            _generate: function (success, keyPrivate, keyPublic) {
+            _generate: function(success, keyPrivate, keyPublic) {
                 info('generate key callback');
                 var that = Mist.keyAddController;
                 that.set('generatingKey', false);
-                if (success) {                    
+                if (success) {
                     that.setProperties({
                         'keyPrivate': keyPrivate,
                         'keyPublic': keyPublic
@@ -130,11 +130,10 @@ define('app/controllers/key_add', ['ember'],
             },
 
 
-            _sanitizeFields: function () {
-
+            _sanitizeFields: function() {
                 // Remove non alphanumeric chars
-                if (this.keyId)
-                    this.set('keyId', this.keyId.replace(/\W/g, ''));
+                if (this.keyName)
+                    this.set('keyName', this.keyName.replace(/\W/g, ''));
 
                 // Remove extra spaces and new lines
                 if (this.keyPrivate)
@@ -142,8 +141,23 @@ define('app/controllers/key_add', ['ember'],
             },
 
 
-            _updateFormReady: function () {
-                this.set('formReady', this.keyId && this.keyPrivate);
+            _updateFormReady: function() {
+                var formReady = false,
+                    isUnique = true;
+
+                if (this.keyName && this.keyPrivate) {
+                    formReady = true;
+
+                    isUnique = Mist.keysController.model.every(function(key) {
+                        return key.name != this.keyName;
+                    }, this);
+
+                    if (!isUnique) {
+                        formReady = false;
+                    }
+                }
+
+                this.set('formReady', formReady);
             },
 
 
@@ -154,10 +168,10 @@ define('app/controllers/key_add', ['ember'],
             //
 
 
-            formObserver: function () {
+            formObserver: function() {
                 Ember.run.once(this, '_sanitizeFields');
                 Ember.run.once(this, '_updateFormReady');
-            }.observes('keyId', 'keyPrivate'),
+            }.observes('keyName', 'keyPrivate'),
         });
     }
 );

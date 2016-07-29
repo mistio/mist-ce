@@ -1,0 +1,136 @@
+<link rel="import" href="../theme-color/theme-color.html">
+<dom-module id="section-tile">
+    <template>
+        <style>
+        :host {
+            display: block;
+            transition: var(--material-curve-320);
+            transform: translate(60px, 0);
+            opacity: 0;
+        }
+        
+        :host(.active) {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+
+        h2 {
+            font-weight: 300;
+            font-size: 54px;
+            padding: 36px 0;
+            margin: 0;
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: all 500ms 320ms;
+            transition-timing-function: var(--material-curve-320);
+            text-align: center;
+            min-height: 1em;
+        }
+        
+        :host(.active) h2 {
+            transform: translate(0, 0);
+            opacity: 1;
+            color: rgba(0,0,0,0.32)
+        }
+        
+        h3 {
+            transform: translate(-50px, 0);
+            opacity: 0;
+            transition: all 600ms 320ms;
+            transition-timing-function: var(--material-curve-320);
+            text-transform: uppercase;            
+            display: inline;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 36px;
+            margin-left: 8px;
+        }
+        h3.icon-true {
+            margin-left: 40px;
+        }
+        :host(.active) h3 {
+            transform: translate(0, 0);
+            opacity: 1;
+        }
+        iron-icon {
+            width: 24px;
+            height: 24px;
+            opacity: 1;
+            vertical-align: text-top;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: #424242;
+            color: #fff;
+            padding: 4px;
+            margin-right: 8px;
+
+        }
+
+        :host[incidents] paper-material {
+            background-color: var(--red-color);
+        }
+        :host[incidents] iron-icon {            
+            background-color: var(--red-color);
+            color: #fff;
+        }
+        :host[incidents] h2, 
+        :host[incidents] h3 {
+            color: #fff;
+        }
+        </style>
+        <paper-material>
+            <template is="dom-if" if="[[icon]]">
+                <iron-icon icon="[[icon]]"></iron-icon>
+            </template>
+            <h3 class$="title icon-[[hasIcon]]">[[name]]</h3>
+            <h2 class="count">[[count]]</h2>
+            <!-- <theme-color color="[[statecolor]]" class="vertical layout" themed-reverse>
+            </theme-color> -->
+            <content></content>
+        </paper-material>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'section-tile',
+    enableCustomStyleProperties: true,
+    properties: {
+        section: {
+            type: String
+        },
+        count: {
+            type: Number
+        },
+        color: {
+            type: String
+        },
+        statecolor: {
+            type: String,
+            computed: "_computeStateColor(count, color)"
+        },
+        icon: String,
+        hasIcon: {
+            type: Boolean,
+            value: true,
+            computed: "_computeHasIcon(icon)"
+        }
+    },
+    _computeStateColor: function (count, color){
+        return (count ? color : "#eeeeee" );
+    },
+    attached: function() {
+        var tiles = this.parentNode.querySelectorAll('section-tile');
+        var index = Array.prototype.indexOf.call(tiles, this);
+        setTimeout(function() {
+            this.classList.add('active');
+        }.bind(this), (index + 1) * 500);
+    },
+    _computeHasIcon: function (icon) {
+        if (icon)
+            return true;
+        else
+            return false;
+    }
+});
+</script>

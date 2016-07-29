@@ -1,0 +1,71 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+
+<dom-module id="plans-list">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            .plans {
+                @apply(--layout-horizontal);
+            }
+
+            .plan {
+                @apply(--layout-flex);
+                @apply(--shadow-elevation-2dp);
+                text-align: center;
+            }
+            plan-item[iscurrent = 'true'] {
+                background-color: #f2f2f2;
+                color: rgba(66,66,66,.8);
+            }
+        </style>
+
+        <paper-material>
+            <h3>Your plan</h3>
+            <plan-item user="[[user]]" plan="[[user.current_plan]]" iscurrent="true" index="0" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
+            <h3>Other plans</h3>
+            <div class="plans">
+                <template is="dom-repeat" items=[[plans]] as="plan">
+                    <plan-item user="[[user]]" plan="[[plan]]" index="[[index]]" iscurrent$="[[computeIsCurrent(plan, user)]]" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
+                </template>
+            </div>
+        </paper-material>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'plans-list',
+
+                properties: {
+                    user: {
+                        type: Object,
+                        notify: true
+                    },
+                    plans: {
+                        type: Array,
+                        value: function() {
+                            return PLANS.filter(function(plan) {
+                                return plan.visible;
+                            });
+                        }
+                    }
+                },
+                computeIsCurrent: function(plan, user) {
+                  if (this.user.current_plan) {
+                    return plan.title == this.user.current_plan.title ? true : false;
+                  }
+                  else {
+                    return false;
+                  }
+                }
+            });
+        })();
+    </script>
+</dom-module>

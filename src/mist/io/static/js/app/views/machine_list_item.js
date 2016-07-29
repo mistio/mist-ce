@@ -4,16 +4,16 @@ define('app/views/machine_list_item', ['app/views/list_item'],
      *
      *  @returns Class
      */
-    function (ListItemComponent) {
+    function(ListItemComponent) {
         return App.MachineListItemComponent = ListItemComponent.extend({
 
             //
             //  Properties
             //
+
             layoutName: 'machine_list_item',
             machine: null,
             classNameBindings: ['machineState', 'monitoringState', 'monitoringTooltip'],
-
 
             //
             //  Computed Properties
@@ -24,7 +24,7 @@ define('app/views/machine_list_item', ['app/views/list_item'],
             }.property('machine.state'),
 
             monitoringState: function() {
-                if (this.machine.hasMonitoring){
+                if (this.machine.hasMonitoring) {
                     if (this.machine.get('hasOpenIncident'))
                         return 'has-incident';
                     return 'has-monitoring';
@@ -33,36 +33,34 @@ define('app/views/machine_list_item', ['app/views/list_item'],
             }.property('machine.hasMonitoring', 'machine.hasOpenIncident'),
 
             monitoringTooltip: function() {
-                if (this.machine.hasMonitoring){
+                if (this.machine.hasMonitoring) {
                     if (this.machine.get('hasOpenIncident'))
-                        return 'Machine has Incident'; 
+                        return 'Machine has Incident';
                     return 'Monitoring state is good';
                 }
                 return 'Monitoring not enabled';
             }.property('machine.hasMonitoring', 'machine.hasOpenIncident'),
 
-
             //
             //  Methods
             //
 
-            updateCheckbox: function () {
+            updateCheckbox: function() {
                 var element = $('#' + this.elementId + ' input.ember-checkbox');
-                Ember.run.next(this, function () {
+                Ember.run.next(this, function() {
                     if (element.checkboxradio) {
                         element.checkboxradio()
-                               .checkboxradio('refresh');
+                            .checkboxradio('refresh');
                     }
                 });
             },
-
 
             //
             //  Actions
             //
 
             actions: {
-                disassociateGhostMachine: function () {
+                disassociateGhostMachine: function() {
                     // This method is called ONLY from inside the
                     // single key view. That is why we get the parent
                     // view to get "keyId"
@@ -72,13 +70,11 @@ define('app/views/machine_list_item', ['app/views/list_item'],
                     Mist.dialogController.open({
                         type: DIALOG_TYPES.YES_NO,
                         head: 'Disassociate machine',
-                        body: [
-                            {
-                                paragraph: 'Are you sure you want to disassociate ' +
-                                    machine.name + ' ?'
-                            }
-                        ],
-                        callback: function (didConfirm) {
+                        body: [{
+                            paragraph: 'Are you sure you want to disassociate ' +
+                                machine.name + ' ?'
+                        }],
+                        callback: function(didConfirm) {
                             if (didConfirm) {
                                 Mist.keysController.disassociateKey(keyId, machine);
                             }
@@ -87,12 +83,11 @@ define('app/views/machine_list_item', ['app/views/list_item'],
                 }
             },
 
-
             //
             //  Observers
             //
 
-            machineSelectedObserver: function () {
+            machineSelectedObserver: function() {
                 Ember.run.once(this, 'updateCheckbox');
             }.observes('machine.selected')
         });

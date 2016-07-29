@@ -11,7 +11,6 @@ define('app/models/script', ['app/models/base'],
         return BaseModel.extend({
 
             convertProperties: {
-                'script_id': 'id',
                 'exec_type': 'type',
                 'location_type': 'source',
             }

@@ -1,0 +1,244 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../app-form/app-form.html">
+
+<dom-module id="script-add">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+        :host {
+            display: block;
+        }
+        #content {
+            max-width: 900px;
+        }
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
+
+        paper-progress {
+            position: absolute;
+            bottom: 85px;
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        :host >::content paper-input-container {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+
+        </style>
+
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Add Script
+                    </h2>
+                    <div class="subtitle">
+                        You can add scripts inline or from a url. You will soon be able to schedule your scripts to run.
+                    </div>
+                </div>
+            </paper-material>
+            <paper-material>
+                <app-form fields="[[fields]]" form="[[script]]" url="/api/v1/scripts" on-request="_addScriptAjaxRequest" on-response="_addScriptAjaxResponse"></app-form>
+            </paper-material>
+        </div>
+
+
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'script-add',
+
+            properties: {
+                sections: {
+                    type: Object
+                },
+                section: {
+                    type: Object
+                },
+                model: {
+                    type: Object
+                },
+                script: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            name: '',
+                            script: '',
+                            exec_type: '',
+                            entrypoint: '',
+                            location_type: '',
+                            description: ''
+                        }
+                    }
+                },
+                typedName: {
+                    type: String,
+                    value: '',
+                    notify: true
+                },
+                fields: {
+                    type: Array,
+                    value: [{
+                        name: "name",
+                        label: "Script Name *",
+                        type: "text",
+                        value: "",
+                        isLead: true,
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please enter script's name",
+                        show: true,
+                        required: true
+                    }, {
+                        name: "description",
+                        label: "Script Description",
+                        type: "textarea",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please enter script's description",
+                        show: true,
+                        required: false
+                    }, {
+                        name: "exec_type",
+                        label: "Type *",
+                        type: "dropdown",
+                        value: "",
+                        defaultValue: "",
+                        errorMessage: "Please enter script's description",
+                        show: true,
+                        required: true,
+                        options: [{
+                            title: "Executable",
+                            val: "executable"
+                        }, {
+                            title: "Ansible Playbook",
+                            val: "ansible"
+                        }]
+                    }, {
+                        name: "location_type",
+                        label: "Source *",
+                        type: "dropdown",
+                        value: "",
+                        defaultValue: "",
+                        errorMessage: "Please enter script's source",
+                        show: true,
+                        required: true,
+                        options: [{
+                            title: "Github",
+                            val: "github"
+                        }, {
+                            title: "URL",
+                            val: "url"
+                        }, {
+                            title: "Inline",
+                            val: "inline"
+                        }]
+                    }, {
+                        name: "script",
+                        label: "Url *",
+                        type: "text",
+                        value: "http://",
+                        defaultValue: "http://",
+                        placeholder: "",
+                        show: false,
+                        required: true,
+                        showIf: {
+                            fieldName: "location_type",
+                            fieldValues: ["url"]
+                        },
+                        errorMessage: "Please enter a url"
+                    }, {
+                        name: "script",
+                        label: "Github Repo *",
+                        type: "text",
+                        value: "https://github.com/owner/repo",
+                        defaultValue: "https://github.com/owner/repo",
+                        placeholder: "",
+                        show: false,
+                        required: true,
+                        showIf: {
+                            fieldName: "location_type",
+                            fieldValues: ["github"]
+                        },
+                        errorMessage: "Please enter a github repo"
+                    }, {
+                        name: "script",
+                        label: "Script *",
+                        type: "textarea",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        show: false,
+                        required: true,
+                        errorMessage: "Please enter inline script",
+                        showIf: {
+                            fieldName: "location_type",
+                            fieldValues: ["inline"]
+                        },
+                        placeholderIf: {
+                            fieldName: "location_type",
+                            fieldOptions: {
+                                "executable": "#!/bin/bash\necho 'hello world'",
+                                "ansible": "- name: Dummy ansible playbook\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug:\n\t\t\t\tmsg: 'Hello World'\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug: msg='Hello World'\n"
+                            }
+                        }
+                    }, {
+                        name: "entrypoint",
+                        label: "Entry point",
+                        type: "text",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "location_type",
+                            fieldValues: ["github", "url"]
+                        },
+                        errorMessage: "Please enter entry point"
+                    }],
+                    notify: true
+                },
+                // sendingData: {
+                //     type: Boolean,
+                //     value: false
+                // },
+                // formReady: {
+                //     type: Boolean,
+                //     value: false
+                // },
+                // hideprogress: {
+                //     type: Boolean,
+                //     value: true
+                // }
+            },
+            listeners: {
+            },
+            _addScriptAjaxRequest: function() {
+            },
+            _addScriptAjaxResponse: function(e) {
+                // 
+                // console.log('XHR', e.detail);
+                var response = YAML.parse(e.detail.xhr.response);
+                page('/scripts/'+ response.id);
+                page('/scripts/');
+            },
+        });
+    })();
+    </script>
+</dom-module>

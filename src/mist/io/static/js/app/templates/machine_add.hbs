@@ -50,6 +50,27 @@
             </div>
         </div>
 
+        <!-- Select Provider Type -->
+        {{#if view.hasSoftlayer}}
+            <div id="create-machine-provider-type" class="{{if Mist.machineAddController.newMachineProviderType 'filled' 'empty'}}">
+                <label>Provider Type</label>
+                <div data-role="collapsible"
+                    data-iconpos="right"
+                    data-collapsed-icon="carat-d"
+                    data-expanded-icon="carat-u"
+                    class="mist-select">
+                    <h4>{{Mist.machineAddController.newMachineProviderType.title}}</h4>
+                    <ul data-role="listview">
+                        {{#each view.newMachineProviderTypeOptions as |option|}}
+                        <li data-icon="false">
+                            <a {{action "selectProviderType" option.val target=view}}>{{option.title}}</a>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
+        {{/if}}
+
         <!-- Select Image -->
         <div id="create-machine-image" class="field-wrapper required {{if Mist.machineAddController.selectedImage 'preset' ''}} {{if Mist.machineAddController.newMachineProvider.provider '' 'ui-state-disabled'}} {{if Mist.machineAddController.newMachineImage.id 'filled' 'empty'}}">
             <div class="first-child {{if view.hasLibvirt '' 'last-child'}}">
@@ -71,7 +92,7 @@
 
                     {{#unless Mist.machineAddController.selectedImage}}
                     <ul data-role="listview" >
-                        {{#each Mist.machineAddController.newMachineProvider.images.model as |image|}}
+                        {{#each Mist.machineAddController.newMachineImagesOptions as |image|}}
                             {{#unless Mist.machineAddController.newMachineProvider.images.hasStarred}}
                                 <li data-icon="false">
                                     <span class="image-icon-small">
@@ -185,7 +206,6 @@
                      data-iconpos="right"
                      data-collapsed-icon="carat-d"
                      data-expanded-icon="carat-u"
-
                      class="mist-select">
                     <h4>{{Mist.machineAddController.newMachineLocation.name}}</h4>
                     <ul data-role="listview">
@@ -213,7 +233,7 @@
                      class="mist-select">
                     <h4>
                         {{#if Mist.machineAddController.newMachineKey.id}}
-                        {{Mist.machineAddController.newMachineKey.id}}
+                        {{Mist.machineAddController.newMachineKey.name}}
                         {{else}}
                         {{Mist.machineAddController.newMachineKey.title}}
                         {{/if}}
@@ -222,7 +242,7 @@
                     <ul data-role="listview">
                         {{#each Mist.keysController.model as |key|}}
                             <li data-icon="false">
-                                <a {{action "selectKey" key target=view}}>{{key.id}}</a>
+                                <a {{action "selectKey" key target=view}}>{{key.name}}</a>
                             </li>
                         {{/each}}
                         <li data-icon="false" data-theme="d">
@@ -323,6 +343,17 @@
         </div>
         {{/if}}
 
+        <!-- Softlayer VLAN ID -->
+        {{#if view.hasSoftlayer}}
+            <div id="vlan-id">
+                <label>Backend VLAN ID</label>
+                {{view Mist.TextField
+                       id="create-machine-vlan-id"
+                       placeholder="optional"
+                       value=Mist.machineAddController.newMachineVlanID}}
+            </div>
+        {{/if}}
+
         <!-- Select Cloud Init Script -->
         {{#if view.hasCloudInit}}
         <div id="cloud-init">
@@ -409,6 +440,27 @@
                        value=Mist.machineAddController.newMachineAzurePorts}}
             </div>
         </div>
+        {{/if}}
+
+        <!-- Select Billing Type -->
+        {{#if view.hasSoftlayer}}
+            <div id="create-machine-billing" class="{{if Mist.machineAddController.newMachineBilling 'filled' 'empty'}}">
+                <label>Billing Type</label>
+                <div data-role="collapsible"
+                    data-iconpos="right"
+                    data-collapsed-icon="carat-d"
+                    data-expanded-icon="carat-u"
+                    class="mist-select">
+                    <h4>{{Mist.machineAddController.newMachineBilling.title}}</h4>
+                    <ul data-role="listview">
+                        {{#each view.newMachineBillingOptions as |option|}}
+                        <li data-icon="false">
+                            <a {{action "selectProviderBilling" option.val target=view}}>{{option.title}}</a>
+                        </li>
+                        {{/each}}
+                    </ul>
+                </div>
+            </div>
         {{/if}}
 
         <!-- Enable monitoring -->

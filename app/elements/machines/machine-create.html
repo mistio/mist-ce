@@ -1,0 +1,2411 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+
+<dom-module id="machine-create">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                min-height: 1200px;
+            }
+
+            paper-material {
+                display: block;
+                padding: 24px;
+                transition: all 0.2 ease-in;
+            }
+            #content {
+                max-width: 900px;
+            }
+            paper-card,
+            paper-checkbox {
+                display: block;
+            }
+
+            paper-card {
+                margin-bottom: 40px;
+            }
+
+            paper-toggle-button,
+            paper-checkbox {
+                margin-top: 20px;
+            }
+
+            .dropdown-with-logos paper-item img {
+                margin-right: 16px;
+            }
+
+            .dropdown-with-logos paper-item {
+                text-transform: capitalize;
+                opacity: 0.87;
+            }
+            paper-dropdown-menu ::content .dropdown-content {
+                max-height: 400px !important;
+            }
+        </style>
+
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="hardware:computer"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Create machine
+                    </h2>
+                    <div class="subtitle">
+                        Create your machines 
+                    </div>
+                </div>
+            </paper-material>
+            <paper-material>
+                <div class="grid-row">
+                    <paper-dropdown-menu class="dropdown-block l6 xs12 dropdown-with-logos" label="Choose Cloud" horizontal-align="left">
+                        <paper-menu attr-for-selected="value" selected="{{selectedCloud}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[model.cloudsArray]]" as="provider">
+                                <paper-item value="[[provider.id]]"><img src="[[_computeProviderLogo(provider.provider)]]" width="24px" />[[provider.title]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+                </div>
+            </paper-material>
+            <paper-material class$=" selected-[[!selectedCloud]]">
+                <h3 class="smallcaps">Machine Setup</h3>
+                <div hidden$=[[selectedCloud]]>
+                    <p>Depending on the cloud there maybe needed different machine parameters. Choose a provider for the coresponding fields to appear.</p>
+                </div>
+                <div hidden$=[[!selectedProvider]]>
+                    <template is="dom-repeat" items="{{machineFields}}" as="field">
+                        <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
+                            <paper-input id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                        </template>
+                        <template is="dom-if" if="[[_computeFieldType(field, 'password', field.show)]]">
+                            <paper-input id="[[field.name]]" type="password" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
+                        </template>
+                        <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
+                            <paper-textarea id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
+                        </template>
+                        <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
+                            <paper-dropdown-menu class="dropdown-block" label="[[field.label]]" horizontal-align="left">
+                                <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                    <template is="dom-repeat" items="[[field.options]]" as="option">
+                                        <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                    </template>
+                                </paper-menu>
+                            </paper-dropdown-menu>
+                        </template>
+                        <template is="dom-if" if="[[_computeFieldType(field, 'ssh_key', field.show)]]">
+                            <paper-dropdown-menu class="dropdown-block" label="[[field.label]]" horizontal-align="left">
+                                <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                    <template is="dom-repeat" items="[[field.options]]" as="option">
+                                        <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                    </template>
+                                </paper-menu>
+                            </paper-dropdown-menu>
+                        </template>
+                        <template is="dom-if" if="[[_computeFieldType(field, 'switch', field.show)]]">
+                            <paper-toggle-button checked="{{field.value}}">[[field.label]]</paper-toggle-button>
+                        </template>
+                    </template>
+                    <hr/>
+                    <div class="clearfix">
+                        <paper-button class="submit-btn pull-left blue" disabled$="[[!formReady]]" on-tap="_submitForm">Add</paper-button>
+                        <paper-button class="submit-btn pull-right blue" on-tap="_resetForm">Reset</paper-button>
+                    </div>
+                </div>
+            </paper-material>
+        </div>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'machine-create',
+
+                properties: {
+                    machine: {
+                        type: Object
+                    },
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    model: {
+                        type: Object
+                    },
+                    cloud: {
+                        type: Object,
+                        value: {}
+                    },
+                    selectedCloud: {
+                        type: String,
+                        value: null,
+                        notify: true
+                    },
+                    machineFields: {
+                        type: Array,
+                        value: []
+                    },
+                    machinesFields:{
+                        type: Object,
+                        value: {
+                            "packet.net": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "openstack": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "CLoud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "networksArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "multi",
+                                        "name": "networks",
+                                        "errorMessage": "",
+                                        "required": false,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Networks"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "vmware_vcloud": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": false,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "networksArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "multi",
+                                        "name": "networks",
+                                        "errorMessage": "",
+                                        "required": false,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Networks"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "docker": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": false,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": false,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "docker_env",
+                                        "errorMessage": "",
+                                        "required": false,
+                                        "helptext": "",
+                                        "label": "Docker Env"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "docker_command",
+                                        "errorMessage": "",
+                                        "required": false,
+                                        "helptext": "",
+                                        "label": "Docker Command"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "docker_port_bindings",
+                                        "errorMessage": "",
+                                        "required": false,
+                                        "helptext": "",
+                                        "label": "Docker Port Bindings"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "docker_exposed_ports",
+                                        "errorMessage": "",
+                                        "required": false,
+                                        "helptext": "",
+                                        "label": "Docker Exposed Ports"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "kvm": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Siza"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "vmware_vsphere": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "other_server": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "softlayer": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "hp_helion_cloud": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "azure": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "azure_port_bindings",
+                                        "errorMessage": "",
+                                        "required": false,
+                                        "helptext": "",
+                                        "label": "Azure Port Bindings"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "nephoscale": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "hostvirtual": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "ec2": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "coreos": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "vultr": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "indonesian_cloud": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": false,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "gce": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "linode": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            },
+                            "digital_ocean": {
+                                "machine": [
+                                    {
+                                        "default": "",
+                                        "value": "",
+                                        "query": [
+                                            "cloudsArray"
+                                        ],
+                                        "type": "dropdown",
+                                        "description": "The mist.io cloud",
+                                        "show": true,
+                                        "errorMessage": "Please enter cloud id",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "name": "cloud",
+                                        "label": "Cloud"
+                                    },
+                                    {
+                                        "value": "",
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "text",
+                                        "name": "name",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "",
+                                        "label": "Name"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "imagesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "image",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Image"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "sizesArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "size",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Size"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "keysArray"
+                                        ],
+                                        "show": true,
+                                        "description": "The mist.io key",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "key",
+                                        "errorMessage": "Please enter key",
+                                        "required": true,
+                                        "helptext": "You can choose key is needed to...",
+                                        "label": "Key"
+                                    },
+                                    {
+                                        "value": "",
+                                        "query": [
+                                            "clouds",
+                                            "$.cloud",
+                                            "locationsArray"
+                                        ],
+                                        "showIf": {
+                                            "fieldName": "cloud",
+                                            "fieldExists": true
+                                        },
+                                        "show": true,
+                                        "description": "",
+                                        "default": "",
+                                        "type": "dropdown",
+                                        "name": "location",
+                                        "errorMessage": "",
+                                        "required": true,
+                                        "helptext": "You can choose cloud id is needed to...",
+                                        "label": "Location"
+                                    }
+                                ],
+                                "cloud": []
+                            }
+                        }
+                    }
+                },
+                observers: [
+                    '_cloudChanged(selectedCloud, machinesFields)',
+                    '_fieldsChanged(machinesFields.*, sendingData)',
+                ],
+                _computeProviderLogo: function(className) {
+                    var identifier = className.split('_')[0];
+                    return '../assets/providers/provider-' + identifier + '.png';
+                },
+                _computeFieldType: function(field, value, show) {
+                    if (!(field.showIf && !field.show)) {
+                        return field.type == value;
+                    }
+                },
+                _cloudChanged: function(selectedCloud, machinesFields) {
+                    this._resetForm();
+                    console.log('HEREER',this.selectedCloud);
+                    if (selectedCloud){
+                        var cloudName =  this.model.clouds[selectedCloud].provider.split('_')[0];
+                        var machineFields = this.machinesFields[cloudName].machine;
+                        console.log('ssssssss', selectedCloud, cloudName, this.machinesFields[cloudName].machine)
+                    }
+                    else {
+                        machineFields = []
+                    }
+                    this.set('machineFields', machineFields);
+                },
+                _resetForm: function(e) {
+                    // Reset cloud
+                    this.set('cloud', {});
+
+                    // Reset Form Fields
+                    this.machineFields.forEach(function(el, index) {
+                        if (el.showIf) {
+                            this.set('providerFields.' + index + '.show', false);
+                        }
+
+                        // Reset Form Fields Validation
+                        this._resetField(el, index);
+                    }, this);
+                },
+                _resetField: function(el, index) {
+                    this.set('providerFields.' + index + '.value', el.defaultValue);
+
+                    var input = this.querySelector('#' + el.name);
+                    if (input) {
+                        input.invalid = false;
+                    }
+                },
+                _goBack: function(){
+                    history.back();
+                }
+            });
+        })();
+    </script>
+</dom-module>

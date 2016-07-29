@@ -18,8 +18,8 @@ from amqp import Message
 from amqp.connection import Connection
 from amqp.exceptions import NotFound as AmqpNotFound
 
-from mist.io.model import User
 from mist.io.exceptions import MistError
+import mist.core.user.models
 
 try:
     from mist.core import config
@@ -72,18 +72,6 @@ def params_from_request(request):
     return params
 
 
-def user_from_request(request):
-    return User()
-
-
-def user_from_session_id(session_id):
-    return User()
-
-
-def user_from_email(email):
-    return User()
-
-
 def b58_encode(num):
     """Returns num in a base58-encoded string."""
     alphabet = '123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ'
@@ -111,7 +99,8 @@ def parse_ping(stdout):
     """Parse ping's stdout and return dict of extracted metrics."""
     re_header = "^--- (.*) ping statistics ---$"
     re_packets = "^([\d]+) packets transmitted, ([\d]+)"
-    re_rtt = ".*min/avg/max/[a-z]* = ([\d]+\.[\d]+)/([\d]+\.[\d]+)/([\d]+\.[\d]+)"
+    re_rtt = ".*min/avg/max/[a-z]* = " \
+             "([\d]+\.[\d]+)/([\d]+\.[\d]+)/([\d]+\.[\d]+)"
     lines = stdout.split("\n")
     for i in range(len(lines) - 2):
         line = lines[i]
@@ -176,7 +165,7 @@ def amqp_subscribe(exchange, callback, queue='',
 
     connection = Connection(config.AMQP_URI)
     channel = connection.channel()
-    channel.exchange_declare(exchange=exchange, type=ex_type, auto_delete=true)
+    channel.exchange_declare(exchange=exchange, type=ex_type, auto_delete=True)
     resp = channel.queue_declare(queue, exclusive=True)
     if not routing_keys:
         channel.queue_bind(resp.queue, exchange)
@@ -196,20 +185,22 @@ def amqp_subscribe(exchange, callback, queue='',
         amqp_log("SUBSCRIPTION ENDED: %s %s %r" % (exchange, queue, exc))
 
 
-def _amqp_user_exchange(user):
+def _amqp_owner_exchange(owner):
     # The exchange/queue name consists of a non-empty sequence of these
     # characters: letters, digits, hyphen, underscore, period, or colon.
-    if isinstance(user, basestring):
-        email = user
-    else:
-        email = user.email
-    tag = email.replace('@', ':') or 'noone'
-    return "mist-user_%s" % tag
+    if isinstance(owner, basestring) and '@' in owner:
+        owner = mist.core.user.models.User.objects.get(email=owner)
+    elif not isinstance(owner, mist.core.user.models.Owner):
+        try:
+            owner = mist.core.user.models.Owner.objects.get(id=owner)
+        except Exception as exc:
+            raise Exception('%r %r' % (exc, owner))
+    return "owner_%s" % owner.id
 
 
 def amqp_publish_user(user, routing_key, data):
     try:
-        amqp_publish(_amqp_user_exchange(user), routing_key, data)
+        amqp_publish(_amqp_owner_exchange(user), routing_key, data)
     except AmqpNotFound:
         return False
     except Exception:
@@ -218,14 +209,14 @@ def amqp_publish_user(user, routing_key, data):
 
 
 def amqp_subscribe_user(user, queue, callback):
-    amqp_subscribe(_amqp_user_exchange(user), callback, queue)
+    amqp_subscribe(_amqp_owner_exchange(user), callback, queue)
 
 
-def amqp_user_listening(user):
+def amqp_owner_listening(owner):
     connection = Connection(config.AMQP_URI)
     channel = connection.channel()
     try:
-        channel.exchange_declare(exchange=_amqp_user_exchange(user),
+        channel.exchange_declare(exchange=_amqp_owner_exchange(owner),
                                  type='fanout', passive=True)
     except AmqpNotFound:
         return False
@@ -236,11 +227,14 @@ def amqp_user_listening(user):
         connection.close()
 
 
-def trigger_session_update(email, sections=['clouds', 'keys', 'monitoring']):
-    amqp_publish_user(email, routing_key='update', data=sections)
+def trigger_session_update(owner, sections=['clouds', 'keys', 'monitoring',
+                                            'scripts', 'templates', 'stacks',
+                                            'cronjobs', 'user', 'org']):
+    amqp_publish_user(owner, routing_key='update', data=sections)
 
 
 def amqp_log(msg):
+    return
     msg = "[%s] %s" % (time.strftime("%Y-%m-%d %H:%M:%S %Z"), msg)
     try:
         amqp_publish('mist_debug', '', msg)
@@ -308,7 +302,7 @@ class StdStreamCapture(object):
 
 
 def sanitize_host(host):
-    "Return the hostame or ip address out of a URL"
+    """Return the hostname or ip address out of a URL"""
 
     for prefix in ['https://', 'http://']:
         host = host.replace(prefix, '')
@@ -317,6 +311,41 @@ def sanitize_host(host):
     host = host.split(':')[0]
 
     return host
+
+
+def extract_port(url):
+    """Returns the port number out of a url"""
+    for prefix in ['http://', 'https://']:
+        if prefix in url:
+            url = url.replace(prefix, '')
+            break
+    else:
+        prefix = ''
+    url = url.split('/')[0]
+    url = url.split(':')
+    if len(url) > 1:
+        return int(url[1])
+    elif prefix == 'https://':
+        return 443
+    else:
+        return 80
+
+
+def extract_params(url):
+    """Extracts the trailing params beyond the port number out of a url"""
+    for prefix in ['http://', 'https://']:
+        url = url.replace(prefix, '')
+    params = url.split('/')[1:]
+    params = '/'.join(params)
+    return params
+
+
+def extract_prefix(url, prefixes=['http://', 'https://']):
+    """Extracts the (http, https) prefix out of a given url"""
+    try:
+        return [prefix for prefix in prefixes if prefix in url][0]
+    except IndexError:
+        return ''
 
 
 def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
@@ -335,7 +364,6 @@ def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
         msg = "Host '%s' resolves to '%s' which" % (host, ipaddr)
     else:
         msg = "Host '%s'" % host
-
 
     if not netaddr.valid_ipv4(ipaddr):
         raise MistError(msg + " is not a valid IPv4 address.")
@@ -376,3 +404,17 @@ def check_host(host, allow_localhost=config.ALLOW_CONNECT_LOCALHOST,
         raise MistError("%s is not allowed. It belongs to '%s' "
                         "which is %s." % (msg, cidr,
                                           forbidden_subnets[str(cidr)]))
+
+
+def transform_key_machine_associations(machines, key):
+    key_associations = []
+    for machine in machines:
+        for key_assoc in machine.key_associations:
+            if key_assoc.keypair == key:
+                key_associations.append([machine.cloud.id,
+                                        machine.machine_id,
+                                        key_assoc.last_used,
+                                        key_assoc.ssh_user,
+                                        key_assoc.sudo,
+                                        key_assoc.port])
+    return key_associations

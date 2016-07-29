@@ -1,0 +1,525 @@
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
+
+<dom-module id="item-actions">
+    <template>
+        <style include="paper-dialog-shared-styles"></style>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                margin: 0;
+                background-color: transparent;
+                width: 100%;
+                box-shadow: none;
+            }
+
+            #select-action {
+                width: 200px;
+            }
+            #select-action paper-listbox {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+            #select-action paper-listbox ::content iron-icon {
+                vertical-align: top;
+            }
+            #select-action paper-button {text-align: left;}
+            #select-action paper-item {padding: 0; margin: 0; width: 200px;}
+            #select-action paper-item iron-icon {padding: 0 8px;}
+
+            div.actions {
+                width: 100%;
+                float: right;
+                text-align: left;
+                margin-top: 0;
+                color: #fff;
+            }
+
+            div.actions .more {
+                width: 95px;
+            }
+
+            div.actions iron-icon {
+                fill: #fff;
+                margin-top: -2px;
+            }
+
+            div.actions paper-button {
+                padding: 16px 16px;
+                margin-left: 16px;
+            }
+            paper-dialog {
+                padding: 0;
+            }
+            paper-dialog > h2 {
+                text-transform: capitalize;
+                margin-top: 24px;
+            }
+            paper-dialog > p {
+                margin: 0 24px 0 24px
+            }
+            paper-dialog > .btn-group {
+                margin-bottom: 16px;
+            }
+
+        </style>
+        <content>
+          <div class="actions">
+            <template is="dom-if" if="[[topActions.length]]">
+              <template is="dom-repeat" items="{{topActions}}">
+                  <paper-button on-tap="_selectMultiAction"><iron-icon icon="[[item.icon]]"></iron-icon> <span>[[item.name]]</span></paper-button>
+              </template>
+            </template>
+            <template is="dom-if" if="[[moreActions.length]]">
+              <paper-button class="more"><iron-icon icon="more-vert"></iron-icon></paper-button>
+            </template>
+          </div>
+
+          <paper-dialog id="select-action">
+            <paper-listbox class="dropdown-content">
+              <template is="dom-repeat" items="[[itemActionsDetails(selectedItem)]]">
+                  <paper-item><paper-button on-tap="_selectAction"><iron-icon icon="[[item.icon]]"></iron-icon> [[item.name]]</paper-button></paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dialog>
+
+          <paper-dialog id="confirmation" modal closingReason="{{confirmationStatus}}">
+            <template is="dom-if" if="[[!multi]]">
+              <h2>[[selectedAction.name]] [[selectedItem.type]] ?</h2>
+              <paper-dialog-scrollable>
+                <p>
+                    [[selectedItem.name]]
+                </p>
+              </paper-dialog-scrollable>
+            </template>
+
+            <template is="dom-if" if="[[multi]]">
+              <h2>[[selectedAction.name]] [[selectedItemsOfCurrentSection.length]] {{selectedItemsOfCurrentSectionType(selectedItemsOfCurrentSection.length, items.length)}} ?</h2>
+              <paper-dialog-scrollable>
+                <p>
+                    <template is="dom-repeat" items="{{selectedItemsDetails(selectedItemsOfCurrentSection.length)}}">
+                      [[item.name]]
+                    </template>
+                </p>
+              </paper-dialog-scrollable>
+            </template>
+            <div class="buttons clearfix btn-group">
+              <paper-button dialog-dismiss>Cancel</paper-button>
+              <paper-button dialog-confirm class="red" on-tap="_confirmAction">Proceed</paper-button>
+            </div>
+          </paper-dialog>
+          <dialog-element></dialog-element>
+        </content>
+    </template>
+</dom-module>
+
+<script>
+
+ACTIONS = {
+  'shell': {
+    'name': 'shell',
+    'icon': 'vaadin-icons:terminal',
+    'confirm': false,
+    'multi': false
+  },
+  'tag': {
+    'name': 'tag',
+    'icon': 'label',
+    'confirm': false,
+    'multi': false
+  },
+  'reboot': {
+    'name': 'reboot',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'destroy': {
+    'name': 'destroy',
+    'icon': 'delete',
+    'confirm': true,
+    'multi': true
+  },
+  'star': {
+    'name': 'star',
+    'icon': 'star',
+    'confirm': false,
+    'multi': true
+  },
+  'unstar': {
+    'name': 'unstar',
+    'icon': 'star-border',
+    'confirm': false,
+    'multi': true
+  },
+  'make_default': {
+    'name': 'make default',
+    'icon': 'star',
+    'confirm': false,
+    'multi': false
+  },
+  'run': {
+    'name': 'run',
+    'icon': 'av:play-arrow',
+    'confirm': true,
+    'multi': false
+  },
+  'enable': {
+    'name': 'enable',
+    'icon': 'av:fiber-manual-record',
+    'confirm': false,
+    'multi': true
+  },
+  'disable': {
+    'name': 'disable',
+    'icon': 'av:pause-circle-outline',
+    'confirm': false,
+    'multi': true
+  },
+  'delete': {
+    'name': 'delete',
+    'icon': 'delete',
+    'confirm': true,
+    'multi': true
+  }
+}
+
+function actionDetails(actions) {
+    var ret = [];
+    for (var i=0; i<actions.length; i++) {
+        ret.push(ACTIONS[actions[i]]);
+    }
+    return ret;
+}
+
+function itemUid(item, section) {
+    // Returns a universal resource id of the form
+    //      resourceType:[cloudId]:itemId
+    // e.g. machine:3tm7aaHHZcMxpZ:bf04f27e924fa67023582,
+    //      key::MnhLdx9u22YjVJ
+    //
+    // TODO replace with mist uuids
+
+    // if item type is not defined derive it fro the current section id
+    var item_type = item.type ? item.type : (section &&
+                                             section.id.slice(0,-1));
+    var cloudId = item.cloud ? item.cloud.id : '';
+
+    return item_type + ':' + cloudId + ':' + item.id;
+}
+
+Polymer({
+    is: 'item-actions',
+
+    properties: {
+        section: Object,
+        items: {
+            type: Array,
+            value: [],
+            notify: true
+        },
+        selectedItems: {
+            type: Array,
+            notify: true
+        },
+        selectedItemsOfCurrentSection: {
+            type: Array,
+            computed: 'computeSelectedOfCurrent(selectedItems.*, section)'
+        },
+        actions: {
+            type: Array,
+            value: []
+        },
+        topActions: {
+            type: Array,
+            computed: "_topActions(actions.*)"
+        },
+        moreActions: {
+            type: Array,
+            computed: "_moreActions(actions.*)"
+        },
+        selectedAction: {
+            type: String
+        },
+        selectedItem: Object
+    },
+
+    observers: [
+        'selectedItemsChanged(selectedItems.splices, items.length)',
+    ],
+
+    ready: function () {
+    },
+    computeSelectedOfCurrent: function(selected, section){
+        var selectedOfCurrent = [];
+        selectedOfCurrent = this.selectedItems.filter(function(i){
+            var itemtype = i.split(':')[0];
+            return this.section.id.indexOf(itemtype) > -1;
+        }, this);
+        this.fire('selected-of-current-section-length', {'itemLength': selectedOfCurrent.length})
+        return selectedOfCurrent;
+    },
+    openItemActions: function (item, y, x) {
+        // ugly hack that displays dialog only after it is correctly positioned
+        var selectActionDialog = this.$['select-action'];
+
+        this.set('selectedItem', item);
+
+        selectActionDialog.set('hidden', true);
+        selectActionDialog.open();
+        setTimeout(function() {
+            selectActionDialog.set('style.top', y + 'px');
+            selectActionDialog.set('style.right', x + 'px');
+            selectActionDialog.set('style.left', 'auto');
+            selectActionDialog.set('hidden', false);
+        }, 25);
+    },
+
+    selectedItemsChanged: function (changeRecord) {
+        // recompute the actions array property as the intersection
+        // of the available actions of the selected items
+        if (!this.selectedItemsOfCurrentSection || !this.selectedItemsOfCurrentSection.length)
+            this.set('actions', []);
+        var actions = new swiftSet.Set(), isection = new swiftSet.Set();
+        actions.addItems(this.itemActions(this.selectedItemsOfCurrentSection[0]) || []);
+        for (var i=1; i<this.selectedItemsOfCurrentSection.length; i++) {
+            isection.clear()
+            isection.addItems(actions.intersection(this.itemActions(this.selectedItemsOfCurrentSection[i])));
+            actions.clear();
+            actions.addItems(isection.items());
+        }
+        var multiActions;
+        if (this.selectedItemsOfCurrentSection.length > 1) {
+            multiActions = actionDetails(actions.items()).filter(function(a){
+                return a.multi;
+            });
+        }
+        else {
+            multiActions = actionDetails(actions.items());
+        }
+        this.set('actions', multiActions);
+    },
+
+    selectedItemsDetails: function(s) {
+        var ret = [];
+        for (var i=0; i<this.selectedItemsOfCurrentSection.length; i++) {
+            ret.push(this.items[this.itemIndex(this.selectedItemsOfCurrentSection[i])]);
+        }
+        return ret;
+    },
+
+    selectedItemsType: function(s) {
+        var item_type = this.selectedItemsOfCurrentSection.length && this.items[this.itemIndex(this.selectedItemsOfCurrentSection[0])] && this.items[this.itemIndex(this.selectedItemsOfCurrentSection[0])].type;
+        if (this.get('selectedItemsOfCurrentSection.length') != 1)
+            item_type+='s';
+        return item_type;
+    },
+
+    itemIndex: function(itemUid) {
+        // returns the index of the item in the items list based on the itemUid
+
+        var chunks = itemUid.split(':'),
+            itemId = chunks[2];
+            cloudId = chunks[1];
+
+        for (var i = 0; i < this.items.length; i++) {
+            if (this.items[i].id == itemId && (!cloudId || cloudId == this.items[i].cloud.id))
+                return i;
+        }
+        return -1;
+    },
+
+    itemActions: function(itemUid) {
+        // the list of available actions for this item based on the itemUid
+        if (!itemUid)
+            return [];
+
+        var index = this.itemIndex(itemUid),
+            item_type = itemUid.split(':')[0];
+
+        if (index == -1)
+            return []
+
+        var item = this.items[index];
+
+        item.type = item_type;
+        var ret = [];
+        if (item.type == 'machine') {
+            if (item.state == 'running') {
+              // if key then add shell / run script
+              // if not monitoring then enable monitoring
+              ret.push('shell');
+              ret.push('tag');
+              ret.push('reboot');
+            } else {
+              ret.push('tag');
+            }
+            ret.push('destroy');
+        } else if (item.type == 'image') {
+            if (item.star) {
+                ret.push('unstar');
+            }
+            else {
+                ret.push('star');
+            }
+            return ret;
+        } else if (item.type == 'key') {
+            if (!item.isDefault) {
+                ret.push('make_default');
+            }
+            ret.push('delete');
+        } else if (item.type == 'script') {
+            ret.push('run');
+            ret.push('delete');
+        } else if (item.type == 'network') {
+            ret.push('delete');
+        } else if (item.type == 'tunnel') {
+            if(item.active)
+                ret.push('disable');
+            if(!item.active)
+                ret.push('enable');
+            ret.push('delete');
+        } else if (item.type == 'template') {
+            ret.push('delete');
+        } else if (item.type == 'stack') {
+            ret.push('delete');
+        } else if (item.type == 'team') {
+            ret.push('delete');
+        }
+        return ret;
+    },
+
+    itemActionsDetails: function (item) {
+        return actionDetails(this.itemActions(itemUid(item)));
+    },
+
+    _selectAction: function (event, item) {
+        this.set('selectedAction', event.model.item);
+        this.set('multi', false);
+        if (event.model.item.confirm)
+            this.$['confirmation'].toggle();
+        else {
+            var items = [];
+            items.push(this.selectedItem);
+            this._performAction(this.selectedAction, items);
+        }
+        this.$['select-action'].close();
+    },
+
+    _selectMultiAction: function (event) {
+        this.set('selectedAction', event.model.item);
+        this.set('multi', true);
+        if (event.model.item.confirm)
+            this.$['confirmation'].toggle();
+        else {
+            var items = [];
+            this.selectedItems.forEach(function(si){
+                var ind = this.itemIndex(si);
+                items.push(this.items[ind]);
+            }, this);
+            this._performAction(this.selectedAction, items);
+        }
+        this.$['select-action'].close();
+    },
+
+    _confirmAction: function (event) {
+        console.warn('confirmed', event);
+        //this.$['select-action'].close();
+
+        var that = this;
+
+        if (this.multi) {
+            //console.error('not implemented');
+            console.info(this.selectedAction, this.selectedItemsOfCurrentSection);
+            this._performAction(this.selectedAction, this.selectedItemsDetails());
+        } else {
+            console.info(this.selectedAction, this.selectedItem);
+            this._performAction(this.selectedAction, [this.selectedItem]);
+        }
+    },
+
+    _performAction: function(action, items) {
+        var run = function() {
+            var uri, payload, item = items.shift(), method = 'POST';
+            //machines
+            if (action.name == 'reboot') {
+                uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
+                payload = {'action': 'reboot'};
+                console.log('rebooting');
+            } else if (action.name == 'destroy') {
+                uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
+                payload = {'action': 'destroy'};
+            //templates                
+            } else if (action.name == 'delete' && item.type == 'template') {
+                uri = '/api/v1/templates/' + item.id;
+                method = 'DELETE';
+            //stacks
+            } else if (action.name == 'delete' && item.type == 'stack') {
+                uri = '/api/v1/stacks/' + item.id;
+                method = 'DELETE';
+            //keys
+            } else if (action.name == 'delete' && item.type == 'key') {
+                uri = '/api/v1/keys/' + item.id;
+                method = 'DELETE';
+            } else if (action.name == 'make default' && item.type == 'key') {
+                uri = '/api/v1/keys/' + item.id;
+                method = 'POST';
+            //scripts
+            } else if (action.name == 'delete' && item.type == 'script') {
+                uri = '/api/v1/scripts/' + item.id;
+                method = 'DELETE';
+            //teams
+            } else if (action.name == 'delete' && item.type == 'team') {
+                uri = '/api/v1/teams/' + item.id;
+                method = 'DELETE';
+            //images
+            } else if (action.name == 'star' || action.name == 'unstar' && item && item.type == 'image') {
+                uri = '/api/v1/clouds/'+item.cloud.id+'/images/'+item.id;
+                method = 'POST';
+            //networks
+            } else if (action.name == 'delete' && item.type == 'network') {
+                uri = '/api/v1/networks/' + item.id;
+                method = 'DELETE';
+            //tunnels
+            } else if (action.name == 'delete' && item.type == 'tunnel') {
+                uri = '/api/v1/tunnels/' + item.id;
+                method = 'DELETE';
+            } else {
+                console.error('unknown action', action, 'on item', item );
+            }
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    if (xhr.status == 200) {
+                        console.log(action, 'success');
+                    } else {
+                        console.error(action, 'failed');
+                    }
+                    if (items.length) {
+                        run();
+                    }
+                }
+            };
+
+            xhr.open(method, uri);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.setRequestHeader("Csrf-Token", CSRF_TOKEN);
+            xhr.send(JSON.stringify(payload));
+      }
+
+      run();
+    },
+
+    _topActions: function (actions) {
+        return this.get('actions').slice(0, 4);
+    },
+
+    _moreActions: function (actions) {
+        return this.get('actions').slice(4);
+    }
+
+});
+</script>

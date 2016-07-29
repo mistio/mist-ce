@@ -1,0 +1,471 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
+<link rel="import" href="../app-togglable/app-togglable-list.html">
+
+<link rel="import" href="team-edit.html">
+<link rel="import" href="team-add.html">
+<link rel="import" href="team-policy.html">
+
+<dom-module id="team-page">
+    <template>
+        <style is="custom-style" include="lists"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style is="custom-style" include="shared-styles">
+
+        :host {
+            display: block;
+        }
+
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
+
+        paper-material.no-pad {
+            padding: 0;
+        }
+
+        paper-menu-button paper-button {
+            display: block;
+        }
+
+        .flex-horizontal-with-ratios {
+            @apply(--layout-horizontal);
+            align-content: stretch;
+        }
+
+        .flexchild {
+            @apply(--layout-flex);
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+        }
+
+        .paper-header [paper-drawer-toggle] {
+            margin-left: 10px;
+        }
+
+        .paper-header {
+            @apply(--layout-horizontal);
+        }
+
+        .paper-header {
+            height: 60px;
+            font-size: 24px;
+            line-height: 60px;
+            padding: 0 10px;
+            color: white;
+            transition: height 0.2s;
+            transition: font-size 0.2s;
+        }
+
+        .paper-header.tall {
+            height: 320px;
+            font-size: 16px;
+        }
+
+        .paper-header h2 {
+            margin-left: 20px;
+            @apply(--layout-flex);
+            text-transform: capitalize;
+        }
+
+        .paper-header .toggleViewButton {
+            --paper-icon-button-ink-color: transparent;
+        }
+
+        .paper-header .cartButton {
+            margin-right: 10px;
+        }
+
+        paper-icon-button {
+            transition: all 200ms;
+        }
+
+        paper-icon-button.active-sort {
+            transform: rotate(180deg);
+        }
+
+        paper-icon-button.active-sort::content iron-icon {
+            color: #D48900 !important;
+        }
+
+        [size=xs] > * {
+            display: none;
+        }
+
+        [size=xs] app-sidebar {
+            min-width: 100%;
+            height: auto;
+        }
+
+        paper-icon-bottom.bottom {
+            padding-right: 8px;
+        }
+        .subhead {
+            box-sizing: border-box;
+            position: absolute;
+            width: 100%;
+            left: 0;
+            height: 57px;
+            bottom: -57px;
+            right: 0;
+            z-index: 9;
+            color: rgba(0,0,0,0.87);
+            font-size: 15px;
+            line-height: 24px;
+        }
+        .content {
+            margin-top: 57px;
+            padding-bottom: 80px
+        }
+        paper-header-panel ::content #dropShadow {
+            top: 56px;
+        }
+        paper-toolbar ::content #bottomBar .right-actions{
+            transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
+        }
+        paper-toolbar:not(.tall) ::content #bottomBar .right-actions{
+            margin-right: 70px;
+        }
+
+        .section {
+            padding-top: 16px;
+        }
+        .red {
+            color: var(--red-color);
+            background-color: transparent;
+        }
+        .required {
+            font-size: 0.9em;
+        }
+        .resource-head {
+            font-weight: 500;
+            padding: 8px 16px;
+            opacity: 0.87;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 0;
+        }
+        .title .up {
+            text-transform: uppercase;
+        }
+        .width100 {
+            width: 100%;
+        }
+        .pending {
+            font-weight: 500;
+            font-size: 0.9em;
+            background-color: #69b46c;
+            color: #fff;
+            padding: 2px 6px 4px 6px;
+            border-radius: 3px;
+        }
+        .delete-member {
+            opacity: 0.32;
+        }
+        </style>
+
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        [[team.name]]
+                    </h2>
+                    <div class="subtitle">
+                        <span class="sub" hidden$="[[!team.description]]">[[team.description]] </span>
+                        <span class="desc" hidden$="[[!hasOnlyYou]]"> Only you</span>
+                        <span class="desc" hidden$="[[hasOnlyYou]]"> [[confirmedMembersLength]] members.</span>
+                        <span class="desc" hidden$="[[!hasPending]]"> [[pendingMembers.length]] pending</span>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <paper-menu-button horizontal-align="right">
+                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu id="machine_actions" class="dropdown-content">
+                            <paper-button on-tap="_deleteTeam" class="simple"> Delete Team</paper-button>
+                            <paper-button on-tap="_editTeam" class="simple">Edit Team</paper-button>
+                        </paper-menu>
+                    </paper-menu-button>
+
+                    <paper-button on-tap="_addMember" class="simple white left-icon" style$="color: [[section.color]]">
+                        <iron-icon icon="social:person-add" style$="color: [[section.color]]"></iron-icon> Invite Members
+                    </paper-button>
+                </div>
+            </paper-material>
+            <paper-material>
+                <div class="flex-horizontal-with-ratios">
+                    <div class="page-block" hidden$="[[!team.description]]">
+                        <h3 class="smallcaps">Team Description</h3>
+                        <p>[[team.description]]</p>
+                    </div>
+                    <div class="page-block">
+                        <h3 class="smallcaps">Created</h3>
+                        <p>[[timestamp]]
+                        </p>
+                    </div>
+                </div>
+            </paper-material>
+            <div class="flex-horizontal-with-ratios section">
+                    <div class="width100">
+                        <template is="dom-if" if="[[hasMembers]]">
+                            <paper-material class="no-pad">
+                                <h3 class="smallcaps resource-head">Members in [[team.name]] team</h3>
+                                <template is="dom-repeat" items="[[members]]">
+                                    <paper-item>
+                                        <div class="flex-horizontal-with-ratios width100">
+                                            <span class="flexchild">
+                                                <a href="/members/[[item.id]]" class="pad-left">
+                                                    [[item.name]]
+                                                    <span class="pending" hidden$="[[!item.pending]]">pending </span>
+                                                </a>
+                                            </span>
+                                            <span class="flexchild">[[item.email]]</span>
+                                            <iron-icon icon="icons:delete" on-tap="_deleteMemberFromTeam" class="delete-member" memberid$="[[item.id]]" membername$="[[item.name]]"></iron-icon>
+                                        </div>
+                                    </paper-item>
+                                </template>
+                            </paper-material>
+                        </template>
+
+                        <template is="dom-if" if="[[!hasMembers]]">
+                            <div class="text-center">
+                                <h3 class="smallcaps">Members</h3>
+                                <p>You have not yet added members in [[team.name]] team.</p>
+                                <paper-button class="blue pad-left2 pad-right2" on-tap="_addMember"> Add Member </paper-button>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <div class="flex-horizontal-with-ratios section">
+                    <div class="width100">
+                    <paper-material class="no-pad">
+                        <!-- TODO: make interactive add edit of rules -->
+                        <h3 class="smallcaps resource-head">Team Policy</h3>
+                        <team-policy model="[[model]]" team="[[team]]"></team-policy>                        
+                    </paper-material>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute-bottom-right">
+            <paper-fab icon="add" on-tap="_addTeam"></paper-fab>
+        </div>
+
+        <team-edit team="[[team]]" org="[[model.org]]"></team-edit>
+        <team-add></team-add>
+        <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
+        <iron-ajax id="deleteMember" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/members/[[memberToDelete]]" method="DELETE" on-response="_deleteMemberResponse" on-error="_deleteMemberError"></iron-ajax>
+        
+        <dialog-element></dialog-element>
+        <paper-toast></paper-toast>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'team-page',
+
+                properties: {
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    params: {
+                        type: Object
+                    },
+                    model: {
+                        type: Object
+                    },
+                    hasPending: {
+                        type: Boolean,
+                        notify: true
+                    },
+                    team: {
+                        type: Object,
+                        computed: '_computeTeam(params, model.teams.*)',
+                        notify: true
+                    },
+                    hasMembers: {
+                        type: Boolean,
+                        value: false
+                    },
+                    hasOnlyYou: {
+                        type: Boolean,
+                        value: true,
+                        computed: '_hasOnlyYou(team)'
+                    },
+                    hasOtherMembers: {
+                        type: Boolean,
+                        value: true,
+                        computed: '_hasOtherMembers(team)'
+                    },
+                    confirmedMembersLength: Number,
+                    members: {
+                        type: Array,
+                        computed: '_computeMembers(team, team.members, model.members.*)'
+                    },
+                    pendingMembers: {
+                        type: Array
+                    },
+                    timestamp: {
+                        type: String,
+                        computed: '_getFormattedTimestamp(team)'
+                    },
+                    memberToDelete: {
+                        type: String,
+                        value: null
+                    }
+                },
+                listeners: {
+                    'confirmation': '_deleteResponse',
+                    'updateSelectedTeam': '_updateTeam',
+                    // 'confirmation': '_deleteMemberEventResponse'
+                },
+                ready: function() {
+                    var wh = window.innerHeight;
+                    this.vpHeight = 'height:' + wh + 'px; overflow: auto;';
+                },
+                _getFormattedTimestamp: function(team) {
+                    var timestamp = parseInt(team.created_at);
+                    return Date(timestamp).toLocaleString('en-US', {
+                        timeZoneName: 'short'
+                    });
+                },
+                _hasOnlyYou: function(team) {
+                    if (team.members && team.members.length == 1 && team.members[0].email == this.model.user.email){
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                },
+                _hasOtherMembers: function(team) {
+                    if (team.members && !this._hasOnlyYou && team.members.length > 0){
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                },
+                _hasMembers: function(team) {
+                    if (team.members)
+                        return team.members.length > 0 ? true : false;
+                },
+                _computeId: function(params) {
+                    return params.id;
+                },
+                _computeTeam: function(params, teams) {
+                    return teams.base[params.id];
+                },
+                _computeMembers: function(team, teamMembers, members) {
+                    var teamMembers = [],
+                        pendingMembers = [],
+                        confirmedMembers = [];
+
+                    team.members.forEach(function(member) {
+                        if (members.base[member].pending){
+                            pendingMembers.push(members.base[member]);
+                        }
+                        else {
+                            confirmedMembers.push(members.base[member]);
+                        }
+                        teamMembers.push(members.base[member]);
+                    });
+
+                    if (pendingMembers.length > 0) { this.set("hasPending", true); }
+                    else { this.set("hasPending", false); }
+                    
+                    if (teamMembers.length > 0) { this.set("hasMembers", true);}
+                    else { this.set("hasMembers", false);}
+
+                    this.set("confirmedMembersLength", teamMembers.length - pendingMembers.length);
+                    this.set("pendingMembers", pendingMembers);
+                    return teamMembers;
+                },
+                _addMember: function(e) {
+                    page('/add-members/' + this.team.id);
+                },
+                _editTeam: function(e) {
+                    var el = this.querySelector('team-edit');
+                    el._openEditTeamModal();
+                },
+                _updateTeam: function(e) {
+                    var team = e.detail.team;
+                    this.set('team.name', team.name);
+                    this.set('team.description', team.description);
+                },
+                _deleteTeam: function(e) {
+                    this._showDialog({
+                        title: 'Delete Team?',
+                        body: "Deleting teams cannot be undone. You are about to delete team: " + this.team.name,
+                        danger: true,
+                        reason: "team.delete"
+                    });
+                },
+                _deleteResponse: function(e) {
+                    var reason = e.detail.reason,
+                        response = e.detail.response;
+
+                    if (response.confirmed && reason == "team.delete") {
+                        this.$.teamDeleteAjaxRequest.body = {};
+                        this.$.teamDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                        this.$.teamDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.teamDeleteAjaxRequest.generateRequest();
+                        page('/teams');
+                    }
+                    if (response.confirmed && reason == "member.delete") {
+                        this.$.deleteMember.body = {};
+                        this.$.deleteMember.headers["Content-Type"] = 'application/json';
+                        this.$.deleteMember.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.deleteMember.generateRequest();
+                    }
+                },
+                _handleTeamDeleteAjaxResponse: function(e) {
+                    page('/teams');
+                },
+                _deleteMemberFromTeam: function(e){
+                    var membId = e.target.attributes.memberid.value,
+                        membname = e.target.attributes.membername.value;
+                    this.set('memberToDelete', membId);
+                    this._showDialog({
+                        title: 'Delete member from team?',
+                        body: "Deleting member" + membname + " from team "+this.team.name +'. You can allways reinvite people by email.',
+                        danger: true,
+                        reason: "member.delete"
+                    });
+                },
+                _deleteMemberResponse: function(){
+                    this.set('memberToDelete', null);
+                    var toast = this.querySelector('paper-toast');
+                    toast.text = "Member deleted succesfully";
+                    toast.show();
+                },
+                _showDialog: function(info) {
+                    var dialog = this.querySelector('dialog-element');
+                    for (var i in info) {
+                        dialog[i] = info[i];
+                    }
+                    dialog._openDialog();
+                },
+                _addTeam: function(e) {
+                    var dialog = this.querySelector('team-add');
+                    dialog.openDialog();
+                }
+            });
+        })();
+    </script>
+</dom-module>
