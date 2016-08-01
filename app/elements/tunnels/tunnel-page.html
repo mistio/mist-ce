@@ -99,6 +99,8 @@
         #leftcolumn {
             position: relative;
         }
+        #getcurl,
+        #getscript,
         #copycurl,
         #copyscript {
             display: none;
@@ -106,10 +108,16 @@
             color: inherit;
             font-size: 13px;
         }
+        #getcurl iron-icon,
+        #getscript iron-icon,
         #copycurl iron-icon,
         #copyscript iron-icon {
             color: inherit;
             margin-right: 8px;
+        }
+        #getcurl,
+        #getscript {
+            display: inline-block;
         }
         #copycurl[show],
         #copyscript[show] {
@@ -145,13 +153,33 @@
             <div class="columns">
                 <div id="leftcolumn" class="left command-container">
                     <div class="pad2">
-                        <paper-button id="copyscript" on-tap="copyScript" class="pull-right link">Copy command <iron-icon icon="content-copy"></iron-icon></paper-button>
-                        <pre><code>Curl Command:</code></pre>
+                        <pre><code>
+Options for installing your VPN client:
+
+1.  Via `curl`: Hit the button below in order to be provided with 
+    a simple `curl` command, which you can directly run in your shell 
+    and will take care of installing the VPN client. This is the 
+    recommended option, especially if you are not planning on modifying 
+    the configuration script provided.
+
+2.  Alternatively, you can request and then copy & paste the configuration 
+    script in your shell, make it executable, and run it. This option is 
+    useful in case you want to make any changes to the configuration provided.
+
+==============================================================================</code></pre>
+                        <pre><code>CURL Command:</code></pre>
                         <pre><code id="tunnelscommand"></code></pre>
                         <paper-button id="copycurl" on-tap="copyCurl" class="pull-right link"> <iron-icon icon="content-copy"> </iron-icon>Copy command</paper-button>
-                        <pre><code id="tunnelscript">
--------
-Request to view the script</code></pre>
+                        <paper-button id="getcurl" on-tap="_requestCommand" class="pull-right link"> <iron-icon icon="content-copy"> </iron-icon>Request command</paper-button>
+                        <pre><code>
+==============================================================================
+Script:</code></pre>
+                        <pre><code id="tunnelscript"></code></pre>
+                        <paper-button id="getscript" handle-as="json" on-tap="_requestScript" class="pull-right link"><iron-icon icon="content-copy"></iron-icon> Request Script</paper-button>
+                        <paper-button id="copyscript" on-tap="copyScript" class="pull-right link"><iron-icon icon="content-copy"></iron-icon> Copy Script </paper-button>
+                        <pre><code>
+                            
+                        </code></pre>
                     </div>
                 </div>
                 <paper-material id="rightcolumn" class="right">
@@ -201,8 +229,8 @@ Request to view the script</code></pre>
         </div>
         <tunnel-edit tunnel="[[tunnel]]"></tunnel-edit>
         <iron-ajax id="tunnelDeleteAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]" method="DELETE" on-response="_handleTunnelDeleteAjaxResponse" on-error="_handleTunnelDeleteAjaxError"></iron-ajax>
-        <!-- <iron-ajax id="scriptAjaxRequest" url="/api/v1/tunnels/{tunnel_id}/script" method="GET" on-response="_handleScriptAjaxRequest" on-error="_handleScriptAjaxError"></iron-ajax> -->
-        <iron-ajax id="commandAjaxRequest" auto url="/api/v1/tunnels/[[tunnel.id]]/command" method="GET" on-response="_handleCommandAjaxRequest" handle-as="xml" on-error="_handleCommandAjaxError"></iron-ajax>
+        <iron-ajax id="scriptAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]/script" method="GET" on-response="_handleScriptAjaxRequest" on-error="_handleScriptAjaxError"></iron-ajax>
+        <iron-ajax id="commandAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]/command" method="GET" on-response="_handleCommandAjaxRequest" handle-as="xml" on-error="_handleCommandAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
         <tags-list resource="tunnel"></tags-list>
@@ -245,18 +273,12 @@ Request to view the script</code></pre>
                 }
             },
             observers: [
-                "_updateCurl(tunnel)"
+                // "_updateCurl(tunnel)"
             ],
             listeners: {
                 'confirmation': '_deleteTunnelEventResponse',
                 'updateSelectedScript': '_updateScript'
-            },
-            _updateCurl: function(){
-                this.$.commandAjaxRequest.body = {};
-                this.$.commandAjaxRequest.headers["Content-Type"] = 'application/json';
-                this.$.commandAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                this.$.commandAjaxRequest.generateRequest();
-            },
+            },            
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
             },
@@ -333,13 +355,21 @@ Request to view the script</code></pre>
             _handleScriptAjaxRequest: function(e){
                 console.log(e);
                 var response = e.detail.response;
-                this.$.copyscript.setAttribute('show', true);
-                this.$.tunnelscript.textContent = response;
+                // if (e.detail.type != "error"){
+                    this.$.tunnelscript.textContent = response;
+                    this.$.copyscript.setAttribute('show', true);
+                // }
             },
             _handleScriptAjaxError: function(e){
                 
             },
             // command 
+            _requestCommand: function(){
+                this.$.commandAjaxRequest.body = {};
+                this.$.commandAjaxRequest.headers["Content-Type"] = 'application/json';
+                this.$.commandAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.commandAjaxRequest.generateRequest();
+            },
             _handleCommandAjaxRequest: function(e){
                 console.log(e);
                 var response = e.detail.xhr.responseText;
