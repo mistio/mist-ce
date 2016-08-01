@@ -99,17 +99,21 @@
         #leftcolumn {
             position: relative;
         }
-        #copybutton {
+        #copycurl,
+        #copyscript {
             display: none;
             background-color: rgba(255, 255, 255, 0.15);
-            color: rgba(0,0,0,0.87);
-            transform: translateY(24%) translateX(-18%) scale(0.7);
+            color: inherit;
+            font-size: 13px;
         }
-        #copy-button iron-icon {
-            margin-left: 8px;
+        #copycurl iron-icon,
+        #copyscript iron-icon {
+            color: inherit;
+            margin-right: 8px;
         }
-        #copybutton[show="true"] {
-            display: block;
+        #copycurl[show],
+        #copyscript[show] {
+            display: inline-block;
         }
         </style>
 
@@ -141,9 +145,10 @@
             <div class="columns">
                 <div id="leftcolumn" class="left command-container">
                     <div class="pad2">
-                        <paper-button id="copybutton" on-tap="copyScript" class="pull-right link">Copy command <iron-icon icon="content-copy"></iron-icon></paper-button>
+                        <paper-button id="copyscript" on-tap="copyScript" class="pull-right link">Copy command <iron-icon icon="content-copy"></iron-icon></paper-button>
                         <pre><code>Curl Command:</code></pre>
                         <pre><code id="tunnelscommand"></code></pre>
+                        <paper-button id="copycurl" on-tap="copyCurl" class="pull-right link"> <iron-icon icon="content-copy"> </iron-icon>Copy command</paper-button>
                         <pre><code id="tunnelscript">
 -------
 Request to view the script</code></pre>
@@ -328,7 +333,7 @@ Request to view the script</code></pre>
             _handleScriptAjaxRequest: function(e){
                 console.log(e);
                 var response = e.detail.response;
-                this.$.copybutton.setAttribute('show', true);
+                this.$.copyscript.setAttribute('show', true);
                 this.$.tunnelscript.textContent = response;
             },
             _handleScriptAjaxError: function(e){
@@ -338,8 +343,9 @@ Request to view the script</code></pre>
             _handleCommandAjaxRequest: function(e){
                 console.log(e);
                 var response = e.detail.xhr.responseText;
-                if (response){
+                if (e.detail.type != "error"){
                     this.$.tunnelscommand.textContent = response;
+                    this.$.copycurl.setAttribute('show', true);
                 }
             },
             _handleCommandAjaxError: function(e){
@@ -360,6 +366,15 @@ Request to view the script</code></pre>
                 this.setSelection(el);            
                 var successful = document.execCommand('copy');
                 var msg = successful ? 'The script was copied to clipboard!' : 'There was an error copying to clipboard!';
+
+                this._showToast(msg);
+            },
+            copyCurl: function(e) {
+                this.clearSelection();
+                var el = this.$.tunnelscommand;
+                this.setSelection(el);            
+                var successful = document.execCommand('copy');
+                var msg = successful ? 'The command was copied to clipboard!' : 'There was an error copying to clipboard!';
 
                 this._showToast(msg);
             },
