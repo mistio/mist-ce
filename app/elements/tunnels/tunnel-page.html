@@ -196,7 +196,7 @@ Request to view the script</code></pre>
         </div>
         <tunnel-edit tunnel="[[tunnel]]"></tunnel-edit>
         <iron-ajax id="tunnelDeleteAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]" method="DELETE" on-response="_handleTunnelDeleteAjaxResponse" on-error="_handleTunnelDeleteAjaxError"></iron-ajax>
-        <iron-ajax id="scriptAjaxRequest" url="/api/v1/tunnels/{tunnel_id}/script" method="GET" on-response="_handleScriptAjaxRequest" on-error="_handleScriptAjaxError"></iron-ajax>
+        <!-- <iron-ajax id="scriptAjaxRequest" url="/api/v1/tunnels/{tunnel_id}/script" method="GET" on-response="_handleScriptAjaxRequest" on-error="_handleScriptAjaxError"></iron-ajax> -->
         <iron-ajax id="commandAjaxRequest" auto url="/api/v1/tunnels/[[tunnel.id]]/command" method="GET" on-response="_handleCommandAjaxRequest" handle-as="xml" on-error="_handleCommandAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
