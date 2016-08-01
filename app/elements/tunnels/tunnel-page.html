@@ -30,6 +30,12 @@
             flex: 1 100%;
             overflow: hidden;
         }
+        .left {
+            flex: 1 60%;
+        }
+        .right {
+            flex: 1 40%;
+        }
         paper-material {
             display: block;
             padding: 20px;
@@ -138,7 +144,6 @@
                 </div>
                 <div class="item-actions">
                     <paper-button on-tap="_editTags" class="simple">tags</paper-button>
-                    <paper-button on-tap="_requestScript" class="simple">request script</paper-button>
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
@@ -162,12 +167,13 @@ Options for installing your VPN client:
     recommended option, especially if you are not planning on modifying 
     the configuration script provided.
 
-2.  Alternatively, you can request and then copy & paste the configuration 
+2.  Alternatively, you can request and then copy &amp; paste the configuration 
     script in your shell, make it executable, and run it. This option is 
     useful in case you want to make any changes to the configuration provided.
-
-==============================================================================</code></pre>
-                        <pre><code>CURL Command:</code></pre>
+</code></pre>
+                        <pre><code>
+==============================================================================
+CURL Command:</code></pre>
                         <pre><code id="tunnelscommand"></code></pre>
                         <paper-button id="copycurl" on-tap="copyCurl" class="pull-right link"> <iron-icon icon="content-copy"> </iron-icon>Copy command</paper-button>
                         <paper-button id="getcurl" on-tap="_requestCommand" class="pull-right link"> <iron-icon icon="content-copy"> </iron-icon>Request command</paper-button>
@@ -273,12 +279,18 @@ Script:</code></pre>
                 }
             },
             observers: [
-                // "_updateCurl(tunnel)"
+                "_updateCommandArea(tunnel.id)"
             ],
             listeners: {
                 'confirmation': '_deleteTunnelEventResponse',
                 'updateSelectedScript': '_updateScript'
-            },            
+            },
+            _updateCommandArea: function(id){
+                this.$.tunnelcommand.textContent = '';
+                this.$.tunnelscript.textContent = '';
+                this.$.copyscript.removeAttribute('show');
+                this.$.copycurl.removeAttribute('show');
+            },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
             },
@@ -355,10 +367,10 @@ Script:</code></pre>
             _handleScriptAjaxRequest: function(e){
                 console.log(e);
                 var response = e.detail.response;
-                // if (e.detail.type != "error"){
+                if (e.detail.xhr.status == 200){
                     this.$.tunnelscript.textContent = response;
                     this.$.copyscript.setAttribute('show', true);
-                // }
+                }
             },
             _handleScriptAjaxError: function(e){
                 
