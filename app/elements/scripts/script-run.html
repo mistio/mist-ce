@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
+<link rel="import" href="../app-icons/app-icons.html">
 <link rel="import" href="../app-form/app-form.html">
 
 <dom-module id="script-run">
@@ -39,6 +40,12 @@
             padding-bottom: 16px;
         }
 
+        .error {
+            color: var(--red-color);
+        }
+        .error iron-icon {
+            color: inherit;
+        }
         </style>
 
         <div id="content">
@@ -56,6 +63,9 @@
             <paper-material>
                 <p>
                     Heads up! Make sure you select a machine you have already associated a key with. Otherwise the the request may be accepted but the script will never finish run.
+                </p>
+                <p class="error" hidden$="[[machineHasKeys]]">
+                    <iron-icon icon="icons:warning"></iron-icon> Machine [[machine.name]] no associated keys. 
                 </p>
                 <app-form fields="[[fields]]" url="/api/v1/scripts/[[params.id]]" on-response="_runScriptResponse" btncontent="run"></app-form>
             </paper-material>
@@ -96,6 +106,12 @@
                     cardTitleText: {
                         type: String,
                         computed: '_computeCardTitleText(script.name, runScript.machine)'
+                    },
+                    machine: Object,
+                    machineHasKeys: {
+                        type: Boolean,
+                        value: true,
+                        computed: '_machineChanged(machine)'
                     }
                 },
                 observers: [
@@ -138,9 +154,27 @@
                         var machineCloud = this.model.machinesArray.find(function(m){
                             return m.id == machineID;
                         });
+                        this.set("machine", machineCloud);
                         this.set('fields.1.value', machineCloud.cloud.id);
                     };
 
+                },
+                _machineChanged: function(machine){
+                    if (machine){
+                        var machineID = machine.id;
+                        var key = this.model.keysArray.find(function(k){
+                            return k.machines.find(function(m){
+                                return m[1] == machineID;
+                            })
+                        });
+
+                        if (key){
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
                 },
                 _cloudsChanged: function(clouds) {
                     var fields = [{
