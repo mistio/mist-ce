@@ -1,3 +1,4 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
@@ -206,8 +207,8 @@
             <div class="absolute-bottom-right">
                 <paper-fab id="isTeams" icon="add" on-tap="_addTeam"></paper-fab>
             </div>
+            <team-add id="isTeamsPage"></team-add>
         </template>
-        <team-add></team-add>
         
     </template>
 </dom-module>
@@ -549,7 +550,8 @@
         },
 
         _addTeam: function(e) {
-            var dialog = this.querySelector('team-add');
+            var dialog = this.querySelector('team-add#isTeamsPage');
+            console.log('_addTeam', dialog);
             dialog.openDialog();
         },
 
