@@ -108,7 +108,7 @@
                 color: var(--red-color) !important;
             }
 
-            .machine-state-icon.unkown, .machine-state-icon.pending {
+            .machine-state-icon.unknown, .machine-state-icon.pending {
                 color: #ccc !important;
             }
 
@@ -450,7 +450,8 @@
                 title: 'Destroy Machine?',
                 body: "Destroying a machine can not be undone. You are about to delete machine '" + this.machine.name + "'.",
                 danger: true,
-                reason: "machine.destroy"
+                reason: "machine.destroy",
+                action: "destroy"
             });
         },
         _deleteMachine: function(e) {
@@ -458,7 +459,7 @@
                 title: 'Delete Machine?',
                 body: "Deleting a machine can not be undone. You are about to destroy machine '" + this.machine.name + "'.",
                 danger: true,
-                reason: "machine.destroy"
+                reason: "machine.delete"
             });
         },
         _machineActionConfirmation: function(e) {
@@ -472,14 +473,7 @@
                 this.$.machineDeleteAjaxRequest.generateRequest();
             }
 
-            if (response.confirmed && reason == "machine.destroy") {
-                this.$.machineDeleteAjaxRequest.body = {};
-                this.$.machineDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
-                this.$.machineDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                this.$.machineDeleteAjaxRequest.generateRequest();
-            }
-
-            if (response.confirmed && reason != "machine.delete" && reason != "machine.destroy") {
+            if (response.confirmed && reason != "machine.delete") {
                 if (reason == "machine.start")
                     payload = {'action': 'start'};
                 if (reason == "machine.stop")
@@ -492,6 +486,8 @@
                     payload = {'action': 'resume'};
                 if (reason == "machine.undefine")
                     payload = {'action': 'undefine'};
+                if (reason == "machine.destroy")
+                    payload = {'action': 'destroy'};
 
                 this.$.actionRequest.body = payload;
                 this.$.actionRequest.headers["Content-Type"] = 'application/json';

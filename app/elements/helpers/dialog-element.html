@@ -31,7 +31,10 @@
                     </paper-button>
 
                     <paper-button hidden$="[[!danger]]" dialog-dismiss>Cancel</paper-button>
-                    <paper-button hidden$="[[!danger]]" class="red" dialog-confirm>Delete</paper-button>
+                    <paper-button hidden$="[[!danger]]" class="red" dialog-confirm>
+                        <span hidden$="[[action]]"> Delete </span>
+                        <span hidden$="[[!action]]">[[action]]</span>
+                    </paper-button>
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
