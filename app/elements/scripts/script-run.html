@@ -65,7 +65,7 @@
                     Heads up! Make sure you select a machine you have already associated a key with. Otherwise the the request may be accepted but the script will never finish run.
                 </p>
                 <p class="error" hidden$="[[machineHasKeys]]">
-                    <iron-icon icon="icons:warning"></iron-icon> Machine [[machine.name]] no associated keys. 
+                    <iron-icon icon="icons:warning"></iron-icon> Machine [[machine.name]] has no associated keys. 
                 </p>
                 <app-form fields="[[fields]]" url="/api/v1/scripts/[[params.id]]" on-response="_runScriptResponse" btncontent="run"></app-form>
             </paper-material>
