@@ -7,70 +7,51 @@
 <dom-module id="script-run">
     <template>
         <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
+        :host {
+            display: block;
+        }
+        #content {
+            max-width: 900px;
+        }
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
 
-            paper-card,
-            paper-checkbox {
-                display: block;
-            }
+        paper-progress {
+            position: absolute;
+            bottom: 85px;
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
 
-            paper-toggle-button,
-            paper-checkbox {
-                margin-top: 20px;
-            }
+        :host >::content paper-input-container {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+
         </style>
 
-        <paper-card heading="[[cardTitleText]]">
-            <div class="card-content">
-                <div hidden$=[[!hasMachines]]>
-
-                    <template is="dom-repeat" items="{{fields}}" as="field">
-                        <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-                            <paper-input id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-                        </template>
-
-                        <template is="dom-if" if="[[_computeFieldType(field, 'number', field.show)]]">
-                            <paper-input id="[[field.name]]" type="number" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-                        </template>
-
-                        <template is="dom-if" class="datetime" if="[[_computeFieldType(field, 'datetime', field.show)]]">
-                            <paper-input id="[[field.name]]" type="datetime" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-                        </template>
-
-                        <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-                            <paper-textarea id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
-                        </template>
-
-                        <div class="grid-row">
-                        <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-
-                                <paper-dropdown-menu class="dropdown-block xs12 l6" label="[[field.label]]" horizontal-align="left">
-                                    <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
-                                        <template is="dom-repeat" items="[[field.options]]" as="option">
-                                            <paper-item value="[[option.val]]">[[option.title]]</paper-item>
-                                        </template>
-                                    </paper-menu>
-                                </paper-dropdown-menu>
-                        </template>
-                        </div>
-
-                        <template is="dom-if" if="[[_computeFieldType(field, 'switch', field.show)]]">
-                            <paper-toggle-button checked="{{field.value}}">[[field.label]]</paper-toggle-button>
-                        </template>
-                    </template>
-                    <hr/>
-                    <div class="clearfix">
-                        <paper-button class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
-                        <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Add Script
+                    </h2>
+                    <div class="subtitle">
+                        You can add scripts inline or from a url. You will soon be able to schedule your scripts to run.
                     </div>
                 </div>
-                <div hidden$=[[hasMachines]]>
-                    <p>Please add some machines first!</p>
-                </div>
-            </div>
+            </paper-material>
+            <paper-material>
+                <app-form fields="[[fields]]" form="[[script]]" url="/api/v1/scripts" on-request="_addScriptAjaxRequest" on-response="_addScriptAjaxResponse"></app-form>
+            </paper-material>
+        </div>
+            
 
             <iron-ajax id="runScriptAjax" url="/scripts/[[script.id]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
     </template>
@@ -87,6 +68,7 @@
                         type: Object,
                         computed: '_computeScript(id)'
                     },
+                    section: Object,
                     runScript: {
                         type: Object,
                         value: function() {
@@ -108,23 +90,12 @@
                         }
                     },
                     fields: {
-                        type: Array,
-                        value: function() {
-                            return SCRIPT_RUN_FORM_FIELDS;
-                        },
+                        type: Array,                        
                         notify: true
                     },
                     parameters: {
                         type: String,
                         value: null
-                    },
-                    clouds: {
-                        type: Array,
-                        value: function() {
-                            return Mist.clouds.filter(function(cloud) {
-                                return cloud.enabled;
-                            });
-                        }
                     },
                     machinesOptions: {
                         type: Array,
@@ -149,7 +120,7 @@
                 },
                 observers: [
                     '_fieldsChanged(fields.*, sendingData)',
-                    '_cloudsChanged(clouds.*)'
+                    '_cloudsChanged(model.clouds.*)'
                 ],
                 _computeScript: function(id) {
                     return Mist.scripts.find(function(script) {
@@ -157,7 +128,7 @@
                     });
                 },
                 _computeMachinesOptions: function(clouds) {
-                    return clouds
+                    return this.model.clouds
                         .filter(function(cloud) {
                             return cloud.enabled;
                         })
