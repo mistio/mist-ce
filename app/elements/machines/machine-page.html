@@ -139,6 +139,9 @@
                 display: block;
                 margin: 0 auto;
             }
+            paper-button[disabled] {
+                opacity: 0.54
+            }
         </style>
 
         <div id="content">
@@ -174,8 +177,8 @@
                             <paper-button on-tap="undefine" class="simple" hidden$="[[!machine.can_undefine]]">undefine</paper-button>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button on-tap="ssh" class="simple white" style$="color: [[section.color]]"><iron-icon style$="color: [[section.color]]" icon="icons:code"></iron-icon> ssh</paper-button>
-                    <paper-button on-tap="monitor" class="simple white" style$="color: [[section.color]]" hidden$="[[isMonitored]]">monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button>
+                    <paper-button on-tap="ssh" class="simple white" style$="color: [[section.color]]" disabled><iron-icon style$="color: [[section.color]]" icon="icons:code"></iron-icon> ssh</paper-button>
+                    <paper-button on-tap="monitor" class="simple white" style$="color: [[section.color]]" hidden$="[[isMonitored]]" disabled>monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button>
                 </div>
             </paper-material>
             <div class="columns">
