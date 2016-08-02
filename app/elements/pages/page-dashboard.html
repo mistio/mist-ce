@@ -302,7 +302,7 @@
                                 <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
                             </a>
                         </div>
-                        <paper-material class="graphs">
+                        <paper-material class="graphs" hidden$="[[!onboarding.hasMonitoring]]">
                             <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                         </paper-material>
                     </div>
@@ -597,3 +597,4 @@ Polymer({
     },
 });
 </script>
+f
