@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 
@@ -96,20 +97,26 @@
             }
 
             .machine-state-icon.terminated {
-                color: var(--mist-dark-color) !important;;
+                color: var(--mist-dark-color) !important;
             }
 
             .machine-state-icon.stopped {
-                color: var(--orange-color) !important;;
+                color: var(--orange-color) !important;
             }
 
             .machine-state-icon.error {
-                color: var(--red-color) !important;;
+                color: var(--red-color) !important;
             }
+
+            .machine-state-icon.unknown, .machine-state-icon.pending {
+                color: #ccc !important;
+            }
+
             paper-material > .smallcaps {
                 margin-top: 0;
             }
-            .tag {
+            :host .tag {
+                display: inline !important;
                 padding: 4px;
                 margin: 4px;
             }
@@ -132,6 +139,15 @@
             polyana-dashboard ::content paper-spinner {
                 display: block;
                 margin: 0 auto;
+            }
+            paper-button[disabled] {
+                opacity: 0.54
+            }
+            paper-button.left-icon iron-icon {
+                margin: 0 4px 0 0;
+            }
+            paper-button.right-icon iron-icon {
+                margin: 0 0 0 4px;
             }
         </style>
 
@@ -156,7 +172,7 @@
                     can_resume:false
                     can_tag:true
                     can_undefine:false -->
-                    <paper-button on-tap="restart" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
+                    <paper-button on-tap="start" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
                     <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
                     <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="_editTags" class="simple" hidden$="[[!machine.can_tag]]">tags</paper-button>
                     <paper-menu-button horizontal-align="right">
@@ -168,8 +184,8 @@
                             <paper-button on-tap="undefine" class="simple" hidden$="[[!machine.can_undefine]]">undefine</paper-button>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button on-tap="ssh" class="simple white" style$="color: [[section.color]]"><iron-icon style$="color: [[section.color]]" icon="icons:code"></iron-icon> ssh</paper-button>
-                    <paper-button on-tap="monitor" class="simple white" style$="color: [[section.color]]" hidden$="[[isMonitored]]">monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button>
+                    <paper-button on-tap="ssh" class="simple white left-icon" style$="color: [[section.color]]" disabled><iron-icon style$="color: [[section.color]]" icon="icons:code"></iron-icon> ssh</paper-button>
+                    <paper-button on-tap="monitor" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[isMonitored]]" disabled>monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button>
                 </div>
             </paper-material>
             <div class="columns">
@@ -228,9 +244,11 @@
             </paper-material>
         </div>
         <dialog-element></dialog-element>
+        <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
         <tags-list resource="machine"></tags-list>
+        <paper-toast></paper-toast>
     </template>
 </dom-module>
 <script>
@@ -283,7 +301,7 @@
             '_isMonitored(machine, model.monitoring.machines.*)'
         ],
         listeners: {
-            'confirmation': '_deleteMachineEventResponse'
+            'confirmation': '_machineActionConfirmation'
         },
         attached: function(){
             this.datasources = [
@@ -389,15 +407,7 @@
         rename: function(_, params) {
             console.log("clicked rename");
         },
-        restart: function(_, params) {
-            console.log("clicked restart");
-        },
-        shutdown: function(_, params) {
-            console.log("clicked shutdown");
-        },
-        destroy: function(_, params) {
-            console.log("clicked destroy");
-        },
+        
         _getHeaderStyle: function(color) {
             return 'background-color: ' + color + '; color: #fff;';
         },
@@ -427,15 +437,42 @@
             var el = this.querySelector('machine-edit');
             el._openEditMachineModal();
         },
+        start: function(_, params) {
+            this.confirmAction("start");
+        },
+        stop: function(_, params) {
+            this.confirmAction("stop");
+        },
+        suspend: function(_, params) {
+            this.confirmAction("suspend");
+        },
+        reboot: function(_, params) {
+            this.confirmAction("reboot");
+        },
+        resume: function(_, params) {
+            this.confirmAction("resume");
+        },
+        undefine: function(_, params) {
+            this.confirmAction("undefine");
+        },
+        destroy: function(_, params) {
+            this._showDialog({
+                title: 'Destroy Machine?',
+                body: "Destroying a machine can not be undone. You are about to delete machine '" + this.machine.name + "'.",
+                danger: true,
+                reason: "machine.destroy",
+                action: "destroy"
+            });
+        },
         _deleteMachine: function(e) {
             this._showDialog({
                 title: 'Delete Machine?',
-                body: "Deleting a machine can not be undone. You are about to delete machine '" + this.machine.name + "'.",
+                body: "Deleting a machine can not be undone. You are about to destroy machine '" + this.machine.name + "'.",
                 danger: true,
                 reason: "machine.delete"
             });
         },
-        _deleteMachineEventResponse: function(e) {
+        _machineActionConfirmation: function(e) {
             var reason = e.detail.reason,
                 response = e.detail.response;
 
@@ -445,6 +482,37 @@
                 this.$.machineDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.machineDeleteAjaxRequest.generateRequest();
             }
+
+            if (response.confirmed && reason != "machine.delete") {
+                if (reason == "machine.start")
+                    payload = {'action': 'start'};
+                if (reason == "machine.stop")
+                    payload = {'action': 'stop'};
+                if (reason == "machine.suspend")
+                    payload = {'action': 'suspend'};
+                if (reason == "machine.reboot")
+                    payload = {'action': 'reboot'};
+                if (reason == "machine.resume")
+                    payload = {'action': 'resume'};
+                if (reason == "machine.undefine")
+                    payload = {'action': 'undefine'};
+                if (reason == "machine.destroy")
+                    payload = {'action': 'destroy'};
+
+                this.$.actionRequest.body = payload;
+                this.$.actionRequest.headers["Content-Type"] = 'application/json';
+                this.$.actionRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.actionRequest.generateRequest();
+            }
+        },
+        _actionRequest: function(e){
+            this._showToast('Action request was sent. Waiting for response.');
+        },
+        _actionResponse: function(e){
+            this._showToast('Requested action is being processed');
+        },
+        _actionError: function(e){
+            this._showToast('Action request failed');
         },
         _handleMachineDeleteAjaxResponse: function(e) {
             page.show('/machines');
@@ -459,6 +527,15 @@
             this.dashboard.rows[0].panels[0].targets[0].target = 'bucky.'+this.machine.id+'.load.shortterm';
             return ret;
         },
+        confirmAction: function(action){
+            this._showDialog({
+                title: action+' Machine?',
+                body: "You are about to "+ action +" machine '" + this.machine.name + "'.",
+                danger: false,
+                reason: "machine."+action,
+                action: action
+            });
+        },
         _showDialog: function(info) {
             var dialog = this.querySelector('dialog-element');
             for (var i in info) {
@@ -466,8 +543,10 @@
             }
             dialog._openDialog();
         },
-        _goBack: function() {
-            history.back();
+        _showToast: function(msg) {
+            var toast = this.querySelector('paper-toast');
+            toast.text = msg;
+            toast.show();
         },
         isState: function(machine){
             return machine.state == machine.extra.status ;
