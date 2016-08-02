@@ -124,10 +124,44 @@ class BaseController(object):
     def connect(self):
         """Return libcloud-like connection to cloud
 
+        This is a wrapper, an error handler, around cloud specific `_connect`
+        methods. Subclasses SHOULD NOT override this method.
+
+        """
+        try:
+            return self._connect()
+        except (CloudUnavailableError, CloudUnauthorizedError) as exc:
+            log.error("Error adding cloud %s: %r", self.cloud, exc)
+            raise
+        except InvalidCredsError as exc:
+            log.warning("Invalid creds while connecting to %s: %s",
+                        self.cloud, exc)
+            raise CloudUnauthorizedError("Invalid creds.")
+        except ssl.SSLError as exc:
+            log.error("SSLError on connecting to %s: %s", self.cloud, exc)
+            raise CloudUnavailableError(exc=exc)
+        except Exception as exc:
+            log.exception("Error while connecting to %s", self.cloud)
+            raise CloudUnavailableError(exc=exc)
+
+    def _connect(self):
+        """Return libcloud-like connection to cloud
+
+        This is called solely by `connect` which adds error handling.
         All subclasses MUST implement this method.
 
         """
         raise NotImplementedError()
+
+    def check_connection(self):
+        """Raise exception if we can't connect to cloud provider
+
+        In case of error, an instance of `CloudUnavailableError` or
+        `CloudUnauthorizedError` should be raised.
+
+        """
+        self.connect()
+        self.list_machines()
 
     def disconnect(self):
         """Close libcloud-like connection to cloud"""
@@ -149,7 +183,7 @@ class BaseController(object):
         # Basic param check.
         errors = {}
         for key, value in kwargs.iteritems():
-            if key not in self.cloud.cloud_specifc_fields:
+            if key not in self.cloud.cloud_specific_fields:
                 errors[key] = "Invalid parameter %s=%r." % (key, value)
         for key in self.cloud.cloud_specific_fields:
             if self.cloud._fields[key].required and key not in kwargs:
@@ -167,6 +201,18 @@ class BaseController(object):
                                    'errors': exc.to_dict()})
         except me.NotUniqueError:
             raise CloudExistsError()
+
+        # Try to connect to cloud.
+        try:
+            self.check_connection()
+        except (CloudUnavailableError, CloudUnauthorizedError) as exc:
+            log.error("Removing cloud %s because we couldn't connect: %r",
+                      self.cloud, exc)
+            raise
+        except Exception as exc:
+            log.exception("Removing cloud %s because we couldn't connect.",
+                          self.cloud)
+            raise
 
     def list_machines(self):
         """Return list of machines for cloud
@@ -195,10 +241,13 @@ class BaseController(object):
             nodes = self.connection.list_nodes()
             log.info("List nodes returned %d results for %s.",
                      len(nodes), self.cloud)
-        except InvalidCredsError:
+        except InvalidCredsError as exc:
+            log.warning("Invalid creds on running list_nodes on %s: %s",
+                        self.cloud, exc)
             raise CloudUnauthorizedError()
         except ssl.SSLError as exc:
-            log.exception("SSLError on running list_nodes on %s", self.cloud)
+            log.error("SSLError on running list_nodes on %s: %s",
+                      self.cloud, exc)
             raise CloudUnavailableError(exc=exc)
         except Exception as exc:
             log.exception("Error while running list_nodes on %s", self.cloud)

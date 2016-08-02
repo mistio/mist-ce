@@ -30,16 +30,30 @@ def load_clouds_from_config():
         model = cdict.pop('model')
         if not (model.endswith('Cloud') and hasattr(models, model)):
             raise Exception("Invalid cloud model: %s" % model)
-        clouds.append(getattr(models, model)(**cdict))
+        clouds.append((getattr(models, model), cdict))
     return clouds
 
 
-def iter_clouds(test_func):
+def iter_clouds_raw(test_func):
     """Iterate test function over CLOUDS"""
     return pytest.mark.parametrize(
-        'cloud', load_clouds_from_config(),
+        'cls,cdict', load_clouds_from_config(),
         ids=lambda cloud: cloud.__class__.__name__
     )(test_func)
+
+
+def iter_clouds(test_func):
+    """Iterate test function over CLOUDS, returning initialized clouds"""
+    return pytest.mark.parametrize(
+        'cloud', [cls(**cdict) for cls, cdict in load_clouds_from_config()],
+        ids=lambda cloud: cloud.__class__.__name__
+    )(test_func)
+
+
+@iter_clouds_raw
+def test_add_cloud(cls, cdict):
+    cloud = cls.add(None, 'test', **cdict)
+    print cloud
 
 
 @iter_clouds
