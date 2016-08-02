@@ -203,7 +203,7 @@ Polymer({
     },
     machineUri: function(item) {
         // console.log(this.model.clouds, item.cloud_id, this.model.incidents, this.model.monitoring);
-        return '/machines/'  + item.machine_id;
+        return '/machines/'  + item.uuid;
     },
     ruleCondition: function(item) {
         return item.logs.length && item.logs[0].condition;
