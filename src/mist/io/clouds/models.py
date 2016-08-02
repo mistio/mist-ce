@@ -90,6 +90,36 @@ class Cloud(me.Document):
             )
         self.ctl = self._controller_cls(self)
 
+        # Calculate and store cloud type specific fields.
+        self.cloud_specific_fields = [field for field in type(self)._fields
+                                      if field not in Cloud._fields]
+
+    @classmethod
+    def add(cls, owner, title, id='', **kwargs):
+        """Add cloud
+
+        This is a class method, meaning that it is meant to be called on the
+        class itself and not on an instance of the class.
+
+        You're not meant to be calling this directly, but on a cloud subclass
+        instead like this:
+
+            cloud = AmazonCloud.add(owner=org, title='EC2',
+                                    apikey=apikey, apisecret=apisecret)
+
+        Params:
+        - owner and title are common and required params
+        - only provide a custom cloud id if you're migrating something
+        - kwargs will be passed to appropriate controller, in most cases these
+          should match the extra fields of the particular cloud type.
+
+        """
+        cloud = cls(owner=owner, title=title)
+        if id:
+            cloud.id = id
+        cloud.ctl.add(**kwargs)
+        return cloud
+
     def delete(self):
         super(Cloud, self).delete()
         Tag.objects(resource=self).delete()

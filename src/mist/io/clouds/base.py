@@ -12,17 +12,24 @@ import json
 import logging
 import datetime
 
+import mongoengine as me
+
 from libcloud.common.types import InvalidCredsError
 from libcloud.compute.base import Node, NodeLocation
 
 from mist.io import config
 
+
 from mist.io.exceptions import MistError
+from mist.io.exceptions import BadRequestError
+from mist.io.exceptions import CloudExistsError
 from mist.io.exceptions import MachineNotFoundError
 from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
+
 from mist.core.tag.models import Tag
+
 from mist.core.cloud.models import Machine
 
 
@@ -54,6 +61,18 @@ def tags_to_dict(tags):
             elif 'key' in tag:
                 tdict[tag['key']] = tag.get('value')
     return tdict
+
+
+def rename_kwargs(kwargs, old_key, new_key):
+    """Given a `kwargs` dict rename `old_key` to `new_key`"""
+    if old_key in kwargs:
+        if new_key not in kwargs:
+            log.warning("Got param '%s' when expecting '%s', trasforming.",
+                        old_key, new_key)
+            kwargs[new_key] = kwargs.pop(old_key)
+        else:
+            log.warning("Got both param '%s' and '%s', will not tranform.",
+                        old_key, new_key)
 
 
 class BaseController(object):
@@ -116,6 +135,38 @@ class BaseController(object):
             log.debug("Closing libcloud-like connection for %s.", self.cloud)
             self._conn.disconnect()
             self._conn = None
+
+    def add(self, **kwargs):
+        """Add cloud
+
+        This is called by Cloud.add classmethod to create a cloud.
+
+        """
+        # Transform params with extra underscores for compatibility.
+        rename_kwargs(kwargs, 'api_key', 'apikey')
+        rename_kwargs(kwargs, 'api_secret', 'apisecret')
+
+        # Basic param check.
+        errors = {}
+        for key, value in kwargs.iteritems():
+            if key not in self.cloud.cloud_specifc_fields:
+                errors[key] = "Invalid parameter %s=%r." % (key, value)
+        for key in self.cloud.cloud_specific_fields:
+            if self.cloud._fields[key].required and key not in kwargs:
+                errors[key] = "Required parameter missing '%s'." % key
+        if errors:
+            raise Exception(errors)
+
+        # Set fields to cloud model and attempt to save.
+        for key, value in kwargs.iteritems():
+            setattr(self.cloud, key, value)
+        try:
+            self.cloud.save()
+        except me.ValidationError as exc:
+            raise BadRequestError({'msg': exc.message,
+                                   'errors': exc.to_dict()})
+        except me.NotUniqueError:
+            raise CloudExistsError()
 
     def list_machines(self):
         """Return list of machines for cloud

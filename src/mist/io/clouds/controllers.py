@@ -20,20 +20,31 @@ accessed through a cloud model, using the `ctl` abbreviation, like this:
 """
 
 
+import json
 import logging
 import tempfile
 
 from xml.sax.saxutils import escape
 
+import mongoengine as me
+
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import NodeImage
 from libcloud.compute.types import Provider
 
+
 from mist.io import config
 
+from mist.io.exceptions import MistError
+from mist.io.exceptions import NotFoundError
+from mist.io.exceptions import RequiredParameterMissingError
+
+from mist.io.helpers import sanitize_host
+
+from mist.core.keypair.models import Keypair
 from mist.core.vpn.methods import destination_nat as dnat
 
-from mist.io.clouds.base import BaseController, tags_to_dict
+from mist.io.clouds.base import BaseController, tags_to_dict, rename_kwargs
 
 
 log = logging.getLogger(__name__)
@@ -44,6 +55,16 @@ class AmazonController(BaseController):
         return get_driver(Provider.EC2)(self.cloud.apikey,
                                         self.cloud.apisecret,
                                         region=self.cloud.region)
+
+    def add(self, **kwargs):
+        apikey = kwargs.get('apikey') or kwargs.get('api_key')
+        apisecret = kwargs.get('apisecret') or kwargs.get('api_secret')
+        if apisecret == 'getsecretfromdb':
+            cloud = type(self.cloud).objects.first(owner=self.cloud.owner,
+                                                   apikey=apikey)
+            if cloud is not None:
+                kwargs['apisecret'] = cloud.apisecret
+        super(AmazonController, self).add(kwargs)
 
     def list_images(self, search=None):
         default_images = config.EC2_IMAGES[self.cloud.region]
@@ -124,6 +145,16 @@ class RackSpaceController(BaseController):
         return driver(self.cloud.username, self.cloud.apikey,
                       region=self.cloud.region)
 
+    def add(self, **kwargs):
+        username = kwargs.get('username')
+        apikey = kwargs.get('apikey') or kwargs.get('api_key')
+        if apikey == 'getsecretfromdb':
+            cloud = type(self.cloud).objects.first(owner=self.cloud.owner,
+                                                   username=username)
+            if cloud is not None:
+                kwargs['apikey'] = cloud.apikey
+        super(RackSpaceController, self).add(kwargs)
+
 
 class SoftLayerController(BaseController):
     def connect(self):
@@ -181,6 +212,27 @@ class GoogleController(BaseController):
         return get_driver(Provider.GCE)(self.cloud.email,
                                         self.cloud.private_key,
                                         project=self.cloud.project_id)
+
+    def add(self, **kwargs):
+        private_key = kwargs.get('private_key')
+        if not private_key:
+            raise RequiredParameterMissingError('private_key')
+        project_id = kwargs.get('project_id')
+        if not project_id:
+            raise RequiredParameterMissingError('project_id')
+        email = kwargs.get('email', '')
+        if not email:
+            # Support both ways to authenticate a service account,
+            # by either using a project id and json key file (highly
+            # recommended) and also by specifying email, project id and private
+            # key file.
+            try:
+                creds = json.loads(private_key)
+                kwargs['email'] = creds['client_email']
+                kwargs['private_key'] = creds['private_key']
+            except:
+                raise MistError("Make sure you upload a valid json file.")
+        super(GoogleController, self).add(**kwargs)
 
     def list_images(self, search=None):
         images = self.connection.list_images()
@@ -278,13 +330,31 @@ class VSphereController(BaseController):
                                             username=self.cloud.username,
                                             password=self.cloud.password)
 
+    def add(self, **kwargs):
+        if not kwargs.get('host'):
+            raise RequiredParameterMissingError('host')
+        kwargs['host'] = sanitize_host(kwargs['host'])
+        super(VSphereController, self).add(**kwargs)
+
 
 class VCloudController(BaseController):
     def connect(self):
         host = dnat(self.cloud.owner, self.cloud.host)
-        return get_driver(Provider.VCLOUD)(self.cloud.username,
-                                           self.cloud.password, host=host,
-                                           verify_match_hostname=False)
+        return get_driver(self.provider)(self.cloud.username,
+                                         self.cloud.password, host=host,
+                                         verify_match_hostname=False)
+
+    def add(self, **kwargs):
+        if not kwargs.get('username'):
+            raise RequiredParameterMissingError('username')
+        if not kwargs.get('organization'):
+            raise RequiredParameterMissingError('organization')
+        kwargs['username'] = '%s@%s' % (kwargs['username'],
+                                        kwargs.pop('organization'))
+        if not kwargs.get('host'):
+            raise RequiredParameterMissingError('host')
+        kwargs['host'] = sanitize_host(kwargs['host'])
+        super(VCloudController, self).add(**kwargs)
 
     def _post_parse_machine(self, machine, machine_model):
         if machine['extra'].get('vdc'):
@@ -303,6 +373,17 @@ class OpenStackController(BaseController):
             ex_force_service_region=self.cloud.region,
             ex_force_base_url=self.cloud.compute_endpoint,
         )
+
+    def add(self, **kwargs):
+        rename_kwargs(kwargs, 'auth_url', 'url')
+        url = kwargs.get('url')
+        if url:
+            if url.endswith('/v2.0/'):
+                url = url.split('/v2.0/')[0]
+            elif url.endswith('/v2.0'):
+                url = url.split('/v2.0')[0]
+            kwargs['url'] = url.rstrip('/')
+        super(OpenStackController, self).add(**kwargs)
 
 
 class DockerController(BaseController):
@@ -334,6 +415,15 @@ class DockerController(BaseController):
         return get_driver(Provider.DOCKER)(self.cloud.username,
                                            self.cloud.password,
                                            host, port)
+
+    def add(self, **kwargs):
+        rename_kwargs(kwargs, 'docker_port', 'port')
+        rename_kwargs(kwargs, 'docker_host', 'host')
+        rename_kwargs(kwargs, 'auth_user', 'username')
+        rename_kwargs(kwargs, 'auth_password', 'password')
+        if kwargs.get('host'):
+            kwargs['host'] = sanitize_host(kwargs['host'])
+        super(DockerController, self).add(**kwargs)
 
     def list_images(self, search=None):
         # Fetch mist's recommended images
@@ -376,6 +466,20 @@ class LibvirtController(BaseController):
                                                 hypervisor=self.cloud.host,
                                                 user=self.cloud.username,
                                                 tcp_port=port)
+
+    def add(self, **kwargs):
+        rename_kwargs(kwargs, 'machine_hostname', 'host')
+        rename_kwargs(kwargs, 'machine_user', 'username')
+        rename_kwargs(kwargs, 'ssh_port', 'port')
+        if kwargs.get('host'):
+            kwargs['host'] = sanitize_host(kwargs['host'])
+        if kwargs.get('key'):
+            try:
+                kwargs['key'] = Keypair.objects.get(owner=self.cloud.owner,
+                                                    id=kwargs['key'])
+            except Keypair.DoesNotExist:
+                raise NotFoundError("Keypair does not exist.")
+        super(LibvirtController, self).add(**kwargs)
 
     def _post_parse_machine(self, machine, machine_model):
         xml_desc = machine['extra'].get('xml_description')
