@@ -156,7 +156,7 @@
                     can_resume:false
                     can_tag:true
                     can_undefine:false -->
-                    <paper-button on-tap="restart" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
+                    <paper-button on-tap="start" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
                     <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
                     <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="_editTags" class="simple" hidden$="[[!machine.can_tag]]">tags</paper-button>
                     <paper-menu-button horizontal-align="right">
@@ -228,6 +228,7 @@
             </paper-material>
         </div>
         <dialog-element></dialog-element>
+        <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError"></iron-ajax>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
         <tags-list resource="machine"></tags-list>
@@ -283,7 +284,7 @@
             '_isMonitored(machine, model.monitoring.machines.*)'
         ],
         listeners: {
-            'confirmation': '_deleteMachineEventResponse'
+            'confirmation': '_machineActionConfirmation'
         },
         attached: function(){
             this.datasources = [
@@ -389,15 +390,7 @@
         rename: function(_, params) {
             console.log("clicked rename");
         },
-        restart: function(_, params) {
-            console.log("clicked restart");
-        },
-        shutdown: function(_, params) {
-            console.log("clicked shutdown");
-        },
-        destroy: function(_, params) {
-            console.log("clicked destroy");
-        },
+        
         _getHeaderStyle: function(color) {
             return 'background-color: ' + color + '; color: #fff;';
         },
@@ -427,15 +420,52 @@
             var el = this.querySelector('machine-edit');
             el._openEditMachineModal();
         },
+        start: function(_, params) {
+            this.confirmAction("start");
+        },
+        stop: function(_, params) {
+            this.confirmAction("stop");
+        },
+        suspend: function(_, params) {
+            this.confirmAction("suspend");
+        },
+        reboot: function(_, params) {
+            this.confirmAction("reboot");
+        },
+        resume: function(_, params) {
+            this.confirmAction("resume");
+        },
+        undefine: function(_, params) {
+            this.confirmAction("undefine");
+        },
+        destroy: function(_, params) {
+            this._showDialog({
+                title: 'Destroy Machine?',
+                body: "Destroying a machine can not be undone. You are about to delete machine '" + this.machine.name + "'.",
+                danger: true,
+                reason: "machine.destroy"
+            });
+        },
         _deleteMachine: function(e) {
             this._showDialog({
                 title: 'Delete Machine?',
-                body: "Deleting a machine can not be undone. You are about to delete machine '" + this.machine.name + "'.",
+                body: "Deleting a machine can not be undone. You are about to destroy machine '" + this.machine.name + "'.",
                 danger: true,
-                reason: "machine.delete"
+                reason: "machine.destroy"
             });
         },
-        _deleteMachineEventResponse: function(e) {
+           // <!-- can_destroy:true
+                    // can_start:false
+                    // can_stop:true
+                    // can_suspend:false
+                    // can_reboot:true
+                    // can_resume:false
+                    // can_undefine:false -->
+
+                    // can_rename:true
+                    // can_tag:true
+
+        _machineActionConfirmation: function(e) {
             var reason = e.detail.reason,
                 response = e.detail.response;
 
@@ -444,6 +474,33 @@
                 this.$.machineDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
                 this.$.machineDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.machineDeleteAjaxRequest.generateRequest();
+            }
+
+            if (response.confirmed && reason == "machine.destroy") {
+                this.$.machineDeleteAjaxRequest.body = {};
+                this.$.machineDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                this.$.machineDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.machineDeleteAjaxRequest.generateRequest();
+            }
+
+            if (response.confirmed && reason != "machine.delete" && reason != "machine.destroy") {
+                if (reason == "machine.start")
+                    payload = {'action': 'start'};
+                if (reason == "machine.stop")
+                    payload = {'action': 'stop'};
+                if (reason == "machine.suspend")
+                    payload = {'action': 'suspend'};
+                if (reason == "machine.reboot")
+                    payload = {'action': 'reboot'};
+                if (reason == "machine.resume")
+                    payload = {'action': 'resume'};
+                if (reason == "machine.undefine")
+                    payload = {'action': 'undefine'};
+
+                this.$.actionRequest.body = payload;
+                this.$.actionRequest.headers["Content-Type"] = 'application/json';
+                this.$.actionRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.actionRequest.generateRequest();
             }
         },
         _handleMachineDeleteAjaxResponse: function(e) {
@@ -459,15 +516,21 @@
             this.dashboard.rows[0].panels[0].targets[0].target = 'bucky.'+this.machine.id+'.load.shortterm';
             return ret;
         },
+        confirmAction: function(action){
+            this._showDialog({
+                title: action+' Machine?',
+                body: "You are about to "+ action +" machine '" + this.machine.name + "'.",
+                danger: false,
+                reason: "machine."+action,
+                action: action
+            });
+        },
         _showDialog: function(info) {
             var dialog = this.querySelector('dialog-element');
             for (var i in info) {
                 dialog[i] = info[i];
             }
             dialog._openDialog();
-        },
-        _goBack: function() {
-            history.back();
         },
         isState: function(machine){
             return machine.state == machine.extra.status ;
