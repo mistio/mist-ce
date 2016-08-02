@@ -15,6 +15,9 @@
         :host {
             display: block;
         }
+        p {
+            padding: 0 !important;
+        }
         #content {
             max-width: 900px;
         }
@@ -51,10 +54,13 @@
                 </div>
             </paper-material>
             <paper-material>
+                <p>
+                    Heads up! Make sure you select a machine you have already associated a key with. Otherwise the the request may be accepted but the script will never finish run.
+                </p>
                 <app-form fields="[[fields]]" url="/api/v1/scripts/[[params.id]]" on-response="_runScriptResponse" btncontent="run"></app-form>
             </paper-material>
         </div>
-        <paper-toast id="run-script"></paper-toast>
+        <paper-toast id="run-script-toast"></paper-toast>
     </template>
 
     <script>
@@ -185,7 +191,7 @@
                     }, 3300)
                 },
                 _showToast: function(msg) {
-                    var toast = this.querySelector('paper-toast#run-script');
+                    var toast = this.querySelector('paper-toast#run-script-toast');
                     toast.text = msg;
                     toast.show();
                 }
