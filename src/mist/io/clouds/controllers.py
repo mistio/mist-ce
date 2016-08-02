@@ -51,6 +51,9 @@ log = logging.getLogger(__name__)
 
 
 class AmazonController(BaseController):
+
+    provider = 'ec2'
+
     def connect(self):
         return get_driver(Provider.EC2)(self.cloud.apikey,
                                         self.cloud.apisecret,
@@ -114,11 +117,17 @@ class AmazonController(BaseController):
 
 
 class DigitalOceanController(BaseController):
+
+    provider = 'digitalocean'
+
     def connect(self):
         return get_driver(Provider.DIGITAL_OCEAN)(self.cloud.token)
 
 
 class DigitalOceanFirstGenController(BaseController):
+
+    provider = 'digitalocean_first_gen'
+
     def connect(self):
         return get_driver(Provider.DIGITAL_OCEAN_FIRST_GEN)(
             self.cloud.apikey, self.cloud.apisecret
@@ -126,6 +135,9 @@ class DigitalOceanFirstGenController(BaseController):
 
 
 class LinodeController(BaseController):
+
+    provider = 'linode'
+
     def connect(self):
         return get_driver(Provider.LINODE)(self.cloud.apikey)
 
@@ -137,6 +149,9 @@ class LinodeController(BaseController):
 
 
 class RackSpaceController(BaseController):
+
+    provider = 'rackspace'
+
     def connect(self):
         if self.cloud.region in ('us', 'uk'):
             driver = get_driver(Provider.RACKSPACE_FIRST_GEN)
@@ -157,6 +172,9 @@ class RackSpaceController(BaseController):
 
 
 class SoftLayerController(BaseController):
+
+    provider = 'softlayer'
+
     def connect(self):
         return get_driver(Provider.SOFTLAYER)(self.cloud.username,
                                               self.cloud.apikey)
@@ -168,6 +186,9 @@ class SoftLayerController(BaseController):
 
 
 class NephoScaleController(BaseController):
+
+    provider = 'nephoscale'
+
     def connect(self):
         return get_driver(Provider.NEPHOSCALE)(self.cloud.username,
                                                self.cloud.password)
@@ -184,6 +205,9 @@ class NephoScaleController(BaseController):
 
 
 class AzureController(BaseController):
+
+    provider = 'azure'
+
     def connect(self):
         tmp_cert_file = tempfile.NamedTemporaryFile(delete=False)
         tmp_cert_file.write(self.cloud.certificate)
@@ -208,6 +232,9 @@ class AzureController(BaseController):
 
 
 class GoogleController(BaseController):
+
+    provider = 'gce'
+
     def connect(self):
         return get_driver(Provider.GCE)(self.cloud.email,
                                         self.cloud.private_key,
@@ -308,22 +335,34 @@ class GoogleController(BaseController):
 
 
 class HostVirtualController(BaseController):
+
+    provider = 'hostvirtual'
+
     def connect(self):
         return get_driver(Provider.HOSTVIRTUAL)(self.cloud.apikey)
 
 
 class PacketController(BaseController):
+
+    provider = 'packet'
+
     def connect(self):
         return get_driver(Provider.PACKET)(self.cloud.apikey,
                                            project=self.cloud.project_id)
 
 
 class VultrController(BaseController):
+
+    provider = 'vultr'
+
     def connect(self):
         return get_driver(Provider.VULTR)(self.cloud.apikey)
 
 
 class VSphereController(BaseController):
+
+    provider = 'vsphere'
+
     def connect(self):
         host = dnat(self.cloud.owner, self.cloud.host)
         return get_driver(Provider.VSPHERE)(host=host,
@@ -338,6 +377,9 @@ class VSphereController(BaseController):
 
 
 class VCloudController(BaseController):
+
+    provider = 'vcloud'
+
     def connect(self):
         host = dnat(self.cloud.owner, self.cloud.host)
         return get_driver(self.provider)(self.cloud.username,
@@ -362,6 +404,9 @@ class VCloudController(BaseController):
 
 
 class OpenStackController(BaseController):
+
+    provider = 'openstack'
+
     def connect(self):
         url = dnat(self.cloud.owner, self.cloud.url)
         return get_driver(Provider.OPENSTACK)(
@@ -387,6 +432,9 @@ class OpenStackController(BaseController):
 
 
 class DockerController(BaseController):
+
+    provider = 'docker'
+
     def connect(self):
         host, port = dnat(self.cloud.owner, self.cloud.host, self.cloud.port)
 
@@ -445,6 +493,9 @@ class DockerController(BaseController):
 
 
 class LibvirtController(BaseController):
+
+    provider = 'libvirt'
+
     def connect(self):
         """Three supported ways to connect: local system, qemu+tcp, qemu+ssh"""
 
@@ -495,13 +546,18 @@ class LibvirtController(BaseController):
 
 # FIXME
 class CoreOSController(BaseController):
+
+    provider = 'coreos'
+
     # def connect(self):
     #     return CoreOSDriver(Machine.objects(cloud=self.cloud))
-    pass
 
 
 # FIXME
 class OtherController(BaseController):
+
+    provider = 'bare_metal'
+
     # def connect(self):
     #     return BareMetalDriver(Machine.objects(cloud=self.cloud))
     pass

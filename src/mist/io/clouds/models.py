@@ -12,6 +12,21 @@ from mist.core.user.models import Organization
 import mist.io.clouds.controllers as controllers
 
 
+# This is a map from provider name to provider class, eg:
+# 'linode': LinodeCloud
+# It is autofilled by _populate_clouds which is run on the end of this file.
+CLOUDS = {}
+
+
+def _populate_clouds():
+    """Populates CLOUDS variable with mappings from providers to clouds"""
+    for key, value in globals().items():
+        if key.endswith('Cloud') and key != 'Cloud':
+            value = globals()[key]
+            if issubclass(value, Cloud) and value is not Cloud:
+                CLOUDS[value._controller_cls.provider] = value
+
+
 class Cloud(me.Document):
     """Abstract base class for every cloud/provider mongoengine model
 
@@ -296,3 +311,6 @@ class CoreOSCloud(Cloud):
 class OtherCloud(Cloud):
 
     _controller_cls = controllers.OtherController
+
+
+_populate_clouds()
