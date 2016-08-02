@@ -67,7 +67,7 @@ class AmazonController(BaseController):
                                                    apikey=apikey)
             if cloud is not None:
                 kwargs['apisecret'] = cloud.apisecret
-        super(AmazonController, self).add(kwargs)
+        super(AmazonController, self).add(**kwargs)
 
     def list_images(self, search=None):
         default_images = config.EC2_IMAGES[self.cloud.region]
@@ -168,7 +168,7 @@ class RackSpaceController(BaseController):
                                                    username=username)
             if cloud is not None:
                 kwargs['apikey'] = cloud.apikey
-        super(RackSpaceController, self).add(kwargs)
+        super(RackSpaceController, self).add(**kwargs)
 
 
 class SoftLayerController(BaseController):
