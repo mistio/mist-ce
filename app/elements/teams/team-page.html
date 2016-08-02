@@ -6,7 +6,6 @@
 <link rel="import" href="../helpers/dialog-element.html">
 
 <link rel="import" href="team-edit.html">
-<link rel="import" href="team-add.html">
 <link rel="import" href="team-policy.html">
 
 <dom-module id="team-page">
@@ -254,11 +253,10 @@
         </div>
 
         <div class="absolute-bottom-right">
-            <paper-fab icon="add" on-tap="_addTeam"></paper-fab>
+            <paper-fab icon="add" on-tap="_addMember"></paper-fab>
         </div>
 
         <team-edit team="[[team]]" org="[[model.org]]"></team-edit>
-        <team-add></team-add>
         <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
         <iron-ajax id="deleteMember" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/members/[[memberToDelete]]" method="DELETE" on-response="_deleteMemberResponse" on-error="_deleteMemberError"></iron-ajax>
         
@@ -455,10 +453,6 @@
                         dialog[i] = info[i];
                     }
                     dialog._openDialog();
-                },
-                _addTeam: function(e) {
-                    var dialog = this.querySelector('team-add');
-                    dialog.openDialog();
                 }
             });
         })();
