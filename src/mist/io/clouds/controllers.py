@@ -403,6 +403,18 @@ class VCloudController(BaseController):
             machine['tags']['vdc'] = machine['extra']['vdc']
 
 
+class IndonesianVCloudController(VCloudController):
+
+    provider = 'indonesian_vcloud'
+
+    def add(self, **kwargs):
+        kwargs.setdefault('host', 'my.idcloudonline.com')
+        if kwargs['host'] not in ('my.idcloudonline.com',
+                                  'compute.idcloudonline.com'):
+            raise me.ValidationError("Invalid host '%s'." % kwargs['host'])
+        super(IndonesianVCloudController, self).add(**kwargs)
+
+
 class OpenStackController(BaseController):
 
     provider = 'openstack'
