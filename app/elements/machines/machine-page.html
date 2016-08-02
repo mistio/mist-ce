@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 
@@ -96,16 +97,21 @@
             }
 
             .machine-state-icon.terminated {
-                color: var(--mist-dark-color) !important;;
+                color: var(--mist-dark-color) !important;
             }
 
             .machine-state-icon.stopped {
-                color: var(--orange-color) !important;;
+                color: var(--orange-color) !important;
             }
 
             .machine-state-icon.error {
-                color: var(--red-color) !important;;
+                color: var(--red-color) !important;
             }
+
+            .machine-state-icon.unkown, .machine-state-icon.pending {
+                color: #ccc !important;
+            }
+
             paper-material > .smallcaps {
                 margin-top: 0;
             }
@@ -228,10 +234,11 @@
             </paper-material>
         </div>
         <dialog-element></dialog-element>
-        <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError"></iron-ajax>
+        <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
         <tags-list resource="machine"></tags-list>
+        <paper-toast></paper-toast>
     </template>
 </dom-module>
 <script>
@@ -454,17 +461,6 @@
                 reason: "machine.destroy"
             });
         },
-           // <!-- can_destroy:true
-                    // can_start:false
-                    // can_stop:true
-                    // can_suspend:false
-                    // can_reboot:true
-                    // can_resume:false
-                    // can_undefine:false -->
-
-                    // can_rename:true
-                    // can_tag:true
-
         _machineActionConfirmation: function(e) {
             var reason = e.detail.reason,
                 response = e.detail.response;
@@ -503,6 +499,15 @@
                 this.$.actionRequest.generateRequest();
             }
         },
+        _actionRequest: function(e){
+            this._showToast('Action request was sent. Waiting for response.');
+        },
+        _actionResponse: function(e){
+            this._showToast('Requested action is being processed');
+        },
+        _actionError: function(e){
+            this._showToast('Action request failed');
+        },
         _handleMachineDeleteAjaxResponse: function(e) {
             page.show('/machines');
         },
@@ -531,6 +536,11 @@
                 dialog[i] = info[i];
             }
             dialog._openDialog();
+        },
+        _showToast: function(msg) {
+            var toast = this.querySelector('paper-toast');
+            toast.text = msg;
+            toast.show();
         },
         isState: function(machine){
             return machine.state == machine.extra.status ;
