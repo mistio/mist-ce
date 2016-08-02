@@ -112,7 +112,7 @@
         }                
         </style>
         <paper-material class="flex3child" hidden$="[[!tags.length]]">
-            <h3>Top five tags
+            <h3>Top [[tags.length]] tags
                 <!-- <a href="http://docs.mist.io/article/103-cost-reporting-with-mist-io" target="new"> <iron-icon id="costdocs" icon="help" position="left"></iron-icon> --></a>
             </h3>
             <table>
@@ -184,7 +184,7 @@ Polymer({
             return 0;
         });
         // return all clouds instead of topCloudsArray.slice(0,3);
-        return tagsArray.slice(0,5);
+        return tagsArray.slice(0,7);
     }
 });
 </script>
