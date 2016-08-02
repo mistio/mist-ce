@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
@@ -30,6 +31,12 @@
             flex: 1 100%;
             overflow: hidden;
         }
+        .left {
+            flex: 1 60%;
+        }
+        .right {
+            flex: 1 40%;
+        }
         paper-material {
             display: block;
             padding: 20px;
@@ -52,7 +59,7 @@
             background-color: #444;
             color: #fff;
             font-family: monospace;
-            padding: 24px 10px 10px;
+            padding: 10px;
             width: 100%;
             max-width: 100%;
             overflow-x: scroll;
@@ -99,15 +106,29 @@
         #leftcolumn {
             position: relative;
         }
-        #copy-button {
-            position: absolute;
-            top: 12px;
-            right: 9px;
+        #getcurl,
+        #getscript,
+        #copycurl,
+        #copyscript {
+            display: none;
             background-color: rgba(255, 255, 255, 0.15);
-            color: rgba(0,0,0,0.87);
+            color: inherit;
+            font-size: 13px;
         }
-        #copy-button iron-icon {
-            margin-left: 8px;
+        #getcurl iron-icon,
+        #getscript iron-icon,
+        #copycurl iron-icon,
+        #copyscript iron-icon {
+            color: inherit;
+            margin-right: 8px;
+        }
+        #getcurl,
+        #getscript {
+            display: inline-block;
+        }
+        #copycurl[show],
+        #copyscript[show] {
+            display: inline-block;
         }
         </style>
 
@@ -137,9 +158,35 @@
             </paper-material>
             <div class="columns">
                 <div id="leftcolumn" class="left command-container">
-                    <paper-button id="copy-button" on-tap="copyScript" class="pull-right link">Copy script <iron-icon icon="content-copy"></iron-icon></paper-button>
                     <div class="pad2">
-                        <pre><code id="tunnelscript">[[tunnel.script]]</code></pre>
+                        <pre><code>
+Options for installing your VPN client:
+
+1.  Via `curl`: Hit the button below in order to be provided with 
+    a simple `curl` command, which you can directly run in your shell 
+    and will take care of installing the VPN client. This is the 
+    recommended option, especially if you are not planning on modifying 
+    the configuration script provided.
+
+2.  Alternatively, you can request and then copy &amp; paste the configuration 
+    script in your shell, make it executable, and run it. This option is 
+    useful in case you want to make any changes to the configuration provided.
+</code></pre>
+                        <pre><code>
+==============================================================================
+CURL Command:</code></pre>
+                        <pre><code id="tunnelscommand"></code></pre>
+                        <paper-button id="copycurl" on-tap="copyCurl" class="pull-right link"> <iron-icon icon="content-copy"> </iron-icon>Copy command</paper-button>
+                        <paper-button id="getcurl" on-tap="_requestCommand" class="pull-right link"> <iron-icon icon="content-copy"> </iron-icon>Request command</paper-button>
+                        <pre><code>
+==============================================================================
+Script:</code></pre>
+                        <pre><code id="tunnelscript"></code></pre>
+                        <paper-button id="getscript" handle-as="json" on-tap="_requestScript" class="pull-right link"><iron-icon icon="content-copy"></iron-icon> Request Script</paper-button>
+                        <paper-button id="copyscript" on-tap="copyScript" class="pull-right link"><iron-icon icon="content-copy"></iron-icon> Copy Script </paper-button>
+                        <pre><code>
+                            
+                        </code></pre>
                     </div>
                 </div>
                 <paper-material id="rightcolumn" class="right">
@@ -153,26 +200,34 @@
                             <div class="flexchild">TUNNEL ID</div>
                             <div class="flexchild">[[tunnel.tunnel_id]]</div>
                         </div>
-                        <div class="info-item flex-horizontal-with-ratios">
-                        <h4 class="id tags">TAGS
+                        <template is="dom-if" if="[[tunnel.tags.length]]">
+                            <div class="info-item flex-horizontal-with-ratios">
+                                <h4 class="id tags">TAGS
+                                    <template is="dom-if" if="[[tunnel.tags]]">
+                                        <span class="id">[[tunnel.tags]]</span>
+                                    </template>
+                                    <template is="dom-if" if="[[!tunnel.tags]]">
+                                        <span class="id">(0)</span>
+                                    </template>
+                                </h4>
                                 <template is="dom-if" if="[[tunnel.tags]]">
-                                    <span class="id">[[tunnel.tags]]</span>
+                                    <template is="dom-repeat" items="[[tunnel.tags]]">
+                                        <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
+                                    </template>
                                 </template>
-                                <template is="dom-if" if="[[!tunnel.tags]]">
-                                    <span class="id">(0)</span>
-                                </template>
-                            </h4>
-                            <template is="dom-if" if="[[tunnel.tags]]">
-                                <template is="dom-repeat" items="[[tunnel.tags]]">
-                                    <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
-                                </template>
-                            </template>
-                        </div>
+                            </div>
+                        </template>
                         <div class="info-item flex-horizontal-with-ratios">
                             <div class="flexchild">CIDRS</div>
-                            <template is="dom-repeat" items=[[tunnel.cidrs]]>
-                                [[item]]<br/>
-                            </template>
+                            <div class="flexchild">
+                                <template is="dom-repeat" items=[[tunnel.cidrs]]>
+                                    [[item]]<br/>
+                                </template>
+                            </div>
+                        </div>
+                        <div class="info-item flex-horizontal-with-ratios">
+                            <div class="flexchild">Port</div>
+                            <div class="flexchild">[[tunnel.port]]</div>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
                             <div class="flexchild">Enabled</div>
@@ -189,9 +244,12 @@
         </div>
         <tunnel-edit tunnel="[[tunnel]]"></tunnel-edit>
         <iron-ajax id="tunnelDeleteAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]" method="DELETE" on-response="_handleTunnelDeleteAjaxResponse" on-error="_handleTunnelDeleteAjaxError"></iron-ajax>
+        <iron-ajax id="scriptAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]/script" method="GET" on-response="_handleScriptAjaxRequest" on-error="_handleScriptAjaxError"></iron-ajax>
+        <iron-ajax id="commandAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]/command" method="GET" on-response="_handleCommandAjaxRequest" handle-as="xml" on-error="_handleCommandAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
         <tags-list resource="tunnel"></tags-list>
+        <paper-toast></paper-toast>
     </template>
     <script>
     (function() {
@@ -230,9 +288,18 @@
                     value: true
                 }
             },
+            observers: [
+                "_updateCommandArea(tunnel.id)"
+            ],
             listeners: {
                 'confirmation': '_deleteTunnelEventResponse',
                 'updateSelectedScript': '_updateScript'
+            },
+            _updateCommandArea: function(id){
+                this.$.tunnelcommand.textContent = '';
+                this.$.tunnelscript.textContent = '';
+                this.$.copyscript.removeAttribute('show');
+                this.$.copycurl.removeAttribute('show');
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
@@ -300,6 +367,44 @@
                 toast.text = "There was a problem deleting the tunnel";
                 toast.show();
             },
+            // script 
+            _requestScript: function(){
+                this.$.scriptAjaxRequest.body = {};
+                this.$.scriptAjaxRequest.headers["Content-Type"] = 'application/json';
+                this.$.scriptAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.scriptAjaxRequest.generateRequest();
+            },
+            _handleScriptAjaxRequest: function(e){
+                console.log(e);
+                var response = e.detail.response;
+                if (e.detail.xhr.status == 200){
+                    this.$.tunnelscript.textContent = response;
+                    this.$.copyscript.setAttribute('show', true);
+                }
+            },
+            _handleScriptAjaxError: function(e){
+                
+            },
+            // command 
+            _requestCommand: function(){
+                this.$.commandAjaxRequest.body = {};
+                this.$.commandAjaxRequest.headers["Content-Type"] = 'application/json';
+                this.$.commandAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.commandAjaxRequest.generateRequest();
+            },
+            _handleCommandAjaxRequest: function(e){
+                console.log(e);
+                var response = e.detail.xhr.responseText;
+                if (e.detail.type != "error"){
+                    this.$.tunnelscommand.textContent = response;
+                    this.$.copycurl.setAttribute('show', true);
+                }
+            },
+            _handleCommandAjaxError: function(e){
+                console.log(e);
+                var response = e.detail.error;
+                this.$.tunnelscommand.textContent = response;
+            },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element');
                 for (var i in info) {
@@ -309,11 +414,19 @@
             },
             copyScript: function(e) {
                 this.clearSelection();
-
                 var el = this.$.tunnelscript;
                 this.setSelection(el);            
                 var successful = document.execCommand('copy');
                 var msg = successful ? 'The script was copied to clipboard!' : 'There was an error copying to clipboard!';
+
+                this._showToast(msg);
+            },
+            copyCurl: function(e) {
+                this.clearSelection();
+                var el = this.$.tunnelscommand;
+                this.setSelection(el);            
+                var successful = document.execCommand('copy');
+                var msg = successful ? 'The command was copied to clipboard!' : 'There was an error copying to clipboard!';
 
                 this._showToast(msg);
             },
