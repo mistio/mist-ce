@@ -18,6 +18,8 @@ from mongoengine import ValidationError, NotUniqueError
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
 
+import jsonschema
+
 # try:
 from mist.core.helpers import view_config
 from mist.core.auth.methods import user_from_request
@@ -39,6 +41,7 @@ import pyramid.httpexceptions
 
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, transform_key_machine_associations
+from mist.io.helpers import schema_by_provider
 
 from mist.core.auth.methods import auth_context_from_request
 
@@ -338,6 +341,7 @@ def delete_cloud(request):
     return OK
 
 
+# rename as edit_cloud
 @view_config(route_name='api_v1_cloud_action', request_method='PUT')
 @view_config(route_name='cloud_action', request_method='PUT')
 def rename_cloud(request):
@@ -356,18 +360,62 @@ def rename_cloud(request):
     """
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
+    params = params_from_request(request)
+
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
-    params = params_from_request(request)
-    new_name = params.get('new_name', '')
-    if not new_name:
-        raise RequiredParameterMissingError('new_name')
+    # the fields which can be edited by the user
+    # api_fields = ['provider', 'subscription_id', 'certificate', 'token',
+    #               'api_key', 'api_secret', 'region', 'project_id',
+    #               'private_key', 'username', 'password', 'organization',
+    #               'host', 'auth_url', 'tenant_name',
+    #               'machine_hostname', 'title']
+
+    api_fields = cloud._fields.keys()
+
+    # here terms must change
+    pt_args = {k: v for k, v in params.items() if k in api_fields}
+
+    # other way round, cloud.as_dict() and keys() and pt_args in keys()
+
     auth_context.check_perm('cloud', 'edit', cloud_id)
 
-    methods.rename_cloud(auth_context.owner, cloud_id, new_name)
+    # i don't like this trick here,
+    # but we must define which typeof schema we need
+    provider_type = params.get('provider_type', '')
+
+    if not provider_type:
+        raise RequiredParameterMissingError('provider_type')
+
+    # call the provider equivalent schema
+    schema = schema_by_provider(provider_type)
+
+    v = jsonschema.Draft3Validator(schema)
+    # validate parameters that user send
+    errors = sorted(v.iter_errors(pt_args), key=lambda e: e.path)
+
+    for error in errors:
+        raise RequiredParameterMissingError(error.message)  # list(error.path)
+
+    # add here an object validation with v = jsonschema.Draft4Validator(schema)
+
+    if provider_type != 'Other Server':
+        # if a param is send, i will update it
+        # what is missing, i assume that remains the same
+        try:
+            cloud.update_validate(pt_args)
+        except ValidationError as e:
+            raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    else:
+        title = params.get('title')
+        provider = params.get('provider')
+        methods.edit_cloud_bare_metal(auth_context.owner, title,
+                                      provider, cloud_id, params)
+
+    # add code like methods add cloud , remove on error and after
     return OK
 
 
