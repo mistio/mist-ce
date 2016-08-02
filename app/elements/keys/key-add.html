@@ -25,10 +25,24 @@
 
             paper-progress {
                 position: absolute;
-                bottom: 85px;
+                bottom: 91px;
                 width: 100%;
                 left: 0;
                 right: 0;
+            }
+            .flexchild {
+                display: inline;
+            }
+            .flexchild paper-button {
+                display: inline-block;
+            }
+            .pull-right {
+                float: right;
+            }
+            iron-icon {
+                width: 20px;
+                height: 20px;
+                color: inherit;
             }
         </style>
         <div id="content">
@@ -45,21 +59,32 @@
             </paper-material>
             <paper-material>
                 <custom-validator validator-name="isUniqueValidator"></custom-validator>
-                <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" validator="isUniqueValidator" auto-validate error-message="Please enter a unique key's name" value="{{key.name}}"></paper-input>
+                
+                <div class="grid-row">
 
-                <paper-textarea id="privateKey" label="Private Key" rows="5" required auto-validate error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
+                    <paper-input id="name" class="xs12 ms" label="Name" required allowed-pattern="[A-Za-z0-9]" validator="isUniqueValidator" auto-validate error-message="Please enter a unique key's name" value="{{key.name}}"></paper-input>
+                    <hr class="xs12" />
+                    <paper-textarea id="privateKey" class="xs12 m6" label="Private Key" rows="5" required auto-validate error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
+                    
+                    <div class="field-helptext xs12 m6">
+                        Copy-paste your private key, upload it, or use the generator to create a key for you.
+                    </div>
+                    <paper-textarea id="publicKey" class="xs12" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
 
-                <paper-textarea id="publicKey" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
-                <div class="clearfix btn-group">
-                    <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
+                    <paper-progress class="xs12" indeterminate hidden$="[[!showProgress]]"></paper-progress>
                     <hr class="xs12" />
                     <div class="clearfix bottom-actions xs12">
-                        <paper-button class="submit-btn pull-left" raised on-tap="_generateKey">Generate</paper-button>
-                        <paper-button class="submit-btn pull-left" raised on-tap="_uploadKey">Upload</paper-button>
-                        <input type="file" name="file" value="{{key.file}}" on-change="_uploadFile" hidden id="keyUpload" />
-                        <paper-button class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
+                        <div class="flexchild">
+                            <paper-button class="submit-btn pull-left" raised on-tap="_generateKey">Generate 
+                                <iron-icon icon="communication:vpn-key"></iron-icon> </paper-button>
+                            <paper-button class="submit-btn pull-left" raised on-tap="_uploadKey">Upload 
+                            <iron-icon icon="icons:file-upload"></iron-icon></paper-button>
+                        </div>
+                        <paper-button class="submit-btn pull-right" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
                     </div>
                 </div>
+                <input type="file" name="file" value="{{key.file}}" on-change="_uploadFile" hidden id="keyUpload" />
+
             </paper-material>
         </div>
 

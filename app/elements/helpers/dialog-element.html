@@ -7,10 +7,13 @@
 <dom-module id="dialog-element">
     <template>
         <style is="custom-style" include="dialogs"></style>
-        <style include="shared-styles">
+        <style is="custom-style" include="shared-styles">
             :host {
                 display: block;
                 width: 100%;
+            }
+            paper-dialog ::content h2 {
+                text-transform: capitalize;
             }
         </style>
 
@@ -21,11 +24,17 @@
                     [[body]]
                 </p>
                 <div hidden$="[[!_computeType(type, 'isYesNo')]]" class="clearfix btn-group">
-                    <paper-button hidden$="[[danger]]" class="green" dialog-confirm>Yes</paper-button>
-                    <paper-button hidden$="[[danger]]" class="red" dialog-dismiss>No</paper-button>
+                    <paper-button hidden$="[[danger]]" class="link" dialog-dismiss>Cancel</paper-button>
+                    <paper-button hidden$="[[danger]]" class="blue" dialog-confirm>
+                        <span hidden$="[[action]]"> Proceed </span>
+                        <span hidden$="[[!action]]">[[action]]</span>
+                    </paper-button>
 
                     <paper-button hidden$="[[!danger]]" dialog-dismiss>Cancel</paper-button>
-                    <paper-button hidden$="[[!danger]]" class="red" dialog-confirm>Delete</paper-button>
+                    <paper-button hidden$="[[!danger]]" class="red" dialog-confirm>
+                        <span hidden$="[[action]]"> Delete </span>
+                        <span hidden$="[[!action]]">[[action]]</span>
+                    </paper-button>
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
@@ -52,10 +61,14 @@
                         value: 'isYesNo'
                     },
                     danger: {
-                        type: String,
+                        type: Boolean,
                         value: false
                     },
                     reason: {
+                        type: String,
+                        value: null
+                    },
+                    action: {
                         type: String,
                         value: null
                     }
