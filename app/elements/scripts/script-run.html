@@ -1,8 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+<link rel="import" href="../app-form/app-form.html">
 
 <dom-module id="script-run">
     <template>
@@ -40,20 +43,18 @@
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
                 <div class="title flex">
                     <h2>
-                        Add Script
+                        Run Script '[[script.name]]
                     </h2>
                     <div class="subtitle">
-                        You can add scripts inline or from a url. You will soon be able to schedule your scripts to run.
+                        You can currently run scripts on one machine per time. You will soon be able to schedule your scripts to run.
                     </div>
                 </div>
             </paper-material>
             <paper-material>
-                <app-form fields="[[fields]]" form="[[script]]" url="/api/v1/scripts" on-request="_addScriptAjaxRequest" on-response="_addScriptAjaxResponse"></app-form>
+                <app-form fields="[[fields]]" url="/api/v1/scripts/[[params.id]]" on-response="_runScriptResponse" btncontent="run"></app-form>
             </paper-material>
         </div>
-            
-
-            <iron-ajax id="runScriptAjax" url="/scripts/[[script.id]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+        <paper-toast id="run-script"></paper-toast>
     </template>
 
     <script>
@@ -64,34 +65,15 @@
                 is: 'script-run',
 
                 properties: {
+                    model: Object,
+                    params: Object,
                     script: {
                         type: Object,
-                        computed: '_computeScript(id)'
+                        computed: '_computeScript(params, model.scriptsArray.*)'
                     },
-                    section: Object,
-                    runScript: {
-                        type: Object,
-                        value: function() {
-                            return {
-                                machine: '',
-                                parameters: '',
-                                schedulerUse: '',
-                                schedulerName: '',
-                                schedulerDescription: '',
-                                schedulerRunImmediately: '',
-                                schedulerAction: '',
-                                schedulerExpires: '',
-                                schedulerType: '',
-                                scedulerOneOffEntry: '',
-                                scedulerCrontabEntry: '',
-                                scedulerIntervalEveryEntry: '',
-                                scedulerIntervalPeriodEntry: ''
-                            }
-                        }
-                    },
+                    section: Object,                    
                     fields: {
-                        type: Array,                        
-                        notify: true
+                        type: Array,
                     },
                     parameters: {
                         type: String,
@@ -105,39 +87,27 @@
                         type: Boolean,
                         computed: '_computeHasMachines(machinesOptions.*)'
                     },
-                    sendingData: {
-                        type: Boolean,
-                        value: false
-                    },
-                    formReady: {
-                        type: Boolean,
-                        value: false
-                    },
                     cardTitleText: {
                         type: String,
                         computed: '_computeCardTitleText(script.name, runScript.machine)'
                     }
                 },
                 observers: [
-                    '_fieldsChanged(fields.*, sendingData)',
-                    '_cloudsChanged(model.clouds.*)'
+                    '_cloudsChanged(model.cloudsArray.*, model.machinesArray.*)'
                 ],
-                _computeScript: function(id) {
-                    return Mist.scripts.find(function(script) {
-                        return script.id == id;
-                    });
+                listeners: {
+                    'iron-select': '_fieldsChanged'
+                },
+                _computeScript: function(params, model) {
+                    var script = this.model.scriptsArray.find(function(script) {
+                        return script.id == this.params.id;
+                    },this);
+                    return script;
                 },
                 _computeMachinesOptions: function(clouds) {
-                    return this.model.clouds
-                        .filter(function(cloud) {
+                    return this.model.machinesArray.filter(function(cloud) {
                             return cloud.enabled;
-                        })
-                        .map(function(cloud) {
-                            return cloud.machines;
-                        })
-                        .reduce(function(a, b) {
-                            return a.concat(b);
-                        }, []);
+                        });
                 },
                 _computeHasMachines: function(machinesOptions) {
                     return machinesOptions.base.length > 0;
@@ -150,143 +120,74 @@
                 _computeCardTitleText: function(name, machine) {
                     return machine ? 'Run Script "' + name + '" on "' + machine.name + '"' : 'Run Script "' + name + '"';
                 },
-                _fieldsChanged: function(fields, sendingData) {
-                    var runScript = this.runScript,
-                        show = true,
-                        dependency;
-
-                    fields.base.forEach(function(el, index) {
-                        this.set('runScript.' + el.name, el.value);
-
-                        if (el.showIf) {
-                            if (el.showIf.fieldExists) {
-                                dependency = runScript[el.showIf.fieldName],
-                                    show = dependency;
-                                this.set('fields.' + index + '.show', show);
-                            } else {
-                                dependency = runScript[el.showIf.fieldName],
-                                    show = el.showIf.fieldValues.indexOf(dependency) != -1;
-                                this.set('fields.' + index + '.show', show);
-                            }
-
-                            if (!show) {
-                                this._resetField(el, index);
-                            }
-                        }
-
-                        if (el.placeholderIf) {
-                            dependency = runScript[el.placeholderIf.fieldName];
-                            this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
-                        }
-                    }, this);
-
-                    var valid = fields.base.every(function(el, index) {
-                        return el.show && el.required ? el.value : true;
-                    }, this);
-
-                    this.set('runScript', runScript);
-
-                    this.set('formReady', valid && !sendingData);
-                },
-                _cloudsChanged: function(clouds) {
-                    var index = this.fields.findIndex(function(field) {
-                        return field.name == "machine";
-                    }, this);
-
-                    var machinesOptions = clouds.base
-                        .filter(function(cloud) {
-                            return cloud.enabled;
-                        })
-                        .map(function(cloud) {
-                            return cloud.machines;
-                        })
-                        .reduce(function(a, b) {
-                            return a.concat(b);
-                        }, [])
-                        .map(function(machine) {
-                            var obj = {};
-                            obj['title'] = machine.name;
-                            obj['val'] = machine;
-                            return obj;
+                _fieldsChanged: function() {
+                    var machine = this.fields.find(function(f){
+                        return f.name.startsWith("machine");
+                    });
+                    var cloud = this.fields.find(function(f, index){
+                        return f.name.startsWith("cloud");
+                    }); 
+                    if (machine && machine.value) {
+                        var machineID = machine.value;
+                        var machineCloud = this.model.machinesArray.find(function(m){
+                            return m.id == machineID;
                         });
-
-                    this.set('machinesOptions', machinesOptions);
-                    this.set('fields.' + index + '.options', machinesOptions);
-                    this.set('fields.' + index + '.value', '');
-                },
-                _submitForm: function(e) {
-                    var payload = {
-                        description: this.runScript.schedulerDescription,
-                        run_immediately: this.runScript.schedulerRunImmediately,
-                        script_id: this.script.id,
-                        action: this.runScript.schedulerAction,
-                        machines_per_cloud: [
-                            [this.runScript.machine.cloud.id, this.runScript.machine.id]
-                        ],
-                        enabled: this.runScript.schedulerEnabled,
-                        expires: this.runScript.schedulerExpires,
-                        schedulerUse: this.runScript.schedulerUse,
-                        cronjob_type: this.runScript.schedulerType,
-                        cronjob_entry: null
+                        this.set('fields.1.value', machineCloud.cloud.id);
                     };
 
-                    if (this.runScript.schedulerType == "one_off") {
-                        payload.cronjob_entry = this.runScript.scedulerOneOffEntry;
-                    }
-                    if (this.runScript.schedulerType == "interval") {
-                        payload.cronjob_entry = {
-                            every: this.runScript.scedulerIntervalEveryEntry,
-                            period: this.runScript.scedulerIntervalPeriodEntry
-                        };
-                    }
-                    if (this.runScript.schedulerType == "crontab") {
-                        payload.cronjob_entry = this.runScript.scedulerCrontabEntry
-                    }
-
-                    console.log(payload);
-
-                    //   this.$.runScriptAjax.body = payload;
-                    //   this.$.runScriptAjax.generateRequest();
                 },
-                _runScriptRequest: function() {
-                    this.set('sendingData', true);
+                _cloudsChanged: function(clouds) {
+                    var fields = [{
+                            name: "machine_id",
+                            label: "Select Machine *",
+                            type: "mist_dropdown",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            helptext: "Choose the machine on which the script will run",
+                            show: true,
+                            required: true,
+                            options: this.model.machinesArray
+                        }, {
+                            name: "cloud_id",
+                            label: "Cloud ID",
+                            type: "text",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            helptext: "The cloud ID of the machine.",
+                            show: false,
+                            showIf: {
+                                fieldName: "machine_id",
+                                fieldExists: true
+                            },
+                            required: true,
+                            disabled: true
+                        }, {
+                            name: "params",
+                            label: "Parameters",
+                            type: "textarea",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            helptext: "Optional. Fill in the scripts pareameters.",
+                            errorMessage: "Please enter network's name",
+                            show: true,
+                            required: false
+                         }];
+                    this.set('fields', fields)
                 },
                 _runScriptResponse: function(e) {
-                    this.set('sendingData', false);
+                    var msg = 'Run script request was successfull. Redirecting to script...';
+                    this._showToast(msg);
+                    this.async(function(){
+                        page('/scripts/'+this.script.id);
+                    }, 3300)
                 },
-                _resetForm: function(e) {
-                    // Reset runScript
-                    this.set('machine', '');
-                    this.set('parameters', '');
-                    this.set('schedulerUse', '');
-                    this.set('schedulerName', '');
-                    this.set('schedulerDescription', '');
-                    this.set('schedulerRunImmediately', '');
-                    this.set('schedulerAction', '');
-                    this.set('schedulerExpires', '');
-                    this.set('schedulerType', '');
-                    this.set('scedulerOneOffEntry', '');
-                    this.set('scedulerCrontabEntry', '');
-                    this.set('scedulerIntervalEveryEntry', '');
-                    this.set('scedulerIntervalPeriodEntry', '');
-
-                    // Reset Form Fields
-                    this.fields.forEach(function(el, index) {
-                        if (el.showIf) {
-                            this.set('fields.' + index + '.show', false);
-                        }
-
-                        // Reset Form Fields Validation
-                        this._resetField(el, index);
-                    }, this);
-                },
-                _resetField: function(el, index) {
-                    this.set('fields.' + index + '.value', el.defaultValue);
-
-                    var input = this.querySelector('#' + el.name);
-                    if (input) {
-                        input.invalid = false;
-                    }
+                _showToast: function(msg) {
+                    var toast = this.querySelector('paper-toast#run-script');
+                    toast.text = msg;
+                    toast.show();
                 }
             });
         })();
