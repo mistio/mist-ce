@@ -311,18 +311,29 @@ class BaseController(object):
                 'last_seen': str(machine_model.last_seen or ''),
                 'missing_since': str(machine_model.missing_since or ''),
             }
-            machine.update(self.get_available_machine_actions(node.id))
+
+            # Update with available machine.actions.
+            try:
+
+                self._add_machine_actions(machine_model.id, node.id, node,
+                                          machine_model, machine)
+            except Exception as exc:
+                log.exception("Error while finding machine actions "
+                              "for machine %s:%s for %s",
+                              machine_model.id, node.name, self.cloud)
 
             # Apply any cloud/provider specific post processing.
             try:
-                self._post_parse_machine(machine, machine_model)
+                self._post_parse_machine(machine_model.id, node.id, node,
+                                         machine_model, machine)
             except Exception as exc:
                 log.exception("Error while post parsing machine %s:%s for %s",
                               machine_model.id, node.name, self.cloud)
 
             # Apply any cloud/provider cost reporting.
             try:
-                self._cost_machine(machine, machine_model)
+                self._cost_machine(machine_model.id, node.id, node,
+                                   machine_model, machine)
             except Exception as exc:
                 log.exception("Error while calculating cost "
                               "for machine %s:%s for %s",
@@ -359,37 +370,88 @@ class BaseController(object):
 
         return machines
 
-    def _post_parse_machine(self, machine, machine_model):
+    def _add_machine_actions(self, mist_machine_id, api_machine_id,
+                             machine_api, machine_model, machine_dict):
+        """Add metadata on the machine dict on the allowed actions
+
+        Any subclass that whishes to specially handle its allowed actions, can
+        implement this internal method.
+
+        mist_machine_id: The id assigned to the machine by mist. This is the
+            machine's primary key in the database and the mist API.
+        api_machine_id: The id assigned to the machine by its cloud. This is
+            not guaranteed to be globally unique.
+        machine_api: An instance of a libcloud compute node, as returned by
+            libcloud's list_nodes.
+        machine_dict: A dict containing all machine metadata gathered from
+            libcloud and the database. This is what gets returned by mist's
+            API.
+        machine_model: A machine mongoengine model. The model may not have yet
+            been saved in the database.
+
+        This method is expected to edit `machine_dict` in place and not return
+        anything.
+
+        """
+        machine_dict.update({
+            'can_stop': False,
+            'can_start': False,
+            'can_destroy': False,
+            'can_reboot': False,
+            'can_rename': False,
+            'can_undefine': False,
+            'can_suspend': False,
+            'can_resume': False,
+            'can_tag': True,
+        })
+
+    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
+                            machine_model, machine_dict):
         """Post parse a machine before returning it in list_machines
 
         Any subclass that whishes to specially handle its cloud's tags and
         metadata, can implement this internal method.
 
-        machine: a dict containing all machine metadata gathered from libcloud
-                 and the database
+        mist_machine_id: The id assigned to the machine by mist. This is the
+            machine's primary key in the database and the mist API.
+        api_machine_id: The id assigned to the machine by its cloud. This is
+            not guaranteed to be globally unique.
+        machine_api: An instance of a libcloud compute node, as returned by
+            libcloud's list_nodes.
+        machine_dict: A dict containing all machine metadata gathered from
+            libcloud and the database. This is what gets returned by mist's
+            API.
         machine_model: A machine mongoengine model. The model may not have yet
-                       been saved in the database.
+            been saved in the database.
 
-        Note: machine['tags'] is a list of {key: value} pairs.
+        Note: machine_dict['tags'] is a list of {key: value} pairs.
 
-        This method is expected to edit its argument in place and not return
+        This method is expected to edit its arguments in place and not return
         anything.
 
         """
         return
 
-    def _cost_machine(self, machine, machine_model):
+    def _cost_machine(self, mist_machine_id, api_machine_id, machine_api,
+                      machine_model, machine_dict):
         """Perform cost calculations for a machine
 
         Any subclass that whishes to handle its cloud's pricing, can implement
         this internal method.
 
-        machine: a dict containing all machine metadata gathered from libcloud
-                 and the database
+        mist_machine_id: The id assigned to the machine by mist. This is the
+            machine's primary key in the database and the mist API.
+        api_machine_id: The id assigned to the machine by its cloud. This is
+            not guaranteed to be globally unique.
+        machine_api: An instance of a libcloud compute node, as returned by
+            libcloud's list_nodes.
+        machine_dict: A dict containing all machine metadata gathered from
+            libcloud and the database. This is what gets returned by mist's
+            API.
         machine_model: A machine mongoengine model. The model may not have yet
-                       been saved in the database.
+            been saved in the database.
 
-        This method is expected to edit its argument in place and not return
+        This method is expected to edit its arguments in place and not return
         anything.
 
         This internal method is called right after _post_parse_machine and has

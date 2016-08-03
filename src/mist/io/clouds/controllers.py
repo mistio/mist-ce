@@ -123,9 +123,11 @@ class AmazonController(BaseController):
                 pass
         return self._post_parse_locations(locations)
 
-    def _post_parse_machine(self, machine, machine_model):
+    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
+                            machine_model, machine_dict):
         # This is windows for windows servers and None for Linux.
-        machine['extra']['os_type'] = machine['extra'].get('platform', 'linux')
+        extra = machine_dict['extra']
+        extra['os_type'] = extra.get('platform', 'linux')
 
 
 class DigitalOceanController(BaseController):
@@ -153,11 +155,12 @@ class LinodeController(BaseController):
     def _connect(self):
         return get_driver(Provider.LINODE)(self.cloud.apikey)
 
-    def _post_parse_machine(self, machine, machine_model):
-        datacenter = machine['extra'].get('DATACENTER')
+    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
+                            machine_model, machine_dict):
+        datacenter = machine_dict['extra'].get('DATACENTER')
         datacenter = config.LINODE_DATACENTERS.get(datacenter)
         if datacenter:
-            machine['tags']['DATACENTERID'] = datacenter
+            machine_dict['tags']['DATACENTERID'] = datacenter
 
 
 class RackSpaceController(BaseController):
@@ -191,10 +194,11 @@ class SoftLayerController(BaseController):
         return get_driver(Provider.SOFTLAYER)(self.cloud.username,
                                               self.cloud.apikey)
 
-    def _post_parse_machine(self, machine, machine_model):
-        machine['extra']['os_type'] = 'linux'
-        if 'windows' in str(machine['extra'].get('image', '')).lower():
-            machine['extra']['os_type'] = 'windows'
+    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
+                            machine_model, machine_dict):
+        machine_dict['extra']['os_type'] = 'linux'
+        if 'windows' in str(machine_dict['extra'].get('image', '')).lower():
+            machine_dict['extra']['os_type'] = 'windows'
 
 
 class NephoScaleController(BaseController):
@@ -210,10 +214,11 @@ class NephoScaleController(BaseController):
         sizes.extend(self.connection.list_sizes(baremetal=True))
         return self._post_parse_sizes(sizes)
 
-    def _post_parse_machine(self, machine, machine_model):
-        machine['extra']['os_type'] = 'linux'
-        if 'windows' in str(machine['extra'].get('image', '')).lower():
-            machine['extra']['os_type'] = 'windows'
+    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
+                            machine_model, machine_dict):
+        machine_dict['extra']['os_type'] = 'linux'
+        if 'windows' in str(machine_dict['extra'].get('image', '')).lower():
+            machine_dict['extra']['os_type'] = 'windows'
 
 
 class AzureController(BaseController):
@@ -294,8 +299,9 @@ class GoogleController(BaseController):
             }
         return self._post_parse_sizes(sizes)
 
-    def _post_parse_machine(self, machine, machine_model):
-        extra = machine['extra']
+    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
+                            machine_model, machine_dict):
+        extra = machine_dict['extra']
 
         # Tags and metadata exist in special location for GCE
         tags = tags_to_dict(extra.get('metadata', {}).get('items', []))
@@ -304,19 +310,20 @@ class GoogleController(BaseController):
             # Windows specific metadata including user/password.
             if key in tags:
                 extra[key] = tags.pop(key)
-        tags.update(machine['tags'])
-        machine['tags'] = tags
+        tags.update(machine_dict['tags'])
+        machine_dict['tags'] = tags
 
         # Wrap in try/except to prevent from future GCE API changes.
 
         # Identify server OS.
-        machine['extra']['os_type'] = 'linux'
+        machine_dict['extra']['os_type'] = 'linux'
         try:
             if 'windows-cloud' in extra['disks'][0]['licenses'][0]:
                 extra['os_type'] = 'windows'
         except:
             log.exception("Couldn't parse os_type for machine %s:%s for %s",
-                          machine['uuid'], machine['name'], self.cloud)
+                          mist_machine_id, machine_dict['name'],
+                          self.cloud)
 
         # Get disk metadata.
         try:
@@ -326,7 +333,7 @@ class GoogleController(BaseController):
                 extra.pop('boot_disk')
         except:
             log.exception("Couldn't parse disk for machine %s:%s for %s",
-                          machine['uuid'], machine['name'], self.cloud)
+                          mist_machine_id, machine_dict['name'], self.cloud)
 
         # Get zone name.
         try:
@@ -334,7 +341,7 @@ class GoogleController(BaseController):
                 extra['zone'] = extra['zone'].name
         except:
             log.exception("Couldn't parse zone for machine %s:%s for %s",
-                          machine['uuid'], machine['name'], self.cloud)
+                          mist_machine_id, machine_dict['name'], self.cloud)
 
         # Get machine type.
         try:
@@ -343,7 +350,7 @@ class GoogleController(BaseController):
         except:
             log.exception("Couldn't parse machine type "
                           "for machine %s:%s for %s",
-                          machine['uuid'], machine['name'], self.cloud)
+                          mist_machine_id, machine_dict['name'], self.cloud)
 
 
 class HostVirtualController(BaseController):
@@ -419,9 +426,10 @@ class VCloudController(BaseController):
         kwargs['host'] = sanitize_host(kwargs['host'])
         super(VCloudController, self).add(**kwargs)
 
-    def _post_parse_machine(self, machine, machine_model):
-        if machine['extra'].get('vdc'):
-            machine['tags']['vdc'] = machine['extra']['vdc']
+    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
+                            machine_model, machine_dict):
+        if machine_dict['extra'].get('vdc'):
+            machine_dict['tags']['vdc'] = machine_dict['extra']['vdc']
 
 
 class IndonesianVCloudController(VCloudController):
@@ -565,10 +573,11 @@ class LibvirtController(BaseController):
                 raise NotFoundError("Keypair does not exist.")
         super(LibvirtController, self).add(**kwargs)
 
-    def _post_parse_machine(self, machine, machine_model):
-        xml_desc = machine['extra'].get('xml_description')
+    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
+                            machine_model, machine_dict):
+        xml_desc = machine_dict['extra'].get('xml_description')
         if xml_desc:
-            machine['extra']['xml_description'] = escape(xml_desc)
+            machine_dict['extra']['xml_description'] = escape(xml_desc)
 
     def list_images(self, search=None):
         return self._post_parse_images(
