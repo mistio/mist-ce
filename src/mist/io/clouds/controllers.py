@@ -60,6 +60,8 @@ class AmazonController(BaseController):
                                         region=self.cloud.region)
 
     def add(self, **kwargs):
+
+        # Autofill apisecret from other Amazon Cloud.
         apikey = kwargs.get('apikey') or kwargs.get('api_key')
         apisecret = kwargs.get('apisecret') or kwargs.get('api_secret')
         if apisecret == 'getsecretfromdb':
@@ -67,6 +69,16 @@ class AmazonController(BaseController):
                                                    apikey=apikey)
             if cloud is not None:
                 kwargs['apisecret'] = cloud.apisecret
+
+        # Translate ec2_ap_northeast to ap-northeast-1.
+        region = kwargs.get('region', '')
+        if region.startswith('ec2_'):
+            region = region[4:]
+            parts = region.split('_')
+            if not parts[-1].isdigit():
+                parts.append('1')
+            kwargs['region'] = '-'.join(parts)
+
         super(AmazonController, self).add(**kwargs)
 
     def list_images(self, search=None):
