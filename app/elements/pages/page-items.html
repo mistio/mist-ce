@@ -1,8 +1,10 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 
 <link rel="import" href="../app-sidebar/app-sidebar.html">
+<link rel="import" href="../teams/team-add.html">
 <link rel="import" href="../item-list/item-list.html">
 <link rel="import" href="../empty-pages/empty-pages.html">
 
@@ -10,8 +12,8 @@
     <template>
         <style>
         :host {
-            background: #fafafa;
             position: relative;
+            display: block;
         }
 
         a {
@@ -190,11 +192,22 @@
             <div class="is-loading" hidden$="[[!isLoading]]">
                 <paper-spinner active></paper-spinner>
             </div>
+            
+            
         </div>
 
-        <div class="absolute-bottom-right">
-            <paper-fab icon="add" on-tap="_fabAction" hidden$="[[!section.add]]"></paper-fab>
-        </div>
+        <template is="dom-if" if="[[!isTeams]]">
+            <div class="absolute-bottom-right">
+                <paper-fab id="notTeams" icon="add" on-tap="_fabAction" hidden$="[[!section.add]]"></paper-fab>
+            </div>
+        </template>
+        <!-- teams add is not a page but a modal -->
+        <template is="dom-if" if="[[isTeams]]">
+            <div class="absolute-bottom-right">
+                <paper-fab id="isTeams" icon="add" on-tap="_addTeam"></paper-fab>
+            </div>
+            <team-add id="isTeamsPage"></team-add>
+        </template>
         
     </template>
 </dom-module>
@@ -245,6 +258,10 @@
             isLoading: {
                 type: Boolean,
                 computed: '_computeIsloading(onboarding.*, section.id)'
+            },
+            isTeams: {
+                type: Boolean,
+                computed: 'computeIsTeams(section)'
             }
         },
 
@@ -343,18 +360,22 @@
             }, 300);
         },
 
+        computeIsTeams: function(section){
+            return section.id == "teams";
+        },
+
         _fabAction: function(e) {
             console.debug('fabAction', e, this.section.add);
             page(this.section.add);
         },
 
         _computeSort: function(property, order) {
-            console.log('_computeSort', property, order);
+            // console.log('_computeSort', property, order);
 
             return function(a, b) {
                 // console.log('comparison', a[property], b[property]);
                 // string compare on fields other than members machines and cost, image ids, default
-                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size', 'create_date' ].indexOf(property) == -1) {
+                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size', 'create_date', 'stack state' ].indexOf(property) == -1) {
                     //if both properties exist
                     if(JSON.stringify(a[property]) && JSON.stringify(b[property])) {
                         if (JSON.stringify(a[property]).toLowerCase() < JSON.stringify(b[property]).toLowerCase()) {
@@ -429,7 +450,7 @@
                 else if (property == 'size'){
                     var ta = a[property] || a.extra.instance_type || extra.instance_size || item.extra.maxCpu+item.extra.maxMemory || a.extra.PLANID || item.extra.maxCpu+item.extra.maxMemory,
                         tb = b[property] || b.extra.instance_type || extra.instance_size || item.extra.maxCpu+item.extra.maxMemory || b.extra.PLANID || item.extra.maxCpu+item.extra.maxMemory;
-                    console.log('comparison', ta, tb);
+                    // console.log('comparison', ta, tb);
                     if (ta < tb) {
                         return -1 * order;
                     }
@@ -474,6 +495,26 @@
                     }
                     return 0;
                 }
+                // compare stack states
+                else if (property == 'stack state'){
+                    //if both properties exist && not ok
+                    if (a["status"] != 'ok' && b["status"] != 'ok'){
+                        if (a["status"] > b["status"]) {
+                            return -1 * order;
+                        }
+                        if (a["status"] < b["status"]) {
+                            return 1 * order;
+                        }
+                        return 0;
+                    }
+                    //if some status ok move down
+                    else {
+                        if (a["status"] == 'ok')
+                            return 1;   
+                        else
+                            return -1
+                    }
+                }
                 //compare created date
                 else if (property == 'create_date'){
                     //if both properties exist
@@ -505,6 +546,12 @@
             this.async(function() {
               this.updateMeta(this.section);
             });
+        },
+
+        _addTeam: function(e) {
+            var dialog = this.querySelector('team-add#isTeamsPage');
+            console.log('_addTeam', dialog);
+            dialog.openDialog();
         },
 
         _stampCards: function(view) {

@@ -1319,7 +1319,7 @@ def list_images(request):
 
     cloud_id = request.matchdict['cloud']
     try:
-        term = request.json_body.get('search_term', '').lower()
+        term = request.json_body.get('search_term', '')
     except:
         term = None
     auth_context = auth_context_from_request(request)
