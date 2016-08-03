@@ -423,6 +423,7 @@ class BaseController(object):
         # Filter out duplicate images, if any.
         seen_ids = set()
         for i in reversed(xrange(len(images))):
+            image = images[i]
             if image.id in seen_ids:
                 images.pop(i)
             else:
