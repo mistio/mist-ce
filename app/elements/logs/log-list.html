@@ -3,6 +3,10 @@
 <dom-module id="log-list">
     <template>
       <style>
+          :host {
+            overflow: hidden;
+            height: 602px;
+          }
           vaadin-combo-box {
             padding: 8px; 
           }
@@ -22,7 +26,7 @@
           <h3 class="flex">LOGS</h3>
           <vaadin-combo-box class="flex" label="Filter logs" items="[[logFilterSuggestions]]" allow-custom-value on-value-change="_updateFilter"></vaadin-combo-box>
         </div>
-        <vaadin-grid size="10000">
+        <vaadin-grid size="10">
         </vaadin-grid>
       </paper-material>
     </template>
@@ -60,6 +64,11 @@ Polymer({
         logFilterSuggestions: {
             type: Array,
             value: ['type:job', 'type:request', 'type:incident', 'type:session', 'type:shell', 'error']
+        },
+
+        queryFinished: {
+          type: Boolean,
+          value: false
         }
     },
 
@@ -76,8 +85,8 @@ Polymer({
         this.grid.items = function(params, callback) {
             that.filteredItems = that.items.filter(that._filter.bind(that));
             if (params.index + params.count < that.get('filteredItems.length')) {
-                callback(that.get('filteredItems').slice(params.index, params.index + params.count));
-            } else if (!requestPending) {
+                callback(that.get('filteredItems').slice(params.index, params.index + params.count), that.filteredItems.length);
+            } else if (!requestPending && !that.queryFinished) {
                 var pending = false;
                 // Fetch the JSON data from a URL
                 var xhr = new XMLHttpRequest();
@@ -86,13 +95,16 @@ Polymer({
                     if (xhr.readyState == XMLHttpRequest.DONE) {
                         if (xhr.status == 200) {
                             var entries = JSON.parse(xhr.responseText);
+                            if (!entries.length) {
+                              that.set('queryFinished', true);
+                              console.log("queryFinished");
+                            }
+                            console.log(entries.length, params.count);
                             for (i=0; i < entries.length; i++)
                                 that.push('items', entries[i]);
                             that.filteredItems = that.items.filter(that._filter.bind(that));
-                            callback(that.filteredItems.slice(params.index, params.index + params.count));
-                            if (that.filteredItems.length > that.grid.size)
-                                that.grid.size=2*that.grid.size;
-
+                            that.grid.setAttribute("size",that.items.length);
+                            callback(that.filteredItems.slice(params.index, params.index + params.count), that.filteredItems.length);
                             if (that.items.length) {
                                 var stop = Math.floor(that.items[that.items.length-1].time);
                                 that.set('stop', stop);
