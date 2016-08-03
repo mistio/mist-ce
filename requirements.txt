@@ -1,6 +1,7 @@
 ansible==1.9.3
 apache-libcloud
 amqp==1.4.6
+deepdiff
 celery==3.1.17
 gevent==1.0.2
 gevent-subprocess==0.1.1
@@ -10,6 +11,7 @@ paramiko==1.16.0
 PasteDeploy==1.5.2
 PasteScript==2.0.2
 pika==0.10.0
+pretty
 pycrypto==2.6.1
 pyramid==1.4
 python-memcached==1.57
