@@ -116,52 +116,25 @@ def add_cloud_v_2(user, title, provider, params):
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
     if provider not in CLOUDS:
         raise BadRequestError("Provider unknown.")
-    cloud = CLOUDS[provider](user, title, **params)
-    cloud_id = cloud.id
 
     remove_on_error = params.get('remove_on_error', True)
-    # validate cloud before adding
-    if remove_on_error:
-        try:
-            try:
-                conn = connect_provider(cloud)
-            except CloudUnavailableError, CloudUnauthorizedError:
-                log.error("Error while adding cloud: %r" % exc)
-                raise
-            except InvalidCredsError as exc:
-                log.error("Error while adding cloud: %r" % exc)
-                raise CloudUnauthorizedError(exc)
-            except Exception as exc:
-                log.error("Error while adding cloud%r" % exc)
-                raise CloudUnavailableError(exc)
-            if provider not in ['vshere']:
-                # in some providers -eg vSphere- this is not needed
-                # as we are sure we got a succesfull connection with
-                # the provider if connect_provider doesn't fail
-                try:
-                    machines = conn.list_nodes()
-                except InvalidCredsError as exc:
-                    raise CloudUnauthorizedError(exc)
-                except Exception as exc:
-                    log.error("Error while trying list_nodes: %r", exc)
-                    raise CloudUnavailableError(exc=exc)
-        except Exception as exc:
-            try:
-                cloud.delete()
-            except:
-                pass
-            raise
-    cloud.owner = user
-    cloud.save()
+
+    cloud = CLOUDS[provider].add(user, title, remove_on_error=remove_on_error,
+                                 **params)
+    cloud_id = cloud.id
+
     log.info("Cloud with id '%s' added succesfully with Api-Version: 2.", cloud_id)
     trigger_session_update(user, ['clouds'])
 
-    if provider == 'libvirt' and cloud.apisecret:
-    # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
-        key_id = params.get('machine_key')
-        node_id = cloud.apiurl  # id of the hypervisor is the hostname provided
-        username = cloud.apikey
-        associate_key(user, key_id, cloud_id, node_id, username=username)
+    # FIXME: Is this still needed? If so it should be migrated to
+    # clouds.controllers.LibvirtController
+    #
+    # if provider == 'libvirt' and cloud.apisecret:
+    # # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
+    #     key_id = params.get('machine_key')
+    #     node_id = cloud.apiurl  # id of the hypervisor is the hostname provided
+    #     username = cloud.apikey
+    #     associate_key(user, key_id, cloud_id, node_id, username=username)
 
     return {'cloud_id': cloud.id}
 

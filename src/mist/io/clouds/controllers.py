@@ -369,6 +369,15 @@ class VSphereController(BaseController):
                                             username=self.cloud.username,
                                             password=self.cloud.password)
 
+    def check_connection(self):
+        """Check connection without performing `list_machines`
+
+        In vSphere we are sure we got a succesful connection with the provider
+        if `self.connect` works, no need to run a `list_machines` to find out.
+
+        """
+        self.connect()
+
     def add(self, **kwargs):
         if not kwargs.get('host'):
             raise RequiredParameterMissingError('host')
@@ -521,7 +530,7 @@ class LibvirtController(BaseController):
             return get_driver(Provider.LIBVIRT)(host,
                                                 hypervisor=self.cloud.host,
                                                 user=self.cloud.username,
-                                                ssh_key=self.cloud.key,
+                                                ssh_key=self.cloud.key.private,
                                                 ssh_port=port)
         else:
             host, port = dnat(self.cloud.owner, self.cloud.host, 5000)

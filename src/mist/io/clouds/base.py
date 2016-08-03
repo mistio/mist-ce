@@ -30,7 +30,7 @@ from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.core.tag.models import Tag
 
-from mist.core.cloud.models import Machine
+# from mist.core.cloud.models import Machine
 
 
 log = logging.getLogger(__name__)
@@ -170,7 +170,7 @@ class BaseController(object):
             self._conn.disconnect()
             self._conn = None
 
-    def add(self, **kwargs):
+    def add(self, remove_on_error=True, **kwargs):
         """Add cloud
 
         This is called by Cloud.add classmethod to create a cloud.
@@ -203,16 +203,21 @@ class BaseController(object):
             raise CloudExistsError()
 
         # Try to connect to cloud.
-        try:
-            self.check_connection()
-        except (CloudUnavailableError, CloudUnauthorizedError) as exc:
-            log.error("Removing cloud %s because we couldn't connect: %r",
-                      self.cloud, exc)
-            raise
-        except Exception as exc:
-            log.exception("Removing cloud %s because we couldn't connect.",
-                          self.cloud)
-            raise
+        if remove_on_error:
+            try:
+                try:
+                    self.check_connection()
+                except (CloudUnavailableError, CloudUnauthorizedError) as exc:
+                    log.error("Removing cloud %s because "
+                              "we couldn't connect: %r", self.cloud, exc)
+                    raise
+                except Exception as exc:
+                    log.exception("Removing cloud %s because "
+                                  "we couldn't connect.", self.cloud)
+                    raise CloudUnavailableError(exc=exc)
+            except:
+                self.cloud.delete()
+                raise
 
     def list_machines(self):
         """Return list of machines for cloud
@@ -235,6 +240,11 @@ class BaseController(object):
         default, dummy methods.
 
         """
+
+        # FIXME: Move this to top of the file once Machine model is migrated.
+        # The import statement is currently here to avoid circular import
+        # issues.
+        from mist.core.cloud.models import Machine
 
         # Try to query list of machines from provider API.
         try:
