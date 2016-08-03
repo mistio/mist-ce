@@ -1,7 +1,6 @@
 """Definition of Cloud mongoengine models"""
 
 import uuid
-import json
 
 import mongoengine as me
 
