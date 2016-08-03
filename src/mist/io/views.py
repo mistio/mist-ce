@@ -296,19 +296,8 @@ def add_cloud(request):
         mist.core.methods.set_cloud_tags(owner, cloud_tags, cloud_id)
 
     c_count = Cloud.objects(owner=owner).count()
-    ret = {
-        'index': c_count - 1,
-        'id': cloud_id,
-        'apikey': cloud.apikey,
-        'apiurl': cloud.apiurl,
-        'tenant_name': cloud.tenant_name,
-        'title': cloud.title,
-        'provider': cloud.provider,
-        'poll_interval': cloud.poll_interval,
-        'region': cloud.region,
-        'status': 'off',
-        'enabled': cloud.enabled,
-    }
+    ret = cloud.as_dict()
+    ret['index'] = c_count - 1
     if monitoring:
         ret['monitoring'] = monitoring
     return ret

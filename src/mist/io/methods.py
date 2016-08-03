@@ -67,6 +67,8 @@ from mist.io.helpers import StdStreamCapture
 import mist.io.tasks
 import mist.io.inventory
 
+from mist.io.clouds.models import Cloud
+
 from mist.core.vpn.methods import destination_nat as dnat
 from mist.core.vpn.methods import super_ping
 
@@ -2022,21 +2024,10 @@ def star_image(user, cloud_id, image_id):
 
 
 def list_clouds(user):
-    clouds = Cloud.objects(owner=user).only("id", "apikey", "title", "provider",
-                                            "poll_interval", "enabled",
-                                            "region", "tenant_name",
-                                            "docker_port")
-    clouds = clouds.as_pymongo()
-    normalized_clouds = []
+    clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=user)]
     for cloud in clouds:
-        if cloud["provider"] != "docker":
-            del cloud["docker_port"]
-        cloud["state"] = 'online' if cloud["enabled"] else 'offline'
-        cloud["id"] = cloud["_id"]
-        cloud['tags'] = mist.core.methods.get_cloud_tags(user,  cloud["_id"])
-        normalized_clouds.append(cloud)
-
-    return normalized_clouds
+        cloud['tags'] = mist.core.methods.get_cloud_tags(user,  cloud['id'])
+    return clouds
 
 
 def list_keys(user):
