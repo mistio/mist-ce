@@ -224,7 +224,7 @@ class MainConnection(MistConnection):
     def update_org(self):
         try:
             org = rbac_methods.filter_org(self.auth_context)
-        except: # Forbidden
+        except:  # Forbidden
             org = None
 
         if org:
@@ -251,10 +251,9 @@ class MainConnection(MistConnection):
                   orchestration_methods.filter_list_stacks(self.auth_context))
 
     def list_tunnels(self):
-        if self.auth_context.is_owner():
-            tunnels = [tunnel.as_dict()
-                       for tunnel in Tunnel.objects(owner=self.auth_context.owner)]
-            self.send('list_tunnels', tunnels)
+        tunnels = [tunnel.as_dict()
+                   for tunnel in Tunnel.objects(owner=self.auth_context.owner)]
+        self.send('list_tunnels', tunnels)
 
     def list_clouds(self):
         self.send('list_clouds',
