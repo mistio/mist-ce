@@ -141,8 +141,17 @@ class Cloud(me.Document):
         Tag.objects(resource=self).delete()
 
     def as_dict(self):
-        # TODO: This is just plain stupid.
-        return json.loads(self.to_json())
+        cdict = {
+            'id': self.id,
+            'title': self.title,
+            'provider': self.ctl.provider,
+            'enabled': self.enabled,
+            'state': 'online' if self.enabled else 'offline',
+        }
+        cdict.update({key: getattr(self, key)
+                     for key in self._cloud_specific_fields
+                     if key not in self._private_fields})
+        return cdict
 
     def __str__(self):
         return '%s cloud %s (%s) of %s' % (type(self), self.title,
@@ -326,6 +335,11 @@ class LibvirtCloud(Cloud):
     images_location = me.StringField(default="/var/lib/libvirt/images")
 
     _controller_cls = controllers.LibvirtController
+
+    def as_dict(self):
+        cdict = super(LibvirtCloud, self).as_dict()
+        cdict['key'] = self.key.id
+        return cdict
 
 
 # FIXME
