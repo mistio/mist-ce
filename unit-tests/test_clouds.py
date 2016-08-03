@@ -14,7 +14,7 @@ import mist.io.clouds.models as models
 
 @pytest.fixture
 def load_staging_l_machines():
-    with open('/mist.core/src/mist.io/unit-tests/l_m_staging.json') as data_f:
+    with open('/mist.core/src/mist.io/unit-tests/list_machines.json') as data_f:
         data = json.load(data_f)
         data_f.close()
     return data
