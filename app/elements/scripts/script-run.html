@@ -1,78 +1,76 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+<link rel="import" href="../app-icons/app-icons.html">
+<link rel="import" href="../app-form/app-form.html">
 
 <dom-module id="script-run">
     <template>
         <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
+        :host {
+            display: block;
+        }
+        p {
+            padding: 0 !important;
+        }
+        #content {
+            max-width: 900px;
+        }
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
 
-            paper-card,
-            paper-checkbox {
-                display: block;
-            }
+        paper-progress {
+            position: absolute;
+            bottom: 85px;
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
 
-            paper-toggle-button,
-            paper-checkbox {
-                margin-top: 20px;
-            }
+        :host >::content paper-input-container {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+
+        .error {
+            color: var(--red-color);
+        }
+        .error iron-icon {
+            color: inherit;
+        }
         </style>
 
-        <paper-card heading="[[cardTitleText]]">
-            <div class="card-content">
-                <div hidden$=[[!hasMachines]]>
-
-                    <template is="dom-repeat" items="{{fields}}" as="field">
-                        <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-                            <paper-input id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-                        </template>
-
-                        <template is="dom-if" if="[[_computeFieldType(field, 'number', field.show)]]">
-                            <paper-input id="[[field.name]]" type="number" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-                        </template>
-
-                        <template is="dom-if" class="datetime" if="[[_computeFieldType(field, 'datetime', field.show)]]">
-                            <paper-input id="[[field.name]]" type="datetime" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-                        </template>
-
-                        <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-                            <paper-textarea id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
-                        </template>
-
-                        <div class="grid-row">
-                        <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-
-                                <paper-dropdown-menu class="dropdown-block xs12 l6" label="[[field.label]]" horizontal-align="left">
-                                    <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
-                                        <template is="dom-repeat" items="[[field.options]]" as="option">
-                                            <paper-item value="[[option.val]]">[[option.title]]</paper-item>
-                                        </template>
-                                    </paper-menu>
-                                </paper-dropdown-menu>
-                        </template>
-                        </div>
-
-                        <template is="dom-if" if="[[_computeFieldType(field, 'switch', field.show)]]">
-                            <paper-toggle-button checked="{{field.value}}">[[field.label]]</paper-toggle-button>
-                        </template>
-                    </template>
-                    <hr/>
-                    <div class="clearfix">
-                        <paper-button class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
-                        <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Run Script '[[script.name]]
+                    </h2>
+                    <div class="subtitle">
+                        You can currently run scripts on one machine per time. You will soon be able to schedule your scripts to run.
                     </div>
                 </div>
-                <div hidden$=[[hasMachines]]>
-                    <p>Please add some machines first!</p>
-                </div>
-            </div>
-
-            <iron-ajax id="runScriptAjax" url="/scripts/[[script.id]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+            </paper-material>
+            <paper-material>
+                <p>
+                    Heads up! Make sure you select a machine you have already associated a key with. Otherwise the the request may be accepted but the script will never finish run.
+                </p>
+                <p class="error" hidden$="[[machineHasKeys]]">
+                    <iron-icon icon="icons:warning"></iron-icon> Machine [[machine.name]] has no associated keys. 
+                </p>
+                <app-form fields="[[fields]]" url="/api/v1/scripts/[[params.id]]" on-response="_runScriptResponse" btncontent="run"></app-form>
+            </paper-material>
+        </div>
+        <paper-toast id="run-script-toast"></paper-toast>
     </template>
 
     <script>
@@ -83,48 +81,19 @@
                 is: 'script-run',
 
                 properties: {
+                    model: Object,
+                    params: Object,
                     script: {
                         type: Object,
-                        computed: '_computeScript(id)'
+                        computed: '_computeScript(params, model.scriptsArray.*)'
                     },
-                    runScript: {
-                        type: Object,
-                        value: function() {
-                            return {
-                                machine: '',
-                                parameters: '',
-                                schedulerUse: '',
-                                schedulerName: '',
-                                schedulerDescription: '',
-                                schedulerRunImmediately: '',
-                                schedulerAction: '',
-                                schedulerExpires: '',
-                                schedulerType: '',
-                                scedulerOneOffEntry: '',
-                                scedulerCrontabEntry: '',
-                                scedulerIntervalEveryEntry: '',
-                                scedulerIntervalPeriodEntry: ''
-                            }
-                        }
-                    },
+                    section: Object,                    
                     fields: {
                         type: Array,
-                        value: function() {
-                            return SCRIPT_RUN_FORM_FIELDS;
-                        },
-                        notify: true
                     },
                     parameters: {
                         type: String,
                         value: null
-                    },
-                    clouds: {
-                        type: Array,
-                        value: function() {
-                            return Mist.clouds.filter(function(cloud) {
-                                return cloud.enabled;
-                            });
-                        }
                     },
                     machinesOptions: {
                         type: Array,
@@ -134,39 +103,33 @@
                         type: Boolean,
                         computed: '_computeHasMachines(machinesOptions.*)'
                     },
-                    sendingData: {
-                        type: Boolean,
-                        value: false
-                    },
-                    formReady: {
-                        type: Boolean,
-                        value: false
-                    },
                     cardTitleText: {
                         type: String,
                         computed: '_computeCardTitleText(script.name, runScript.machine)'
+                    },
+                    machine: Object,
+                    machineHasKeys: {
+                        type: Boolean,
+                        value: true,
+                        computed: '_machineChanged(machine)'
                     }
                 },
                 observers: [
-                    '_fieldsChanged(fields.*, sendingData)',
-                    '_cloudsChanged(clouds.*)'
+                    '_cloudsChanged(model.cloudsArray.*, model.machinesArray.*)'
                 ],
-                _computeScript: function(id) {
-                    return Mist.scripts.find(function(script) {
-                        return script.id == id;
-                    });
+                listeners: {
+                    'iron-select': '_fieldsChanged'
+                },
+                _computeScript: function(params, model) {
+                    var script = this.model.scriptsArray.find(function(script) {
+                        return script.id == this.params.id;
+                    },this);
+                    return script;
                 },
                 _computeMachinesOptions: function(clouds) {
-                    return clouds
-                        .filter(function(cloud) {
+                    return this.model.machinesArray.filter(function(cloud) {
                             return cloud.enabled;
-                        })
-                        .map(function(cloud) {
-                            return cloud.machines;
-                        })
-                        .reduce(function(a, b) {
-                            return a.concat(b);
-                        }, []);
+                        });
                 },
                 _computeHasMachines: function(machinesOptions) {
                     return machinesOptions.base.length > 0;
@@ -179,143 +142,92 @@
                 _computeCardTitleText: function(name, machine) {
                     return machine ? 'Run Script "' + name + '" on "' + machine.name + '"' : 'Run Script "' + name + '"';
                 },
-                _fieldsChanged: function(fields, sendingData) {
-                    var runScript = this.runScript,
-                        show = true,
-                        dependency;
-
-                    fields.base.forEach(function(el, index) {
-                        this.set('runScript.' + el.name, el.value);
-
-                        if (el.showIf) {
-                            if (el.showIf.fieldExists) {
-                                dependency = runScript[el.showIf.fieldName],
-                                    show = dependency;
-                                this.set('fields.' + index + '.show', show);
-                            } else {
-                                dependency = runScript[el.showIf.fieldName],
-                                    show = el.showIf.fieldValues.indexOf(dependency) != -1;
-                                this.set('fields.' + index + '.show', show);
-                            }
-
-                            if (!show) {
-                                this._resetField(el, index);
-                            }
-                        }
-
-                        if (el.placeholderIf) {
-                            dependency = runScript[el.placeholderIf.fieldName];
-                            this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
-                        }
-                    }, this);
-
-                    var valid = fields.base.every(function(el, index) {
-                        return el.show && el.required ? el.value : true;
-                    }, this);
-
-                    this.set('runScript', runScript);
-
-                    this.set('formReady', valid && !sendingData);
-                },
-                _cloudsChanged: function(clouds) {
-                    var index = this.fields.findIndex(function(field) {
-                        return field.name == "machine";
-                    }, this);
-
-                    var machinesOptions = clouds.base
-                        .filter(function(cloud) {
-                            return cloud.enabled;
-                        })
-                        .map(function(cloud) {
-                            return cloud.machines;
-                        })
-                        .reduce(function(a, b) {
-                            return a.concat(b);
-                        }, [])
-                        .map(function(machine) {
-                            var obj = {};
-                            obj['title'] = machine.name;
-                            obj['val'] = machine;
-                            return obj;
+                _fieldsChanged: function() {
+                    var machine = this.fields.find(function(f){
+                        return f.name.startsWith("machine");
+                    });
+                    var cloud = this.fields.find(function(f, index){
+                        return f.name.startsWith("cloud");
+                    }); 
+                    if (machine && machine.value) {
+                        var machineID = machine.value;
+                        var machineCloud = this.model.machinesArray.find(function(m){
+                            return m.id == machineID;
                         });
-
-                    this.set('machinesOptions', machinesOptions);
-                    this.set('fields.' + index + '.options', machinesOptions);
-                    this.set('fields.' + index + '.value', '');
-                },
-                _submitForm: function(e) {
-                    var payload = {
-                        description: this.runScript.schedulerDescription,
-                        run_immediately: this.runScript.schedulerRunImmediately,
-                        script_id: this.script.id,
-                        action: this.runScript.schedulerAction,
-                        machines_per_cloud: [
-                            [this.runScript.machine.cloud.id, this.runScript.machine.id]
-                        ],
-                        enabled: this.runScript.schedulerEnabled,
-                        expires: this.runScript.schedulerExpires,
-                        schedulerUse: this.runScript.schedulerUse,
-                        cronjob_type: this.runScript.schedulerType,
-                        cronjob_entry: null
+                        this.set("machine", machineCloud);
+                        this.set('fields.1.value', machineCloud.cloud.id);
                     };
 
-                    if (this.runScript.schedulerType == "one_off") {
-                        payload.cronjob_entry = this.runScript.scedulerOneOffEntry;
-                    }
-                    if (this.runScript.schedulerType == "interval") {
-                        payload.cronjob_entry = {
-                            every: this.runScript.scedulerIntervalEveryEntry,
-                            period: this.runScript.scedulerIntervalPeriodEntry
-                        };
-                    }
-                    if (this.runScript.schedulerType == "crontab") {
-                        payload.cronjob_entry = this.runScript.scedulerCrontabEntry
-                    }
-
-                    console.log(payload);
-
-                    //   this.$.runScriptAjax.body = payload;
-                    //   this.$.runScriptAjax.generateRequest();
                 },
-                _runScriptRequest: function() {
-                    this.set('sendingData', true);
+                _machineChanged: function(machine){
+                    if (machine){
+                        var machineID = machine.id;
+                        var key = this.model.keysArray.find(function(k){
+                            return k.machines.find(function(m){
+                                return m[1] == machineID;
+                            })
+                        });
+
+                        if (key){
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    }
+                },
+                _cloudsChanged: function(clouds) {
+                    var fields = [{
+                            name: "machine_id",
+                            label: "Select Machine *",
+                            type: "mist_dropdown",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            helptext: "Choose the machine on which the script will run",
+                            show: true,
+                            required: true,
+                            options: this.model.machinesArray
+                        }, {
+                            name: "cloud_id",
+                            label: "Cloud ID",
+                            type: "text",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            helptext: "The cloud ID of the machine.",
+                            show: false,
+                            showIf: {
+                                fieldName: "machine_id",
+                                fieldExists: true
+                            },
+                            required: true,
+                            disabled: true
+                        }, {
+                            name: "params",
+                            label: "Parameters",
+                            type: "textarea",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            helptext: "Optional. Fill in the scripts pareameters.",
+                            errorMessage: "Please enter network's name",
+                            show: true,
+                            required: false
+                         }];
+                    this.set('fields', fields)
                 },
                 _runScriptResponse: function(e) {
-                    this.set('sendingData', false);
+                    var msg = 'Run script request was successfull. Redirecting to script...';
+                    this._showToast(msg);
+                    this.async(function(){
+                        page('/scripts/'+this.script.id);
+                    }, 3300)
                 },
-                _resetForm: function(e) {
-                    // Reset runScript
-                    this.set('machine', '');
-                    this.set('parameters', '');
-                    this.set('schedulerUse', '');
-                    this.set('schedulerName', '');
-                    this.set('schedulerDescription', '');
-                    this.set('schedulerRunImmediately', '');
-                    this.set('schedulerAction', '');
-                    this.set('schedulerExpires', '');
-                    this.set('schedulerType', '');
-                    this.set('scedulerOneOffEntry', '');
-                    this.set('scedulerCrontabEntry', '');
-                    this.set('scedulerIntervalEveryEntry', '');
-                    this.set('scedulerIntervalPeriodEntry', '');
-
-                    // Reset Form Fields
-                    this.fields.forEach(function(el, index) {
-                        if (el.showIf) {
-                            this.set('fields.' + index + '.show', false);
-                        }
-
-                        // Reset Form Fields Validation
-                        this._resetField(el, index);
-                    }, this);
-                },
-                _resetField: function(el, index) {
-                    this.set('fields.' + index + '.value', el.defaultValue);
-
-                    var input = this.querySelector('#' + el.name);
-                    if (input) {
-                        input.invalid = false;
-                    }
+                _showToast: function(msg) {
+                    var toast = this.querySelector('paper-toast#run-script-toast');
+                    toast.text = msg;
+                    toast.show();
                 }
             });
         })();
