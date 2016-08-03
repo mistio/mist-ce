@@ -84,6 +84,7 @@ class Cloud(me.Document):
         'indexes': ['owner'],
     }
 
+    _private_fields = ()
     _controller_cls = None
 
     def __init__(self, *args, **kwargs):
@@ -106,8 +107,8 @@ class Cloud(me.Document):
         self.ctl = self._controller_cls(self)
 
         # Calculate and store cloud type specific fields.
-        self.cloud_specific_fields = [field for field in type(self)._fields
-                                      if field not in Cloud._fields]
+        self._cloud_specific_fields = [field for field in type(self)._fields
+                                       if field not in Cloud._fields]
 
     @classmethod
     def add(cls, owner, title, id='', **kwargs):
@@ -154,6 +155,7 @@ class AmazonCloud(Cloud):
     apisecret = me.StringField(required=True)
     region = me.StringField(required=True)
 
+    _private_fields = ('apisecret', )
     _controller_cls = controllers.AmazonController
 
 
@@ -161,6 +163,7 @@ class DigitalOceanCloud(Cloud):
 
     token = me.StringField(required=True)
 
+    _private_fields = ('token', )
     _controller_cls = controllers.DigitalOceanController
 
 
@@ -169,6 +172,7 @@ class DigitalOceanFirstGenCloud(Cloud):
     apikey = me.StringField(required=True)
     apisecret = me.StringField(required=True)
 
+    _private_fields = ('apisecret', )
     _controller_cls = controllers.DigitalOceanFirstGenController
 
 
@@ -176,6 +180,7 @@ class LinodeCloud(Cloud):
 
     apikey = me.StringField(required=True)
 
+    _private_fields = ('apikey', )
     _controller_cls = controllers.LinodeController
 
 
@@ -185,6 +190,7 @@ class RackSpaceCloud(Cloud):
     apikey = me.StringField(required=True)
     region = me.StringField(required=True)
 
+    _private_fields = ('apikey', )
     _controller_cls = controllers.RackSpaceController
 
 
@@ -193,6 +199,7 @@ class SoftLayerCloud(Cloud):
     username = me.StringField(required=True)
     apikey = me.StringField(required=True)
 
+    _private_fields = ('apikey', )
     _controller_cls = controllers.SoftLayerController
 
 
@@ -201,6 +208,7 @@ class NephoScaleCloud(Cloud):
     username = me.StringField(required=True)
     password = me.StringField(required=True)
 
+    _private_fields = ('password', )
     _controller_cls = controllers.NephoScaleController
 
 
@@ -209,6 +217,7 @@ class AzureCloud(Cloud):
     subscription_id = me.StringField(required=True)
     certificate = me.StringField(required=True)
 
+    _private_fields = ('certificate', )
     _controller_cls = controllers.AzureController
 
 
@@ -218,6 +227,7 @@ class GoogleCloud(Cloud):
     private_key = me.StringField(required=True)
     project_id = me.StringField(required=True)
 
+    _private_fields = ('private_key', )
     _controller_cls = controllers.GoogleController
 
 
@@ -225,6 +235,7 @@ class HostVirtualCloud(Cloud):
 
     apikey = me.StringField(required=True)
 
+    _private_fields = ('apikey', )
     _controller_cls = controllers.HostVirtualController
 
 
@@ -233,6 +244,7 @@ class PacketCloud(Cloud):
     apikey = me.StringField(required=True)
     project_id = me.StringField(required=False)
 
+    _private_fields = ('apikey', )
     _controller_cls = controllers.PacketController
 
 
@@ -240,6 +252,7 @@ class VultrCloud(Cloud):
 
     apikey = me.StringField(required=True)
 
+    _private_fields = ('apikey', )
     _controller_cls = controllers.VultrController
 
 
@@ -249,6 +262,7 @@ class VSphereCloud(Cloud):
     username = me.StringField(required=True)
     password = me.StringField(required=True)
 
+    _private_fields = ('password', )
     _controller_cls = controllers.VSphereController
 
 
@@ -258,6 +272,7 @@ class VCloud(Cloud):
     username = me.StringField(required=True)
     password = me.StringField(required=True)
 
+    _private_fields = ('password', )
     _controller_cls = controllers.VCloudController
 
 
@@ -267,6 +282,7 @@ class IndonesianVCloud(Cloud):
     username = me.StringField(required=True)
     password = me.StringField(required=True)
 
+    _private_fields = ('password', )
     _controller_cls = controllers.IndonesianVCloudController
 
 
@@ -279,6 +295,7 @@ class OpenStackCloud(Cloud):
     region = me.StringField(required=False)
     compute_endpoint = me.StringField(required=False)
 
+    _private_fields = ('password', )
     _controller_cls = controllers.OpenStackController
 
 
@@ -296,6 +313,7 @@ class DockerCloud(Cloud):
     cert_file = me.StringField(required=False)
     ca_cert_file = me.StringField(required=False)
 
+    _private_fields = ('password', 'key_file')
     _controller_cls = controllers.DockerController
 
 

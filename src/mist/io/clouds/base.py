@@ -183,9 +183,10 @@ class BaseController(object):
         # Basic param check.
         errors = {}
         for key, value in kwargs.iteritems():
-            if key not in self.cloud.cloud_specific_fields:
-                errors[key] = "Invalid parameter %s=%r." % (key, value)
-        for key in self.cloud.cloud_specific_fields:
+            if key not in self.cloud._cloud_specific_fields:
+                # errors[key] = "Invalid parameter %s=%r." % (key, value)
+                log.warning("Invalid parameter %s=%r.", key, value)
+        for key in self.cloud._cloud_specific_fields:
             if self.cloud._fields[key].required and key not in kwargs:
                 errors[key] = "Required parameter missing '%s'." % key
         if errors:

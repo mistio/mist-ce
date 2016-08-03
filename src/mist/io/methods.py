@@ -114,13 +114,16 @@ def add_cloud_v_2(user, title, provider, params):
         log.info("Cloud with id '%s' added successfully.", cloud_id)
         trigger_session_update(user, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
-    if provider not in CLOUDS:
+    if provider not in cloud_models.CLOUDS:
         raise BadRequestError("Provider unknown.")
 
     remove_on_error = params.get('remove_on_error', True)
 
-    cloud = CLOUDS[provider].add(user, title, remove_on_error=remove_on_error,
-                                 **params)
+    params.pop('title', None)
+    params.pop('provider', None)
+    cloud = cloud_models.CLOUDS[provider].add(user, title,
+                                              remove_on_error=remove_on_error,
+                                              **params)
     cloud_id = cloud.id
 
     log.info("Cloud with id '%s' added succesfully with Api-Version: 2.", cloud_id)
