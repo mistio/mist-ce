@@ -1,6 +1,7 @@
 """Tests Cloud models and Controllers"""
 
 import os
+import uuid
 import json
 
 import yaml
@@ -14,36 +15,7 @@ from mist.core.user.models import Organization, User
 import mist.io.clouds.models as models
 
 
-@pytest.fixture
-def load_staging_l_machines():
-    with open('/mist.core/src/mist.io/unit-tests/list_machines.json') as data_f:
-        data = json.load(data_f)
-        data_f.close()
-    return data
-
-
-@pytest.fixture
-def load_staging_l_locations():
-    with open('/mist.core/src/mist.io/unit-tests/list_locations.json') as data_f:
-        data = json.load(data_f)
-        data_f.close()
-    return data
-
-
-@pytest.fixture
-def load_staging_l_sizes():
-    with open('/mist.core/src/mist.io/unit-tests/list_sizes.json') as data_f:
-        data = json.load(data_f)
-        data_f.close()
-    return data
-
-
-@pytest.fixture
-def load_staging_l_images():
-    with open('/mist.core/src/mist.io/unit-tests/list_images.json') as data_f:
-        data = json.load(data_f)
-        data_f.close()
-    return data
+TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def load_clouds_from_config():
@@ -140,16 +112,62 @@ def cloud(request, org):
     return cloud
 
 
+@pytest.fixture
+def load_staging_l_machines():
+    path = os.path.join(TEST_DIR, 'list_machines.json')
+    print "Reading machines from path '%s'." % path
+    with open(path) as fobj:
+        return json.load(fobj)
+
+
+@pytest.fixture
+def load_staging_l_locations():
+    path = os.path.join(TEST_DIR, 'list_locations.json')
+    print "Reading locations from path '%s'." % path
+    with open(path) as fobj:
+        return json.load(fobj)
+
+
+@pytest.fixture
+def load_staging_l_sizes():
+    path = os.path.join(TEST_DIR, 'list_sizes.json')
+    print "Reading sizes from path '%s'." % path
+    with open(path) as fobj:
+        return json.load(fobj)
+
+
+@pytest.fixture
+def load_staging_l_images():
+    path = os.path.join(TEST_DIR, 'list_images.json')
+    print "Reading images from path '%s'." % path
+    with open(path) as fobj:
+        return json.load(fobj)
+
+
+def unicode_to_str(data):
+    if isinstance(data, dict):
+        return {unicode_to_str(key): unicode_to_str(value)
+                for key, value in data.iteritems()}
+    elif isinstance(data, list):
+        return [unicode_to_str(element) for element in data]
+    elif isinstance(data, unicode):
+        return data.encode('utf-8')
+    else:
+        return data
+
+
+def diff(a, b, **kwargs):
+    """Return a recursive diff of two objects after casting unicodes to str"""
+    return DeepDiff(unicode_to_str(a), unicode_to_str(b), **kwargs)
+
+
 def compare_fields(res):
-    """compare result of DeepDiff, type of fields and values that changed"""
-    type_changes = res.get('type_changes')
-    if type_changes:    # res['type_changes']
-        for k, v in type_changes.iteritems():
-            if v['new_type'] == type('str'):
-                assert isinstance(v['new_type'], basestring) == \
-                       isinstance(v['old_type'], basestring)
-            else:
-                assert v['new_type'] == v['old_type'], "key is: %s" %k
+    """Compare deep diff of objects, type of fields and values that changed"""
+    pprint(res, indent=2)
+    changes = res.get('type_changes')
+    if changes:
+        for key in changes:
+            assert changes[key]['new_type'] == changes[key]['old_type']
 
     values_changed = res.get('values_changed')
     if values_changed:
@@ -162,184 +180,58 @@ def compare_fields(res):
 
 def test_list_machines(cloud, load_staging_l_machines):
 
-    print len(cloud.ctl.list_machines())
     response = cloud.ctl.list_machines()
+    print len(response)
 
     if response:
         machine = response[0]
+        ref = load_staging_l_machines.get(cloud.ctl.provider)
+        for t in machine, ref:
+            # Remove keys from extra.
+            for key in ('billingItemChildren', 'hoursUsed', 'recurringFee'):
+                if key in t['extra']:
+                    t['extra'].pop(key)
 
-        if cloud._cls == 'Cloud.AmazonCloud':
-            res = DeepDiff(load_staging_l_machines.get('AmazonCloud'), machine)
-            # pprint (res, indent=2)
-            compare_fields(res)
+        # Ignore value changes in some fields.
+        for key in ('uuid', 'last_seen'):
+            if type(machine[key]) == type(ref[key]) or (
+                isinstance(machine[key], basestring) and
+                isinstance(ref[key], basestring)
+            ):
+                machine[key] = ref[key]
 
-        elif cloud._cls == "Cloud.PacketCloud":
-            res = DeepDiff(load_staging_l_machines.get('PacketCloud'), machine)
-            # pprint(res, indent=2)
-            compare_fields(res)
-        elif cloud._cls == "Cloud.DigitalOceanCloud":
-            res = DeepDiff(load_staging_l_machines.get('DigitalOceanCloud'),
-                           machine)
-            # pprint(res, indent=2)
-            compare_fields(res)
-        elif cloud._cls == "SoftLayerCloud":
-            res = DeepDiff(load_staging_l_machines.get('SoftLayerCloud'),
-                           machine)
-            # pprint(res, indent=2)
-            compare_fields(res)
-        elif cloud._cls == "Cloud.RackSpaceCloud":
-            res = DeepDiff(load_staging_l_machines.get('RackSpaceCloud'),
-                           machine)
-            # pprint(res, indent=2)
-            compare_fields(res)
-        elif cloud._cls == "Cloud.LinodeCloud":
-            res = DeepDiff(load_staging_l_machines.get('LinodeCloud'),
-                           machine)
-            # pprint(res, indent=2)
-            compare_fields(res)
-        elif cloud._cls == "Cloud.NephoScaleCloud":
-            res = DeepDiff(load_staging_l_machines.get('NephoScaleCloud'),
-                           machine)
-            # pprint(res, indent=2)
-            compare_fields(res)
+        res = diff(ref, machine)
+        compare_fields(res)
 
 
 def test_list_locations(cloud, load_staging_l_locations):
 
-    print len(cloud.ctl.list_locations())
     response = cloud.ctl.list_locations()
+    print len(response)
 
     if response:
-        if cloud._cls == 'Cloud.AmazonCloud':
-            list_loc = load_staging_l_locations.get('AmazonCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint (res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.PacketCloud":
-            list_loc = load_staging_l_locations.get('PacketCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.DigitalOceanCloud":
-            list_loc = load_staging_l_locations.get('DigitalOceanCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.SoftLayerCloud":
-            list_loc = load_staging_l_locations.get('SoftLayerCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.RackSpaceCloud":
-            list_loc = load_staging_l_locations.get('RackSpaceCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.LinodeCloud":
-            list_loc = load_staging_l_locations.get('LinodeCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.NephoScaleCloud":
-            list_loc = load_staging_l_locations.get('NephoScaleCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
+        ref = load_staging_l_locations.get(cloud.ctl.provider)
+        res = diff(ref, response, ignore_order=True)
+        compare_fields(res)
 
 
 def test_list_images(cloud, load_staging_l_images):
-    print len(cloud.ctl.list_images())
+
     response = cloud.ctl.list_images()
+    print len(response)
+
     if response:
-        if cloud._cls == 'Cloud.AmazonCloud':
-            list_loc = load_staging_l_images.get('AmazonCloud')
-            for new in response:
-                for old in list_loc:
-                    for (k, v), (k2, v2) in zip(old.items(), new.items()):
-                        if k == 'name':
-                            v2_str = str(v2)
-                            if v == v2_str:
-                                res = DeepDiff(old, new)
-                                pprint(res, indent=2)
-                                compare_fields(res)
-        elif cloud._cls == 'Cloud.Linode':
-            list_loc = load_staging_l_images.get('LinodeCloud')
-            for new in response:
-                for old in list_loc:
-                    for (k, v), (k2, v2) in zip(old.items(), new.items()):
-                        if k == 'name':
-                            v2_str = str(v2)
-                            if v == v2_str:
-                                res = DeepDiff(old, new)
-                                pprint(res, indent=2)
-                                compare_fields(res)
+        ref = load_staging_l_images.get(cloud.ctl.provider)
+        res = diff(ref, response, ignore_order=True)
+        compare_fields(res)
 
 
 def test_list_sizes(cloud, load_staging_l_sizes):
-    print len(cloud.ctl.list_sizes())
+
     response = cloud.ctl.list_sizes()
+    print len(response)
+
     if response:
-        # pytest.set_trace()
-        if cloud._cls == 'Cloud.AmazonCloud':
-            list_loc = load_staging_l_sizes.get('AmazonCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.PacketCloud":
-            list_loc = load_staging_l_sizes.get('PacketCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.DigitalOceanCloud":
-            list_loc = load_staging_l_sizes.get('DigitalOceanCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.SoftLayerCloud":
-            list_loc = load_staging_l_sizes.get('SoftLayerCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.RackSpaceCloud":
-            list_loc = load_staging_l_sizes.get('RackSpaceCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.LinodeCloud":
-            list_loc = load_staging_l_sizes.get('LinodeCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
-        elif cloud._cls == "Cloud.NephoScaleCloud":
-            list_loc = load_staging_l_sizes.get('NephoScaleCloud')
-            for d in response:
-                for dd in list_loc:
-                    res = DeepDiff(dd, d)
-                    # pprint(res, indent=2)
-                    compare_fields(res)
+        ref = load_staging_l_sizes.get(cloud.ctl.provider)
+        res = diff(ref, response, ignore_order=True)
+        compare_fields(res)

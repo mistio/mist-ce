@@ -1,7 +1,7 @@
-{"AmazonCloud":
+{"ec2":
               [{"country": "Japan", "id": "0", "name": "ap-northeast-1a"},
                 {"country": "Japan", "id": "1", "name": "ap-northeast-1c"}],
-  "LinodeCloud":
+  "linode":
               [{"country": "US", "id": "2", "name": "Dallas, TX, USA"},
                 {"country": "US", "id": "3", "name": "Fremont, CA, USA"},
                 {"country": "US", "id": "4", "name": "Atlanta, GA, USA"},
@@ -10,11 +10,11 @@
                 {"country": "JP", "id": "8", "name": "Tokyo, JP"},
                 {"country": "??", "id": "9", "name": "Singapore, SG"},
                 {"country": "??", "id": "10", "name": "Frankfurt, DE"}],
-  "PacketCloud":
+  "packet":
           [{"country": null, "id": "ewr1", "name": "Parsippany, NJ"},
             {"country": null, "id": "ams1", "name": "Amsterdam, NL"},
             {"country": null, "id": "sjc1", "name": "Sunnyvale, CA"}],
-  "DigitalOceanCloud":
+  "digitalocean":
           [{"country": null, "id": "nyc1", "name": "New York 1"},
             {"country": null, "id": "sfo1", "name": "San Francisco 1"},
             {"country": null, "id": "nyc2", "name": "New York 2"},
@@ -27,7 +27,7 @@
             {"country": null, "id": "tor1", "name": "Toronto 1"},
             {"country": null, "id": "sfo2", "name": "San Francisco 2"},
             {"country": null, "id": "blr1", "name": "Bangalore 1"}],
-  "SoftLayerCloud":
+  "softlayer":
           [{"country": "NL", "id": "ams01", "name": "AMS01 - Amsterdam"},
             {"country": "NL", "id": "ams03", "name": "AMS03 - Amsterdam"},
             {"country": "UNKNOWN", "id": "che01", "name": "che01"},
@@ -56,10 +56,10 @@
             {"country": "UNKNOWN", "id": "tor01", "name": "tor01"},
             {"country": "US", "id": "wdc01", "name": "Washington, DC"},
             {"country": "US", "id": "wdc04", "name": "Washington 4, DC"}],
-   "NephoScaleCloud":
+   "nephoscale":
            [{"country": "US", "id": "86945", "name": "SJC-1"},
              {"country": "US", "id": "87729", "name": "RIC-1"}],
-   "RackSpaceCloud":
+   "rackspace":
            [{"country": "", "id": "0", "name": ""}]
 
 

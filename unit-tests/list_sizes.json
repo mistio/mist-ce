@@ -1,4 +1,4 @@
-{"AmazonCloud":
+{"ec2":
               [{"bandwidth": null, "ram": 1740,
                 "name": "c1.medium - High-CPU Medium Instance",
                 "extra": {"virtualizationTypes": ["paravirtual"], "cpu": 2},
@@ -393,7 +393,7 @@
                     "mswin": "0.05", "rhel": "0.1", "linux": "0.04"},
                   "disk": 0, "driver": "Amazon EC2 (ap-northeast-1)",
                   "id": "t2.small"}],
-  "DigitalOceanCloud":
+  "digitalocean":
           [{"bandwidth": 0, "ram": "512mb", "name": "512mb", "extra": {},
             "price": "$0.00744/hour, $5.0/month", "disk": "20G SSD",
             "driver": "Digital Ocean", "id": "512mb"},
@@ -421,7 +421,7 @@
             {"bandwidth": 0, "ram": "64gb", "name": "64gb", "extra": {},
               "price": "$0.95238/hour, $640.0/month",
               "disk": "640G SSD", "driver": "Digital Ocean", "id": "64gb"}],
-  "LinodeCloud":
+  "linode":
           [{"bandwidth": 2000, "ram": 2048, "name": "Linode 2048", "extra": {},
             "price": 10.0, "disk": 24576, "driver": "Linode", "id": "1"},
             {"bandwidth": 3000, "ram": 4096, "name": "Linode 4096", "extra": {},
@@ -446,7 +446,7 @@
             {"bandwidth": 20000, "ram": 122880, "name": "Linode 122880",
               "extra": {}, "price": 960.0, "disk": 1966080,
               "driver": "Linode", "id": "12"}],
-  "SoftLayerCloud":
+  "softlayer":
           [{"bandwidth": null, "ram": null,
             "name":
             "Bare Metal: Single Xeon 1270, 8GB Ram, 2x1TB SATA disks, Non-RAID",
@@ -556,7 +556,7 @@
             {"bandwidth": null, "ram": 65536, "name": "16 CPU, 64GB ram, 100GB",
               "extra": {}, "price": null, "disk": 100,
               "driver": "SoftLayer", "id": "16"}],
-  "RackSpaceCloud":
+  "rackspace":
           [{"bandwidth": null, "ram": 512, "name": "512MB Standard Instance",
             "extra": {}, "price": {"linux": 0.022}, "disk": 20,
             "driver": "Rackspace Cloud (Next Gen)", "id": "2"},
@@ -735,7 +735,7 @@
             {"bandwidth": null, "ram": 92160, "name": "90 GB Performance",
               "extra": {}, "price": {"linux": 4.08}, "disk": 40,
               "driver": "Rackspace Cloud (Next Gen)", "id": "performance2-90"}],
-  "PacketCloud":
+  "packet":
           [{"bandwidth": 0, "ram": "8GB", "name": "Type 0 - 8GB RAM",
             "extra": {"line": "baremetal",
               "description": "Our Type 0 configuration is a general use /\/\"cloud killer/\/\" server, with a Intel Atom 2.4Ghz processor and 8GB of RAM."},
@@ -750,7 +750,7 @@
               "description": "Our Type 3 configuration is a high core, high IO server, with dual Intel E5-2640 v3 processors, 128GB of DDR4 RAM and ultra fast NVME flash drives."},
             "price": "1.75 / hour", "disk": 1840, "driver": "Packet",
             "id": "baremetal_3"}],
-"NephoScaleCloud":
+"nephoscale":
           [{"bandwidth": null, "ram": 512,
             "name": "CS05-SSD - SSD Cloud Server 0.5 GB RAM, 1 Core",
             "extra": {}, "price": "$.008/hr", "disk": 25,

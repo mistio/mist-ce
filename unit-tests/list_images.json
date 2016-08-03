@@ -1,4 +1,4 @@
-{"AmazonCloud":
+{"ec2":
         [{"star": true, "id": "ami-0dd8f963",
           "name": "Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type",
           "extra": {
@@ -107,7 +107,7 @@
             "state": "available", "architecture": "x86_64",
             "is_public": "true", "virtualization_type": "hvm",
             "tags": {}, "owner_id": "013907871322"}}],
-   "DigitalOceanCloud":
+   "digitalocean":
            [{"star": true, "id": "18539132",
              "name": "CoreOS 1081.5.0 (beta)",
              "extra": {"distribution": "CoreOS"}},
@@ -294,7 +294,7 @@
              {"star": true, "id": "5009277",
                "name": "Debian dikomou",
                "extra": {"distribution": "Debian"}}],
-  "SoftLayerCloud":
+  "softlayer":
           [{"star": true, "id": "CENTOS_LATEST", "name": "CentOS - Latest",
             "extra": {}}, {"star": true, "id": "CENTOS_LATEST_64",
             "name": "CentOS - Latest (64 bit)", "extra": {}},
@@ -520,7 +520,7 @@
               "name": "Bare Metal: Citrix XenServer 5.6.2",
               "extra": {}}, {"star": true, "id": "XENSERVER_5.5_64",
             "name": "Bare Metal: Citrix XenServer 5.5", "extra": {}}],
-  "PacketCloud":
+  "packet":
           [{"star": true, "id": "centos_7", "name": "CentOS 7 (legacy)",
             "extra": {"version": "7", "distro": "centos"}},
             {"star": true, "id": "coreos_stable", "name": "CoreOS (stable)",
@@ -540,7 +540,7 @@
             {"star": true, "id": "ubuntu_16_04_image",
             "name": "Ubuntu 16.04 LTS (beta)",
               "extra": {"version": "16.04", "distro": "ubuntu"}}],
-  "RackSpaceCloud":
+  "rackspace":
           [{"star": true, "id": "951331fe-cb49-4254-ae19-ba66af80cb6c",
             "name": "CentOS 6 (PV)",
             "extra": {"status": "ACTIVE", "updated": "2016-07-20T18:11:47Z",
@@ -1504,7 +1504,7 @@
                   "com.rackspace__1__build_core": "1",
                   "com.rackspace__1__visible_managed": "0",
                   "org.openstack__1__architecture": "x64"}}}],
-  "NephoScaleCloud":
+  "nephoscale":
           [{"star": true, "id": "40d5543a-38c0-46fb-a7ce-e8e379f364f5",
             "name": "Ubuntu Server 16.04 LTS 64-bit",
             "extra": {"disks": null, "storage": null, "uri": null,
@@ -1551,7 +1551,7 @@
             "name": "Linux CentOS 7 64-bit", "extra": {"disks": null,
               "storage": null, "uri": null, "architecture": null,
               "cores": null, "pcpus": null, "billable_type": null}}],
-  "LinodeCloud":
+  "linode":
           [{"star": true, "id": "148", "name": "Arch 2016.06.01",
             "extra": {"64bit": 1, "pvops": 1}},
             {"star": true, "id": "129", "name": "CentOS 7",
