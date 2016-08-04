@@ -161,7 +161,6 @@ Polymer({
                         var tagExists = tagsArray.find(function(prevt, index){
                             return prevt.key == t.key && prevt.value == t.value;
                         });
-                        console.log('mcost',mcost, typeof mcost);
                         if (tagExists){
                                 tagExists.count ++;
                                 tagExists.cost = tagExists.cost + Math.round(parseInt(mcost));
