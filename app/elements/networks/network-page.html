@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 
@@ -118,9 +119,29 @@
             paper-icon-bottom.bottom {
                 padding-right: 8px;
             }
+            .is-loading {
+                top: 15px;
+                left: 200px;
+                position: fixed;
+                right: 0;
+                bottom: 0;
+                display: block;
+                width: 100%;
+                height: 100vh;
+                background-color: #eee;
+            }
+            .is-loading paper-spinner {
+                width: 80px;
+                height: 80px;
+                margin: 10% auto;
+                display: block;
+            }
         </style>
 
         <div id="content">
+            <div class="is-loading" hidden$="[[!isLoading]]">
+                <paper-spinner active hidden$="[[!isLoading]]"></paper-spinner>
+            </div>
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
                 <div class="title flex">
@@ -209,6 +230,11 @@
                         type: Boolean,
                         computed: '_computeHasSubnets(network.subnets)'
                     },
+                    isLoading: {
+                        type: Boolean,
+                        computed: '_computeIsloading(network)',
+                        value: true
+                    }
                 },
                 listeners: {
                     'confirmation': '_deleteNetworkEventResponse'
@@ -262,8 +288,8 @@
                     }
                     dialog._openDialog();
                 },
-                _goBack: function() {
-                    history.back();
+                _computeIsloading(network) {
+                    return !this.network ? true : false;
                 }
             });
         })();
