@@ -2,8 +2,7 @@
 
 This currently contains only BaseController. It includes basic functionality
 for a given cloud (including libcloud calls, fetching and storing information
-to database etc. Cloud specific controllers are in
-`mist.io.clouds.controllers`.
+to db etc. Cloud specific controllers are in `mist.io.clouds.controllers`.
 
 """
 
@@ -15,15 +14,14 @@ import datetime
 import mongoengine as me
 
 from libcloud.common.types import InvalidCredsError
-from libcloud.compute.base import Node, NodeLocation
+from libcloud.compute.base import NodeLocation
 
 from mist.io import config
 
 
-from mist.io.exceptions import MistError
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudExistsError
-from mist.io.exceptions import MachineNotFoundError
+from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
@@ -91,12 +89,35 @@ class BaseController(object):
     there is a very good reason to do so.
 
     The following convention is followed:
-    All methods that start with an underscore are considered internal. They
-    are to be called, extended, overrided by subclasses, but not to be called
-    directly by some consumer of the controller's API.
-    All other methods are the public API of controllers and should be stable
-    as possible. New methods should almost always first be added to this base
-    class.
+
+    Any methods and attributes that don't start with an underscore are the
+    controller's public API.
+
+    In the `BaseController`, these public methods will in most cases contain
+    a basic implementation that works for most clouds, along with the proper
+    logging and error handling. In almost all cases, subclasses SHOULD NOT
+    override or extend the public methods of `BaseController`. To account for
+    cloud/subclass specific behaviour, one is expected to override the
+    internal/private methods of `BaseController`.
+
+    Any methods and attributes that start with an underscore are the
+    controller's internal/private API.
+
+    To account for cloud/subclass specific behaviour, the public methods of
+    `BaseController` call a number of private methods. These methods will
+    always start with an underscore, such as `self._connect`. When an internal
+    method is only ever used in the process of one public method, it is
+    prefixed as such to make identification and purpose more obvious. For
+    example, method `self._list_machines__postparse_machine` is called in the
+    process of `self.list_machines` to postparse a machine and inject or
+    modify its attributes.
+
+    This `BaseController` defines a strict interface to controlling clouds.
+    For each different cloud type, a subclass needs to be defined. The subclass
+    must at least define a proper `self._connect` method. For simple clouds,
+    this may be enough. To provide cloud specific processing, hook the code on
+    the appropriate private method. Each method defined here documents its
+    intended purpose and use.
 
     """
 
@@ -109,6 +130,11 @@ class BaseController(object):
             cloud = mist.io.clouds.models.Cloud.objects.get(id=cloud_id)
             print cloud.ctl.list_machines()
 
+        Subclasses SHOULD NOT override this method.
+
+        If a subclass has to initialize a certain instance attribute, it SHOULD
+        extend this method instead.
+
         """
 
         self.cloud = cloud
@@ -116,7 +142,11 @@ class BaseController(object):
 
     @property
     def connection(self):
-        """Cached libcloud connection, accessible as attribute"""
+        """Cached libcloud connection, accessible as attribute
+
+        Subclasses SHOULD NOT have to override or extend this method.
+
+        """
         if self._conn is None:
             self._conn = self.connect()
         return self._conn
@@ -125,7 +155,11 @@ class BaseController(object):
         """Return libcloud-like connection to cloud
 
         This is a wrapper, an error handler, around cloud specific `_connect`
-        methods. Subclasses SHOULD NOT override this method.
+        methods.
+
+        Subclasses SHOULD NOT override or extend this method.
+
+        Instead, subclasses MUST override `_connect` method.
 
         """
         try:
@@ -148,6 +182,7 @@ class BaseController(object):
         """Return libcloud-like connection to cloud
 
         This is called solely by `connect` which adds error handling.
+
         All subclasses MUST implement this method.
 
         """
@@ -159,38 +194,100 @@ class BaseController(object):
         In case of error, an instance of `CloudUnavailableError` or
         `CloudUnauthorizedError` should be raised.
 
+        For most cloud providers, who use an HTTP API, calling `connect`
+        doesn't really establish a connection, so we also have to attempt to
+        make an actual call such as `list_machines` to verify that the
+        connection actually works.
+
+        If a subclass's `connect` not raising errors is enough to make sure
+        that establishing a connection works, then these subclasses should
+        override this method and only call `connect`.
+
+        In most cases, subclasses SHOULD NOT override or extend this method.
+
         """
         self.connect()
         self.list_machines()
 
     def disconnect(self):
-        """Close libcloud-like connection to cloud"""
+        """Close libcloud-like connection to cloud
+
+        If a connection object has been initialized, this method will attempt
+        to call its disconnect method.
+
+        This method is called automatically called by the class's destructor.
+        This may however be unreliable, so users should call `disconnect`
+        manually to be on the safe side.
+
+        For cloud providers whose connection object is dummy in the sense that
+        it doesn't represent an actual underlying connection, this method
+        doesn't really do anything.
+
+        Subclasses SHOULD NOT override this method.
+
+        If a subclass has to perform some special clean up, like deleting
+        temporary files, it SHOULD *extend* this method instead.
+
+        """
         if self._conn is not None:
             log.debug("Closing libcloud-like connection for %s.", self.cloud)
             self._conn.disconnect()
             self._conn = None
 
-    def add(self, remove_on_error=True, **kwargs):
-        """Add cloud
+    def add(self, remove_on_error=True, fail_on_invalid_params=True, **kwargs):
+        """Add new Cloud to the database
 
-        This is called by Cloud.add classmethod to create a cloud.
+        This is only expected to be called by `Cloud.add` classmethod to create
+        a cloud. Fields `owner` and `title` are already populated in
+        `self.cloud`. The `self.cloud` model is not yet saved.
+
+        Params:
+        remove_on_error: If True, then a connection to the cloud will be
+            established and if it fails, a `CloudUnavailableError` or
+            `CloudUnauthorizedError` will be raised and the cloud will be
+            deleted.
+        fail_on_invalid_params: If True, then invalid keys in `kwargs` will
+            raise an Error.
+
+        Subclasses SHOULD NOT override or extend this method.
+
+        If a subclass has to perform special parsing of `kwargs`, it can
+        override `self._add__preparse_kwargs`.
 
         """
+
         # Transform params with extra underscores for compatibility.
         rename_kwargs(kwargs, 'api_key', 'apikey')
         rename_kwargs(kwargs, 'api_secret', 'apisecret')
 
+        # Cloud specific kwargs preparsing.
+        try:
+            self._add__preparse_kwargs(kwargs)
+        except Exception as exc:
+            log.exception("Error while preparsing kwargs on add %s",
+                          self.cloud)
+            raise InternalServerError(exc=exc)
+
         # Basic param check.
         errors = {}
-        for key, value in kwargs.iteritems():
+        # Check for invalid `kwargs` keys.
+        for key in kwargs.keys():
             if key not in self.cloud._cloud_specific_fields:
-                # errors[key] = "Invalid parameter %s=%r." % (key, value)
-                log.warning("Invalid parameter %s=%r.", key, value)
+                error = "Invalid parameter %s=%r." % (key, kwargs[key])
+                if fail_on_invalid_params:
+                    errors[key] = error
+                else:
+                    log.warning(error)
+                    kwargs.pop(key)
+        # Check for missing required `kwargs` keys.
         for key in self.cloud._cloud_specific_fields:
             if self.cloud._fields[key].required and key not in kwargs:
                 errors[key] = "Required parameter missing '%s'." % key
         if errors:
-            raise Exception(errors)
+            raise BadRequestError({
+                'msg': "Invalid parameters %s." % errors.keys(),
+                'errors': errors,
+            })
 
         # Set fields to cloud model and attempt to save.
         for key, value in kwargs.iteritems():
@@ -220,22 +317,39 @@ class BaseController(object):
                 self.cloud.delete()
                 raise
 
+    def _add__preparse_kwargs(self, kwargs):
+        """Preparse keyword arguments to `self.add`
+
+        This is called by `self.add` when adding a new cloud, in order to apply
+        preprocessing to the given params. Any subclass that requires any
+        special preprocessing of the params passed to `self.add`, SHOULD
+        override this method.
+
+        Params:
+        kwargs: A dict of the keyword arguments that will be set as attributes
+            to the `Cloud` model instance stored in `self.cloud`. This method
+            is expected to modify `kwargs` in place.
+
+        Subclasses MAY override this method.
+
+        """
+        return
+
     def list_machines(self):
         """Return list of machines for cloud
 
         This returns the results obtained from libcloud, after some processing,
         formatting and injection of extra information in a sane format.
 
-        In most cases where the machine listing is taken from a libcloud-like
-        connection, a subclass shouldn't have to override (or even extend) this
-        method directly.
+        Subclasses SHOULD NOT override or extend this method.
 
-        There are instead a number of class methods that are called from this
-        method, to allow subclasses to modify the data according to the
-        specific of their cloud type. These methods currently are:
+        There are instead a number of methods that are called from this method,
+        to allow subclasses to modify the data according to the specific of
+        their cloud type. These methods currently are:
 
-            _post_parse_machine
-            _cost_machine
+            `self._list_machines__machine_actions`
+            `self._list_machines__postparse_machine`
+            `self._list_machines__cost_machine`
 
         Subclasses that require special handling should override these, by
         default, dummy methods.
@@ -314,9 +428,9 @@ class BaseController(object):
 
             # Update with available machine.actions.
             try:
-
-                self._add_machine_actions(machine_model.id, node.id, node,
-                                          machine_model, machine)
+                self._list_machines__machine_actions(
+                    machine_model.id, node.id, node, machine_model, machine
+                )
             except Exception as exc:
                 log.exception("Error while finding machine actions "
                               "for machine %s:%s for %s",
@@ -324,16 +438,18 @@ class BaseController(object):
 
             # Apply any cloud/provider specific post processing.
             try:
-                self._post_parse_machine(machine_model.id, node.id, node,
-                                         machine_model, machine)
+                self._list_machines__postparse_machine(
+                    machine_model.id, node.id, node, machine_model, machine
+                )
             except Exception as exc:
                 log.exception("Error while post parsing machine %s:%s for %s",
                               machine_model.id, node.name, self.cloud)
 
             # Apply any cloud/provider cost reporting.
             try:
-                self._cost_machine(machine_model.id, node.id, node,
-                                   machine_model, machine)
+                self._list_machines__cost_machine(
+                    machine_model.id, node.id, node, machine_model, machine
+                )
             except Exception as exc:
                 log.exception("Error while calculating cost "
                               "for machine %s:%s for %s",
@@ -370,11 +486,12 @@ class BaseController(object):
 
         return machines
 
-    def _add_machine_actions(self, mist_machine_id, api_machine_id,
-                             machine_api, machine_model, machine_dict):
+    def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
+                                        machine_api, machine_model,
+                                        machine_dict):
         """Add metadata on the machine dict on the allowed actions
 
-        Any subclass that whishes to specially handle its allowed actions, can
+        Any subclass that wishes to specially handle its allowed actions, can
         implement this internal method.
 
         mist_machine_id: The id assigned to the machine by mist. This is the
@@ -392,6 +509,8 @@ class BaseController(object):
         This method is expected to edit `machine_dict` in place and not return
         anything.
 
+        Subclasses MAY extend this method.
+
         """
         machine_dict.update({
             'can_stop': False,
@@ -405,11 +524,12 @@ class BaseController(object):
             'can_tag': True,
         })
 
-    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
-                            machine_model, machine_dict):
+    def _list_machines__postparse_machine(self, mist_machine_id,
+                                          api_machine_id, machine_api,
+                                          machine_model, machine_dict):
         """Post parse a machine before returning it in list_machines
 
-        Any subclass that whishes to specially handle its cloud's tags and
+        Any subclass that wishes to specially handle its cloud's tags and
         metadata, can implement this internal method.
 
         mist_machine_id: The id assigned to the machine by mist. This is the
@@ -429,14 +549,16 @@ class BaseController(object):
         This method is expected to edit its arguments in place and not return
         anything.
 
+        Subclasses MAY override this method.
+
         """
         return
 
-    def _cost_machine(self, mist_machine_id, api_machine_id, machine_api,
-                      machine_model, machine_dict):
+    def _list_machines__cost_machine(self, mist_machine_id, api_machine_id,
+                                     machine_api, machine_model, machine_dict):
         """Perform cost calculations for a machine
 
-        Any subclass that whishes to handle its cloud's pricing, can implement
+        Any subclass that wishes to handle its cloud's pricing, can implement
         this internal method.
 
         mist_machine_id: The id assigned to the machine by mist. This is the
@@ -454,33 +576,39 @@ class BaseController(object):
         This method is expected to edit its arguments in place and not return
         anything.
 
-        This internal method is called right after _post_parse_machine and has
-        the exact same signature. The reason this was split into a secondary
-        method is to separate cost processing from generic metadata injection
-        in subclasses.
+        This internal method is called right after
+        `self._list_machines__postparse_machine` and has the exact same
+        signature. The reason this was split into a secondary method is to
+        separate cost processing from generic metadata injection in subclasses.
+
+        Subclasses MAY override this method.
 
         """
         return
 
     def list_images(self, search=None):
-        return self._post_parse_images(self.connection.list_images(), search)
+        """Return list of images for cloud
 
-    def image_is_default(self, image_id):
-        return True
+        This returns the results obtained from libcloud, after some processing,
+        formatting and injection of extra information in a sane format.
 
-    def _post_parse_images(self, images, search=None):
+        Subclasses SHOULD NOT override or extend this method.
 
-        # Filter out invalid images.
-        images = [image for image in images
-                  if image.name and image.id[:3] not in ('aki', 'ari')
-                  and 'windows' not in image.name.lower()]
+        There are instead a number of methods that are called from this method,
+        to allow subclasses to modify the data according to the specific of
+        their cloud type. These methods currently are:
 
-        # Filter images based on search term.
-        if search:
-            search = str(search).lower()
-            images = [image for image in images
-                      if search in image.id.lower()
-                      or search in image.name.lower()]
+            `self._list_images__fetch_images`
+
+        Subclasses that require special handling should override these, by
+        default, dummy methods.
+
+        """
+
+        # Fetch images list, usually from libcloud connection.
+        images = self._list_images__fetch_images(search=search)
+        if not isinstance(images, list):
+            images = list(images)
 
         # Filter out duplicate images, if any.
         seen_ids = set()
@@ -491,7 +619,19 @@ class BaseController(object):
             else:
                 seen_ids.add(image.id)
 
-        # sort images in following groups, then alphabetically:
+        # Filter images based on search term.
+        if search:
+            search = str(search).lower()
+            images = [img for img in images
+                      if search in img.id.lower()
+                      or search in img.name.lower()]
+
+        # Filter out invalid images.
+        images = [img for img in images
+                  if img.name and img.id[:3] not in ('aki', 'ari')
+                  and 'windows' not in img.name.lower()]
+
+        # Sort images in following groups, then alphabetically:
         # 0: default and starred
         # 1: not default and starred
         # 2: default
@@ -533,10 +673,46 @@ class BaseController(object):
                  'star': sortvals[image.id] < 3}
                 for image in images]
 
-    def list_sizes(self):
-        return self._post_parse_sizes(self.connection.list_sizes())
+    def _list_images__fetch_images(self, search=None):
+        """Fetch image listing in a libcloud compatible format
 
-    def _post_parse_sizes(self, sizes):
+        This is to be called exclusively by `self.list_images`.
+
+        Most subclasses that use a simple libcloud connection, shouldn't need
+        to override or extend this method.
+
+        Subclasses MAY override this method.
+
+        """
+        return self.connection.list_images()
+
+    def image_is_default(self, image_id):
+        # FIXME
+        return True
+
+    def list_sizes(self):
+        """Return list of sizes for cloud
+
+        This returns the results obtained from libcloud, after some processing,
+        formatting and injection of extra information in a sane format.
+
+        Subclasses SHOULD NOT override or extend this method.
+
+        There are instead a number of methods that are called from this method,
+        to allow subclasses to modify the data according to the specific of
+        their cloud type. These methods currently are:
+
+            `self._list_sizes__fetch_sizes`
+
+        Subclasses that require special handling should override these, by
+        default, dummy methods.
+
+        """
+
+        # Fetch sizes, usually from libcloud connection.
+        sizes = self._list_sizes__fetch_sizes()
+
+        # Format size information.
         return [{'id': size.id,
                  'name': size.name,
                  'bandwidth': size.bandwidth,
@@ -546,66 +722,68 @@ class BaseController(object):
                  'ram': size.ram,
                  'extra': size.extra} for size in sizes]
 
+    def _list_sizes__fetch_sizes(self):
+        """Fetch size listing in a libcloud compatible format
+
+        This is to be called exclusively by `self.list_sizes`.
+
+        Most subclasses that use a simple libcloud connection, shouldn't need
+        to override or extend this method.
+
+        Subclasses MAY override this method.
+
+        """
+        return self.connection.list_sizes()
+
     def list_locations(self):
-        """List locations from each cloud
+        """Return list of available locations for current cloud
 
         Locations mean different things in each cloud. e.g. EC2 uses it as a
         datacenter in a given availability zone, whereas Linode lists
         availability zones. However all responses share id, name and country
         eventhough in some cases might be empty, e.g. Openstack.
 
-        """
-        try:
-            locations = self.connection.list_locations()
-        except:
-            locations = [NodeLocation('', name='default', country='',
-                                      driver=self.connection)]
-        return self._post_parse_locations(locations)
+        This returns the results obtained from libcloud, after some processing,
+        formatting and injection of extra information in a sane format.
 
-    def _post_parse_locations(self, locations):
+        Subclasses SHOULD NOT override or extend this method.
+
+        There are instead a number of methods that are called from this method,
+        to allow subclasses to modify the data according to the specific of
+        their cloud type. These methods currently are:
+
+            `self._list_locations__fetch_locations`
+
+        Subclasses that require special handling should override these, by
+        default, dummy methods.
+
+        """
+
+        # Fetch locations, usually from libcloud connection.
+        locations = self._list_locations__fetch_locations()
+
+        # Format size information.
         return [{'id': location.id,
                  'name': location.name,
                  'country': location.country} for location in locations]
 
-    def list_networks(self):
-        raise MistError("Listing networks isn't supported for this provider.")
+    def _list_locations__fetch_locations(self):
+        """Fetch location listing in a libcloud compatible format
 
-    def create_machine(self, name, keypair, image_id, *args, **kwargs):
-        raise NotImplementedError()
+        This is to be called exclusively by `self.list_locations`.
 
-    def get_available_machine_actions(self, machine_id=None):
-        return {
-            'can_stop': False,
-            'can_start': False,
-            'can_destroy': False,
-            'can_reboot': False,
-            'can_tag': False,
-        }
+        Most subclasses that use a simple libcloud connection, shouldn't need
+        to override or extend this method.
 
-    def get_machine_node(self, machine_id, no_fail=False):
-        for node in self.connection.list_nodes():
-            if node.id == machine_id:
-                return node
-        if no_fail:
-            return Node(machine_id, name=machine_id, state=0,
-                        public_ips=[], private_ips=[], driver=self.connection)
-        raise MachineNotFoundError("Machine with id '%s'." % machine_id)
+        Subclasses MAY override this method.
 
-    def start_machine(self, machine_id):
-        self.connection.ex_start_node(self.get_machine_node(machine_id, True))
-
-    def stop_machine(self, machine_id):
-        self.connection.ex_stop_node(self.get_machine_node(machine_id, True))
-
-    def reboot_machine(self, machine_id):
-        self.get_machine_node(machine_id, True).reboot()
-
-    def destroy_machine(self, machine_id):
-        self.get_machine_node(machine_id, True).destroy()
-
-    def resize_machine(self, machine_id, plan_id):
-        self.connection.ex_resize_node(self.get_machine_node(machine_id, True),
-                                       plan_id)
+        """
+        try:
+            return self.connection.list_locations()
+        except:
+            return [NodeLocation('', name='default', country='',
+                                 driver=self.connection)]
 
     def __del__(self):
+        """Disconnect libcloud connection upon garbage collection"""
         self.disconnect()

@@ -148,8 +148,8 @@ class Cloud(me.Document):
             'state': 'online' if self.enabled else 'offline',
         }
         cdict.update({key: getattr(self, key)
-                     for key in self._cloud_specific_fields
-                     if key not in self._private_fields})
+                      for key in self._cloud_specific_fields
+                      if key not in self._private_fields})
         return cdict
 
     def __str__(self):

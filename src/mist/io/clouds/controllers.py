@@ -59,18 +59,18 @@ class AmazonController(BaseController):
                                         self.cloud.apisecret,
                                         region=self.cloud.region)
 
-    def add(self, **kwargs):
+    def _add__preparse_kwargs(self, kwargs):
 
         # Autofill apisecret from other Amazon Cloud.
-        apikey = kwargs.get('apikey') or kwargs.get('api_key')
-        apisecret = kwargs.get('apisecret') or kwargs.get('api_secret')
+        apikey = kwargs.get('apikey')
+        apisecret = kwargs.get('apisecret')
         if apisecret == 'getsecretfromdb':
             cloud = type(self.cloud).objects.first(owner=self.cloud.owner,
                                                    apikey=apikey)
             if cloud is not None:
                 kwargs['apisecret'] = cloud.apisecret
 
-        # Translate ec2_ap_northeast to ap-northeast-1.
+        # Regions translations, eg ec2_ap_northeast to ap-northeast-1.
         region = kwargs.get('region', '')
         if region.startswith('ec2_'):
             region = region[4:]
@@ -79,9 +79,14 @@ class AmazonController(BaseController):
                 parts.append('1')
             kwargs['region'] = '-'.join(parts)
 
-        super(AmazonController, self).add(**kwargs)
+    def _list_machines__postparse_machine(self, mist_machine_id,
+                                          api_machine_id, machine_api,
+                                          machine_model, machine_dict):
+        # This is windows for windows servers and None for Linux.
+        extra = machine_dict['extra']
+        extra['os_type'] = extra.get('platform', 'linux')
 
-    def list_images(self, search=None):
+    def _list_images__fetch_images(self, search=None):
         default_images = config.EC2_IMAGES[self.cloud.region]
         image_ids = default_images.keys() + self.cloud.starred
         if not search:
@@ -105,10 +110,9 @@ class AmazonController(BaseController):
                 images = self.connection.list_images(
                     ex_filters={'name': '*%s*' % search}
                 )
+        return images
 
-        return self._post_parse_images(images)
-
-    def list_locations(self):
+    def _list_locations__fetch_locations(self):
         """List availability zones for EC2 region
 
         In EC2 all locations of a region have the same name, so the
@@ -121,13 +125,7 @@ class AmazonController(BaseController):
                 location.name = location.availability_zone.name
             except:
                 pass
-        return self._post_parse_locations(locations)
-
-    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
-                            machine_model, machine_dict):
-        # This is windows for windows servers and None for Linux.
-        extra = machine_dict['extra']
-        extra['os_type'] = extra.get('platform', 'linux')
+        return locations
 
 
 class DigitalOceanController(BaseController):
@@ -155,8 +153,9 @@ class LinodeController(BaseController):
     def _connect(self):
         return get_driver(Provider.LINODE)(self.cloud.apikey)
 
-    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
-                            machine_model, machine_dict):
+    def _list_machines__postparse_machine(self, mist_machine_id,
+                                          api_machine_id, machine_api,
+                                          machine_model, machine_dict):
         datacenter = machine_dict['extra'].get('DATACENTER')
         datacenter = config.LINODE_DATACENTERS.get(datacenter)
         if datacenter:
@@ -175,15 +174,14 @@ class RackSpaceController(BaseController):
         return driver(self.cloud.username, self.cloud.apikey,
                       region=self.cloud.region)
 
-    def add(self, **kwargs):
+    def _add__preparse_kwargs(self, kwargs):
         username = kwargs.get('username')
-        apikey = kwargs.get('apikey') or kwargs.get('api_key')
+        apikey = kwargs.get('apikey')
         if apikey == 'getsecretfromdb':
             cloud = type(self.cloud).objects.first(owner=self.cloud.owner,
                                                    username=username)
             if cloud is not None:
                 kwargs['apikey'] = cloud.apikey
-        super(RackSpaceController, self).add(**kwargs)
 
 
 class SoftLayerController(BaseController):
@@ -194,8 +192,9 @@ class SoftLayerController(BaseController):
         return get_driver(Provider.SOFTLAYER)(self.cloud.username,
                                               self.cloud.apikey)
 
-    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
-                            machine_model, machine_dict):
+    def _list_machines__postparse_machine(self, mist_machine_id,
+                                          api_machine_id, machine_api,
+                                          machine_model, machine_dict):
         machine_dict['extra']['os_type'] = 'linux'
         if 'windows' in str(machine_dict['extra'].get('image', '')).lower():
             machine_dict['extra']['os_type'] = 'windows'
@@ -209,16 +208,17 @@ class NephoScaleController(BaseController):
         return get_driver(Provider.NEPHOSCALE)(self.cloud.username,
                                                self.cloud.password)
 
-    def list_sizes(self):
-        sizes = self.connection.list_sizes(baremetal=False)
-        sizes.extend(self.connection.list_sizes(baremetal=True))
-        return self._post_parse_sizes(sizes)
-
-    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
-                            machine_model, machine_dict):
+    def _list_machines__postparse_machine(self, mist_machine_id,
+                                          api_machine_id, machine_api,
+                                          machine_model, machine_dict):
         machine_dict['extra']['os_type'] = 'linux'
         if 'windows' in str(machine_dict['extra'].get('image', '')).lower():
             machine_dict['extra']['os_type'] = 'windows'
+
+    def _list_sizes__fetch_sizes(self):
+        sizes = self.connection.list_sizes(baremetal=False)
+        sizes.extend(self.connection.list_sizes(baremetal=True))
+        return sizes
 
 
 class AzureController(BaseController):
@@ -232,7 +232,7 @@ class AzureController(BaseController):
         return get_driver(Provider.AZURE)(self.cloud.subscription_id,
                                           tmp_cert_file.name)
 
-    def list_images(self, search=None):
+    def _list_images__fetch_images(self, search=None):
         images = self.connection.list_images()
         images = [image for image in images
                   if 'RightImage' not in image.name
@@ -244,8 +244,7 @@ class AzureController(BaseController):
         for image in images:
             if image.name not in images_dict:
                 images_dict[image.name] = image
-
-        return self._post_parse_images(images_dict.values(), search)
+        return images_dict.values()
 
 
 class GoogleController(BaseController):
@@ -257,7 +256,7 @@ class GoogleController(BaseController):
                                         self.cloud.private_key,
                                         project=self.cloud.project_id)
 
-    def add(self, **kwargs):
+    def _add__preparse_kwargs(self, kwargs):
         private_key = kwargs.get('private_key')
         if not private_key:
             raise RequiredParameterMissingError('private_key')
@@ -276,31 +275,10 @@ class GoogleController(BaseController):
                 kwargs['private_key'] = creds['private_key']
             except:
                 raise MistError("Make sure you upload a valid json file.")
-        super(GoogleController, self).add(**kwargs)
 
-    def list_images(self, search=None):
-        images = self.connection.list_images()
-
-        # GCE has some objects in extra so we make sure they are not passed.
-        for image in images:
-            image.extra.pop('licenses', None)
-
-        return self._post_parse_images(images, search)
-
-    def list_sizes(self):
-        sizes = self.connection.list_sizes()
-        for size in sizes:
-            zone = size.extra.pop('zone')
-            size.extra['zone'] = {
-                'id': zone.id,
-                'name': zone.name,
-                'status': zone.status,
-                'country': zone.country,
-            }
-        return self._post_parse_sizes(sizes)
-
-    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
-                            machine_model, machine_dict):
+    def _list_machines__postparse_machine(self, mist_machine_id,
+                                          api_machine_id, machine_api,
+                                          machine_model, machine_dict):
         extra = machine_dict['extra']
 
         # Tags and metadata exist in special location for GCE
@@ -352,6 +330,25 @@ class GoogleController(BaseController):
                           "for machine %s:%s for %s",
                           mist_machine_id, machine_dict['name'], self.cloud)
 
+    def _list_images__fetch_images(self, search=None):
+        images = self.connection.list_images()
+        # GCE has some objects in extra so we make sure they are not passed.
+        for image in images:
+            image.extra.pop('licenses', None)
+        return images
+
+    def _list_sizes__fetch_sizes(self):
+        sizes = self.connection.list_sizes()
+        for size in sizes:
+            zone = size.extra.pop('zone')
+            size.extra['zone'] = {
+                'id': zone.id,
+                'name': zone.name,
+                'status': zone.status,
+                'country': zone.country,
+            }
+        return sizes
+
 
 class HostVirtualController(BaseController):
 
@@ -397,11 +394,10 @@ class VSphereController(BaseController):
         """
         self.connect()
 
-    def add(self, **kwargs):
+    def _add__preparse_kwargs(self, kwargs):
         if not kwargs.get('host'):
             raise RequiredParameterMissingError('host')
         kwargs['host'] = sanitize_host(kwargs['host'])
-        super(VSphereController, self).add(**kwargs)
 
 
 class VCloudController(BaseController):
@@ -414,7 +410,7 @@ class VCloudController(BaseController):
                                          self.cloud.password, host=host,
                                          verify_match_hostname=False)
 
-    def add(self, **kwargs):
+    def _add__preparse_kwargs(self, kwargs):
         if not kwargs.get('username'):
             raise RequiredParameterMissingError('username')
         if not kwargs.get('organization'):
@@ -424,10 +420,10 @@ class VCloudController(BaseController):
         if not kwargs.get('host'):
             raise RequiredParameterMissingError('host')
         kwargs['host'] = sanitize_host(kwargs['host'])
-        super(VCloudController, self).add(**kwargs)
 
-    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
-                            machine_model, machine_dict):
+    def _list_machines__postparse_machine(self, mist_machine_id,
+                                          api_machine_id, machine_api,
+                                          machine_model, machine_dict):
         if machine_dict['extra'].get('vdc'):
             machine_dict['tags']['vdc'] = machine_dict['extra']['vdc']
 
@@ -436,12 +432,11 @@ class IndonesianVCloudController(VCloudController):
 
     provider = 'indonesian_vcloud'
 
-    def add(self, **kwargs):
+    def _add__preparse_kwargs(self, kwargs):
         kwargs.setdefault('host', 'my.idcloudonline.com')
         if kwargs['host'] not in ('my.idcloudonline.com',
                                   'compute.idcloudonline.com'):
             raise me.ValidationError("Invalid host '%s'." % kwargs['host'])
-        super(IndonesianVCloudController, self).add(**kwargs)
 
 
 class OpenStackController(BaseController):
@@ -460,7 +455,7 @@ class OpenStackController(BaseController):
             ex_force_base_url=self.cloud.compute_endpoint,
         )
 
-    def add(self, **kwargs):
+    def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'auth_url', 'url')
         url = kwargs.get('url')
         if url:
@@ -469,7 +464,6 @@ class OpenStackController(BaseController):
             elif url.endswith('/v2.0'):
                 url = url.split('/v2.0')[0]
             kwargs['url'] = url.rstrip('/')
-        super(OpenStackController, self).add(**kwargs)
 
 
 class DockerController(BaseController):
@@ -505,29 +499,25 @@ class DockerController(BaseController):
                                            self.cloud.password,
                                            host, port)
 
-    def add(self, **kwargs):
+    def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'docker_port', 'port')
         rename_kwargs(kwargs, 'docker_host', 'host')
         rename_kwargs(kwargs, 'auth_user', 'username')
         rename_kwargs(kwargs, 'auth_password', 'password')
         if kwargs.get('host'):
             kwargs['host'] = sanitize_host(kwargs['host'])
-        super(DockerController, self).add(**kwargs)
 
-    def list_images(self, search=None):
+    def _list_images__fetch_images(self, search=None):
         # Fetch mist's recommended images
         images = [NodeImage(id=image, name=name,
                             driver=self.connection, extra={})
                   for image, name in config.DOCKER_IMAGES.items()]
-
         # Fetch images from libcloud (supports search).
         if search:
             images += self.connection.search_images(term=search)[:100]
         else:
             images += self.connection.list_images()
-
-        # Parse and return images
-        return self._post_parse_images(images, search)
+        return images
 
     def image_is_default(self, image_id):
         return image_id in config.DOCKER_IMAGES
@@ -559,7 +549,7 @@ class LibvirtController(BaseController):
                                                 user=self.cloud.username,
                                                 tcp_port=port)
 
-    def add(self, **kwargs):
+    def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'machine_hostname', 'host')
         rename_kwargs(kwargs, 'machine_user', 'username')
         rename_kwargs(kwargs, 'ssh_port', 'port')
@@ -571,19 +561,16 @@ class LibvirtController(BaseController):
                                                     id=kwargs['key'])
             except Keypair.DoesNotExist:
                 raise NotFoundError("Keypair does not exist.")
-        super(LibvirtController, self).add(**kwargs)
 
-    def _post_parse_machine(self, mist_machine_id, api_machine_id, machine_api,
-                            machine_model, machine_dict):
+    def _list_machines__postparse_machine(self, mist_machine_id,
+                                          api_machine_id, machine_api,
+                                          machine_model, machine_dict):
         xml_desc = machine_dict['extra'].get('xml_description')
         if xml_desc:
             machine_dict['extra']['xml_description'] = escape(xml_desc)
 
-    def list_images(self, search=None):
-        return self._post_parse_images(
-            self.connection.list_images(location=self.cloud.images_location),
-            search
-        )
+    def _list_images__fetch_images(self, search=None):
+        return self.connection.list_images(location=self.cloud.images_location)
 
 
 # FIXME
