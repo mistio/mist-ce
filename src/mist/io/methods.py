@@ -1342,7 +1342,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.GCE:
         conn = driver(cloud.apikey, cloud.apisecret, project=cloud.tenant_name)
     elif cloud.provider == Provider.DOCKER:
-        docker_host, docker_port = dnat(cloud.owner, cloud.apiurl, cloud.docker_port)
+        host, port = dnat(cloud.owner, cloud.apiurl, cloud.docker_port)
         if cloud.key_file and cloud.cert_file:
             # tls auth, needs to pass the key and cert as files
             key_temp_file = NamedTemporaryFile(delete=False)
@@ -1356,22 +1356,22 @@ def connect_provider(cloud):
                 ca_cert_temp_file = NamedTemporaryFile(delete=False)
                 ca_cert_temp_file.write(cloud.ca_cert_file)
                 ca_cert_temp_file.close()
-                conn = driver(host=docker_host,
+                conn = driver(host=host,
                               docker_host=cloud.apiurl,
-                              port=docker_port,
+                              port=port,
                               key_file=key_temp_file.name,
                               cert_file=cert_temp_file.name,
                               ca_cert=ca_cert_temp_file.name,
                               verify_match_hostname=False)
             else:
-                conn = driver(host=docker_host,
+                conn = driver(host=host,
                               docker_host=cloud.apiurl,
-                              port=docker_port,
+                              port=port,
                               key_file=key_temp_file.name,
                               cert_file=cert_temp_file.name,
                               verify_match_hostname=False)
         else:
-            conn = driver(cloud.apikey, cloud.apisecret, docker_host, docker_port, docker_host=cloud.apiurl)
+            conn = driver(cloud.apikey, cloud.apisecret, host, port, docker_host=cloud.apiurl)
     elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
         conn = driver(cloud.apikey, cloud.apisecret, region=cloud.region)
     elif cloud.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
