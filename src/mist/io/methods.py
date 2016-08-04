@@ -98,6 +98,7 @@ def add_cloud_v_2(user, title, provider, params):
 
     # perform hostname validation if hostname is supplied
     if provider in ['vcloud', 'bare_metal', 'docker', 'libvirt', 'openstack', 'vsphere', 'coreos']:
+        hostname = ''
         if provider in ('bare_metal', 'coreos'):
             hostname = params.get('machine_ip', '')
 
@@ -1636,7 +1637,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
 
     bare_metal = False
-    if cloud.provider == 'bare_metal':
+    if cloud.ctl.provider == 'bare_metal':
         bare_metal = True
     try:
         conn = connect_provider(cloud)
