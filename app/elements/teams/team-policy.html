@@ -202,7 +202,7 @@
 	            		[[index]]. 
 	            	</span>
 	            	<span class="operator">
-                        <paper-toggle-button id$="index-[[index]]" class="operator" checked$="[[_computeToggle(rule.operator)]]" on-tap="_changeOperator"></paper-toggle-button>
+                        <paper-toggle-button id$="index-[[index]]" class="operator" checked$="[[_computeToggle(rule.operator)]]" on-tap="_changeOperator" data-attr="[[index]]"></paper-toggle-button>
 	                	<span id$="index-[[index]]" class="operator-text">[[rule.operator]] </span>
                     </span>
                     <span class="resource">
@@ -210,8 +210,8 @@
                             on 
                         </span>
                         <span class="uppercase">
-                            <paper-dropdown-menu no-animations>
-                              <paper-listbox class="dropdown-content" selected="[[_computeSelectedType(index, rule.rtype)]]" >
+                            <paper-dropdown-menu no-animations data-attr="[[index]]">
+                              <paper-listbox class="dropdown-content" selected="[[_computeSelectedType(index, rule.rtype)]]" data-attr="[[index]]">
                                 <template is="dom-repeat" items="[[resources]]">
                                     <paper-item value="[[item]]" class="rtype">[[item]]</paper-item>    
                                 </template>
@@ -221,8 +221,8 @@
                     </span>
 	                <span class="action">
                         <span class="uppercase">
-                            <paper-dropdown-menu no-animations>
-                              <paper-listbox class="dropdown-content" selected="[[_computeSelectedAction(index, rule.rtype, rule.action)]]" >
+                            <paper-dropdown-menu no-animations data-attr="[[index]]">
+                              <paper-listbox class="dropdown-content" selected="[[_computeSelectedAction(index, rule.rtype, rule.action)]]" data-attr="[[index]]">
                                 <template is="dom-repeat" items="[[_computeActions(index, rule.rtype)]]">
                                     <paper-item value="[[item]]" class="raction">[[pretify(item)]]</paper-item>    
                                 </template>
@@ -234,7 +234,7 @@
                         <rule-identifier model="[[model]]" rule="[[rule]]" rtype="[[rule.rtype]]" rtags="[[rule.rtags]]" index="[[index]]" rid="[[rule.rid]]"></rule-identifier>
                     </span>
                     <span class="delete">
-                        <iron-icon id$="delete-[[index]]" icon="close" on-tap="_deleteRule"></iron-icon>
+                        <iron-icon id$="delete-[[index]]" icon="close" on-tap="_deleteRule" data-attr="[[index]]"></iron-icon>
                     </span>
 	            </div>
 	        </template>            
@@ -242,7 +242,7 @@
         <div class="rules">
             <div class="rule add">
                 <span class="index">
-                    <iron-icon icon="icons:add-circle" on-tap="_addRule"></iron-icon>
+                    <iron-icon icon="icons:add-circle" on-tap="_addRule"></iron-icon> <span on-tap="_addRule">Add a new rule</span>
                 </span>
             </div>
             <paper-item class="default">
@@ -432,10 +432,7 @@
             },
             _updateRule: function(e){
                 //get rule index
-                var target = e.path.find(function(p){
-                    return p.classList.contains('rule');
-                });
-                var ind = parseInt(target.id);
+                var ind = e.target.dataAttr;
                 //case of editing rtype
                 if (e.detail.item.attributes.class.nodeValue.indexOf('rtype') > -1){
                     var rtype = e.detail.item.textContent.trim();
@@ -502,21 +499,18 @@
                 this.ruleHasChanges();
             },
             _deleteRule: function(e){
-                var target = e.detail.sourceEvent.path[0];
-                var index = target.getAttribute('id').split('-')[1];
+                var index = e.target.dataAttr;
                 this.splice('rules',index,1);
                 this.set('formReady', true);
                 this.splice('newOrder', index, 1)
 
                 this.ruleHasChanges();
             },
-            _changeOperator: function(e){
-                var path = e.detail.sourceEvent.path;
-                var target = path.find(function(p){
-                    return p.tagName == "PAPER-TOGGLE-BUTTON";
-                });
-                var index = target.getAttribute('id').split('-')[1];
-                var newOp = target.attributes.checked ? 'ALLOW' : "DENY";
+            _changeOperator: function(event){
+                var e = Polymer.dom(event);
+                var path = e.path;
+                var index = e.localTarget.getAttribute('id').split('-')[1];
+                var newOp = e.localTarget.attributes.checked ? 'ALLOW' : "DENY";
                 if (index) {
                     this.set('rules.#'+index+'.operator', newOp);
                 }
@@ -524,6 +518,7 @@
                     this.set('defaultOperator', newOp);
                 }
                 this.ruleHasChanges();
+                console.log('_changeOperator',e);
             },
             _resetForm: function(){
                 // var initial = this.team.policy.rules;
