@@ -125,6 +125,7 @@ def add_cloud_v_2(user, title, provider, params):
     params.pop('provider', None)
     cloud = cloud_models.CLOUDS[provider].add(user, title,
                                               remove_on_error=remove_on_error,
+                                              fail_on_invalid_params=False,
                                               **params)
     cloud_id = cloud.id
 
