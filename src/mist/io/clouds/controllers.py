@@ -30,7 +30,7 @@ import mongoengine as me
 
 from libcloud.compute.providers import get_driver
 from libcloud.compute.base import NodeImage
-from libcloud.compute.types import Provider
+from libcloud.compute.types import Provider, NodeState
 
 
 from mist.io import config
@@ -78,6 +78,15 @@ class AmazonController(BaseController):
             if not parts[-1].isdigit():
                 parts.append('1')
             kwargs['region'] = '-'.join(parts)
+
+    def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
+                                        machine_api, machine_model,
+                                        machine_dict):
+        super(AmazonController, self)._list_machines__machine_actions(
+            mist_machine_id, api_machine_id,
+            machine_api, machine_model, machine_dict
+        )
+        machine_dict['can_rename'] = True
 
     def _list_machines__postparse_machine(self, mist_machine_id,
                                           api_machine_id, machine_api,
@@ -135,6 +144,15 @@ class DigitalOceanController(BaseController):
     def _connect(self):
         return get_driver(Provider.DIGITAL_OCEAN)(self.cloud.token)
 
+    def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
+                                        machine_api, machine_model,
+                                        machine_dict):
+        super(DigitalOceanController, self)._list_machines__machine_actions(
+            mist_machine_id, api_machine_id,
+            machine_api, machine_model, machine_dict
+        )
+        machine_dict['can_rename'] = True
+
 
 class DigitalOceanFirstGenController(BaseController):
 
@@ -152,6 +170,18 @@ class LinodeController(BaseController):
 
     def _connect(self):
         return get_driver(Provider.LINODE)(self.cloud.apikey)
+
+    def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
+                                        machine_api, machine_model,
+                                        machine_dict):
+        super(LinodeController, self)._list_machines__machine_actions(
+            mist_machine_id, api_machine_id,
+            machine_api, machine_model, machine_dict
+        )
+        machine_dict['can_rename'] = True
+        # After resize, node gets to pending mode, needs to be started.
+        if machine_api.state is NodeState.PENDING:
+            machine_dict['can_start'] = True
 
     def _list_machines__postparse_machine(self, mist_machine_id,
                                           api_machine_id, machine_api,
@@ -183,6 +213,15 @@ class RackSpaceController(BaseController):
             if cloud is not None:
                 kwargs['apikey'] = cloud.apikey
 
+    def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
+                                        machine_api, machine_model,
+                                        machine_dict):
+        super(RackSpaceController, self)._list_machines__machine_actions(
+            mist_machine_id, api_machine_id,
+            machine_api, machine_model, machine_dict
+        )
+        machine_dict['can_rename'] = True
+
 
 class SoftLayerController(BaseController):
 
@@ -207,6 +246,15 @@ class NephoScaleController(BaseController):
     def _connect(self):
         return get_driver(Provider.NEPHOSCALE)(self.cloud.username,
                                                self.cloud.password)
+
+    def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
+                                        machine_api, machine_model,
+                                        machine_dict):
+        super(NephoScaleController, self)._list_machines__machine_actions(
+            mist_machine_id, api_machine_id,
+            machine_api, machine_model, machine_dict
+        )
+        machine_dict['can_rename'] = True
 
     def _list_machines__postparse_machine(self, mist_machine_id,
                                           api_machine_id, machine_api,
@@ -421,6 +469,17 @@ class VCloudController(BaseController):
             raise RequiredParameterMissingError('host')
         kwargs['host'] = sanitize_host(kwargs['host'])
 
+    def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
+                                        machine_api, machine_model,
+                                        machine_dict):
+        super(VCloudController, self)._list_machines__machine_actions(
+            mist_machine_id, api_machine_id,
+            machine_api, machine_model, machine_dict
+        )
+        if machine_api.state is NodeState.PENDING:
+            machine_dict['can_start'] = True
+            machine_dict['can_stop'] = True
+
     def _list_machines__postparse_machine(self, mist_machine_id,
                                           api_machine_id, machine_api,
                                           machine_model, machine_dict):
@@ -464,6 +523,15 @@ class OpenStackController(BaseController):
             elif url.endswith('/v2.0'):
                 url = url.split('/v2.0')[0]
             kwargs['url'] = url.rstrip('/')
+
+    def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
+                                        machine_api, machine_model,
+                                        machine_dict):
+        super(OpenStackController, self)._list_machines__machine_actions(
+            mist_machine_id, api_machine_id,
+            machine_api, machine_model, machine_dict
+        )
+        machine_dict['can_rename'] = True
 
 
 class DockerController(BaseController):
@@ -561,6 +629,27 @@ class LibvirtController(BaseController):
                                                     id=kwargs['key'])
             except Keypair.DoesNotExist:
                 raise NotFoundError("Keypair does not exist.")
+
+    def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
+                                        machine_api, machine_model,
+                                        machine_dict):
+        super(LibvirtController, self)._list_machines__machine_actions(
+            mist_machine_id, api_machine_id,
+            machine_api, machine_model, machine_dict
+        )
+        if machine_dict['extra'].get('tags', {}).get('type') == 'hypervisor':
+            # Allow only reboot and tag actions for hypervisor.
+            for action in ('start', 'stop', 'destroy', 'rename'):
+                machine_dict['can_%s' % action] = False
+        else:
+            machine_dict['can_undefine'] = True
+            if machine_api.state is NodeState.TERMINATED:
+                # In libvirt a terminated machine can be started.
+                machine_dict['can_start'] = True
+            if machine_api.state is NodeState.RUNNING:
+                machine_dict['can_suspend'] = True
+            if machine_api.state is NodeState.SUSPENDED:
+                machine_dict['can_resume'] = True
 
     def _list_machines__postparse_machine(self, mist_machine_id,
                                           api_machine_id, machine_api,

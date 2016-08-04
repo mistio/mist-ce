@@ -632,44 +632,6 @@ def get_machine_actions(machine_from_api, conn, extra):
 
     """
 
-    # defaults for running state
-    can_start = False
-    can_stop = True
-    can_destroy = True
-    can_reboot = True
-    can_tag = True
-    can_undefine = False
-    can_resume = False
-    can_suspend = False
-    # resume, suspend and undefine are states related to KVM
-
-    # tag allowed on mist.core only for all providers, mist.io
-    # supports only EC2, RackSpace, GCE, OpenStack
-    try:
-        from mist.core.views import set_machine_tags
-    except ImportError:
-        if conn.type in (Provider.RACKSPACE_FIRST_GEN, Provider.LINODE,
-                         Provider.NEPHOSCALE, Provider.SOFTLAYER,
-                         Provider.DIGITAL_OCEAN, Provider.DOCKER, Provider.AZURE,
-                         Provider.VCLOUD, Provider.INDONESIAN_VCLOUD, Provider.LIBVIRT, Provider.HOSTVIRTUAL, Provider.VSPHERE, Provider.VULTR, Provider.PACKET, 'bare_metal', 'coreos'):
-            can_tag = False
-
-    # for other states
-    if machine_from_api.state in (NodeState.REBOOTING, NodeState.PENDING):
-        can_start = False
-        can_stop = False
-        can_reboot = False
-    elif machine_from_api.state in (NodeState.UNKNOWN, NodeState.STOPPED):
-        # We assume unknown state mean stopped
-        can_stop = False
-        can_start = True
-        can_reboot = False
-    elif machine_from_api.state in (NodeState.TERMINATED,):
-        can_start = False
-        can_destroy = False
-        can_stop = False
-        can_reboot = False
-
     if conn.type in ['bare_metal', 'coreos']:
         can_start = False
         can_destroy = False
@@ -679,52 +641,6 @@ def get_machine_actions(machine_from_api, conn, extra):
         if extra.get('can_reboot', False):
         # allow reboot action for bare metal with key associated
             can_reboot = True
-
-
-    if conn.type in [Provider.LINODE]:
-        if machine_from_api.state is NodeState.PENDING:
-        #after resize, node gets to pending mode, needs to be started
-            can_start = True
-
-    if conn.type in [Provider.LIBVIRT]:
-        can_undefine = True
-        if machine_from_api.state is NodeState.TERMINATED:
-        # in libvirt a terminated machine can be started
-            can_start = True
-        if machine_from_api.state is NodeState.RUNNING:
-            can_suspend = True
-        if machine_from_api.state is NodeState.SUSPENDED:
-            can_resume = True
-
-    if conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD] and machine_from_api.state is NodeState.PENDING:
-        can_start = True
-        can_stop = True
-
-    if conn.type == Provider.LIBVIRT and extra.get('tags', {}).get('type', None) == 'hypervisor':
-        # allow only reboot action for libvirt hypervisor
-        can_stop = False
-        can_destroy = False
-        can_start = False
-        can_undefine = False
-        can_suspend = False
-        can_resume = False
-
-    if conn.type in (Provider.LINODE, Provider.NEPHOSCALE, Provider.DIGITAL_OCEAN,
-                     Provider.OPENSTACK, Provider.RACKSPACE) or conn.type in config.EC2_PROVIDERS:
-        can_rename = True
-    else:
-        can_rename = False
-
-
-    return {'can_stop': can_stop,
-            'can_start': can_start,
-            'can_destroy': can_destroy,
-            'can_reboot': can_reboot,
-            'can_tag': can_tag,
-            'can_undefine': can_undefine,
-            'can_rename': can_rename,
-            'can_suspend': can_suspend,
-            'can_resume': can_resume}
 
 
 def list_machines(user, cloud_id):
@@ -816,7 +732,6 @@ def list_machines(user, cloud_id):
             machine['extra'].pop('cost_per_month', None)
             machine['extra'].pop('cost_per_hour', None)
 
-        machine.update(get_machine_actions(m, conn, m.extra))
         ret.append(machine)
 
     return ret

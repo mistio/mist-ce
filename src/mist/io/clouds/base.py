@@ -14,6 +14,7 @@ import datetime
 import mongoengine as me
 
 from libcloud.common.types import InvalidCredsError
+from libcloud.compute.types import NodeState
 from libcloud.compute.base import NodeLocation
 
 from mist.io import config
@@ -426,7 +427,7 @@ class BaseController(object):
                 'missing_since': str(machine_model.missing_since or ''),
             }
 
-            # Update with available machine.actions.
+            # Update with available machine actions.
             try:
                 self._list_machines__machine_actions(
                     machine_model.id, node.id, node, machine_model, machine
@@ -512,16 +513,46 @@ class BaseController(object):
         Subclasses MAY extend this method.
 
         """
+        # Defaults for running state and common clouds.
+        can_start = False
+        can_stop = True
+        can_reboot = True
+        can_destroy = True
+        can_rename = False  # Most providers do not support renaming.
+        can_tag = True  # Always True now that we store tags in db.
+
+        # Actions resume, suspend and undefine are states related to KVM.
+        can_resume = False
+        can_suspend = False
+        can_undefine = False
+
+        # Default actions for other states.
+        if machine_api.state in (NodeState.REBOOTING, NodeState.PENDING):
+            can_start = False
+            can_stop = False
+            can_reboot = False
+        elif machine_api.state in (NodeState.STOPPED, NodeState.UNKNOWN):
+            # We assume unknown state means stopped.
+            can_start = True
+            can_stop = False
+            can_reboot = False
+        elif machine_api.state in (NodeState.TERMINATED, ):
+            can_start = False
+            can_stop = False
+            can_reboot = False
+            can_destroy = False
+            can_rename = False
+
         machine_dict.update({
-            'can_stop': False,
-            'can_start': False,
-            'can_destroy': False,
-            'can_reboot': False,
-            'can_rename': False,
-            'can_undefine': False,
-            'can_suspend': False,
-            'can_resume': False,
-            'can_tag': True,
+            'can_start': can_start,
+            'can_stop': can_stop,
+            'can_reboot': can_reboot,
+            'can_destroy': can_destroy,
+            'can_rename': can_rename,
+            'can_tag': can_tag,
+            'can_resume': can_resume,
+            'can_suspend': can_suspend,
+            'can_undefine': can_undefine,
         })
 
     def _list_machines__postparse_machine(self, mist_machine_id,
