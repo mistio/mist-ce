@@ -32,9 +32,9 @@
                 <p>
                     <paper-textarea id="description" label="Description (optional)" rows="3" max-rows="5" error-message="Please enter team's description" value="{{newTeam.description}}"></paper-textarea>
                 </p>
-                <!-- <p>
+                <p>
                     <paper-toggle-button id="visible" label="Visible" checked="{{newTeam.visible}}"></paper-toggle-button> Visible to members not in the team.
-                </p> -->
+                </p>
                 <div class="clearfix btn-group">
                     <paper-button class="blue-link" dialog-dismiss>Cancel</paper-button>
                     <paper-button class="blue" disabled$="[[!formReady]]" on-tap="_submitForm">Add</paper-button>
@@ -60,7 +60,7 @@
                         value: {
                             name: '',
                             description: '',
-                            // visible: true
+                            visible: true
                         },
                     },
                     organization: {
@@ -116,7 +116,7 @@
                     this.$.teamAddAjaxRequest.body = {
                         name: this.newTeam.name,
                         description: this.newTeam.description,
-                        // visible: this.newTeam.visible
+                        visible: this.newTeam.visible
                     };
                     this.$.teamAddAjaxRequest.generateRequest();
 
@@ -147,7 +147,7 @@
                 _formReset: function() {
                     this.set('newTeam.name', '');
                     this.set('newTeam.description', '');
-                    // this.set('newTeam.visible', true);
+                    this.set('newTeam.visible', true);
                 }
             });
         })();
