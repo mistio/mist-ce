@@ -397,7 +397,9 @@ class BaseController(object):
             machine_model.missing_since = None
 
             # Get misc libcloud metadata.
-            image_id = node.image or node.extra.get('imageId')
+            image_id = str(node.image or node.extra.get('imageId') or
+                           node.extra.get('image_id') or
+                           node.extra.get('image') or '')
             size = (node.size or node.extra.get('flavorId')
                     or node.extra.get('instancetype'))
 

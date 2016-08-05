@@ -774,7 +774,7 @@ var PROVIDER_MAP = {
             defaultValue: 'HostVirtual',
         },
         {
-            name: 'api_key',
+            name: 'apikey',
             type: 'password',
             helpText: 'You can find your API Token on the HostVirtual portal',
             helpHref: 'http://docs.mist.io/article/22-adding-hostvirtual'
@@ -788,7 +788,7 @@ var PROVIDER_MAP = {
             defaultValue: 'Vultr',
         },
         {
-            name: 'api_key',
+            name: 'apikey',
             type: 'password',
             helpText: 'You can find your API Token on the Vultr portal',
             helpHref: 'http://docs.mist.io/article/72-adding-vultr'
@@ -802,7 +802,7 @@ var PROVIDER_MAP = {
             defaultValue: 'Packet.net',
         },
         {
-            name: 'api_key',
+            name: 'apikey',
             type: 'password',
             helpText: 'You can find your API Token on the Packet.net portal',
             helpHref: 'http://docs.mist.io/article/100-adding-packet'
@@ -901,13 +901,13 @@ var PROVIDER_MAP = {
             defaultValue: 'EC2',
         },
         {
-            name: 'api_key',
+            name: 'apikey',
             type: 'text',
             helpText: 'You can find your API key on your Amazon console',
             helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2',
         },
         {
-            name: 'api_secret',
+            name: 'apisecret',
             type: 'password',
             helpText: 'You can find your API secret on your Amazon console',
             helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2',
@@ -970,7 +970,7 @@ var PROVIDER_MAP = {
             defaultValue: 'Linode',
         },
         {
-            name: 'api_key',
+            name: 'apikey',
             type: 'text',
             helpText: 'You can create an API key on your Linode portal',
             helpHref: 'http://docs.mist.io/article/25-adding-linode',
@@ -1042,7 +1042,7 @@ var PROVIDER_MAP = {
             helpText: 'The username you use to connect to the RackSpace portal',
         },
         {
-            name: 'api_key',
+            name: 'apikey',
             type: 'password',
             helpText: 'You can find your API key on your RackSpace portal',
             helpHref: 'http://docs.mist.io/article/29-adding-rackspace',
@@ -1061,7 +1061,7 @@ var PROVIDER_MAP = {
             helpText: 'The username you use to connect to the SoftLayer portal',
         },
         {
-            name: 'api_key',
+            name: 'apikey',
             type: 'password',
             helpText: 'You can find your API key on your SoftLayer portal',
             helpHref: 'http://docs.mist.io/article/30-adding-softlayer',
