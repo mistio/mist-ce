@@ -330,7 +330,7 @@ def add_cloud_v_2(user, title, provider, params):
         key_id = params.get('machine_key')
         node_id = cloud.apiurl  # id of the hypervisor is the hostname provided
         username = cloud.apikey
-        associate_key(user, key_id, cloud_id, node_id, username=username)
+        associate_key(user, key_id, cloud_id, node_id, username=username, port=cloud.ssh_port)
 
     return {'cloud_id': cloud.id}
 

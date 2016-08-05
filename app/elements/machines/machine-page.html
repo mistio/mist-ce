@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 
@@ -149,9 +150,29 @@
             paper-button.right-icon iron-icon {
                 margin: 0 0 0 4px;
             }
+            .is-loading {
+                top: 15px;
+                left: 200px;
+                position: fixed;
+                right: 0;
+                bottom: 0;
+                display: block;
+                width: 100%;
+                height: 100vh;
+                background-color: #eee;
+            }
+            .is-loading paper-spinner {
+                width: 80px;
+                height: 80px;
+                margin: 10% auto;
+                display: block;
+            }
         </style>
 
         <div id="content">
+            <div class="is-loading" hidden$="[[!isLoading]]">
+                <paper-spinner active hidden$="[[!isLoading]]"></paper-spinner>
+            </div>
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <span class="icon"><iron-icon class$=" machine-state-icon [[machine.state]]" icon="[[section.icon]]"></iron-icon></span>
                 <div class="title flex">
@@ -295,6 +316,11 @@
             replaceTargets: {
                 type: Object,
                 computed: '_computeReplaceTargets(machine)'
+            },
+            isLoading: {
+                type: Boolean,
+                computed: '_computeIsloading(machine)',
+                value: true
             }
         },
         observers: [
@@ -551,5 +577,8 @@
         isState: function(machine){
             return machine.state == machine.extra.status ;
         },
+        _computeIsloading(machine) {
+            return !this.machine ? true : false;
+        }
     });
 </script>
