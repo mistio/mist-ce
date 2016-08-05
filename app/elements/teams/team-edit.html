@@ -65,7 +65,6 @@
                     },
                     newTeam: {
                         type: Object,
-                        computed: '_computeNewTeam(team)',
                         notify: true
                     },
                     sendingData: {
@@ -77,15 +76,26 @@
                         computed: '_computeFormReady(newTeam.name, sendingData)'
                     }
                 },
+                observers: [
+                    '_computeNewTeam(team)'
+                ],
                 listeners: {
                     'iron-overlay-closed': '_modalClosed'
                 },
                 _computeNewTeam: function(team) {
-                    return {
-                        name: team.name,
-                        description: team.description,
-                        visible: team.visible
-                    };
+                    var newTeam = {};
+
+                    for(var p in team) {
+                        if (typeof team[p] == 'string'){
+                            var initial = team[p];
+                            var str = initial.slice(0);
+                            newTeam[p] = str;
+                        }
+                        if (typeof team[p] == 'boolean'){
+                            newTeam[p] = team[p] ? true : false;   
+                        }
+                    }
+                    this.set('newTeam', newTeam);
                 },
                 _computeFormReady: function(id, sendingData) {
                     var formReady = false;
@@ -126,7 +136,19 @@
                     this.set('sendingData', true);
                 },
                 _formReset: function() {
-                    //   this.set('team.id', '');
+                    var newTeam = {};
+
+                    for(var p in this.team) {
+                        if (typeof this.team[p] == 'string'){
+                            var initial = this.team[p];
+                            var str = initial.slice(0);
+                            newTeam[p] = str;
+                        }
+                        if (typeof this.team[p] == 'boolean'){
+                            newTeam[p] = this.team[p] ? true : false;   
+                        }
+                    }
+                    this.set('newTeam', newTeam);
                 },
                 _handleTeamEditAjaxResponse: function(e) {
                     this.set('sendingData', false);
