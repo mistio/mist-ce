@@ -120,10 +120,6 @@
                     this._formReset();
                 },
                 _submitForm: function(e) {
-                    // this.fire('updateSelectedTeam', {
-                    //     team: this.team
-                    // });
-
                     this.$.teamEditAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.teamEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.teamEditAjaxRequest.body = {
@@ -137,7 +133,6 @@
                 },
                 _formReset: function() {
                     var newTeam = {};
-
                     for(var p in this.team) {
                         if (typeof this.team[p] == 'string'){
                             var initial = this.team[p];
