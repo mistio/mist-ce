@@ -60,7 +60,24 @@
            [{"country": "US", "id": "86945", "name": "SJC-1"},
              {"country": "US", "id": "87729", "name": "RIC-1"}],
    "rackspace":
-           [{"country": "", "id": "0", "name": ""}]
+           [{"country": "", "id": "0", "name": ""}],
+  "gce":
+          [{"country": "asia", "id": "2222", "name": "asia-east1-c"},
+            {"country": "asia", "id": "2220", "name": "asia-east1-a"},
+            {"country": "asia", "id": "2221", "name": "asia-east1-b"},
+            {"country": "europe", "id": "2103", "name": "europe-west1-c"},
+            {"country": "europe", "id": "2101", "name": "europe-west1-b"},
+            {"country": "europe", "id": "2104", "name": "europe-west1-d"},
+            {"country": "us", "id": "2004", "name": "us-central1-f"},
+            {"country": "us", "id": "2000", "name": "us-central1-a"},
+            {"country": "us", "id": "2002", "name": "us-central1-c"},
+            {"country": "us", "id": "2001", "name": "us-central1-b"},
+            {"country": "us", "id": "2234", "name": "us-east1-d"},
+            {"country": "us", "id": "2233", "name": "us-east1-c"},
+            {"country": "us", "id": "2231", "name": "us-east1-b"},
+            {"country": "us", "id": "2211", "name": "us-west1-b"},
+            {"country": "us", "id": "2210", "name": "us-west1-a"}]
+
 
 
 
