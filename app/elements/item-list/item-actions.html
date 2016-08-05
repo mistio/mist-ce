@@ -214,6 +214,7 @@ Polymer({
     is: 'item-actions',
 
     properties: {
+        org: Object,
         section: Object,
         items: {
             type: Array,
@@ -441,6 +442,7 @@ Polymer({
     },
 
     _performAction: function(action, items) {
+        var orgId = this.org.id;
         var run = function() {
             var uri, payload, item = items.shift(), method = 'POST';
             //machines
@@ -472,7 +474,7 @@ Polymer({
                 method = 'DELETE';
             //teams
             } else if (action.name == 'delete' && item.type == 'team') {
-                uri = '/api/v1/teams/' + item.id;
+                uri = '/api/v1/org/'+ orgId +'/teams/' + item.id;
                 method = 'DELETE';
             //images
             } else if (action.name == 'star' || action.name == 'unstar' && item && item.type == 'image') {
