@@ -392,7 +392,7 @@ class BaseController(object):
             except Machine.DoesNotExist:
                 machine_model = Machine(cloud=self.cloud, machine_id=node.id)
 
-            # Update machine_model's last_seen fields
+            # Update machine_model's last_seen fields.
             machine_model.last_seen = now
             machine_model.missing_since = None
 
@@ -487,11 +487,7 @@ class BaseController(object):
                                    if key != 'Name']
 
             # Save all changes to machine model on the database.
-            # FIXME: This is currently disabled because we want to be able to
-            # run tests without using a real mongo instance. It is a temporary
-            # solution that will be lifted once we start using mock mongo on
-            # tests.
-            # machine_model.save()
+            machine_model.save()
 
             machines.append(machine)
 
