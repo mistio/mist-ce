@@ -19,13 +19,13 @@ from libcloud.compute.base import NodeLocation
 
 from mist.io import config
 
-
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudExistsError
 from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
+from mist.io.helpers import get_datetime
 
 from mist.core.tag.models import Tag
 
@@ -427,7 +427,20 @@ class BaseController(object):
                 'extra': node.extra,
                 'last_seen': str(machine_model.last_seen or ''),
                 'missing_since': str(machine_model.missing_since or ''),
+                'created': str(machine_model.created or ''),
             }
+
+            # Get machine creation date.
+            try:
+                created = self._list_machines__machine_creation_date(node)
+                if created:
+                    machine_model.created = get_datetime(created)
+            except Exception as exc:
+                log.exception("Error finding creation date for %s in %s.",
+                              self.cloud, machine_model)
+            # TODO: Consider if we should fall back to using current date.
+            # if not machine_model.created:
+            #     machine_model.created = datetime.datetime.utcnow()
 
             # Update with available machine actions.
             try:
@@ -488,6 +501,9 @@ class BaseController(object):
                         missing_since=None).update(missing_since=now)
 
         return machines
+
+    def _list_machines__machine_creation_date(self, machine_api):
+        return
 
     def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
                                         machine_api, machine_model,

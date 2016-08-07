@@ -670,29 +670,6 @@ def list_machines(user, cloud_id):
         if cost_per_month:
             machine['extra']['cost_per_month'] = cost_per_month
 
-        # the reason this goes down is that we want to allow
-        # cost_per_hour/cost_per_month to be overrided by users
-        if not machine_entry.created:
-            # if the machine has no created value then try to get one from the
-            # provider
-            try:
-                create_date, create_date_timestamp = machine_create_date(m)
-                if create_date_timestamp:
-                    machine_entry.created = create_date_timestamp
-                    machine_entry.save()
-            except:
-                pass
-
-        if machine_entry.created:
-            # if a value is available then send it to the ui
-            create_date_timestamp = machine_entry.created
-            try:
-                create_date = datetime.fromtimestamp(create_date_timestamp).strftime("%b %d, %Y at %I:%M:%S %p")
-                machine['extra']['create_date'] = create_date
-                machine['extra']['create_date_timestamp'] = create_date_timestamp
-            except:
-                pass
-
         all_tags = tags_from_provider
 
         try:
@@ -3457,47 +3434,6 @@ def machine_cost_calculator(m):
             except:
                 cost[key] = 0
     return cost
-
-
-def machine_create_date(m):
-    """
-    Returns the create date out of the VM metadata
-    Supports:
-        AWS, DigitalOcean, Packet.net, Linode, SoftLayer, Rackspace Cloud,
-        OpenStack, Nephoscale, Vultr, GCE, Docker, Azure
-    TODO:
-        vCloud, vSphere
-    """
-    if m.driver.type in config.EC2_PROVIDERS:
-        create_date = m.created_at
-    elif m.driver.type in [Provider.DIGITAL_OCEAN, Provider.PACKET]:
-        create_date = m.extra.get('created_at')
-        create_date = iso8601.parse_date(create_date)
-    elif m.driver.type == Provider.LINODE:
-        create_date = m.extra.get('CREATE_DT')
-        create_date = iso8601.parse_date(create_date)
-    elif m.driver.type in [Provider.SOFTLAYER, Provider.RACKSPACE, Provider.RACKSPACE_FIRST_GEN, Provider.OPENSTACK]:
-        create_date = m.extra.get('created')
-        create_date = iso8601.parse_date(create_date)
-    elif m.driver.type == Provider.NEPHOSCALE:
-        create_date = m.extra.get('create_time')
-        create_date = iso8601.parse_date(create_date)
-    elif m.driver.type == Provider.VULTR:
-        create_date = m.extra.get('date_created')
-        create_date = iso8601.parse_date(create_date)
-    elif m.driver.type == Provider.GCE:
-        create_date = m.extra.get('creationTimestamp')
-        create_date = iso8601.parse_date(create_date)
-    elif m.driver.type == Provider.DOCKER:
-        create_date = m.created_at
-        create_date = datetime.fromtimestamp(create_date / 1e3)
-    else:
-        return None, None
-
-    create_date_timestamp = mktime(create_date.timetuple())
-    create_date = create_date.strftime("%b %d, %Y at %I:%M:%S %p")
-
-    return create_date, create_date_timestamp
 
 
 def machine_name_validator(provider, name):

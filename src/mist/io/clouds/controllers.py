@@ -79,6 +79,9 @@ class AmazonController(BaseController):
                 parts.append('1')
             kwargs['region'] = '-'.join(parts)
 
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.created_at  # datetime
+
     def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
                                         machine_api, machine_model,
                                         machine_dict):
@@ -144,6 +147,9 @@ class DigitalOceanController(BaseController):
     def _connect(self):
         return get_driver(Provider.DIGITAL_OCEAN)(self.cloud.token)
 
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.extra.get('created_at')  # iso8601 string
+
     def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
                                         machine_api, machine_model,
                                         machine_dict):
@@ -170,6 +176,9 @@ class LinodeController(BaseController):
 
     def _connect(self):
         return get_driver(Provider.LINODE)(self.cloud.apikey)
+
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.extra.get('CREATE_DT')  # iso8601 string
 
     def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
                                         machine_api, machine_model,
@@ -213,6 +222,9 @@ class RackSpaceController(BaseController):
             if cloud is not None:
                 kwargs['apikey'] = cloud.apikey
 
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.extra.get('created')  # iso8601 string
+
     def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
                                         machine_api, machine_model,
                                         machine_dict):
@@ -230,6 +242,9 @@ class SoftLayerController(BaseController):
     def _connect(self):
         return get_driver(Provider.SOFTLAYER)(self.cloud.username,
                                               self.cloud.apikey)
+
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.extra.get('created')  # iso8601 string
 
     def _list_machines__postparse_machine(self, mist_machine_id,
                                           api_machine_id, machine_api,
@@ -255,6 +270,9 @@ class NephoScaleController(BaseController):
             machine_api, machine_model, machine_dict
         )
         machine_dict['can_rename'] = True
+
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.extra.get('create_time')  # iso8601 string
 
     def _list_machines__postparse_machine(self, mist_machine_id,
                                           api_machine_id, machine_api,
@@ -324,12 +342,15 @@ class GoogleController(BaseController):
             except:
                 raise MistError("Make sure you upload a valid json file.")
 
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.extra.get('creationTimestamp')  # iso8601 string
+
     def _list_machines__postparse_machine(self, mist_machine_id,
                                           api_machine_id, machine_api,
                                           machine_model, machine_dict):
         extra = machine_dict['extra']
 
-        # Tags and metadata exist in special location for GCE
+        # Tags and metadata exist in special location for GCE.
         tags = tags_to_dict(extra.get('metadata', {}).get('items', []))
         for key in ('gce-initial-windows-password',
                     'gce-initial-windows-user'):
@@ -414,6 +435,9 @@ class PacketController(BaseController):
         return get_driver(Provider.PACKET)(self.cloud.apikey,
                                            project=self.cloud.project_id)
 
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.extra.get('created_at')  # iso8601 string
+
 
 class VultrController(BaseController):
 
@@ -421,6 +445,9 @@ class VultrController(BaseController):
 
     def _connect(self):
         return get_driver(Provider.VULTR)(self.cloud.apikey)
+
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.extra.get('date_created')  # iso8601 string
 
 
 class VSphereController(BaseController):
@@ -524,6 +551,9 @@ class OpenStackController(BaseController):
                 url = url.split('/v2.0')[0]
             kwargs['url'] = url.rstrip('/')
 
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.extra.get('created')  # iso8601 string
+
     def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
                                         machine_api, machine_model,
                                         machine_dict):
@@ -574,6 +604,9 @@ class DockerController(BaseController):
         rename_kwargs(kwargs, 'auth_password', 'password')
         if kwargs.get('host'):
             kwargs['host'] = sanitize_host(kwargs['host'])
+
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.created_at  # unix timestamp in ms
 
     def _list_images__fetch_images(self, search=None):
         # Fetch mist's recommended images
