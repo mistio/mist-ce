@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
@@ -130,9 +131,29 @@
         #copyscript[show] {
             display: inline-block;
         }
+        .is-loading {
+            top: 15px;
+            left: 200px;
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            display: block;
+            width: 100%;
+            height: 100vh;
+            background-color: #eee;
+        }
+        .is-loading paper-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 10% auto;
+            display: block;
+        }
         </style>
 
         <div id="content">
+            <div class="is-loading" hidden$="[[!isLoading]]">
+                <paper-spinner active hidden$="[[!isLoading]]"></paper-spinner>
+            </div>
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
                 <div class="title flex">
@@ -285,6 +306,11 @@ Script:</code></pre>
                 },
                 isInline: {
                     type: Boolean,
+                    value: true
+                },
+                isLoading: {
+                    type: Boolean,
+                    computed: '_computeIsloading(tunnel)',
                     value: true
                 }
             },
@@ -462,6 +488,9 @@ Script:</code></pre>
                     range.selectNode(el);
                     window.getSelection().addRange(range);
                 }
+            },
+            _computeIsloading(tunnel) {
+                return !this.tunnel ? true : false;
             }
         });
     })();
