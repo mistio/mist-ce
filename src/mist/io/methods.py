@@ -71,6 +71,9 @@ from mist.io.clouds.models import Cloud
 
 from mist.core.vpn.methods import destination_nat as dnat
 from mist.core.vpn.methods import super_ping
+from mist.core.vpn.methods import to_tunnel
+
+from mist.core.exceptions import VPNTunnelError
 
 import mist.io.clouds.models as cloud_models
 
@@ -133,15 +136,13 @@ def add_cloud_v_2(user, title, provider, params):
     log.info("Cloud with id '%s' added succesfully with Api-Version: 2.", cloud_id)
     trigger_session_update(user, ['clouds'])
 
-    # FIXME: Is this still needed? If so it should be migrated to
-    # clouds.controllers.LibvirtController
-    #
-    # if provider == 'libvirt' and cloud.apisecret:
-    # # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
-    #     key_id = params.get('machine_key')
-    #     node_id = cloud.apiurl  # id of the hypervisor is the hostname provided
-    #     username = cloud.apikey
-    #     associate_key(user, key_id, cloud_id, node_id, username=username)
+    # FIXME: This should be migrated to clouds.controllers.LibvirtController
+    if provider == 'libvirt' and cloud.apisecret:
+    # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
+        key_id = params.get('machine_key')
+        node_id = cloud.apiurl  # id of the hypervisor is the hostname provided
+        username = cloud.apikey
+        associate_key(user, key_id, cloud_id, node_id, username=username, port=cloud.ssh_port)
 
     return {'cloud_id': cloud.id}
 
@@ -189,6 +190,12 @@ def _add_cloud_bare_metal(user, title, provider, params):
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
     except NotUniqueError:
         raise CloudExistsError()
+
+    try:
+        to_tunnel(user, machine_hostname)
+    except VPNTunnelError as err:
+        Cloud.objects.get(owner=user, id=cloud.id).delete()
+        raise err
 
     machine = Machine()
     machine.cloud = cloud
@@ -269,6 +276,12 @@ def _add_cloud_coreos(user, title, provider, params):
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
     except NotUniqueError:
         raise CloudExistsError()
+
+    try:
+        to_tunnel(user, machine_hostname)
+    except VPNTunnelError as err:
+        Cloud.objects.get(owner=user, id=cloud.id).delete()
+        raise err
 
     machine = Machine()
     machine.ssh_port = port
