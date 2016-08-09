@@ -10,6 +10,7 @@ import ssl
 import json
 import logging
 import datetime
+import calendar
 
 import mongoengine as me
 
@@ -463,13 +464,35 @@ class BaseController(object):
 
             # Apply any cloud/provider cost reporting.
             try:
-                self._list_machines__cost_machine(
-                    machine_model.id, node.id, node, machine_model, machine
-                )
+                def parse_num(num):
+                    try:
+                        return float(num or 0)
+                    except (ValueError, TypeError):
+                        log.warning("Can't parse %r as float.", num)
+                        return 0
+
+                month_days = calendar.monthrange(now.year, now.month)[1]
+
+                cph = parse_num(machine['tags'].get('cost_per_hour'))
+                cpm = parse_num(machine['tags'].get('cost_per_month'))
+                if not (cph or cpm) or cph > 100 or cpm > 100 * 24 * 31:
+                    cph, cpm = map(parse_num,
+                                   self._list_machines__cost_machine(node))
+                if cph or cpm:
+                    if not cph:
+                        cph = cpm / month_days / 24
+                    elif not cpm:
+                        cpm = cph * 24 * month_days
+                    machine['extra']['cost_per_hour'] = '%.2f' % cph
+                    machine['extra']['cost_per_month'] = '%.2f' % cpm
+
             except Exception as exc:
                 log.exception("Error while calculating cost "
                               "for machine %s:%s for %s",
                               machine_model.id, node.name, self.cloud)
+            if node.state.lower() == 'terminated':
+                machine['extra'].pop('cost_per_hour', None)
+                machine['extra'].pop('cost_per_month', None)
 
             # Make sure we don't meet any surprises when we try to json encode
             # later on in the HTTP response.
@@ -599,37 +622,23 @@ class BaseController(object):
         """
         return
 
-    def _list_machines__cost_machine(self, mist_machine_id, api_machine_id,
-                                     machine_api, machine_model, machine_dict):
+    def _list_machines__cost_machine(self, machine_api):
         """Perform cost calculations for a machine
 
         Any subclass that wishes to handle its cloud's pricing, can implement
         this internal method.
 
-        mist_machine_id: The id assigned to the machine by mist. This is the
-            machine's primary key in the database and the mist API.
-        api_machine_id: The id assigned to the machine by its cloud. This is
-            not guaranteed to be globally unique.
+        Params:
         machine_api: An instance of a libcloud compute node, as returned by
             libcloud's list_nodes.
-        machine_dict: A dict containing all machine metadata gathered from
-            libcloud and the database. This is what gets returned by mist's
-            API.
-        machine_model: A machine mongoengine model. The model may not have yet
-            been saved in the database.
 
-        This method is expected to edit its arguments in place and not return
-        anything.
-
-        This internal method is called right after
-        `self._list_machines__postparse_machine` and has the exact same
-        signature. The reason this was split into a secondary method is to
-        separate cost processing from generic metadata injection in subclasses.
+        This method is expected to return a tuple of two values:
+            (cost_per_hour, cost_per_month)
 
         Subclasses MAY override this method.
 
         """
-        return
+        return 0, 0
 
     def list_images(self, search=None):
         """Return list of images for cloud

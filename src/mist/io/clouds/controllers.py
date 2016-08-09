@@ -28,8 +28,9 @@ from xml.sax.saxutils import escape
 
 import mongoengine as me
 
-from libcloud.compute.providers import get_driver
+from libcloud.pricing import get_size_price
 from libcloud.compute.base import NodeImage
+from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider, NodeState
 
 
@@ -98,6 +99,27 @@ class AmazonController(BaseController):
         extra = machine_dict['extra']
         extra['os_type'] = extra.get('platform', 'linux')
 
+    def _list_machines__cost_machine(self, machine_api):
+        image_id = machine_api.extra.get('image_id')
+        try:
+            # FIXME: This is here to avoid circular imports.
+            from mist.core.cloud.models import CloudImage
+            os_type = CloudImage.objects.get(
+                cloud_provider=machine_api.driver.type, image_id=image_id
+            ).os_type
+        except:
+            os_type = 'linux'
+        sizes = machine_api.driver.list_sizes()
+        size = machine_api.extra.get('instance_type')
+        for node_size in sizes:
+            if node_size.id == size:
+                plan_price = node_size.price.get(os_type)
+                if not plan_price:
+                    # Use the default which is linux.
+                    plan_price = node_size.price.get('linux')
+                return plan_price.replace('/hour', '').replace('$', ''), 0
+        return 0, 0
+
     def _list_images__fetch_images(self, search=None):
         default_images = config.EC2_IMAGES[self.cloud.region]
         image_ids = default_images.keys() + self.cloud.starred
@@ -108,12 +130,14 @@ class AmazonController(BaseController):
                     image.name = default_images[image.id]
             images += self.connection.list_images(ex_owner='self')
         else:
-            # FIXME:
-            # image_models = CloudImage.objects(
-            #     me.Q(cloud_provider=conn.type, image_id__icontains=term) |
-            #     me.Q(cloud_provider=conn.type, name__icontains=term)
-            # )[:200]
-            image_models = []
+            # FIXME: This is here to avoid circular imports.
+            from mist.core.cloud.models import CloudImage
+            image_models = CloudImage.objects(
+                me.Q(cloud_provider=self.connection.type,
+                     image_id__icontains=search) |
+                me.Q(cloud_provider=self.connection.type,
+                     name__icontains=search)
+            )[:200]
             images = [NodeImage(id=image.image_id, name=image.name,
                                 driver=self.connection, extra={})
                       for image in image_models]
@@ -159,6 +183,10 @@ class DigitalOceanController(BaseController):
         )
         machine_dict['can_rename'] = True
 
+    def _list_machines__cost_machine(self, machine_api):
+        size = machine_api.get('size', {})
+        return size.get('price_hourly', 0), size.get('price_monthly', 0)
+
 
 class DigitalOceanFirstGenController(BaseController):
 
@@ -200,6 +228,12 @@ class LinodeController(BaseController):
         if datacenter:
             machine_dict['tags']['DATACENTERID'] = datacenter
 
+    def _list_machines__cost_machine(self, machine_api):
+        size = machine_api.extra.get('PLANID')
+        price = get_size_price(driver_type='compute', driver_name='linode',
+                               size_id=size)
+        return 0, price or 0
+
 
 class RackSpaceController(BaseController):
 
@@ -234,6 +268,33 @@ class RackSpaceController(BaseController):
         )
         machine_dict['can_rename'] = True
 
+    def _list_machines__cost_machine(self, machine_api):
+        # Need to get image in order to specify the OS type
+        # out of the image id.
+        instance_image = machine_api.extra.get('imageId')
+        try:
+            # FIXME: This is here to avoid circular imports.
+            from mist.core.cloud.models import CloudImage
+            os_type = CloudImage.objects.get(
+                cloud_provider=machine_api.driver.type, image_id=instance_image
+            ).os_type
+        except:
+            os_type = 'linux'
+        size = machine_api.extra.get('flavorId')
+        location = machine_api.driver.region[:3]
+        driver_name = 'rackspacenova' + location
+        price = get_size_price(driver_type='compute', driver_name=driver_name,
+                               size_id=size)
+        if price:
+            plan_price = price.get(os_type, 'linux')
+            # 730 is the number of hours per month as on
+            # https://www.rackspace.com/calculator
+            return plan_price, float(plan_price) * 730
+
+            # TODO: RackSpace mentions on
+            # https://www.rackspace.com/cloud/public-pricing
+            # there's a minimum service charge of $50/mo across all servers.
+
 
 class SoftLayerController(BaseController):
 
@@ -252,6 +313,31 @@ class SoftLayerController(BaseController):
         machine_dict['extra']['os_type'] = 'linux'
         if 'windows' in str(machine_dict['extra'].get('image', '')).lower():
             machine_dict['extra']['os_type'] = 'windows'
+
+    def _list_machines__cost_machine(self, machine_api):
+        # SoftLayer includes recurringFee on the VM metadata but
+        # this is only for the compute - CPU pricing.
+        # Other costs (ram, bandwidth, image) are included
+        # on billingItemChildren.
+
+        extra_fee = 0
+        if not machine_api.extra.get('hourlyRecurringFee'):
+            cpu_fee = float(machine_api.extra.get('recurringFee'))
+            for item in machine_api.extra.get('billingItemChildren', ()):
+                # don't calculate billing that is cancelled
+                if not item.get('cancellationDate'):
+                    extra_fee += float(item.get('recurringFee'))
+            return 0, cpu_fee + extra_fee
+        else:
+            # machine_api.extra.get('recurringFee') here will show what it has
+            # cost for the current month, up to now.
+            cpu_fee = float(machine_api.extra.get('hourlyRecurringFee'))
+            for item in machine_api.extra.get('billingItemChildren', ()):
+                # don't calculate billing that is cancelled
+                if not item.get('cancellationDate'):
+                    extra_fee += float(item.get('hourlyRecurringFee'))
+
+            return cpu_fee + extra_fee, 0
 
 
 class NephoScaleController(BaseController):
@@ -297,6 +383,16 @@ class AzureController(BaseController):
         tmp_cert_file.close()
         return get_driver(Provider.AZURE)(self.cloud.subscription_id,
                                           tmp_cert_file.name)
+
+    def _list_machines__cost_machine(self, machine_api):
+        # TODO: Get prices per location
+        os_type = machine_api.extra.get('os_type', 'linux')
+        size = machine_api.extra.get('instance_size')
+        price = get_size_price(driver_type='compute', driver_name='azure',
+                               size_id=size)
+        if price:
+            return price.get(os_type) or price.get('linux') or 0, 0
+        return 0, 0
 
     def _list_images__fetch_images(self, search=None):
         images = self.connection.list_images()
@@ -406,6 +502,56 @@ class GoogleController(BaseController):
             image.extra.pop('licenses', None)
         return images
 
+    def _list_machines__cost_machine(self, machine_api):
+        # https://cloud.google.com/compute/pricing
+        size = machine_api.extra.get('machineType')
+        # eg europe-west1-d
+        location = machine_api.extra.get('location').split('-')[0]
+        driver_name = 'google_' + location
+        price = get_size_price(driver_type='compute', driver_name=driver_name,
+                               size_id=size)
+        if not price:
+            return 0, 0
+        os_type = machine_api.extra.get('os_type')
+        if 'sles' in machine_api.image:
+            os_type = 'sles'
+        if 'rhel' in machine_api.image:
+            os_type = 'rhel'
+        if 'win' in machine_api.image:
+            os_type = 'win'
+        os_cost_per_hour = 0
+        if os_type == 'sles':
+            if size in ('f1-micro', 'g1-small'):
+                os_cost_per_hour = 0.02
+            else:
+                os_cost_per_hour = 0.11
+        if os_type == 'win':
+            if size in ('f1-micro', 'g1-small'):
+                os_cost_per_hour = 0.02
+            else:
+                cores = size.split('-')[-1]
+                os_cost_per_hour = cores * 0.04
+        if os_type == 'rhel':
+            if size in ('n1-highmem-2', 'n1-highcpu-2', 'n1-highmem-4',
+                        'n1-highcpu-4', 'f1-micro', 'g1-small',
+                        'n1-standard-1', 'n1-standard-2', 'n1-standard-4'):
+                os_cost_per_hour = 0.06
+            else:
+                os_cost_per_hour = 0.13
+
+        try:
+            if 'preemptible' in size:
+                # No monthly discount.
+                return price + os_cost_per_hour, 0
+            else:
+                # Monthly discount of 30% if the VM runs all the billing month.
+                # Monthly discount on instance size only (not on OS image).
+                return 0.7 * price + os_cost_per_hour, 0
+            # TODO: better calculate the discounts, taking under consideration
+            # when the VM has been initiated.
+        except:
+            pass
+
     def _list_sizes__fetch_sizes(self):
         sizes = self.connection.list_sizes()
         for size in sizes:
@@ -438,6 +584,12 @@ class PacketController(BaseController):
     def _list_machines__machine_creation_date(self, machine_api):
         return machine_api.extra.get('created_at')  # iso8601 string
 
+    def _list_machines__cost_machine(self, machine_api):
+        size = machine_api.extra.get('plan')
+        price = get_size_price(driver_type='compute', driver_name='packet',
+                               size_id=size)
+        return price or 0, 0
+
 
 class VultrController(BaseController):
 
@@ -448,6 +600,9 @@ class VultrController(BaseController):
 
     def _list_machines__machine_creation_date(self, machine_api):
         return machine_api.extra.get('date_created')  # iso8601 string
+
+    def _list_machines__cost_machine(self, machine_api):
+        return machine_api.extra.get('cost_per_month', 0)
 
 
 class VSphereController(BaseController):
@@ -711,4 +866,13 @@ class OtherController(BaseController):
 
     # def _connect(self):
     #     return BareMetalDriver(Machine.objects(cloud=self.cloud))
-    pass
+    # m.extra['can_reboot'] = False
+    # if machine_entry.key_associations:
+    #     m.extra['can_reboot'] = True
+    # can_start = False
+    # can_destroy = False
+    # can_stop = False
+    # can_reboot = False
+    # if extra.get('can_reboot', False):
+    # # allow reboot action for bare metal with key associated
+    #     can_reboot = True
