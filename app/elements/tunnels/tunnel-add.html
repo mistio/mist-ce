@@ -33,7 +33,19 @@
             padding-top: 16px;
             padding-bottom: 16px;
         }
-
+        :host ::content paper-radio-group {
+            margin-bottom: 16px !important;
+        }
+        :host ::content paper-radio-group:before {
+            content: "Protocol";
+            position: relative;
+            display: block;
+            color: rgba(0, 0, 0, 0.54) !important;
+            text-transform: uppercase;
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 24px;
+        }
         </style>
 
         <div id="content">
@@ -44,7 +56,7 @@
                         Add Tunnel
                     </h2>
                     <div class="subtitle">
-                        You can add tunnels to your networks by providing a list of cidrs ips.
+                        You can add tunnels to your networks by providing a list of networks in CIDR notation.
                     </div>
                 </div>
             </paper-material>
@@ -120,7 +132,7 @@
                         value: "",
                         defaultValue: "",
                         errorMessage: "Please enter tunnel's cidrs",
-                        helptext: "These are the IPv4 address ranges that Mist.io will be able to access through the tunnel",
+                        helptext: "These are the IPv4 address ranges that Mist.io will be able to access through the tunnel. Example: 172.17.3.0/24",
                         show: true,
                         required: true
                     }, {
@@ -134,6 +146,23 @@
                         show: true,
                         required: false
                     },{
+                        name: "protocol",
+                        label: "Protocol",
+                        type: "radio",
+                        value: "udp",
+                        defaultValue: "udp",
+                        errorMessage: "Please choose the VPN tunnel's underlying protocol",
+                        helptext: "Please choose the VPN tunnel's underlying protocol. This option may seem useful in case of security restrictions, such as protocol-specific, blocking firewall rules",
+                        show: true,
+                        required: false,
+                        options: [{
+                            title: "UDP",
+                            val: "udp"
+                        }, {
+                            title: "TCP",
+                            val: "tcp"
+                        }]
+                    }, {
                         name: "Αctive",
                         label: "Enabled",
                         type: "toggle",

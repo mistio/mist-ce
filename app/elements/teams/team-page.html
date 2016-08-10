@@ -2,12 +2,11 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
-<link rel="import" href="../app-togglable/app-togglable-list.html">
 
 <link rel="import" href="team-edit.html">
-<link rel="import" href="team-add.html">
 <link rel="import" href="team-policy.html">
 
 <dom-module id="team-page">
@@ -18,6 +17,10 @@
 
         :host {
             display: block;
+        }
+
+        #content {
+            padding-bottom: 180px;
         }
 
         paper-material {
@@ -169,9 +172,29 @@
         .delete-member {
             opacity: 0.32;
         }
+        .is-loading {
+            top: 15px;
+            left: 200px;
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            display: block;
+            width: 100%;
+            height: 100vh;
+            background-color: #eee;
+        }
+        .is-loading paper-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 10% auto;
+            display: block;
+        }
         </style>
 
         <div id="content">
+            <div class="is-loading" hidden$="[[!isLoading]]">
+                <paper-spinner active hidden$="[[!isLoading]]"></paper-spinner>
+            </div>
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
                 <div class="title flex">
@@ -255,11 +278,10 @@
         </div>
 
         <div class="absolute-bottom-right">
-            <paper-fab icon="add" on-tap="_addTeam"></paper-fab>
+            <paper-fab icon="add" on-tap="_addMember"></paper-fab>
         </div>
 
         <team-edit team="[[team]]" org="[[model.org]]"></team-edit>
-        <team-add></team-add>
         <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
         <iron-ajax id="deleteMember" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/members/[[memberToDelete]]" method="DELETE" on-response="_deleteMemberResponse" on-error="_deleteMemberError"></iron-ajax>
         
@@ -279,10 +301,6 @@
                     },
                     section: {
                         type: Object
-                    },
-                    color: {
-                        type: String,
-                        computed: '_getHeaderStyle(section)'
                     },
                     params: {
                         type: Object
@@ -328,6 +346,11 @@
                     memberToDelete: {
                         type: String,
                         value: null
+                    },
+                    isLoading: {
+                        type: Boolean,
+                        computed: '_computeIsloading(team)',
+                        value: true
                     }
                 },
                 listeners: {
@@ -461,9 +484,8 @@
                     }
                     dialog._openDialog();
                 },
-                _addTeam: function(e) {
-                    var dialog = this.querySelector('team-add');
-                    dialog.openDialog();
+                _computeIsloading(team) {
+                    return !this.team ? true : false;
                 }
             });
         })();
