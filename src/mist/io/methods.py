@@ -46,6 +46,7 @@ import ansible.constants
 from mist.core.tag.models import Tag
 from mist.core.cloud.models import Cloud, Machine, KeyAssociation, CloudSize, CloudImage
 from mist.core.keypair.models import Keypair
+from mist.core.cronjobs.models import UserPeriodicTask
 from mist.core import config
 # except ImportError:
 #     print "Seems to be on IO version"
@@ -2882,6 +2883,16 @@ def destroy_machine(user, cloud_id, machine_id):
         except Exception as exc:
             log.warning("Didn't manage to disable monitoring, maybe the "
                         "machine never had monitoring enabled. Error: %r", exc)
+
+    # delete cronjobs for this machine or remove it from cron.machines_per_cloud
+    crons = UserPeriodicTask.objects(owner=user)
+    for cron in crons:
+        if [cloud_id, machine_id] in cron.machines_per_cloud:
+            if len(cron.machines_per_cloud) > 1:
+                cron.machines_per_cloud.remove([cloud_id, machine_id])
+                cron.save()
+            else:
+                cron.delete()
 
     _machine_action(user, cloud_id, machine_id, 'destroy')
 
