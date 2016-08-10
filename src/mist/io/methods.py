@@ -69,6 +69,9 @@ import mist.io.inventory
 
 from mist.core.vpn.methods import destination_nat as dnat
 from mist.core.vpn.methods import super_ping
+from mist.core.vpn.methods import to_tunnel
+
+from mist.core.exceptions import VPNTunnelError
 
 
 import logging
@@ -376,6 +379,12 @@ def _add_cloud_bare_metal(user, title, provider, params):
     except NotUniqueError:
         raise CloudExistsError()
 
+    try:
+        to_tunnel(user, machine_hostname)
+    except VPNTunnelError as err:
+        Cloud.objects.get(owner=user, id=cloud.id).delete()
+        raise err
+
     machine = Machine()
     machine.cloud = cloud
     machine_hostname = sanitize_host(machine_hostname)
@@ -455,6 +464,12 @@ def _add_cloud_coreos(user, title, provider, params):
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
     except NotUniqueError:
         raise CloudExistsError()
+
+    try:
+        to_tunnel(user, machine_hostname)
+    except VPNTunnelError as err:
+        Cloud.objects.get(owner=user, id=cloud.id).delete()
+        raise err
 
     machine = Machine()
     machine.ssh_port = port
