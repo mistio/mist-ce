@@ -175,15 +175,6 @@ class DigitalOceanCloud(Cloud):
     _controller_cls = controllers.DigitalOceanController
 
 
-class DigitalOceanFirstGenCloud(Cloud):
-
-    apikey = me.StringField(required=True)
-    apisecret = me.StringField(required=True)
-
-    _private_fields = ('apisecret', )
-    _controller_cls = controllers.DigitalOceanFirstGenController
-
-
 class LinodeCloud(Cloud):
 
     apikey = me.StringField(required=True)
