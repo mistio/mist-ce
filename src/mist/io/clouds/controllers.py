@@ -851,15 +851,6 @@ class LibvirtController(BaseController):
 
 
 # FIXME
-class CoreOSController(BaseController):
-
-    provider = 'coreos'
-
-    # def _connect(self):
-    #     return CoreOSDriver(Machine.objects(cloud=self.cloud))
-
-
-# FIXME
 class OtherController(BaseController):
 
     provider = 'bare_metal'

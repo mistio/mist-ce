@@ -243,7 +243,6 @@ def add_cloud(request):
       - libvirt
       - openstack
       - vsphere
-      - coreos
       - ec2
       - rackspace
       - nephoscale

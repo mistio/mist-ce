@@ -54,7 +54,7 @@ from mist.core import config
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
-from mist.io.bare_metal import BareMetalDriver, CoreOSDriver
+from mist.io.bare_metal import BareMetalDriver
 from mist.io.helpers import check_host, sanitize_host
 from mist.io.helpers import transform_key_machine_associations
 from mist.io.exceptions import *
@@ -100,9 +100,9 @@ def add_cloud_v_2(user, title, provider, params):
     log.info("Adding new cloud in provider '%s' with Api-Version: 2", provider)
 
     # perform hostname validation if hostname is supplied
-    if provider in ['vcloud', 'bare_metal', 'docker', 'libvirt', 'openstack', 'vsphere', 'coreos']:
+    if provider in ['vcloud', 'bare_metal', 'docker', 'libvirt', 'openstack', 'vsphere']:
         hostname = ''
-        if provider in ('bare_metal', 'coreos'):
+        if provider == 'bare_metal':
             hostname = params.get('machine_ip', '')
 
         if hostname:
@@ -112,11 +112,6 @@ def add_cloud_v_2(user, title, provider, params):
 
     if provider == 'bare_metal':
         cloud_id, mon_dict = _add_cloud_bare_metal(user, title, provider, params)
-        log.info("Cloud with id '%s' added successfully.", cloud_id)
-        trigger_session_update(user, ['clouds'])
-        return {'cloud_id': cloud_id, 'monitoring': mon_dict}
-    if provider == 'coreos':
-        cloud_id, mon_dict = _add_cloud_coreos(user, title, provider, params)
         log.info("Cloud with id '%s' added successfully.", cloud_id)
         trigger_session_update(user, ['clouds'])
         return {'cloud_id': cloud_id, 'monitoring': mon_dict}
@@ -229,90 +224,6 @@ def _add_cloud_bare_metal(user, title, provider, params):
             Cloud.objects.get(owner=user, id=cloud.id).delete()
             raise MistError("Couldn't connect to host '%s'."
                             % machine_hostname)
-    if params.get('monitoring'):
-        try:
-            from mist.core.methods import enable_monitoring as _en_monitoring
-        except ImportError:
-            _en_monitoring = enable_monitoring
-        mon_dict = _en_monitoring(user, cloud.id, machine.machine_id,
-                                  no_ssh=not use_ssh)
-    else:
-        mon_dict = {}
-
-    return cloud.id, mon_dict
-
-
-def _add_cloud_coreos(user, title, provider, params):
-    remove_on_error = params.get('remove_on_error', True)
-    machine_key = params.get('machine_key', '')
-    machine_user = params.get('machine_user', '')
-    os_type = 'coreos'
-
-    try:
-        port = int(params.get('machine_port', 22))
-    except:
-        port = 22
-    machine_hostname = str(params.get('machine_ip', ''))
-
-    if not machine_hostname:
-        raise RequiredParameterMissingError('machine_ip')
-    machine_hostname = sanitize_host(machine_hostname)
-
-    use_ssh = remove_on_error and machine_key
-    if use_ssh:
-        key = Keypair.objects.get(owner=user, id=machine_key)
-        if not machine_user:
-            machine_user = 'root'
-
-    cloud = Cloud()
-    cloud.title = title
-    cloud.provider = provider
-    cloud.enabled = True
-    cloud.owner = user
-
-    try:
-        cloud.save()
-    except ValidationError as e:
-        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
-    except NotUniqueError:
-        raise CloudExistsError()
-
-    try:
-        to_tunnel(user, machine_hostname)
-    except VPNTunnelError as err:
-        Cloud.objects.get(owner=user, id=cloud.id).delete()
-        raise err
-
-    machine = Machine()
-    machine.ssh_port = port
-    if machine_hostname:
-        if is_private_subnet(socket.gethostbyname(machine_hostname)):
-            machine.private_ips = [machine_hostname]
-        else:
-            machine.dns_name = machine_hostname
-            machine.public_ips = [machine_hostname]
-    machine.machine_id = machine_hostname.replace('.', '').replace(' ', '')
-    machine.name = title
-    machine.os_type = os_type
-    machine.cloud = cloud
-    machine.save()
-    # try to connect. this will either fail and we'll delete the
-    # cloud, or it will work and it will create the association
-    if use_ssh:
-        try:
-            ssh_command(
-                user, cloud.id, machine.machine_id, machine_hostname, 'uptime',
-                key_id=machine_key, username=machine_user, password=None,
-                port=port
-            )
-        except MachineUnauthorizedError as exc:
-            Cloud.objects.get(owner=user, id=cloud.id).delete()
-            raise CloudUnauthorizedError(exc)
-        except ServiceUnavailableError as exc:
-            Cloud.objects.get(owner=user, id=cloud.id).delete()
-            raise MistError("Couldn't connect to host '%s'."
-                            % machine_hostname)
-
     if params.get('monitoring'):
         try:
             from mist.core.methods import enable_monitoring as _en_monitoring

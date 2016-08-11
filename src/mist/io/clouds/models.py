@@ -342,12 +342,6 @@ class LibvirtCloud(Cloud):
 
 
 # FIXME
-class CoreOSCloud(Cloud):
-
-    _controller_cls = controllers.CoreOSController
-
-
-# FIXME
 class OtherCloud(Cloud):
 
     _controller_cls = controllers.OtherController
