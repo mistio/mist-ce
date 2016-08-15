@@ -27,8 +27,8 @@ If you run the command erl after that and it is not found, then package erlang m
 
     sudo yum install wget -y
     wget http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
-    wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
-    sudo rpm -Uvh remi-release-7.rpm  epel-release-7-5.noarch.rpm
+    wget http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-8.noarch.rpm
+    sudo rpm -Uvh remi-release-7.rpm  epel-release-7-8.noarch.rpm
     sudo yum install erlang -y
 
 
