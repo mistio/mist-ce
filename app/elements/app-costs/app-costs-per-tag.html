@@ -156,19 +156,18 @@ Polymer({
         if (machines.base.length > 0) {
             this.model.machinesArray.forEach(function(m){
                 var mcost = m.extra.cost_per_month;
-                if (m.tags && m.tags.length){
+                if (m.tags && m.tags.length  && mcost){
                     m.tags.forEach(function(t){
                         var tagExists = tagsArray.find(function(prevt, index){
                             return prevt.key == t.key && prevt.value == t.value;
                         });
-                        if (tagExists)
-                            {
+                        if (tagExists){
                                 tagExists.count ++;
-                                tagExists.cost = tagExists.cost + Math.round(mcost) ;
+                                tagExists.cost = tagExists.cost + Math.round(parseInt(mcost));
                             }
                         else {
                             var tag = t;
-                            tag.cost = Math.round(mcost);
+                            tag.cost = Math.round(parseInt(mcost));
                             tag.count = 1;
                             tagsArray.push(tag);
                         }                        

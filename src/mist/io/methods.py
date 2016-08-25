@@ -69,6 +69,9 @@ import mist.io.inventory
 
 from mist.core.vpn.methods import destination_nat as dnat
 from mist.core.vpn.methods import super_ping
+from mist.core.vpn.methods import to_tunnel
+
+from mist.core.exceptions import VPNTunnelError
 
 
 import logging
@@ -327,7 +330,7 @@ def add_cloud_v_2(user, title, provider, params):
         key_id = params.get('machine_key')
         node_id = cloud.apiurl  # id of the hypervisor is the hostname provided
         username = cloud.apikey
-        associate_key(user, key_id, cloud_id, node_id, username=username)
+        associate_key(user, key_id, cloud_id, node_id, username=username, port=cloud.ssh_port)
 
     return {'cloud_id': cloud.id}
 
@@ -375,6 +378,12 @@ def _add_cloud_bare_metal(user, title, provider, params):
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
     except NotUniqueError:
         raise CloudExistsError()
+
+    try:
+        to_tunnel(user, machine_hostname)
+    except VPNTunnelError as err:
+        Cloud.objects.get(owner=user, id=cloud.id).delete()
+        raise err
 
     machine = Machine()
     machine.cloud = cloud
@@ -455,6 +464,12 @@ def _add_cloud_coreos(user, title, provider, params):
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
     except NotUniqueError:
         raise CloudExistsError()
+
+    try:
+        to_tunnel(user, machine_hostname)
+    except VPNTunnelError as err:
+        Cloud.objects.get(owner=user, id=cloud.id).delete()
+        raise err
 
     machine = Machine()
     machine.ssh_port = port
