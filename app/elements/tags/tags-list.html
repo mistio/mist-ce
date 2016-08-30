@@ -82,22 +82,28 @@
                 properties: {
                     resource: String,
                     model: Object,
-                    items: Array,
-                    tags: {
+                    items: {
                         type: Array,
-                        value: [],
-                        computed: '_computeTags(items)'
+                        notify: true
+                    },
+                    tags: {
+                        type: Array
                     },
                     newItems: {
                         type: Array,
                         computed: '_computeNewItems(items, tags)'
                     }
                 },
+                observers: [
+                    'selectedItemsChanged(items.splices, items.length)',
+                    '_computeTags(items)'
+                ],
                 listeners: {
                     'iron-overlay-closed': '_modalClosed',
                     'tag-delete': '_tagDeleteHandler'
                 },
                 ready: function(){
+                    this.set('tags', [])
                 },
                 _openDialog: function(e) {
                     this.querySelector('paper-dialog').open();
@@ -110,9 +116,13 @@
                         // console.log(e);
                     // }
                 },
+                selectedItemsChanged: function(items, length){
+                    this._computeTags(this.items);
+                    this._computeNewItems(this.items, this.tags);
+                },
                 _computeNewItems: function(items, tags) {
                     // var newItems = [];
-                    var newItems = items.slice();
+                    var newItems = this.items;
                     newItems.forEach(function(item) {
                         var itemType = item.split(":")[0],
                             itemCloudId = item.split(":")[1],
@@ -123,11 +133,11 @@
                             .filter(function(tag, index) {
                                 return tags.indexOf(tag) == -1;
                             });
-                        // this.tags = newTags.length ? newTags : tags;
+                        // tags = newTags.length ? newTags : tags;
                     }, this);
 
                     
-                    // console.log('_computeNewItems', newItems, tags);
+                    console.log('_computeNewItems', newItems, items, tags);
                     return newItems;
                 },
                 _computeTags: function(items) {
@@ -140,12 +150,15 @@
                         }];
                     }
 
-                    return tags;
+                    this.set('tags', tags);
                 },
                 _computeCommonTags: function(items) {
                     var tags = [];
+                    var tagsref = [];
 
-                    items.forEach(function(item) {
+                    var set = new swiftSet.Set();
+
+                    items.forEach(function(item, index) {
                         console.log('item',item);
                         var itemType = item.split(":")[0],
                             itemCloudId = item.split(":")[1],
@@ -153,20 +166,36 @@
 
                         var itemObj = this.model[itemType+'s'][itemId];
 
+                        if (index == 0) {
+                            set.clear(itemObj.tags.map(function(tag){
+                                return tag.key+'='+tag.value;
+                            }) || []);
+                        }
+                        else {
+                            set.clear(set.intersection(itemObj.tags.map(function(tag){
+                                return tag.key+'='+tag.value;
+                            }) || []));
+                        }
+
                         if (itemObj.tags) {
+
                             itemObj.tags.forEach(function(tag) {
-                                if (tags.indexOf(tag) == -1) {
+                                if (tagsref.indexOf(tag['key']) == -1) {
+                                    tagsref.push(tag['key']);
                                     tags.push(tag);
-                                    console.log('tagspush')
                                 }
                             });
+
                         } else {
                             tags = [];
-                            console.log('empty tags item.tags = []')
                         }
                     }, this);
 
-                    return tags;
+                    console.log('_computeCommonTags', tags);
+                    return set.items().map(function(item){
+                        return {key: item.split('=')[0],
+                                value: item.split('=')[1]};
+                    });
                 },
                 _addTag: function() {
                     var newTag = {
@@ -185,7 +214,7 @@
                             return tag.key;
                         }),
                         payload = [];
-
+                        console.log('_saveTags', this.newItems, this.tags);
                     payload = this.newItems.map(function(item) {
                         var itemType = item.split(":")[0],
                             itemCloudId = item.split(":")[1],

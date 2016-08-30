@@ -54,7 +54,7 @@
             paper-dialog {
                 padding: 0;
             }
-            paper-dialog > h2 {
+            :host paper-dialog > h2 {
                 text-transform: capitalize;
                 margin-top: 24px;
             }
@@ -112,7 +112,7 @@
             </div>
           </paper-dialog>
           <dialog-element></dialog-element>
-          <tags-list id="tagsdialog" items="[[selectedItems]]"></tags-list>
+          <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
         </content>
     </template>
 </dom-module>
@@ -129,8 +129,8 @@ ACTIONS = {
   'tag': {
     'name': 'tag',
     'icon': 'label',
-    'confirm': false,
-    'multi': false
+    'confirm': true,
+    'multi': true
   },
   'reboot': {
     'name': 'reboot',
@@ -301,6 +301,7 @@ Polymer({
         else {
             multiActions = actionDetails(actions.items());
         }
+        console.log('selectedItemsChanged');
         this.set('actions', multiActions);
     },
 
@@ -348,8 +349,8 @@ Polymer({
 
         item.type = item_type;
         var ret = [];
-        if (item.type == 'machine') {
-            ret.push('tag');
+        ret.push('tag');
+        if (item.type == 'machine') {            
             if (item.state == 'running') {
               // if key then add shell / run script
               // if not monitoring then enable monitoring
@@ -387,7 +388,7 @@ Polymer({
             ret.push('delete');
         } else if (item.type == 'team') {
             ret.push('delete');
-        }
+        }        
         return ret;
     },
 
@@ -498,9 +499,6 @@ Polymer({
             } else if (action.name == 'delete' && item.type == 'tunnel') {
                 uri = '/api/v1/tunnels/' + item.id;
                 method = 'DELETE';
-            } else if (action.name == 'tag') {
-                uri = '/api/v1/tags/';
-                method = 'POST';
             } else {
                 console.error('unknown action', action, 'on item', item );
             }
@@ -534,6 +532,10 @@ Polymer({
 
     _moreActions: function (actions) {
         return this.get('actions').slice(4);
+    },
+
+    computeModel: function(){
+        return document.querySelector("app-main").model;
     }
 
 });
