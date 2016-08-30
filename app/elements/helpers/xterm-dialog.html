@@ -9,7 +9,7 @@
 
 <style>
 .terminal {
-    font-family: monospace;
+    font-family: Monaco, monospace;
     font-feature-settings: "liga" 0;
     position: relative;
 }
@@ -18,8 +18,22 @@
     outline: none;
 }
 
-.terminal.xterm {
-  padding: 14px;
+.terminal .xterm-helpers {
+    position: absolute;
+    top: 0;
+}
+
+.terminal .xterm-helper-textarea {
+    position: absolute;
+    /*
+     * HACK: to fix IE's blinking cursor
+     * Move textarea out of the screen to the far left, so that the cursor is not visible.
+     */
+    left: -9999em;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    z-index: -10;
 }
 
 .terminal .terminal-cursor {
@@ -48,6 +62,41 @@
     }
 }
 
+.terminal .composition-view {
+    background: #000;
+    color: #FFF;
+    display: none;
+    position: absolute;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+.terminal .composition-view.active {
+    display: block;
+}
+
+.terminal .xterm-viewport {
+    /* On OS X this is required in order for the scroll bar to appear fully opaque */
+    overflow-y: scroll;
+}
+
+.terminal .xterm-rows {
+    position: absolute;
+    left: 0;
+    top: 0;
+    margin: 14px;
+}
+
+.terminal .xterm-scroll-area {
+    visibility: hidden;
+}
+
+.terminal .xterm-char-measure-element {
+    display: inline-block;
+    visibility: hidden;
+    position: absolute;
+    left: -9999em;
+}
 /*
  *  Determine default colors for xterm.js
  */
@@ -2130,8 +2179,10 @@
             :host {
                 display: block;
                 width: 100% !important;
-                position: absolute;
+                position: fixed;
                 z-index: 999999;
+                top: 0;
+                left: 0;
             }
 
             paper-dialog-scrollable {
@@ -2159,8 +2210,9 @@
             #terminal-container {
                 padding: 4px;
                 background-color: rgba(0,0,0,0.85) !important;
-                color: rgba(155,255,155,.8);
+                color: rgba(255,255,255,.8);
                 font-family: monospace;
+                font-weight: 700;
             }
 
             .icon-buttons {
@@ -2209,19 +2261,15 @@
                     var term = this.term,
                         terminalContainer = this.querySelector('#terminal-container');
 
-                    while (terminalContainer.children.length) {
-                        terminalContainer.removeChild(terminalContainer.children[0]);
-                    }
-
                     term.open(terminalContainer);
 
                     var termBody = terminalContainer.querySelector('.xterm'),
-                        termHeight = this.parentElement.offsetHeight - 58;
+                        termHeight = window.innerHeight - 54;
 
                     termBody.style.height = termHeight + 'px';
 
-                    var newRows = Math.floor(termHeight/21),
-                        newCols = Math.floor(terminalContainer.offsetWidth/10)-1;
+                    var newRows = Math.floor(termHeight/22) - 1,
+                        newCols = Math.floor(terminalContainer.offsetWidth/10);
 
                     console.warn('newrows', newRows);
                     console.warn('newcols', newCols);
@@ -2255,12 +2303,13 @@
                 windowResize: function(that) {
                   var terminalContainer = that.querySelector('#terminal-container'),
                       termBody = terminalContainer.querySelector('.xterm'),
-                      termHeight = that.parentElement.offsetHeight - 58;
+                      termHeight = window.innerHeight - 54;
 
-                  //termBody.style.height = termHeight + 'px';
+                  termBody.style.height = termHeight + 'px';
 
-                  var newRows = Math.floor(termHeight/21),
-                      newCols = Math.floor(terminalContainer.offsetWidth/10)-1;
+
+                  var newRows = Math.floor(termHeight/22) - 1,
+                      newCols = Math.floor(terminalContainer.offsetWidth/10);
 
                     that.term.resize(newCols, newRows);
                     document.querySelector('app-socket')
