@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
+<link rel="import" href="../tags/tags-list.html">
 
 <dom-module id="item-actions">
     <template>
@@ -111,6 +112,7 @@
             </div>
           </paper-dialog>
           <dialog-element></dialog-element>
+          <tags-list id="tagsdialog" items="[[selectedItems]]"></tags-list>
         </content>
     </template>
 </dom-module>
@@ -121,8 +123,8 @@ ACTIONS = {
   'shell': {
     'name': 'shell',
     'icon': 'vaadin-icons:terminal',
-    'confirm': false,
-    'multi': false
+    'confirm': true,
+    'multi': true
   },
   'tag': {
     'name': 'tag',
@@ -347,15 +349,13 @@ Polymer({
         item.type = item_type;
         var ret = [];
         if (item.type == 'machine') {
+            ret.push('tag');
             if (item.state == 'running') {
               // if key then add shell / run script
               // if not monitoring then enable monitoring
               ret.push('shell');
-              ret.push('tag');
               ret.push('reboot');
-            } else {
-              ret.push('tag');
-            }
+            } 
             ret.push('destroy');
         } else if (item.type == 'image') {
             if (item.star) {
@@ -398,8 +398,14 @@ Polymer({
     _selectAction: function (event, item) {
         this.set('selectedAction', event.model.item);
         this.set('multi', false);
-        if (event.model.item.confirm)
-            this.$['confirmation'].toggle();
+        if (event.model.item.confirm) {
+            if(event.model.item.name == 'tag') {
+                this.$['tagsdialog']._openDialog();
+            }
+            else {
+                this.$['confirmation'].toggle();
+            }
+        }
         else {
             var items = [];
             items.push(this.selectedItem);
@@ -411,8 +417,14 @@ Polymer({
     _selectMultiAction: function (event) {
         this.set('selectedAction', event.model.item);
         this.set('multi', true);
-        if (event.model.item.confirm)
-            this.$['confirmation'].toggle();
+        if (event.model.item.confirm){
+            if(event.model.item.name == 'tag') {
+                this.$['tagsdialog']._openDialog();
+            }
+            else {
+                this.$['confirmation'].toggle();
+            }
+        }
         else {
             var items = [];
             this.selectedItems.forEach(function(si){
@@ -486,6 +498,9 @@ Polymer({
             } else if (action.name == 'delete' && item.type == 'tunnel') {
                 uri = '/api/v1/tunnels/' + item.id;
                 method = 'DELETE';
+            } else if (action.name == 'tag') {
+                uri = '/api/v1/tags/';
+                method = 'POST';
             } else {
                 console.error('unknown action', action, 'on item', item );
             }

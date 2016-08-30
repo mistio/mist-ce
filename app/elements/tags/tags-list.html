@@ -108,20 +108,20 @@
                 },
                 _computeNewItems: function(items, tags) {
                     var newItems = items.slice();
-
                     newItems.forEach(function(item) {
                         var newTags = item.tags
                             .filter(function(tag, index) {
                                 return tags.indexOf(tag) == -1;
+                                // return tag;
                             });
-                        item.tags = newTags;
+                        item.tags = tags.concat(newTags);
                     });
 
+                    console.log('_computeNewItems', newItems, tags);
                     return newItems;
                 },
                 _computeTags: function(items) {
                     var tags = this._computeCommonTags(items);
-
                     if (!tags.length) {
                         return [{
                             key: '',
@@ -129,6 +129,7 @@
                         }];
                     }
 
+                    console.log('_computeTags', items, tags);
                     return tags;
                 },
                 _computeCommonTags: function(items) {
