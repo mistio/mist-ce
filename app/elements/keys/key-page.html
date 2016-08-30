@@ -5,6 +5,7 @@
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../item-list/item-actions.html">
 
 <link rel="import" href="key-edit.html">
 
@@ -216,10 +217,8 @@
                 <!-- <paper-material></paper-material> -->
                 <paper-material>
                     <h4 class="id">Key ID:</h4><span class="id">[[key.id]]</span>
-                    <template is="dom-if" if="[[key.tags]]">
-                        <h4 class="id tags" hidden$="[[!key.tags.length]]">
-                            Tags <span class="id">([[key.tags.length]])</span>:
-                        </h4>
+                    <template is="dom-if" if="[[tagsExist]]">
+                        <h4 class="id tags">Tags </h4>
                         <template is="dom-repeat" items="[[key.tags]]">
                             <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
                         </template>
@@ -284,7 +283,7 @@
         <key-edit key="[[key]]"></key-edit>
         <dialog-element></dialog-element>
         <paper-toast></paper-toast>
-        <tags-list resource="key"></tags-list>
+        <tags-list model="[[model]]"></tags-list>
     </template>
     <script>
         (function() {
@@ -313,7 +312,8 @@
                     },
                     key: {
                         type: Object,
-                        computed: '_computeKey(params, model.keysArray.*)'
+                        computed: '_computeKey(params, model.keysArray.*)',
+                        notify: true
                     },
                     id: {
                         type: String,
@@ -357,6 +357,15 @@
                         type: Boolean,
                         computed: '_computeIsloading(key)',
                         value: true
+                    },
+                    tagsExist: {
+                        type: Boolean,
+                        computed: '_computeTagsExist(key, key.tags.*)',
+                        value: false
+                    },
+                    itemsfortags: {
+                        type: Array,
+                        computed: 'computeTagItems(key)'
                     }
                 },
                 observers: [
@@ -387,6 +396,21 @@
                 },
                 _computeId: function(params) {
                     return params.id;
+                },
+                _computeTagsExist: function(key, tags){
+                    if (this.key.tags.length > 0 && this.key.tags[0] && this.key.tags[0]['key'] && this.key.tags[0]['key'] != "") {
+                        console.log('_computeTagsExist true');
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                },
+                computeTagItems: function(key){
+                    var arr = [];
+                    var item = itemUid(key, this.section);
+                    arr.push(item);
+                    return arr;
                 },
                 _computeKeyMachines: function(key) {
                     return key.machines;
@@ -460,7 +484,7 @@
                 _editTags: function() {
                     var el = this.querySelector('tags-list'),
                     items = [];
-                    items.push(this.key);
+                    items.push(itemUid(this.key, this.section));
                     el.items = items;
                     el._openDialog();
                 },

@@ -81,9 +81,11 @@
 
                 properties: {
                     resource: String,
+                    model: Object,
                     items: Array,
                     tags: {
                         type: Array,
+                        value: [],
                         computed: '_computeTags(items)'
                     },
                     newItems: {
@@ -95,6 +97,8 @@
                     'iron-overlay-closed': '_modalClosed',
                     'tag-delete': '_tagDeleteHandler'
                 },
+                ready: function(){
+                },
                 _openDialog: function(e) {
                     this.querySelector('paper-dialog').open();
                 },
@@ -102,26 +106,33 @@
                     this.querySelector('paper-dialog').close();
                 },
                 _modalClosed: function(e) {
-                    if (e.srcElement.id == 'tagsModal') {
-                        console.log(e);
-                    }
+                    // if (e.srcElement.id == 'tagsModal') {
+                        // console.log(e);
+                    // }
                 },
                 _computeNewItems: function(items, tags) {
+                    // var newItems = [];
                     var newItems = items.slice();
                     newItems.forEach(function(item) {
-                        var newTags = item.tags
+                        var itemType = item.split(":")[0],
+                            itemCloudId = item.split(":")[1],
+                            itemId = item.split(":")[2];
+
+                        var itemObj = this.model[itemType+'s'][itemId];
+                        var newTags = itemObj.tags
                             .filter(function(tag, index) {
                                 return tags.indexOf(tag) == -1;
-                                // return tag;
                             });
-                        item.tags = tags.concat(newTags);
-                    });
+                        // this.tags = newTags.length ? newTags : tags;
+                    }, this);
 
-                    console.log('_computeNewItems', newItems, tags);
+                    
+                    // console.log('_computeNewItems', newItems, tags);
                     return newItems;
                 },
                 _computeTags: function(items) {
                     var tags = this._computeCommonTags(items);
+                    
                     if (!tags.length) {
                         return [{
                             key: '',
@@ -129,23 +140,31 @@
                         }];
                     }
 
-                    console.log('_computeTags', items, tags);
                     return tags;
                 },
                 _computeCommonTags: function(items) {
                     var tags = [];
 
                     items.forEach(function(item) {
-                        if (item.tags) {
-                            item.tags.forEach(function(tag) {
+                        console.log('item',item);
+                        var itemType = item.split(":")[0],
+                            itemCloudId = item.split(":")[1],
+                            itemId = item.split(":")[2];
+
+                        var itemObj = this.model[itemType+'s'][itemId];
+
+                        if (itemObj.tags) {
+                            itemObj.tags.forEach(function(tag) {
                                 if (tags.indexOf(tag) == -1) {
                                     tags.push(tag);
+                                    console.log('tagspush')
                                 }
                             });
                         } else {
-                            item.tags = [];
+                            tags = [];
+                            console.log('empty tags item.tags = []')
                         }
-                    });
+                    }, this);
 
                     return tags;
                 },
@@ -168,18 +187,24 @@
                         payload = [];
 
                     payload = this.newItems.map(function(item) {
+                        var itemType = item.split(":")[0],
+                            itemCloudId = item.split(":")[1],
+                            itemId = item.split(":")[2];
+
+                        var itemObj = this.model[itemType+'s'][itemId];
+
                         var newItem = {};
 
                         newItem.resource = {
-                            type: this.resource,
-                            item_id: item.id,
-                            cloud_id: ['machine', 'image', 'network'].indexOf(this.resource) != -1 ? item.cloud.id : ''
+                            type: itemType,
+                            item_id: itemId,
+                            cloud_id: ['machine', 'image', 'network'].indexOf(itemType) != -1 ? item.cloud.id : ''
                         };
-                        newItem.tags = item.tags.concat(newTags);
+                        newItem.tags = newTags;
 
                         return newItem;
                     }, this);
-                    console.log(payload);
+                    console.log('payload',payload);
 
                     this.$.tagsAjaxRequest.body = payload;
                     this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
