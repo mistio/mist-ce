@@ -1063,7 +1063,7 @@ def delete_cloud(owner, cloud_id):
     trigger_session_update(owner, ['clouds'])
 
 
-def add_key(user, key_name, private_key):
+def add_key(user, key_name, private_key, public_key=None):
     """Adds a new key by name and returns the new key_name."""
 
     log.info("Adding key with name '%s'.", key_name)
@@ -1079,7 +1079,10 @@ def add_key(user, key_name, private_key):
     key = Keypair()
     key.private = private_key
     key.name = key_name
-    key.construct_public_from_private()
+    if public_key and public_key.startswith('ssh-rsa-cert-v01@openssh.com'):
+        key.public = public_key
+    else:
+        key.construct_public_from_private()
     if not Keypair.objects(owner=user, default=True):
         key.default = True
 

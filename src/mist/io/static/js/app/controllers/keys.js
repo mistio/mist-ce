@@ -90,7 +90,8 @@ define('app/controllers/keys', ['app/models/key', 'ember'],
                 Mist.ajax
                     .PUT('/api/v1/keys', {
                         'name': args.keyName,
-                        'priv': args.keyPrivate
+                        'priv': args.keyPrivate,
+                        'public': args.keyPublic,
                     })
                     .success(function(key) {
                         that._addKey(key);

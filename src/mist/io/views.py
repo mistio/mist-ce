@@ -440,14 +440,20 @@ def add_key(request):
       description: The private key
       required: true
       type: string
+    public:
+      description: The public key, for signed ssh keys
+      required: false
+      type: string
+
     """
     params = params_from_request(request)
     key_name = params.get('name', '')
     private_key = params.get('priv', '')
+    public_key = params.get('public', '')
 
     auth_context = auth_context_from_request(request)
     key_tags = auth_context.check_perm("key", "add", None)
-    key_name = methods.add_key(auth_context.owner, key_name, private_key)
+    key_name = methods.add_key(auth_context.owner, key_name, private_key, public_key=public_key)
 
     key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
 

@@ -56,6 +56,7 @@ define('app/controllers/key_add', ['ember'],
                 Mist.keysController.addKey({
                     keyName: this.keyName,
                     keyPrivate: this.keyPrivate,
+                    keyPublic: this.keyPublic,
                     callback: this._add,
                 });
             },
