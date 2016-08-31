@@ -120,7 +120,7 @@
                         <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
                             <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
                                 <template is="dom-repeat" items="{{field.options}}" as="option">
-                                    <paper-item value="[[option.id]]">[[option.title]] [[option.name]]</paper-item>
+                                    <paper-item value="[[option.id]]">[[showOption(option)]]</paper-item>
                                 </template>
                             </paper-menu>
                         </paper-dropdown-menu>
@@ -280,6 +280,14 @@
                 ],
                 ready: function(){
                     this.fields = [];
+                },
+                showOption: function(option){
+                    if (option.title)
+                        return option.title;
+                    if (option.name)
+                        return option.name;
+                    if (option.id)
+                        return option.id;
                 },
                 _computeShowProgress: function(sendingData) {
                     return sendingData;

@@ -151,14 +151,13 @@
                     <div class="logo xs4">
                         <iron-icon class="user-menu-icon" icon="social:person"></iron-icon>
                     </div>
-                        <div class="org xs8">
-                            <h4>[[org.name]]</h4>
-                            <div>[[user.email]]</div>
-                            <template is="dom-repeat" items="[[teams]]">
-                                <span class="current-org-teams">[[item.name]]</span>
-                            </template>
-                        </div>
-
+                    <div class="org xs8">
+                        <h4>[[org.name]]</h4>
+                        <div>[[user.email]]</div>
+                        <template is="dom-repeat" items="[[teams]]">
+                            <span class="current-org-teams">[[item.name]]</span>
+                        </template>
+                    </div>
                 </div>
                 <paper-menu>
                     <template is="dom-repeat" items="[[organizationsList]]" as="organization">
