@@ -204,7 +204,7 @@
         <iron-ajax id="scriptDeleteAjaxRequest" url="/api/v1/scripts/[[script.id]]" method="DELETE" on-response="_handleScriptDeleteAjaxResponse" on-error="_handleScriptDeleteAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
-        <tags-list resource="script"></tags-list>
+        <tags-list model="[[model]]"></tags-list>                
     </template>
     <script>
     (function() {
@@ -276,7 +276,7 @@
             _editTags: function() {
                 var el = this.querySelector('tags-list'),
                 items = [];
-                items.push(this.script);
+                items.push(itemUid(this.script, this.section));
                 el.items = items;
                 el._openDialog();
             },

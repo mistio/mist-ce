@@ -137,7 +137,6 @@
                 },
                 _computeTags: function(items) {
                     var tags = this._computeCommonTags(items);
-                    console.log('_computeTags',tags);
                     if (!tags.length) {
                         tags = [{
                             key: '',
@@ -178,10 +177,6 @@
                             tagset.addItems(isection.items());
                         }
                     }
-                    console.log('COMMON TAGS',tagset.items().map(function(item){
-                        return {key: item.split('=')[0],
-                                value: item.split('=')[1]};
-                    }));
 
                     return tagset.items().map(function(item){
                         return {key: item.split('=')[0],
