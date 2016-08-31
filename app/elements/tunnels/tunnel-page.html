@@ -9,6 +9,7 @@
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../item-list/item-actions.html">
 
 <link rel="import" href="tunnel-edit.html">
 <!-- <link rel="import" href="script-run.html"> -->
@@ -269,7 +270,7 @@ Script:</code></pre>
         <iron-ajax id="commandAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]/command" method="GET" on-response="_handleCommandAjaxRequest" handle-as="xml" on-error="_handleCommandAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
-        <tags-list resource="tunnel"></tags-list>
+        <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
     </template>
     <script>
@@ -350,7 +351,7 @@ Script:</code></pre>
             _editTags: function() {
                 var el = this.querySelector('tags-list'),
                 items = [];
-                items.push(this.tunnel);
+                items.push(itemUid(this.tunnel, this.section));
                 el.items = items;
                 el._openDialog();
             },
