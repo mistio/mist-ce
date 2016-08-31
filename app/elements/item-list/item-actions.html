@@ -217,6 +217,7 @@ Polymer({
     is: 'item-actions',
 
     properties: {
+        org: Object,
         section: Object,
         items: {
             type: Array,
@@ -487,7 +488,7 @@ Polymer({
                 method = 'DELETE';
             //teams
             } else if (action.name == 'delete' && item.type == 'team') {
-                uri = '/api/v1/teams/' + item.id;
+                uri = '/api/v1/org/'+ el.org.id +'/teams/' + item.id;
                 method = 'DELETE';
             //images
             } else if (action.name == 'star' || action.name == 'unstar' && item && item.type == 'image') {
@@ -514,7 +515,7 @@ Polymer({
                         console.error(action, 'failed');
                     }
                     if (items.length) {
-                        run();
+                        run(el);
                     }
                 }
             };
