@@ -6,6 +6,7 @@
 <link rel="import" href="../helpers/dialog-element.html">
 
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 
 <dom-module id="machine-page">
@@ -268,7 +269,7 @@
         <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
-        <tags-list resource="machine"></tags-list>
+        <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
     </template>
 </dom-module>
@@ -455,7 +456,7 @@
         _editTags: function() {
             var el = this.querySelector('tags-list'),
             items = [];
-            items.push(this.machine);
+            items.push(itemUid(this.machine, this.section));
             el.items = items;
             el._openDialog();
         },
