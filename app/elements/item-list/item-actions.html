@@ -1,8 +1,6 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
-<link rel="import" href="../helpers/dialog-element.html">
-
 <dom-module id="item-actions">
     <template>
         <style include="paper-dialog-shared-styles"></style>
@@ -35,6 +33,7 @@
                 text-align: left;
                 margin-top: 0;
                 color: #fff;
+                height: 54px;
             }
 
             div.actions .more {
@@ -62,6 +61,11 @@
             }
             paper-dialog > .btn-group {
                 margin-bottom: 16px;
+            }
+
+            paper-dialog p.item-actions {
+                max-height: 200px;
+                overflow: scroll;
             }
 
         </style>
@@ -110,7 +114,6 @@
               <paper-button dialog-confirm class="red" on-tap="_confirmAction">Proceed</paper-button>
             </div>
           </paper-dialog>
-          <dialog-element></dialog-element>
         </content>
     </template>
 </dom-module>
@@ -442,18 +445,29 @@ Polymer({
     },
 
     _performAction: function(action, items) {
-        var orgId = this.org.id;
-        var run = function() {
+        var run = function(el) {
             var uri, payload, item = items.shift(), method = 'POST';
             //machines
-            if (action.name == 'reboot') {
+            if (action.name == 'shell') {
+                console.warn('opening shell');
+                // load page import on demand.
+                el.importHref(el.resolveUrl('../helpers/xterm-dialog.html'), null, null, true);
+                var xterm = el.querySelector("xterm-dialog");
+                if (!xterm) {
+                    xterm = document.createElement("xterm-dialog");
+                    xterm.target = item;
+                    var parent = el.parentElement.parentElement;
+                    parent.insertBefore(xterm, parent.firstChild);
+                }
+                return;
+            } else if (action.name == 'reboot') {
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
                 payload = {'action': 'reboot'};
                 console.log('rebooting');
             } else if (action.name == 'destroy') {
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
                 payload = {'action': 'destroy'};
-            //templates                
+            //templates
             } else if (action.name == 'delete' && item.type == 'template') {
                 uri = '/api/v1/templates/' + item.id;
                 method = 'DELETE';
@@ -474,7 +488,7 @@ Polymer({
                 method = 'DELETE';
             //teams
             } else if (action.name == 'delete' && item.type == 'team') {
-                uri = '/api/v1/org/'+ orgId +'/teams/' + item.id;
+                uri = '/api/v1/org/'+ el.org.id +'/teams/' + item.id;
                 method = 'DELETE';
             //images
             } else if (action.name == 'star' || action.name == 'unstar' && item && item.type == 'image') {
@@ -501,7 +515,7 @@ Polymer({
                         console.error(action, 'failed');
                     }
                     if (items.length) {
-                        run();
+                        run(el);
                     }
                 }
             };
@@ -512,7 +526,7 @@ Polymer({
             xhr.send(JSON.stringify(payload));
       }
 
-      run();
+      run(this);
     },
 
     _topActions: function (actions) {
