@@ -103,7 +103,7 @@
                     'tag-delete': '_tagDeleteHandler'
                 },
                 ready: function(){
-                    this.set('tags', [])
+                    this.set('tags', []);
                 },
                 _openDialog: function(e) {
                     this.querySelector('paper-dialog').open();
@@ -131,11 +131,15 @@
                         else {
                             itemObj = this.model[itemType+'s'][itemId];
                         }
+                        
+                        if (!itemObj.tags) 
+                            itemObj.tags = [];
 
                         var newTags = itemObj.tags
                             .filter(function(tag, index) {
-                                return tags.indexOf(tag) == -1;
-                            });
+                            return tags.indexOf(tag) == -1;
+                        });    
+                        
                     }
                     return newItems;
                 },
@@ -171,6 +175,9 @@
                         else {
                             itemObj = this.model[itemType+'s'][itemId];
                         }
+
+                        if (!itemObj.tags) 
+                            itemObj.tags = [];
 
                         if (i == 0) {
                             tagset.addItems(itemObj.tags.map(function(tag){
@@ -209,7 +216,7 @@
                             return tag.key;
                         }),
                         payload = [];
-
+                    
                     payload = this.newItems.map(function(item) {
                         var itemType = item.split(":")[0],
                             itemCloudId = item.split(":")[1],
