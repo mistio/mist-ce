@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 
 <link rel="import" href="tag-item.html">
 
@@ -49,23 +50,45 @@
                 padding-left: 16px;
                 padding-right: 16px;
             }
+            #progress {
+                margin-bottom: 16px;
+                border-bottom: 1px solid #ddd;
+            }
+            #errormsg {
+                color: var(--red-color) !important;
+                padding: 16px 24px;
+            }
+            #progress paper-progress {
+                width: 100%;
+                margin: 0 auto;
+            }
+            #progress paper-progress[error]>::content #primaryProgress {
+                background-color: var(--red-color) !important;
+            }
         </style>
 
         <paper-dialog id="tagsModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
-            <h2>Tags</h2>
-            <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
+            <h2>Tags</h2>            
             <paper-dialog-scrollable>
                 <div class="tag-list">
                     <template is="dom-repeat" items="[[tags]]" as="tag">
                         <tag-item tag="[[tag]]" index=[[index]]></tag-item>
                     </template>
                 </div>
+                <div id="progress">
+                    <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
+                    <paper-progress error hidden$="[[!hasError]]"></paper-progress>
+                    <div id="errormsg" hidden$="[[!hasError]]"></div>
+                </div>
 
                 <div class="clearfix bottom-actions xs12">
                     <paper-button class="submit-btn add" on-tap="_addTag">
                         <iron-icon icon="add"></iron-icon> Add Tag</paper-button>
                     <paper-button class="submit-btn pull-right blue save" on-tap="_saveTags">Save Tags</paper-button>
+                    <paper-button class="pull-right blue-link" dialog-dismiss>Cancel</paper-button>
                 </div>
+
+
             </paper-dialog-scrollable>
         </paper-dialog>
         <paper-toast></paper-toast>
@@ -92,6 +115,14 @@
                     newItems: {
                         type: Array,
                         computed: '_computeNewItems(items, tags)'
+                    },
+                    hasError: {
+                        type: Boolean,
+                        value: false
+                    },
+                    showProgress: {
+                        type: Boolean,
+                        value: false
                     }
                 },
                 observers: [
@@ -112,6 +143,9 @@
                     this.querySelector('paper-dialog').close();
                 },
                 _modalClosed: function(e) {
+                    this.set('showProgress', false);
+                    this.set('hasError', false);
+                    this.$.errormsg.textContent = '';
                 },
                 selectedItemsChanged: function(items, length){
                     this._computeTags(this.items);
@@ -127,7 +161,7 @@
                             itemObj;
 
                         if (['machine', 'image', 'network'].indexOf(itemType) != -1 && itemCloudId)
-                            itemObj = this.model.clouds[itemCloudId].machines[itemId];
+                            itemObj = this.model.clouds[itemCloudId][itemType+'s'][itemId];
                         else {
                             itemObj = this.model[itemType+'s'][itemId];
                         }
@@ -171,7 +205,7 @@
                             itemObj; 
 
                         if (['machine', 'image', 'network'].indexOf(itemType) != -1 && itemCloudId)
-                            itemObj = this.model.clouds[itemCloudId].machines[itemId];
+                            itemObj = this.model.clouds[itemCloudId][itemType+'s'][itemId];
                         else {
                             itemObj = this.model[itemType+'s'][itemId];
                         }
@@ -216,7 +250,7 @@
                             return tag.key;
                         }),
                         payload = [];
-                    
+
                     payload = this.newItems.map(function(item) {
                         var itemType = item.split(":")[0],
                             itemCloudId = item.split(":")[1],
@@ -224,7 +258,7 @@
                             itemObj;
                         
                         if (['machine', 'image', 'network'].indexOf(itemType) != -1 && itemCloudId)
-                            itemObj = this.model.clouds[itemCloudId].machines[itemId];
+                            itemObj = this.model.clouds[itemCloudId][itemType+'s'][itemId];
                         else {
                             itemObj = this.model[itemType+'s'][itemId];
                         }
@@ -246,10 +280,20 @@
                     this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.tagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.tagsAjaxRequest.generateRequest();
+
+                    this.set('showProgress', true);
                 },
                 _handleTagsAjaxResponse: function(e) {
                     this._closeDialog();
                     this._showToast('Tags were updated!');
+                    // this.set('showProgress', false);
+                    // this.set('hasError', false);
+                },
+                _handleTagsAjaxError: function(e){
+                    console.log(e.detail.error.message);
+                    this.set('showProgress', false);
+                    this.set('hasError', true);
+                    this.$.errormsg.textContent = e.detail.error.message;
                 },
                 _showToast: function(msg) {
                     var toast = this.querySelector('paper-toast');
