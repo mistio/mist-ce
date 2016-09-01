@@ -112,10 +112,13 @@
                     tags: {
                         type: Array
                     },
-                    newItems: {
-                        type: Array,
-                        computed: '_computeNewItems(items, tags)'
+                    tagsToDelete: {
+                        type: Array
                     },
+                    // newItems: {
+                    //     type: Array,
+                    //     computed: '_computeNewItems(items, tags)'
+                    // },
                     hasError: {
                         type: Boolean,
                         value: false
@@ -134,7 +137,9 @@
                     'tag-delete': '_tagDeleteHandler'
                 },
                 ready: function(){
+                    this.set('items', []);
                     this.set('tags', []);
+                    this.set('tagsToDelete', []);
                 },
                 _openDialog: function(e) {
                     this.querySelector('paper-dialog').open();
@@ -149,34 +154,34 @@
                 },
                 selectedItemsChanged: function(items, length){
                     this._computeTags(this.items);
-                    this._computeNewItems(this.items, this.tags);
+                    // this._computeNewItems(this.items, this.tags);
                 },
-                _computeNewItems: function(items, tags) {
-                    var newItems = this.items;
-                    for (var i = 0; i < newItems.length; i++){
-                        var item = items[i],
-                            itemType = item.split(":")[0],
-                            itemCloudId = item.split(":")[1],
-                            itemId = item.split(":")[2],
-                            itemObj;
+                // _computeNewItems: function(items, tags) {
+                //     var newItems = this.items;
+                //     for (var i = 0; i < newItems.length; i++){
+                //         var item = items[i],
+                //             itemType = item.split(":")[0],
+                //             itemCloudId = item.split(":")[1],
+                //             itemId = item.split(":")[2],
+                //             itemObj;
 
-                        if (['machine', 'image', 'network'].indexOf(itemType) != -1 && itemCloudId)
-                            itemObj = this.model.clouds[itemCloudId][itemType+'s'][itemId];
-                        else {
-                            itemObj = this.model[itemType+'s'][itemId];
-                        }
+                //         if (['machine', 'image', 'network'].indexOf(itemType) != -1 && itemCloudId)
+                //             itemObj = this.model.clouds[itemCloudId][itemType+'s'][itemId];
+                //         else {
+                //             itemObj = this.model[itemType+'s'][itemId];
+                //         }
                         
-                        if (!itemObj.tags) 
-                            itemObj.tags = [];
+                //         if (!itemObj.tags) 
+                //             itemObj.tags = [];
 
-                        var newTags = itemObj.tags
-                            .filter(function(tag, index) {
-                            return tags.indexOf(tag) == -1;
-                        });    
+                //         var newTags = itemObj.tags
+                //             .filter(function(tag, index) {
+                //             return tags.indexOf(tag) == -1;
+                //         });    
                         
-                    }
-                    return newItems;
-                },
+                //     }
+                //     return newItems;
+                // },
                 _computeTags: function(items) {
                     var tags = this._computeCommonTags(items);
                     if (!tags.length) {
@@ -244,14 +249,19 @@
                     var tag = e.detail.tag,
                         index = this.tags.indexOf(tag);
                     this.splice('tags', index, 1);
+
+                    tag.op = "-";
+                    this.push('tagsToDelete', tag);
+                    console.log(this.tagsToDelete);
                 },
                 _saveTags: function() {
+                    console.log('_saveTags', this.items);
                     var newTags = this.tags.filter(function(tag) {
                             return tag.key;
                         }),
                         payload = [];
 
-                    payload = this.newItems.map(function(item) {
+                    payload = this.items.map(function(item) {
                         var itemType = item.split(":")[0],
                             itemCloudId = item.split(":")[1],
                             itemId = item.split(":")[2],
@@ -272,6 +282,13 @@
                         };
                         newItem.tags = newTags;
 
+                        console.log('newItem before',newItem);
+                        if (this.tagsToDelete.length > 0) {
+                            this.tagsToDelete.forEach(function(tag){
+                                newItem.tags.push(tag);
+                            })
+                        }
+                        console.log('newItem after',newItem);
                         return newItem;
                     }, this);
                     // console.log('payload',payload);

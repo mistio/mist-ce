@@ -151,6 +151,13 @@
             border-radius: 2px;
         }
 
+        .field.machines,
+        .field.default,
+        .field.id {
+            width: 100px;
+            min-width: 100px;
+        }
+
         .no-data {
             font-style: italic;
             padding: 15px 24px;
@@ -424,8 +431,8 @@ Polymer({
             }
             var oldSelected = that.get('selectedItems').slice(0);
             while (that.get('selectedItems.length')) {
-                that.pop('selectedItems');
-                console.log('poping 1 element');
+                var popped = that.pop('selectedItems');
+                console.log('poping 1 element', popped);
             }
             for (var i=0; i < that.items.length; i++) {
                 if (oldSelected.indexOf(that.itemUid(that.items[i]))>-1) {
