@@ -322,7 +322,8 @@ Script:</code></pre>
                 'updateSelectedScript': '_updateScript'
             },
             _updateCommandArea: function(id){
-                this.$.tunnelcommand.textContent = '';
+                console.log('_updateCommandArea');
+                this.$.tunnelscommand.textContent = '';
                 this.$.tunnelscript.textContent = '';
                 this.$.copyscript.removeAttribute('show');
                 this.$.copycurl.removeAttribute('show');
