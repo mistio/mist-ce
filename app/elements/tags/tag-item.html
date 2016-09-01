@@ -34,6 +34,9 @@
                 computed: '_computeNewIndex(index)'
             }
         },
+        listeners: {
+            'input' : '_tagChange'
+        },
         _computeNewIndex: function(index) {
             return index + 1;
         },
@@ -41,6 +44,9 @@
             this.fire('tag-delete', {
                 tag: this.tag
             });
+        },
+        _tagChange: function(e){
+            this.fire('tag-change',{tag: this.tag});
         }
     });
 </script>

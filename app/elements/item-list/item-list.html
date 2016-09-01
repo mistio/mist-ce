@@ -427,18 +427,18 @@ Polymer({
             // If some selectedItems are no longer in the items list, unselect them
             console.debug('itemsChanged');
             if (!that.selectedItems) {
-                console.log('returning');
+                // console.log('returning');
                 return;
             }
             var oldSelected = that.get('selectedItems').slice(0);
             while (that.get('selectedItems.length')) {
                 var popped = that.pop('selectedItems');
-                console.log('poping 1 element', popped);
+                // console.log('poping 1 element', popped);
             }
             for (var i=0; i < that.items.length; i++) {
                 if (oldSelected.indexOf(that.itemUid(that.items[i]))>-1) {
                   that.push('selectedItems', that.itemUid(that.items[i]));
-                  console.log('pushing back 1 element', items[i]);
+                  // console.log('pushing back 1 element', that.itemUid(that.items[i]));
                 }
             }
             // console.log('new selected', this.selectedItems);

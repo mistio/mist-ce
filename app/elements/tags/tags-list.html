@@ -115,10 +115,6 @@
                     tagsToDelete: {
                         type: Array
                     },
-                    // newItems: {
-                    //     type: Array,
-                    //     computed: '_computeNewItems(items, tags)'
-                    // },
                     hasError: {
                         type: Boolean,
                         value: false
@@ -134,7 +130,8 @@
                 ],
                 listeners: {
                     'iron-overlay-closed': '_modalClosed',
-                    'tag-delete': '_tagDeleteHandler'
+                    'tag-delete': '_tagDeleteHandler',
+                    'tag-change': '_tagUpdate'
                 },
                 ready: function(){
                     this.set('items', []);
@@ -154,34 +151,7 @@
                 },
                 selectedItemsChanged: function(items, length){
                     this._computeTags(this.items);
-                    // this._computeNewItems(this.items, this.tags);
                 },
-                // _computeNewItems: function(items, tags) {
-                //     var newItems = this.items;
-                //     for (var i = 0; i < newItems.length; i++){
-                //         var item = items[i],
-                //             itemType = item.split(":")[0],
-                //             itemCloudId = item.split(":")[1],
-                //             itemId = item.split(":")[2],
-                //             itemObj;
-
-                //         if (['machine', 'image', 'network'].indexOf(itemType) != -1 && itemCloudId)
-                //             itemObj = this.model.clouds[itemCloudId][itemType+'s'][itemId];
-                //         else {
-                //             itemObj = this.model[itemType+'s'][itemId];
-                //         }
-                        
-                //         if (!itemObj.tags) 
-                //             itemObj.tags = [];
-
-                //         var newTags = itemObj.tags
-                //             .filter(function(tag, index) {
-                //             return tags.indexOf(tag) == -1;
-                //         });    
-                        
-                //     }
-                //     return newItems;
-                // },
                 _computeTags: function(items) {
                     var tags = this._computeCommonTags(items);
                     if (!tags.length) {
@@ -194,11 +164,9 @@
                     this.set('tags', tags);
                 },
                 _computeCommonTags: function(items) {
-                    var tags = [];
-                    var tagsref = [];
-
-                    var tagset = new swiftSet.Set();
-                    var isection = new swiftSet.Set();
+                    var tags = [],
+                        tagset = new swiftSet.Set(),
+                        isection = new swiftSet.Set();
 
                     for (var i = 0; i < items.length; i++) {
 
@@ -254,6 +222,11 @@
                     this.push('tagsToDelete', tag);
                     console.log(this.tagsToDelete);
                 },
+                _tagUpdate: function(e){
+                    var tag = e.detail.tag,
+                        index = this.tags.indexOf(tag);
+                    console.log(tag, index);
+                },
                 _saveTags: function() {
                     console.log('_saveTags', this.items);
                     var newTags = this.tags.filter(function(tag) {
@@ -282,16 +255,14 @@
                         };
                         newItem.tags = newTags;
 
-                        console.log('newItem before',newItem);
                         if (this.tagsToDelete.length > 0) {
                             this.tagsToDelete.forEach(function(tag){
                                 newItem.tags.push(tag);
                             })
                         }
-                        console.log('newItem after',newItem);
                         return newItem;
                     }, this);
-                    // console.log('payload',payload);
+                    console.log('payload',payload);
 
                     this.$.tagsAjaxRequest.body = payload;
                     this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -303,8 +274,6 @@
                 _handleTagsAjaxResponse: function(e) {
                     this._closeDialog();
                     this._showToast('Tags were updated!');
-                    // this.set('showProgress', false);
-                    // this.set('hasError', false);
                 },
                 _handleTagsAjaxError: function(e){
                     console.log(e.detail.error.message);
