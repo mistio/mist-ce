@@ -26,7 +26,6 @@ try:
     from mist.core.cloud.models import Cloud, Machine
     from mist.core.keypair.models import Keypair
     from mist.core.vpn.models import Tunnel
-    from mist.core.vpn.methods import get_tunnel
     multi_user = True
 except ImportError:
     from mist.io import config
@@ -224,7 +223,7 @@ class MainConnection(MistConnection):
     def update_org(self):
         try:
             org = rbac_methods.filter_org(self.auth_context)
-        except: # Forbidden
+        except:  # Forbidden
             org = None
 
         if org:
@@ -360,24 +359,22 @@ class MainConnection(MistConnection):
                         continue
                     # machine just started running
                     self.running_machines.add(bmid)
+
                     ips = filter(lambda ip: ':' not in ip,
                                  machine.get('public_ips', []))
                     if not ips:
-                        # if not public IPs, search for private IPs with an
-                        # associated Tunnel, otherwise continue iterating over
-                        # the list of machines
+                        # if not public IPs, search for private IPs, otherwise
+                        # continue iterating over the list of machines
                         ips = filter(lambda ip: ':' not in ip,
                                      machine.get('private_ips', []))
-                        tunnel = get_tunnel(self.owner, ips[0])
-                        if not tunnel:
-                            if ips[0] not in ioconfig.EXCLUDED_PRIVATE_ADDRESSES:
-                                continue
+                        if not ips:
+                            continue
 
                     has_key = False
                     keypairs = Keypair.objects(owner=self.owner)
                     machine_obj = Machine.objects(cloud=cloud,
-                                          machine_id=machine["id"],
-                                          key_associations__not__size=0).first()
+                                                  machine_id=machine["id"],
+                                                  key_associations__not__size=0).first()
                     if machine_obj:
                         cached = tasks.ProbeSSH().smart_delay(
                             self.owner.id, cloud_id, machine['id'], ips[0]

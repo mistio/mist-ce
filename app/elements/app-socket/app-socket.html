@@ -28,9 +28,13 @@
                     isLoadingScripts: true,
                     isLoadingTemplates: true,
                     isLoadingStacks: true,
-                    isLoadingTeams: true
+                    isLoadingTeams: true,
+                    isLoadingIncidents: true
                 },
                 notify: true
+            },
+            term: {
+                type: Object
             }
         },
 
@@ -178,6 +182,15 @@
                         }, 250);
                     }
                 },
+                shell: {
+                    shell_data: function(data) {
+                        if (that.term) {
+                            that.term.write(data);
+                        } else {
+                            console.warn('received shell data from socket but the terminal is not open', data);
+                        }
+                    }
+                },
                 logs: {
                     logs: function(data) {
                         console.warn('received log entries from socket', data);
@@ -193,6 +206,7 @@
                         }
                     },
                     open_incidents: function(data) {
+                        that.set('onboarding.isLoadingIncidents', false);
                         if (DEBUG_SOCKET)
                             console.debug('got incidents', data);
                         that.set('model.incidents', data);
@@ -221,7 +235,7 @@
             this.send('h'); // reply with empty frame
         },
 
-        send: function(type, namespace, body, params) {
+        send: function(type, namespace, body, params, moreparams) {
             if (namespace == undefined)
                 namespace = 'main';
 
@@ -231,7 +245,10 @@
                 payload += ',' + body;
 
             if (params !== undefined)
-                payload += ',' + JSON.stringify([params]);
+                if (moreparams !== undefined)
+                    payload += ',' + JSON.stringify([params, moreparams]);
+                else
+                    payload += ',' + JSON.stringify([params]);
 
             this.socket.send(payload);
             if (DEBUG_SOCKET)
@@ -358,13 +375,14 @@
         },
 
         _updateOrg: function(data) {
+            this.set('onboarding.isLoadingTeams', false);
             this._updateModel('teams', data.teams);
             this._updateModel('members', data.members);
             data.teams = data.members = undefined;
             this.set('model.org', data);
         },
 
-        _updateKeys: function(data) {            
+        _updateKeys: function(data) {
             this.set('onboarding.isLoadingKeys', false);
             return this._updateModel('keys', data);
         },

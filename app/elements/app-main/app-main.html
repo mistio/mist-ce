@@ -102,6 +102,7 @@
             <iron-route path="/scripts" title="scripts" current="scripts" href="../pages/page-items.html"></iron-route>
             <iron-route path="/scripts/:id" title="script" current="scripts" href="../scripts/script-page.html"></iron-route>
             <iron-route path="/add-script" title="add script" current="scripts" href="../scripts/script-add.html"></iron-route>
+            <iron-route path="/run-script/:id" title="run script" current="scripts" href="../scripts/script-run.html"></iron-route>
 
             <!-- other -->
             <iron-route path="/my-account" title="account" current="account" href="../pages/page-account.html"></iron-route>
@@ -133,7 +134,7 @@
                 <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
                 <network-add model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
                 <!-- tunnels-->
-                <page-items model="[[model]]" sections="[[sections]]" section="[[sections.tunnels]]" items="[[model.tunnelsArray]]" onboarding="[[onboarding]]"></page-items>
+                <page-items class="tunnels" model="[[model]]" sections="[[sections]]" section="[[sections.tunnels]]" items="[[model.tunnelsArray]]" onboarding="[[onboarding]]"></page-items>
                 <tunnel-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.tunnels]]"></tunnel-page>
                 <tunnel-add model="[[model]]" sections="[[sections]]" section="[[sections.tunnels]]"></tunnel-add>
                 <!-- templates -->
@@ -151,9 +152,10 @@
                 <members-add model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></members-add>
                 <member-add-in-teams model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-add-in-teams>
                 <!-- scripts - leave scipts last due to editors highlighting problem -->
-                <page-items model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]" onboarding="[[onboarding]]"></page-items>
+                <page-items class="scripts" model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]" onboarding="[[onboarding]]"></page-items>
                 <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
                 <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
+                <script-run model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-run>
 
                 <page-account user="[[model.user]]"></page-account>
 
@@ -504,7 +506,7 @@
                 document.querySelector('#query').value = '';
                 var page = this.querySelector('iron-pages').selectedItem;
                 var section = page['section'];
-                if (section.id) {
+                if (section && section.id) {
                     var q = this.get('sections.'+section.id+'.q');
                     document.querySelector('#query').value = q;
                 }

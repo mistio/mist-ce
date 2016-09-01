@@ -69,6 +69,9 @@ import mist.io.inventory
 
 from mist.core.vpn.methods import destination_nat as dnat
 from mist.core.vpn.methods import super_ping
+from mist.core.vpn.methods import to_tunnel
+
+from mist.core.exceptions import VPNTunnelError
 
 
 import logging
@@ -327,7 +330,7 @@ def add_cloud_v_2(user, title, provider, params):
         key_id = params.get('machine_key')
         node_id = cloud.apiurl  # id of the hypervisor is the hostname provided
         username = cloud.apikey
-        associate_key(user, key_id, cloud_id, node_id, username=username)
+        associate_key(user, key_id, cloud_id, node_id, username=username, port=cloud.ssh_port)
 
     return {'cloud_id': cloud.id}
 
@@ -375,6 +378,12 @@ def _add_cloud_bare_metal(user, title, provider, params):
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
     except NotUniqueError:
         raise CloudExistsError()
+
+    try:
+        to_tunnel(user, machine_hostname)
+    except VPNTunnelError as err:
+        Cloud.objects.get(owner=user, id=cloud.id).delete()
+        raise err
 
     machine = Machine()
     machine.cloud = cloud
@@ -455,6 +464,12 @@ def _add_cloud_coreos(user, title, provider, params):
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
     except NotUniqueError:
         raise CloudExistsError()
+
+    try:
+        to_tunnel(user, machine_hostname)
+    except VPNTunnelError as err:
+        Cloud.objects.get(owner=user, id=cloud.id).delete()
+        raise err
 
     machine = Machine()
     machine.ssh_port = port
@@ -1342,7 +1357,7 @@ def connect_provider(cloud):
     elif cloud.provider == Provider.GCE:
         conn = driver(cloud.apikey, cloud.apisecret, project=cloud.tenant_name)
     elif cloud.provider == Provider.DOCKER:
-        docker_host, docker_port = dnat(cloud.owner, cloud.apiurl, cloud.docker_port)
+        host, port = dnat(cloud.owner, cloud.apiurl, cloud.docker_port)
         if cloud.key_file and cloud.cert_file:
             # tls auth, needs to pass the key and cert as files
             key_temp_file = NamedTemporaryFile(delete=False)
@@ -1356,20 +1371,22 @@ def connect_provider(cloud):
                 ca_cert_temp_file = NamedTemporaryFile(delete=False)
                 ca_cert_temp_file.write(cloud.ca_cert_file)
                 ca_cert_temp_file.close()
-                conn = driver(host=docker_host,
-                              port=docker_port,
+                conn = driver(host=host,
+                              docker_host=cloud.apiurl,
+                              port=port,
                               key_file=key_temp_file.name,
                               cert_file=cert_temp_file.name,
                               ca_cert=ca_cert_temp_file.name,
                               verify_match_hostname=False)
             else:
-                conn = driver(host=docker_host,
-                              port=docker_port,
+                conn = driver(host=host,
+                              docker_host=cloud.apiurl,
+                              port=port,
                               key_file=key_temp_file.name,
                               cert_file=cert_temp_file.name,
                               verify_match_hostname=False)
         else:
-            conn = driver(cloud.apikey, cloud.apisecret, docker_host, docker_port)
+            conn = driver(cloud.apikey, cloud.apisecret, host, port, docker_host=cloud.apiurl)
     elif cloud.provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
         conn = driver(cloud.apikey, cloud.apisecret, region=cloud.region)
     elif cloud.provider in [Provider.NEPHOSCALE, Provider.SOFTLAYER]:
@@ -2784,7 +2801,11 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                 conn.destroy_node(machine)
             else:
                 machine.destroy()
-            Machine.objects(cloud=cloud, machine_id=machine_id).delete()
+            machine_in_db = Machine.objects.get(cloud=cloud, machine_id=machine_id)
+            # remove any existing key associations
+            while machine_in_db.key_associations:
+                machine_in_db.key_associations.pop()
+            machine_in_db.save()
 
     except AttributeError:
         raise BadRequestError("Action %s not supported for this machine"

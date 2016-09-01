@@ -3,6 +3,8 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
 <!-- needed for the forms' inputs -->
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
@@ -117,8 +119,8 @@
                     <template is="dom-if" if="[[_computeFieldType(field, 'mist_dropdown', field.show)]]">
                         <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
                             <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
-                                <template is="dom-repeat" items="[[field.options]]" as="option">
-                                    <paper-item value="[[option.id]]">[[option.title]] [[option.name]]</paper-item>
+                                <template is="dom-repeat" items="{{field.options}}" as="option">
+                                    <paper-item value="[[option.id]]">[[showOption(option)]]</paper-item>
                                 </template>
                             </paper-menu>
                         </paper-dropdown-menu>
@@ -241,7 +243,6 @@
                     },
                     fields: {
                         type: Array,
-                        value: [],
                         notify: true
                     },
                     method: {
@@ -277,11 +278,22 @@
                 observers: [
                     '_fieldsChanged(fields.*, sendingData)',
                 ],
+                ready: function(){
+                    this.fields = [];
+                },
+                showOption: function(option){
+                    if (option.title)
+                        return option.title;
+                    if (option.name)
+                        return option.name;
+                    if (option.id)
+                        return option.id;
+                },
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
                 },
                 _computeFieldType: function(field, value, show) {
-                        return field.type == value;
+                    return field.type == value;
                 },
                 _handleRequest: function(e) {
                     this.fire("request", e.detail)
@@ -314,6 +326,7 @@
 
                         // Update show field flag after calculating dependencies
                         fields.base.forEach(function(el, index) {
+                            // if field has a dependency
                             if (el.showIf) {
 
                                 dependency = form[el.showIf.fieldName];
@@ -343,16 +356,13 @@
 
                                 this.set('fields.' + index + '.show', show);
 
-                                if (!show && reset) {
-                                    // this._resetField(el, index);
-                                } else {
-                                    if(el.type == "ip_textarea") {
-                                        var cidrsArray = el.value.split('\n');
-                                        this.set('form.' + el.name, cidrsArray);
-                                    }
-                                    else {
-                                        this.set('form.' + el.name, el.value);
-                                    }
+                                // update form values regardless of el.show
+                                if(el.type == "ip_textarea") {
+                                    var cidrsArray = el.value.split('\n');
+                                    this.set('form.' + el.name, cidrsArray);
+                                }
+                                else {
+                                    this.set('form.' + el.name, el.value);
                                 }
                             } else {
                                 if(el.type == "ip_textarea") {
@@ -363,6 +373,17 @@
                                     this.set('form.' + el.name, el.value);
                                 }
                             }
+
+                            // if field is a dependency of another field
+                            this.fields.forEach(function(depel, index) {
+                                if (depel.showIf && 
+                                    depel.showIf.fieldName != 'yaml_or_form' && 
+                                    depel.showIf.fieldName == el.name){
+                                        if (depel.options){
+                                            this.set('fields.' + index + '.options', depel.options);
+                                        }
+                                }
+                            }, this);
 
                             if (el.placeholderIf) {
                                 dependency = form[el.placeholderIf.fieldName];
@@ -382,22 +403,37 @@
                         this.set('form', form);
                         this.set('formReady', valid && !sendingData);
                     });
+
+                    //console
+                    // for (var p in this.form){
+                    //     console.log('f ', p, this.form[p]);
+                    // }
+                    // console.log(this.form.stackinputs);
                 },
                 _submitForm: function() {
                     var payload;
 
                     if (this.workflow) {
+                        var inps = YAML.parse(this.form.stackinputs);
+                        for (var p in inps) {
+                            if (p.startsWith('mist_location'))
+                            {
+                                inps[p] = inps[p].toString();
+                            }
+                        }
+
                         payload = {
                             deploy: this.form.deploy,
                             name: this.form.name,
                             template_id: this.templateid,
                             description: this.form.description,
                             workflow: this.workflow,
-                            inputs: YAML.parse(this.form.stackinputs)
+                            inputs: inps
                         }
                     } else {
                         payload = this.form;
                     }
+                    // console.log('Payload',payload);
 
                     this.$.formAjax.headers["Content-Type"] = 'application/json';
                     this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;

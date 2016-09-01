@@ -133,7 +133,7 @@
             font-weight: 600;
         }
 
-        .field.field0 {
+        .field.name {
             min-width: 250px;
         }
 
@@ -141,6 +141,20 @@
             min-width: 150px;
             margin-right: 17px;
             margin-left: 7px;
+        }
+        .field.state,        
+        /*.field.create_date,*/
+        .field.cloud,
+        .field.size,
+        .field.image,
+        .field.id {
+            width: 100px;
+            min-width: 100px;
+        }
+
+        .field.cost {
+            width: 70px;
+            min-width: 70px;
         }
 
         .tag {
@@ -238,7 +252,7 @@
                   </paper-dropdown-menu>[[_isSortedBy(sortBy, sortBy, sortOrder)]]
               </div>
             </template>
-            <item-actions id="actions" items="[[items]]" selected-items="[[selectedItems]]" section="[[section]]"></item-actions>
+            <item-actions id="actions" items="[[items]]" selected-items="[[selectedItems]]" section="[[section]]" org="[[org]]"></item-actions>
         </div>
         <div class="row no-data" hidden$="[[items.length]]">
             no data yet
@@ -272,6 +286,7 @@ Polymer({
     is: 'item-list',
 
     properties: {
+        org: Object,
         items: {
             type: Array,
             value: []
@@ -556,12 +571,13 @@ Polymer({
     _openItemActions: function (e) {
         var actionsItem = this.$.actions;
         var bodyRect = document.body.getBoundingClientRect(),
-            elemRect = event.srcElement.tagName == 'PAPER-BUTTON' ?
-                          event.srcElement.getBoundingClientRect() :
-                          event.srcElement.parentNode.getBoundingClientRect(),
-            offset   = elemRect.top - bodyRect.top;
+            elemRect =  e.target.tagName == 'PAPER-BUTTON' ?
+                        e.target.getBoundingClientRect() :
+                        e.target.parentNode.getBoundingClientRect(),
+            offsetTop   = elemRect.top - bodyRect.top,
+            offsetRight   = elemRect.right - bodyRect.right;
         e.model.item.type = e.model.item.type || (this.section && this.section.id.slice(0,-1));
-        actionsItem.openItemActions(e.model.item, offset - 23);
+        actionsItem.openItemActions(e.model.item, offsetTop, - offsetRight);
     },
 
     _computeItemImage: function (item) {

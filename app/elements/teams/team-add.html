@@ -1,5 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="team-add">
     <template>
@@ -12,6 +17,10 @@
             paper-button.blue {
                 margin-right: 0;
             }
+            paper-toggle-button {
+                display: block;
+                float: left;
+            }
         </style>
 
         <paper-dialog id="teamAddModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
@@ -21,7 +30,10 @@
                     <paper-input id="name" label="Name" error-message="Please enter team's name" value="{{newTeam.name}}"></paper-input>
                 </p>
                 <p>
-                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter team's description" value="{{newTeam.description}}"></paper-textarea>
+                    <paper-textarea id="description" label="Description (optional)" rows="3" max-rows="5" error-message="Please enter team's description" value="{{newTeam.description}}"></paper-textarea>
+                </p>
+                <p>
+                    <paper-toggle-button id="visible" label="Visible" checked="{{newTeam.visible}}"></paper-toggle-button> Visible to members not in the team.
                 </p>
                 <div class="clearfix btn-group">
                     <paper-button class="blue-link" dialog-dismiss>Cancel</paper-button>
@@ -47,7 +59,8 @@
                         type: Object,
                         value: {
                             name: '',
-                            description: ''
+                            description: '',
+                            visible: true
                         },
                     },
                     organization: {
@@ -102,7 +115,8 @@
                     this.$.teamAddAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.teamAddAjaxRequest.body = {
                         name: this.newTeam.name,
-                        description: this.newTeam.description
+                        description: this.newTeam.description,
+                        visible: this.newTeam.visible
                     };
                     this.$.teamAddAjaxRequest.generateRequest();
 
@@ -133,6 +147,7 @@
                 _formReset: function() {
                     this.set('newTeam.name', '');
                     this.set('newTeam.description', '');
+                    this.set('newTeam.visible', true);
                 }
             });
         })();

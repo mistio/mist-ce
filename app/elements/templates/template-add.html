@@ -72,12 +72,12 @@
     <script>
     var defaultTemplatesJS = [
         {
-            name: 'Mist Cloudify Kubernetes Cluster Example',
-            description: 'This template contains a blueprint for installing a kubernetes cluster through mist.io.The aforementioned kubernetes cluster consists of: a kubernetes master and a kubernetes minion (worker)',
+            name: 'Kubernetes blueprint',
+            description: 'This template contains a cloud agnostic blueprint to deploy Kubernetes cluster through mist.io',
             exec_type: "cloudify",
             location_type: "github",
             template_github: "https://github.com/mistio/kubernetes-blueprint",
-            entrypoint: "kubernetes-blueprint.yaml"   
+            entrypoint: "blueprint.yaml"   
         }
     ];
 
@@ -251,6 +251,7 @@
                 },
                 ready: function(){
                     this.defaultTemplates = defaultTemplatesJS;
+                    this._resetForm();
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
@@ -271,6 +272,7 @@
                 },
                 _resetForm: function(e) {
                     // Reset template
+                    this.set('selected', -1);
                     this.set('template.name', '');
                     this.set('template.source', '');
                     this.set('template.url', '');
@@ -298,7 +300,7 @@
                 useCatalogueTemplate: function(selected){
                     this.fields.forEach(function(f, index){
                         var key = f.name;
-                        if (this.defaultTemplates[selected][key])
+                        if (selected > -1 && this.defaultTemplates[selected][key])
                             this.set('fields.'+index+'.value', this.defaultTemplates[selected][key]);
                     }, this);
                 },

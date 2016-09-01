@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../app-togglable/app-togglable-list.html">
@@ -187,6 +188,23 @@
             .width100 {
                 width: 100%;
             }
+            .is-loading {
+                top: 15px;
+                left: 200px;
+                position: fixed;
+                right: 0;
+                bottom: 0;
+                display: block;
+                width: 100%;
+                height: 100vh;
+                background-color: #eee;
+            }
+            .is-loading paper-spinner {
+                width: 80px;
+                height: 80px;
+                margin: 10% auto;
+                display: block;
+            }
             /* TODO: better */
             .tag {
                 padding: 0.5em;
@@ -196,6 +214,9 @@
 
 
         <div id="content">
+            <div class="is-loading" hidden$="[[!isLoading]]">
+                <paper-spinner active hidden$="[[!isLoading]]"></paper-spinner>
+            </div>
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
                 <div class="title flex">
@@ -313,7 +334,7 @@
                             <template is="dom-if" if="[[template.template]]">
                                 <div class="info-item flex-horizontal-with-ratios" hidden$="[[isInline]]">
                                     <div class="flexchild">Template</div>
-                                    <div class$="flexchild">
+                                    <div class="flexchild">
                                         <a href="[[template.template]]" class="blue-link regular" target="_blank">
                                             [[template.template]]
                                         </a>
@@ -405,7 +426,7 @@
                     },
                     hasStacks: {
                         type: Boolean,
-                        computed: '_computeHasStacks(stacks.*)'
+                        computed: '_computeHasStacks(stacks.*, model.stacksArray.*, template.id)'
                     },
                     isInline: {
                         type: Boolean,
@@ -423,6 +444,11 @@
                         type: Boolean,
                         value: true
                     },
+                    isLoading: {
+                        type: Boolean,
+                        computed: '_computeIsloading(template)',
+                        value: true
+                    },
                     vpHeight: String
                 },
                 listeners: {
@@ -438,8 +464,8 @@
                         timeZoneName: 'short'
                     });
                 },
-                _hasStacks: function(stacks) {
-                    return stacks.base.length > 0;
+                _computeHasStacks: function(stacks) {
+                    return this.stacks.length > 0;
                 },
                 _computeTemplate: function(templateid, templates) {
                     return templates.base[templateid];
@@ -448,9 +474,9 @@
                     return source == 'inline';
                 },
                 _computeStacks: function(templateid, stacks) {
-                    return stacks.base.filter(function(stack) {
-                        return stack.template == templateid;
-                    });
+                    return this.model.stacksArray.filter(function(stack) {
+                        return stack.template == this.template.id;
+                    }, this);
                 },
                 _class: function(isinline) {
                     return isinline ? "command-container" : "";
@@ -503,6 +529,9 @@
                     [].forEach.call(els, function(el, index) {
                         el.open = true;
                     });
+                },
+                _computeIsloading(template) {
+                    return !this.template ? true : false;
                 }
             });
         })();
