@@ -315,14 +315,13 @@ Script:</code></pre>
                 }
             },
             observers: [
-                "_updateCommandArea(tunnel.id)"
+                "_clearCommandArea(tunnel.id)"
             ],
             listeners: {
                 'confirmation': '_deleteTunnelEventResponse',
                 'updateSelectedScript': '_updateScript'
             },
-            _updateCommandArea: function(id){
-                console.log('_updateCommandArea');
+            _clearCommandArea: function(id){
                 this.$.tunnelscommand.textContent = '';
                 this.$.tunnelscript.textContent = '';
                 this.$.copyscript.removeAttribute('show');
