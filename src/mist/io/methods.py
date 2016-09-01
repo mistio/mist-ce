@@ -1833,9 +1833,6 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
             # signed ssh key, return the public key to deploy
             public_key = key.construct_public_from_private(return_key=True)
     else:
-        key.construct_public_from_private()
-
-    else:
         public_key = None
 
     size = NodeSize(size_id, name=size_name, ram='', disk=disk,
