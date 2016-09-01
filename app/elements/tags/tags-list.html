@@ -145,6 +145,7 @@
                     this.querySelector('paper-dialog').close();
                 },
                 _modalClosed: function(e) {
+                    this.set('tagsToDelete', []);
                     this.set('showProgress', false);
                     this.set('hasError', false);
                     this.$.errormsg.textContent = '';
@@ -223,12 +224,20 @@
                     console.log(this.tagsToDelete);
                 },
                 _tagUpdate: function(e){
-                    var tag = e.detail.tag,
-                        index = this.tags.indexOf(tag);
-                    console.log(tag, index);
+                    // this._tagDeleteHandler(e);
+                    console.log(e.detail);
+
+                    var oldTag = e.detail.oldTag;
+                    var newTag = e.detail.newTag;
+
+                    //move old tag to tags to delete
+                    if (oldTag.key != newTag.key){
+                        oldTag.op = "-";
+                        this.push('tagsToDelete', oldTag);
+                    }
                 },
                 _saveTags: function() {
-                    console.log('_saveTags', this.items);
+                    // console.log('_saveTags', this.items);
                     var newTags = this.tags.filter(function(tag) {
                             return tag.key;
                         }),
