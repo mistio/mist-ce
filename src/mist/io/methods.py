@@ -1829,6 +1829,12 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     if key:
         private_key = key.private
         public_key = key.public
+        if public_key.startswith('ssh-rsa-cert-v01@openssh.com'):
+            # signed ssh key, return the public key to deploy
+            public_key = key.construct_public_from_private(return_key=True)
+    else:
+        key.construct_public_from_private()
+
     else:
         public_key = None
 
