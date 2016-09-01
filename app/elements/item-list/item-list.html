@@ -280,12 +280,10 @@ Polymer({
 
     properties: {
         items: {
-            type: Array,
-            value: []
+            type: Array
         },
         selectedItems: {
             type: Array,
-            value: [],
             notify: true
         },
         allselected: {
@@ -358,15 +356,18 @@ Polymer({
 
     listeners: {
         'selected-of-current-section-length' : 'updateNumber'
+        // 'list-selection' : 'itemsChanged'
     },
 
     observers: [
-      'itemsChanged(items.splices)',
+      'itemsChanged(items.*)',
     ],
     updateNumber: function(e){
         this.set('currentSelectedItems', e.detail.itemLength);
     },
     ready: function() {
+        this.set('items', []);
+        this.set('selectedItems', []);
         var topOfset = 142;
         var wh = window.innerHeight - topOfset;
         var itemHeight = 65;
@@ -397,7 +398,7 @@ Polymer({
         }, 300);
     },
     _icon: function(sortOrder){
-        console.log(this.sortOrder);
+        // console.log(this.sortOrder);
         if (this.sortOrder){
             return 'icons:arrow-upward'
         }
@@ -405,7 +406,7 @@ Polymer({
             return 'icons:arrow-downward'
         }
     },
-    itemsChanged: function (changeRecord) {
+    itemsChanged: function (changeRecord) {    
         var that = this;
         // update height of list depending on number of items
         var topOfset = 142;
@@ -437,9 +438,11 @@ Polymer({
             for (var i=0; i < that.items.length; i++) {
                 if (oldSelected.indexOf(that.itemUid(that.items[i]))>-1) {
                   that.push('selectedItems', that.itemUid(that.items[i]));
-                  console.log('pushing back 1 element');
+                  console.log('pushing back 1 element', items[i]);
                 }
             }
+            // console.log('new selected', this.selectedItems);
+
             if (that.get('items.length') != that.get('selectedItems.length'))
                 that.set('allselected', false);
 
