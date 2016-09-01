@@ -85,7 +85,7 @@ class ParamikoShell(object):
         if username:
             self.connect(username, key, password, port)
 
-    def connect(self, username, key=None, password=None, port=22):
+    def connect(self, username, key=None, password=None, cert_file=None, port=22):
         """Initialize an SSH connection.
 
         Tries to connect and configure self. If only password is provided, it
@@ -102,7 +102,11 @@ class ParamikoShell(object):
             raise RequiredParameterMissingError("neither key nor password "
                                                 "provided.")
         if key:
-            rsa_key = paramiko.RSAKey.from_private_key(StringIO(key))
+            if self.cert_file and self.cert_file.startswith('ssh-rsa-cert-v01@openssh.com'):
+                rsa_key = paramiko.RSACert(privkey_file_obj=StringIO(key),
+                       cert_file_obj=StringIO(cert_file))
+            else:
+                rsa_key = paramiko.RSAKey.from_private_key(StringIO(key))
         else:
             rsa_key = None
 
