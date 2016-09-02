@@ -79,7 +79,7 @@
             cursor: pointer;
         }
         .add .index {
-            padding: 12px;
+            padding: 16px 24px;
         }
         .bottom-actions {
             display: flex;
@@ -166,9 +166,15 @@
             font-size: 0.9em;
             opacity: 0.54;
             padding-left: 40px;
+            flex: 2;
         }
         .notice iron-icon {
             opacity: 0.6;
+        }
+        @media (max-width: 1121px) {
+            paper-dropdown-menu {
+                width: 150px;
+            }
         }
         @media (max-width: 1380px) { 
             .rule > span {
@@ -312,12 +318,10 @@
                     type: Array
                 },
                 sendingData: {
-                    type: Boolean,
-                    value: false  
+                    type: Boolean
                 },
                 formError: {
-                    type: Boolean,
-                    value: false  
+                    type: Boolean
                 },
                 newOrder: {
                     type: Array,
@@ -353,7 +357,11 @@
                 'update-rtags': '_updateRtags',
                 'update-rid': '_updateRid'
 
-            },            
+            },
+            ready: function(){
+                this.set('sendingData', false);
+                this.set('formError', false);
+            },
             attached: function(){
                 var el = document.getElementById('rules');
                 var sortable = Sortable.create(el, {
@@ -390,9 +398,7 @@
                 var newString = initialOp.slice(0);
                 this.set("defaultOperator", newString);
 
-                // copy the rules array to a new array by .slice(0)
-                // var initial = this.team.policy.rules;
-                // var newArr = initial.slice(0);
+                // copy the rules array to a new array by
                 // clean copy of items
                 var newArr = [];
                 this.team.policy.rules.forEach(function(rule, i){
