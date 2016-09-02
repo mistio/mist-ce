@@ -1714,8 +1714,8 @@ def list_machines(user, cloud_id):
         all_tags = tags_from_provider
 
         try:
-            from mist.core.methods import get_machine_tags
-            mistio_tags = get_machine_tags(user, cloud_id, m.id)
+            from mist.core.tag.methods import get_tags_for_resource
+            mistio_tags = get_tags_for_resource(user, machine_entry)
         except:
             mistio_tags = {}
 
