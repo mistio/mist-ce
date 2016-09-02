@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
 
@@ -22,18 +23,25 @@
                 background-color: var(--mist-blue);
                 color: #fff;
             }
+            paper-toggle-button {
+                display: block;
+                float: left;
+            }
         </style>
 
         <paper-dialog id="editTeamModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
-            <h2>Rename Team</h2>
-            <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
+            <h2>Edit Team</h2>
             <paper-dialog-scrollable>
                 <p>
                     <paper-input id="name" label="Name" required error-message="Please enter team's name" value="{{newTeam.name}}"></paper-input>
-                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter team's description" value="{{newTeam.description}}"></paper-textarea>
+                    <paper-textarea id="description" label="Description (optional)" rows="3" max-rows="5" error-message="Please enter team's description" value="{{newTeam.description}}"></paper-textarea>
+                </p>
+                <p>
+                    <paper-toggle-button id="visible" label="Visible" checked="{{newTeam.visible}}"></paper-toggle-button> Visible to members not in the team.
                 </p>
                 <div class="clearfix btn-group">
-                <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                    <paper-button class="blue-link" dialog-dismiss>Cancel</paper-button>
+                    <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
@@ -57,7 +65,6 @@
                     },
                     newTeam: {
                         type: Object,
-                        computed: '_computeNewTeam(team)',
                         notify: true
                     },
                     sendingData: {
@@ -69,14 +76,26 @@
                         computed: '_computeFormReady(newTeam.name, sendingData)'
                     }
                 },
+                observers: [
+                    '_computeNewTeam(team)'
+                ],
                 listeners: {
                     'iron-overlay-closed': '_modalClosed'
                 },
                 _computeNewTeam: function(team) {
-                    return {
-                        name: team.name,
-                        description: team.description
-                    };
+                    var newTeam = {};
+
+                    for(var p in team) {
+                        if (typeof team[p] == 'string'){
+                            var initial = team[p];
+                            var str = initial.slice(0);
+                            newTeam[p] = str;
+                        }
+                        if (typeof team[p] == 'boolean'){
+                            newTeam[p] = team[p] ? true : false;   
+                        }
+                    }
+                    this.set('newTeam', newTeam);
                 },
                 _computeFormReady: function(id, sendingData) {
                     var formReady = false;
@@ -101,22 +120,30 @@
                     this._formReset();
                 },
                 _submitForm: function(e) {
-                    // this.fire('updateSelectedTeam', {
-                    //     team: this.team
-                    // });
-
                     this.$.teamEditAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.teamEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.teamEditAjaxRequest.body = {
                         'new_name': this.newTeam.name,
-                        'new_description': this.newTeam.description
+                        'new_description': this.newTeam.description,
+                        'new_visible': this.newTeam.visible
                     };
                     this.$.teamEditAjaxRequest.generateRequest();
 
                     this.set('sendingData', true);
                 },
                 _formReset: function() {
-                    //   this.set('team.id', '');
+                    var newTeam = {};
+                    for(var p in this.team) {
+                        if (typeof this.team[p] == 'string'){
+                            var initial = this.team[p];
+                            var str = initial.slice(0);
+                            newTeam[p] = str;
+                        }
+                        if (typeof this.team[p] == 'boolean'){
+                            newTeam[p] = this.team[p] ? true : false;   
+                        }
+                    }
+                    this.set('newTeam', newTeam);
                 },
                 _handleTeamEditAjaxResponse: function(e) {
                     this.set('sendingData', false);

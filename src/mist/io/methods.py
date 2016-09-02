@@ -4687,7 +4687,7 @@ def machine_create_date(m):
         create_date = iso8601.parse_date(create_date)
     elif m.driver.type == Provider.DOCKER:
         create_date = m.created_at
-        create_date = datetime.fromtimestamp(create_date / 1e3)
+        create_date = datetime.fromtimestamp(create_date)
     else:
         return None, None
 

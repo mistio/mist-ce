@@ -770,6 +770,7 @@
                     'iron-activate': '_handleInterval'
                 },
                 ready: function(){
+                    this.set('job', {});
                 },
                 attached: function(){
                 },
@@ -785,15 +786,6 @@
                     
                 },
                 jobFinished: function(finished_at){
-                    //update logs one last time
-                    // this._updateLogs(this);
-                    if (this.stack && this.stack.status == 'workflow_started' || this.stack.status == 'start_creation'){
-                        var that = this;
-                        this.async(function(){
-                            that.$.getJobLog.generateRequest();
-                        },5000);
-                        
-                    }
                     //clear interval
                     if (this.job && this.job.finished_at > 0 && this.intervalID){
                         window.clearInterval(this.intervalID);
@@ -810,7 +802,6 @@
                 },
                 _computeStack: function(params) {
                     var stack = {};
-                        this.job = {};
                     if (params.id)
                         stack = this.model.stacks[params.id];
 
@@ -839,6 +830,10 @@
                     return stack.status == 'start_creation';
                 },
                 is_error: function(stack) {
+                    //update logs once to view the error
+                    if (this.job && stack.status == 'error'){
+                        this.$.getJobLog.generateRequest();
+                    }
                     return stack.status == 'error';
                 },
                 is_workflow_started: function(stack) {
