@@ -1714,9 +1714,13 @@ def list_machines(user, cloud_id):
         all_tags = tags_from_provider
 
         from mist.core.tag.methods import resolve_id_and_get_tags
+        try:
+            mistio_tags = resolve_id_and_get_tags(user, 'machine', m.id,
+                                                  cloud_id=cloud_id)
+        except:
+            mistio_tags = []
 
-        for tag in resolve_id_and_get_tags(user, 'machine', m.id,
-                                           cloud_id=cloud_id):
+        for tag in mistio_tags:
             if tag not in all_tags:
                 all_tags.append(tag)
             # cost_per_hour + cost_per_month fixed tags for
