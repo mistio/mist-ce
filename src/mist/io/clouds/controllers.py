@@ -629,6 +629,7 @@ class VSphereController(BaseController):
         if not kwargs.get('host'):
             raise RequiredParameterMissingError('host')
         kwargs['host'] = sanitize_host(kwargs['host'])
+        check_host(kwargs['host'])
 
 
 class VCloudController(BaseController):
@@ -651,6 +652,7 @@ class VCloudController(BaseController):
         if not kwargs.get('host'):
             raise RequiredParameterMissingError('host')
         kwargs['host'] = sanitize_host(kwargs['host'])
+        check_host(kwargs['host'])
 
     def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
                                         machine_api, machine_model,
@@ -706,6 +708,7 @@ class OpenStackController(BaseController):
             elif url.endswith('/v2.0'):
                 url = url.split('/v2.0')[0]
             kwargs['url'] = url.rstrip('/')
+            check_host(sanitize_host(kwargs['url']))
 
     def _list_machines__machine_creation_date(self, machine_api):
         return machine_api.extra.get('created')  # iso8601 string
@@ -760,6 +763,7 @@ class DockerController(BaseController):
         rename_kwargs(kwargs, 'auth_password', 'password')
         if kwargs.get('host'):
             kwargs['host'] = sanitize_host(kwargs['host'])
+            check_host(kwargs['host'])
 
     def _list_machines__machine_creation_date(self, machine_api):
         return machine_api.created_at  # unix timestamp in ms
@@ -809,15 +813,31 @@ class LibvirtController(BaseController):
     def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'machine_hostname', 'host')
         rename_kwargs(kwargs, 'machine_user', 'username')
+        rename_kwargs(kwargs, 'machine_key', 'key')
         rename_kwargs(kwargs, 'ssh_port', 'port')
         if kwargs.get('host'):
             kwargs['host'] = sanitize_host(kwargs['host'])
+            check_host(kwargs['host'])
         if kwargs.get('key'):
             try:
                 kwargs['key'] = Keypair.objects.get(owner=self.cloud.owner,
                                                     id=kwargs['key'])
             except Keypair.DoesNotExist:
                 raise NotFoundError("Keypair does not exist.")
+
+    def add(self, remove_on_error=True, fail_on_invalid_params=True, **kwargs):
+        """This is a hack to associate a key with the VM hosting this cloud"""
+        super(LibvirtController, self).add(
+            remove_on_error=remove_on_error,
+            fail_on_invalid_params=fail_on_invalid_params,
+            **kwargs
+        )
+        if self.cloud.key is not None:
+            # FIMXE
+            from mist.io.methods import associate_key
+            associate_key(self.cloud.owner, self.cloud.key.id, self.cloud.id,
+                          self.cloud.host,  # hypervisor id is the hostname
+                          username=self.cloud.username, port=self.cloud.port)
 
     def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
                                         machine_api, machine_model,
