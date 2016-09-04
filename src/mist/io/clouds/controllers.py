@@ -20,7 +20,9 @@ accessed through a cloud model, using the `ctl` abbreviation, like this:
 """
 
 
+import uuid
 import json
+import socket
 import logging
 import tempfile
 
@@ -32,18 +34,27 @@ from libcloud.pricing import get_size_price
 from libcloud.compute.base import NodeImage
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider, NodeState
+from libcloud.utils.networking import is_private_subnet
 
 
 from mist.io import config
 
 from mist.io.exceptions import MistError
 from mist.io.exceptions import NotFoundError
+from mist.io.exceptions import BadRequestError
+from mist.io.exceptions import CloudExistsError
+from mist.io.exceptions import CloudUnauthorizedError
+from mist.io.exceptions import ServiceUnavailableError
+from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
 
-from mist.io.helpers import sanitize_host
+from mist.io.helpers import sanitize_host, check_host
 
 from mist.core.keypair.models import Keypair
 from mist.core.vpn.methods import destination_nat as dnat
+from mist.core.vpn.methods import to_tunnel
+
+from mist.io.bare_metal import BareMetalDriver
 
 from mist.io.clouds.base import BaseController, tags_to_dict, rename_kwargs
 
@@ -845,8 +856,178 @@ class OtherController(BaseController):
 
     provider = 'bare_metal'
 
-    # def _connect(self):
-    #     return BareMetalDriver(Machine.objects(cloud=self.cloud))
+    def _connect(self):
+        # FIXME: Move this to top of the file once Machine model is migrated.
+        # The import statement is currently here to avoid circular import
+        # issues.
+        from mist.core.cloud.models import Machine
+        return BareMetalDriver(Machine.objects(cloud=self.cloud))
+
+    def add(self, remove_on_error=True, fail_on_invalid_params=True, **kwargs):
+        """Add new Cloud to the database
+
+        This is the only cloud controller subclass that overrides the `add`
+        method of `BaseController`.
+
+        This is only expected to be called by `Cloud.add` classmethod to create
+        a cloud. Fields `owner` and `title` are already populated in
+        `self.cloud`. The `self.cloud` model is not yet saved.
+
+        """
+        # Attempt to save.
+        try:
+            self.cloud.save()
+        except me.ValidationError as exc:
+            raise BadRequestError({'msg': exc.message,
+                                   'errors': exc.to_dict()})
+        except me.NotUniqueError:
+            raise CloudExistsError()
+
+        # Sanitize params.
+        rename_kwargs(kwargs, 'machine_ip', 'host')
+        rename_kwargs(kwargs, 'machine_user', 'ssh_user')
+        rename_kwargs(kwargs, 'machine_key', 'ssh_key')
+        rename_kwargs(kwargs, 'machine_port', 'ssh_port')
+        if kwargs.pop('windows', False):
+            kwargs['os_type'] = 'windows'
+        else:
+            kwargs['os_type'] = 'unix'
+        errors = {}
+        for key in kwargs.keys():
+            if key not in ('host', 'ssh_user', 'ssh_port', 'ssh_key',
+                           'os_type', 'rdp_port'):
+                error = "Invalid parameter %s=%r." % (key, kwargs[key])
+                if fail_on_invalid_params:
+                    errors[key] = error
+                else:
+                    log.warning(error)
+                    kwargs.pop(key)
+        if errors:
+            raise BadRequestError({
+                'msg': "Invalid parameters %s." % errors.keys(),
+                'errors': errors,
+            })
+
+        # Add machine.
+        try:
+            machine = self.add_machine(
+                self.cloud.title, remove_on_error=remove_on_error, **kwargs
+            )
+        except Exception as exc:
+            if remove_on_error:
+                self.cloud.delete()
+            raise
+
+    def add_machine(self, name, host='',
+                    ssh_user='root', ssh_port=22, ssh_key=None,
+                    os_type='unix', rdp_port=3389, remove_on_error=True):
+        """Add machine to this dummy Cloud
+
+        This is a special method that exists only on this Cloud subclass.
+
+        """
+        # FIXME: Move this to top of the file once Machine model is migrated.
+        # The import statement is currently here to avoid circular import
+        # issues.
+        from mist.core.cloud.models import Machine
+        # FIXME: Move ssh command to Machine controller once it is migrated.
+        from mist.core.methods import ssh_command
+
+        # Sanitize inputs.
+        host = sanitize_host(host)
+        check_host(host)
+        try:
+            ssh_port = int(ssh_port)
+        except (ValueError, TypeError):
+            ssh_port = 22
+        try:
+            rdp_port = int(rdp_port)
+        except (ValueError, TypeError):
+            rdp_port = 3389
+        if ssh_key:
+            ssh_key = Keypair.objects.get(owner=self.cloud.owner, id=ssh_key)
+
+        # Create and save machine entry to database.
+        machine = Machine(
+            cloud=self.cloud,
+            name=name,
+            machine_id=uuid.uuid4().hex,
+            os_type=os_type,
+            ssh_port=ssh_port,
+            remote_desktop_port=rdp_port
+        )
+        if host:
+            if is_private_subnet(socket.gethostbyname(host)):
+                machine.private_ips = [host]
+            else:
+                machine.dns_name = host
+                machine.public_ips = [host]
+        machine.save()
+
+        # Attempt to connect.
+        if os_type == 'unix' and ssh_key:
+            if not ssh_user:
+                ssh_user = 'root'
+            # Try to connect. If it works, it will create the association.
+            try:
+                if not host:
+                    raise BadRequestError("You have specified an SSH key but "
+                                          "machine hostname is empty.")
+                to_tunnel(self.cloud.owner, host)  # May raise VPNTunnelError
+                ssh_command(
+                    self.cloud.owner, self.cloud.id, machine.machine_id, host,
+                    'uptime', key_id=ssh_key.id, username=ssh_user,
+                    port=ssh_port
+                )
+            except MachineUnauthorizedError as exc:
+                if remove_on_error:
+                    machine.delete()
+                raise CloudUnauthorizedError(exc)
+            except ServiceUnavailableError as exc:
+                if remove_on_error:
+                    machine.delete()
+                raise MistError("Couldn't connect to host '%s'." % host)
+            except:
+                if remove_on_error:
+                    machine.delete()
+                raise
+
+        return machine
+
+    def add_machine_wrapper(self, name, remove_on_error=True,
+                            fail_on_invalid_params=True, **kwargs):
+        """Wrapper around add_machine to accept stupid
+
+        FIXME: This wrapper should be deprecated"""
+        # Sanitize params.
+        rename_kwargs(kwargs, 'machine_ip', 'host')
+        rename_kwargs(kwargs, 'machine_user', 'ssh_user')
+        rename_kwargs(kwargs, 'machine_key', 'ssh_key')
+        rename_kwargs(kwargs, 'machine_port', 'ssh_port')
+        if kwargs.pop('windows', False):
+            kwargs['os_type'] = 'windows'
+        else:
+            kwargs['os_type'] = 'unix'
+        errors = {}
+        for key in kwargs:
+            if key not in ('host', 'ssh_user', 'ssh_port', 'ssh_key',
+                           'os_type', 'rdp_port'):
+                error = "Invalid parameter %s=%r." % (key, kwargs[key])
+                if fail_on_invalid_params:
+                    errors[key] = error
+                else:
+                    log.warning(error)
+                    kwargs.pop(key)
+        if errors:
+            raise BadRequestError({
+                'msg': "Invalid parameters %s." % errors.keys(),
+                'errors': errors,
+            })
+
+        # Add machine.
+        return self.add_machine(name, remove_on_error=remove_on_error,
+                                **kwargs)
+
     # m.extra['can_reboot'] = False
     # if machine_entry.key_associations:
     #     m.extra['can_reboot'] = True

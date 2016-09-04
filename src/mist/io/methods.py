@@ -83,158 +83,55 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
                     datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
 
-# this is a sanity check for the user supplied
-# tags cost_per_month/cost_per_hour
-# used for VM cost analysis
-MAX_USER_PROVIDER_COST_PER_HOUR = 100
-MAX_USER_PROVIDER_COST_PER_MONTH = 100 * 24 * 31
 
+def add_cloud_v_2(owner, title, provider, params):
+    """Add cloud to owner"""
 
-def add_cloud_v_2(user, title, provider, params):
-    """
-    Version 2 of add_cloud
-    Adds a new cloud to the user and returns the cloud_id
-    """
-    if not provider:
-        raise RequiredParameterMissingError("provider")
-    log.info("Adding new cloud in provider '%s' with Api-Version: 2", provider)
-
-    # perform hostname validation if hostname is supplied
-    if provider in ['vcloud', 'bare_metal', 'docker', 'libvirt', 'openstack', 'vsphere']:
-        hostname = ''
-        if provider == 'bare_metal':
-            hostname = params.get('machine_ip', '')
-
-        if hostname:
-            check_host(sanitize_host(hostname))
-
-    baremetal = provider == 'bare_metal'
-
-    if provider == 'bare_metal':
-        cloud_id, mon_dict = _add_cloud_bare_metal(user, title, provider, params)
-        log.info("Cloud with id '%s' added successfully.", cloud_id)
-        trigger_session_update(user, ['clouds'])
-        return {'cloud_id': cloud_id, 'monitoring': mon_dict}
-    if provider not in cloud_models.CLOUDS:
-        raise BadRequestError("Provider unknown.")
-
-    remove_on_error = params.get('remove_on_error', True)
-
+    # FIXME: Some of these should be explicit arguments, others shouldn't exist
+    remove_on_error = params.pop('remove_on_error', True)
+    monitoring = params.pop('monitoring', False)
     params.pop('title', None)
     params.pop('provider', None)
-    cloud = cloud_models.CLOUDS[provider].add(user, title,
-                                              remove_on_error=remove_on_error,
-                                              fail_on_invalid_params=False,
-                                              **params)
-    cloud_id = cloud.id
 
-    log.info("Cloud with id '%s' added succesfully with Api-Version: 2.", cloud_id)
-    trigger_session_update(user, ['clouds'])
+    # Find proper Cloud subclass.
+    if not provider:
+        raise RequiredParameterMissingError("provider")
+    log.info("Adding new cloud in provider '%s'", provider)
+    if provider not in cloud_models.CLOUDS:
+        raise BadRequestError("Invalid provider '%s'." % provider)
+    cloud_cls = cloud_models.CLOUDS[provider]  # Class of Cloud model.
 
-    # FIXME: This should be migrated to clouds.controllers.LibvirtController
-    if provider == 'libvirt' and cloud.apisecret:
-    # associate libvirt hypervisor witht the ssh key, if on qemu+ssh
-        key_id = params.get('machine_key')
-        node_id = cloud.apiurl  # id of the hypervisor is the hostname provided
-        username = cloud.apikey
-        associate_key(user, key_id, cloud_id, node_id, username=username, port=cloud.ssh_port)
-
-    return {'cloud_id': cloud.id}
-
-
-def _add_cloud_bare_metal(user, title, provider, params):
-    """
-    Add a bare metal cloud
-    """
-    remove_on_error = params.get('remove_on_error', True)
-    machine_key = params.get('machine_key', '')
-    machine_user = params.get('machine_user', '')
-    is_windows = params.get('windows', False)
-    if is_windows:
-        os_type = 'windows'
-    else:
-        os_type = 'unix'
-    try:
-        port = int(params.get('machine_port', 22))
-    except:
-        port = 22
-    try:
-        rdp_port = int(params.get('remote_desktop_port', 3389))
-    except:
-        rdp_port = 3389
-    machine_hostname = params.get('machine_ip', '')
-
-    use_ssh = remove_on_error and os_type == 'unix' and machine_key
-    if use_ssh:
-        key = Keypair.objects.get(owner=user, id=machine_key)
-        if not machine_hostname:
-            raise BadRequestError("You have specified an SSH key but machine "
-                                  "hostname is empty.")
-        if not machine_user:
-            machine_user = 'root'
-
-    cloud = Cloud()
-    cloud.title = title
-    cloud.provider = provider
-    cloud.enabled = True
-    cloud.owner = user
-
-    try:
-        cloud.save()
-    except ValidationError as e:
-        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
-    except NotUniqueError:
-        raise CloudExistsError()
-
-    try:
-        to_tunnel(user, machine_hostname)
-    except VPNTunnelError as err:
-        Cloud.objects.get(owner=user, id=cloud.id).delete()
-        raise err
-
-    machine = Machine()
-    machine.cloud = cloud
-    machine_hostname = sanitize_host(machine_hostname)
-    machine.ssh_port = port
-    machine.remote_desktop_port = rdp_port
-    if machine_hostname:
-        if is_private_subnet(socket.gethostbyname(machine_hostname)):
-            machine.private_ips = [machine_hostname]
-        else:
-            machine.dns_name = machine_hostname
-            machine.public_ips = [machine_hostname]
-    machine.machine_id = title.replace('.', '').replace(' ', '')
-    machine.name = title
-    machine.os_type = os_type
-    machine.save()
-
-    # try to connect. this will either fail and we'll delete the
-    # cloud, or it will work and it will create the association
-    if use_ssh:
+    # Add the cloud.
+    ret = {}
+    if provider == 'bare_metal':
+        # Add empty dummy, or 'other' cloud.
+        cloud = cloud_cls.add(owner, title)
         try:
-            ssh_command(
-                user, cloud.id, machine.machine_id, machine_hostname, 'uptime',
-                key_id=machine_key, username=machine_user, password=None,
-                port=port
+            # Add actual server to dummy cloud.
+            machine = cloud.ctl.add_machine_wrapper(
+                cloud.title, remove_on_error=remove_on_error,
+                fail_on_invalid_params=False, **params
             )
-        except MachineUnauthorizedError as exc:
-            Cloud.objects.get(owner=user, id=cloud.id).delete()
-            raise CloudUnauthorizedError(exc)
-        except ServiceUnavailableError as exc:
-            Cloud.objects.get(owner=user, id=cloud.id).delete()
-            raise MistError("Couldn't connect to host '%s'."
-                            % machine_hostname)
-    if params.get('monitoring'):
-        try:
-            from mist.core.methods import enable_monitoring as _en_monitoring
-        except ImportError:
-            _en_monitoring = enable_monitoring
-        mon_dict = _en_monitoring(user, cloud.id, machine.machine_id,
-                                  no_ssh=not use_ssh)
+        except:
+            if remove_on_error:
+                cloud.delete()
+            raise
+        # Let's overload this a bit more by also combining monitoring.
+        if monitoring:
+            try:
+                from mist.core.methods import enable_monitoring as _en_mon
+            except ImportError:
+                _en_mon = enable_monitoring
+            ret['monitoring'] = _en_mon(owner, cloud.id, machine.machine_id,
+                                        no_ssh=not use_ssh)
     else:
-        mon_dict = {}
-
-    return cloud.id, mon_dict
+        # Common clouds are thankfully simple.
+        cloud = cloud_cls.add(owner, title, remove_on_error=remove_on_error,
+                              fail_on_invalid_params=False, **params)
+    ret['cloud_id'] = cloud.id
+    log.info("Cloud with id '%s' added succesfully.", cloud.id)
+    trigger_session_update(owner, ['clouds'])
+    return ret
 
 
 def rename_cloud(owner, cloud_id, new_name):
