@@ -411,7 +411,7 @@ class BaseController(object):
             # Get machine tags from db and update libcloud's tag list,
             # overriding in case of conflict.
             tags.update({tag.key: tag.value for tag in Tag.objects(
-                owner=self.cloud.owner, resource=Machine(id=node.id),
+                owner=self.cloud.owner, resource=machine_model,
             ).only('key', 'value')})
 
             # Construct machine dict.
