@@ -6,6 +6,7 @@
 <link rel="import" href="../helpers/dialog-element.html">
 
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 
 <dom-module id="machine-page">
@@ -205,7 +206,7 @@
                             <paper-button on-tap="undefine" class="simple" hidden$="[[!machine.can_undefine]]">undefine</paper-button>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button on-tap="ssh" class="simple white left-icon" style$="color: [[section.color]]" disabled><iron-icon style$="color: [[section.color]]" icon="icons:code"></iron-icon> ssh</paper-button>
+                    <paper-button on-tap="shell" class="simple white left-icon" style$="color: [[section.color]]"><iron-icon style$="color: [[section.color]]" icon="vaadin-icons:terminal"></iron-icon> SHELL</paper-button>
                     <paper-button on-tap="monitor" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[isMonitored]]" disabled>monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button>
                 </div>
             </paper-material>
@@ -264,6 +265,7 @@
                 </div>
             </paper-material>
         </div>
+        <item-actions id="actions" items="[[_itemInArray(machine)]]" selected-items="[[thisItemUid]]" section="[[section]]" org="[[model.org]]"></item-actions>
         <dialog-element></dialog-element>
         <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
@@ -273,6 +275,21 @@
     </template>
 </dom-module>
 <script>
+function itemUid(item, section) {
+    // Returns a universal resource id of the form
+    //      resourceType:[cloudId]:itemId
+    // e.g. machine:3tm7aaHHZcMxpZ:bf04f27e924fa67023582,
+    //      key::MnhLdx9u22YjVJ
+    //
+    // TODO replace with mist uuids
+
+    // if item type is not defined derive it fro the current section id
+    var item_type = item.type ? item.type : (section &&
+                                             section.id.slice(0,-1));
+    var cloudId = item.cloud ? item.cloud.id : '';
+
+    return item_type + ':' + cloudId + ':' + item.id;
+}
     Polymer({
         is: 'machine-page',
 
@@ -321,6 +338,10 @@
                 type: Boolean,
                 computed: '_computeIsloading(machine)',
                 value: true
+            },
+            thisItemUid: {
+                type: Array,
+                computed: '_computeThisItemUid(machine)'
             }
         },
         observers: [
@@ -408,6 +429,16 @@
                 return machine.uuid == params.uuid;
             }, this);
         },
+        _itemInArray: function(machine){
+            var arr = [];
+            arr.push(this.machine);
+            return arr;
+        },
+        _computeThisItemUid: function(machine){
+            var itemUidInArray = [];
+            itemUidInArray.push(itemUid(this.machine, this.section));
+            return itemUidInArray;
+        },
         _isEqual: function(a, b) {
             return a === b;
         },
@@ -462,6 +493,20 @@
         _editMachine: function(e) {
             var el = this.querySelector('machine-edit');
             el._openEditMachineModal();
+        },
+        shell: function(){
+            console.warn('opening shell');
+            var el = this;
+            // load page import on demand.
+            el.importHref(el.resolveUrl('../helpers/xterm-dialog.html'), null, null, true);
+            var xterm = el.querySelector("xterm-dialog");
+            if (!xterm) {
+                xterm = document.createElement("xterm-dialog");
+                xterm.target = this.machine;
+                var parent = el.parentElement.parentElement;
+                parent.insertBefore(xterm, parent.firstChild);
+            }
+            return;
         },
         start: function(_, params) {
             this.confirmAction("start");
