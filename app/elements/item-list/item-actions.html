@@ -407,6 +407,9 @@ Polymer({
         this.set('multi', false);
         if (event.model.item.confirm) {
             if(event.model.item.name == 'tag') {
+                var items = [];
+                items.push(itemUid(this.selectedItem));
+                this.$['tagsdialog'].items = items;
                 this.$['tagsdialog']._openDialog();
             }
             else {
@@ -426,6 +429,7 @@ Polymer({
         this.set('multi', true);
         if (event.model.item.confirm){
             if(event.model.item.name == 'tag') {
+                this.$['tagsdialog'].items = this.selectedItems;
                 this.$['tagsdialog']._openDialog();
             }
             else {
