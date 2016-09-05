@@ -1,6 +1,9 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
+<link rel="import" href="../helpers/dialog-element.html">
+<link rel="import" href="../tags/tags-list.html">
+
 <dom-module id="item-actions">
     <template>
         <style include="paper-dialog-shared-styles"></style>
@@ -114,6 +117,8 @@
               <paper-button dialog-confirm class="red" on-tap="_confirmAction">Proceed</paper-button>
             </div>
           </paper-dialog>
+          <dialog-element></dialog-element>
+          <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
         </content>
     </template>
 </dom-module>
