@@ -1,0 +1,92 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+<dom-module id="associate-key">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style is="custom-style" include="shared-styles">
+        :host {
+            display: block;
+            width: 100%;
+        }
+        :host .btn-group {
+            margin: 0 0 24px 0;
+        }
+        .grey {
+            opacity: 0.54;
+        }
+        </style>
+        <paper-dialog id="dialogModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Associate a key</h2>
+            <p>
+                <span class="grey"> Choose from your existing keys. </span>
+                <paper-dropdown-menu label="Choose key" horizontal-align="left">
+                    <paper-menu id="keys" attr-for-selected="value" selected="[[selected]]" class="dropdown-content">
+                        <template is="dom-repeat" items="[[keys]]" as="key">
+                            <paper-item value="[[key.id]]">[[key.name]]</paper-item>
+                        </template>                        
+                    </paper-menu>
+                </paper-dropdown-menu>
+            </p>
+            <div class="clearfix btn-group">
+                <paper-button dialog-dismiss>
+                    Cancel
+                </paper-button>
+                <paper-button class="blue" on-tap="associateKey">
+                    Associate
+                </paper-button>
+            </div>
+        </paper-dialog>
+
+
+        <iron-ajax id="associateKeyRequest" url="/api/v1/clouds/[[cloudId]]/machines/[[machineId]]/keys/[[selectedKeyId]]" method="PUT" on-response="_associateKeyResponse" on-error="_associateKeyError" on-request="_associateKeyRequest"></iron-ajax>
+
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'associate-key',
+
+    properties: {
+        keys: Array,
+        host: String,
+        cloudId: String,
+        machineId: String,
+        selected: String,
+        selectedKeyId: {
+            type: String
+        }
+    },
+    listeners: {
+        'iron-select' : 'computedSelectedKeyId'
+    },
+    ready: function(){
+    },
+    computedSelectedKeyId: function(selected){
+        this.set('selectedKeyId', this.querySelector('#keys').selected || '');
+        console.log('updateSelected',this.selectedKeyId);
+    },
+    _openDialog: function(e) {
+        this.$.dialogModal.open();
+    },
+    _closeDialog: function(e) {
+        this.$.dialogModal.close();
+    },
+    _addKey: function(){
+        //set attribute origin
+        var origin = window.location.pathname;
+        page("/add-key?origin="+origin);
+
+    },
+    associateKey: function(e){
+        this.$.associateKeyRequest.headers["Content-Type"] = 'application/json';
+        this.$.associateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+        this.$.associateKeyRequest.body = {
+            host: this.host};
+        this.$.associateKeyRequest.generateRequest();
+    }
+});
+</script>

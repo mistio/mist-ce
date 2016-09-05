@@ -4,10 +4,11 @@
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
-
 <link rel="import" href="../tags/tags-list.html">
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
+
+<link rel="import" href="associate-key.html">
 
 <dom-module id="machine-page">
     <template>
@@ -214,6 +215,7 @@
                             <paper-button on-tap="destroy" class="simple" hidden$="[[!machine.can_destroy]]">destroy</paper-button>
                             <paper-button on-tap="rename" class="simple" hidden$="[[!machine.can_rename]]">rename</paper-button>
                             <paper-button on-tap="undefine" class="simple" hidden$="[[!machine.can_undefine]]">undefine</paper-button>
+                            <paper-button on-tap="associateKey" class="simple">Associate a key</paper-button>
                         </paper-menu>
                     </paper-menu-button>
                     <paper-button on-tap="shell" class="simple white left-icon" style$="color: [[section.color]]"><iron-icon style$="color: [[section.color]]" icon="vaadin-icons:terminal"></iron-icon> SHELL</paper-button>
@@ -237,7 +239,7 @@
                     <h3 class="smallcaps">Associated Keys:</h3>
                     <template is="dom-repeat" items="[[associatedKeys]]">
                         <a class="regular blue-link machine-key" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</span>
-                    </template>
+                    </template>                    
                 </paper-material>
             </div>
             <div hidden$="{{!isMonitored}}">
@@ -283,6 +285,7 @@
         </div>
         <item-actions id="actions" items="[[_itemInArray(machine)]]" selected-items="[[thisItemUid]]" section="[[section]]" org="[[model.org]]"></item-actions>
         <dialog-element></dialog-element>
+        <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key>
         <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
@@ -362,6 +365,14 @@ function itemUid(item, section) {
             associatedKeys: {
                 type: Array,
                 computed:'_computeAssociatedKeys(machine, model.keysArray)'
+            },
+            newKeyId: {
+                type: String,
+                value: ''
+            },
+            machineIp: {
+                type: String,
+                computed: 'computeMachineIp(machine.public_ips)'
             }
         },
         observers: [
@@ -464,19 +475,18 @@ function itemUid(item, section) {
             var associatedKeys = [];
                 associatedKeys = this.model.keysArray.filter(function(key){
                 return key.machines.filter(function(machine){
-                    console.log('key check', machineId, machine['0'])
                     return machine[1] == machineId;
                 }).length;
             }, this);
-            // for (var i=0; i<this.model.keysArray.length; i++){
-            //     var key = this.model.keysArray[i];
-            //     for (var j=0; j<key.machines.length; j++){
-            //         var machine = key.machines[j];
-            //         if (machine[1] == machineId )
-            //             associatedKeys.push(key);
-            //     }
-            // }
             return associatedKeys || [];
+        },
+        computeMachineIp: function(machineips){
+            if (this.machine.public_ips){
+                return this.machine.public_ips[0]
+            }
+            else {
+                return ''
+            }
         },
         _isEqual: function(a, b) {
             return a === b;
@@ -663,6 +673,10 @@ function itemUid(item, section) {
         },
         _computeIsloading(machine) {
             return !this.machine ? true : false;
+        },
+        associateKey:  function(e){
+            var keysDialog = this.querySelector('associate-key');
+            keysDialog._openDialog();
         }
     });
 </script>
