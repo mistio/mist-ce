@@ -168,6 +168,16 @@
                 margin: 10% auto;
                 display: block;
             }
+            .machine-key::after {
+                position: relative;
+                content: ", "
+            }
+            .machine-key:last-of-type::after {
+                content: " "   
+            }
+            .machine-key iron-icon {
+                opacity: 0.32
+            }
         </style>
 
         <div id="content">
@@ -217,10 +227,14 @@
                     <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
                 </paper-material>
-                <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
-                    <h3 class="smallcaps">TAGS:</h3>
+                <paper-material id="rightcolumn" class="right">
+                    <h3 class="smallcaps" hidden$="[[!machine.tags.length]]">TAGS:</h3>
                     <template is="dom-repeat" items="[[machine.tags]]">
                         <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
+                    </template>
+                    <h3 class="smallcaps">Associated Keys:</h3>
+                    <template is="dom-repeat" items="[[associatedKeys]]">
+                        <a class="regular blue-link machine-key" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</span>
                     </template>
                 </paper-material>
             </div>
@@ -342,6 +356,10 @@ function itemUid(item, section) {
             thisItemUid: {
                 type: Array,
                 computed: '_computeThisItemUid(machine)'
+            },
+            associatedKeys: {
+                type: Array,
+                computed:'_computeAssociatedKeys(machine, model.keysArray)'
             }
         },
         observers: [
@@ -438,6 +456,25 @@ function itemUid(item, section) {
             var itemUidInArray = [];
             itemUidInArray.push(itemUid(this.machine, this.section));
             return itemUidInArray;
+        },
+        _computeAssociatedKeys: function(machine, keys){
+            var machineId = this.machine.id;
+            var associatedKeys = [];
+                associatedKeys = this.model.keysArray.filter(function(key){
+                return key.machines.filter(function(machine){
+                    console.log('key check', machineId, machine['0'])
+                    return machine[1] == machineId;
+                }).length;
+            }, this);
+            // for (var i=0; i<this.model.keysArray.length; i++){
+            //     var key = this.model.keysArray[i];
+            //     for (var j=0; j<key.machines.length; j++){
+            //         var machine = key.machines[j];
+            //         if (machine[1] == machineId )
+            //             associatedKeys.push(key);
+            //     }
+            // }
+            return associatedKeys || [];
         },
         _isEqual: function(a, b) {
             return a === b;
