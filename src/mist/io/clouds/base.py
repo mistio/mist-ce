@@ -337,11 +337,11 @@ class BaseController(object):
         """
         return
 
-    def list_machines(self):
+    def list_machines(self, return_libcloud_results=False):
         """Return list of machines for cloud
 
-        This returns the results obtained from libcloud, after some processing,
-        formatting and injection of extra information in a sane format.
+        A list of nodes is fetched from libcloud, the data is processed, stored
+        on machine models, and a list of machine models is returned.
 
         Subclasses SHOULD NOT override or extend this method.
 
@@ -388,14 +388,14 @@ class BaseController(object):
 
             # Fetch machine mongoengine model from db, or initialize one.
             try:
-                machine_model = Machine.objects.get(cloud=self.cloud,
-                                                    machine_id=node.id)
+                machine = Machine.objects.get(cloud=self.cloud,
+                                              machine_id=node.id)
             except Machine.DoesNotExist:
-                machine_model = Machine(cloud=self.cloud, machine_id=node.id)
+                machine = Machine(cloud=self.cloud, machine_id=node.id)
 
             # Update machine_model's last_seen fields.
-            machine_model.last_seen = now
-            machine_model.missing_since = None
+            machine.last_seen = now
+            machine.missing_since = None
 
             # Get misc libcloud metadata.
             image_id = str(node.image or node.extra.get('imageId') or
@@ -411,25 +411,33 @@ class BaseController(object):
             # Get machine tags from db and update libcloud's tag list,
             # overriding in case of conflict.
             tags.update({tag.key: tag.value for tag in Tag.objects(
-                owner=self.cloud.owner, resource=machine_model,
+                owner=self.cloud.owner, resource=machine,
             ).only('key', 'value')})
 
-            # Construct machine dict.
-            machine = {
-                'id': node.id,
-                'uuid': machine_model.id,
-                'name': node.name,
-                'image_id': image_id,
-                'size': size,
-                'state': config.STATES[node.state],
-                'private_ips': node.private_ips,
-                'public_ips': node.public_ips,
-                'tags': tags,
-                'extra': node.extra,
-                'last_seen': str(machine_model.last_seen or ''),
-                'missing_since': str(machine_model.missing_since or ''),
-                'created': str(machine_model.created or ''),
-            }
+            # TODO: Rename machine to machine_libcloud
+            # TODO: Rename machine_model to machine
+            # TODO: Perhaps the signature of secondary private methods should
+            #       change from:
+            #       (self, mist_machine_id, api_machine_id, machine_api,
+            #       machine_model, machine_dict)
+            #       to:
+            #       (self, machine, machine_libcloud)
+            #       methods should modify machine (model) in place.
+
+            # TODO: This should be replaced by machine_model.as_dict()
+            machine.machine_id = node.id
+            machine.name = node.name
+            machine.image_id = image_id
+            machine.size = size
+            machine.state = config.STATES[node.state]
+            machine.private_ips = node.private_ips
+            machine.public_ips = node.public_ips
+            # FIXME: machine.tags': tags,
+            machine.extra = node.extra
+            #machine.last_seen': str(machine_model.last_seen or ''),
+            #machine.missing_since': str(machine_model.missing_since or ''),
+            #machine.created': str(machine_model.created or ''),
+            #}
 
             # Get machine creation date.
             try:
@@ -518,7 +526,8 @@ class BaseController(object):
         Machine.objects(cloud=self.cloud,
                         id__nin=[m['uuid'] for m in machines],
                         missing_since=None).update(missing_since=now)
-
+        if return_libcloud_results:
+            return nodes
         return machines
 
     def _list_machines__machine_creation_date(self, machine_api):
@@ -837,6 +846,22 @@ class BaseController(object):
         except:
             return [NodeLocation('', name='default', country='',
                                  driver=self.connection)]
+
+    def reboot(self, machine):
+        #if not isinstance(machine.cloud, Machine): etc etc
+        #if self.cloud != machine.cloud:
+        #    raise FuckYouError()
+        if not machine.actions.reboot:
+            raise Exception("Machine doesn't support reboot.")
+        log.debug("Rebooting machine %s", machine)
+        try:
+            #machine_libcloud = self.list_machines(return_libcloud_results=True).find(
+            self._reboot(machine, machine_libcloud)
+        except Exception as exc:
+            log.exception(exc)
+            raise MistError(exc=exc)
+
+    def _reboot(self, machine, machine_libcloud)
 
     def __del__(self):
         """Disconnect libcloud connection upon garbage collection"""
