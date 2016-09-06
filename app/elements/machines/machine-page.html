@@ -169,15 +169,27 @@
                 margin: 10% auto;
                 display: block;
             }
-            .machine-key::after {
-                position: relative;
-                content: ", "
-            }
-            .machine-key:last-of-type::after {
-                content: " "   
+            .machine-key {
+                line-height: 24px;
+                display: inline-block;
+                vertical-align: top;
             }
             .machine-key iron-icon {
-                opacity: 0.32
+                margin-right: 8px;
+                opacity: 0.32;
+                cursor: pointer;
+            }
+            .machine-key iron-icon[icon='close'] {
+                opacity: 0;
+                margin-right: 16px;
+            }
+            .machine-key:hover iron-icon[icon='close'] {
+                opacity: 0.32;
+            }
+            #pendingKeyrequest paper-spinner {
+                width: 24px !important;
+                height: 24px !important;
+                vertical-align: middle !important;
             }
         </style>
 
@@ -237,9 +249,17 @@
                 </paper-material>
                 <paper-material id="rightcolumn" class="right" hidden$="[[!associatedKeys.length]]">
                     <h3 class="smallcaps">Associated Keys:</h3>
-                    <template is="dom-repeat" items="[[associatedKeys]]">
-                        <a class="regular blue-link machine-key" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</span>
-                    </template>                    
+                    <div class="associatedKeys">
+                        <template is="dom-repeat" items="[[associatedKeys]]">
+                            <div class="machine-key">
+                                <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
+                                <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon> 
+                            </div>
+                        </template>
+                        <div class="machine-key" id="pendingKeyRequest">
+                            <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
+                        </div>
+                    </div>
                 </paper-material>
             </div>
             <div hidden$="{{!isMonitored}}">
@@ -288,6 +308,9 @@
         <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key>
         <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+        
+        <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
+
         <machine-edit machine="[[machine]]"></machine-edit>
         <tags-list resource="machine"></tags-list>
         <paper-toast></paper-toast>
@@ -373,13 +396,21 @@ function itemUid(item, section) {
             machineIp: {
                 type: String,
                 computed: 'computeMachineIp(machine.public_ips)'
+            },
+            disassociateKeyId: {
+                type: String
+            },
+            isPendingKeyRequest: {
+                type: Boolean,
+                value: false
             }
         },
         observers: [
             '_isMonitored(machine, model.monitoring.machines.*)'
         ],
         listeners: {
-            'confirmation': '_machineActionConfirmation'
+            'confirmation': '_machineActionConfirmation',
+            'pending-key-request': 'updateKeyLoader'
         },
         attached: function(){
             this.datasources = [
@@ -618,11 +649,20 @@ function itemUid(item, section) {
                     payload = {'action': 'undefine'};
                 if (reason == "machine.destroy")
                     payload = {'action': 'destroy'};
+                if (reason == "disassociate.key"){
+                    payload = {'host': this.machineIp};
+                    this.$.disassociateKeyRequest.body = payload;
+                    this.$.disassociateKeyRequest.headers["Content-Type"] = 'application/json';
+                    this.$.disassociateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.disassociateKeyRequest.generateRequest();
+                }
 
-                this.$.actionRequest.body = payload;
-                this.$.actionRequest.headers["Content-Type"] = 'application/json';
-                this.$.actionRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                this.$.actionRequest.generateRequest();
+                if (reason != "disassociate.key"){
+                    this.$.actionRequest.body = payload;
+                    this.$.actionRequest.headers["Content-Type"] = 'application/json';
+                    this.$.actionRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.actionRequest.generateRequest();
+                }
             }
         },
         _actionRequest: function(e){
@@ -677,6 +717,40 @@ function itemUid(item, section) {
         associateKey:  function(e){
             var keysDialog = this.querySelector('associate-key');
             keysDialog._openDialog();
+        },
+        disassociateKey: function(e){
+            var keyId = e.target['dataKeyid'];
+            var keyName = e.target['dataKeyname'];
+            this.set('disassociateKeyId', keyId);
+            this._showDialog({
+                title: 'Disassociate key',
+                body: "You are about to disassociate key '" + keyName + "' from machine.",
+                danger: false,
+                reason: "disassociate.key",
+                action: 'disassociate',
+                key: keyId
+            });
+        },
+        _disassociateKeyRequest: function(){
+            this.set('isPendingKeyRequest', true);
+        },
+        _disassociateKeyResponse: function(){
+            this.set('isPendingKeyRequest', false);
+        },
+        _disassociateKeyError: function(){
+            this.set('isPendingKeyRequest', false);
+        },
+        updateKeyLoader: function(e){
+            console.log(e.detail);
+            if (e.detail.request) {
+                this.set('isPendingKeyRequest', true);
+            }
+            else if (e.detail.response || e.detail.error) {
+                this.set('isPendingKeyRequest', false);
+            }
+            if (e.detail.error) {
+                this._showToast('Error associateing key '+ this.model.keys[e.detail.keyId].name);
+            }
         }
     });
 </script>

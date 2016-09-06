@@ -27,7 +27,7 @@
                     <paper-menu id="keys" attr-for-selected="value" selected="[[selected]]" class="dropdown-content">
                         <template is="dom-repeat" items="[[keys]]" as="key">
                             <paper-item value="[[key.id]]">[[key.name]]</paper-item>
-                        </template>                        
+                        </template>
                     </paper-menu>
                 </paper-dropdown-menu>
             </p>
@@ -35,12 +35,11 @@
                 <paper-button dialog-dismiss>
                     Cancel
                 </paper-button>
-                <paper-button class="blue" on-tap="associateKey">
+                <paper-button class="blue" on-tap="associateKey" dialog-confirm>
                     Associate
                 </paper-button>
             </div>
         </paper-dialog>
-
 
         <iron-ajax id="associateKeyRequest" url="/api/v1/clouds/[[cloudId]]/machines/[[machineId]]/keys/[[selectedKeyId]]" method="PUT" on-response="_associateKeyResponse" on-error="_associateKeyError" on-request="_associateKeyRequest"></iron-ajax>
 
@@ -73,7 +72,7 @@ Polymer({
         this.$.dialogModal.open();
     },
     _closeDialog: function(e) {
-        this.$.dialogModal.close();
+        this.$.dialogModal.close();        
     },
     _addKey: function(){
         //set attribute origin
@@ -84,9 +83,17 @@ Polymer({
     associateKey: function(e){
         this.$.associateKeyRequest.headers["Content-Type"] = 'application/json';
         this.$.associateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-        this.$.associateKeyRequest.body = {
-            host: this.host};
+        this.$.associateKeyRequest.body = {host: this.host};
         this.$.associateKeyRequest.generateRequest();
-    }
+    },
+    _associateKeyRequest: function(){
+        this.fire('pending-key-request', {request: true, keyId: this.selectedKeyId});
+    },
+    _associateKeyResponse: function(){
+        this.fire('pending-key-request', {response: true, keyId: this.selectedKeyId});
+    },
+    _associateKeyError: function(){
+        this.fire('pending-key-request', {error: true, keyId: this.selectedKeyId});
+    },
 });
 </script>
