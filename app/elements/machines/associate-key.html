@@ -18,18 +18,42 @@
         .grey {
             opacity: 0.54;
         }
+        .trigger {
+            cursor: pointer;
+        }
+        .trigger iron-icon {
+            transition: transform 300ms ease-in;
+        }
+        .trigger[open] iron-icon {
+            transform: rotate(180deg);
+        }
+        .collapsible {
+            height: 0;
+            overflow: hidden;
+            transition: height 300ms ease-in-out 100ms;
+        }
+        .collapsible[open] {
+            height: auto;
+        }
         </style>
         <paper-dialog id="dialogModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
             <h2>Associate a key</h2>
             <p>
                 <span class="grey"> Choose from your existing keys. </span>
-                <paper-dropdown-menu label="Choose key" horizontal-align="left">
+                <paper-dropdown-menu label="Select key" horizontal-align="left">
                     <paper-menu id="keys" attr-for-selected="value" selected="[[selected]]" class="dropdown-content">
                         <template is="dom-repeat" items="[[keys]]" as="key">
                             <paper-item value="[[key.id]]">[[key.name]]</paper-item>
                         </template>
                     </paper-menu>
                 </paper-dropdown-menu>
+            </p>
+            <p>
+                <div class="trigger" on-tap="toggleCollapsble">Advanced Options <iron-icon icon="icons:arrow-drop-down"></iron-icon></div>
+                <div class="collapsible">
+                    <paper-input id="user" label="ssh user" value$="[[user]]" placeholder="root"></paper-input>
+                    <paper-input id="port" label="ssh port" value$="[[port]]" placeholder="22"></paper-input>
+                </div>
             </p>
             <div class="clearfix btn-group">
                 <paper-button dialog-dismiss>
@@ -52,6 +76,14 @@ Polymer({
     properties: {
         keys: Array,
         host: String,
+        user: {
+            type: String,
+            value: false
+        },
+        port: {
+            type: String,
+            value: false
+        },
         cloudId: String,
         machineId: String,
         selected: String,
@@ -61,7 +93,8 @@ Polymer({
         }
     },
     listeners: {
-        'iron-select' : 'computedSelectedKeyId'
+        'iron-select' : 'computedSelectedKeyId',
+        'change': 'updateInputs'
     },
     ready: function(){
     },
@@ -73,7 +106,7 @@ Polymer({
         this.$.dialogModal.open();
     },
     _closeDialog: function(e) {
-        this.$.dialogModal.close();        
+        this.$.dialogModal.close();
     },
     _addKey: function(){
         //set attribute origin
@@ -82,9 +115,12 @@ Polymer({
 
     },
     associateKey: function(e){
+        var user = this.querySelector('paper-input#user').value || 'root';
+        var port = this.querySelector('paper-input#port').value || '22';
+
         this.$.associateKeyRequest.headers["Content-Type"] = 'application/json';
         this.$.associateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-        this.$.associateKeyRequest.body = {host: this.host};
+        this.$.associateKeyRequest.body = {host: this.host, ssh_user: user, ssh_port: port};
         this.$.associateKeyRequest.generateRequest();
     },
     _associateKeyRequest: function(){
@@ -97,5 +133,21 @@ Polymer({
         console.log(e);
         this.fire('pending-key-request', {error: true, errormsg: e.detail.error ,keyId: this.selectedKeyId, machine: this.machineId});
     },
+    updateInputs: function(e){
+        var target = e.target.id;
+        console.log(e, target)
+    },
+    toggleCollapsble: function(){
+        var col = this.querySelector('.collapsible');
+        var trigger = this.querySelector('.trigger');
+        if (col.getAttribute('open')) {
+            trigger.removeAttribute('open');
+            col.removeAttribute('open');
+        }
+        else {
+            trigger.setAttribute('open', true);
+            col.setAttribute('open', true);
+        }
+    }
 });
 </script>
