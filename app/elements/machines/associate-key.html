@@ -35,7 +35,7 @@
                 <paper-button dialog-dismiss>
                     Cancel
                 </paper-button>
-                <paper-button class="blue" on-tap="associateKey" dialog-confirm>
+                <paper-button class="blue" on-tap="associateKey" dialog-confirm disabled$="[[!selectedKeyId]]">
                     Associate
                 </paper-button>
             </div>
@@ -56,7 +56,8 @@ Polymer({
         machineId: String,
         selected: String,
         selectedKeyId: {
-            type: String
+            type: String,
+            value: false
         }
     },
     listeners: {
