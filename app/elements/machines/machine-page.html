@@ -241,12 +241,6 @@
                     <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
                 </paper-material>
-                <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
-                    <h3 class="smallcaps">TAGS:</h3>
-                    <template is="dom-repeat" items="[[machine.tags]]">
-                        <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
-                    </template>
-                </paper-material>
                 <paper-material id="rightcolumn" class="right" hidden$="[[!associatedKeys.length]]">
                     <h3 class="smallcaps">Associated Keys:</h3>
                     <div class="associatedKeys">
@@ -260,6 +254,12 @@
                             <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
                         </div>
                     </div>
+                </paper-material>
+                <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
+                    <h3 class="smallcaps">TAGS:</h3>
+                    <template is="dom-repeat" items="[[machine.tags]]">
+                        <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
+                    </template>
                 </paper-material>
             </div>
             <div hidden$="{{!isMonitored}}">
