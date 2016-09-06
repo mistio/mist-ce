@@ -6,7 +6,6 @@ gevent==1.0.2
 gevent-subprocess==0.1.1
 mongoengine==0.10.5
 netaddr==0.7.18
-paramiko==1.16.0
 PasteDeploy==1.5.2
 PasteScript==2.0.2
 pika==0.10.0
@@ -21,4 +20,5 @@ sphinx-bootstrap-theme==0.4.7
 sphinx-rtd-theme==0.1.8
 sphinxcontrib-httpdomain==1.4.0
 websocket-client==0.29.0
+-e git+https://github.com/mgogoulos/paramiko.git#egg=paramiko
 iso8601
