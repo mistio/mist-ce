@@ -9,6 +9,7 @@
 <link rel="import" href="../element-for-in/element-for-in.html">
 
 <link rel="import" href="associate-key.html">
+<link rel="import" href="run-script-on-machine.html">
 
 <dom-module id="machine-page">
     <template>
@@ -22,6 +23,7 @@
             .columns {
                 @apply(--layout-horizontal);
                 flex: 1 100%;
+                margin-bottom: 16px;
             }
             .left, .right {
                 @apply(--layout-vertical);
@@ -228,6 +230,7 @@
                             <paper-button on-tap="rename" class="simple" hidden$="[[!machine.can_rename]]">rename</paper-button>
                             <paper-button on-tap="undefine" class="simple" hidden$="[[!machine.can_undefine]]">undefine</paper-button>
                             <paper-button on-tap="associateKey" class="simple">Associate a key</paper-button>
+                            <paper-button on-tap="_runScript" class="simple">Run a Script</paper-button>
                         </paper-menu>
                     </paper-menu-button>
                     <paper-button on-tap="shell" class="simple white left-icon" style$="color: [[section.color]]"><iron-icon style$="color: [[section.color]]" icon="vaadin-icons:terminal"></iron-icon> SHELL</paper-button>
@@ -262,11 +265,13 @@
                     </template>
                 </paper-material>
             </div>
-            <div hidden$="{{!isMonitored}}">
-                <h3 class="smallcaps">Monitoring Graphs</h3>
-                <paper-material>demo graph data</paper-material>
-                <!-- <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard> -->
-            </div>
+            <paper-material class="info-card" hidden$="{{!isMonitored}}">
+                <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
+                <div>
+                    <paper-material>graph data</paper-material> 
+                    <!-- <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard> -->
+                </div>
+            </paper-material>
             <paper-material class="info-card">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
                 <div class="card-content">
@@ -306,11 +311,10 @@
         <item-actions id="actions" items="[[_itemInArray(machine)]]" selected-items="[[thisItemUid]]" section="[[section]]" org="[[model.org]]"></item-actions>
         <dialog-element></dialog-element>
         <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key>
+        <run-script-on-machine model="[[model]]" machine="[[machine]]" cloud-id="[[machine.cloud.id]]"></run-script-on-machine>
         <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-        
         <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
-
         <machine-edit machine="[[machine]]"></machine-edit>
         <tags-list resource="machine"></tags-list>
         <paper-toast></paper-toast>
@@ -438,7 +442,16 @@ function itemUid(item, section) {
               "isDefault": false,
               "jsonData": null
               }
-            ];
+            ];            
+            var that = this;
+            setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
+                if (that.querySelector('dashboard-panel'))
+                    that.querySelector('dashboard-panel').resize();
+
+            }, 5000);
+
+        },
+        _computeMachine: function(params, machines) {
             this.dashboard = {
               "id": 1,
               "refresh": "10s",
@@ -452,7 +465,7 @@ function itemUid(item, section) {
                   "targets": [
                     {
                     "refId": "A",
-                    "target": "bucky.*.load.shortterm"
+                    "target": "bucky."+params.uuid+".load.shortterm"
                     },
                   ],
                   "timeFrom": null,
@@ -485,15 +498,6 @@ function itemUid(item, section) {
               "timezone": "browser"
             };
 
-            var that = this;
-            setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-                if (that.querySelector('dashboard-panel'))
-                    that.querySelector('dashboard-panel').resize();
-
-            }, 5000);
-
-        },
-        _computeMachine: function(params, machines) {
             if (this.machine && this.machine.uuid && params.uuid != this.machine.uuid) {
                 this.set('isPendingKeyRequest', false);
             }
@@ -766,6 +770,11 @@ function itemUid(item, section) {
         _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
             var hide =  !(associatedKeys.base.length > 0 || isPendingKeyRequest);
             this.set('hideAssociatedKeys', hide);
-        }
+        },
+        _runScript: function(e){
+            console.log('run script');
+            var scriptDialog = this.querySelector('run-script-on-machine');
+            scriptDialog._openDialog();
+        },
     });
 </script>
