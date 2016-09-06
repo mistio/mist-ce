@@ -87,14 +87,14 @@ Polymer({
         this.$.associateKeyRequest.generateRequest();
     },
     _associateKeyRequest: function(){
-        this.fire('pending-key-request', {request: true, keyId: this.selectedKeyId});
+        this.fire('pending-key-request', {request: true, keyId: this.selectedKeyId, machine: this.machineId});
     },
     _associateKeyResponse: function(){
-        this.fire('pending-key-request', {response: true, keyId: this.selectedKeyId});
+        this.fire('pending-key-request', {response: true, keyId: this.selectedKeyId, machine: this.machineId});
     },
     _associateKeyError: function(e){
         console.log(e);
-        this.fire('pending-key-request', {error: true, errormsg: e.detail.error ,keyId: this.selectedKeyId});
+        this.fire('pending-key-request', {error: true, errormsg: e.detail.error ,keyId: this.selectedKeyId, machine: this.machineId});
     },
 });
 </script>

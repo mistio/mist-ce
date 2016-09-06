@@ -401,20 +401,23 @@ function itemUid(item, section) {
                 type: String
             },
             isPendingKeyRequest: {
-                type: Boolean,
-                value: false
+                type: Boolean
             },
             hideAssociatedKeys: {
-                type: Boolean,
-                computed: "_computeHideAssociatedKeys(associatedKeys, isPendingKeyRequest)"
+                type: Boolean
             },
         },
         observers: [
-            '_isMonitored(machine, model.monitoring.machines.*)'
+            '_isMonitored(machine, model.monitoring.machines.*)',
+            '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)'
         ],
         listeners: {
             'confirmation': '_machineActionConfirmation',
-            'pending-key-request': 'updateKeyLoader'
+            'pending-key-request': '_updateKeyLoader'
+        },
+        ready: function(){
+            this.set('hideAssociatedKeys', true);
+            this.set('isPendingKeyRequest', false);
         },
         attached: function(){
             this.datasources = [
@@ -491,6 +494,9 @@ function itemUid(item, section) {
 
         },
         _computeMachine: function(params, machines) {
+            if (this.machine && this.machine.uuid && params.uuid != this.machine.uuid) {
+                this.set('isPendingKeyRequest', false);
+            }
             return machines.base.find(function(machine) {
                 return machine.uuid == params.uuid;
             }, this);
@@ -735,29 +741,31 @@ function itemUid(item, section) {
                 key: keyId
             });
         },
-        _disassociateKeyRequest: function(){
+        _disassociateKeyRequest: function(e){
             this.set('isPendingKeyRequest', true);
         },
-        _disassociateKeyResponse: function(){
+        _disassociateKeyResponse: function(e){
             this.set('isPendingKeyRequest', false);
         },
-        _disassociateKeyError: function(){
+        _disassociateKeyError: function(e){
             this.set('isPendingKeyRequest', false);
         },
-        updateKeyLoader: function(e){
-            console.log(e.detail);
+        _updateKeyLoader: function(e){
+            //console.log(e.detail);
             if (e.detail.request) {
                 this.set('isPendingKeyRequest', true);
             }
-            else if (e.detail.response || e.detail.error) {
+            else if (e.detail.response) {
                 this.set('isPendingKeyRequest', false);
             }
-            if (e.detail.error) {
+            else if (e.detail.error) {
+                this.set('isPendingKeyRequest', false);
                 this._showToast('Error associateing key '+ this.model.keys[e.detail.keyId].name+'. '+e.detail.errormsg);
             }
         },
-        _computeHideAssociatedKeys: function(associatedKeys, isPendingKeyRequest){
-            return associatedKeys.length || !isPendingKeyRequest;
+        _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
+            var hide =  !(associatedKeys.base.length > 0 || isPendingKeyRequest);
+            this.set('hideAssociatedKeys', hide);
         }
     });
 </script>
