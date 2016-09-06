@@ -103,10 +103,24 @@ Polymer({
         console.log('updateSelected',this.selectedKeyId);
     },
     _openDialog: function(e) {
+        //reset
+        var col = this.querySelector('.collapsible');
+        var trigger = this.querySelector('.trigger');
+        if (col.getAttribute('open')) {
+            trigger.removeAttribute('open');
+            col.removeAttribute('open');
+        }
         this.$.dialogModal.open();
     },
     _closeDialog: function(e) {
         this.$.dialogModal.close();
+        //reset
+        var col = this.querySelector('.collapsible');
+        var trigger = this.querySelector('.trigger');
+        if (col.getAttribute('open')) {
+            trigger.removeAttribute('open');
+            col.removeAttribute('open');
+        }
     },
     _addKey: function(){
         //set attribute origin
