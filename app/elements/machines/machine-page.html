@@ -241,7 +241,7 @@
                     <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
                 </paper-material>
-                <paper-material id="rightcolumn" class="right" hidden$="[[!associatedKeys.length]]">
+                <paper-material id="rightcolumn" class="right" hidden$="[[hideAssociatedKeys]]">
                     <h3 class="smallcaps">Associated Keys:</h3>
                     <div class="associatedKeys">
                         <template is="dom-repeat" items="[[associatedKeys]]">
@@ -403,7 +403,11 @@ function itemUid(item, section) {
             isPendingKeyRequest: {
                 type: Boolean,
                 value: false
-            }
+            },
+            hideAssociatedKeys: {
+                type: Boolean,
+                computed: "_computeHideAssociatedKeys(associatedKeys, isPendingKeyRequest)"
+            },
         },
         observers: [
             '_isMonitored(machine, model.monitoring.machines.*)'
@@ -749,8 +753,11 @@ function itemUid(item, section) {
                 this.set('isPendingKeyRequest', false);
             }
             if (e.detail.error) {
-                this._showToast('Error associateing key '+ this.model.keys[e.detail.keyId].name);
+                this._showToast('Error associateing key '+ this.model.keys[e.detail.keyId].name+'. '+e.detail.errormsg);
             }
+        },
+        _computeHideAssociatedKeys: function(associatedKeys, isPendingKeyRequest){
+            return associatedKeys.length || !isPendingKeyRequest;
         }
     });
 </script>

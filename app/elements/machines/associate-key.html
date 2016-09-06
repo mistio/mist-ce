@@ -92,8 +92,9 @@ Polymer({
     _associateKeyResponse: function(){
         this.fire('pending-key-request', {response: true, keyId: this.selectedKeyId});
     },
-    _associateKeyError: function(){
-        this.fire('pending-key-request', {error: true, keyId: this.selectedKeyId});
+    _associateKeyError: function(e){
+        console.log(e);
+        this.fire('pending-key-request', {error: true, errormsg: e.detail.error ,keyId: this.selectedKeyId});
     },
 });
 </script>
