@@ -310,6 +310,7 @@
                     this.$.errormsg.textContent = e.detail.request.xhr.responseText;
                 },
                 _fieldsChanged: function(fields, sendingData) {
+                    console.log('_fieldsChanged',fields);
                     if (this.formError){
                         this.set('formError', false);
                     }
