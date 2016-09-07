@@ -302,6 +302,10 @@
                                 inp.type = 'mist_dropdown';
                                 inp.helptext = 'Select cloud';
                                 inp.options = this.model.cloudsArray;
+
+                                inp.options.forEach(function(o){
+                                    o.disabled = !o.enabled;
+                                });
                             }
 
                             // make image dropdown & dependent on cloud
