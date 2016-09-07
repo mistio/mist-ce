@@ -6,6 +6,8 @@
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../app-togglable/app-togglable-list.html">
+<link rel="import" href="../item-list/item-actions.html">
+<link rel="import" href="../tags/tags-list.html">
 
 <link rel="import" href="template-edit.html">
 <link rel="import" href="template-run.html">
@@ -232,7 +234,7 @@
                 </div>
 
                 <div class="item-actions">
-                    <!-- <paper-button on-tap="_editTags" class="simple">tags</paper-button> -->
+                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
@@ -395,6 +397,7 @@
         </div>
         <template-edit template="[[template]]"></template-edit>
         <dialog-element></dialog-element>
+        <tags-list model="[[model]]"></tags-list>
     </template>
     <script>
         (function() {
@@ -487,6 +490,13 @@
                 _editTemplate: function(e) {
                     var el = this.querySelector('template-edit');
                     el._openEditTemplateModal();
+                },
+                _editTags: function() {
+                    var el = this.querySelector('tags-list'),
+                    items = [];
+                    items.push(itemUid(this.template, this.section));
+                    el.items = items;
+                    el._openDialog();
                 },
                 _updateTemplate: function(e) {
                     var template = e.detail.template;

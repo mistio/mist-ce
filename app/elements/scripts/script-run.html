@@ -120,6 +120,48 @@
                 listeners: {
                     'iron-select': '_fieldsChanged'
                 },
+                ready: function(){
+                    var arr = [];
+                    var fields = [{
+                            name: "machine_id",
+                            label: "Select Machine *",
+                            type: "mist_dropdown",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            helptext: "Choose the machine on which the script will run",
+                            show: true,
+                            required: true,
+                            options: arr
+                        }, {
+                            name: "cloud_id",
+                            label: "Cloud ID",
+                            type: "text",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            helptext: "The cloud ID of the machine.",
+                            show: false,
+                            showIf: {
+                                fieldName: "machine_id",
+                                fieldExists: true
+                            },
+                            required: true,
+                            disabled: true
+                        }, {
+                            name: "params",
+                            label: "Parameters",
+                            type: "textarea",
+                            value: "",
+                            defaultValue: "",
+                            placeholder: "",
+                            helptext: "Optional. Fill in the scripts pareameters.",
+                            errorMessage: "Please enter network's name",
+                            show: true,
+                            required: false
+                         }];
+                    this.set('fields', fields);
+                },
                 _computeScript: function(params, model) {
                     var script = this.model.scriptsArray.find(function(script) {
                         return script.id == this.params.id;
@@ -176,46 +218,8 @@
                         }
                     }
                 },
-                _cloudsChanged: function(clouds) {
-                    var fields = [{
-                            name: "machine_id",
-                            label: "Select Machine *",
-                            type: "mist_dropdown",
-                            value: "",
-                            defaultValue: "",
-                            placeholder: "",
-                            helptext: "Choose the machine on which the script will run",
-                            show: true,
-                            required: true,
-                            options: this.model.machinesArray
-                        }, {
-                            name: "cloud_id",
-                            label: "Cloud ID",
-                            type: "text",
-                            value: "",
-                            defaultValue: "",
-                            placeholder: "",
-                            helptext: "The cloud ID of the machine.",
-                            show: false,
-                            showIf: {
-                                fieldName: "machine_id",
-                                fieldExists: true
-                            },
-                            required: true,
-                            disabled: true
-                        }, {
-                            name: "params",
-                            label: "Parameters",
-                            type: "textarea",
-                            value: "",
-                            defaultValue: "",
-                            placeholder: "",
-                            helptext: "Optional. Fill in the scripts pareameters.",
-                            errorMessage: "Please enter network's name",
-                            show: true,
-                            required: false
-                         }];
-                    this.set('fields', fields)
+                _cloudsChanged: function(clouds, machines) {
+                    this.set('fields.0.options', this.model.machinesArray);
                 },
                 _runScriptResponse: function(e) {
                     var msg = 'Run script request was successfull. Redirecting to script...';

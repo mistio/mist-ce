@@ -201,7 +201,7 @@
                 },
 
                 _computeFields: function(template, templateInps, templateInputs, modelTemplates, clouds, keys, params) {
-                    var yaml_or_form = 'yaml';
+                    var yaml_or_form = 'form';
                     console.log('Computing Fields started');
 
                     if (this.fields) {
@@ -211,7 +211,7 @@
                         if (yf && yf.value)
                             yaml_or_form = yf.value;
                         else
-                            yaml_or_form = 'yaml';
+                            yaml_or_form = 'form';
                     }
 
                     var ret = [{
@@ -241,17 +241,17 @@
                         label: "YAML or form",
                         type: "radio",
                         value: yaml_or_form,
-                        defaultValue: "yaml",
+                        defaultValue: "form",
                         helptext: "Choose the way you want to insert inputs",
                         errorMessage: "Choose an input format",
                         show: true,
                         required: true,
                         options: [{
-                            title: "YAML",
-                            val: "yaml"
-                        }, {
                             title: "Form",
                             val: "form"
+                        },{
+                            title: "YAML",
+                            val: "yaml"
                         }]
                     }, {
                         name: "stackinputs",
@@ -302,6 +302,10 @@
                                 inp.type = 'mist_dropdown';
                                 inp.helptext = 'Select cloud';
                                 inp.options = this.model.cloudsArray;
+
+                                inp.options.forEach(function(o){
+                                    o.disabled = !o.enabled;
+                                });
                             }
 
                             // make image dropdown & dependent on cloud

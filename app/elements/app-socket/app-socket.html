@@ -353,8 +353,7 @@
             if (data.length && (this.get('onboarding.hasCloud') != true))
                 this.set('onboarding.hasCloud', true);
             if (!data.length)
-                this.set('onboarding.hasCloud', false);
-
+                this.set('onboarding.hasCloud', false);            
             var ret = this._updateModel('clouds', data);
             this.set('onboarding.isLoadingClouds', false);
             return ret;
@@ -421,7 +420,7 @@
             if (this.model != undefined) {
                 this.model.cloudsArray.forEach(
                     function(cloud) {
-                        if (cloud.imagesArray != undefined) {
+                        if (cloud.imagesArray != undefined && cloud.enabled) {
                             cloud.imagesArray.forEach(function(image, index, arr) {
                                 arr[index].icons = self._generateIcon(image);
                                 arr[index].cloud = {
@@ -448,7 +447,7 @@
             if (this.model != undefined) {
                 this.model.cloudsArray.forEach(
                     function(cloud) {
-                        if (cloud.machinesArray != undefined) {
+                        if (cloud.machinesArray != undefined && cloud.enabled) {
                             cloud.machinesArray.forEach(function(machine) {
                                 machine.cloud = {
                                     'id': cloud.id,
@@ -480,7 +479,7 @@
             if (this.model != undefined) {
                 this.model.cloudsArray.forEach(
                     function(cloud) {
-                        if (cloud.networksArray != undefined && 0 < cloud.networksArray.public.length + cloud.networksArray.private.length + cloud.networksArray.routers.length) {
+                        if (cloud.networksArray != undefined && 0 < cloud.networksArray.public.length + cloud.networksArray.private.length + cloud.networksArray.routers.length && cloud.enabled) {
                             cloud.networksArray.public.forEach(function(net) {
                                 net["type"] = "public";
                                 net["provider"] = cloud.provider;
