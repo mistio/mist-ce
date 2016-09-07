@@ -48,8 +48,8 @@
                 padding-right: 8px;
             }
 
-            #keyPublicContainer textarea,
-            #keyPrivateContainer textarea {
+            #keyPublicContainer .textarea,
+            #keyPrivateContainer .textarea {
                 height: 120px;
                 overflow: auto;
                 font-family: monospace;
@@ -61,11 +61,12 @@
                 background-color: #f8f8f8;
                 border-color: #eeedeb;
                 color: rgba(0, 0, 0, 0.54);
-                white-space: normal;
+                white-space: pre-line;
+                word-wrap: break-word;
                 text-align: left;
             }
 
-            #keyPublicContainer textarea {
+            #keyPublicContainer .textarea {
                 height: 120px;
             }
 
@@ -73,7 +74,7 @@
                 text-align: center;
             }
 
-            #keyPrivateContainer textarea {
+            #keyPrivateContainer .textarea {
                 height: 440px;
             }
 
@@ -233,9 +234,7 @@
                         </paper-button>
                     </div>
                     <div id="keyPublicContainer">
-                        <textarea id="keyPublic">
-                            [[publicKey]]
-                        </textarea>
+                        <div class="textarea" id="keyPublic">[[publicKey]]</div>
                     </div>
                 </paper-material>
                 <paper-material>
@@ -251,9 +250,7 @@
                     <div id="keyPrivateContainer">
                         <paper-button hidden$="[[visiblePrivateKey]]" id="showPrivateKeybtn" on-tap="showPrivateKey">
                             <iron-icon icon="icons:visibility"></iron-icon> View Private Key</paper-button>
-                        <textarea hidden$="[[!visiblePrivateKey]]" id="keyPrivate">
-                        [[privateKey]]
-                        </textarea>
+                        <div class="textarea" hidden$="[[!visiblePrivateKey]]" id="keyPrivate">[[privateKey]]</div>
                     </div>
                 </paper-material>
                 <br/>
@@ -417,14 +414,20 @@
                     return isDefault;
                 },
                 copyPublicKey: function() {
-                    this.$.keyPublic.select();
-                    document.execCommand('copy');
-                    this._showToast('The Public Key was copied to clipboard!');
+                    this.clearSelection();
+                    var el = this.$.keyPublic;
+                    this.setSelection(el);            
+                    var successful = document.execCommand('copy');
+                    var msg = successful ? 'The Public Key was copied to clipboard!' : 'There was an error copying to clipboard!';
+                    this._showToast(msg);
                 },
                 copyPrivateKey: function() {
-                    this.$.keyPrivate.select();
-                    document.execCommand('copy');
-                    this._showToast('The Private Key was copied to clipboard!');
+                    this.clearSelection();
+                    var el = this.$.keyPrivate;
+                    this.setSelection(el);            
+                    var successful = document.execCommand('copy');
+                    var msg = successful ? 'The Private Key was copied to clipboard!' : 'There was an error copying to clipboard!';
+                    this._showToast(msg);
                 },
                 handlePublicResponse: function(data) {
                     this.publicKey = data.detail.response;
@@ -497,14 +500,32 @@
                     var toast = this.querySelector('paper-toast');
                     toast.text = msg;
                     toast.show();
-                    var newnot = {};
-                    newnot["text"] = msg;
-                    newnot["type"] = 'green';
-                    document.querySelector("notifications-element").notifications.push(newnot);
                 },
                 _computeIsloading(key) {
                     return !this.key ? true : false;
-                }
+                },
+                clearSelection: function(){
+                if (window.getSelection) {
+                        if (window.getSelection().empty) {  // Chrome
+                            window.getSelection().empty();
+                        } else if (window.getSelection().removeAllRanges) {  // Firefox
+                            window.getSelection().removeAllRanges();
+                        }
+                    } else if (document.selection) {  // IE?
+                        document.selection.empty();
+                    }
+                },
+                setSelection: function(el){
+                    if (document.selection) {
+                        var range = document.body.createTextRange();
+                            range.moveToElementText(el);
+                        range.select();
+                    } else if (window.getSelection) {
+                        var range = document.createRange();
+                        range.selectNode(el);
+                        window.getSelection().addRange(range);
+                    }
+                },
             });
         })();
     </script>
