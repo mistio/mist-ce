@@ -72,14 +72,12 @@
             cursor: pointer;
             z-index: 9;
         }
-        .clouds cloud-chip.online .icon {
-            background-color: var(--green-color) !important;
-        }
-
-        .clouds cloud-chip.offline .icon {
+        .clouds cloud-chip[offline] .icon {
             background-color: var(--red-color) !important;
         }
-
+        .clouds cloud-chip[online] .icon {
+            background-color: var(--green-color) !important;
+        }
         paper-button.blue {
             line-height: 30px;
             font-weight: 500;
@@ -256,8 +254,8 @@
         <template is="dom-if" if="[[showDashboard]]">
                 <div class="clouds top flexchild-wide-top">                    
                     <div id="cloudslist" class="flex">
-                        <template is="dom-repeat" items="[[model.cloudsArray]]">
-                            <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" index$=[[index]] on-tap="_showCloudInfoDialog" id$="[[item.id]]">
+                        <template is="dom-repeat" items="[[model.cloudsArray]]" restamp="true">
+                            <cloud-chip label="{{item.title}}" class$="link" index$=[[index]] on-tap="_showCloudInfoDialog" id$="[[item.id]]" cloud="[[item]]">
                                 <div class="icon"></div>
                                 <!-- src="[[_computeProviderLogo(item.provider)]]" -->
                                 <h1 class="cloud-title">[[item.title]]</h1>
@@ -461,12 +459,6 @@ Polymer({
 
         }, 5000);
         //this.cloudLayoutMatrix();
-    },
-    isOnline: function(cloud) {
-        return cloud.state == 'online' && 'online';
-    },
-    isOffline: function(cloud) {
-        return cloud.state == 'offline' && 'offline';
     },
     _computeHasIncidents: function(incidents){
          if (incidents.base && incidents.base.length > 0){

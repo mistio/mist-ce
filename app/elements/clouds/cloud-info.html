@@ -172,55 +172,9 @@
                         type: Boolean,
                         computed: '_computeIsEnabled(cloud.enabled)'
                     },
-                    // animationConfig: {
-                    //   value: function() {
-                    //     return {
-                    //       'entry': {
-                    //         // provided by neon-animation/animations/scale-up-animation.html
-                    //         name: 'slide-from-top-animation',
-                    //         node: this
-                    //       },
-                    //       'exit': {
-                    //         // provided by neon-animation/animations/fade-out-animation.html
-                    //         name: 'slide-up-animation',
-                    //         node: this
-                    //       }
-                    //     }
-                    //   }
-                    // }
                 },
                 listeners: {
-                    // 'neon-animation-finish': '_onNeonAnimationFinish'
                 },
-                // toggle: function(){
-                //     if (this.opened == true){
-                //         this.opened = false;
-                //         this.style.display = 'inline-block';
-                //         // run scale-up-animation
-                //         this.playAnimation('entry');
-                //     }
-                //     else {
-                //         this.opened = true;
-                //         // run fade-out-animation
-                //         this.playAnimation('exit');
-                //     }
-                // },
-                // show: function() {
-                //     this.opened = true;
-                //     this.style.display = 'inline-block';
-                //     // run scale-up-animation
-                //     this.playAnimation('entry');
-                // },
-                // hide: function() {
-                //     this.opened = false;
-                //     // run fade-out-animation
-                //     this.playAnimation('exit');
-                // },
-                // _onNeonAnimationFinish: function() {
-                //     if (!this.opened) {
-                //       this.style.display = 'none';
-                //     }
-                // },
                 close: function(){
                     this.set('opened', false);
                     this.fire('close-cloud-info');
@@ -278,7 +232,6 @@
                 },
                 _handleCloudStateAjaxResponse: function(e) {
                     this.set('cloud.enabled', !this.cloud.enabled);
-                    this.set('cloud.state', this.cloud.enabled ? 'online' : 'offline');
                     this.set('sendingData', false);
                     console.log(this.cloud);
                     var msg = this.cloud.enabled ? 'Cloud ' + this.cloud.title + ' was enabled!' :
