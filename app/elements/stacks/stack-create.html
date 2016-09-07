@@ -371,13 +371,19 @@
 
             _computeFields: function(template, templateInps, templateInputs, modelTemplates, clouds, keys, params) {
                 this.fields.filter(function(inp, index) {
-                    if (inp.name.startsWith('mist_key'))
-                        this.set('fields.' + index + '.options', this.model.keysArray);
+                    if (inp.name.startsWith('mist_key')){
+                        this.set('fields.' + index + '.options', this.model.keysArray);                        
+                    }
+
                 }, this);
 
                 this.fields.filter(function(inp, index) {
-                    if (inp.name.startsWith('mist_cloud'))
+                    if (inp.name.startsWith('mist_cloud')){
                         this.set('fields.' + index + '.options', this.model.cloudsArray);
+                        this.fields[index].options.forEach(function(o){
+                            o.disabled = !o.enabled;
+                        })
+                    }
                 }, this);
             },
 
