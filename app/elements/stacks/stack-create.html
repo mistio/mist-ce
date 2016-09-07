@@ -201,7 +201,7 @@
                 },
 
                 _computeFields: function(template, templateInps, templateInputs, modelTemplates, clouds, keys, params) {
-                    var yaml_or_form = 'yaml';
+                    var yaml_or_form = 'form';
                     console.log('Computing Fields started');
 
                     if (this.fields) {
@@ -211,7 +211,7 @@
                         if (yf && yf.value)
                             yaml_or_form = yf.value;
                         else
-                            yaml_or_form = 'yaml';
+                            yaml_or_form = 'form';
                     }
 
                     var ret = [{
@@ -247,11 +247,11 @@
                         show: true,
                         required: true,
                         options: [{
-                            title: "YAML",
-                            val: "yaml"
-                        }, {
                             title: "Form",
                             val: "form"
+                        },{
+                            title: "YAML",
+                            val: "yaml"
                         }]
                     }, {
                         name: "stackinputs",
