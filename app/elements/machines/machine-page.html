@@ -222,7 +222,7 @@
                     <paper-button on-tap="start" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
                     <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
                     <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="_editTags" class="simple" hidden$="[[!machine.can_tag]]">tags</paper-button>
-                    <paper-menu-button horizontal-align="right">
+                    <paper-menu-button id="moreMachineActions" horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
                             <paper-button on-tap="suspend" class="simple" hidden$="[[!machine.can_suspend]]">suspend</paper-button>
@@ -417,7 +417,8 @@ function itemUid(item, section) {
         ],
         listeners: {
             'confirmation': '_machineActionConfirmation',
-            'pending-key-request': '_updateKeyLoader'
+            'pending-key-request': '_updateKeyLoader',
+            'run-script-request':'_feedbackOnScript'
         },
         ready: function(){
             this.set('hideAssociatedKeys', true);
@@ -764,17 +765,26 @@ function itemUid(item, section) {
             }
             else if (e.detail.error) {
                 this.set('isPendingKeyRequest', false);
-                this._showToast('Error associateing key '+ this.model.keys[e.detail.keyId].name+'. '+e.detail.errormsg);
+                this._showToast(e.detail.errormsg);
             }
+            this.querySelector("#moreMachineActions").close();
         },
         _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
             var hide =  !(associatedKeys.base.length > 0 || isPendingKeyRequest);
             this.set('hideAssociatedKeys', hide);
         },
         _runScript: function(e){
-            console.log('run script');
             var scriptDialog = this.querySelector('run-script-on-machine');
             scriptDialog._openDialog();
         },
+        _feedbackOnScript: function(e){
+            if (e.detail.response) {
+                this._showToast('Script run request succeded. Script '+this.model.scripts[e.detail.scriptId].name+' has been queued for execution');
+            }
+            if (e.detail.error) {
+                this._showToast(e.detail.errormsg);
+            }
+            this.querySelector("#moreMachineActions").close();
+        }
     });
 </script>

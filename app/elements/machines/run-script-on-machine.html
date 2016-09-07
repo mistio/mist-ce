@@ -44,7 +44,7 @@
             </div>
         </paper-dialog>
 
-        <iron-ajax id="runScriptRequest" url="/api/v1/scripts/[[selectedScriptId]]" method="POST" on-response="_runScriptResponse" on-error="_runScriptError" on-request="_runScriptRequest"></iron-ajax>
+        <iron-ajax id="runScriptRequest" url="/api/v1/scripts/[[selectedScriptId]]" method="POST" on-response="_runScriptResponse" on-error="_runScriptError" on-request="_runScriptRequest" handle-as="xml"></iron-ajax>
 
     </template>
 </dom-module>
@@ -70,7 +70,6 @@ Polymer({
     },
     computedSelectedScriptId: function(selected){
         this.set('selectedScriptId', this.querySelector('#scripts').selected || '');
-        console.log('updateSelected',this.selectedScriptId);
     },
     _openDialog: function(e) {
         this.$.scriptDialogModal.open();
@@ -88,15 +87,16 @@ Polymer({
         this.$.runScriptRequest.headers["Csrf-Token"] = CSRF_TOKEN;
         this.$.runScriptRequest.generateRequest();
     },
-    _runScriptRequest: function(){
-        this.fire('pending-script-request', {request: true, scriptId: this.selectedScriptId, machine: this.machine.uuid});
+    _runScriptRequest: function(e){
+        this.fire('run-script-request', {request: true, scriptId: this.selectedScriptId, machine: this.machine.uuid});
     },
-    _runScriptResponse: function(){
-        this.fire('pending-script-request', {response: true, scriptId: this.selectedScriptId, machine: this.machine.uuid});
+    _runScriptResponse: function(e){
+        console.log(e, e.detail);
+        this.fire('run-script-request', {response: e.detail.xhr.response, scriptId: this.selectedScriptId, machine: this.machine.uuid});
     },
     _runScriptError: function(e){
-        console.log(e);
-        this.fire('pending-script-request', {error: true, errormsg: e.detail.error, scriptId: this.selectedScriptId, machine: this.machine.uuid});
+        console.log(e, e.detail.xhr.responseText);
+        this.fire('run-script-request', {error: true, errormsg: e.detail.xhr.responseText, scriptId: this.selectedScriptId, machine: this.machine.uuid});
     },
 });
 </script>

@@ -65,7 +65,7 @@
             </div>
         </paper-dialog>
 
-        <iron-ajax id="associateKeyRequest" url="/api/v1/clouds/[[cloudId]]/machines/[[machineId]]/keys/[[selectedKeyId]]" method="PUT" on-response="_associateKeyResponse" on-error="_associateKeyError" on-request="_associateKeyRequest"></iron-ajax>
+        <iron-ajax id="associateKeyRequest" url="/api/v1/clouds/[[cloudId]]/machines/[[machineId]]/keys/[[selectedKeyId]]" method="PUT" on-response="_associateKeyResponse" on-error="_associateKeyError" on-request="_associateKeyRequest" handle-as="xml"></iron-ajax>
 
     </template>
 </dom-module>
@@ -144,12 +144,10 @@ Polymer({
         this.fire('pending-key-request', {response: true, keyId: this.selectedKeyId, machine: this.machineId});
     },
     _associateKeyError: function(e){
-        console.log(e);
-        this.fire('pending-key-request', {error: true, errormsg: e.detail.error ,keyId: this.selectedKeyId, machine: this.machineId});
+        this.fire('pending-key-request', {error: true, errormsg: e.detail.request.xhr.responseText ,keyId: this.selectedKeyId, machine: this.machineId});
     },
     updateInputs: function(e){
         var target = e.target.id;
-        console.log(e, target)
     },
     toggleCollapsble: function(){
         var col = this.querySelector('.collapsible');
