@@ -316,7 +316,7 @@
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
-        <tags-list resource="machine"></tags-list>
+        <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
     </template>
 </dom-module>
@@ -581,7 +581,7 @@ function itemUid(item, section) {
         _editTags: function() {
             var el = this.querySelector('tags-list'),
             items = [];
-            items.push(this.machine);
+            items.push(itemUid(this.machine, this.section));
             el.items = items;
             el._openDialog();
         },

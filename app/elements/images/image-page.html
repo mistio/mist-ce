@@ -4,6 +4,8 @@
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../element-for-in/element-for-in.html">
+<link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../item-list/item-actions.html">
 
 <dom-module id="image-page">
     <template>
@@ -156,6 +158,7 @@
                     </div>
                 </div>
                 <div class="item-actions">
+                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>
                     <paper-button on-tap="_starImage" class="simple">
                         <span hidden$="{{!isStarred}}"> unstar </span>
                         <span hidden$="{{isStarred}}"> star <iron-icon icon="star"></iron-icon> </span>
@@ -188,13 +191,13 @@
                     </div>
                 </paper-material>
             </template>
-
             <div class="absolute-bottom-right">
                 <paper-fab icon="star-border" on-tap="_starImage" id="starImageFab" hidden$={{!isStarred}}></paper-fab>
                 <paper-fab icon="star" on-tap="_starImage" id="starImageFab" hidden$={{isStarred}}></paper-fab>
             </div>
         </div>
         <iron-ajax id="imageStarAjaxRequest" url="/api/v1/clouds/{{image.cloud.id}}/images/{{image.id}}" method="POST" on-response="_handleImageStarAjaxResponse" on-error="_handleImageStarAjaxError"></iron-ajax>
+        <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
     </template>
     <script>
@@ -256,6 +259,13 @@
                 },
                 _computeIsStarred: function(star) {
                     return star;
+                },
+                _editTags: function() {
+                    var el = this.querySelector('tags-list'),
+                    items = [];
+                    items.push(itemUid(this.image, this.section));
+                    el.items = items;
+                    el._openDialog();
                 },
                 _starImage: function(e) {
                     this.$.imageStarAjaxRequest.headers["Content-Type"] = 'application/json';
