@@ -115,7 +115,7 @@
                     }
                 },
                 observers: [
-                    '_cloudsChanged(model.cloudsArray.*, model.machinesArray.*, model.keysArray.*)'
+                    '_cloudsChanged(model.cloudsArray.*, model.machinesArray.*)'
                 ],
                 listeners: {
                     'iron-select': '_fieldsChanged'
@@ -218,32 +218,8 @@
                         }
                     }
                 },
-                _cloudsChanged: function(clouds, machines, keys) {
-                    
-                    // make an array of machines with keys
-                    var machinesWithKeys = [];
-                    this.model.keysArray.forEach(function(k){
-                        k.machines.forEach(function(m){
-                            var cloudId = m[0];
-                            var machineId = m[1];
-                            if (this.model.clouds && this.model.clouds[cloudId] && this.model.clouds[cloudId].machines && this.model.clouds[cloudId].machines[machineId]) {
-                                machinesWithKeys.push(this.model.clouds[cloudId].machines[machineId].uuid);
-                            }
-                        }, this);
-                    }, this);
-                    
+                _cloudsChanged: function(clouds, machines) {
                     this.set('fields.0.options', this.model.machinesArray);
-                    // 
-                    if (this.fields) {
-                        this.fields[0].options.forEach(function(o, index){
-                            if (machinesWithKeys.indexOf(o.uuid) > -1){
-                                this.set('fields.0.options.'+index+'.icon', 'communication:vpn-key');
-                            }
-                            else {
-                                this.set('fields.0.options.'+index+'.icon', 'nokey');   
-                            }
-                        }, this);
-                    }
                 },
                 _runScriptResponse: function(e) {
                     var msg = 'Run script request was successfull. Redirecting to script...';
