@@ -293,7 +293,8 @@ def add_cloud(request):
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
     if cloud_tags:
-        mist.core.methods.set_cloud_tags(owner, cloud_tags, cloud_id)
+        from mist.core.tag.methods import add_tags_to_resource
+        add_tags_to_resource(owner, cloud, cloud_tags.items())
 
     c_count = Cloud.objects(owner=owner).count()
     ret = {
@@ -458,8 +459,8 @@ def add_key(request):
     key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
 
     if key_tags:
-        mist.core.methods.set_keypair_tags(auth_context.owner,
-                                           key_tags, key.id)
+        from mist.core.tag.methods import add_tags_to_resource
+        add_tags_to_resource(auth_context.owner, key, key_tags.items())
     # since its a new key machines fields should be an empty list
 
     clouds = Cloud.objects(owner=auth_context.owner)
