@@ -744,8 +744,11 @@ class DockerController(BaseController):
                 ca_cert_temp_file.write(self.cloud.ca_cert_file)
                 ca_cert_temp_file.close()
                 ca_cert = ca_cert_temp_file.name
+            # FIXME: The docker_host logic should come out of libcloud into
+            # DockerController.list_machines
             return get_driver(Provider.DOCKER)(host=host,
                                                port=port,
+                                               docker_host=cloud.host,
                                                key_file=key_temp_file.name,
                                                cert_file=cert_temp_file.name,
                                                ca_cert=ca_cert,
@@ -766,7 +769,7 @@ class DockerController(BaseController):
             check_host(kwargs['host'])
 
     def _list_machines__machine_creation_date(self, machine_api):
-        return machine_api.created_at  # unix timestamp in ms
+        return machine_api.created_at  # unix timestamp
 
     def _list_images__fetch_images(self, search=None):
         # Fetch mist's recommended images

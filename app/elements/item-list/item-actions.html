@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
+<link rel="import" href="../tags/tags-list.html">
 
 <dom-module id="item-actions">
     <template>
@@ -35,6 +36,7 @@
                 text-align: left;
                 margin-top: 0;
                 color: #fff;
+                height: 54px;
             }
 
             div.actions .more {
@@ -53,7 +55,7 @@
             paper-dialog {
                 padding: 0;
             }
-            paper-dialog > h2 {
+            :host paper-dialog > h2 {
                 text-transform: capitalize;
                 margin-top: 24px;
             }
@@ -62,6 +64,11 @@
             }
             paper-dialog > .btn-group {
                 margin-bottom: 16px;
+            }
+
+            paper-dialog p.item-actions {
+                max-height: 200px;
+                overflow: scroll;
             }
 
         </style>
@@ -111,6 +118,7 @@
             </div>
           </paper-dialog>
           <dialog-element></dialog-element>
+          <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
         </content>
     </template>
 </dom-module>
@@ -121,14 +129,14 @@ ACTIONS = {
   'shell': {
     'name': 'shell',
     'icon': 'vaadin-icons:terminal',
-    'confirm': false,
-    'multi': false
+    'confirm': true,
+    'multi': true
   },
   'tag': {
     'name': 'tag',
     'icon': 'label',
-    'confirm': false,
-    'multi': false
+    'confirm': true,
+    'multi': true
   },
   'reboot': {
     'name': 'reboot',
@@ -214,6 +222,7 @@ Polymer({
     is: 'item-actions',
 
     properties: {
+        org: Object,
         section: Object,
         items: {
             type: Array,
@@ -346,16 +355,14 @@ Polymer({
 
         item.type = item_type;
         var ret = [];
-        if (item.type == 'machine') {
+        ret.push('tag');
+        if (item.type == 'machine') {            
             if (item.state == 'running') {
               // if key then add shell / run script
               // if not monitoring then enable monitoring
               ret.push('shell');
-              ret.push('tag');
               ret.push('reboot');
-            } else {
-              ret.push('tag');
-            }
+            } 
             ret.push('destroy');
         } else if (item.type == 'image') {
             if (item.star) {
@@ -387,7 +394,7 @@ Polymer({
             ret.push('delete');
         } else if (item.type == 'team') {
             ret.push('delete');
-        }
+        }        
         return ret;
     },
 
@@ -398,8 +405,17 @@ Polymer({
     _selectAction: function (event, item) {
         this.set('selectedAction', event.model.item);
         this.set('multi', false);
-        if (event.model.item.confirm)
-            this.$['confirmation'].toggle();
+        if (event.model.item.confirm) {
+            if(event.model.item.name == 'tag') {
+                var items = [];
+                items.push(itemUid(this.selectedItem));
+                this.$['tagsdialog'].items = items;
+                this.$['tagsdialog']._openDialog();
+            }
+            else {
+                this.$['confirmation'].toggle();
+            }
+        }
         else {
             var items = [];
             items.push(this.selectedItem);
@@ -411,8 +427,15 @@ Polymer({
     _selectMultiAction: function (event) {
         this.set('selectedAction', event.model.item);
         this.set('multi', true);
-        if (event.model.item.confirm)
-            this.$['confirmation'].toggle();
+        if (event.model.item.confirm){
+            if(event.model.item.name == 'tag') {
+                this.$['tagsdialog'].items = this.selectedItems;
+                this.$['tagsdialog']._openDialog();
+            }
+            else {
+                this.$['confirmation'].toggle();
+            }
+        }
         else {
             var items = [];
             this.selectedItems.forEach(function(si){
@@ -441,17 +464,29 @@ Polymer({
     },
 
     _performAction: function(action, items) {
-        var run = function() {
+        var run = function(el) {
             var uri, payload, item = items.shift(), method = 'POST';
             //machines
-            if (action.name == 'reboot') {
+            if (action.name == 'shell') {
+                console.warn('opening shell');
+                // load page import on demand.
+                el.importHref(el.resolveUrl('../helpers/xterm-dialog.html'), null, null, true);
+                var xterm = el.querySelector("xterm-dialog");
+                if (!xterm) {
+                    xterm = document.createElement("xterm-dialog");
+                    xterm.target = item;
+                    var parent = el.parentElement.parentElement;
+                    parent.insertBefore(xterm, parent.firstChild);
+                }
+                return;
+            } else if (action.name == 'reboot') {
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
                 payload = {'action': 'reboot'};
                 console.log('rebooting');
             } else if (action.name == 'destroy') {
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
                 payload = {'action': 'destroy'};
-            //templates                
+            //templates
             } else if (action.name == 'delete' && item.type == 'template') {
                 uri = '/api/v1/templates/' + item.id;
                 method = 'DELETE';
@@ -472,7 +507,7 @@ Polymer({
                 method = 'DELETE';
             //teams
             } else if (action.name == 'delete' && item.type == 'team') {
-                uri = '/api/v1/teams/' + item.id;
+                uri = '/api/v1/org/'+ el.org.id +'/teams/' + item.id;
                 method = 'DELETE';
             //images
             } else if (action.name == 'star' || action.name == 'unstar' && item && item.type == 'image') {
@@ -499,7 +534,7 @@ Polymer({
                         console.error(action, 'failed');
                     }
                     if (items.length) {
-                        run();
+                        run(el);
                     }
                 }
             };
@@ -510,7 +545,7 @@ Polymer({
             xhr.send(JSON.stringify(payload));
       }
 
-      run();
+      run(this);
     },
 
     _topActions: function (actions) {
@@ -519,6 +554,10 @@ Polymer({
 
     _moreActions: function (actions) {
         return this.get('actions').slice(4);
+    },
+
+    computeModel: function(){
+        return document.querySelector("app-main").model;
     }
 
 });

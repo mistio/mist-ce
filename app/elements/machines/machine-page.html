@@ -4,9 +4,12 @@
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
-
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
+
+<link rel="import" href="associate-key.html">
+<link rel="import" href="run-script-on-machine.html">
 
 <dom-module id="machine-page">
     <template>
@@ -20,6 +23,7 @@
             .columns {
                 @apply(--layout-horizontal);
                 flex: 1 100%;
+                margin-bottom: 16px;
             }
             .left, .right {
                 @apply(--layout-vertical);
@@ -167,6 +171,28 @@
                 margin: 10% auto;
                 display: block;
             }
+            .machine-key {
+                line-height: 24px;
+                display: inline-block;
+                vertical-align: top;
+            }
+            .machine-key iron-icon {
+                margin-right: 8px;
+                opacity: 0.32;
+                cursor: pointer;
+            }
+            .machine-key iron-icon[icon='close'] {
+                opacity: 0;
+                margin-right: 16px;
+            }
+            .machine-key:hover iron-icon[icon='close'] {
+                opacity: 0.32;
+            }
+            #pendingKeyrequest paper-spinner {
+                width: 24px !important;
+                height: 24px !important;
+                vertical-align: middle !important;
+            }
         </style>
 
         <div id="content">
@@ -196,16 +222,18 @@
                     <paper-button on-tap="start" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
                     <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
                     <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="_editTags" class="simple" hidden$="[[!machine.can_tag]]">tags</paper-button>
-                    <paper-menu-button horizontal-align="right">
+                    <paper-menu-button id="moreMachineActions" horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
                             <paper-button on-tap="suspend" class="simple" hidden$="[[!machine.can_suspend]]">suspend</paper-button>
                             <paper-button on-tap="destroy" class="simple" hidden$="[[!machine.can_destroy]]">destroy</paper-button>
                             <paper-button on-tap="rename" class="simple" hidden$="[[!machine.can_rename]]">rename</paper-button>
                             <paper-button on-tap="undefine" class="simple" hidden$="[[!machine.can_undefine]]">undefine</paper-button>
+                            <paper-button on-tap="associateKey" class="simple">Associate a key</paper-button>
+                            <paper-button on-tap="_runScript" class="simple">Run a Script</paper-button>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button on-tap="ssh" class="simple white left-icon" style$="color: [[section.color]]" disabled><iron-icon style$="color: [[section.color]]" icon="icons:code"></iron-icon> ssh</paper-button>
+                    <paper-button on-tap="shell" class="simple white left-icon" style$="color: [[section.color]]"><iron-icon style$="color: [[section.color]]" icon="vaadin-icons:terminal"></iron-icon> SHELL</paper-button>
                     <paper-button on-tap="monitor" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[isMonitored]]" disabled>monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button>
                 </div>
             </paper-material>
@@ -216,6 +244,20 @@
                     <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
                 </paper-material>
+                <paper-material id="rightcolumn" class="right" hidden$="[[hideAssociatedKeys]]">
+                    <h3 class="smallcaps">Associated Keys:</h3>
+                    <div class="associatedKeys">
+                        <template is="dom-repeat" items="[[associatedKeys]]">
+                            <div class="machine-key">
+                                <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
+                                <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon> 
+                            </div>
+                        </template>
+                        <div class="machine-key" id="pendingKeyRequest">
+                            <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
+                        </div>
+                    </div>
+                </paper-material>
                 <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
                     <h3 class="smallcaps">TAGS:</h3>
                     <template is="dom-repeat" items="[[machine.tags]]">
@@ -223,11 +265,13 @@
                     </template>
                 </paper-material>
             </div>
-            <div hidden$="{{!isMonitored}}">
-                <h3 class="smallcaps">Monitoring Graphs</h3>
-                <paper-material>demo graph data</paper-material>
-                <!-- <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard> -->
-            </div>
+            <!--<paper-material class="info-card" hidden$="{{!isMonitored}}">
+                <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
+                <div>
+                    <paper-material>graph data</paper-material> 
+                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard> 
+                </div>
+            </paper-material>-->
             <paper-material class="info-card">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
                 <div class="card-content">
@@ -264,15 +308,34 @@
                 </div>
             </paper-material>
         </div>
+        <item-actions id="actions" items="[[_itemInArray(machine)]]" selected-items="[[thisItemUid]]" section="[[section]]" org="[[model.org]]"></item-actions>
         <dialog-element></dialog-element>
+        <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key>
+        <run-script-on-machine model="[[model]]" machine="[[machine]]" cloud-id="[[machine.cloud.id]]"></run-script-on-machine>
         <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax>
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+        <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
-        <tags-list resource="machine"></tags-list>
+        <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
     </template>
 </dom-module>
 <script>
+function itemUid(item, section) {
+    // Returns a universal resource id of the form
+    //      resourceType:[cloudId]:itemId
+    // e.g. machine:3tm7aaHHZcMxpZ:bf04f27e924fa67023582,
+    //      key::MnhLdx9u22YjVJ
+    //
+    // TODO replace with mist uuids
+
+    // if item type is not defined derive it fro the current section id
+    var item_type = item.type ? item.type : (section &&
+                                             section.id.slice(0,-1));
+    var cloudId = item.cloud ? item.cloud.id : '';
+
+    return item_type + ':' + cloudId + ':' + item.id;
+}
     Polymer({
         is: 'machine-page',
 
@@ -321,13 +384,45 @@
                 type: Boolean,
                 computed: '_computeIsloading(machine)',
                 value: true
-            }
+            },
+            thisItemUid: {
+                type: Array,
+                computed: '_computeThisItemUid(machine)'
+            },
+            associatedKeys: {
+                type: Array,
+                computed:'_computeAssociatedKeys(machine, model.keysArray)'
+            },
+            newKeyId: {
+                type: String,
+                value: ''
+            },
+            machineIp: {
+                type: String,
+                computed: 'computeMachineIp(machine.public_ips)'
+            },
+            disassociateKeyId: {
+                type: String
+            },
+            isPendingKeyRequest: {
+                type: Boolean
+            },
+            hideAssociatedKeys: {
+                type: Boolean
+            },
         },
         observers: [
-            '_isMonitored(machine, model.monitoring.machines.*)'
+            '_isMonitored(machine, model.monitoring.machines.*)',
+            '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)'
         ],
         listeners: {
-            'confirmation': '_machineActionConfirmation'
+            'confirmation': '_machineActionConfirmation',
+            'pending-key-request': '_updateKeyLoader',
+            'run-script-request':'_feedbackOnScript'
+        },
+        ready: function(){
+            this.set('hideAssociatedKeys', true);
+            this.set('isPendingKeyRequest', false);
         },
         attached: function(){
             this.datasources = [
@@ -348,7 +443,16 @@
               "isDefault": false,
               "jsonData": null
               }
-            ];
+            ];            
+            var that = this;
+            setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
+                if (that.querySelector('dashboard-panel'))
+                    that.querySelector('dashboard-panel').resize();
+
+            }, 5000);
+
+        },
+        _computeMachine: function(params, machines) {
             this.dashboard = {
               "id": 1,
               "refresh": "10s",
@@ -362,7 +466,7 @@
                   "targets": [
                     {
                     "refId": "A",
-                    "target": "bucky.*.load.shortterm"
+                    "target": "bucky."+params.uuid+".load.shortterm"
                     },
                   ],
                   "timeFrom": null,
@@ -395,18 +499,40 @@
               "timezone": "browser"
             };
 
-            var that = this;
-            setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-                if (that.querySelector('dashboard-panel'))
-                    that.querySelector('dashboard-panel').resize();
-
-            }, 5000);
-
-        },
-        _computeMachine: function(params, machines) {
+            if (this.machine && this.machine.uuid && params.uuid != this.machine.uuid) {
+                this.set('isPendingKeyRequest', false);
+            }
             return machines.base.find(function(machine) {
                 return machine.uuid == params.uuid;
             }, this);
+        },
+        _itemInArray: function(machine){
+            var arr = [];
+            arr.push(this.machine);
+            return arr;
+        },
+        _computeThisItemUid: function(machine){
+            var itemUidInArray = [];
+            itemUidInArray.push(itemUid(this.machine, this.section));
+            return itemUidInArray;
+        },
+        _computeAssociatedKeys: function(machine, keys){
+            var machineId = this.machine.id;
+            var associatedKeys = [];
+                associatedKeys = this.model.keysArray.filter(function(key){
+                return key.machines.filter(function(machine){
+                    return machine[1] == machineId;
+                }).length;
+            }, this);
+            return associatedKeys || [];
+        },
+        computeMachineIp: function(machineips){
+            if (this.machine.public_ips){
+                return this.machine.public_ips[0]
+            }
+            else {
+                return ''
+            }
         },
         _isEqual: function(a, b) {
             return a === b;
@@ -455,13 +581,27 @@
         _editTags: function() {
             var el = this.querySelector('tags-list'),
             items = [];
-            items.push(this.machine);
+            items.push(itemUid(this.machine, this.section));
             el.items = items;
             el._openDialog();
         },
         _editMachine: function(e) {
             var el = this.querySelector('machine-edit');
             el._openEditMachineModal();
+        },
+        shell: function(){
+            console.warn('opening shell');
+            var el = this;
+            // load page import on demand.
+            el.importHref(el.resolveUrl('../helpers/xterm-dialog.html'), null, null, true);
+            var xterm = el.querySelector("xterm-dialog");
+            if (!xterm) {
+                xterm = document.createElement("xterm-dialog");
+                xterm.target = this.machine;
+                var parent = el.parentElement.parentElement;
+                parent.insertBefore(xterm, parent.firstChild);
+            }
+            return;
         },
         start: function(_, params) {
             this.confirmAction("start");
@@ -524,11 +664,20 @@
                     payload = {'action': 'undefine'};
                 if (reason == "machine.destroy")
                     payload = {'action': 'destroy'};
+                if (reason == "disassociate.key"){
+                    payload = {'host': this.machineIp};
+                    this.$.disassociateKeyRequest.body = payload;
+                    this.$.disassociateKeyRequest.headers["Content-Type"] = 'application/json';
+                    this.$.disassociateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.disassociateKeyRequest.generateRequest();
+                }
 
-                this.$.actionRequest.body = payload;
-                this.$.actionRequest.headers["Content-Type"] = 'application/json';
-                this.$.actionRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                this.$.actionRequest.generateRequest();
+                if (reason != "disassociate.key"){
+                    this.$.actionRequest.body = payload;
+                    this.$.actionRequest.headers["Content-Type"] = 'application/json';
+                    this.$.actionRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.actionRequest.generateRequest();
+                }
             }
         },
         _actionRequest: function(e){
@@ -579,6 +728,63 @@
         },
         _computeIsloading(machine) {
             return !this.machine ? true : false;
+        },
+        associateKey:  function(e){
+            var keysDialog = this.querySelector('associate-key');
+            keysDialog._openDialog();
+        },
+        disassociateKey: function(e){
+            var keyId = e.target['dataKeyid'];
+            var keyName = e.target['dataKeyname'];
+            this.set('disassociateKeyId', keyId);
+            this._showDialog({
+                title: 'Disassociate key',
+                body: "You are about to disassociate key '" + keyName + "' from machine.",
+                danger: false,
+                reason: "disassociate.key",
+                action: 'disassociate',
+                key: keyId
+            });
+        },
+        _disassociateKeyRequest: function(e){
+            this.set('isPendingKeyRequest', true);
+        },
+        _disassociateKeyResponse: function(e){
+            this.set('isPendingKeyRequest', false);
+        },
+        _disassociateKeyError: function(e){
+            this.set('isPendingKeyRequest', false);
+        },
+        _updateKeyLoader: function(e){
+            //console.log(e.detail);
+            if (e.detail.request) {
+                this.set('isPendingKeyRequest', true);
+            }
+            else if (e.detail.response) {
+                this.set('isPendingKeyRequest', false);
+            }
+            else if (e.detail.error) {
+                this.set('isPendingKeyRequest', false);
+                this._showToast(e.detail.errormsg);
+            }
+            this.querySelector("#moreMachineActions").close();
+        },
+        _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
+            var hide =  !(associatedKeys.base.length > 0 || isPendingKeyRequest);
+            this.set('hideAssociatedKeys', hide);
+        },
+        _runScript: function(e){
+            var scriptDialog = this.querySelector('run-script-on-machine');
+            scriptDialog._openDialog();
+        },
+        _feedbackOnScript: function(e){
+            if (e.detail.response) {
+                this._showToast('Script run request succeded. Script '+this.model.scripts[e.detail.scriptId].name+' has been queued for execution');
+            }
+            if (e.detail.error) {
+                this._showToast(e.detail.errormsg);
+            }
+            this.querySelector("#moreMachineActions").close();
         }
     });
 </script>
