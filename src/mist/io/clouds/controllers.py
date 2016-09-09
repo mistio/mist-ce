@@ -748,7 +748,7 @@ class DockerController(BaseController):
             # DockerController.list_machines
             return get_driver(Provider.DOCKER)(host=host,
                                                port=port,
-                                               docker_host=cloud.host,
+                                               docker_host=self.cloud.host,
                                                key_file=key_temp_file.name,
                                                cert_file=cert_temp_file.name,
                                                ca_cert=ca_cert,
@@ -933,7 +933,7 @@ class OtherController(BaseController):
 
         # Add machine.
         try:
-            machine = self.add_machine(
+            self.add_machine(
                 self.cloud.title, remove_on_error=remove_on_error, **kwargs
             )
         except Exception as exc:
