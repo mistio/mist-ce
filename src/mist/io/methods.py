@@ -1713,17 +1713,16 @@ def list_machines(user, cloud_id):
 
         all_tags = tags_from_provider
 
+        from mist.core.tag.methods import resolve_id_and_get_tags
         try:
-            from mist.core.methods import get_machine_tags
-            mistio_tags = get_machine_tags(user, cloud_id, m.id)
+            mistio_tags = resolve_id_and_get_tags(user, 'machine', m.id,
+                                                  cloud_id=cloud_id)
         except:
-            mistio_tags = {}
+            mistio_tags = []
 
         for tag in mistio_tags:
-            key, value = tag.popitem()
-            tag_dict = {'key': key, 'value': value}
-            if tag_dict not in all_tags:
-                all_tags.append(tag_dict)
+            if tag not in all_tags:
+                all_tags.append(tag)
             # cost_per_hour + cost_per_month fixed tags for
             # machine cost analysis
             if key == 'cost_per_hour':
@@ -1979,7 +1978,9 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         )
 
     if tags:
-        mist.core.methods.set_machine_tags(user, tags, cloud_id, node.id)
+        from mist.core.tag.methods import resolve_id_and_set_tags
+        resolve_id_and_set_tags(user, 'machine', node.id, tags,
+                                cloud_id=cloud_id)
 
     ret = {'id': node.id,
            'name': node.name,
@@ -3052,6 +3053,7 @@ def star_image(user, cloud_id, image_id):
 
 
 def list_clouds(user):
+    from mist.core.tag.methods import get_tags_for_resource
     clouds = Cloud.objects(owner=user).only("id", "apikey", "title", "provider",
                                             "poll_interval", "enabled",
                                             "region", "tenant_name",
@@ -3063,7 +3065,7 @@ def list_clouds(user):
             del cloud["docker_port"]
         cloud["state"] = 'online' if cloud["enabled"] else 'offline'
         cloud["id"] = cloud["_id"]
-        cloud['tags'] = mist.core.methods.get_cloud_tags(user,  cloud["_id"])
+        cloud['tags'] = get_tags_for_resource(user, cloud)
         normalized_clouds.append(cloud)
 
     return normalized_clouds
@@ -3074,6 +3076,7 @@ def list_keys(user):
     :param user:
     :return:
     """
+    from mist.core.tag.methods import get_tags_for_resource
     keys = Keypair.objects(owner=user).only("default", "name")
     clouds = Cloud.objects(owner=user)
     key_objects = []
@@ -3086,7 +3089,7 @@ def list_keys(user):
         key_object["isDefault"] = key.default
         key_object["machines"] = transform_key_machine_associations(machines,
                                                                     key)
-        key_object['tags'] = mist.core.methods.get_key_tags(user, key.id)
+        key_object['tags'] = get_tags_for_resource(user, key)
         key_objects.append(key_object)
     return key_objects
 

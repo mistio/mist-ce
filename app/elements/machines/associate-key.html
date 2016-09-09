@@ -1,0 +1,165 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+<dom-module id="associate-key">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style is="custom-style" include="shared-styles">
+        :host {
+            display: block;
+            width: 100%;
+        }
+        :host .btn-group {
+            margin: 0 0 24px 0;
+        }
+        .grey {
+            opacity: 0.54;
+        }
+        .trigger {
+            cursor: pointer;
+        }
+        .trigger iron-icon {
+            transition: transform 300ms ease-in;
+        }
+        .trigger[open] iron-icon {
+            transform: rotate(180deg);
+        }
+        .collapsible {
+            height: 0;
+            overflow: hidden;
+            transition: height 300ms ease-in-out 100ms;
+        }
+        .collapsible[open] {
+            height: auto;
+        }
+        </style>
+        <paper-dialog id="dialogModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Associate a key</h2>
+            <p>
+                <span class="grey"> Choose from your existing keys. </span>
+                <paper-dropdown-menu label="Select key" horizontal-align="left">
+                    <paper-menu id="keys" attr-for-selected="value" selected="[[selected]]" class="dropdown-content">
+                        <template is="dom-repeat" items="[[keys]]" as="key">
+                            <paper-item value="[[key.id]]">[[key.name]]</paper-item>
+                        </template>
+                    </paper-menu>
+                </paper-dropdown-menu>
+            </p>
+            <p>
+                <div class="trigger" on-tap="toggleCollapsble">Advanced Options <iron-icon icon="icons:arrow-drop-down"></iron-icon></div>
+                <div class="collapsible">
+                    <paper-input id="user" label="ssh user" value$="[[user]]" placeholder="root"></paper-input>
+                    <paper-input id="port" label="ssh port" value$="[[port]]" placeholder="22"></paper-input>
+                </div>
+            </p>
+            <div class="clearfix btn-group">
+                <paper-button dialog-dismiss>
+                    Cancel
+                </paper-button>
+                <paper-button class="blue" on-tap="associateKey" dialog-confirm disabled$="[[!selectedKeyId]]">
+                    Associate
+                </paper-button>
+            </div>
+        </paper-dialog>
+
+        <iron-ajax id="associateKeyRequest" url="/api/v1/clouds/[[cloudId]]/machines/[[machineId]]/keys/[[selectedKeyId]]" method="PUT" on-response="_associateKeyResponse" on-error="_associateKeyError" on-request="_associateKeyRequest" handle-as="xml"></iron-ajax>
+
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'associate-key',
+
+    properties: {
+        keys: Array,
+        host: String,
+        user: {
+            type: String,
+            value: false
+        },
+        port: {
+            type: String,
+            value: false
+        },
+        cloudId: String,
+        machineId: String,
+        selected: String,
+        selectedKeyId: {
+            type: String,
+            value: false
+        }
+    },
+    listeners: {
+        'iron-select' : 'computedSelectedKeyId',
+        'change': 'updateInputs'
+    },
+    ready: function(){
+    },
+    computedSelectedKeyId: function(selected){
+        this.set('selectedKeyId', this.querySelector('#keys').selected || '');
+        console.log('updateSelected',this.selectedKeyId);
+    },
+    _openDialog: function(e) {
+        //reset
+        var col = this.querySelector('.collapsible');
+        var trigger = this.querySelector('.trigger');
+        if (col.getAttribute('open')) {
+            trigger.removeAttribute('open');
+            col.removeAttribute('open');
+        }
+        this.$.dialogModal.open();
+    },
+    _closeDialog: function(e) {
+        this.$.dialogModal.close();
+        //reset
+        var col = this.querySelector('.collapsible');
+        var trigger = this.querySelector('.trigger');
+        if (col.getAttribute('open')) {
+            trigger.removeAttribute('open');
+            col.removeAttribute('open');
+        }
+    },
+    _addKey: function(){
+        //set attribute origin
+        var origin = window.location.pathname;
+        page("/add-key?origin="+origin);
+
+    },
+    associateKey: function(e){
+        var user = this.querySelector('paper-input#user').value || 'root';
+        var port = this.querySelector('paper-input#port').value || '22';
+
+        this.$.associateKeyRequest.headers["Content-Type"] = 'application/json';
+        this.$.associateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+        this.$.associateKeyRequest.body = {host: this.host, ssh_user: user, ssh_port: port};
+        this.$.associateKeyRequest.generateRequest();
+    },
+    _associateKeyRequest: function(){
+        this.fire('pending-key-request', {request: true, keyId: this.selectedKeyId, machine: this.machineId});
+    },
+    _associateKeyResponse: function(){
+        this.fire('pending-key-request', {response: true, keyId: this.selectedKeyId, machine: this.machineId});
+    },
+    _associateKeyError: function(e){
+        this.fire('pending-key-request', {error: true, errormsg: e.detail.request.xhr.responseText ,keyId: this.selectedKeyId, machine: this.machineId});
+    },
+    updateInputs: function(e){
+        var target = e.target.id;
+    },
+    toggleCollapsble: function(){
+        var col = this.querySelector('.collapsible');
+        var trigger = this.querySelector('.trigger');
+        if (col.getAttribute('open')) {
+            trigger.removeAttribute('open');
+            col.removeAttribute('open');
+        }
+        else {
+            trigger.setAttribute('open', true);
+            col.setAttribute('open', true);
+        }
+    }
+});
+</script>
