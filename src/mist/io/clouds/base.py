@@ -20,6 +20,7 @@ from libcloud.compute.base import NodeLocation
 
 from mist.io import config
 
+from mist.io.exceptions import MistError
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudExistsError
 from mist.io.exceptions import InternalServerError
@@ -361,7 +362,7 @@ class BaseController(object):
         # FIXME: Move this to top of the file once Machine model is migrated.
         # The import statement is currently here to avoid circular import
         # issues.
-        from mist.core.cloud.models import Machine
+        from mist.io.machines.models import Machine
 
         # Try to query list of machines from provider API.
         try:
@@ -379,6 +380,10 @@ class BaseController(object):
         except Exception as exc:
             log.exception("Error while running list_nodes on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
+
+        if return_libcloud_results:
+            # FIXME i move it here, not to making parsing without a reason
+            return nodes
 
         now = datetime.datetime.utcnow()
 
@@ -432,43 +437,40 @@ class BaseController(object):
             machine.state = config.STATES[node.state]
             machine.private_ips = node.private_ips
             machine.public_ips = node.public_ips
-            # FIXME: machine.tags': tags,
+            machine.tags = tags  # FIXME: machine.tags': tags,
             machine.extra = node.extra
             #machine.last_seen': str(machine_model.last_seen or ''),
             #machine.missing_since': str(machine_model.missing_since or ''),
             #machine.created': str(machine_model.created or ''),
             #}
+            # machine_libcloud = machine.as_dict()
 
             # Get machine creation date.
             try:
                 created = self._list_machines__machine_creation_date(node)
                 if created:
-                    machine_model.created = get_datetime(created)
+                    machine.created = get_datetime(created)
             except Exception as exc:
                 log.exception("Error finding creation date for %s in %s.",
-                              self.cloud, machine_model)
+                              self.cloud, machine)
             # TODO: Consider if we should fall back to using current date.
             # if not machine_model.created:
             #     machine_model.created = datetime.datetime.utcnow()
 
             # Update with available machine actions.
             try:
-                self._list_machines__machine_actions(
-                    machine_model.id, node.id, node, machine_model, machine
-                )
+                self._list_machines__machine_actions(node, machine)
             except Exception as exc:
                 log.exception("Error while finding machine actions "
                               "for machine %s:%s for %s",
-                              machine_model.id, node.name, self.cloud)
+                              machine.id, node.name, self.cloud)
 
             # Apply any cloud/provider specific post processing.
             try:
-                self._list_machines__postparse_machine(
-                    machine_model.id, node.id, node, machine_model, machine
-                )
+                self._list_machines__postparse_machine(node, machine)
             except Exception as exc:
                 log.exception("Error while post parsing machine %s:%s for %s",
-                              machine_model.id, node.name, self.cloud)
+                              machine.id, node.name, self.cloud)
 
             # Apply any cloud/provider cost reporting.
             try:
@@ -481,8 +483,8 @@ class BaseController(object):
 
                 month_days = calendar.monthrange(now.year, now.month)[1]
 
-                cph = parse_num(machine['tags'].get('cost_per_hour'))
-                cpm = parse_num(machine['tags'].get('cost_per_month'))
+                cph = parse_num(machine.tags.get('cost_per_hour'))
+                cpm = parse_num(machine.tags.get('cost_per_month'))
                 if not (cph or cpm) or cph > 100 or cpm > 100 * 24 * 31:
                     cph, cpm = map(parse_num,
                                    self._list_machines__cost_machine(node))
@@ -491,56 +493,57 @@ class BaseController(object):
                         cph = cpm / month_days / 24
                     elif not cpm:
                         cpm = cph * 24 * month_days
-                    machine['extra']['cost_per_hour'] = '%.2f' % cph
-                    machine['extra']['cost_per_month'] = '%.2f' % cpm
+                    # machine_libcloud['cost_per_hour'] = '%.2f' % cph
+                    # machine_libcloud['cost_per_month'] = '%.2f' % cpm
+                    machine.cost.cost_per_hour = round(cph, 2) # '%.2f' % cph
+                    machine.cost.cost_per_month = round(cpm, 2) # '%.2f' % cpm
 
             except Exception as exc:
                 log.exception("Error while calculating cost "
                               "for machine %s:%s for %s",
-                              machine_model.id, node.name, self.cloud)
+                              machine.id, node.name, self.cloud)
             if node.state.lower() == 'terminated':
-                machine['extra'].pop('cost_per_hour', None)
-                machine['extra'].pop('cost_per_month', None)
+                # machine_libcloud.pop('cost_per_hour', None)
+                # machine_libcloud.pop('cost_per_month', None)
+                machine.cost.cost_per_hour = 0
+                machine.cost.cost_per_month = 0
 
             # Make sure we don't meet any surprises when we try to json encode
             # later on in the HTTP response.
-            for key, val in machine['extra'].items():
+            for key, val in machine.extra.items():
                 try:
                     json.dumps(val)
                 except TypeError:
-                    machine['extra'][key] = str(val)
+                    machine.extra[key] = str(val)
 
             # Optimize tags data structure for js...
-            tags = machine['tags']
+            tags = machine.tags
             if isinstance(tags, dict):
-                machine['tags'] = [{'key': key, 'value': value}
+                machine.tags = [{'key': key, 'value': value}
                                    for key, value in tags.iteritems()
                                    if key != 'Name']
 
             # Save all changes to machine model on the database.
-            machine_model.save()
+            machine.save()
 
+            # machines.append(machine_libcloud)
             machines.append(machine)
 
         # Set last_seen on machine models we didn't see for the first time now.
         Machine.objects(cloud=self.cloud,
-                        id__nin=[m['uuid'] for m in machines],
+                        id__nin=[m.id for m in machines],
                         missing_since=None).update(missing_since=now)
-        if return_libcloud_results:
-            return nodes
+
         return machines
 
-    def _list_machines__machine_creation_date(self, machine_api):
+    def _list_machines__machine_creation_date(self, machine_libcloud):
         return
 
-    def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
-                                        machine_api, machine_model,
-                                        machine_dict):
+    def _list_machines__machine_actions(self, machine_libcloud, machine):
         """Add metadata on the machine dict on the allowed actions
 
         Any subclass that wishes to specially handle its allowed actions, can
         implement this internal method.
-
         mist_machine_id: The id assigned to the machine by mist. This is the
             machine's primary key in the database and the mist API.
         api_machine_id: The id assigned to the machine by its cloud. This is
@@ -550,7 +553,7 @@ class BaseController(object):
         machine_dict: A dict containing all machine metadata gathered from
             libcloud and the database. This is what gets returned by mist's
             API.
-        machine_model: A machine mongoengine model. The model may not have yet
+        machine: A machine mongoengine model. The model may not have yet
             been saved in the database.
 
         This method is expected to edit `machine_dict` in place and not return
@@ -573,55 +576,51 @@ class BaseController(object):
         can_undefine = False
 
         # Default actions for other states.
-        if machine_api.state in (NodeState.REBOOTING, NodeState.PENDING):
+        if machine_libcloud.state in (NodeState.REBOOTING, NodeState.PENDING):
             can_start = False
             can_stop = False
             can_reboot = False
-        elif machine_api.state in (NodeState.STOPPED, NodeState.UNKNOWN):
+        elif machine_libcloud.state in (NodeState.STOPPED, NodeState.UNKNOWN):
             # We assume unknown state means stopped.
             can_start = True
             can_stop = False
             can_reboot = False
-        elif machine_api.state in (NodeState.TERMINATED, ):
+        elif machine_libcloud.state in (NodeState.TERMINATED, ):
             can_start = False
             can_stop = False
             can_reboot = False
             can_destroy = False
             can_rename = False
 
-        machine_dict.update({
-            'can_start': can_start,
-            'can_stop': can_stop,
-            'can_reboot': can_reboot,
-            'can_destroy': can_destroy,
-            'can_rename': can_rename,
-            'can_tag': can_tag,
-            'can_resume': can_resume,
-            'can_suspend': can_suspend,
-            'can_undefine': can_undefine,
-        })
+        # FIXME: Move this to top of the file once Machine model is migrated.
+        from mist.io.machines.models import Actions
 
-    def _list_machines__postparse_machine(self, mist_machine_id,
-                                          api_machine_id, machine_api,
-                                          machine_model, machine_dict):
+        actions = Actions()
+        actions.start = can_start
+        actions.stop = can_stop
+        actions.suspend = can_suspend
+        actions.resume = can_resume
+        actions.reboot = can_reboot
+        actions.destroy = can_destroy
+        actions.rename = can_rename
+        actions.tag = can_tag
+        actions.undefine = can_undefine
+
+        machine.actions = actions
+
+
+    def _list_machines__postparse_machine(self, machine_libcloud, machine):
         """Post parse a machine before returning it in list_machines
 
         Any subclass that wishes to specially handle its cloud's tags and
         metadata, can implement this internal method.
 
-        mist_machine_id: The id assigned to the machine by mist. This is the
-            machine's primary key in the database and the mist API.
-        api_machine_id: The id assigned to the machine by its cloud. This is
-            not guaranteed to be globally unique.
-        machine_api: An instance of a libcloud compute node, as returned by
+        machine_libcloud: An instance of a libcloud compute node, as returned by
             libcloud's list_nodes.
-        machine_dict: A dict containing all machine metadata gathered from
-            libcloud and the database. This is what gets returned by mist's
-            API.
         machine_model: A machine mongoengine model. The model may not have yet
             been saved in the database.
 
-        Note: machine_dict['tags'] is a list of {key: value} pairs.
+        Note: machine.tags is a list of {key: value} pairs.
 
         This method is expected to edit its arguments in place and not return
         anything.
@@ -631,7 +630,7 @@ class BaseController(object):
         """
         return
 
-    def _list_machines__cost_machine(self, machine_api):
+    def _list_machines__cost_machine(self, machine_libcloud):
         """Perform cost calculations for a machine
 
         Any subclass that wishes to handle its cloud's pricing, can implement
@@ -847,21 +846,152 @@ class BaseController(object):
             return [NodeLocation('', name='default', country='',
                                  driver=self.connection)]
 
+    def _find_machine_libcloud(self, machine):
+        # I don't like this
+        #TODO markos says that list_nodes is not necessary
+        # we can create and pass a node object
+        # but in Node.__doc__ says
+        #You don\'t normally create a node object yourself
+
+        try:
+            # machine_libcloud = self.list_machines(return_libcloud_results=True).find(
+            list_nodes = self.list_machines(return_libcloud_results=True)
+            for node in list_nodes:
+                if node.id == machine.machine_id:
+                    machine_libcloud = node
+                    break
+        except Exception as exc:
+            log.exception(exc)
+            raise MistError(exc=exc)
+        return machine_libcloud
+
+    def start(self, machine):
+        if not machine.actions.start:
+            raise Exception("Machine doesn't support start.")
+        log.debug("Starting machine %s", machine)
+
+        machine_libcloud = self._find_machine_libcloud(machine)
+        self._start(machine_libcloud, machine)
+
+    def _start(self, machine_libcloud, machine):
+        self.connection.ex_start_node(machine_libcloud)
+
+    def stop(self, machine):
+        # if not isinstance(machine.cloud, Machine): etc etc
+        # if self.cloud != machine.cloud:
+        #    raise FuckYouError()
+        if not machine.actions.stop:
+            raise Exception("Machine doesn't support reboot.")
+        log.debug("Stopping machine %s", machine)
+
+        machine_libcloud = self._find_machine_libcloud(machine)
+        self._stop(machine_libcloud, machine)
+
+    def _stop(self, machine_libcloud, machine):
+        self.connection.ex_stop_node(machine_libcloud)
+        return True
+
+    def undefine(self, machine):
+        # if not isinstance(machine.cloud, Machine): etc etc
+        # if self.cloud != machine.cloud:
+        #    raise FuckYouError()
+        if not machine.actions.undefine:
+            raise Exception("Machine doesn't support undefine.")
+        log.debug("Undefining machine %s", machine)
+
+        machine_libcloud = self._find_machine_libcloud(machine)
+        self._undefine(machine_libcloud, machine)
+
+    def _undefine(self, machine_libcloud, machine):
+        return
+
+    def suspend(self, machine):
+        # if not isinstance(machine.cloud, Machine): etc etc
+        # if self.cloud != machine.cloud:
+        #    raise FuckYouError()
+        if not machine.actions.suspend:
+            raise Exception("Machine doesn't support suspend.")
+        log.debug("Suspending machine %s", machine)
+
+        machine_libcloud = self._find_machine_libcloud(machine)
+        self._undefine(machine_libcloud, machine)
+
+    def _suspend(self, machine_libcloud, machine):
+        return
+
+    def resume(self, machine):
+        # if not isinstance(machine.cloud, Machine): etc etc
+        # if self.cloud != machine.cloud:
+        #    raise FuckYouError()
+        if not machine.actions.resume:
+            raise Exception("Machine doesn't support resume.")
+        log.debug("Resuming machine %s", machine)
+
+        machine_libcloud = self._find_machine_libcloud(machine)
+        self._resume(machine_libcloud, machine)
+
+    def _resume(self, machine_libcloud, machine):
+        return
+
+    def resize(self, machine, plan_id=None):
+        if not machine.actions.resume:
+            raise Exception("Machine doesn't support resize.")
+        log.debug("Resizing machine %s", machine)
+
+        machine_libcloud = self._find_machine_libcloud(machine)
+        self._resize(machine_libcloud, machine)
+
+    def _resize(self, machine_libcloud, machine):
+        self.connection.ex_resize_node(machine_libcloud,
+                                       self.cloud.owner.plan_id)
+
+    def rename(self, machine, name=None):
+        # if not isinstance(machine.cloud, Machine): etc etc
+        # if self.cloud != machine.cloud:
+        #    raise FuckYouError()
+        if not machine.actions.rename:
+            raise Exception("Machine doesn't support rename.")
+        log.debug("Renaming machine %s", machine)
+
+        machine_libcloud = self._find_machine_libcloud(machine)
+        self._rename(machine_libcloud, name)
+
+    def _rename(self, machine_libcloud, name):
+        self.connection.ex_rename_node(machine_libcloud, name)
+
     def reboot(self, machine):
-        #if not isinstance(machine.cloud, Machine): etc etc
-        #if self.cloud != machine.cloud:
+        # if not isinstance(machine.cloud, Machine): etc etc
+        # if self.cloud != machine.cloud:
         #    raise FuckYouError()
         if not machine.actions.reboot:
             raise Exception("Machine doesn't support reboot.")
         log.debug("Rebooting machine %s", machine)
-        try:
-            #machine_libcloud = self.list_machines(return_libcloud_results=True).find(
-            self._reboot(machine, machine_libcloud)
-        except Exception as exc:
-            log.exception(exc)
-            raise MistError(exc=exc)
 
-    def _reboot(self, machine, machine_libcloud)
+        machine_libcloud = self._find_machine_libcloud(machine)
+        self._reboot(machine_libcloud, machine)
+
+    def _reboot(self, machine_libcloud, machine):
+        machine_libcloud.reboot()
+        log.info("reboot for %s.", machine_libcloud.state)
+        return True
+
+    def destroy(self, machine):
+        # if not isinstance(machine.cloud, Machine): etc etc
+        # if self.cloud != machine.cloud:
+        #    raise FuckYouError()
+        if not machine.actions.destroy:
+            raise Exception("Machine doesn't support destroy.")
+        log.debug("Destroying machine %s", machine)
+
+        machine_libcloud = self._find_machine_libcloud(machine)
+        self._destroy(machine_libcloud, machine)
+        while machine.key_associations:
+            machine.key_associations.pop()
+        machine.save()
+
+    def _destroy(self, machine_libcloud, machine):
+        machine_libcloud.destroy()
+        return True
 
     def __del__(self):
         """Disconnect libcloud connection upon garbage collection"""
