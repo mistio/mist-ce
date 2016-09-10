@@ -98,9 +98,9 @@ def cloud(request, org):
 
     cdict = request.param
     name = cdict.pop('name')
-    cls = models.CLOUDS[cdict.pop('provider')]
+    cls = models.CLOUDS[cdict['provider']]
     print "Creating cloud '%s'." % name
-    cloud = cls.add(org, name, **cdict)
+    cloud = cls.add(org, name, **cdict['fields'])
 
     def fin():
         """Finalizer clean up cloud after tests"""
