@@ -14,6 +14,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input-behavior.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input-addon-behavior.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
 <dom-module id="app-form">
     <template>
@@ -83,6 +84,10 @@
             .errormsg-container iron-icon {
                 color: inherit;
             }
+            .key-icon {
+                color: rgba(0,0,0,0.32);
+                margin-right: 4px;
+            }
         </style>
 
         <div class="grid-row">
@@ -120,7 +125,12 @@
                         <paper-dropdown-menu class="dropdown-block xs12 m6" label="[[field.label]]" horizontal-align="left" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
                             <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
                                 <template is="dom-repeat" items="{{field.options}}" as="option">
-                                    <paper-item value="[[option.id]]">[[option.title]] [[option.name]]</paper-item>
+                                    <paper-item value="[[option.id]]" disabled$="[[option.disabled]]">
+                                        <template is="dom-if" if="[[option.icon]]">
+                                            <iron-icon class="key-icon" icon="[[option.icon]]"></iron-icon>
+                                        </template> 
+                                        [[showOption(option)]]
+                                    </paper-item>
                                 </template>
                             </paper-menu>
                         </paper-dropdown-menu>
@@ -281,6 +291,14 @@
                 ready: function(){
                     this.fields = [];
                 },
+                showOption: function(option){
+                    if (option.title)
+                        return option.title;
+                    if (option.name)
+                        return option.name;
+                    if (option.id)
+                        return option.id;
+                },
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
                 },
@@ -302,6 +320,7 @@
                     this.$.errormsg.textContent = e.detail.request.xhr.responseText;
                 },
                 _fieldsChanged: function(fields, sendingData) {
+                    console.log('_fieldsChanged',fields);
                     if (this.formError){
                         this.set('formError', false);
                     }

@@ -45,7 +45,7 @@
             color: #fff;
         }
 
-        .paper-header h2 {
+        :host .paper-header h2 {
             margin-left: 16px;
             @apply(--layout-flex);
             text-transform: capitalize;
@@ -186,7 +186,7 @@
                     <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>
                 </template>
                 <template is="dom-if" if="[[_stampTable(view)]]">
-                    <item-list sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-list>
+                    <item-list sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}" org="[[model.org]]"></item-list>
                 </template>
             </div>
             <div class="is-loading" hidden$="[[!isLoading]]">

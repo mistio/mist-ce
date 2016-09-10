@@ -10,6 +10,8 @@
 <link rel="import" href="../app-form/app-form.html">
 <link rel="import" href="../app-icons/app-icons.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
+<link rel="import" href="../item-list/item-actions.html">
+<link rel="import" href="../tags/tags-list.html">
 
 <link rel="import" href="stack-machine-item.html">
 <link rel="import" href="stack-network-item.html">
@@ -431,6 +433,7 @@
                     </div>
                 </div>
                 <div class="item-actions">
+                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>
                     <!-- buttons to show normally-->
                     <paper-button id="[[workflows.0.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.0.name]]</paper-button>
                     <paper-button id="[[workflows.1.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.1.name]]</paper-button>
@@ -628,6 +631,7 @@
             </div>
         </div>
         <dialog-element></dialog-element>
+        <tags-list model="[[model]]"></tags-list>
         <iron-ajax id="workflowRequest" method="POST" url="" on-response="handleWorkflowResponse" on-error="handleWorkflowError"></iron-ajax>
         <iron-ajax id="cancelJob" method="DELETE" url="/api/v1/jobs/[[stack.job_id]]" on-response="handleCanceled" on-error=""></iron-ajax>
         <iron-ajax id="getJobLog" method="GET" auto url="/api/v1/jobs/[[stack.job_id]]" handle-as="json" on-response="handleGetJobLog" on-error=""></iron-ajax>
@@ -770,6 +774,7 @@
                     'iron-activate': '_handleInterval'
                 },
                 ready: function(){
+                    this.set('job', {});
                 },
                 attached: function(){
                 },
@@ -785,15 +790,6 @@
                     
                 },
                 jobFinished: function(finished_at){
-                    //update logs one last time
-                    // this._updateLogs(this);
-                    if (this.stack && this.stack.status == 'workflow_started' || this.stack.status == 'start_creation'){
-                        var that = this;
-                        this.async(function(){
-                            that.$.getJobLog.generateRequest();
-                        },5000);
-                        
-                    }
                     //clear interval
                     if (this.job && this.job.finished_at > 0 && this.intervalID){
                         window.clearInterval(this.intervalID);
@@ -810,7 +806,6 @@
                 },
                 _computeStack: function(params) {
                     var stack = {};
-                        this.job = {};
                     if (params.id)
                         stack = this.model.stacks[params.id];
 
@@ -839,6 +834,10 @@
                     return stack.status == 'start_creation';
                 },
                 is_error: function(stack) {
+                    //update logs once to view the error
+                    if (this.job && stack.status == 'error'){
+                        this.$.getJobLog.generateRequest();
+                    }
                     return stack.status == 'error';
                 },
                 is_workflow_started: function(stack) {
@@ -1038,8 +1037,12 @@
                     }
                     dialog._openDialog();
                 },
-                _goBack: function() {
-                    history.back();
+                _editTags: function() {
+                    var el = this.querySelector('tags-list'),
+                    items = [];
+                    items.push(itemUid(this.stack, this.section));
+                    el.items = items;
+                    el._openDialog();
                 },
                 _workflowNavigation: function(e) {
                     var action = e.target.id;
