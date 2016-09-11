@@ -15,6 +15,8 @@ pika==0.10.0
 pretty
 pycrypto==2.6.1
 pyramid==1.4
+pytest==3.0.2
+pytest-env==0.6.0
 python-memcached==1.57
 PyYAML==3.10
 requests==2.7.0
