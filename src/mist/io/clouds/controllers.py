@@ -195,7 +195,7 @@ class DigitalOceanController(BaseController):
         machine_dict['can_rename'] = True
 
     def _list_machines__cost_machine(self, machine_api):
-        size = machine_api.get('size', {})
+        size = machine_api.extra.get('size', {})
         return size.get('price_hourly', 0), size.get('price_monthly', 0)
 
 
