@@ -200,7 +200,7 @@
                             fieldName: "location_type",
                             fieldOptions: {
                                 "executable": "#!/bin/bash\necho 'hello world'",
-                                "ansible": "- name: Dummy ansible playbook\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug:\n\t\t\t\tmsg: 'Hello World'\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug: msg='Hello World'\n"
+                                "ansible": "- name: Dummy ansible playbook\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug:\n\t\t\t\tmsg: 'Hello World'\n"
                             }
                         },
                         helptext: "Copy paste your script. Make sure the script's format is alligned to the examples"
@@ -235,7 +235,7 @@
                         placeholder = "#!/bin/bash\necho 'hello world'";
                     }
                     else if (type.value == "ansible"){
-                        placeholder = "- name: Dummy ansible playbook\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug:\n\t\t\t\tmsg: 'Hello World'\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug: msg='Hello World'\n";
+                        placeholder = "- name: Dummy ansible playbook\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug:\n\t\t\t\tmsg: 'Hello World'\n";
                     }
                     // placeholder does not rerender
                     // this.set('fields.6.placeholder',placeholder);
