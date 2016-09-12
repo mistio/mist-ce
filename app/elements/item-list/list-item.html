@@ -85,7 +85,7 @@
         </style>
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
-        <content></content>
+        <content></content>        
         <template is="dom-repeat" items="{{fields}}" as="field">
           <a href="[[uri]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false">
             <div class$="[[field]] field field[[index]] {{itemField(item, field)}}">{{itemField(item, field)}}</div>
