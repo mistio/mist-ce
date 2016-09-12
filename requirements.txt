@@ -5,7 +5,7 @@ celery==3.1.17
 gevent==1.0.2
 gevent-subprocess==0.1.1
 iso8601
-mongoengine==0.10.5
+mongoengine==0.10.6
 netaddr==0.7.18
 -e git+https://github.com/mgogoulos/paramiko.git@master#egg=paramiko
 PasteDeploy==1.5.2
