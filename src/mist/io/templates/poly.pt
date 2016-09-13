@@ -77,7 +77,6 @@
         }
     </script>
     <!--script src="/bower_components/webcomponentsjs/webcomponents-lite.js" inline></script-->
-    <script src="/resources/dist/yamljs/dist/yaml.min.js" inline></script>
     <!-- will be replaced with /elements/elements.build.html -->
     <link rel="import" href="/elements/app-main/app-main.html">
     <!-- endreplace-->
