@@ -31,7 +31,7 @@ from xml.sax.saxutils import escape
 import mongoengine as me
 
 from libcloud.pricing import get_size_price
-from libcloud.compute.base import NodeImage
+from libcloud.compute.base import Node, NodeImage
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider, NodeState
 from libcloud.utils.networking import is_private_subnet
@@ -45,6 +45,7 @@ from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudExistsError
 from mist.io.exceptions import CloudUnauthorizedError
 from mist.io.exceptions import ServiceUnavailableError
+from mist.io.exceptions import MachineNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
 
@@ -91,8 +92,8 @@ class AmazonController(BaseController):
                 parts.append('1')
             kwargs['region'] = '-'.join(parts)
 
-    def _list_machines__machine_creation_date(self, machine_api):
-        return machine_api.created_at  # datetime
+    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+        return machine_libcloud.created_at  # datetime
 
     def _list_machines__machine_actions(self, machine_libcloud, machine):
         super(AmazonController, self)._list_machines__machine_actions(
@@ -104,7 +105,7 @@ class AmazonController(BaseController):
         extra = machine.extra
         machine.extra['os_type'] = extra.get('platform', 'linux')
 
-    def _list_machines__cost_machine(self, machine_libcloud):
+    def _list_machines__cost_machine(self, machine_libcloud, machine):
         image_id = machine_libcloud.extra.get('image_id')
         try:
             # FIXME: This is here to avoid circular imports.
@@ -176,16 +177,16 @@ class DigitalOceanController(BaseController):
     def _connect(self):
         return get_driver(Provider.DIGITAL_OCEAN)(self.cloud.token)
 
-    def _list_machines__machine_creation_date(self, machine_api):
-        return machine_api.extra.get('created_at')  # iso8601 string
+    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+        return machine_libcloud.extra.get('created_at')  # iso8601 string
 
     def _list_machines__machine_actions(self, machine_libcloud, machine):
         super(DigitalOceanController, self)._list_machines__machine_actions(
               machine_libcloud, machine)
         machine.actions.rename = True
 
-    def _list_machines__cost_machine(self, machine_libcloud):
-        size = machine_libcloud.get('size', {})
+    def _list_machines__cost_machine(self, machine_libcloud, machine):
+        size = machine_libcloud.extra.get('size', {})
         return size.get('price_hourly', 0), size.get('price_monthly', 0)
 
 
@@ -196,7 +197,7 @@ class LinodeController(BaseController):
     def _connect(self):
         return get_driver(Provider.LINODE)(self.cloud.apikey)
 
-    def _list_machines__machine_creation_date(self, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
         return machine_libcloud.extra.get('CREATE_DT')  # iso8601 string
 
     def _list_machines__machine_actions(self, machine_libcloud, machine):
@@ -213,7 +214,7 @@ class LinodeController(BaseController):
         if datacenter:
             machine.tags['DATACENTERID'] = datacenter
 
-    def _list_machines__cost_machine(self, machine_libcloud):
+    def _list_machines__cost_machine(self, machine_libcloud, machine):
         size = machine_libcloud.extra.get('PLANID')
         price = get_size_price(driver_type='compute', driver_name='linode',
                                size_id=size)
@@ -241,7 +242,7 @@ class RackSpaceController(BaseController):
             if cloud is not None:
                 kwargs['apikey'] = cloud.apikey
 
-    def _list_machines__machine_creation_date(self, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
         return machine_libcloud.extra.get('created')  # iso8601 string
 
     def _list_machines__machine_actions(self, machine_libcloud, machine):
@@ -249,7 +250,7 @@ class RackSpaceController(BaseController):
               machine_libcloud, machine)
         machine.actions.rename = True
 
-    def _list_machines__cost_machine(self, machine_libcloud):
+    def _list_machines__cost_machine(self, machine_libcloud, machine):
         # Need to get image in order to specify the OS type
         # out of the image id.
         instance_image = machine_libcloud.extra.get('imageId')
@@ -286,15 +287,15 @@ class SoftLayerController(BaseController):
         return get_driver(Provider.SOFTLAYER)(self.cloud.username,
                                               self.cloud.apikey)
 
-    def _list_machines__machine_creation_date(self, machine_api):
-        return machine_api.extra.get('created')  # iso8601 string
+    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+        return machine_libcloud.extra.get('created')  # iso8601 string
 
     def _list_machines__postparse_machine(self, machine_libcloud, machine):
         machine.extra['os_type'] = 'linux'
         if 'windows' in str(machine.extra.get('image', '')).lower():
             machine.extra['os_type'] = 'windows'
 
-    def _list_machines__cost_machine(self, machine_libcloud):
+    def _list_machines__cost_machine(self, machine_libcloud, machine):
         # SoftLayer includes recurringFee on the VM metadata but
         # this is only for the compute - CPU pricing.
         # Other costs (ram, bandwidth, image) are included
@@ -319,11 +320,11 @@ class SoftLayerController(BaseController):
 
             return cpu_fee + extra_fee, 0
 
-    def _reboot(self, machine_libcloud, machine):
+    def _reboot_machine(self, machine_libcloud):
         self.connection.reboot_node(machine_libcloud)
         return True
 
-    def _destroy(self, machine_libcloud, machine):
+    def _destroy_machine(self, machine_libcloud):
         self.connection.destroy_node(machine_libcloud)
 
 
@@ -341,7 +342,7 @@ class NephoScaleController(BaseController):
               machine_libcloud, machine)
         machine.actions.rename = True
 
-    def _list_machines__machine_creation_date(self, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
         return machine_libcloud.extra.get('create_time')  # iso8601 string
 
     def _list_machines__postparse_machine(self, machine_libcloud, machine):
@@ -366,7 +367,7 @@ class AzureController(BaseController):
         return get_driver(Provider.AZURE)(self.cloud.subscription_id,
                                           tmp_cert_file.name)
 
-    def _list_machines__cost_machine(self, machine_libcloud):
+    def _list_machines__cost_machine(self, machine_libcloud, machine):
         # TODO: Get prices per location
         os_type = machine_libcloud.extra.get('os_type', 'linux')
         size = machine_libcloud.extra.get('instance_size')
@@ -390,42 +391,45 @@ class AzureController(BaseController):
                 images_dict[image.name] = image
         return images_dict.values()
 
-    # FIXME cloud specific private method only for azure
-    # it is necessary?
-    def _cloud_service(self, machine):
+    def _cloud_service(self, machine_libcloud_id):
         # Azure needs the cloud service specified as well as the node
         cloud_service = self.connection.get_cloud_service_from_node_id(
-            machine.machine_id)
+            machine_libcloud_id)
         return cloud_service
 
-    def _find_machine_libcloud(self, machine):
-        cloud_service = self._cloud_service(machine)
-        nodes = self.connection.list_nodes(ex_cloud_service_name=cloud_service)
-        for node in nodes:
+    def _get_machine_libcloud(self, machine, no_fail=False):
+        cloud_service = self._cloud_service(machine.machine_id)
+        for node in self.connection.list_nodes(ex_cloud_service_name=
+                                               cloud_service):
             if node.id == machine.machine_id:
-                machine_libcloud = node
-                break
-        return machine_libcloud
+                return node
+            if no_fail:
+                return Node(machine.machine_id, name=machine.machine_id,
+                            state=0, public_ips=[], private_ips=[],
+                            driver=self.connection)
+            raise MachineNotFoundError("Machine with id '%s'." %
+                                       machine.machine_id)
 
-    def _start(self, machine_libcloud, machine):
-        cloud_service = self._cloud_service(machine)
+    def _start_machine(self, machine_libcloud, machine):
+        cloud_service = self._cloud_service(machine_libcloud.id)
         self.connection.ex_start_node(machine_libcloud,
                                       ex_cloud_service_name=cloud_service)
 
-    def _stop(self, machine_libcloud, machine):
-        cloud_service = self._cloud_service(machine)
+    def _stop_machine(self, machine_libcloud):
+        cloud_service = self._cloud_service(machine_libcloud.id)
         self.connection.ex_stop_node(machine_libcloud,
                                      ex_cloud_service_name=cloud_service)
 
-    def _reboot(self, machine_libcloud, machine):
-        cloud_service = self._cloud_service(machine)
+    def _reboot_machine(self, machine_libcloud):
+        cloud_service = self._cloud_service(machine_libcloud.id)
         self.connection.reboot_node(machine_libcloud,
                                     ex_cloud_service_name=cloud_service)
 
-    def _destroy(self, machine_libcloud, machine):
-        cloud_service = self._cloud_service(machine)
+    def _destroy_machine(self, machine_libcloud):
+        cloud_service = self._cloud_service(machine_libcloud.id)
         self.connection.destroy_node(machine_libcloud,
                                      ex_cloud_service_name=cloud_service)
+
 
 class GoogleController(BaseController):
 
@@ -456,8 +460,8 @@ class GoogleController(BaseController):
             except:
                 raise MistError("Make sure you upload a valid json file.")
 
-    def _list_machines__machine_creation_date(self, machine_api):
-        return machine_api.extra.get('creationTimestamp')  # iso8601 string
+    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+        return machine_libcloud.extra.get('creationTimestamp')  # iso8601 string
 
     def _list_machines__postparse_machine(self, machine_libcloud, machine):
         extra = machine.extra
@@ -519,7 +523,7 @@ class GoogleController(BaseController):
             image.extra.pop('licenses', None)
         return images
 
-    def _list_machines__cost_machine(self, machine_libcloud):
+    def _list_machines__cost_machine(self, machine_libcloud, machine):
         # https://cloud.google.com/compute/pricing
         size = machine_libcloud.extra.get('machineType')
         # eg europe-west1-d
@@ -598,10 +602,10 @@ class PacketController(BaseController):
         return get_driver(Provider.PACKET)(self.cloud.apikey,
                                            project=self.cloud.project_id)
 
-    def _list_machines__machine_creation_date(self, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
         return machine_libcloud.extra.get('created_at')  # iso8601 string
 
-    def _list_machines__cost_machine(self, machine_libcloud):
+    def _list_machines__cost_machine(self, machine_libcloud, machine):
         size = machine_libcloud.extra.get('plan')
         price = get_size_price(driver_type='compute', driver_name='packet',
                                size_id=size)
@@ -615,10 +619,10 @@ class VultrController(BaseController):
     def _connect(self):
         return get_driver(Provider.VULTR)(self.cloud.apikey)
 
-    def _list_machines__machine_creation_date(self, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
         return machine_libcloud.extra.get('date_created')  # iso8601 string
 
-    def _list_machines__cost_machine(self, machine_libcloud):
+    def _list_machines__cost_machine(self, machine_libcloud, machine):
         return machine_libcloud.extra.get('cost_per_month', 0)
 
 
@@ -720,7 +724,7 @@ class OpenStackController(BaseController):
             kwargs['url'] = url.rstrip('/')
             check_host(sanitize_host(kwargs['url']))
 
-    def _list_machines__machine_creation_date(self, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
         return machine_libcloud.extra.get('created')  # iso8601 string
 
     def _list_machines__machine_actions(self, machine_libcloud, machine):
@@ -774,7 +778,7 @@ class DockerController(BaseController):
             kwargs['host'] = sanitize_host(kwargs['host'])
             check_host(kwargs['host'])
 
-    def _list_machines__machine_creation_date(self, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
         return machine_libcloud.created_at  # unix timestamp
 
     def _list_images__fetch_images(self, search=None):
@@ -792,36 +796,28 @@ class DockerController(BaseController):
     def image_is_default(self, image_id):
         return image_id in config.DOCKER_IMAGES
 
-    def _start(self, machine_libcloud, machine):
-        # TODO this is necessary? What happen here
-        node_info = self.connection.inspect_node(machine_libcloud)
-        try:
-            port = node_info.extra['network_settings']['Ports']['22/tcp'][0][
-                'HostPort']
-        except KeyError:
-            port = 22
+    def _start_machine(self, machine_libcloud, machine):
+        self.connection.ex_start_node(machine_libcloud)
 
-        for key_assoc in machine.key_associations:
-            key_assoc.port = port
-        machine.save()
+        if machine_libcloud.extra.get('tags', {}).get('type') == 'docker_host':
+            pass
+        else:
+            node_info = self.connection.inspect_node(machine_libcloud)
+            try:
+                port = node_info.extra['network_settings']['Ports'
+                ]['22/tcp'][0]['HostPort']
+            except KeyError:
+                port = 22
 
-    def _reboot(self, machine_libcloud, machine):
-        # TODO this is necessary?
-        # why happen here
-        node_info = self.connection.inspect_node(machine_libcloud)
-        try:
-            port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
-        except KeyError:
-            port = 22
+            for key_assoc in machine.key_associations:
+                key_assoc.port = port
+            machine.save()
 
-        for key_assoc in machine.key_associations:
-            key_assoc.port = port
-        machine.save()
-
-    def _destroy(self, machine_libcloud, machine):
+    def _destroy_machine(self, machine_libcloud):
         if machine_libcloud.state == NodeState.RUNNING:
             self.connection.ex_stop_node(machine_libcloud)
             machine_libcloud.destroy()
+
 
 class LibvirtController(BaseController):
 
@@ -903,7 +899,7 @@ class LibvirtController(BaseController):
     def _list_images__fetch_images(self, search=None):
         return self.connection.list_images(location=self.cloud.images_location)
 
-    def _reboot(self, machine_libcloud, machine):
+    def _reboot_machine(self, machine_libcloud):
         if machine_libcloud.extra.get('tags', {}).get('type',
                                                       None) == 'hypervisor':
             # issue an ssh command for the libvirt hypervisor
@@ -915,19 +911,19 @@ class LibvirtController(BaseController):
                 # todo move it up
                 from mist.core.methods import ssh_command
                 ssh_command(self.cloud.owner, self.cloud.id,
-                            machine.machine_id, hostname, command)
+                            machine_libcloud.id, hostname, command)
                 return True
             except:
                 return False
 
-    def _undefine(self, machine_libcloud, machine):
-        self.connection.ex_undefine_node(machine_libcloud)
+    def _resume_machine(self, machine_libcloud):
+        self.connection.ex_resume_node(machine_libcloud)
 
-    def _suspend(self, machine_libcloud, machine):
+    def _suspend_machine(self, machine_libcloud):
         self.connection.ex_suspend_node(machine_libcloud)
 
-    def _resume(self, machine_libcloud, machine):
-        self.connection.ex_resume_node(machine_libcloud)
+    def _undefine_machine(self, machine_libcloud):
+        self.connection.ex_undefine_node(machine_libcloud)
 
 # FIXME
 class OtherController(BaseController):
@@ -1106,15 +1102,18 @@ class OtherController(BaseController):
         return self.add_machine(name, remove_on_error=remove_on_error,
                                 **kwargs)
 
-    def _reboot(self, machine_libcloud, machine):
+    def _reboot_machine(self, machine_libcloud):
         # todo move it up
         from mist.core.methods import ssh_command
         try:
-            hostname = machine.public_ips[0] if machine.public_ips else \
-            machine.private_ips[0]
+            if machine_libcloud.public_ips:
+                hostname = machine_libcloud.public_ips[0]
+            else:
+                hostname = machine_libcloud.private_ips[0]
+
             command = '$(command -v sudo) shutdown -r now'
             ssh_command(self.cloud.owner, self.cloud.id,
-                        machine.machine_id, hostname, command)
+                        machine_libcloud.id, hostname, command)
             return True
         except:
             return False

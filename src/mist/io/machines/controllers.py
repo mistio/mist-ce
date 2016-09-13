@@ -12,30 +12,31 @@ class MachineController(object):
         self.machine = machine
 
     def start(self):
-        return self.machine.cloud.ctl.start(self.machine)
+        return self.machine.cloud.ctl.start_machine(self.machine)
 
     def stop(self):
-        return self.machine.cloud.ctl.stop(self.machine)
+        return self.machine.cloud.ctl.stop_machine(self.machine)
 
     def suspend(self):
-        return self.machine.cloud.ctl.suspend(self.suspend)
+        return self.machine.cloud.ctl.suspend_machine(self.machine)
 
     def resume(self):
-        return self.machine.cloud.ctl.resume(self.machine)
+        return self.machine.cloud.ctl.resume_machine(self.machine)
 
     def reboot(self):
-        return self.machine.cloud.ctl.reboot(self.machine)
+        return self.machine.cloud.ctl.reboot_machine(self.machine)
 
     def destroy(self):
-        return self.machine.cloud.ctl.destroy(self.machine)
+        return self.machine.cloud.ctl.destroy_machine(self.machine)
 
-    # todo resize
+    def resize(self, plan_id=None):
+        return self.machine.cloud.ctl.resize_machine(self.machine, plan_id)
 
-    def rename(self, name):
-        return self.machine.cloud.ctl.rename(self.machine, name)
-    #
+    def rename(self, name=None):
+        return self.machine.cloud.ctl.rename_machine(self.machine, name)
+    # TODO why want this also ?
     # def tag(self):
     #     return self.machine.cloud.ctl.tag(self.machine)
     #
     def undefine(self):
-        return self.machine.cloud.ctl.undefine(self.machine)
+        return self.machine.cloud.ctl.undefine_machine(self.machine)

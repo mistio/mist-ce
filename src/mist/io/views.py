@@ -1117,23 +1117,25 @@ def machine_actions(request):
     if action in ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename',
                   'undefine', 'suspend', 'resume'):
         if action == 'start':
-            methods.start_machine(auth_context.owner, cloud_id, machine_id)
+            methods.start_machine(auth_context.owner, cloud_id, machine)
         elif action == 'stop':
-            methods.stop_machine(auth_context.owner, cloud_id, machine_id)
+            methods.stop_machine(auth_context.owner, cloud_id, machine)
         elif action == 'reboot':
-            methods.reboot_machine(auth_context.owner, cloud_id, machine_id)
+            methods.reboot_machine(auth_context.owner, cloud_id, machine)
         elif action == 'destroy':
-            methods.destroy_machine(auth_context.owner, cloud_id, machine_id)
+            methods.destroy_machine(auth_context.owner, cloud_id, machine)
         elif action == 'resize':
-            methods.resize_machine(auth_context.owner, cloud_id, machine_id, plan_id)
+            methods.resize_machine(auth_context.owner, cloud_id, machine,
+                                   plan_id)
         elif action == 'rename':
-            methods.rename_machine(auth_context.owner, cloud_id, machine_id, name)
+            methods.rename_machine(auth_context.owner,
+                                   cloud_id, machine, name)
         elif action == 'undefine':
-            methods.undefine_machine(auth_context.owner, cloud_id, machine_id)
+            methods.undefine_machine(auth_context.owner, cloud_id, machine)
         elif action == 'resume':
-            methods.resume_machine(auth_context.owner, cloud_id, machine_id)
+            methods.resume_machine(auth_context.owner, cloud_id, machine)
         elif action == 'suspend':
-            methods.suspend_machine(auth_context.owner, cloud_id, machine_id)
+            methods.suspend_machine(auth_context.owner, cloud_id, machine)
 
         # return OK
         return mist.core.methods.filter_list_machines(auth_context, cloud_id)

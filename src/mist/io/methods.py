@@ -44,7 +44,7 @@ import ansible.constants
 # try:
 # from mist.core.user.models import User
 from mist.core.tag.models import Tag
-from mist.core.cloud.models import Machine, KeyAssociation, CloudSize, CloudImage
+from mist.core.cloud.models import KeyAssociation, CloudSize, CloudImage
 from mist.core.keypair.models import Keypair
 from mist.core import config
 # except ImportError:
@@ -68,6 +68,7 @@ import mist.io.tasks
 import mist.io.inventory
 
 from mist.io.clouds.models import Cloud
+from mist.core.cloud.models import Machine
 
 from mist.core.vpn.methods import destination_nat as dnat
 from mist.core.vpn.methods import super_ping
@@ -446,7 +447,8 @@ def connect_provider(cloud):
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_machines()
+    machines = Cloud.objects.get(owner=user, id=cloud_id).ctl.list_machines()
+    return [machine.as_dict_old() for machine in machines]
 
 
 def create_machine(user, cloud_id, key_id, machine_name, location_id,
@@ -1336,169 +1338,50 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
     return node
 
 
-def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None):
-    """Start, stop, reboot, resize, undefine and destroy have the same logic underneath, the only
-    thing that changes is the action. This helper function saves us some code.
-
+def _machine_action(user, cloud_id, machine, action, plan_id=None, name=None):
+    """Start, stop, reboot, resize, undefine and destroy have the same
+    logic underneath, the only thing that changes is the action.
+    This helper function saves us some code.
     """
-    actions = ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename', 'undefine', 'suspend', 'resume')
+    actions = ('start', 'stop', 'reboot', 'destroy', 'resize',
+               'rename', 'undefine', 'suspend', 'resume')
 
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
                                                                    actions))
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    # TODO this is not needed any more, but i am not sure
+    # cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    #
+    # bare_metal = False
+    # if cloud.ctl.provider == 'bare_metal':
+    #     bare_metal = True
+    # try:
+    #     conn = connect_provider(cloud)
+    # except InvalidCredsError:
+    #     raise CloudUnauthorizedError()
+    # except Exception as exc:
+    #     log.error("Error while connecting to cloud")
+    #     raise CloudUnavailableError(exc=exc)
 
-    bare_metal = False
-    if cloud.ctl.provider == 'bare_metal':
-        bare_metal = True
-    try:
-        conn = connect_provider(cloud)
-    except InvalidCredsError:
-        raise CloudUnauthorizedError()
-    except Exception as exc:
-        log.error("Error while connecting to cloud")
-        raise CloudUnavailableError(exc=exc)
-
-    # GCE needs machine.extra as well, so we need the real machine object
-    machine = None
-    try:
-        if conn.type == 'azure':
-            # Azure needs the cloud service specified as well as the node
-            cloud_service = conn.get_cloud_service_from_node_id(machine_id)
-            nodes = conn.list_nodes(ex_cloud_service_name=cloud_service)
-            for node in nodes:
-                if node.id == machine_id:
-                    machine = node
-                    break
-        else:
-            for node in conn.list_nodes():
-                if node.id == machine_id:
-                    machine = node
-                    break
-        if machine is None:
-            # did not find the machine_id on the list of nodes, still do not fail
-            raise MachineUnavailableError("Error while attempting to %s machine"
-                                  % action)
-    except:
-        machine = Node(machine_id,
-                       name=machine_id,
-                       state=NodeState.RUNNING,
-                       public_ips=[],
-                       private_ips=[],
-                       driver=conn)
-    try:
-        if action is 'start':
-            # In liblcoud it is not possible to call this with machine.start()
-            if conn.type == 'azure':
-                conn.ex_start_node(machine, ex_cloud_service_name=cloud_service)
-            else:
-                conn.ex_start_node(machine)
-            if conn.type is Provider.DOCKER:
-                node_info = conn.inspect_node(node)
-                try:
-                    port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
-                except KeyError:
-                    port = 22
-
-                try:
-                    machine = Machine.objects.get(cloud=cloud,
-                                                  machine_id=machine_id)
-                except DoesNotExist:
-                    pass
-                else:
-                    for key_assoc in machine.key_associations:
-                        key_assoc.port = port
-                    machine.save()
-        elif action is 'stop':
-            # In libcloud it is not possible to call this with machine.stop()
-            if conn.type == 'azure':
-                conn.ex_stop_node(machine, ex_cloud_service_name=cloud_service)
-            else:
-                conn.ex_stop_node(machine)
-        elif action is 'undefine':
-            # In libcloud undefine means destroy machine and delete XML configuration
-            if conn.type == 'libvirt':
-                conn.ex_undefine_node(machine)
-        elif action is 'suspend':
-            if conn.type == 'libvirt':
-                conn.ex_suspend_node(machine)
-        elif action is 'resume':
-            if conn.type == 'libvirt':
-                conn.ex_resume_node(machine)
-        elif action is 'resize':
-            conn.ex_resize_node(node, plan_id)
-        elif action is 'rename':
-            conn.ex_rename_node(node, name)
-        elif action is 'reboot':
-            if bare_metal:
-                try:
-                    machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
-                    hostname = machine.public_ips[0] if machine.public_ips else machine.private_ips[0]
-                    command = '$(command -v sudo) shutdown -r now'
-                    ssh_command(user, cloud_id, machine_id, hostname, command)
-                    return True
-                except:
-                    return False
-            else:
-                if conn.type == 'libvirt':
-                    if machine.extra.get('tags', {}).get('type', None) == 'hypervisor':
-                        # issue an ssh command for the libvirt hypervisor
-                        try:
-                            hostname = machine.public_ips[0] if machine.public_ips else machine.private_ips[0]
-                            command = '$(command -v sudo) shutdown -r now'
-                            ssh_command(user, cloud_id, machine_id, hostname, command)
-                            return True
-                        except:
-                            return False
-
-                    else:
-                       machine.reboot()
-                elif conn.type == 'azure':
-                    conn.reboot_node(machine, ex_cloud_service_name=cloud_service)
-                elif conn.type == 'softlayer':
-                    conn.reboot_node(machine)
-                else:
-                    machine.reboot()
-                if conn.type is Provider.DOCKER:
-                    node_info = conn.inspect_node(node)
-                    try:
-                        port = node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort']
-                    except KeyError:
-                        port = 22
-
-                    try:
-                        machine = Machine.objects.get(cloud=cloud,
-                                                      machine_id=machine_id)
-                    except DoesNotExist:
-                        pass
-                    else:
-                        for key_assoc in machine.key_associations:
-                            key_assoc.port = port
-                        machine.save()
-        elif action is 'destroy':
-            if conn.type is Provider.DOCKER and node.state == NodeState.RUNNING:
-                conn.ex_stop_node(machine)
-                machine.destroy()
-            elif conn.type == 'azure':
-                conn.destroy_node(machine, ex_cloud_service_name=cloud_service)
-            elif conn.type == 'softlayer':
-                conn.destroy_node(machine)
-            else:
-                machine.destroy()
-            machine_in_db = Machine.objects.get(cloud=cloud, machine_id=machine_id)
-            # remove any existing key associations
-            while machine_in_db.key_associations:
-                machine_in_db.key_associations.pop()
-            machine_in_db.save()
-
-    except AttributeError:
-        raise BadRequestError("Action %s not supported for this machine"
-                              % action)
-
-    except Exception as e:
-        log.error("%r", e)
-        raise MachineUnavailableError("Error while attempting to %s machine"
-                                  % action)
+    # try:
+    if action is 'start':
+        machine.ctl.start()
+    elif action is 'stop':
+        machine.ctl.stop()
+    elif action is 'undefine':
+        machine.ctl.undefine()
+    elif action is 'suspend':
+        machine.ctl.suspend()
+    elif action is 'resume':
+        machine.ctl.resume()
+    elif action is 'resize':
+        machine.ctl.resize(plan_id)
+    elif action is 'rename':
+        machine.ctl.rename(name)
+    elif action is 'reboot':
+        machine.ctl.reboot()
+    elif action is 'destroy':
+        machine.ctl.destroy()
 
 
 def start_machine(user, cloud_id, machine_id):

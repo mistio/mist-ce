@@ -794,7 +794,8 @@ class ListMachines(UserTask):
                 for tag in machine["tags"]:
                     tags[tag["key"]]= tag["value"]
             try:
-                mistio_tags = resolve_id_and_get_tags(user, 'machine',
+                from mist.core.tag.methods import resolve_id_and_get_tags
+                mistio_tags = resolve_id_and_get_tags(owner, 'machine',
                                                       machine.get("id"),
                                                       cloud_id=cloud_id)
             except:
