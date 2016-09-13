@@ -439,7 +439,7 @@
                 copyPublicKey: function() {
                     this.clearSelection();
                     var el = this.$.keyPublic;
-                    this.setSelection(el);            
+                    this.setSelection(el);
                     var successful = document.execCommand('copy');
                     var msg = successful ? 'The Public Key was copied to clipboard!' : 'There was an error copying to clipboard!';
                     this._showToast(msg);
@@ -447,7 +447,7 @@
                 copyPrivateKey: function() {
                     this.clearSelection();
                     var el = this.$.keyPrivate;
-                    this.setSelection(el);            
+                    this.setSelection(el);
                     var successful = document.execCommand('copy');
                     var msg = successful ? 'The Private Key was copied to clipboard!' : 'There was an error copying to clipboard!';
                     this._showToast(msg);
@@ -524,8 +524,8 @@
                     toast.text = msg;
                     toast.show();
                 },
-                _computeIsloading(key) {
-                    return !this.key ? true : false;
+                _computeIsloading: function(key) {
+                    return !key ? true : false;
                 },
                 clearSelection: function(){
                 if (window.getSelection) {
