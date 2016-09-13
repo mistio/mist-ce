@@ -28,7 +28,7 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <!--link rel="import" href="../../bower_components/iron-form/iron-form.html"-->
 
-<!--link rel="import" href="../logs/log-list.html"-->
+<link rel="import" href="../logs/log-list.html">
 <link rel="import" href="../onb-element/onb-element.html">
 <link rel="import" href="../clouds/cloud-info.html">
 <link rel="import" href="../clouds/cloud-chip.html">
@@ -359,7 +359,7 @@ Polymer({
         showDashboard: {
             type: Boolean,
             // value: true,
-            computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds)',
+            computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds, model.org.name)',
             notify: true
         },
         hasIncidents: {
@@ -470,9 +470,9 @@ Polymer({
              return false;
          }
      },
-    _computeshowDashboard: function(cloudslength, isLoadingClouds) {
+    _computeshowDashboard: function(cloudslength, isLoadingClouds, orgName) {
         var show;
-        if (cloudslength > 0 && isLoadingClouds == false) {
+        if (orgName && cloudslength > 0 && isLoadingClouds == false) {
             show =  true;
         }
         else {
@@ -592,4 +592,3 @@ Polymer({
     },
 });
 </script>
-f
