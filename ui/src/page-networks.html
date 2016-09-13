@@ -2,20 +2,20 @@
 
 <link rel="import" href="../elements/pages/page-items.html">
 
-<dom-module id="page-machines">
+<dom-module id="page-networks">
   <template>
     <style>
       :host {
         display: block;
       }
     </style>
-    <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]" onboarding="[[onboarding]]"></page-items>
+    <page-items class="images" model="[[model]]" items="[[model.networksArray]]" sections="[[sections]]" section="[[sections.networks]]" onboarding="[[onboarding]]"></page-items>
   </template>
 
   <script>
     Polymer({
 
-      is: 'page-machines',
+      is: 'page-networks',
 
       properties: {
         model: Object,

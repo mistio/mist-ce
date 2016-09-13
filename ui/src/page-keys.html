@@ -1,0 +1,59 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../elements/pages/page-items.html">
+<link rel="import" href="../elements/keys/key-add.html">
+<link rel="import" href="../elements/keys/key-page.html">
+
+<dom-module id="page-keys">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <app-route route="{{route}}"
+           pattern="/+add"
+           data="{{data}}"
+           active="{{addFormActive}}"></app-route>
+
+     <app-route route="{{route}}"
+            pattern="/:key"
+            data="{{data}}"
+            active="{{detailsPageActive}}"></app-route>
+
+    <key-add name="key-add" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" hidden$=[[!addFormActive]]></key-add>
+
+    <page-items class="keys" model="[[model]]" items="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]" onboarding="[[onboarding]]" hidden$=[[!listActive]]></page-items>
+
+    <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]" hidden$=[[!detailsPageActive]]></key-page>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'page-keys',
+
+      properties: {
+        model: Object,
+        sections: Array,
+        onboarding: Object,
+        listActive: {
+            type: Boolean,
+            computed: '_computeListActive(addFormActive, detailsPageActive)'
+        }
+      },
+
+      attached: function() {
+
+      },
+
+      _computeListActive: function(addFormActive, detailsPageActive) {
+          return !addFormActive && !detailsPageActive;
+      }
+
+    });
+  </script>
+</dom-module>

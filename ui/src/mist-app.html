@@ -1,12 +1,3 @@
-<!--
-@license
-Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
@@ -77,13 +68,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         tail="{{subroute}}"></app-route>
 
     <paper-header-panel mode="standard" class="fit">
-        <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
-        <mist-header model="[[model]]" title="{{title}}" class="paper-header" style$="[[style]]"></mist-header>
+        <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{page}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
+        <mist-header model="[[model]]" title="[[page]]" class="paper-header" style$="[[style]]"></mist-header>
 
         <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
-          <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]" onboarding="[[onboarding]]"></page-dashboard>
-          <page-machines name="machines" q="[[q]]" class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-machines>
-          <page-images name="images" q="[[q]]" class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-images>
+          <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-dashboard>
+          <page-machines name="machines" route="{{subroute}}" q="[[q]]"odel="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-machines>
+          <page-images name="images" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-images>
+
+          <page-keys name="keys" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-keys>
+
+          <page-networks name="networks" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-networks>
+          <page-tunnels name="tunnels" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-tunnels>
+          <page-scripts name="scripts" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-scripts>
+          <page-templates name="templates" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-templates>
+          <page-stacks name="stacks" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-stacks>
+          <page-teams name="teams" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-teams>
+          <page-incidents name="incidents" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-incidents>
+
+          <page-my-account name="my-account" user="[[model.user]]" org="[[model.org]]"></page-my-account>
         </iron-pages>
     </paper-header-panel>
 
@@ -130,24 +133,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         title: {
             type: String,
             value: "",
-            notify: true
-        },
-
-        current: {
-            type: String,
-            value: "",
-            observer: '_currentChanged',
-            notify: true
         },
 
         q: { // search query
             type: String,
-            value: '',
-            notify: true
+            value: ''
         },
 
         style: {
-            computed: "_style(current, sections)",
+            computed: "_style(page, sections)",
             value: "background-color: #424242;",
             notify: true
         },
@@ -170,9 +164,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         '_routePageChanged(routeData.page)'
       ],
 
-      _style: function(current, sections) {
-          if (current) {
-              return "background-color: " + sections[current].color;
+      _style: function(page, sections) {
+          if (page) {
+              return "background-color: " + sections[page].color;
           }
       },
 
@@ -183,7 +177,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _pageChanged: function(page) {
         // load page import on demand.
         this.importHref(
-          this.resolveUrl('page-' + page + '.html'), null, null, true);
+          this.resolveUrl('page-' + page + '.html'),
+          null,
+          null,
+          true
+        );
+      },
+
+      updateSearchQuery: function(e){
+          console.warn('updateSearchQuery');
+          this.set('q', e.detail);
       },
 
       ready: function() {
@@ -285,58 +288,75 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.sectionsArray = [{
             id: 'dashboard',
             color: '#424242',
+            q: ''
         }, {
             id: 'incidents',
             color: '#d96557',
+            q: ''
         }, {
             id: 'machines',
             color: '#8c76d1',
             icon: 'hardware:computer',
             count: '0',
-            add: '/create-machine'
+            add: '/create-machine',
+            q: ''
         }, {
             id: 'images',
             color: '#0099cc',
             icon: 'image:photo',
-            count: '0'
+            count: '0',
+            q: ''
         }, {
             id: 'keys',
             color: '#009688',
             icon: 'communication:vpn-key',
             count: '0',
-            add: '/add-key'
+            add: '/add-key',
+            q: ''
         }, {
             id: 'networks',
             color: '#795548',
             icon: 'hardware:device-hub',
             count: '0',
-            add: '/add-network'
+            add: '/add-network',
+            q: ''
+        },{
+            id: 'tunnels',
+            color: '#795548',
+            icon: 'editor:merge-type',
+            count: '0',
+            add: '/add-tunnel',
+            q: ''
         }, {
             id: 'scripts',
             color: '#D48900',
             icon: 'image:movie-creation',
             count: '0',
-            add: '/add-script'
+            add: '/add-script',
+            q: ''
         }, {
             id: 'templates',
             color: '#0097A7',
             icon: 'av:art-track',
             count: '0',
-            add: '/add-template'
+            add: '/add-template',
+            q: ''
         }, {
             id: 'teams',
             color: '#607D8B',
             icon: 'social:people',
-            count: '0'
+            count: '0',
+            q: ''
         }, {
             id: 'stacks',
             color: '#0277BD',
             icon: 'maps:layers',
-            count: '0'
+            count: '0',
+            q: ''
         }, {
-            id: 'account',
+            id: 'my-account',
             color: '#2F2F3E',
-            icon: 'accont-circle',
+            icon: 'account-circle',
             count: null
         }];
 
