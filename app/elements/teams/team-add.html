@@ -24,7 +24,7 @@
         </style>
 
         <paper-dialog id="teamAddModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
-            <h2>Add Team</h2>            
+            <h2>Add Team</h2>
             <paper-dialog-scrollable>
                 <p>
                     <paper-input id="name" label="Name" error-message="Please enter team's name" value="{{newTeam.name}}"></paper-input>
@@ -64,10 +64,7 @@
                         },
                     },
                     organization: {
-                        type: Object,
-                        value: function() {
-                            return ORGANIZATION;
-                        }
+                        type: Object
                     },
                     sendingData: {
                         type: Boolean,
