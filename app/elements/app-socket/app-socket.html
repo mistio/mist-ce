@@ -1,5 +1,6 @@
 <script src="../../bower_components/sockjs-client/dist/sockjs.min.js"></script>
 <script>
+    CSRF_TOKEN = '';
     DEBUG_SOCKET = false;
     Polymer({
         is: 'app-socket',
@@ -353,7 +354,7 @@
             if (data.length && (this.get('onboarding.hasCloud') != true))
                 this.set('onboarding.hasCloud', true);
             if (!data.length)
-                this.set('onboarding.hasCloud', false);            
+                this.set('onboarding.hasCloud', false);
             var ret = this._updateModel('clouds', data);
             this.set('onboarding.isLoadingClouds', false);
             return ret;
@@ -371,6 +372,7 @@
 
         _updateUser: function(data) {
             this.set('model.user', data);
+            CSRF_TOKEN = data.csrf_token;
         },
 
         _updateOrg: function(data) {
