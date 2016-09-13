@@ -16,6 +16,9 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
+
+<script src="../../bower_components/yaml.js/dist/yaml.min.js"></script>
+
 <dom-module id="app-form">
     <template>
         <style is="custom-style" include="forms"></style>
@@ -128,7 +131,7 @@
                                     <paper-item value="[[option.id]]" disabled$="[[option.disabled]]">
                                         <template is="dom-if" if="[[option.icon]]">
                                             <iron-icon class="key-icon" icon="[[option.icon]]"></iron-icon>
-                                        </template> 
+                                        </template>
                                         [[showOption(option)]]
                                     </paper-item>
                                 </template>
@@ -345,7 +348,7 @@
                                     show = dependency ? true : false;
                                 } else {
                                     show = el.showIf.fieldValues.indexOf(dependency) != -1;
-                                }                                
+                                }
 
                                 //check for second level dependency
                                 var parent = this.fields.find(function(f){
@@ -359,7 +362,7 @@
                                     if (parent.showIf.fieldExists){
                                         parentShow = parentDependency ? true : false;
                                     }
-                                    else { 
+                                    else {
                                         parentShow = parent.showIf.fieldValues.indexOf(parentDependency) != -1;
                                     }
                                     show = show && parentShow;
@@ -387,8 +390,8 @@
 
                             // if field is a dependency of another field
                             this.fields.forEach(function(depel, index) {
-                                if (depel.showIf && 
-                                    depel.showIf.fieldName != 'yaml_or_form' && 
+                                if (depel.showIf &&
+                                    depel.showIf.fieldName != 'yaml_or_form' &&
                                     depel.showIf.fieldName == el.name){
                                         if (depel.options){
                                             this.set('fields.' + index + '.options', depel.options);
