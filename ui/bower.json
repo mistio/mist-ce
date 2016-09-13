@@ -29,7 +29,8 @@
     "vaadin-grid": "^1.1.1",
     "vaadin-combo-box": "^1.1.1",
     "vaadin-icons": "^1.0.2",
-    "yaml.js": "jeremyfa/yaml.js#^0.2.8"
+    "yaml.js": "jeremyfa/yaml.js#^0.2.8",
+    "iron-validator-behavior": "^1.0.1"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
