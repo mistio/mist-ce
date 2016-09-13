@@ -28,7 +28,8 @@
     "paper-datatable": "^0.9.8",
     "vaadin-grid": "^1.1.1",
     "vaadin-combo-box": "^1.1.1",
-    "iron-data-table": "^1.0.0"
+    "vaadin-icons": "^1.0.2",
+    "yaml.js": "jeremyfa/yaml.js#^0.2.8"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
@@ -37,6 +38,7 @@
     "polymer": "^1.6.0",
     "paper-styles": "^1.1.4",
     "paper-item": "^1.1.4",
-    "iron-list": "^1.2.0"
+    "iron-list": "^1.2.0",
+    "paper-icon-button": "~1.1.1"
   }
 }
