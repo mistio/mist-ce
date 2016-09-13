@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/vaadin-icons/vaadin-icons.html">
 
@@ -142,7 +143,7 @@
             margin-right: 17px;
             margin-left: 7px;
         }
-        .field.state,        
+        .field.state,
         /*.field.create_date,*/
         .field.cloud,
         .field.size,
@@ -421,7 +422,7 @@ Polymer({
             return 'icons:arrow-downward'
         }
     },
-    itemsChanged: function (changeRecord) {    
+    itemsChanged: function (changeRecord) {
         var that = this;
         // update height of list depending on number of items
         var topOfset = 142;
@@ -629,14 +630,14 @@ Polymer({
             this.set('sortOrder', 1);
 
         } else if (this.get('sortBy') == e.model.item){
-            //same sortBy chosen 
+            //same sortBy chosen
             var newSortOrder = this.get('sortOrder')*(-1)
             this.set('sortOrder', newSortOrder);
-        } 
+        }
     },
 
     _isSortedBy: function (e) {
-        // console.info('_isSortedBy',e, this.sortBy, e == this.sortBy) 
+        // console.info('_isSortedBy',e, this.sortBy, e == this.sortBy)
 
         if (e == this.sortBy)
           return this.sortOrder == 1 ? 'desc' : 'asc';
