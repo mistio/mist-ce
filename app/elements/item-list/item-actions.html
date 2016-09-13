@@ -356,13 +356,13 @@ Polymer({
         item.type = item_type;
         var ret = [];
         ret.push('tag');
-        if (item.type == 'machine') {            
+        if (item.type == 'machine') {
             if (item.state == 'running') {
               // if key then add shell / run script
               // if not monitoring then enable monitoring
               ret.push('shell');
               ret.push('reboot');
-            } 
+            }
             ret.push('destroy');
         } else if (item.type == 'image') {
             if (item.star) {
@@ -394,7 +394,7 @@ Polymer({
             ret.push('delete');
         } else if (item.type == 'team') {
             ret.push('delete');
-        }        
+        }
         return ret;
     },
 
@@ -557,7 +557,7 @@ Polymer({
     },
 
     computeModel: function(){
-        return document.querySelector("app-main").model;
+        return document.querySelector("app-main") ? document.querySelector("app-main").model : document.querySelector("mist-app").model;;
     }
 
 });
