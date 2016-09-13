@@ -12,6 +12,7 @@
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
 
 <script type="text/javascript" src="../bower_components/swiftSet/swiftSet.js" inline></script>
 
@@ -59,6 +60,7 @@
     </style>
 
     <style is="custom-style" include="shared-styles"></style>
+    <iron-media-query query="(max-width: 860px)" query-matches="{{smallscreen}}"></iron-media-query>
 
     <app-location route="{{route}}"></app-location>
     <app-route
@@ -71,7 +73,7 @@
         <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{page}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
         <mist-header model="[[model]]" title="[[page]]" class="paper-header" style$="[[style]]"></mist-header>
 
-        <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
+        <iron-pages id="iron-pages" role="main" selected="[[page]]" attr-for-selected="name" smallscreen$="{{smallscreen}}">
           <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-dashboard>
           <page-machines name="machines" route="{{subroute}}" q="[[q]]"odel="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-machines>
           <page-images name="images" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-images>
@@ -153,7 +155,6 @@
       listeners: {
           'iron-activate': 'updateCurrent',
           'iron-navigate': 'scrollToTop',
-          'toggle-sidebar': 'toggleSidebar',
           'page-meta': 'updateTitle',
           'toast': 'showToast',
           'subscribeLogEvents': 'subscribeLogEvents',
@@ -182,6 +183,10 @@
           null,
           true
         );
+        if (this.querySelector('iron-media-query').queryMatches){
+            document.querySelector("#sidebar").classList.add('close');
+            document.querySelector("#iron-pages").classList.add('center');
+        }
       },
 
       updateSearchQuery: function(e){

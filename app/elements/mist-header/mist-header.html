@@ -113,7 +113,8 @@
             title: String
         },
         toggleSidebar: function() {
-            this.fire('toggle-sidebar');
+            document.querySelector("#sidebar").toggleClass('close');
+            document.querySelector("#iron-pages").toggleClass('center');
         },
         _goToDashboard: function(e) {
             var main = document.querySelector('app-main');
