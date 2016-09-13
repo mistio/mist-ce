@@ -1,0 +1,250 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="search-suggestions">
+  <template>
+    <style is="custom-style">
+      :host {
+      	display: none;
+      	background-color: #fff;
+        width: 730px;
+        position: absolute;
+        height: auto;
+        max-height: calc(100vh - 90px);
+        top: 100%;
+        @apply(--shadow-elevation-4dp);
+        color: rgba(0,0,0,0.87);
+        padding: 8px 16px 16px 16px;
+        overflow-x: hidden;
+        overflow-y: scroll;
+      }
+      :host[visible] {
+      	display: block;
+      }
+      h2, p {
+        line-height: 1.5em;
+        margin-bottom: 8px;
+        margin-top: 8px;
+      }
+      .truncate {
+      	width: inherit;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		list-style: disc;
+      }
+      .section ul {
+      	padding: 0;
+    	margin: 8px 40px;
+      }
+      a.more {
+      	color: var(--blue-color);
+      }
+      .iron-icon {
+      	color: rgba(0,0,0,0.32);
+      }
+    </style>
+
+    <div class="sections grid-row">
+	    <!-- <div class="section xs6" hidden$="[[!results.cloudsArray.length]]">
+		    <h2>Clouds</h2>
+		    <ul>
+		    <template is="dom-repeat" items="[[results.cloudsArray]]">
+		    	<li class="truncate"><a href="/">[[item.title]]</a></li>
+		    </template>
+		    </ul>
+	    </div> -->
+
+		<div class="section xs6" hidden$="[[!results.machinesArray.length]]">
+		    <h2>
+		    <!-- <iron-icon icon="hardware:computer"></iron-icon> -->
+		    	Machines</h2>
+		    <ul>
+		    <template is="dom-repeat" items="[[results.machinesArray]]">
+		    	<li class="truncate"><a href="/machines/[[item.uuid]]">[[item.name]]</a></li>
+		    </template>
+		    <a class="more" href="/machines">view all results</a>
+		    </ul>
+	    </div>   
+
+	    <div class="section xs6" hidden$="[[!results.imagesArray.length]]">
+		    <h2>
+		    <!-- <iron-icon icon="image:photo"></iron-icon> -->
+		    Images</h2>
+		    <ul>
+		    <template is="dom-repeat" items="[[results.imagesArray]]">
+		    	<li class="truncate"><a href="/images/[[item.id]]">[[item.name]]</a></li>
+		    </template>
+		    <a class="more" href="/images">view all</a>
+		    </ul>
+	    </div>
+
+	    <div class="section xs6" hidden$="[[!results.keysArray.length]]">
+		    <h2>
+		    <!-- <iron-icon icon="communication:vpn-key"></iron-icon> -->
+		    Keys</h2>
+		    <ul>
+		    <template is="dom-repeat" items="[[results.keysArray]]">
+		    	<li class="truncate"><a href="/keys/[[item.id]]">[[item.name]]</a></li>
+		    </template>
+		    <a class="more" href="/keys">view all</a>
+		    </ul>
+	    </div>
+
+	    <div class="section xs6" hidden$="[[!results.networksArray.length]]">
+		    <h2>
+		    <!-- <iron-icon icon="hardware:device-hub"></iron-icon> -->
+		    Networks</h2>
+		    <ul>
+		    <template is="dom-repeat" items="[[results.networksArray]]">
+		    	<li class="truncate"><a href="/networks/[[item.id]]">[[item.name]]</a></li>
+		    </template>
+		    <a class="more" href="/networks">view all</a>
+		    </ul>
+	    </div>
+
+	    <div class="section xs6" hidden$="[[!results.tunnelsArray.length]]">
+		    <h2>
+		    <!-- <iron-icon icon="editor:merge-type"></iron-icon> -->
+		    Tunnels</h2>
+		    <ul>
+		    <template is="dom-repeat" items="[[results.tunnelsArray]]">
+		    	<li class="truncate"><a href="/tunnels/[[item.id]]">[[item.name]]</a></li>
+		    </template>
+		    <a class="more" href="/tunnels">view all</a>
+		    </ul>
+	    </div>
+
+	    <div class="section xs6" hidden$="[[!results.scriptsArray.length]]">
+		    <h2>
+		    <!-- <iron-icon icon="image:movie-creation"></iron-icon> -->
+		    Scripts</h2>
+		    <ul>
+		    <template is="dom-repeat" items="[[results.scriptsArray]]">
+		    	<li class="truncate"><a href="/scripts/[[item.id]]">[[item.name]]</a></li>
+		    </template>
+		    <a class="more" href="/scripts">view all</a>
+		    </ul>
+	    </div>
+
+	    <div class="section xs6" hidden$="[[!results.templatesArray.length]]">
+		    <h2>
+		    <!-- <iron-icon icon="av:art-track"></iron-icon> -->
+		    Templates</h2>
+		    <ul>
+		    <template is="dom-repeat" items="[[results.templatesArray]]">
+		    	<li class="truncate"><a href="/templates/[[item.id]]">[[item.name]]</a></li>
+		    </template>
+		    <a class="more" href="/templates">view all</a>
+		    </ul>
+	    </div>
+
+	    <div class="section xs6" hidden$="[[!results.stacksArray.length]]">
+		    <h2>
+		    <!-- <iron-icon icon="maps:layers"></iron-icon> -->
+		    Stacks</h2>
+		    <ul>
+		    <template is="dom-repeat" items="[[results.stacksArray]]">
+		    	<li class="truncate"><a href="/stacks/[[item.id]]">[[item.name]]</a></li>
+		    </template>
+		    <a class="more" href="/stacks">view all</a>
+		    </ul>
+	    </div>
+
+	    <div class="section xs6" hidden$="[[!results.teamsArray.length]]">
+		    <h2>
+		    <!-- <iron-icon icon="social:people"></iron-icon> -->
+		    Teams</h2>
+		    <ul>
+		    <template is="dom-repeat" items="[[results.teamsArray]]">
+		    	<li class="truncate"><a href="/teams/[[item.id]]">[[item.name]]</a></li>
+		    </template>
+		    <a class="more" href="/teams">view all</a>
+		    </ul>
+	    </div>
+
+   	</div>
+
+  </template>
+<script>
+  Polymer({
+    is: 'search-suggestions',
+    properties: {
+    	query: String,
+    	model: Object,
+    	results: {
+    		type: Object
+    	},
+    	visible: {
+    		type: Boolean,
+    		reflectToAttribute: true, 
+    		value: false
+    	}
+    },
+    observers: [
+    	'queryChanged(query)',
+    	'resultsChanged(results)' 
+    ],
+    attached: function(){
+
+    },
+    queryChanged: function(query){
+    	if(this.query && this.query.length > 2){
+	    	var results = {};
+	    	for (var prop in this.model) {
+	    		if (prop.endsWith('Array')){
+	    			results[prop] = this.filterItems(this.model[prop]).splice(0,3);
+	    		}
+	    	}
+
+	    	this.set('results', results);
+	    }
+	    else { 
+	    	this.set('results', {});
+	    }
+    },
+    resultsChanged: function(results){
+    	
+    	if(!this.query || this.query.length <= 2 || !this.results || !this.results.length == 0) {
+    		this.set('visible', false);
+    	}
+    	else {
+    		var rlen = 0;
+	    	for (var prop in this.results) {
+	    		if (this.results[prop].length > 0) {
+	    			rlen += this.results[prop].length;
+
+	    		}
+	    	}
+	    	if (rlen > 0)
+	    		this.set('visible', true);
+	    	else 
+	    		this.set('visible', false);
+
+    	}
+    },
+    filterItems: function(items) {
+    	if (items && this.query && this.query.length > 0)
+        	return items.filter(this.filterItem.bind(this)).splice(0,3);
+        return false;
+    },
+
+    filterItem: function(item, index) {
+    	console.log('filterItem');
+        var q = this.query || '', 
+        	queryTerms = q.split(' ');
+
+        if (this.query && this.query.length > 0) {
+	        // Check if all terms exist in stringified item
+	        for (var i=0; i<queryTerms.length; i++) {
+	            if (queryTerms[i] && queryTerms[i].length &&
+	                JSON.stringify(item).toLowerCase().indexOf(queryTerms[i].toLowerCase()) < 0) {
+	                    return false;
+	                }
+	        }
+	    }
+        return true;
+    },
+  });
+  </script>
+</dom-module>

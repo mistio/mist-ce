@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 
+<link rel="import" href="search-suggestions.html">
+
 <dom-module id="top-search">
   <template>
     <style is="custom-style">
@@ -59,6 +61,7 @@
           <input type="search" id="query" value="{{query::keyup}}" autocomplete="off" placeholder="Search">
       </form>
     </div>
+    <!-- <search-suggestions query="[[query]]" model="[[model]]"></search-suggestions> -->
   </template>
   <script>
   Polymer({
@@ -67,6 +70,10 @@
     properties: {
       query: {
         type: String,
+        notify: true
+      },
+      model: {
+        type: Object,
         notify: true
       }
     },

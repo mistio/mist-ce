@@ -98,7 +98,7 @@
                 <span class="page-title">[[title]]</span>
             </div>
             <span class="title layout horizontal">
-                <top-search tabindex="3"></top-search>
+                <top-search model="[[model]]" tabindex="3"></top-search>
             </span>
             <div class="container" tabindex="4">
                 <!--notifications-element></notifications-element-->
@@ -110,7 +110,8 @@
     Polymer({
         is: 'mist-header',
         properties: {
-            title: String
+            title: String,
+            model: Object
         },
         toggleSidebar: function() {
             document.querySelector("#sidebar").toggleClass('close');
