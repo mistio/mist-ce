@@ -196,7 +196,7 @@
             </div>
         </div>
 
-        <team-add referrel="onb"></team-add>
+        <team-add referral="onb" organization="[[model.org]]"></team-add>
         <iron-ajax id="saveOrgRequest" method="PUT" url="/api/v1/org/[[model.org.id]]"></iron-ajax>
         <iron-ajax id="invitePeopleRequest" method="POST" on-response="invitePeopleResponse" on-error="invitePeopleError" url$="api/v1/org/[[model.org.id]]/teams/[[selectedTeamId]]/members"></iron-ajax>
 
