@@ -20,7 +20,6 @@
             display: block;
             position: relative;
             background: white;
-            border: 1px solid #d0d0d0;
             border-radius: 3px;
             opacity: 1;
             transition: opacity 0.4s;
@@ -32,8 +31,13 @@
         }
 
         iron-list {
+            border-right: 1px solid #d0d0d0;
+            border-left: 1px solid #d0d0d0;
+            border-bottom: 1px solid #d0d0d0;
             overflow-y: auto;
             overflow-x: hidden;
+            max-height: calc(100vh - 168px); 
+            margin-bottom: 24px;
         }
 
         paper-button {
@@ -76,6 +80,9 @@
             font-weight: 400;
             border-bottom: 1px solid #e5e5e5;
             overflow: hidden;
+            border-right: 1px solid #d0d0d0;
+            border-left: 1px solid #d0d0d0;
+            border-top: 1px solid #d0d0d0;
         }
 
         .header > .item-list {
@@ -425,7 +432,7 @@ Polymer({
     itemsChanged: function (changeRecord) {
         var that = this;
         // update height of list depending on number of items
-        var topOfset = 142;
+        var topOfset = 168;
         var wh = document.getElementById('mainPanel').offsetHeight - 24 - 54; //#mainPanel height - top padding - header height
         var itemHeight = 64 + 1; //list item height + border
         var criticalNumofItems = Math.floor(wh/itemHeight) - 1;
