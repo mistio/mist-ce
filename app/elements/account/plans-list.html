@@ -62,7 +62,7 @@
                     <plan-item user="[[user]]" plan="[[user.current_plan]]" iscurrent="true" index="0" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
                 </div>
                 <div class="xs12 l6">
-                    <p>Your current plan offers you: [[user.current_plan.promo_code.description]]</p>
+                    <p hidden$="[[!user.current_plan.promo_code.description]]">Your current plan offers you: [[user.current_plan.promo_code.description]]</p>
                     <p>For questions and other information contact us at <a href="mailto:support@mist.io">support@mist.io</a></p>
                 </div>
             </div>
