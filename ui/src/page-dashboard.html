@@ -27,7 +27,7 @@
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <!--link rel="import" href="../bower_components/iron-form/iron-form.html"-->
 
-<!--link rel="import" href="../logs/log-list.html"-->
+<!--link rel="import" href="../elements/logs/log-list.html"-->
 <link rel="import" href="../elements/onb-element/onb-element.html">
 <link rel="import" href="../elements/clouds/cloud-info.html">
 <link rel="import" href="../elements/clouds/cloud-chip.html">
@@ -444,8 +444,14 @@ Polymer({
             if (that.querySelector('dashboard-panel'))
                 that.querySelector('dashboard-panel').resize();
 
-        }, 5000);
+        }, 5000, this);
         //this.cloudLayoutMatrix();
+        this.async(function() {
+            this.importHref(this.resolveUrl('../elements/logs/log-list.html'),
+                            null,
+                            null,
+                            true)},
+            500);
     },
     isOnline: function(cloud) {
         return cloud.state == 'online' && 'online';
