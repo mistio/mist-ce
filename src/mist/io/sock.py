@@ -132,6 +132,7 @@ class ShellConnection(MistConnection):
         if self.ssh_info:
             self.close()
         self.ssh_info = {
+            'job_id': data.get('job_id', ''),
             'cloud_id': data['cloud_id'],
             'machine_id': data['machine_id'],
             'host': data['host'],
