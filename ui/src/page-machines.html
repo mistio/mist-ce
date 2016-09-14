@@ -1,6 +1,8 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../elements/pages/page-items.html">
+<link rel="import" href="../elements/machines/machine-create.html">
+<link rel="import" href="../elements/machines/machine-page.html">
 
 <dom-module id="page-machines">
   <template>
@@ -9,7 +11,13 @@
         display: block;
       }
     </style>
-    <page-items class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]" onboarding="[[onboarding]]"></page-items>
+    <app-route route="{{route}}"
+                pattern="/:machine"
+                data="{{data}}"></app-route>
+
+    <page-items name="machines" class="keys" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
+    <machine-create model="[[model]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isAddPageActive(route.path)]]></machine-create>
+    <machine-page model="[[model]]" params="[[_getMachine(data.machine)]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isDetailsPageActive(route.path)]]></machine-page>
   </template>
 
   <script>
@@ -21,6 +29,19 @@
         model: Object,
         sections: Array,
         onboarding: Object
+      },
+
+      _isAddPageActive: function(path) {
+          return path == '/+create';
+      },
+      _isDetailsPageActive: function(path) {
+          return path && path != '/+create';
+      },
+      _isListActive: function(path) {
+          return !path;
+      },
+      _getMachine: function(id) {
+          return this.model.machines[id];
       }
 
     });

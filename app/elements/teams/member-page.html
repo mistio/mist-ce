@@ -221,7 +221,7 @@
                     </div>
                 </div>
             </paper-material>
-            <div class="page section">                                
+            <div class="page section">
                 <div class="flex-horizontal-with-ratios section">
                     <div class="width100">
                         <paper-material class="no-pad">
@@ -324,7 +324,7 @@
                             this.set('teamId', t.id);
                             this.deleteMemberRequest(t.id);
                         }, 50, this)
-                    }, this);                    
+                    }, this);
                 }
             },
             deleteMemberRequest: function(team){
@@ -336,11 +336,11 @@
             },
             _deleteMemberResponseAjax: function(e){
                 // if user was in one single team return there, else in teams
-                if (this.memberTeams.length == 1 ){                        
-                    page('/teams/'+this.memberTeams[0].id);
+                if (this.memberTeams.length == 1 ){
+                    document.querySelector('app-location').set('route.path', '/teams/' + this.memberTeams[0].id);
                 }
                 else {
-                    page('/teams')
+                    document.querySelector('app-location').set('route.path', '/teams')
                 }
             },
             _showDialog: function(info) {
@@ -352,7 +352,7 @@
                 dialog._openDialog();
             },
             _addMemberInTeams: function(){
-                page('/members/'+this.member.id+'/add-in-teams');
+                document.querySelector('app-location').set('route.path', '/members/' + this.member.id + '/add-in-teams');
             }
         });
     })();

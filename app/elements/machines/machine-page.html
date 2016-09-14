@@ -250,7 +250,7 @@
                         <template is="dom-repeat" items="[[associatedKeys]]">
                             <div class="machine-key">
                                 <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
-                                <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon> 
+                                <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
                             </div>
                         </template>
                         <div class="machine-key" id="pendingKeyRequest">
@@ -268,8 +268,8 @@
             <!--<paper-material class="info-card" hidden$="{{!isMonitored}}">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
                 <div>
-                    <paper-material>graph data</paper-material> 
-                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard> 
+                    <paper-material>graph data</paper-material>
+                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                 </div>
             </paper-material>-->
             <paper-material class="info-card">
@@ -321,21 +321,6 @@
     </template>
 </dom-module>
 <script>
-function itemUid(item, section) {
-    // Returns a universal resource id of the form
-    //      resourceType:[cloudId]:itemId
-    // e.g. machine:3tm7aaHHZcMxpZ:bf04f27e924fa67023582,
-    //      key::MnhLdx9u22YjVJ
-    //
-    // TODO replace with mist uuids
-
-    // if item type is not defined derive it fro the current section id
-    var item_type = item.type ? item.type : (section &&
-                                             section.id.slice(0,-1));
-    var cloudId = item.cloud ? item.cloud.id : '';
-
-    return item_type + ':' + cloudId + ':' + item.id;
-}
     Polymer({
         is: 'machine-page',
 
@@ -443,7 +428,7 @@ function itemUid(item, section) {
               "isDefault": false,
               "jsonData": null
               }
-            ];            
+            ];
             var that = this;
             setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
                 if (that.querySelector('dashboard-panel'))
@@ -559,7 +544,7 @@ function itemUid(item, section) {
         rename: function(_, params) {
             console.log("clicked rename");
         },
-        
+
         _getHeaderStyle: function(color) {
             return 'background-color: ' + color + '; color: #fff;';
         },

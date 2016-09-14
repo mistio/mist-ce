@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
 
 <link rel="import" href="../app-sidebar/app-sidebar.html">
 <link rel="import" href="../teams/team-add.html">
@@ -175,7 +176,7 @@
             <div hidden$="[[!showEmptyScreen]]">
                 <empty-pages clouds="[[model.cloudsArray]]" section="[[section]]"></empty-pages>
             </div>
-            <div hidden$="[[showEmptyScreen]]">                
+            <div hidden$="[[showEmptyScreen]]">
                 <div id="section-heading" hidden$="[[!section]]">
                     <div class="search-notice" hidden$="[[!section.q.length]]">
                         <h2>[[filteredItems.length]] "[[section.q]]" [[section.id]] <paper-icon-button icon="close" on-tap="clearSearch"></paper-icon-button></h2>
@@ -192,8 +193,8 @@
             <div class="is-loading" hidden$="[[!isLoading]]">
                 <paper-spinner active></paper-spinner>
             </div>
-            
-            
+
+
         </div>
 
         <template is="dom-if" if="[[!isTeams]]">
@@ -208,7 +209,7 @@
             </div>
             <team-add id="isTeamsPage" organization="[[model.org]]"></team-add>
         </template>
-        
+
     </template>
 </dom-module>
 <script>
@@ -366,7 +367,7 @@
 
         _fabAction: function(e) {
             console.debug('fabAction', e, this.section.add);
-            page(this.section.add);
+            document.querySelector('app-location').set('route.path', this.section.add)
         },
 
         _computeSort: function(property, order) {
@@ -391,7 +392,7 @@
                     //if some property misses, move it down
                     else {
                         if (!JSON.stringify(a[property]))
-                            return 1;   
+                            return 1;
                         else
                             return -1
                     }
@@ -421,7 +422,7 @@
                     //if some property misses, move it down
                     else {
                         if (!a.extra.cost_per_month)
-                            return 1;   
+                            return 1;
                         else
                             return -1
                     }
@@ -441,7 +442,7 @@
                     //if some property misses, move it down
                     else {
                         if (!a.extra.image_id)
-                            return 1;   
+                            return 1;
                         else
                             return -1
                     }
@@ -510,7 +511,7 @@
                     //if some status ok move down
                     else {
                         if (a["status"] == 'ok')
-                            return 1;   
+                            return 1;
                         else
                             return -1
                     }
@@ -529,12 +530,12 @@
                     }
                     else {
                         if (!a.extra.create_date_timestamp)
-                            return 1;   
+                            return 1;
                         else
                             return -1
                     }
                 }
-                
+
             };
         },
 

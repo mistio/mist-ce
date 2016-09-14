@@ -527,8 +527,7 @@
                 _addKey: function(){
                     //set attribute origin
                     var origin = window.location.pathname;
-                    page("/add-key?origin="+origin);
-
+                    document.querySelector('app-location').set('route.path', '/keys/+add?origin=' + origin);
                 }
             });
         })();

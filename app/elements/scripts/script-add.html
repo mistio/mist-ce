@@ -232,11 +232,10 @@
             _addScriptAjaxRequest: function() {
             },
             _addScriptAjaxResponse: function(e) {
-                // 
+                //
                 // console.log('XHR', e.detail);
                 var response = YAML.parse(e.detail.xhr.response);
-                page('/scripts/'+ response.id);
-                page('/scripts/');
+                document.querySelector('app-location').set('route.path', '/scripts/' + response.id);
             },
         });
     })();

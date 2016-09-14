@@ -14,21 +14,12 @@
     </style>
 
     <app-route route="{{route}}"
-           pattern="/+add"
-           data="{{data}}"
-           active="{{addFormActive}}"></app-route>
+                pattern="/:key"
+                data="{{data}}"></app-route>
 
-     <app-route route="{{route}}"
-            pattern="/:key"
-            data="{{data}}"
-            active="{{detailsPageActive}}"></app-route>
-
-    <key-add name="key-add" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" hidden$=[[!addFormActive]]></key-add>
-
-    <page-items class="keys" model="[[model]]" items="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]" onboarding="[[onboarding]]" hidden$=[[!listActive]]></page-items>
-
-    <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]" hidden$=[[!detailsPageActive]]></key-page>
-
+    <page-items name="keys" class="keys" model="[[model]]" items="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
+    <key-add model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" hidden$=[[!_isAddPageActive(route.path)]]></key-add>
+    <key-page model="[[model]]" params="[[_getKeyPair(data.key)]]" sections="[[sections]]" section="[[sections.keys]]" hidden$=[[!_isDetailsPageActive(route.path)]]></key-page>
   </template>
 
   <script>
@@ -40,18 +31,23 @@
         model: Object,
         sections: Array,
         onboarding: Object,
-        listActive: {
-            type: Boolean,
-            computed: '_computeListActive(addFormActive, detailsPageActive)'
-        }
       },
 
       attached: function() {
 
       },
 
-      _computeListActive: function(addFormActive, detailsPageActive) {
-          return !addFormActive && !detailsPageActive;
+      _isAddPageActive: function(path) {
+          return path == '/+add';
+      },
+      _isDetailsPageActive: function(path) {
+          return path && path != '/+add';
+      },
+      _isListActive: function(path) {
+          return !path;
+      },
+      _getKeyPair: function(id) {
+          return this.model.keys[id];
       }
 
     });

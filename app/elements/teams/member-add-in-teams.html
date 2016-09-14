@@ -32,7 +32,7 @@
         }
         h3, .item {
             display: block;
-            width: 100%;   
+            width: 100%;
         }
         .item {
             margin: 8px 0;
@@ -112,7 +112,7 @@
                 member: {
                     type: Object,
                     computed: '_computeMember(params, model.members.*)'
-                },                
+                },
                 selectedTeams: {
                     type: Array,
                     value: []
@@ -176,7 +176,7 @@
                 };
                 this.$.formAjax.headers["Content-Type"] = 'application/json';
                 this.$.formAjax.headers["Csrf-Token"] = CSRF_TOKEN;
-                
+
                 this.async(function(){
                     this.selectedTeams.forEach(function(t){
                         this.set('teamId', t);
@@ -186,7 +186,7 @@
 
             },
             _handleResponse: function(e) {
-                page('/members/'+this.member.id);
+                document.querySelector('app-location').set('route.path', '/members/'+this.member.id);
                 this.set('sendingData', false);
             },
             _handleError: function(e){
@@ -205,7 +205,7 @@
 
             },
             goToMember: function(){
-                page('/members/'+this.member.id);
+                document.querySelector('app-location').set('route.path', '/members/' + this.member.id);
             }
         });
     })();

@@ -12,7 +12,6 @@
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
 
 <script type="text/javascript" src="../bower_components/swiftSet/swiftSet.js" inline></script>
 
@@ -60,7 +59,6 @@
     </style>
 
     <style is="custom-style" include="shared-styles"></style>
-    <iron-media-query query="(max-width: 860px)" query-matches="{{smallscreen}}"></iron-media-query>
 
     <app-location route="{{route}}"></app-location>
     <app-route
@@ -73,9 +71,10 @@
         <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{page}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
         <mist-header model="[[model]]" title="[[page]]" class="paper-header" style$="[[style]]"></mist-header>
 
-        <iron-pages id="iron-pages" role="main" selected="[[page]]" attr-for-selected="name" smallscreen$="{{smallscreen}}">
+        <iron-pages role="main" selected="[[page]]" attr-for-selected="name">
           <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-dashboard>
-          <page-machines name="machines" route="{{subroute}}" q="[[q]]"odel="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-machines>
+          <page-clouds name="clouds" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-clouds>
+          <page-machines name="machines" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-machines>
           <page-images name="images" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-images>
 
           <page-keys name="keys" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-keys>
@@ -118,11 +117,6 @@
             type: Object
         },
 
-        providers: {
-            type: Object,
-            value: PROVIDERS
-        },
-
         sections: {
             type: Object
         },
@@ -155,6 +149,7 @@
       listeners: {
           'iron-activate': 'updateCurrent',
           'iron-navigate': 'scrollToTop',
+          'toggle-sidebar': 'toggleSidebar',
           'page-meta': 'updateTitle',
           'toast': 'showToast',
           'subscribeLogEvents': 'subscribeLogEvents',
@@ -183,10 +178,6 @@
           null,
           true
         );
-        if (this.querySelector('iron-media-query').queryMatches){
-            document.querySelector("#sidebar").classList.add('close');
-            document.querySelector("#iron-pages").classList.add('center');
-        }
       },
 
       updateSearchQuery: function(e){
@@ -303,7 +294,7 @@
             color: '#8c76d1',
             icon: 'hardware:computer',
             count: '0',
-            add: '/create-machine',
+            add: '/machines/+create',
             q: ''
         }, {
             id: 'images',
@@ -316,7 +307,7 @@
             color: '#009688',
             icon: 'communication:vpn-key',
             count: '0',
-            add: '/add-key',
+            add: '/keys/+add',
             q: ''
         }, {
             id: 'networks',
@@ -337,14 +328,14 @@
             color: '#D48900',
             icon: 'image:movie-creation',
             count: '0',
-            add: '/add-script',
+            add: '/scripts/+add',
             q: ''
         }, {
             id: 'templates',
             color: '#0097A7',
             icon: 'av:art-track',
             count: '0',
-            add: '/add-template',
+            add: '/templates/+add',
             q: ''
         }, {
             id: 'teams',
@@ -363,12 +354,32 @@
             color: '#2F2F3E',
             icon: 'account-circle',
             count: null
+        }, {
+            id: 'clouds',
+            color: '#424242',
+            q: ''
         }];
 
         this.sections = _generateMap(this.sectionsArray);
       }
 
     });
+
+    function itemUid(item, section) {
+        // Returns a universal resource id of the form
+        //      resourceType:[cloudId]:itemId
+        // e.g. machine:3tm7aaHHZcMxpZ:bf04f27e924fa67023582,
+        //      key::MnhLdx9u22YjVJ
+        //
+        // TODO replace with mist uuids
+
+        // if item type is not defined derive it fro the current section id
+        var item_type = item.type ? item.type : (section &&
+                                                 section.id.slice(0,-1));
+        var cloudId = item.cloud ? item.cloud.id : '';
+
+        return item_type + ':' + cloudId + ':' + item.id;
+    }
 
   </script>
 

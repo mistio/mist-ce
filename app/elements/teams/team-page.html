@@ -276,7 +276,7 @@
                     <paper-material class="no-pad">
                         <!-- TODO: make interactive add edit of rules -->
                         <h3 class="smallcaps resource-head">Team Policy</h3>
-                        <team-policy model="[[model]]" team="[[team]]"></team-policy>                        
+                        <team-policy model="[[model]]" team="[[team]]"></team-policy>
                     </paper-material>
                 </div>
             </div>
@@ -289,7 +289,7 @@
         <team-edit team="[[team]]" org="[[model.org]]"></team-edit>
         <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
         <iron-ajax id="deleteMember" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/members/[[memberToDelete]]" method="DELETE" on-response="_deleteMemberResponse" on-error="_deleteMemberError"></iron-ajax>
-        
+
         <dialog-element></dialog-element>
         <paper-toast></paper-toast>
     </template>
@@ -416,7 +416,7 @@
 
                     if (pendingMembers.length > 0) { this.set("hasPending", true); }
                     else { this.set("hasPending", false); }
-                    
+
                     if (teamMembers.length > 0) { this.set("hasMembers", true);}
                     else { this.set("hasMembers", false);}
 
@@ -425,7 +425,7 @@
                     return teamMembers;
                 },
                 _addMember: function(e) {
-                    page('/add-members/' + this.team.id);
+                    document.querySelector('app-location').set('route.path', '/teams/' + this.team.id + '/+add');
                 },
                 _editTeam: function(e) {
                     var el = this.querySelector('team-edit');
@@ -453,7 +453,7 @@
                         this.$.teamDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
                         this.$.teamDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                         this.$.teamDeleteAjaxRequest.generateRequest();
-                        page('/teams');
+                        document.querySelector('app-location').set('route.path', '/teams');
                     }
                     if (response.confirmed && reason == "member.delete") {
                         this.$.deleteMember.body = {};
@@ -463,7 +463,7 @@
                     }
                 },
                 _handleTeamDeleteAjaxResponse: function(e) {
-                    page('/teams');
+                    document.querySelector('app-location').set('route.path', '/teams');
                 },
                 _deleteMemberFromTeam: function(e){
                     var membId = e.target.attributes.memberid.value,

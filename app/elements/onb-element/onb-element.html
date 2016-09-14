@@ -258,11 +258,11 @@
                 this.$.saveOrgRequest.generateRequest();
             },
             goToAddTeam: function(){
-                page.show('/add-team');
+                document.querySelector('app-location').set('route.path', '/team/+add');
                 this.showSidebar();
             },
             goToAddCloud: function(){
-                page.show('/add-cloud');
+                document.querySelector('app-location').set('route.path', '/clouds/+add');
                 this.showSidebar();
             },
             showInviteForm: function(){
@@ -284,7 +284,7 @@
             invitePeople: function(){
                 this.showProgress = true;
 
-                var emails = document.querySelector('#membersemails').value; 
+                var emails = document.querySelector('#membersemails').value;
                 if (emails){
                     this.$.invitePeopleRequest.headers["Content-Type"] = 'application/json';
                     this.$.invitePeopleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
@@ -296,7 +296,7 @@
                 }
             },
             invitePeopleResponse: function(){
-                page('/teams/' + this.selectedTeamId);
+                document.querySelector('app-location').set('route.path', '/teams/' + this.selectedTeamId);
                 this.set('showProgress', false);
                 this.async(function(){
                     this.hideInviteForm();
@@ -309,7 +309,7 @@
                     this.$.errormsg.textContent = e.detail.error.message;
                 }
                 else {
-                    this.$.errormsg.textContent = "You have not provided any emails";   
+                    this.$.errormsg.textContent = "You have not provided any emails";
                 }
             },
             updateSelectTeamId: function(e){
