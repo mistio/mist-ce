@@ -391,7 +391,7 @@ class BaseController(object):
                 machine_model = Machine.objects.get(cloud=self.cloud,
                                                     machine_id=node.id)
             except Machine.DoesNotExist:
-                machine_model = Machine(cloud=self.cloud, machine_id=node.id)
+                machine_model = Machine(cloud=self.cloud, machine_id=node.id).save()
 
             # Update machine_model's last_seen fields.
             machine_model.last_seen = now
@@ -508,7 +508,6 @@ class BaseController(object):
                 machine['tags'] = [{'key': key, 'value': value}
                                    for key, value in tags.iteritems()
                                    if key != 'Name']
-
             # Save all changes to machine model on the database.
             machine_model.save()
 
