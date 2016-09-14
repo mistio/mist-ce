@@ -1344,21 +1344,12 @@ def trigger_machine_action(user, cloud_id, machine, action, plan_id=None,
     that deal with the actions
     """
 
-    # TODO this is not needed any more, but i am not sure
-    # cloud = Cloud.objects.get(owner=user, id=cloud_id)
-    #
-    # bare_metal = False
-    # if cloud.ctl.provider == 'bare_metal':
-    #     bare_metal = True
-    # try:
-    #     conn = connect_provider(cloud)
-    # except InvalidCredsError:
-    #     raise CloudUnauthorizedError()
-    # except Exception as exc:
-    #     log.error("Error while connecting to cloud")
-    #     raise CloudUnavailableError(exc=exc)
-
-    # try:
+    actions = ('start', 'stop', 'reboot', 'destroy', 'resize',
+               'rename', 'undefine', 'suspend', 'resume')
+    # add this check also here cause other functions call this one
+    if action not in actions:
+        raise BadRequestError("Action '%s' should be one of %s" % (action,
+                                                               actions))
     if action is 'start':
         machine.ctl.start()
     elif action is 'stop':

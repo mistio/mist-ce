@@ -434,8 +434,8 @@ class BaseController(object):
 
             # Get machine creation date.
             try:
-                created = self._list_machines__machine_creation_date(node,
-                                                                     machine)
+                created = self._list_machines__machine_creation_date(machine,
+                                                                     node)
                 if created:
                     machine.created = get_datetime(created)
             except Exception as exc:
@@ -447,7 +447,7 @@ class BaseController(object):
 
             # Update with available machine actions.
             try:
-                self._list_machines__machine_actions(node, machine)
+                self._list_machines__machine_actions(machine, node)
             except Exception as exc:
                 log.exception("Error while finding machine actions "
                               "for machine %s:%s for %s",
@@ -455,7 +455,7 @@ class BaseController(object):
 
             # Apply any cloud/provider specific post processing.
             try:
-                self._list_machines__postparse_machine(node, machine)
+                self._list_machines__postparse_machine(machine, node)
             except Exception as exc:
                 log.exception("Error while post parsing machine %s:%s for %s",
                               machine.id, node.name, self.cloud)
@@ -475,8 +475,8 @@ class BaseController(object):
                 cpm = parse_num(machine.tags.get('cost_per_month'))
                 if not (cph or cpm) or cph > 100 or cpm > 100 * 24 * 31:
                     cph, cpm = map(parse_num,
-                                   self._list_machines__cost_machine(node,
-                                                                     machine))
+                                   self._list_machines__cost_machine(machine,
+                                                                     node))
                 if cph or cpm:
                     if not cph:
                         cph = cpm / month_days / 24

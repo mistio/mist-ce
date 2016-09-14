@@ -125,11 +125,15 @@ class Machine(me.Document):
             'last_seen': str(self.last_seen or ''),
             'missing_since': str(self.missing_since or ''),
             'created': str(self.created or '')
-
         }
 
     def as_dict_old(self):
         # Return a dict as it was previously being returned by list_machines
+
+        # This is need to be consistent with the previous situation
+        self.extra.update({'created': str(self.created or ''),
+                           'cost_per_month': '%.2f' % self.cost.monthly,
+                           'cost_per_hour': '%.2f' % self.cost.hourly})
         return {
             'id': self.machine_id,
             'uuid': self.id,
@@ -151,11 +155,9 @@ class Machine(me.Document):
             'cloud': self.cloud.id,
             'last_seen': str(self.last_seen or ''),
             'missing_since': str(self.missing_since or ''),
-            'created': str(self.created or ''),
             'state': self.state,
+            'size': self.size,
             'tags': self.tags,
-            'cost_per_month': self.cost.monthly,
-            'cost_per_hour': self.cost.hourly,
             'extra': self.extra,
             'can_stop': self.actions.stop,
             'can_start': self.actions.start,
