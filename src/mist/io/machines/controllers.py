@@ -18,9 +18,11 @@ class MachineController(object):
         return self.machine.cloud.ctl.stop_machine(self.machine)
 
     def suspend(self):
+        """Suspends machine - used in KVM libvirt to pause machine"""
         return self.machine.cloud.ctl.suspend_machine(self.machine)
 
     def resume(self):
+        """Resumes machine - used in KVM libvirt to resume suspended machine"""
         return self.machine.cloud.ctl.resume_machine(self.machine)
 
     def reboot(self):
@@ -30,13 +32,18 @@ class MachineController(object):
         return self.machine.cloud.ctl.destroy_machine(self.machine)
 
     def resize(self, plan_id=None):
+        """Resize a machine on an other plan."""
         return self.machine.cloud.ctl.resize_machine(self.machine, plan_id)
 
     def rename(self, name=None):
+        """Renames a machine on a certain cloud."""
         return self.machine.cloud.ctl.rename_machine(self.machine, name)
+
     # TODO why want this also ?
     # def tag(self):
     #     return self.machine.cloud.ctl.tag(self.machine)
     #
     def undefine(self):
+        """Undefines machine - used in KVM libvirt
+        to destroy machine and delete XML conf"""
         return self.machine.cloud.ctl.undefine_machine(self.machine)

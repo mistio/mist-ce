@@ -92,20 +92,20 @@ class AmazonController(BaseController):
                 parts.append('1')
             kwargs['region'] = '-'.join(parts)
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.created_at  # datetime
 
-    def _list_machines__machine_actions(self, machine_libcloud, machine):
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(AmazonController, self)._list_machines__machine_actions(
-              machine_libcloud, machine)
+               machine, machine_libcloud)
         machine.actions.rename = True
 
-    def _list_machines__postparse_machine(self, machine_libcloud, machine):
+    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
         # This is windows for windows servers and None for Linux.
         extra = machine.extra
         machine.extra['os_type'] = extra.get('platform', 'linux')
 
-    def _list_machines__cost_machine(self, machine_libcloud, machine):
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
         image_id = machine_libcloud.extra.get('image_id')
         try:
             # FIXME: This is here to avoid circular imports.
@@ -177,15 +177,15 @@ class DigitalOceanController(BaseController):
     def _connect(self):
         return get_driver(Provider.DIGITAL_OCEAN)(self.cloud.token)
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('created_at')  # iso8601 string
 
-    def _list_machines__machine_actions(self, machine_libcloud, machine):
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(DigitalOceanController, self)._list_machines__machine_actions(
-              machine_libcloud, machine)
+               machine, machine_libcloud)
         machine.actions.rename = True
 
-    def _list_machines__cost_machine(self, machine_libcloud, machine):
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
         size = machine_libcloud.extra.get('size', {})
         return size.get('price_hourly', 0), size.get('price_monthly', 0)
 
@@ -197,24 +197,24 @@ class LinodeController(BaseController):
     def _connect(self):
         return get_driver(Provider.LINODE)(self.cloud.apikey)
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('CREATE_DT')  # iso8601 string
 
-    def _list_machines__machine_actions(self, machine_libcloud, machine):
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(LinodeController, self)._list_machines__machine_actions(
-              machine_libcloud, machine)
+               machine, machine_libcloud)
         machine.actions.rename = True
         # After resize, node gets to pending mode, needs to be started.
         if machine_libcloud.state is NodeState.PENDING:
             machine.actions.start = True
 
-    def _list_machines__postparse_machine(self, machine_libcloud, machine):
+    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
         datacenter = machine.extra.get('DATACENTER')
         datacenter = config.LINODE_DATACENTERS.get(datacenter)
         if datacenter:
             machine.tags['DATACENTERID'] = datacenter
 
-    def _list_machines__cost_machine(self, machine_libcloud, machine):
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
         size = machine_libcloud.extra.get('PLANID')
         price = get_size_price(driver_type='compute', driver_name='linode',
                                size_id=size)
@@ -242,15 +242,15 @@ class RackSpaceController(BaseController):
             if cloud is not None:
                 kwargs['apikey'] = cloud.apikey
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('created')  # iso8601 string
 
-    def _list_machines__machine_actions(self, machine_libcloud, machine):
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(RackSpaceController, self)._list_machines__machine_actions(
-              machine_libcloud, machine)
+               machine, machine_libcloud)
         machine.actions.rename = True
 
-    def _list_machines__cost_machine(self, machine_libcloud, machine):
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
         # Need to get image in order to specify the OS type
         # out of the image id.
         instance_image = machine_libcloud.extra.get('imageId')
@@ -287,15 +287,15 @@ class SoftLayerController(BaseController):
         return get_driver(Provider.SOFTLAYER)(self.cloud.username,
                                               self.cloud.apikey)
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('created')  # iso8601 string
 
-    def _list_machines__postparse_machine(self, machine_libcloud, machine):
+    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
         machine.extra['os_type'] = 'linux'
         if 'windows' in str(machine.extra.get('image', '')).lower():
             machine.extra['os_type'] = 'windows'
 
-    def _list_machines__cost_machine(self, machine_libcloud, machine):
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
         # SoftLayer includes recurringFee on the VM metadata but
         # this is only for the compute - CPU pricing.
         # Other costs (ram, bandwidth, image) are included
@@ -337,15 +337,15 @@ class NephoScaleController(BaseController):
         return get_driver(Provider.NEPHOSCALE)(self.cloud.username,
                                                self.cloud.password)
 
-    def _list_machines__machine_actions(self, machine_libcloud, machine):
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(NephoScaleController, self)._list_machines__machine_actions(
-              machine_libcloud, machine)
+               machine, machine_libcloud)
         machine.actions.rename = True
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('create_time')  # iso8601 string
 
-    def _list_machines__postparse_machine(self, machine_libcloud, machine):
+    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
         machine.extra['os_type'] = 'linux'
         if 'windows' in str(machine.extra.get('image', '')).lower():
             machine.extra['os_type'] = 'windows'
@@ -367,7 +367,7 @@ class AzureController(BaseController):
         return get_driver(Provider.AZURE)(self.cloud.subscription_id,
                                           tmp_cert_file.name)
 
-    def _list_machines__cost_machine(self, machine_libcloud, machine):
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
         # TODO: Get prices per location
         os_type = machine_libcloud.extra.get('os_type', 'linux')
         size = machine_libcloud.extra.get('instance_size')
@@ -410,7 +410,7 @@ class AzureController(BaseController):
             raise MachineNotFoundError("Machine with id '%s'." %
                                        machine.machine_id)
 
-    def _start_machine(self, machine_libcloud, machine):
+    def _start_machine(self,  machine, machine_libcloud):
         cloud_service = self._cloud_service(machine_libcloud.id)
         self.connection.ex_start_node(machine_libcloud,
                                       ex_cloud_service_name=cloud_service)
@@ -460,10 +460,10 @@ class GoogleController(BaseController):
             except:
                 raise MistError("Make sure you upload a valid json file.")
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('creationTimestamp')  # iso8601 string
 
-    def _list_machines__postparse_machine(self, machine_libcloud, machine):
+    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
         extra = machine.extra
 
         # Tags and metadata exist in special location for GCE.
@@ -523,7 +523,7 @@ class GoogleController(BaseController):
             image.extra.pop('licenses', None)
         return images
 
-    def _list_machines__cost_machine(self, machine_libcloud, machine):
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
         # https://cloud.google.com/compute/pricing
         size = machine_libcloud.extra.get('machineType')
         # eg europe-west1-d
@@ -602,10 +602,10 @@ class PacketController(BaseController):
         return get_driver(Provider.PACKET)(self.cloud.apikey,
                                            project=self.cloud.project_id)
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('created_at')  # iso8601 string
 
-    def _list_machines__cost_machine(self, machine_libcloud, machine):
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
         size = machine_libcloud.extra.get('plan')
         price = get_size_price(driver_type='compute', driver_name='packet',
                                size_id=size)
@@ -619,10 +619,10 @@ class VultrController(BaseController):
     def _connect(self):
         return get_driver(Provider.VULTR)(self.cloud.apikey)
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('date_created')  # iso8601 string
 
-    def _list_machines__cost_machine(self, machine_libcloud, machine):
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('cost_per_month', 0)
 
 
@@ -674,14 +674,14 @@ class VCloudController(BaseController):
         kwargs['host'] = sanitize_host(kwargs['host'])
         check_host(kwargs['host'])
 
-    def _list_machines__machine_actions(self, machine_libcloud, machine):
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(VCloudController, self)._list_machines__machine_actions(
-              machine_libcloud, machine)
+               machine, machine_libcloud)
         if machine_libcloud.state is NodeState.PENDING:
             machine.actions.start = True
             machine.actions.stop = True
 
-    def _list_machines__postparse_machine(self, machine_libcloud, machine):
+    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
         if machine.extra.get('vdc'):
             machine.tags['vdc'] = machine.extra['vdc']
 
@@ -724,12 +724,12 @@ class OpenStackController(BaseController):
             kwargs['url'] = url.rstrip('/')
             check_host(sanitize_host(kwargs['url']))
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('created')  # iso8601 string
 
-    def _list_machines__machine_actions(self, machine_libcloud, machine):
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(OpenStackController, self)._list_machines__machine_actions(
-              machine_libcloud, machine)
+               machine, machine_libcloud)
         machine.actions.rename = True
 
 
@@ -778,7 +778,7 @@ class DockerController(BaseController):
             kwargs['host'] = sanitize_host(kwargs['host'])
             check_host(kwargs['host'])
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.created_at  # unix timestamp
 
     def _list_images__fetch_images(self, search=None):
@@ -796,8 +796,7 @@ class DockerController(BaseController):
     def image_is_default(self, image_id):
         return image_id in config.DOCKER_IMAGES
 
-    def _start_machine(self, machine_libcloud, machine):
-        self.connection.ex_start_node(machine_libcloud)
+    def _action_change_port(self,  machine, machine_libcloud):
 
         if machine_libcloud.extra.get('tags', {}).get('type') == 'docker_host':
             pass
@@ -812,6 +811,14 @@ class DockerController(BaseController):
             for key_assoc in machine.key_associations:
                 key_assoc.port = port
             machine.save()
+
+    def _start_machine(self,  machine, machine_libcloud):
+        self.connection.ex_start_node(machine_libcloud)
+        self._action_change_port( machine, machine_libcloud)
+
+    def _reboot_machine(self,  machine, machine_libcloud):
+        self.connection.ex_start_node(machine_libcloud)
+        self._action_change_port( machine, machine_libcloud)
 
     def _destroy_machine(self, machine_libcloud):
         if machine_libcloud.state == NodeState.RUNNING:
@@ -874,9 +881,9 @@ class LibvirtController(BaseController):
                           self.cloud.host,  # hypervisor id is the hostname
                           username=self.cloud.username, port=self.cloud.port)
 
-    def _list_machines__machine_actions(self, machine_libcloud, machine):
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(LibvirtController, self)._list_machines__machine_actions(
-              machine_libcloud, machine)
+               machine, machine_libcloud)
         if machine.extra.get('tags', {}).get('type') == 'hypervisor':
             # Allow only reboot and tag actions for hypervisor.
             for action in ('start', 'stop', 'destroy', 'rename'):
@@ -891,7 +898,7 @@ class LibvirtController(BaseController):
             if machine_libcloud.state is NodeState.SUSPENDED:
                 machine.actions.resume = True
 
-    def _list_machines__postparse_machine(self, machine_libcloud, machine):
+    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
         xml_desc = machine.extra.get('xml_description')
         if xml_desc:
             machine.extra['xml_description'] = escape(xml_desc)

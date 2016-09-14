@@ -1338,17 +1338,12 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
     return node
 
 
-def _machine_action(user, cloud_id, machine, action, plan_id=None, name=None):
-    """Start, stop, reboot, resize, undefine and destroy have the same
-    logic underneath, the only thing that changes is the action.
-    This helper function saves us some code.
+def trigger_machine_action(user, cloud_id, machine, action, plan_id=None,
+                           name=None):
+    """For each action call the machine controller
+    that deal with the actions
     """
-    actions = ('start', 'stop', 'reboot', 'destroy', 'resize',
-               'rename', 'undefine', 'suspend', 'resume')
 
-    if action not in actions:
-        raise BadRequestError("Action '%s' should be one of %s" % (action,
-                                                                   actions))
     # TODO this is not needed any more, but i am not sure
     # cloud = Cloud.objects.get(owner=user, id=cloud_id)
     #
@@ -1384,60 +1379,6 @@ def _machine_action(user, cloud_id, machine, action, plan_id=None, name=None):
         machine.ctl.destroy()
 
 
-def start_machine(user, cloud_id, machine_id):
-    """Starts a machine on clouds that support it.
-
-    Currently only EC2 supports that.
-    Normally try won't get an AttributeError exception because this
-    action is not allowed for machines that don't support it. Check
-    helpers.get_machine_actions.
-
-    """
-    _machine_action(user, cloud_id, machine_id, 'start')
-
-
-def stop_machine(user, cloud_id, machine_id):
-    """Stops a machine on clouds that support it.
-
-    Currently only EC2 supports that.
-    Normally try won't get an AttributeError exception because this
-    action is not allowed for machines that don't support it. Check
-    helpers.get_machine_actions.
-
-    """
-    _machine_action(user, cloud_id, machine_id, 'stop')
-
-
-def reboot_machine(user, cloud_id, machine_id):
-    """Reboots a machine on a certain cloud."""
-    _machine_action(user, cloud_id, machine_id, 'reboot')
-
-
-def undefine_machine(user, cloud_id, machine_id):
-    """Undefines machine - used in KVM libvirt to destroy machine + delete XML conf"""
-    _machine_action(user, cloud_id, machine_id, 'undefine')
-
-
-def resume_machine(user, cloud_id, machine_id):
-    """Resumes machine - used in KVM libvirt to resume suspended machine"""
-    _machine_action(user, cloud_id, machine_id, 'resume')
-
-
-def suspend_machine(user, cloud_id, machine_id):
-    """Suspends machine - used in KVM libvirt to pause machine"""
-    _machine_action(user, cloud_id, machine_id, 'suspend')
-
-
-def rename_machine(user, cloud_id, machine_id, name):
-    """Renames a machine on a certain cloud."""
-    _machine_action(user, cloud_id, machine_id, 'rename', name=name)
-
-
-def resize_machine(user, cloud_id, machine_id, plan_id):
-    """Resize a machine on an other plan."""
-    _machine_action(user, cloud_id, machine_id, 'resize', plan_id=plan_id)
-
-
 def destroy_machine(user, cloud_id, machine_id):
     """Destroys a machine on a certain cloud.
 
@@ -1471,7 +1412,7 @@ def destroy_machine(user, cloud_id, machine_id):
             log.warning("Didn't manage to disable monitoring, maybe the "
                         "machine never had monitoring enabled. Error: %r", exc)
 
-    _machine_action(user, cloud_id, machine_id, 'destroy')
+    trigger_machine_action(user, cloud_id, machine_id, 'destroy')
 
     # we dont have to disassociate keys because
 

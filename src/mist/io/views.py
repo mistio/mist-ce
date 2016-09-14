@@ -1091,58 +1091,46 @@ def machine_actions(request):
       required: true
       type: string
     name:
+      description: The new name of the renamed machine
       type: string
-    size:
-      description: The size id of the plan to resize
+    plan_id:
+      description: The plan id of the plan to resize
       type: string
     """
-    # TODO: We shouldn't return list_machines, just 200. Save the API!
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
     action = params.get('action', '')
     plan_id = params.get('plan_id', '')
-    # plan_id is the id of the plan to resize
     name = params.get('name', '')
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
-    if action in ('start', 'stop', 'reboot', 'destroy', 'resize'):
-        try:
-            machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-            machine_uuid = machine.id
-        except me.DoesNotExist:
-            machine_uuid = ""
-        auth_context.check_perm("machine", action, machine_uuid)
 
-    if action in ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename',
-                  'undefine', 'suspend', 'resume'):
-        if action == 'start':
-            methods.start_machine(auth_context.owner, cloud_id, machine)
-        elif action == 'stop':
-            methods.stop_machine(auth_context.owner, cloud_id, machine)
-        elif action == 'reboot':
-            methods.reboot_machine(auth_context.owner, cloud_id, machine)
-        elif action == 'destroy':
-            methods.destroy_machine(auth_context.owner, cloud_id, machine)
-        elif action == 'resize':
-            methods.resize_machine(auth_context.owner, cloud_id, machine,
-                                   plan_id)
-        elif action == 'rename':
-            methods.rename_machine(auth_context.owner,
-                                   cloud_id, machine, name)
-        elif action == 'undefine':
-            methods.undefine_machine(auth_context.owner, cloud_id, machine)
-        elif action == 'resume':
-            methods.resume_machine(auth_context.owner, cloud_id, machine)
-        elif action == 'suspend':
-            methods.suspend_machine(auth_context.owner, cloud_id, machine)
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except me.DoesNotExist:
+        machine_uuid = ""
+    auth_context.check_perm("machine", action, machine_uuid)
 
-        # return OK
-        return mist.core.methods.filter_list_machines(auth_context, cloud_id)
-    raise BadRequestError()
+    actions = ('start', 'stop', 'reboot', 'destroy', 'resize',
+               'rename', 'undefine', 'suspend', 'resume')
+
+    if action not in actions:
+        raise BadRequestError("Action '%s' should be one of %s" % (action,
+                                                                   actions))
+    elif action == 'destroy':
+        methods.destroy_machine(auth_context.owner, cloud_id, machine)
+    else:
+        methods.trigger_machine_action(auth_context.owner, cloud_id,
+                                       machine, action, plan_id=None, name=None)
+    # return OK
+    # TODO: We shouldn't return list_machines, just 200. Save the API!
+    return mist.core.methods.filter_list_machines(auth_context, cloud_id)
 
 
-@view_config(route_name='api_v1_machine_rdp', request_method='GET', renderer='json')
+@view_config(route_name='api_v1_machine_rdp', request_method='GET',
+             renderer='json')
 def machine_rdp(request):
     """
     Rdp file for windows machines

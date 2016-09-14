@@ -525,10 +525,10 @@ class BaseController(object):
 
         return machines
 
-    def _list_machines__machine_creation_date(self, machine_libcloud, machine):
+    def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return
 
-    def _list_machines__machine_actions(self, machine_libcloud, machine):
+    def _list_machines__machine_actions(self, machine, machine_libcloud):
         """Add metadata on the machine dict on the allowed actions
 
         Any subclass that wishes to specially handle its allowed actions, can
@@ -575,7 +575,7 @@ class BaseController(object):
             machine.actions.destroy = False
             machine.actions.rename = False
 
-    def _list_machines__postparse_machine(self, machine_libcloud, machine):
+    def _list_machines__postparse_machine(self, machine, machine_libcloud):
         """Post parse a machine before returning it in list_machines
 
         Any subclass that wishes to specially handle its cloud's tags and
@@ -596,7 +596,7 @@ class BaseController(object):
         """
         return
 
-    def _list_machines__cost_machine(self, machine_libcloud, machine):
+    def _list_machines__cost_machine(self, machine, machine_libcloud):
         """Perform cost calculations for a machine
 
         Any subclass that wishes to handle its cloud's pricing, can implement
@@ -831,10 +831,9 @@ class BaseController(object):
         log.debug("Starting machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._start_machine(machine_libcloud, machine)
+        self._start_machine(machine, machine_libcloud)
 
-    # TODO i insert machine here because of docker controller
-    def _start_machine(self, machine_libcloud, machine):
+    def _start_machine(self, machine, machine_libcloud):
         self.connection.ex_start_node(machine_libcloud)
 
     def stop_machine(self, machine):
@@ -846,9 +845,9 @@ class BaseController(object):
         log.debug("Stopping machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._stop_machine(machine_libcloud)
+        self._stop_machine(machine, machine_libcloud)
 
-    def _stop_machine(self, machine_libcloud):
+    def _stop_machine(self, machine, machine_libcloud):
         self.connection.ex_stop_node(machine_libcloud)
         return True
 
@@ -861,9 +860,9 @@ class BaseController(object):
         log.debug("Rebooting machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._reboot_machine(machine_libcloud)
+        self._reboot_machine(machine, machine_libcloud)
 
-    def _reboot_machine(self, machine_libcloud):
+    def _reboot_machine(self, machine, machine_libcloud):
         machine_libcloud.reboot()
 
     def destroy_machine(self, machine):
@@ -875,12 +874,12 @@ class BaseController(object):
         log.debug("Destroying machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._destroy_machine(machine_libcloud)
+        self._destroy_machine(machine, machine_libcloud)
         while machine.key_associations:
             machine.key_associations.pop()
         machine.save()
 
-    def _destroy_machine(self, machine_libcloud):
+    def _destroy_machine(self, machine,  machine_libcloud):
         machine_libcloud.destroy()
 
     def resize_machine(self, machine, plan_id=None):
@@ -889,9 +888,9 @@ class BaseController(object):
         log.debug("Resizing machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._resize_machine(machine_libcloud, plan_id)
+        self._resize_machine(machine, machine_libcloud, plan_id)
 
-    def _resize_machine(self, machine_libcloud, plan_id):
+    def _resize_machine(self, machine, machine_libcloud, plan_id):
         self.connection.ex_resize_node(machine_libcloud,
                                        self.cloud.owner.plan_id)
 
@@ -904,9 +903,9 @@ class BaseController(object):
         log.debug("Renaming machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._rename_machine(machine_libcloud, name)
+        self._rename_machine(machine, machine_libcloud, name)
 
-    def _rename_machine(self, machine_libcloud, name):
+    def _rename_machine(self, machine, machine_libcloud, name):
         self.connection.ex_rename_node(machine_libcloud, name)
 
     # TODO we need tag method or not?
@@ -920,9 +919,9 @@ class BaseController(object):
         log.debug("Resuming machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._resume_machine(machine_libcloud)
+        self._resume_machine(machine, machine_libcloud)
 
-    def _resume_machine(self, machine_libcloud):
+    def _resume_machine(self, machine, machine_libcloud):
         return
 
     def suspend_machine(self, machine):
@@ -934,9 +933,9 @@ class BaseController(object):
         log.debug("Suspending machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._undefine_machine(machine_libcloud)
+        self._undefine_machine(machine, machine_libcloud)
 
-    def _suspend_machine(self, machine_libcloud):
+    def _suspend_machine(self, machine, machine_libcloud):
         return
 
     def undefine_machine(self, machine):
@@ -948,9 +947,9 @@ class BaseController(object):
         log.debug("Undefining machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._undefine_machine(machine_libcloud)
+        self._undefine_machine(machine, machine_libcloud)
 
-    def _undefine_machine(self, machine_libcloud):
+    def _undefine_machine(self, machine, machine_libcloud):
         return
 
     def __del__(self):
