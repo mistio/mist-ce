@@ -167,14 +167,13 @@
 		    </ul>
 	    </div>
 
-	    <div class="section xs6" hidden$="[[!results.teamsArray.length]]">
+	    <div class="section xs6" hidden$="[[!results.membersArray.length]]">
 		    <h2> Members </h2>
 		    <ul>
 		    <template is="dom-repeat" items="[[results.membersArray]]">
 		    	<li class="truncate"> <iron-icon icon="social:person"></iron-icon>
 		    	<a href="/members/[[item.id]]">[[item.name]]</a></li>
 		    </template>
-		    <a class="more" on-tap="goToResultsList" href="/teams">view all [[results.membersArrayFullLength]] results</a>
 		    </ul>
 	    </div>
 
@@ -208,6 +207,7 @@
 
     },
     queryChanged: function(query){
+    	console.log('queryChanged',query);
     	if(this.query && this.query.length > 2){
 	    	var results = {};
 	    	for (var prop in this.model) {
@@ -223,11 +223,10 @@
 	    	this.set('results', {});
 	    }
     },
-    resultsChanged: function(results){    	
-    	var subpage = document.querySelector('app-route').subpage;
-    	console.log(subpage);
-    	if( !this.query || this.query.length <= 2) {
+    resultsChanged: function(results){
+    	if( !this.query || this.query==undefined || this.query.length <= 2) {
     		this.set('visible', false);
+    		this.set('resultsExist', false);
     	}
     	else {
     		var rlen = 0;
@@ -237,11 +236,7 @@
 	    		}
 	    	}
 	    	this.set('resultsExist', rlen > 0 );
-	    	// if (rlen > 0)
-	    		this.set('visible', true);
-	    	// else 
-	    	// 	this.set('visible', false);
-
+	    	this.set('visible', true);
     	}
     },
     filterItems: function(items) {
@@ -267,13 +262,11 @@
     },
 
     goToResultsList: function(e){
-    	// var page = 'keys'; //e.details.
-    	// this.set('model.sections["'+section+'"].q', this.query);
-    	// e.preventDefault();
-    	var page = document.querySelector('mist-app').page;
-    	this.fire('search-on-page', {page: page});
     	this.set('visible', false);
-    	// this.page(page);
+    	var that = this;
+    	this.async(function(){
+    		that.fire('search', that.query);
+    	}, 500);
     }
   });
   </script>

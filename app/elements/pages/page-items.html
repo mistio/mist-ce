@@ -579,8 +579,8 @@
             return narrow ? 'waterfall' : 'scroll';
         },
         clearSearch: function(e){
-            this.set('section.q', '');
-            document.querySelector('#query').value = '';
+            this.set('section.q', "");
+            document.querySelector('top-search').query = "";
         }
     });
 })();
