@@ -25,6 +25,7 @@ class Actions(me.EmbeddedDocument):
 # # TODO move these when keys port is completed
 from mist.core.cloud.models import KeyAssociation, InstallationStatus
 
+
 class Monitoring(me.EmbeddedDocument):
     # Most of these will change with the new UI.
     hasmonitoring = me.BooleanField()
@@ -58,6 +59,7 @@ class Machine(me.Document):
     os_type = me.StringField(default='unix', choices=('unix', 'windows'))
     rdp_port = me.IntField(default=3389)
 
+    #  TODO maybe EmbeddedDocumentListField
     actions = me.EmbeddedDocumentField(Actions, default=lambda: Actions())
     extra = me.DictField()
     cost = me.EmbeddedDocumentField(Cost, default=lambda: Cost())
@@ -137,27 +139,14 @@ class Machine(me.Document):
         return {
             'id': self.machine_id,
             'uuid': self.id,
-            '_id': self.id,
             'name': self.name,
-            'dns_name': self.hostname,
             'public_ips': self.public_ips,
             'private_ips': self.private_ips,
-            'ssh_port': self.ssh_port,
-            'os_type': self.os_type,
             'imageId': self.image_id,
-            'remote_desktop_port': self.rdp_port,
-            'hasMonitoring': self.monitoring.hasmonitoring,
-            'monitor_server': self.monitoring.monitor_server,
-            'collectd_password': self.monitoring.collectd_password,
-            'metrics': self.monitoring.metrics,
-            'installation_status': self.monitoring.installation_status,
-            'key_associations': self.key_associations,
-            'cloud': self.cloud.id,
             'last_seen': str(self.last_seen or ''),
             'missing_since': str(self.missing_since or ''),
             'state': self.state,
             'size': self.size,
-            'tags': self.tags,
             'extra': self.extra,
             'can_stop': self.actions.stop,
             'can_start': self.actions.start,

@@ -417,7 +417,6 @@ class BaseController(object):
                 owner=self.cloud.owner, resource=machine,
             ).only('key', 'value')})
 
-            # TODO: This should be replaced by machine_model.as_dict()
             machine.machine_id = node.id
             machine.name = node.name
             machine.image_id = image_id
@@ -427,11 +426,6 @@ class BaseController(object):
             machine.public_ips = node.public_ips
             machine.tags = tags  # FIXME: machine.tags': tags,
             machine.extra = node.extra
-            #machine.last_seen': str(machine_model.last_seen or ''),
-            #machine.missing_since': str(machine_model.missing_since or ''),
-            #machine.created': str(machine_model.created or ''),
-            #}
-            # machine_libcloud = machine.as_dict()
 
             # Get machine creation date.
             try:
@@ -483,8 +477,6 @@ class BaseController(object):
                         cph = cpm / month_days / 24
                     elif not cpm:
                         cpm = cph * 24 * month_days
-                    # machine_libcloud['cost_per_hour'] = '%.2f' % cph
-                    # machine_libcloud['cost_per_month'] = '%.2f' % cpm
                     machine.cost.hourly = round(cph, 2) # '%.2f' % cph
                     machine.cost.monthly = round(cpm, 2) # '%.2f' % cpm
 
@@ -493,8 +485,6 @@ class BaseController(object):
                               "for machine %s:%s for %s",
                               machine.id, node.name, self.cloud)
             if node.state.lower() == 'terminated':
-                # machine_libcloud.pop('cost_per_hour', None)
-                # machine_libcloud.pop('cost_per_month', None)
                 machine.cost.hourly = 0
                 machine.cost.monthly = 0
 
@@ -514,8 +504,6 @@ class BaseController(object):
                                    if key != 'Name']
             # Save all changes to machine model on the database.
             machine.save()
-
-            # machines.append(machine_libcloud)
             machines.append(machine)
 
         # Set last_seen on machine models we didn't see for the first time now.
@@ -534,12 +522,11 @@ class BaseController(object):
         Any subclass that wishes to specially handle its allowed actions, can
         implement this internal method.
 
-        machine_libcloud: An instance of a libcloud compute node, as returned by
-            libcloud's list_nodes.
         machine: A machine mongoengine model. The model may not have yet
             been saved in the database.
-
-        This method is expected to edit `machine_dict` in place and not return
+        machine_libcloud: An instance of a libcloud compute node, as returned by
+            libcloud's list_nodes.
+        This method is expected to edit `machine` in place and not return
         anything.
 
         Subclasses MAY extend this method.
@@ -581,10 +568,10 @@ class BaseController(object):
         Any subclass that wishes to specially handle its cloud's tags and
         metadata, can implement this internal method.
 
-        machine_libcloud: An instance of a libcloud compute node, as returned by
-            libcloud's list_nodes.
         machine: A machine mongoengine model. The model may not have yet
             been saved in the database.
+        machine_libcloud: An instance of a libcloud compute node, as returned by
+            libcloud's list_nodes.
 
         Note: machine.tags is a list of {key: value} pairs.
 
@@ -602,13 +589,12 @@ class BaseController(object):
         Any subclass that wishes to handle its cloud's pricing, can implement
         this internal method.
 
-        Params:
-        machine_libcloud: An instance of a libcloud compute node, as returned by
-            libcloud's list_nodes.
-        machine: A machine mongoengine model. The model may not have yet
+       machine: A machine mongoengine model. The model may not have yet
             been saved in the database.
+       machine_libcloud: An instance of a libcloud compute node, as returned by
+            libcloud's list_nodes.
 
-        This method is expected to return a tuple of two values:
+       This method is expected to return a tuple of two values:
             (cost_per_hour, cost_per_month)
 
         Subclasses MAY override this method.
@@ -826,6 +812,10 @@ class BaseController(object):
                                     machine.machine_id)
 
     def start_machine(self, machine):
+        # if not isinstance(machine.cloud, Machine):
+        #     raise BadRequestError("This is totally wrong!")
+        # if self.cloud != machine.cloud:
+        #    raise BadRequestError("This is totally wrong!")
         if not machine.actions.start:
             raise Exception("Machine doesn't support start.")
         log.debug("Starting machine %s", machine)
@@ -837,11 +827,12 @@ class BaseController(object):
         self.connection.ex_start_node(machine_libcloud)
 
     def stop_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine): etc etc
+        # if not isinstance(machine.cloud, Machine):
+        #     raise BadRequestError("This is totally wrong!")
         # if self.cloud != machine.cloud:
-        #    raise FuckYouError()
+        #    raise BadRequestError("This is totally wrong!")
         if not machine.actions.stop:
-            raise Exception("Machine doesn't support reboot.")
+            raise Exception("Machine doesn't support stop.")
         log.debug("Stopping machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
@@ -852,9 +843,10 @@ class BaseController(object):
         return True
 
     def reboot_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine): etc etc
+        # if not isinstance(machine.cloud, Machine):
+        #     raise BadRequestError("This is totally wrong!")
         # if self.cloud != machine.cloud:
-        #    raise FuckYouError()
+        #    raise BadRequestError("This is totally wrong!")
         if not machine.actions.reboot:
             raise Exception("Machine doesn't support reboot.")
         log.debug("Rebooting machine %s", machine)
@@ -866,9 +858,10 @@ class BaseController(object):
         machine_libcloud.reboot()
 
     def destroy_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine): etc etc
+        # if not isinstance(machine.cloud, Machine):
+        #     raise BadRequestError("This is totally wrong!")
         # if self.cloud != machine.cloud:
-        #    raise FuckYouError()
+        #    raise BadRequestError("This is totally wrong!")
         if not machine.actions.destroy:
             raise Exception("Machine doesn't support destroy.")
         log.debug("Destroying machine %s", machine)
@@ -882,7 +875,12 @@ class BaseController(object):
     def _destroy_machine(self, machine,  machine_libcloud):
         machine_libcloud.destroy()
 
+    # It isn't exist in the ui
     def resize_machine(self, machine, plan_id=None):
+        # if not isinstance(machine.cloud, Machine):
+        #     raise BadRequestError("This is totally wrong!")
+        # if self.cloud != machine.cloud:
+        #    raise BadRequestError("This is totally wrong!")
         if not machine.actions.resize:
             raise Exception("Machine doesn't support resize.")
         log.debug("Resizing machine %s", machine)
@@ -895,9 +893,10 @@ class BaseController(object):
                                        self.cloud.owner.plan_id)
 
     def rename_machine(self, machine, name=None):
-        # if not isinstance(machine.cloud, Machine): etc etc
+        # if not isinstance(machine.cloud, Machine):
+        #     raise BadRequestError("This is totally wrong!")
         # if self.cloud != machine.cloud:
-        #    raise FuckYouError()
+        #    raise BadRequestError("This is totally wrong!")
         if not machine.actions.rename:
             raise Exception("Machine doesn't support rename.")
         log.debug("Renaming machine %s", machine)
@@ -911,9 +910,10 @@ class BaseController(object):
     # TODO we need tag method or not?
 
     def resume_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine): etc etc
+        # if not isinstance(machine.cloud, Machine):
+        #     raise BadRequestError("This is totally wrong!")
         # if self.cloud != machine.cloud:
-        #    raise FuckYouError()
+        #    raise BadRequestError("This is totally wrong!")
         if not machine.actions.resume:
             raise Exception("Machine doesn't support resume.")
         log.debug("Resuming machine %s", machine)
@@ -922,12 +922,15 @@ class BaseController(object):
         self._resume_machine(machine, machine_libcloud)
 
     def _resume_machine(self, machine, machine_libcloud):
+        """Only LibvirtController subclass implement this method"""
+
         return
 
     def suspend_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine): etc etc
+        # if not isinstance(machine.cloud, Machine):
+        #     raise BadRequestError("This is totally wrong!")
         # if self.cloud != machine.cloud:
-        #    raise FuckYouError()
+        #    raise BadRequestError("This is totally wrong!")
         if not machine.actions.suspend:
             raise Exception("Machine doesn't support suspend.")
         log.debug("Suspending machine %s", machine)
@@ -936,12 +939,14 @@ class BaseController(object):
         self._undefine_machine(machine, machine_libcloud)
 
     def _suspend_machine(self, machine, machine_libcloud):
+        """Only LibvirtController subclass implement this method"""
         return
 
     def undefine_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine): etc etc
+        # if not isinstance(machine.cloud, Machine):
+        #     raise BadRequestError("This is totally wrong!")
         # if self.cloud != machine.cloud:
-        #    raise MistError("Do you know what OOP means")
+        #    raise BadRequestError("This is totally wrong!")
         if not machine.actions.undefine:
             raise Exception("Machine doesn't support undefine.")
         log.debug("Undefining machine %s", machine)
@@ -950,6 +955,7 @@ class BaseController(object):
         self._undefine_machine(machine, machine_libcloud)
 
     def _undefine_machine(self, machine, machine_libcloud):
+        """Only LibvirtController subclass implement this method"""
         return
 
     def __del__(self):

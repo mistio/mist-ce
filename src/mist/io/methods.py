@@ -1350,23 +1350,23 @@ def trigger_machine_action(user, cloud_id, machine, action, plan_id=None,
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
                                                                actions))
-    if action is 'start':
+    if action == 'start':
         machine.ctl.start()
-    elif action is 'stop':
+    elif action == 'stop':
         machine.ctl.stop()
-    elif action is 'undefine':
+    elif action == 'undefine':
         machine.ctl.undefine()
-    elif action is 'suspend':
+    elif action == 'suspend':
         machine.ctl.suspend()
-    elif action is 'resume':
+    elif action == 'resume':
         machine.ctl.resume()
-    elif action is 'resize':
+    elif action == 'resize':
         machine.ctl.resize(plan_id)
-    elif action is 'rename':
+    elif action == 'rename':
         machine.ctl.rename(name)
-    elif action is 'reboot':
+    elif action == 'reboot':
         machine.ctl.reboot()
-    elif action is 'destroy':
+    elif action == 'destroy':
         machine.ctl.destroy()
 
 

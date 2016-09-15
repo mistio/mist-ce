@@ -797,6 +797,10 @@ class DockerController(BaseController):
         return image_id in config.DOCKER_IMAGES
 
     def _action_change_port(self,  machine, machine_libcloud):
+        """This part exists here for docker specific reasons. After start and
+        stop actions, docker machine instance need to rearrange its port.
+        In the end save the machine in db.
+        """
 
         if machine_libcloud.extra.get('tags', {}).get('type') == 'docker_host':
             pass
