@@ -33,6 +33,12 @@
 		text-overflow: ellipsis;
 		/*list-style: disc inside;*/
       }
+      
+      .section {
+      	padding-left: 2rem;
+      	padding-right: 2rem;
+      }
+
       .section ul {
       	padding: 0;
     	margin: 8px 0;
@@ -48,6 +54,9 @@
     </style>
 
     <div class="sections grid-row">
+    	<div class="section xs12" hidden$="[[resultsExist]]">
+		    <h2>0 results found for this search.</h2>
+		</div>
 	    <!-- <div class="section xs6" hidden$="[[!results.cloudsArray.length]]">
 		    <h2>Clouds</h2>
 		    <ul>
@@ -64,7 +73,7 @@
 		    	<li class="truncate"> <iron-icon icon="hardware:computer"></iron-icon>
 		    	<a href="/machines/[[item.uuid]]">[[item.name]]</a></li>
 		    </template>
-		    <a class="more" href="/machines">view all [[results.machinesArrayFullLength]] results</a>
+		    <a class="more" on-tap="goToResultsList" href="/machines">view all [[results.machinesArrayFullLength]] results</a>
 		    </ul>
 	    </div>   
 
@@ -75,7 +84,7 @@
 		    	<li class="truncate"> <iron-icon icon="image:photo"></iron-icon>
 		    	<a href="/images/[[item.id]]">[[item.name]]</a></li>
 		    </template>
-		    <a class="more" href="/images">view all [[results.imagesArrayFullLength]] results</a>
+		    <a class="more" on-tap="goToResultsList" href="/images">view all [[results.imagesArrayFullLength]] results</a>
 		    </ul>
 	    </div>
 
@@ -86,7 +95,7 @@
 		    	<li class="truncate"> <iron-icon icon="communication:vpn-key"></iron-icon>
 		    	<a href="/keys/[[item.id]]">[[item.name]]</a></li>
 		    </template>
-		    <a class="more" href="/keys">view all [[results.keysArrayFullLength]] results</a>
+		    <a class="more" on-tap="goToResultsList" href="/keys">view all [[results.keysArrayFullLength]] results</a>
 		    </ul>
 	    </div>
 
@@ -97,7 +106,7 @@
 		    	<li class="truncate"> <iron-icon icon="hardware:device-hub"></iron-icon>
 		    	<a href="/networks/[[item.id]]">[[item.name]]</a></li>
 		    </template>
-		    <a class="more" href="/networks">view all [[results.networksArrayFullLength]] results</a>
+		    <a class="more" on-tap="goToResultsList" href="/networks">view all [[results.networksArrayFullLength]] results</a>
 		    </ul>
 	    </div>
 
@@ -108,7 +117,7 @@
 		    	<li class="truncate"> <iron-icon icon="editor:merge-type"></iron-icon>
 		    	<a href="/tunnels/[[item.id]]">[[item.name]]</a></li>
 		    </template>
-		    <a class="more" href="/tunnels">view all [[results.tunnelsArrayFullLength]] results</a>
+		    <a class="more" on-tap="goToResultsList" href="/tunnels">view all [[results.tunnelsArrayFullLength]] results</a>
 		    </ul>
 	    </div>
 
@@ -119,7 +128,7 @@
 		    	<li class="truncate"> <iron-icon icon="image:movie-creation"></iron-icon>
 		    	<a href="/scripts/[[item.id]]">[[item.name]]</a></li>
 		    </template>
-		    <a class="more" href="/scripts">view all [[results.scriptsArrayFullLength]] results</a>
+		    <a class="more" on-tap="goToResultsList" href="/scripts">view all [[results.scriptsArrayFullLength]] results</a>
 		    </ul>
 	    </div>
 
@@ -130,7 +139,7 @@
 		    	<li class="truncate"> <iron-icon icon="av:art-track"></iron-icon>
 		    	<a href="/templates/[[item.id]]">[[item.name]]</a></li>
 		    </template>
-		    <a class="more" href="/templates">
+		    <a class="more" on-tap="goToResultsList" href="/templates">
 		    	view all [[results.templatesArrayFullLength]] results
 		    </a>
 		    </ul>
@@ -143,7 +152,7 @@
 		    	<li class="truncate"> <iron-icon icon="maps:layers"></iron-icon>
 		    	<a href="/stacks/[[item.id]]">[[item.name]]</a></li>
 		    </template>
-		    <a class="more" href="/stacks">view all [[results.stacksArrayFullLength]] results</a>
+		    <a class="more" on-tap="goToResultsList" href="/stacks">view all [[results.stacksArrayFullLength]] results</a>
 		    </ul>
 	    </div>
 
@@ -154,7 +163,18 @@
 		    	<li class="truncate"> <iron-icon icon="social:people"></iron-icon>
 		    	<a href="/teams/[[item.id]]">[[item.name]]</a></li>
 		    </template>
-		    <a class="more" href="/teams">view all [[results.teamsArrayFullLength]] results</a>
+		    <a class="more" on-tap="goToResultsList" href="/teams">view all [[results.teamsArrayFullLength]] results</a>
+		    </ul>
+	    </div>
+
+	    <div class="section xs6" hidden$="[[!results.teamsArray.length]]">
+		    <h2> Members </h2>
+		    <ul>
+		    <template is="dom-repeat" items="[[results.membersArray]]">
+		    	<li class="truncate"> <iron-icon icon="social:person"></iron-icon>
+		    	<a href="/members/[[item.id]]">[[item.name]]</a></li>
+		    </template>
+		    <a class="more" on-tap="goToResultsList" href="/teams">view all [[results.membersArrayFullLength]] results</a>
 		    </ul>
 	    </div>
 
@@ -173,6 +193,10 @@
     	visible: {
     		type: Boolean,
     		reflectToAttribute: true, 
+    		value: false
+    	},
+    	resultsExist: {
+    		type: Boolean,
     		value: false
     	}
     },
@@ -199,9 +223,10 @@
 	    	this.set('results', {});
 	    }
     },
-    resultsChanged: function(results){
-    	
-    	if(!this.query || this.query.length <= 2 || !this.results || !this.results.length == 0) {
+    resultsChanged: function(results){    	
+    	var subpage = document.querySelector('app-route').subpage;
+    	console.log(subpage);
+    	if( !this.query || this.query.length <= 2) {
     		this.set('visible', false);
     	}
     	else {
@@ -211,10 +236,11 @@
 	    			rlen += this.results[prop].length;
 	    		}
 	    	}
-	    	if (rlen > 0)
+	    	this.set('resultsExist', rlen > 0 );
+	    	// if (rlen > 0)
 	    		this.set('visible', true);
-	    	else 
-	    		this.set('visible', false);
+	    	// else 
+	    	// 	this.set('visible', false);
 
     	}
     },
@@ -225,7 +251,6 @@
     },
 
     filterItem: function(item, index) {
-    	console.log('filterItem');
         var q = this.query || '', 
         	queryTerms = q.split(' ');
 
@@ -240,6 +265,16 @@
 	    }
         return true;
     },
+
+    goToResultsList: function(e){
+    	// var page = 'keys'; //e.details.
+    	// this.set('model.sections["'+section+'"].q', this.query);
+    	// e.preventDefault();
+    	var page = document.querySelector('mist-app').page;
+    	this.fire('search-on-page', {page: page});
+    	this.set('visible', false);
+    	// this.page(page);
+    }
   });
   </script>
 </dom-module>

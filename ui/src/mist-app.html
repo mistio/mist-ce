@@ -153,7 +153,8 @@
           'page-meta': 'updateTitle',
           'toast': 'showToast',
           'subscribeLogEvents': 'subscribeLogEvents',
-          'search': 'updateSearchQuery'
+          'search': 'updateSearchQuery',
+          'search-on-page': 'updateSearchQueryOnpage'
       },
 
       observers: [
@@ -181,8 +182,15 @@
       },
 
       updateSearchQuery: function(e){
-          console.warn('updateSearchQuery');
+          console.log('updateSearchQuery', e.detail);
           this.set('q', e.detail);
+          this.set('sections.'+this.page+'.q',e.detail || '');
+      },
+
+      updateSearchQueryOnpage: function(e){
+          console.log('updateSearchQuery', e.detail);
+          // this.set('q', e.detail.q);
+          this.set('sections.'+e.detail.page+'.q',e.detail.q || '');
       },
 
       ready: function() {
