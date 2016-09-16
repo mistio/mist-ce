@@ -107,7 +107,7 @@
             },
             computePlans:  function(user, org){
                 return this.org.plans.filter(function(p){
-                    return p.visible&& p.title != this.user.current_plan.title;
+                    return p.visible && p.title != this.user.current_plan.title;
                 }, this);
             },
             _computeReadableDate: function(date) {
