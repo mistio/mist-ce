@@ -88,25 +88,27 @@
 
             properties: {
                 user: {
-                    type: Object,
-                    notify: true
+                    type: Object
+                },
+                org: {
+                    type: Object
                 },
                 plans: {
                     type: Array,
-                    value: function() {
-                        return PLANS.filter(function(plan) {
-                            return plan.visible;
-                        });
-                    }
+                    computed: 'computePlans(user,org)'  
                 }
             },
             computeIsCurrent: function(plan, user) {
-                console.log('computeIsCurrent', plan.title, this.user.current_plan.title)
                 if (this.user.current_plan) {
                     return plan.title == this.user.current_plan.title ? true : false;
                 } else {
                     return false;
                 }
+            },
+            computePlans:  function(user, org){
+                return this.org.plans.filter(function(p){
+                    return p.visible&& p.title != this.user.current_plan.title;
+                }, this);
             },
             _computeReadableDate: function(date) {
                 console.log('date', date, moment(date))
