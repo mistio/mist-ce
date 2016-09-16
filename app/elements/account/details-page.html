@@ -85,7 +85,7 @@
                     <h2 class="title">Organisation Profile</h2>
                     <p>Enter your organisation details. To switch organisation use the  user menu in the top right corner of your screen.</p>
                 </div>
-                <paper-input class="dropdown-block xs12 l6" id="companyName" label="Company Name" required error-message="Please enter your company's name" value="[[model.org.name]]" auto-validate></paper-input>
+                <paper-input class="dropdown-block xs12 l6" id="companyName" label="Company Name" required error-message="Please enter your company's name" value="[[org.name]]" auto-validate></paper-input>
 
                 <paper-dropdown-menu class="dropdown-block xs12 l6" id="country" label="Company Location" horizontal-align="left">
                     <paper-menu attr-for-selected="value" selected="[[user.feedback.country]]" class="dropdown-content">
@@ -129,7 +129,7 @@
                 is: 'details-page',
 
                 properties: {
-                    model: {
+                    org: {
                         type: Object
                     },
                     user: {
