@@ -1093,25 +1093,20 @@ def machine_actions(request):
     name:
       description: The new name of the renamed machine
       type: string
-    plan_id:
-      description: The plan id of the plan to resize
-      type: string
     """
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
     action = params.get('action', '')
-    plan_id = params.get('plan_id', '')
     name = params.get('name', '')
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
 
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-        machine_uuid = machine.id
     except me.DoesNotExist:
-        machine_uuid = ""
-    auth_context.check_perm("machine", action, machine_uuid)
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
+    auth_context.check_perm("machine", action, machine.id)
 
     actions = ('start', 'stop', 'reboot', 'destroy', 'resize',
                'rename', 'undefine', 'suspend', 'resume')
@@ -1123,7 +1118,7 @@ def machine_actions(request):
         methods.destroy_machine(auth_context.owner, cloud_id, machine)
     else:
         methods.trigger_machine_action(auth_context.owner, cloud_id,
-                                       machine, action, plan_id=None, name=None)
+                                       machine, action, name)
     # return OK
     # TODO: We shouldn't return list_machines, just 200. Save the API!
     return mist.core.methods.filter_list_machines(auth_context, cloud_id)

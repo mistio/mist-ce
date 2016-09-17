@@ -394,7 +394,7 @@ class BaseController(object):
                                               machine_id=node.id)
             except Machine.DoesNotExist:
                 machine = Machine(cloud=self.cloud,
-                                        machine_id=node.id).save()
+                                  machine_id=node.id).save()
 
             # Update machine_model's last_seen fields.
             machine.last_seen = now
@@ -424,7 +424,6 @@ class BaseController(object):
             machine.state = config.STATES[node.state]
             machine.private_ips = node.private_ips
             machine.public_ips = node.public_ips
-            machine.tags = tags  # FIXME: machine.tags': tags,
             machine.extra = node.extra
 
             # Get machine creation date.
@@ -450,7 +449,7 @@ class BaseController(object):
 
             # Apply any cloud/provider specific post processing.
             try:
-                self._list_machines__postparse_machine(machine, node)
+                self._list_machines__postparse_machine(machine, node, tags)
             except Exception as exc:
                 log.exception("Error while post parsing machine %s:%s for %s",
                               machine.id, node.name, self.cloud)
@@ -466,8 +465,8 @@ class BaseController(object):
 
                 month_days = calendar.monthrange(now.year, now.month)[1]
 
-                cph = parse_num(machine.tags.get('cost_per_hour'))
-                cpm = parse_num(machine.tags.get('cost_per_month'))
+                cph = parse_num(tags.get('cost_per_hour'))
+                cpm = parse_num(tags.get('cost_per_month'))
                 if not (cph or cpm) or cph > 100 or cpm > 100 * 24 * 31:
                     cph, cpm = map(parse_num,
                                    self._list_machines__cost_machine(machine,
@@ -477,8 +476,8 @@ class BaseController(object):
                         cph = cpm / month_days / 24
                     elif not cpm:
                         cpm = cph * 24 * month_days
-                    machine.cost.hourly = round(cph, 2) # '%.2f' % cph
-                    machine.cost.monthly = round(cpm, 2) # '%.2f' % cpm
+                    machine.cost.hourly = round(cph, 2)
+                    machine.cost.monthly = round(cpm, 2)
 
             except Exception as exc:
                 log.exception("Error while calculating cost "
@@ -497,11 +496,13 @@ class BaseController(object):
                     machine.extra[key] = str(val)
 
             # Optimize tags data structure for js...
-            tags = machine.tags
             if isinstance(tags, dict):
-                machine.tags = [{'key': key, 'value': value}
-                                   for key, value in tags.iteritems()
-                                   if key != 'Name']
+                tags = dict([(key, value) for key, value in tags.iteritems()
+                             if key != 'Name'])
+
+            # save updated tags to tag model on the database
+            from mist.core.tag.methods import add_tags_to_resource
+            add_tags_to_resource(self.cloud.owner, machine, tags.items())
             # Save all changes to machine model on the database.
             machine.save()
             machines.append(machine)
@@ -562,7 +563,7 @@ class BaseController(object):
             machine.actions.destroy = False
             machine.actions.rename = False
 
-    def _list_machines__postparse_machine(self, machine, machine_libcloud):
+    def _list_machines__postparse_machine(self, machine, machine_libcloud, tags):
         """Post parse a machine before returning it in list_machines
 
         Any subclass that wishes to specially handle its cloud's tags and
@@ -572,8 +573,7 @@ class BaseController(object):
             been saved in the database.
         machine_libcloud: An instance of a libcloud compute node, as returned by
             libcloud's list_nodes.
-
-        Note: machine.tags is a list of {key: value} pairs.
+        tags: This is exists only gfor now, we will delete it when we plan out
 
         This method is expected to edit its arguments in place and not return
         anything.
@@ -812,10 +812,8 @@ class BaseController(object):
                                     machine.machine_id)
 
     def start_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine):
-        #     raise BadRequestError("This is totally wrong!")
-        # if self.cloud != machine.cloud:
-        #    raise BadRequestError("This is totally wrong!")
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
         if not machine.actions.start:
             raise Exception("Machine doesn't support start.")
         log.debug("Starting machine %s", machine)
@@ -827,10 +825,8 @@ class BaseController(object):
         self.connection.ex_start_node(machine_libcloud)
 
     def stop_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine):
-        #     raise BadRequestError("This is totally wrong!")
-        # if self.cloud != machine.cloud:
-        #    raise BadRequestError("This is totally wrong!")
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
         if not machine.actions.stop:
             raise Exception("Machine doesn't support stop.")
         log.debug("Stopping machine %s", machine)
@@ -843,10 +839,8 @@ class BaseController(object):
         return True
 
     def reboot_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine):
-        #     raise BadRequestError("This is totally wrong!")
-        # if self.cloud != machine.cloud:
-        #    raise BadRequestError("This is totally wrong!")
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
         if not machine.actions.reboot:
             raise Exception("Machine doesn't support reboot.")
         log.debug("Rebooting machine %s", machine)
@@ -858,10 +852,8 @@ class BaseController(object):
         machine_libcloud.reboot()
 
     def destroy_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine):
-        #     raise BadRequestError("This is totally wrong!")
-        # if self.cloud != machine.cloud:
-        #    raise BadRequestError("This is totally wrong!")
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
         if not machine.actions.destroy:
             raise Exception("Machine doesn't support destroy.")
         log.debug("Destroying machine %s", machine)
@@ -876,27 +868,23 @@ class BaseController(object):
         machine_libcloud.destroy()
 
     # It isn't exist in the ui
-    def resize_machine(self, machine, plan_id=None):
-        # if not isinstance(machine.cloud, Machine):
-        #     raise BadRequestError("This is totally wrong!")
-        # if self.cloud != machine.cloud:
-        #    raise BadRequestError("This is totally wrong!")
+    def resize_machine(self, machine):
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
         if not machine.actions.resize:
             raise Exception("Machine doesn't support resize.")
         log.debug("Resizing machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._resize_machine(machine, machine_libcloud, plan_id)
+        self._resize_machine(machine, machine_libcloud)
 
-    def _resize_machine(self, machine, machine_libcloud, plan_id):
+    def _resize_machine(self, machine, machine_libcloud):
         self.connection.ex_resize_node(machine_libcloud,
                                        self.cloud.owner.plan_id)
 
     def rename_machine(self, machine, name=None):
-        # if not isinstance(machine.cloud, Machine):
-        #     raise BadRequestError("This is totally wrong!")
-        # if self.cloud != machine.cloud:
-        #    raise BadRequestError("This is totally wrong!")
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
         if not machine.actions.rename:
             raise Exception("Machine doesn't support rename.")
         log.debug("Renaming machine %s", machine)
@@ -910,10 +898,8 @@ class BaseController(object):
     # TODO we need tag method or not?
 
     def resume_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine):
-        #     raise BadRequestError("This is totally wrong!")
-        # if self.cloud != machine.cloud:
-        #    raise BadRequestError("This is totally wrong!")
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
         if not machine.actions.resume:
             raise Exception("Machine doesn't support resume.")
         log.debug("Resuming machine %s", machine)
@@ -927,10 +913,8 @@ class BaseController(object):
         return
 
     def suspend_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine):
-        #     raise BadRequestError("This is totally wrong!")
-        # if self.cloud != machine.cloud:
-        #    raise BadRequestError("This is totally wrong!")
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
         if not machine.actions.suspend:
             raise Exception("Machine doesn't support suspend.")
         log.debug("Suspending machine %s", machine)
@@ -943,10 +927,8 @@ class BaseController(object):
         return
 
     def undefine_machine(self, machine):
-        # if not isinstance(machine.cloud, Machine):
-        #     raise BadRequestError("This is totally wrong!")
-        # if self.cloud != machine.cloud:
-        #    raise BadRequestError("This is totally wrong!")
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
         if not machine.actions.undefine:
             raise Exception("Machine doesn't support undefine.")
         log.debug("Undefining machine %s", machine)

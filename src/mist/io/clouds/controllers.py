@@ -100,10 +100,10 @@ class AmazonController(BaseController):
                machine, machine_libcloud)
         machine.actions.rename = True
 
-    def _list_machines__postparse_machine(self, machine, machine_libcloud):
+    def _list_machines__postparse_machine(self, machine,
+                                          machine_libcloud, tags):
         # This is windows for windows servers and None for Linux.
-        extra = machine.extra
-        machine.extra['os_type'] = extra.get('platform', 'linux')
+        machine.os_type = machine.extra.get('platform', 'linux')
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
         image_id = machine_libcloud.extra.get('image_id')
@@ -204,15 +204,17 @@ class LinodeController(BaseController):
         super(LinodeController, self)._list_machines__machine_actions(
                machine, machine_libcloud)
         machine.actions.rename = True
+        machine.actions.stop = False
         # After resize, node gets to pending mode, needs to be started.
         if machine_libcloud.state is NodeState.PENDING:
             machine.actions.start = True
 
-    def _list_machines__postparse_machine(self, machine, machine_libcloud):
+    def _list_machines__postparse_machine(self, machine,
+                                          machine_libcloud, tags):
         datacenter = machine.extra.get('DATACENTER')
         datacenter = config.LINODE_DATACENTERS.get(datacenter)
         if datacenter:
-            machine.tags['DATACENTERID'] = datacenter
+            tags['DATACENTERID'] = datacenter
 
     def _list_machines__cost_machine(self, machine, machine_libcloud):
         size = machine_libcloud.extra.get('PLANID')
@@ -290,10 +292,11 @@ class SoftLayerController(BaseController):
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return machine_libcloud.extra.get('created')  # iso8601 string
 
-    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
-        machine.extra['os_type'] = 'linux'
+    def _list_machines__postparse_machine(self,  machine,
+                                          machine_libcloud, tags):
+        machine.extra['os_type'] = machine.os_type = 'linux'
         if 'windows' in str(machine.extra.get('image', '')).lower():
-            machine.extra['os_type'] = 'windows'
+            machine.extra['os_type'] = machine.os_type = 'windows'
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
         # SoftLayer includes recurringFee on the VM metadata but
@@ -345,10 +348,11 @@ class NephoScaleController(BaseController):
     def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('create_time')  # iso8601 string
 
-    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
-        machine.extra['os_type'] = 'linux'
+    def _list_machines__postparse_machine(self,  machine,
+                                          machine_libcloud, tags):
+        machine.extra['os_type'] = machine.os_type = 'linux'
         if 'windows' in str(machine.extra.get('image', '')).lower():
-            machine.extra['os_type'] = 'windows'
+            machine.extra['os_type'] = machine.os_type = 'windows'
 
     def _list_sizes__fetch_sizes(self):
         sizes = self.connection.list_sizes(baremetal=False)
@@ -463,18 +467,18 @@ class GoogleController(BaseController):
     def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
         return machine_libcloud.extra.get('creationTimestamp')  # iso8601 string
 
-    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
+    def _list_machines__postparse_machine(self,  machine,
+                                          machine_libcloud, tags):
         extra = machine.extra
 
         # Tags and metadata exist in special location for GCE.
-        tags = tags_to_dict(extra.get('metadata', {}).get('items', []))
+        provider_tags = tags_to_dict(extra.get('metadata', {}).get('items', []))
         for key in ('gce-initial-windows-password',
                     'gce-initial-windows-user'):
             # Windows specific metadata including user/password.
-            if key in tags:
-                extra[key] = tags.pop(key)
-        tags.update(machine.tags)
-        machine.tags = tags
+            if key in provider_tags:
+                extra[key] = provider_tags.pop(key)
+        tags.update(provider_tags)
 
         # Wrap in try/except to prevent from future GCE API changes.
 
@@ -681,9 +685,10 @@ class VCloudController(BaseController):
             machine.actions.start = True
             machine.actions.stop = True
 
-    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
+    def _list_machines__postparse_machine(self,  machine,
+                                          machine_libcloud, tag):
         if machine.extra.get('vdc'):
-            machine.tags['vdc'] = machine.extra['vdc']
+            tag['vdc'] = machine.extra['vdc']
 
 
 class IndonesianVCloudController(VCloudController):
@@ -822,7 +827,7 @@ class DockerController(BaseController):
 
     def _reboot_machine(self,  machine, machine_libcloud):
         self.connection.ex_start_node(machine_libcloud)
-        self._action_change_port( machine, machine_libcloud)
+        self._action_change_port(machine, machine_libcloud)
 
     def _destroy_machine(self, machine, machine_libcloud):
         if machine_libcloud.state == NodeState.RUNNING:
@@ -902,7 +907,8 @@ class LibvirtController(BaseController):
             if machine_libcloud.state is NodeState.SUSPENDED:
                 machine.actions.resume = True
 
-    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
+    def _list_machines__postparse_machine(self,  machine,
+                                          machine_libcloud, tags):
         xml_desc = machine.extra.get('xml_description')
         if xml_desc:
             machine.extra['xml_description'] = escape(xml_desc)
@@ -917,7 +923,7 @@ class LibvirtController(BaseController):
             try:
                 hostname = machine_libcloud.public_ips[0] if \
                     machine_libcloud.public_ips else \
-                machine_libcloud.private_ips[0]
+                    machine_libcloud.private_ips[0]
                 command = '$(command -v sudo) shutdown -r now'
                 # todo move it up
                 from mist.core.methods import ssh_command

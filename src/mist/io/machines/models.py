@@ -9,7 +9,7 @@ from mist.core.keypair.models import Keypair
 from mist.io.machines.controllers import MachineController
 
 
-class Actions(me.EmbeddedDocument):
+class Actions(me.EmbeddedDocument):  # TODO default
     start = me.BooleanField()
     stop = me.BooleanField()
     reboot = me.BooleanField()
@@ -36,8 +36,8 @@ class Monitoring(me.EmbeddedDocument):
 
 
 class Cost(me.EmbeddedDocument):
-    hourly = me.FloatField()
-    monthly = me.FloatField()
+    hourly = me.FloatField(default=0)
+    monthly = me.FloatField(default=0)
 
 
 class Machine(me.Document):
@@ -56,7 +56,8 @@ class Machine(me.Document):
     public_ips = me.ListField()
     private_ips = me.ListField()
     ssh_port = me.IntField(default=22)
-    os_type = me.StringField(default='unix', choices=('unix', 'windows'))
+    os_type = me.StringField(default='unix', choices=('unix',
+                                                      'linux', 'windows'))
     rdp_port = me.IntField(default=3389)
 
     #  TODO maybe EmbeddedDocumentListField
@@ -67,7 +68,7 @@ class Machine(me.Document):
     size = me.StringField()
     state = me.StringField()  # TODO choices maybe
     # TODO better DictField and in as_dict() make it list for js
-    tags = me.ListField()
+    # tags = me.ListField()
 
     # We should think this through a bit.
     key_associations = me.EmbeddedDocumentListField(KeyAssociation)
@@ -98,7 +99,6 @@ class Machine(me.Document):
 
     def as_dict(self):
         # Return a dict as it will be returned to the API
-        # TODO tags as a list return for the ui
         return {
             'id': self.id,
             'hostname': self.hostname,
@@ -117,7 +117,7 @@ class Machine(me.Document):
             'image_id': self.image_id,
             'size': self.size,
             'state': self.state,
-            'tags': self.tags,
+            # 'tags': mist.core.tag.models.Tag.objects(resource=self,)
             'hasMonitoring': self.monitoring.hasmonitoring,
             'monitor_server': self.monitoring.monitor_server,
             'collectd_password': self.monitoring.collectd_password,
@@ -134,8 +134,15 @@ class Machine(me.Document):
 
         # This is need to be consistent with the previous situation
         self.extra.update({'created': str(self.created or ''),
-                           'cost_per_month': '%.2f' % self.cost.monthly,
-                           'cost_per_hour': '%.2f' % self.cost.hourly})
+                           'cost_per_month': '%.2f' % (self.cost.monthly),
+                           'cost_per_hour': '%.2f' % (self.cost.hourly)})
+        # tags as a list return for the ui
+        tags = {tag.key: tag.value for tag in mist.core.tag.models.Tag.objects(
+            owner=self.cloud.owner, resource=self).only('key', 'value')}
+        # Optimize tags data structure for js...
+        if isinstance(tags, dict):
+            tags = [{'key': key, 'value': value}
+                    for key, value in tags.iteritems()]
         return {
             'id': self.machine_id,
             'uuid': self.id,
@@ -148,6 +155,7 @@ class Machine(me.Document):
             'state': self.state,
             'size': self.size,
             'extra': self.extra,
+            'tags': tags,
             'can_stop': self.actions.stop,
             'can_start': self.actions.start,
             'can_destroy': self.actions.destroy,

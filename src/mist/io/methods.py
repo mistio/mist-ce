@@ -1343,13 +1343,13 @@ def trigger_machine_action(user, cloud_id, machine, action, plan_id=None,
     """For each action call the machine controller
     that deal with the actions
     """
-
     actions = ('start', 'stop', 'reboot', 'destroy', 'resize',
                'rename', 'undefine', 'suspend', 'resume')
     # add this check also here cause other functions call this one
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
                                                                actions))
+
     if action == 'start':
         machine.ctl.start()
     elif action == 'stop':
@@ -1357,11 +1357,11 @@ def trigger_machine_action(user, cloud_id, machine, action, plan_id=None,
     elif action == 'undefine':
         machine.ctl.undefine()
     elif action == 'suspend':
-        machine.ctl.suspend()
+         machine.ctl.suspend()
     elif action == 'resume':
         machine.ctl.resume()
     elif action == 'resize':
-        machine.ctl.resize(plan_id)
+        machine.ctl.resize()
     elif action == 'rename':
         machine.ctl.rename(name)
     elif action == 'reboot':

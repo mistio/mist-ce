@@ -31,9 +31,11 @@ class MachineController(object):
     def destroy(self):
         return self.machine.cloud.ctl.destroy_machine(self.machine)
 
-    def resize(self, plan_id=None):
+    def resize(self):
         """Resize a machine on an other plan."""
-        return self.machine.cloud.ctl.resize_machine(self.machine, plan_id)
+        return self.machine.cloud.ctl.resize_machine(self.machine,
+                                                     self.machine.cloud.
+                                                     owner.plan_id)
 
     def rename(self, name=None):
         """Renames a machine on a certain cloud."""
