@@ -468,7 +468,7 @@
 
             this.set('onboarding.isLoadingMachines', false);
             this.set('model.machinesArray', allMachines);
-            this.set('machinesArray', allMachines);
+            this.set('model.machines', _generateMap(allMachines, 'uuid'));
         },
 
         _updateNetworks: function(data) {
@@ -538,10 +538,12 @@
         }
     });
 
-    var _generateMap = function(list) {
+    var _generateMap = function(list, field) {
         var out = {};
+        if (field == undefined)
+            field = 'id';
         for (var i = 0; i < list.length; i++) {
-            out[list[i].id] = list[i];
+            out[list[i][field]] = list[i];
         }
         return out;
     };
