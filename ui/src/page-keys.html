@@ -19,7 +19,7 @@
 
     <page-items name="keys" class="keys" model="[[model]]" items="[[model.keysArray]]" sections="[[sections]]" section="[[sections.keys]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
     <key-add model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" hidden$=[[!_isAddPageActive(route.path)]]></key-add>
-    <key-page model="[[model]]" params="[[_getKeyPair(data.key)]]" sections="[[sections]]" section="[[sections.keys]]" hidden$=[[!_isDetailsPageActive(route.path)]]></key-page>
+    <key-page model="[[model]]" params$="[[_getKeyPair(data.key)]]" sections="[[sections]]" section="[[sections.keys]]" hidden$=[[!_isDetailsPageActive(route.path)]]></key-page>
   </template>
 
   <script>

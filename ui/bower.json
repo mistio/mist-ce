@@ -18,6 +18,7 @@
     "polymer": "polymer/polymer#^1.6.0",
     "paper-elements": "^1.0.7",
     "iron-ajax": "^1.4.0",
+    "iron-list": "d-mo/iron-list#^1.3.3",
     "sc-timeago": "*",
     "pushstate-anchor": "^0.4.0",
     "color": "^3.0.4",
@@ -30,7 +31,8 @@
     "vaadin-combo-box": "^1.1.1",
     "vaadin-icons": "^1.0.2",
     "yaml.js": "jeremyfa/yaml.js#^0.2.8",
-    "iron-validator-behavior": "^1.0.1"
+    "iron-validator-behavior": "^1.0.1",
+    "xterm.js": "^1.1.3"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
@@ -39,7 +41,7 @@
     "polymer": "^1.6.0",
     "paper-styles": "^1.1.4",
     "paper-item": "^1.1.4",
-    "iron-list": "^1.2.0",
+    "iron-list": "^1.3.3",
     "paper-icon-button": "~1.1.1"
   }
 }
