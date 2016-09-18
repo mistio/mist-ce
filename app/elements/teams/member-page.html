@@ -337,10 +337,10 @@
             _deleteMemberResponseAjax: function(e){
                 // if user was in one single team return there, else in teams
                 if (this.memberTeams.length == 1 ){
-                    document.querySelector('app-location').set('route.path', '/teams/' + this.memberTeams[0].id);
+                    document.querySelector('app-location').set('path', '/teams/' + this.memberTeams[0].id);
                 }
                 else {
-                    document.querySelector('app-location').set('route.path', '/teams')
+                    document.querySelector('app-location').set('path', '/teams')
                 }
             },
             _showDialog: function(info) {
@@ -352,7 +352,7 @@
                 dialog._openDialog();
             },
             _addMemberInTeams: function(){
-                document.querySelector('app-location').set('route.path', '/members/' + this.member.id + '/add-in-teams');
+                document.querySelector('app-location').set('path', '/members/' + this.member.id + '/add-in-teams');
             }
         });
     })();

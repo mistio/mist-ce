@@ -279,7 +279,7 @@
                 el._openDialog();
             },
             _runScript: function(e) {
-                document.querySelector('app-location').set('route.path', '/scripts/' + this.params.id + '/+run');
+                document.querySelector('app-location').set('path', '/scripts/' + this.params.id + '/+run');
             },
             _editScript: function(e) {
                 var el = this.querySelector('script-edit');
@@ -310,7 +310,7 @@
                 }
             },
             _handleScriptDeleteAjaxResponse: function(e) {
-                page.show('/scripts');
+                document.querySelector('app-location').path = '/scripts';
             },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element');

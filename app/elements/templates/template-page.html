@@ -283,7 +283,7 @@
             <div class="section">
                 <div class="flex-horizontal-with-ratios">
                     <div class="width100">
-                        <template is="dom-if" if="[[hasStacks]]">
+                        <template is="dom-if" if="[[stacks]]">
                             <paper-material class="no-pad">
                                 <h3 class="smallcaps resource-head">stacks created from this template</h3>
                                 <template is="dom-repeat" items="[[stacks]]">
@@ -421,15 +421,9 @@
                     },
                     template: {
                         type: Object,
-                        computed: '_computeTemplate(params.id, model.templates.*)'
                     },
                     stacks: {
                         type: Array,
-                        computed: '_computeStacks(params.id, model.stacksArray.*)'
-                    },
-                    hasStacks: {
-                        type: Boolean,
-                        computed: '_computeHasStacks(stacks.*, model.stacksArray.*, template.id)'
                     },
                     isInline: {
                         type: Boolean,
@@ -476,16 +470,11 @@
                 _computeIsInline: function(source) {
                     return source == 'inline';
                 },
-                _computeStacks: function(templateid, stacks) {
-                    return this.model.stacksArray.filter(function(stack) {
-                        return stack.template == this.template.id;
-                    }, this);
-                },
                 _class: function(isinline) {
                     return isinline ? "command-container" : "";
                 },
                 _createStack: function(e) {
-                    page.show('/create-stack/' + this.template._id);
+                    document.querySelector('app-location').path = '/stacks/+create?id=' + this.template._id;
                 },
                 _editTemplate: function(e) {
                     var el = this.querySelector('template-edit');
@@ -517,7 +506,7 @@
 
                     if (response.confirmed && reason == "delete_template") {
                         console.log('i ll delete the template');
-                        page.show('/templates');
+                        document.querySelector('app-location').path = '/templates';
                     }
                 },
                 _showDialog: function(info) {

@@ -274,7 +274,7 @@
                     }
                 },
                 _handleNetworDeletekAjaxResponse: function(e) {
-                    page.show('/networks');
+                    document.querySelector('app-location').path = '/networks';
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element');

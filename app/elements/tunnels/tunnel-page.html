@@ -364,7 +364,7 @@ Script:</code></pre>
                 }
             },
             _handleTunnelDeleteAjaxResponse: function(e) {
-                document.querySelector('app-location').set('route.path', '/tunnels');
+                document.querySelector('app-location').set('path', '/tunnels');
             },
             _handleTunnelDeleteAjaxError: function(e) {
                 var toast = this.querySelector('paper-toast');

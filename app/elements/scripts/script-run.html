@@ -241,7 +241,7 @@
                     var msg = 'Run script request was successfull. Redirecting to script...';
                     this._showToast(msg);
                     this.async(function(){
-                        document.querySelector('app-location').set('route.path', '/scripts/'+this.script.id);
+                        document.querySelector('app-location').set('path', '/scripts/'+this.script.id);
                     }, 3300)
                 },
                 _showToast: function(msg) {

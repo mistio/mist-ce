@@ -675,7 +675,7 @@
             this._showToast('Action request failed');
         },
         _handleMachineDeleteAjaxResponse: function(e) {
-            page.show('/machines');
+            document.querySelector('app-location').path = '/machines';
         },
         _computeReplaceTargets: function(machine) {
             var ret = {'bucky.': ''};

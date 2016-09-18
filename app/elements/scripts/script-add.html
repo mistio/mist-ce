@@ -232,7 +232,7 @@
                 //
                 // console.log('XHR', e.detail);
                 var response = YAML.parse(e.detail.xhr.response);
-                document.querySelector('app-location').set('route.path', '/scripts/' + response.id);
+                document.querySelector('app-location').set('path', '/scripts/' + response.id);
             },
         });
     })();

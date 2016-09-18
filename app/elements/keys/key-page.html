@@ -505,7 +505,7 @@
                     }
                 },
                 _handleKeyDeleteAjaxResponse: function(e) {
-                    page.show('/keys');
+                    this.shadowRoot.querySelector('app-location').path = '/keys';
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element');

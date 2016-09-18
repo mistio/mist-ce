@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../elements/pages/page-items.html">
+<link rel="import" href="../elements/teams/team-page.html">
 
 <dom-module id="page-teams">
   <template>
@@ -9,7 +10,12 @@
         display: block;
       }
     </style>
-    <page-items class="teams" model="[[model]]" items="[[model.teamsArray]]" sections="[[sections]]" section="[[sections.teams]]" onboarding="[[onboarding]]"></page-items>
+    <app-route route="{{route}}"
+                pattern="/:team"
+                data="{{data}}"></app-route>
+
+    <page-items model="[[model]]" items="[[model.teamsArray]]" section="[[sections.teams]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
+    <team-page model="[[model]]" team$="[[_getTeam(data.team, model.stacks)]]" section="[[sections.teams]]" hidden$=[[!_isDetailsPageActive(route.path)]]></template-page>
   </template>
 
   <script>
@@ -19,9 +25,24 @@
 
       properties: {
         model: Object,
-        sections: Array,
         onboarding: Object
-      }
+      },
+
+      attached: function() {
+
+      },
+
+      _isDetailsPageActive: function(path) {
+          return path && path != '/+add';
+      },
+      _isListActive: function(path) {
+          return !path;
+      },
+      _getTeam: function(id) {
+          if (this.model.teams)
+              return this.model.teams[id];
+      },
+
 
     });
   </script>

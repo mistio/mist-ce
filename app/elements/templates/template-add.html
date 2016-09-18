@@ -261,7 +261,7 @@
                 },
                 _addTemplateAjaxResponse: function(e) {
                     var response = YAML.parse(e.detail.xhr.response);
-                    document.querySelector('app-location').set('route.path', '/templates/' + response.template.id);
+                    document.querySelector('app-location').set('path', '/templates/' + response.template.id);
                     console.log(response.template.id);
 
                     this.debounce('resetForm', function() {

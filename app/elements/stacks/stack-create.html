@@ -112,9 +112,6 @@
                 model: {
                     type: Object
                 },
-                sections: {
-                    type: Object
-                },
                 section: {
                     type: Object
                 },
@@ -123,8 +120,7 @@
                     computed: '_getHeaderStyle(section)'
                 },
                 stack: {
-                    type: Object,
-                    value: {}
+                    type: Object
                 },
                 form: {
                     type: Object,
@@ -139,6 +135,7 @@
                 },
                 fields: {
                     type: Array,
+                    value: [],
                     notify: true
                 },
                 keys: {
@@ -472,7 +469,7 @@
                 // console.log('create stack ', e);
                 var response = YAML.parse(e.detail.xhr.response);
                 var sid = response.stack.id;
-                document.querySelector('app-location').set('route.path', '/stacks/' + sid);
+                document.querySelector('app-location').set('path', '/stacks/' + sid);
 
                 this.debounce('resetForm', function() {
                     this._resetForm();

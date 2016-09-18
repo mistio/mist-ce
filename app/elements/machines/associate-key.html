@@ -125,7 +125,7 @@ Polymer({
     _addKey: function(){
         //set attribute origin
         var origin = window.location.pathname;
-        document.querySelector('app-location').set('route.path', '/keys/+add?origin=' + origin);
+        document.querySelector('app-location').set('path', '/keys/+add?origin=' + origin);
     },
     associateKey: function(e){
         var user = this.querySelector('paper-input#user').value || 'root';

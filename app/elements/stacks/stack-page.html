@@ -53,7 +53,7 @@
 
             paper-material.form-view,
             .app-form-title,
-            app-form, 
+            app-form,
             mist-form {
                 max-width: 900px;
                 box-sizing: border-box;
@@ -568,8 +568,8 @@
                 <paper-material>
                     <template is="dom-repeat" items="[[job.logs]]" as="log">
                         <div class$="log error-[[log.error]]">
-                            <iron-icon icon$="[[computeLogIcon(log,index)]]"></iron-icon> 
-                            <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>  
+                            <iron-icon icon$="[[computeLogIcon(log,index)]]"></iron-icon>
+                            <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
                             [[log.action]]
                             <span class="error" hidden="[[!log.error]]">error: [[log.error]]</span>
                         </div>
@@ -648,8 +648,7 @@
 
                 properties: {
                     model: {
-                        type: Object,
-                        notify: true
+                        type: Object
                     },
                     selected: {
                         type: Number,
@@ -668,9 +667,6 @@
                         type: Boolean,
                         computed: '_hideDeployNow(stack)'
                     },
-                    sections: {
-                        type: Object
-                    },
                     section: {
                         type: Object
                     },
@@ -679,12 +675,10 @@
                     },
                     stack: {
                         type: Object,
-                        computed: '_computeStack(params, model.stacks.*)',
-                        notify: true
                     },
                     template: {
                         type: Object,
-                        computed: '_computeTemplate(stack)'
+                        computed: '_computeTemplate(stack, model.templates)'
                     },
                     machines: {
                         type: Array,
@@ -787,7 +781,7 @@
                           }, 1000, that);
                         console.log('setting interval for job', this.intervalID);
                     // }
-                    
+
                 },
                 jobFinished: function(finished_at){
                     //clear interval

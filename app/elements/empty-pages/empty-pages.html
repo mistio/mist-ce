@@ -106,10 +106,10 @@ Polymer({
         }
     },
     _addCloudAction: function(){
-        document.querySelector('app-location').set('route.path', '/clouds/+add');
+        document.querySelector('app-location').set('path', '/clouds/+add');
     },
     _goToTemplate: function(){
-        document.querySelector('app-location').set('route.path', '/templates');
+        document.querySelector('app-location').set('path', '/templates');
     },
     _computeIsStacks: function(section){
         return this.section.id == "stacks";
@@ -118,7 +118,7 @@ Polymer({
         if(this.section.id != "teams")
         {
             console.debug('fabAction', e, this.section.add);
-            document.querySelector('app-location').set('route.path', this.section.add);
+            document.querySelector('app-location').set('path', this.section.add);
         } else {
             var dialog = this.querySelector('team-add');
             dialog.openDialog();

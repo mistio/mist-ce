@@ -211,10 +211,10 @@
                     this.set('sendingData', false);
                     if (!this.origin) {
                         var keyID = e.detail.response.id;
-                        document.querySelector('app-location').set('route.path', '/keys/' + keyID);
+                        document.querySelector('app-location').path = '/keys/' + keyID;
                     }
                     else {
-                        document.querySelector('app-location').set('route.path', this.origin);
+                        document.querySelector('app-location').path = this.origin;
                     }
 
                     this.debounce('formReset', function() {

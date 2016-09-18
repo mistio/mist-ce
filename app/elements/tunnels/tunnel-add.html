@@ -182,10 +182,10 @@
             _addTunnelAjaxResponse: function(e) {
                 var response = e.detail.xhr.response;
                 if (response.id) {
-                    document.querySelector('app-location').set('route.path', '/tunnels/'+ response.id);
+                    document.querySelector('app-location').set('path', '/tunnels/'+ response.id);
                 }
                 else {
-                    document.querySelector('app-location').set('route.path', '/tunnels/');
+                    document.querySelector('app-location').set('path', '/tunnels/');
                 }
             },
         });

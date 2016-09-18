@@ -258,11 +258,11 @@
                 this.$.saveOrgRequest.generateRequest();
             },
             goToAddTeam: function(){
-                document.querySelector('app-location').set('route.path', '/team/+add');
+                document.querySelector('app-location').set('path', '/team/+add');
                 this.showSidebar();
             },
             goToAddCloud: function(){
-                document.querySelector('app-location').set('route.path', '/clouds/+add');
+                document.querySelector('app-location').set('path', '/clouds/+add');
                 this.showSidebar();
             },
             showInviteForm: function(){
@@ -296,7 +296,7 @@
                 }
             },
             invitePeopleResponse: function(){
-                document.querySelector('app-location').set('route.path', '/teams/' + this.selectedTeamId);
+                document.querySelector('app-location').set('path', '/teams/' + this.selectedTeamId);
                 this.set('showProgress', false);
                 this.async(function(){
                     this.hideInviteForm();

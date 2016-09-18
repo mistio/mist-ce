@@ -301,9 +301,6 @@
                 is: 'team-page',
 
                 properties: {
-                    sections: {
-                        type: Object
-                    },
                     section: {
                         type: Object
                     },
@@ -318,9 +315,7 @@
                         notify: true
                     },
                     team: {
-                        type: Object,
-                        computed: '_computeTeam(params, model.teams.*)',
-                        notify: true
+                        type: Object
                     },
                     hasMembers: {
                         type: Boolean,
@@ -393,12 +388,6 @@
                     if (team.members)
                         return team.members.length > 0 ? true : false;
                 },
-                _computeId: function(params) {
-                    return params.id;
-                },
-                _computeTeam: function(params, teams) {
-                    return teams.base[params.id];
-                },
                 _computeMembers: function(team, teamMembers, members) {
                     var teamMembers = [],
                         pendingMembers = [],
@@ -425,7 +414,7 @@
                     return teamMembers;
                 },
                 _addMember: function(e) {
-                    document.querySelector('app-location').set('route.path', '/teams/' + this.team.id + '/+add');
+                    document.querySelector('app-location').set('path', '/teams/' + this.team.id + '/+add');
                 },
                 _editTeam: function(e) {
                     var el = this.querySelector('team-edit');
@@ -453,7 +442,7 @@
                         this.$.teamDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
                         this.$.teamDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                         this.$.teamDeleteAjaxRequest.generateRequest();
-                        document.querySelector('app-location').set('route.path', '/teams');
+                        document.querySelector('app-location').set('path', '/teams');
                     }
                     if (response.confirmed && reason == "member.delete") {
                         this.$.deleteMember.body = {};
@@ -463,7 +452,7 @@
                     }
                 },
                 _handleTeamDeleteAjaxResponse: function(e) {
-                    document.querySelector('app-location').set('route.path', '/teams');
+                    document.querySelector('app-location').set('path', '/teams');
                 },
                 _deleteMemberFromTeam: function(e){
                     var membId = e.target.attributes.memberid.value,

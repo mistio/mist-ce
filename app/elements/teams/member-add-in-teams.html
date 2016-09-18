@@ -186,7 +186,7 @@
 
             },
             _handleResponse: function(e) {
-                document.querySelector('app-location').set('route.path', '/members/'+this.member.id);
+                document.querySelector('app-location').set('path', '/members/'+this.member.id);
                 this.set('sendingData', false);
             },
             _handleError: function(e){
@@ -205,7 +205,7 @@
 
             },
             goToMember: function(){
-                document.querySelector('app-location').set('route.path', '/members/' + this.member.id);
+                document.querySelector('app-location').set('path', '/members/' + this.member.id);
             }
         });
     })();
