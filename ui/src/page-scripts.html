@@ -17,9 +17,10 @@
                 pattern="/:script"
                 data="{{data}}"></app-route>
 
-    <page-items name="scripts" class="scripts" model="[[model]]" items="[[model.scriptsArray]]" sections="[[sections]]" section="[[sections.scripts]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
-    <script-add model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" hidden$=[[!_isAddPageActive(route.path)]]></script-add>
-    <script-page model="[[model]]" params="[[_getScript(data.script, model.scripts)]]" sections="[[sections]]" section="[[sections.scripts]]" hidden$=[[!_isDetailsPageActive(route.path)]]></script-page>
+    <page-items model="[[model]]" items="[[model.scriptsArray]]" section="[[sections.scripts]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
+    <script-add model="[[model]]" section="[[sections.scripts]]" hidden$=[[!_isAddPageActive(route.path)]]></script-add>
+    <script-page model="[[model]]" params="[[_getScript(data.script, model.scripts)]]" section="[[sections.scripts]]" hidden$=[[!_isDetailsPageActive(route.path)]]></script-page>
+    <script-run model="[[model]]" script="[[_getScript(data.script, model.scripts)]]" section="[[sections.scripts]]" hidden$=[[!_isRunPageActive(route.path)]]></script-run>
 
   </template>
 
@@ -38,7 +39,10 @@
           return path == '/+add';
       },
       _isDetailsPageActive: function(path) {
-          return path && path != '/+add';
+          return path && path != '/+add' & !path.endsWith('+run');
+      },
+      _isRunPageActive: function(path) {
+          return path && path.endsWith('+run');
       },
       _isListActive: function(path) {
           return !path;

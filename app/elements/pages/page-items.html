@@ -184,10 +184,10 @@
                     <div class="description">[[section.description]]</div>
                 </div>
                 <template is="dom-if" if="[[_stampCards(view)]]">
-                    <item-cards id="item-cards" sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>
+                    <item-cards id="item-cards" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>
                 </template>
                 <template is="dom-if" if="[[_stampTable(view)]]">
-                    <item-list sections="[[sections]]" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}" org="[[model.org]]" hidden$="[[!filteredItems.length]]"></item-list>
+                    <item-list section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}" org="[[model.org]]" hidden$="[[!filteredItems.length]]"></item-list>
                 </template>
             </div>
             <div class="is-loading" hidden$="[[!isLoading]]">
@@ -223,7 +223,6 @@
         properties: {
             model: Object,
             onboarding: Object,
-            sections: Object,
             section: {
                 type: Object,
                 observer: '_qChanged'

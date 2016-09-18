@@ -12,7 +12,6 @@
 <link rel="import" href="../item-list/item-actions.html">
 
 <link rel="import" href="tunnel-edit.html">
-<!-- <link rel="import" href="script-run.html"> -->
 
 <dom-module id="tunnel-page">
     <template>
@@ -173,7 +172,7 @@
                             <paper-button on-tap="_disableTunnel" class="simple" hidden$="[[!tunnel.active]]" disabled>Disable Tunnel</paper-button>
                             <paper-button on-tap="_editTunnel" class="simple">Edit Tunnel</paper-button>
                             <paper-button on-tap="_deleteTunnel" class="simple">Delete Tunnel</paper-button>
-                        </paper-menu>                        
+                        </paper-menu>
                     </paper-menu-button>
                     <paper-button on-tap="_enableTunnel" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[tunnel.active]]" disabled> Enable Tunnel <iron-icon icon="av:play-arrow" style$="color: [[section.color]]"></iron-icon></paper-button>
                 </div>
@@ -184,14 +183,14 @@
                         <pre><code>
 Options for installing your VPN client:
 
-1.  Via `curl`: Hit the button below in order to be provided with 
-    a simple `curl` command, which you can directly run in your shell 
-    and will take care of installing the VPN client. This is the 
-    recommended option, especially if you are not planning on modifying 
+1.  Via `curl`: Hit the button below in order to be provided with
+    a simple `curl` command, which you can directly run in your shell
+    and will take care of installing the VPN client. This is the
+    recommended option, especially if you are not planning on modifying
     the configuration script provided.
 
-2.  Alternatively, you can request and then copy &amp; paste the configuration 
-    script in your shell, make it executable, and run it. This option is 
+2.  Alternatively, you can request and then copy &amp; paste the configuration
+    script in your shell, make it executable, and run it. This option is
     useful in case you want to make any changes to the configuration provided.
 </code></pre>
                         <pre><code>
@@ -207,7 +206,7 @@ Script:</code></pre>
                         <paper-button id="getscript" handle-as="json" on-tap="_requestScript" class="pull-right link"><iron-icon icon="content-copy"></iron-icon> Request Script</paper-button>
                         <paper-button id="copyscript" on-tap="copyScript" class="pull-right link"><iron-icon icon="content-copy"></iron-icon> Copy Script </paper-button>
                         <pre><code>
-                            
+
                         </code></pre>
                     </div>
                 </div>
@@ -291,19 +290,11 @@ Script:</code></pre>
                     type: String,
                     computed: '_getHeaderStyle(section)'
                 },
-                params: {
-                    type: Object
-                },
                 model: {
                     type: Object
                 },
                 tunnel: {
                     type: Object,
-                    computed: '_computeTunnel(params, model.tunnelsArray.*)'
-                },
-                tunnelid: {
-                    type: String,
-                    computed: '_computeTunnelId(params)'
                 },
                 isInline: {
                     type: Boolean,
@@ -330,17 +321,6 @@ Script:</code></pre>
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
-            },
-            _computeId: function(params) {
-                return params.id;
-            },
-            _computeTunnel: function(params, tunnels) {
-                return tunnels.base.find(function(tunnel) {
-                    return tunnel.id == params.id;
-                });
-            },
-            _computeTunnelId: function(params) {
-                return params.id;
             },
             _computeIsInline: function(location_type) {
                 if (location_type)
@@ -394,7 +374,7 @@ Script:</code></pre>
                 toast.text = "There was a problem deleting the tunnel";
                 toast.show();
             },
-            // script 
+            // script
             _requestScript: function(){
                 this.$.scriptAjaxRequest.body = {};
                 this.$.scriptAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -410,9 +390,9 @@ Script:</code></pre>
                 }
             },
             _handleScriptAjaxError: function(e){
-                
+
             },
-            // command 
+            // command
             _requestCommand: function(){
                 this.$.commandAjaxRequest.body = {};
                 this.$.commandAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -442,7 +422,7 @@ Script:</code></pre>
             copyScript: function(e) {
                 this.clearSelection();
                 var el = this.$.tunnelscript;
-                this.setSelection(el);            
+                this.setSelection(el);
                 var successful = document.execCommand('copy');
                 var msg = successful ? 'The script was copied to clipboard!' : 'There was an error copying to clipboard!';
 
@@ -451,7 +431,7 @@ Script:</code></pre>
             copyCurl: function(e) {
                 this.clearSelection();
                 var el = this.$.tunnelscommand;
-                this.setSelection(el);            
+                this.setSelection(el);
                 var successful = document.execCommand('copy');
                 var msg = successful ? 'The command was copied to clipboard!' : 'There was an error copying to clipboard!';
 
@@ -466,7 +446,7 @@ Script:</code></pre>
 
             },
             _disableTunnel: function(){
-                
+
             },
             clearSelection: function(){
                 if (window.getSelection) {

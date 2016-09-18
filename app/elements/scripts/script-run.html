@@ -67,7 +67,7 @@
                 <p class="error" hidden$="[[machineHasKeys]]">
                     <iron-icon icon="icons:warning"></iron-icon> Machine [[machine.name]] has no associated keys.
                 </p>
-                <app-form fields="[[fields]]" url="/api/v1/scripts/[[params.id]]" on-response="_runScriptResponse" btncontent="run"></app-form>
+                <app-form fields="[[fields]]" url="/api/v1/scripts/[[script.id]]" on-response="_runScriptResponse" btncontent="run"></app-form>
             </paper-material>
         </div>
         <paper-toast id="run-script-toast"></paper-toast>
@@ -82,10 +82,8 @@
 
                 properties: {
                     model: Object,
-                    params: Object,
                     script: {
                         type: Object,
-                        computed: '_computeScript(params, model.scriptsArray.*)'
                     },
                     section: Object,
                     fields: {
@@ -161,12 +159,6 @@
                             required: false
                          }];
                     this.set('fields', fields);
-                },
-                _computeScript: function(params, model) {
-                    var script = this.model.scriptsArray.find(function(script) {
-                        return script.id == this.params.id;
-                    },this);
-                    return script;
                 },
                 _computeMachinesOptions: function(clouds) {
                     return this.model.machinesArray.filter(function(cloud) {

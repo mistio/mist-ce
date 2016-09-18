@@ -438,6 +438,7 @@
             }
 
             this.set('model.imagesArray', allImages);
+            this.set('model.images', _generateMap(allImages));
         },
 
         _updateMachines: function(data) {
@@ -503,6 +504,7 @@
                 );
             }
             this.set('model.networksArray', allNetworks);
+            this.set('model.networks', _generateMap(allNetworks));
         },
         _updateTunnels: function(data) {
             this.set('onboarding.isLoadingTunnels', false);
