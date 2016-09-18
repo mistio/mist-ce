@@ -196,7 +196,7 @@ Options for installing your VPN client:
                         <pre><code>
 ==============================================================================
 CURL Command:</code></pre>
-                        <pre><code id="tunnelscommand"></code></pre>
+                        <pre><code id="tunnelcommand"></code></pre>
                         <paper-button id="copycurl" on-tap="copyCurl" class="pull-right link"> <iron-icon icon="content-copy"> </iron-icon>Copy command</paper-button>
                         <paper-button id="getcurl" on-tap="_requestCommand" class="pull-right link"> <iron-icon icon="content-copy"> </iron-icon>Request command</paper-button>
                         <pre><code>
@@ -335,9 +335,6 @@ Script:</code></pre>
                 el.items = items;
                 el._openDialog();
             },
-            _runScript: function(e) {
-                page.show('/run-script/' + this.tunnel.id);
-            },
             _editTunnel: function(e) {
                 var el = this.querySelector('tunnel-edit');
                 el._openEditTunnelModal();
@@ -367,7 +364,7 @@ Script:</code></pre>
                 }
             },
             _handleTunnelDeleteAjaxResponse: function(e) {
-                page.show('/tunnels');
+                document.querySelector('app-location').set('route.path', '/tunnels');
             },
             _handleTunnelDeleteAjaxError: function(e) {
                 var toast = this.querySelector('paper-toast');
@@ -403,14 +400,14 @@ Script:</code></pre>
                 console.log(e);
                 var response = e.detail.xhr.responseText;
                 if (e.detail.type != "error"){
-                    this.$.tunnelscommand.textContent = response;
+                    this.$.tunnelcommand.textContent = response;
                     this.$.copycurl.setAttribute('show', true);
                 }
             },
             _handleCommandAjaxError: function(e){
                 console.log(e);
                 var response = e.detail.error;
-                this.$.tunnelscommand.textContent = response;
+                this.$.tunnelcommand.textContent = response;
             },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element');
@@ -430,7 +427,7 @@ Script:</code></pre>
             },
             copyCurl: function(e) {
                 this.clearSelection();
-                var el = this.$.tunnelscommand;
+                var el = this.$.tunnelcommand;
                 this.setSelection(el);
                 var successful = document.execCommand('copy');
                 var msg = successful ? 'The command was copied to clipboard!' : 'There was an error copying to clipboard!';

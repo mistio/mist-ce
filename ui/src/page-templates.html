@@ -1,6 +1,9 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../elements/pages/page-items.html">
+<link rel="import" href="../elements/templates/template-add.html">
+<link rel="import" href="../elements/templates/template-page.html">
+
 
 <dom-module id="page-templates">
   <template>
@@ -9,7 +12,13 @@
         display: block;
       }
     </style>
-    <page-items class="templates" model="[[model]]" items="[[model.templatesArray]]" sections="[[sections]]" section="[[sections.templates]]" onboarding="[[onboarding]]"></page-items>
+    <app-route route="{{route}}"
+                pattern="/:template"
+                data="{{data}}"></app-route>
+
+    <page-items model="[[model]]" items="[[model.templatesArray]]" section="[[sections.templates]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
+    <template-add model="[[model]]" section="[[sections.templates]]" hidden$=[[!_isAddPageActive(route.path)]]></template-add>
+    <template-page model="[[model]]" template$="[[_getTemplate(data.template, model.templates)]]" section="[[sections.templates]]" hidden$=[[!_isDetailsPageActive(route.path)]]></template-page>
   </template>
 
   <script>
@@ -19,8 +28,25 @@
 
       properties: {
         model: Object,
-        sections: Array,
         onboarding: Object
+      },
+
+      attached: function() {
+
+      },
+
+      _isAddPageActive: function(path) {
+          return path == '/+add';
+      },
+      _isDetailsPageActive: function(path) {
+          return path && path != '/+add';
+      },
+      _isListActive: function(path) {
+          return !path;
+      },
+      _getTemplate: function(id) {
+          if (this.model.templates)
+              return this.model.templates[id];
       }
 
     });
