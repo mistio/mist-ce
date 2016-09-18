@@ -131,7 +131,7 @@
                     </div>
                 </div>
                 <div class="item-actions">
-                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>                    
+                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
@@ -205,7 +205,7 @@
         <iron-ajax id="scriptDeleteAjaxRequest" url="/api/v1/scripts/[[script.id]]" method="DELETE" on-response="_handleScriptDeleteAjaxResponse" on-error="_handleScriptDeleteAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
-        <tags-list model="[[model]]"></tags-list>                
+        <tags-list model="[[model]]"></tags-list>
     </template>
     <script>
     (function() {
@@ -282,7 +282,7 @@
                 el._openDialog();
             },
             _runScript: function(e) {
-                page.show('/run-script/' + this.script.id);
+                document.querySelector('app-location').set('route.path', '/scripts/' + this.params.id + '/+run');
             },
             _editScript: function(e) {
                 var el = this.querySelector('script-edit');

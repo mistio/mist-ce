@@ -159,7 +159,7 @@
       },
 
       observers: [
-        '_routePageChanged(routeData.page)'
+        '_routePageChanged(routeData.page, subroute.path)'
       ],
 
       _style: function(page, sections) {
@@ -168,8 +168,16 @@
           }
       },
 
-      _routePageChanged: function(page) {
+      _routePageChanged: function(page, subpath) {
         this.page = page || 'dashboard';
+
+        if (subpath == '') { // Update iron-list
+            var i = this.querySelector('iron-list');
+            if (i) {
+                i.fire('iron-resize');
+            }
+        }
+
       },
 
       _pageChanged: function(page) {

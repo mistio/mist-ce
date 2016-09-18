@@ -1,8 +1,9 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 
 <link rel="import" href="../elements/pages/page-items.html">
+
 <link rel="import" href="../elements/scripts/script-add.html">
-<link rel="import" href="../elements/machines/script-page.html">
+<link rel="import" href="../elements/scripts/script-page.html">
 
 <dom-module id="page-scripts">
   <template>
@@ -18,7 +19,7 @@
 
     <page-items name="scripts" class="scripts" model="[[model]]" items="[[model.scriptsArray]]" sections="[[sections]]" section="[[sections.scripts]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
     <script-add model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" hidden$=[[!_isAddPageActive(route.path)]]></script-add>
-    <script-page model="[[model]]" params="[[_getScript(data.script)]]" sections="[[sections]]" section="[[sections.scripts]]" hidden$=[[!_isDetailsPageActive(route.path)]]></script-page>
+    <script-page model="[[model]]" params="[[_getScript(data.script, model.scripts)]]" sections="[[sections]]" section="[[sections.scripts]]" hidden$=[[!_isDetailsPageActive(route.path)]]></script-page>
 
   </template>
 
