@@ -1725,7 +1725,7 @@ def list_machines(user, cloud_id):
                 all_tags.append(tag)
             # cost_per_hour + cost_per_month fixed tags for
             # machine cost analysis
-            if key == 'cost_per_hour':
+            if tag['key'] == 'cost_per_hour':
                 cost_per_hour = value
                 month_days = calendar.monthrange(now.year, now.month)[1]
                 try:
@@ -1736,8 +1736,8 @@ def list_machines(user, cloud_id):
                         m.extra['cost_per_month'] = "{0:.2f}".format(cost_per_month)
                 except:
                     pass
-            if key == 'cost_per_month':
-                cost_per_month = value
+            if tag['key'] == 'cost_per_month':
+                cost_per_month = tag['value']
                 try:
                     cost_per_month = float(cost_per_month)
                     if MAX_USER_PROVIDER_COST_PER_MONTH > cost_per_month >= 0:
