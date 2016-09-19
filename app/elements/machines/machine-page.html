@@ -711,7 +711,7 @@
         isState: function(machine){
             return machine.state == machine.extra.status ;
         },
-        _computeIsloading(machine) {
+        _computeIsloading: function(machine) {
             return !this.machine ? true : false;
         },
         associateKey:  function(e){

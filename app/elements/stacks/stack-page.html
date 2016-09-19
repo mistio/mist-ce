@@ -1149,7 +1149,7 @@
                     window.clearInterval(this.intervalID);
                     this.intervalID = null;
                 },
-                _computeIsloading(stack) {
+                _computeIsloading: function(stack) {
                     return !this.stack ? true : false;
                 }
             });

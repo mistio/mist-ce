@@ -8,7 +8,7 @@
 <link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../bower_components/paper-header-panel/paper-header-panel.html">
-<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
 
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
@@ -88,6 +88,8 @@
           <page-templates name="templates" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-templates>
           <page-stacks name="stacks" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-stacks>
           <page-teams name="teams" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-teams>
+          <page-members name="members" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-members>
+
           <page-incidents name="incidents" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-incidents>
 
           <page-my-account name="my-account" user="[[model.user]]" org="[[model.org]]"></page-my-account>
@@ -150,7 +152,6 @@
       },
 
       listeners: {
-          'iron-activate': 'updateCurrent',
           'iron-navigate': 'scrollToTop',
           'page-meta': 'updateTitle',
           'toast': 'showToast',
@@ -373,7 +374,12 @@
             id: 'clouds',
             color: '#424242',
             q: ''
-        }];
+        }, {
+            id: 'members',
+            color: '#607D8B',
+            icon: 'social:people'
+        }
+        ];
 
         this.sections = _generateMap(this.sectionsArray);
       }

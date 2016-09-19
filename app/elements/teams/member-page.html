@@ -246,9 +246,6 @@
             is: 'member-page',
 
             properties: {
-                sections: {
-                    type: Object
-                },
                 section: {
                     type: Object
                 },
@@ -289,7 +286,7 @@
             },
             _computeMember: function(params, members) {
                 return this.model.membersArray.find(function(member) {
-                    return member.id == params.id;
+                    return member.id == params.member;
                 }, this);
             },
             _computeTeams: function(member, teams){

@@ -13,7 +13,8 @@
     "src/page-stacks.html",
     "src/page-teams.html",
     "src/page-incidents.html",
-    "src/page-my-account.html"
+    "src/page-my-account.html",
     "src/page-clouds.html",
+    "src/page-members.html"
   ]
 }
