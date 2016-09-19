@@ -1,6 +1,9 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
+<link rel="import" href="../helpers/dialog-element.html">
+<link rel="import" href="../tags/tags-list.html">
+
 <dom-module id="item-actions">
     <template>
         <style include="paper-dialog-shared-styles"></style>
@@ -52,7 +55,7 @@
             paper-dialog {
                 padding: 0;
             }
-            paper-dialog > h2 {
+            :host paper-dialog > h2 {
                 text-transform: capitalize;
                 margin-top: 24px;
             }
@@ -114,6 +117,8 @@
               <paper-button dialog-confirm class="red" on-tap="_confirmAction">Proceed</paper-button>
             </div>
           </paper-dialog>
+          <dialog-element></dialog-element>
+          <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
         </content>
     </template>
 </dom-module>
@@ -124,14 +129,14 @@ ACTIONS = {
   'shell': {
     'name': 'shell',
     'icon': 'vaadin-icons:terminal',
-    'confirm': false,
-    'multi': false
+    'confirm': true,
+    'multi': true
   },
   'tag': {
     'name': 'tag',
     'icon': 'label',
-    'confirm': false,
-    'multi': false
+    'confirm': true,
+    'multi': true
   },
   'reboot': {
     'name': 'reboot',
@@ -350,16 +355,14 @@ Polymer({
 
         item.type = item_type;
         var ret = [];
-        if (item.type == 'machine') {
+        ret.push('tag');
+        if (item.type == 'machine') {            
             if (item.state == 'running') {
               // if key then add shell / run script
               // if not monitoring then enable monitoring
               ret.push('shell');
-              ret.push('tag');
               ret.push('reboot');
-            } else {
-              ret.push('tag');
-            }
+            } 
             ret.push('destroy');
         } else if (item.type == 'image') {
             if (item.star) {
@@ -391,7 +394,7 @@ Polymer({
             ret.push('delete');
         } else if (item.type == 'team') {
             ret.push('delete');
-        }
+        }        
         return ret;
     },
 
@@ -402,8 +405,17 @@ Polymer({
     _selectAction: function (event, item) {
         this.set('selectedAction', event.model.item);
         this.set('multi', false);
-        if (event.model.item.confirm)
-            this.$['confirmation'].toggle();
+        if (event.model.item.confirm) {
+            if(event.model.item.name == 'tag') {
+                var items = [];
+                items.push(itemUid(this.selectedItem));
+                this.$['tagsdialog'].items = items;
+                this.$['tagsdialog']._openDialog();
+            }
+            else {
+                this.$['confirmation'].toggle();
+            }
+        }
         else {
             var items = [];
             items.push(this.selectedItem);
@@ -415,8 +427,15 @@ Polymer({
     _selectMultiAction: function (event) {
         this.set('selectedAction', event.model.item);
         this.set('multi', true);
-        if (event.model.item.confirm)
-            this.$['confirmation'].toggle();
+        if (event.model.item.confirm){
+            if(event.model.item.name == 'tag') {
+                this.$['tagsdialog'].items = this.selectedItems;
+                this.$['tagsdialog']._openDialog();
+            }
+            else {
+                this.$['confirmation'].toggle();
+            }
+        }
         else {
             var items = [];
             this.selectedItems.forEach(function(si){
@@ -535,6 +554,10 @@ Polymer({
 
     _moreActions: function (actions) {
         return this.get('actions').slice(4);
+    },
+
+    computeModel: function(){
+        return document.querySelector("app-main").model;
     }
 
 });

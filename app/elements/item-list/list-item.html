@@ -60,6 +60,12 @@
             padding: 20px 0 0;
             white-space: inherit;
         }
+        
+        .field.machines,
+        .field.default,
+        .field.id {
+            width: 100px;
+        }
 
         .id {
             /*color: #757575;*/
@@ -110,7 +116,6 @@ var TIME_MAP = {
 
 Date.prototype.getTimeFromNow = function () {
     var now = new Date();
-    console.log(this)
     var diff = now - this;
     var ret = '';
 
