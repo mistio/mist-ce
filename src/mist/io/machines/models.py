@@ -10,16 +10,16 @@ from mist.io.machines.controllers import MachineController
 
 
 class Actions(me.EmbeddedDocument):  # TODO default
-    start = me.BooleanField()
-    stop = me.BooleanField()
-    reboot = me.BooleanField()
-    destroy = me.BooleanField()
-    resize = me.BooleanField()
-    rename = me.BooleanField()
-    tag = me.BooleanField()
-    resume = me.BooleanField()
-    suspend = me.BooleanField()
-    undefine = me.BooleanField()
+    start = me.BooleanField(default=False)
+    stop = me.BooleanField(default=False)
+    reboot = me.BooleanField(default=False)
+    destroy = me.BooleanField(default=False)
+    resize = me.BooleanField(default=False)
+    rename = me.BooleanField(default=False)
+    tag = me.BooleanField(default=False)
+    resume = me.BooleanField(default=False)
+    suspend = me.BooleanField(default=False)
+    undefine = me.BooleanField(default=False)
 
 
 # # TODO move these when keys port is completed
