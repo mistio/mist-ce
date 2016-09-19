@@ -1726,7 +1726,7 @@ def list_machines(user, cloud_id):
             # cost_per_hour + cost_per_month fixed tags for
             # machine cost analysis
             if tag['key'] == 'cost_per_hour':
-                cost_per_hour = value
+                cost_per_hour = tag['value']
                 month_days = calendar.monthrange(now.year, now.month)[1]
                 try:
                     cost_per_hour = float(cost_per_hour)
