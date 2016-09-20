@@ -646,9 +646,11 @@ class VCloudController(BaseController):
         if not kwargs.get('username'):
             raise RequiredParameterMissingError('username')
         if not kwargs.get('organization'):
-            raise RequiredParameterMissingError('organization')
-        kwargs['username'] = '%s@%s' % (kwargs['username'],
-                                        kwargs.pop('organization'))
+            if '@' not in kwargs['username']:
+                raise RequiredParameterMissingError('organization')
+        else:
+            kwargs['username'] = '%s@%s' % (kwargs['username'],
+                                            kwargs.pop('organization'))
         if not kwargs.get('host'):
             raise RequiredParameterMissingError('host')
         kwargs['host'] = sanitize_host(kwargs['host'])
