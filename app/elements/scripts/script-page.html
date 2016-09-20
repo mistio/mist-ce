@@ -14,7 +14,7 @@
     <template>
         <style is="custom-style" include="single-page"></style>
         <style is="custom-style" include="tags-and-labels"></style>
-        <style include="shared-styles">
+        <style is="custom-style" include="shared-styles">
         :host {
             display: block;
         }
@@ -94,23 +94,6 @@
         }
         .info-table {
             border-top: 1px solid #ddd;
-        }
-        .is-loading {
-            top: 15px;
-            left: 200px;
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            display: block;
-            width: 100%;
-            height: 100vh;
-            background-color: #eee;
-        }
-        .is-loading paper-spinner {
-            width: 80px;
-            height: 80px;
-            margin: 10% auto;
-            display: block;
         }
         </style>
 
