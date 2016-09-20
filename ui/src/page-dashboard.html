@@ -221,6 +221,24 @@
             position: relative;
             z-index: 1
         }
+        .is-loading {
+            top: 0;
+            left: 0;
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            display: block;
+            height: 100vh;
+            width: 100vw;
+            background-color: #eee;
+            z-index: 99;
+        }
+        .is-loading paper-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 10% auto;
+            display: block;
+        }
         </style>
         <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
             <div class="notice">
