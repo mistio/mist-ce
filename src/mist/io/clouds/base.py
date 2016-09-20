@@ -20,6 +20,7 @@ from libcloud.compute.base import NodeLocation
 
 from mist.io import config
 
+from mist.io.exceptions import MistError
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudExistsError
 from mist.io.exceptions import InternalServerError
@@ -265,6 +266,9 @@ class BaseController(object):
         # Cloud specific kwargs preparsing.
         try:
             self._add__preparse_kwargs(kwargs)
+        except MistError as exc:
+            log.error("Error while adding cloud %s: %r", self.cloud, exc)
+            raise
         except Exception as exc:
             log.exception("Error while preparsing kwargs on add %s",
                           self.cloud)
@@ -286,6 +290,7 @@ class BaseController(object):
             if self.cloud._fields[key].required and key not in kwargs:
                 errors[key] = "Required parameter missing '%s'." % key
         if errors:
+            log.error("Error adding %s: %s", self.cloud, errors)
             raise BadRequestError({
                 'msg': "Invalid parameters %s." % errors.keys(),
                 'errors': errors,
@@ -297,9 +302,11 @@ class BaseController(object):
         try:
             self.cloud.save()
         except me.ValidationError as exc:
+            log.error("Error adding %s: %s", self.cloud, exc.to_dict())
             raise BadRequestError({'msg': exc.message,
                                    'errors': exc.to_dict()})
-        except me.NotUniqueError:
+        except me.NotUniqueError as exc:
+            log.error("Cloud %s not unique error: %s", self.cloud, exc)
             raise CloudExistsError()
 
         # Try to connect to cloud.
@@ -316,6 +323,8 @@ class BaseController(object):
                                   "we couldn't connect.", self.cloud)
                     raise CloudUnavailableError(exc=exc)
             except:
+                log.error("Failed to connect to cloud %s, will delete.",
+                          self.cloud)
                 self.cloud.delete()
                 raise
 
