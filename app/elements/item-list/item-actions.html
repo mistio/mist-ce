@@ -14,6 +14,7 @@
                 background-color: transparent;
                 width: 100%;
                 box-shadow: none;
+                text-transform: none;
             }
 
             #select-action {
@@ -59,6 +60,11 @@
                 text-transform: capitalize;
                 margin-top: 24px;
             }
+            paper-dialog-scrollable  ul {
+                padding-left: 18px;
+                color: rgba(0,0,0,0.54);
+                font-size: 16px;
+            }
             paper-dialog > p {
                 margin: 0 24px 0 24px
             }
@@ -93,28 +99,37 @@
           </paper-dialog>
 
           <paper-dialog id="confirmation" modal closingReason="{{confirmationStatus}}">
-            <template is="dom-if" if="[[!multi]]">
-              <h2>[[selectedAction.name]] [[selectedItem.type]] ?</h2>
-              <paper-dialog-scrollable>
-                <p>
-                    [[selectedItem.name]]
-                </p>
-              </paper-dialog-scrollable>
-            </template>
+              <template is="dom-if" if="[[!multi]]">
+                  <h2>[[selectedAction.name]] [[selectedItem.type]] ?</h2>
+              </template>
+              <template is="dom-if" if="[[multi]]">
+                  <h2>[[selectedAction.name]] [[selectedItemsOfCurrentSection.length]] {{selectedItemsType(selectedItems.length, items.length)}} ?</h2>
+              </template>
 
-            <template is="dom-if" if="[[multi]]">
-              <h2>[[selectedAction.name]] [[selectedItemsOfCurrentSection.length]] {{selectedItemsOfCurrentSectionType(selectedItemsOfCurrentSection.length, items.length)}} ?</h2>
+
               <paper-dialog-scrollable>
-                <p>
-                    <template is="dom-repeat" items="{{selectedItemsDetails(selectedItemsOfCurrentSection.length)}}">
-                      [[item.name]]
-                    </template>
-                </p>
+                <template is="dom-if" if="[[!multi]]">
+                    <p>
+                        You are about to [[selectedAction.name]] [[selectedItem.type]]: [[selectedItem.name]]
+                    </p>
+                </template>
+
+                <template is="dom-if" if="[[multi]]">                  
+                    <p>
+                        You are about to [[selectedAction.name]] {{selectedItemsType(selectedItems.length, items.length)}}:
+                        <ul>
+                            <template is="dom-repeat" items="{{selectedItemsDetails(selectedItemsOfCurrentSection.length)}}">
+                              <li>[[item.name]]</li>
+                            </template>
+                        </ul>
+                    </p>
+                </template>
+
               </paper-dialog-scrollable>
-            </template>
+
             <div class="buttons clearfix btn-group">
               <paper-button dialog-dismiss>Cancel</paper-button>
-              <paper-button dialog-confirm class="red" on-tap="_confirmAction">Proceed</paper-button>
+              <paper-button dialog-confirm class="red" on-tap="_confirmAction">[[selectedAction.name]]</paper-button>
             </div>
           </paper-dialog>
           <dialog-element></dialog-element>
@@ -320,8 +335,8 @@ Polymer({
     },
 
     selectedItemsType: function(s) {
-        var item_type = this.selectedItemsOfCurrentSection.length && this.items[this.itemIndex(this.selectedItemsOfCurrentSection[0])] && this.items[this.itemIndex(this.selectedItemsOfCurrentSection[0])].type;
-        if (this.get('selectedItemsOfCurrentSection.length') != 1)
+        var item_type = this.selectedItems.length && this.items[this.itemIndex(this.selectedItems[0])] && this.items[this.itemIndex(this.selectedItems[0])].type;
+        if (this.get('selectedItems.length') != 1)
             item_type+='s';
         return item_type;
     },
