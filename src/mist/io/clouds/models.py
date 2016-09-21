@@ -69,7 +69,7 @@ class Cloud(me.Document):
     id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
     owner = me.ReferenceField(Organization, required=True)
 
-    title = me.StringField(required=True, unique_with="owner")
+    title = me.StringField(required=True)
     enabled = me.BooleanField(default=True)
 
     machine_count = me.IntField(default=0)
@@ -80,7 +80,16 @@ class Cloud(me.Document):
     meta = {
         'allow_inheritance': True,
         'collection': 'clouds',  # collection 'cloud' is used by core's model
-        'indexes': ['owner'],
+        'indexes': [
+            'owner',
+            # Following index ensures owner with title combos are unique
+            {
+                'fields': ['owner', 'title'],
+                'sparse': False,
+                'unique': True,
+                'cls': False,
+            }
+        ],
     }
 
     _private_fields = ()
