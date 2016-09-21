@@ -113,13 +113,13 @@
                     }
                 },
                 observers: [
-                    '_cloudsChanged(model.cloudsArray.*, model.machinesArray.*, model.keysArray.*)'
+                    '_cloudsChanged(fields.length, model.cloudsArray.*, model.machinesArray.*, model.keysArray.*)'
                 ],
                 listeners: {
                     'iron-select': '_fieldsChanged'
                 },
                 ready: function(){
-                    var arr = [];
+                    var arr = this.machinesOptions || [];
                     var fields = [{
                             name: "machine_id",
                             label: "Select Machine *",
@@ -210,8 +210,7 @@
                         }
                     }
                 },
-                _cloudsChanged: function(clouds, machines, keys) {
-
+                _cloudsChanged: function(fieldsLength, clouds, machines, keys) {
                     // make an array of machines with keys
                     var machinesWithKeys = [];
                     this.model.keysArray.forEach(function(k){
@@ -225,7 +224,7 @@
                     }, this);
 
                     this.set('fields.0.options', this.model.machinesArray);
-                    //
+
                     if (this.fields) {
                         this.fields[0].options.forEach(function(o, index){
                             if (machinesWithKeys.indexOf(o.uuid) > -1){
