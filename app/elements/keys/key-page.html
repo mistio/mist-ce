@@ -253,9 +253,7 @@
         <template is="dom-if" if="{{key.id}}">
             <iron-ajax auto id="keyPublicRequest" url="{{baseUrl}}/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
         </template>
-        <template is="dom-if" if="{{key.id}}">
-            <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
-        </template>
+        <iron-ajax id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/[[key.id]]" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
         <iron-ajax id="keyDeleteAjaxRequest" url="/api/v1/keys/[[key.id]]" method="DELETE" on-response="_handleKeyDeleteAjaxResponse" on-error="_handleKeyDeleteAjaxError"></iron-ajax>
         <key-edit key="[[key]]"></key-edit>
@@ -434,11 +432,13 @@
                     this.publicKey = data.detail.response;
                 },
                 showPrivateKey: function() {
-                    // this.$.keyPrivateRequest.generateRequest();
+                    this.$.keyPrivateRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyPrivateRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyPrivateRequest.body = {};
+                    this.$.keyPrivateRequest.generateRequest();
                     this.visiblePrivateKey = true;
                 },
                 hidePrivateKey: function() {
-                    // this.$.keyPrivateRequest.generateRequest();
                     this.visiblePrivateKey = false;
                 },
                 handlePrivateResponse: function(data) {
