@@ -1338,17 +1338,20 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
     return node
 
 
-def trigger_machine_action(user, cloud_id, machine, action, plan_id=None,
-                           name=None):
-    """For each action call the machine controller
-    that deal with the actions
-    """
+def trigger_machine_action(user, cloud_id, machine_id, action, name=None):
+    """For each action call the relevant machine controller"""
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+    except me.DoesNotExist:
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
+
     actions = ('start', 'stop', 'reboot', 'destroy', 'resize',
                'rename', 'undefine', 'suspend', 'resume')
+
     # add this check also here cause other functions call this one
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
-                                                               actions))
+                                                                   actions))
 
     if action == 'start':
         machine.ctl.start()

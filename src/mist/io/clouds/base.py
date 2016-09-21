@@ -867,7 +867,7 @@ class BaseController(object):
     def _destroy_machine(self, machine,  machine_libcloud):
         machine_libcloud.destroy()
 
-    # It isn't exist in the ui
+    # It isn't implemented in the ui
     def resize_machine(self, machine):
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud

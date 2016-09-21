@@ -415,22 +415,22 @@ class AzureController(BaseController):
                                        machine.machine_id)
 
     def _start_machine(self,  machine, machine_libcloud):
-        cloud_service = self._cloud_service(machine_libcloud.id)
+        cloud_service = self._cloud_service(machine.machine_id)
         self.connection.ex_start_node(machine_libcloud,
                                       ex_cloud_service_name=cloud_service)
 
     def _stop_machine(self, machine, machine_libcloud):
-        cloud_service = self._cloud_service(machine_libcloud.id)
+        cloud_service = self._cloud_service(machine.machine_id)
         self.connection.ex_stop_node(machine_libcloud,
                                      ex_cloud_service_name=cloud_service)
 
     def _reboot_machine(self, machine, machine_libcloud):
-        cloud_service = self._cloud_service(machine_libcloud.id)
+        cloud_service = self._cloud_service(machine.machine_id)
         self.connection.reboot_node(machine_libcloud,
                                     ex_cloud_service_name=cloud_service)
 
     def _destroy_machine(self, machine, machine_libcloud):
-        cloud_service = self._cloud_service(machine_libcloud.id)
+        cloud_service = self._cloud_service(machine.machine_id)
         self.connection.destroy_node(machine_libcloud,
                                      ex_cloud_service_name=cloud_service)
 
@@ -802,11 +802,11 @@ class DockerController(BaseController):
         return image_id in config.DOCKER_IMAGES
 
     def _action_change_port(self,  machine, machine_libcloud):
-        """This part exists here for docker specific reasons. After start and
-        stop actions, docker machine instance need to rearrange its port.
-        In the end save the machine in db.
+        """This part exists here for docker specific reasons. After start,
+        reboot and destroy actions, docker machine instance need to rearrange
+        its port. Finally save the machine in db.
         """
-
+        # this exist here cause of docker host implementation
         if machine_libcloud.extra.get('tags', {}).get('type') == 'docker_host':
             pass
         else:
@@ -826,7 +826,7 @@ class DockerController(BaseController):
         self._action_change_port( machine, machine_libcloud)
 
     def _reboot_machine(self,  machine, machine_libcloud):
-        self.connection.ex_start_node(machine_libcloud)
+        machine_libcloud.reboot()
         self._action_change_port(machine, machine_libcloud)
 
     def _destroy_machine(self, machine, machine_libcloud):
@@ -932,6 +932,8 @@ class LibvirtController(BaseController):
                 return True
             except:
                 return False
+        else:
+            machine_libcloud.reboot()
 
     def _resume_machine(self, machine, machine_libcloud):
         self.connection.ex_resume_node(machine_libcloud)
@@ -1120,17 +1122,17 @@ class OtherController(BaseController):
                                 **kwargs)
 
     def _reboot_machine(self, machine, machine_libcloud):
-        # todo move it up
-        from mist.core.methods import ssh_command
         try:
-            if machine_libcloud.public_ips:
-                hostname = machine_libcloud.public_ips[0]
+            if machine.public_ips:
+                hostname = machine.public_ips[0]
             else:
-                hostname = machine_libcloud.private_ips[0]
+                hostname = machine.private_ips[0]
 
             command = '$(command -v sudo) shutdown -r now'
+            # TODO move it up
+            from mist.core.methods import ssh_command
             ssh_command(self.cloud.owner, self.cloud.id,
-                        machine_libcloud.id, hostname, command)
+                        machine.machine_id, hostname, command)
             return True
         except:
             return False

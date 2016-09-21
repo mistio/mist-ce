@@ -41,7 +41,7 @@ class MachineController(object):
         """Renames a machine on a certain cloud."""
         return self.machine.cloud.ctl.rename_machine(self.machine, name)
 
-    # TODO why want this also ?
+    # TODO we want this also ?
     # def tag(self):
     #     return self.machine.cloud.ctl.tag(self.machine)
     #

@@ -1067,7 +1067,7 @@ def create_machine(request):
 def machine_actions(request):
     """
     Call an action on machine
-    Calls a machine action on clouds that support it
+    Calls a machine action on cloud that support it
     READ permission required on cloud.
     ACTION permission required on machine(ACTION can be START,
     STOP, DESTROY, REBOOT).
@@ -1115,10 +1115,10 @@ def machine_actions(request):
         raise BadRequestError("Action '%s' should be one of %s" % (action,
                                                                    actions))
     elif action == 'destroy':
-        methods.destroy_machine(auth_context.owner, cloud_id, machine)
+        methods.destroy_machine(auth_context.owner, cloud_id, machine_id)
     else:
         methods.trigger_machine_action(auth_context.owner, cloud_id,
-                                       machine, action, name)
+                                       machine_id, action, name)
     # return OK
     # TODO: We shouldn't return list_machines, just 200. Save the API!
     return mist.core.methods.filter_list_machines(auth_context, cloud_id)
