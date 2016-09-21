@@ -365,7 +365,9 @@ Polymer({
             type: Boolean,
             value: true
         },
-        matrix: Array
+        matrix: {
+            type: Array
+        }
     },
     observers: [
         'cloudLayoutMatrix(model.clouds.*, sidebarIsOpen)'
@@ -373,9 +375,15 @@ Polymer({
     listeners: {
         'close-cloud-info': '_closeCloudChips'
     },
-    ready: function() {
+    ready: function() {        
     },
     attached: function() {
+        // initialise chips position matrix
+        var that = this;
+        this.async(function(){
+            that.cloudLayoutMatrix(that.model.clouds, that.sidebarIsOpen);
+        }, 50);
+
         // reset page title since this is the default page
         this.fire('page-meta', {
             title: null
@@ -451,7 +459,7 @@ Polymer({
                 that.querySelector('dashboard-panel').resize();
 
         }, 5000, this);
-        //this.cloudLayoutMatrix();
+
         this.async(function() {
             this.importHref(this.resolveUrl('../elements/logs/log-list.html'),
                             null,
