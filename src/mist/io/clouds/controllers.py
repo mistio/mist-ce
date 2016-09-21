@@ -87,7 +87,7 @@ class AmazonController(BaseController):
         if region.startswith('ec2_'):
             region = region[4:]
             parts = region.split('_')
-            if not parts[-1].isdigit():
+            if parts[-1] == 'northeast':
                 parts.append('1')
             kwargs['region'] = '-'.join(parts)
 
@@ -454,6 +454,14 @@ class GoogleController(BaseController):
             # Windows specific metadata including user/password.
             if key in tags:
                 extra[key] = tags.pop(key)
+
+        # FIXME only for now and not forever
+        # we mist change in list_machines the order of libcloud tags
+        # and post_parse machine, better in the oomachines branch
+        for key in ('items', 'fingerprint', 'kind'):
+            if key in machine_dict['tags']:
+                machine_dict['tags'].pop(key)
+
         tags.update(machine_dict['tags'])
         machine_dict['tags'] = tags
 
