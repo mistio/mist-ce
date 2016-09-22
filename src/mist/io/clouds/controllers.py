@@ -834,7 +834,7 @@ class DockerController(BaseController):
     def _destroy_machine(self, machine, machine_libcloud):
         if machine_libcloud.state == NodeState.RUNNING:
             self.connection.ex_stop_node(machine_libcloud)
-            machine_libcloud.destroy()
+        machine_libcloud.destroy()
 
 
 class LibvirtController(BaseController):
