@@ -176,6 +176,25 @@
                 height: 24px !important;
                 vertical-align: middle !important;
             }
+            .machine-actions > * {
+                /*vertical-align: middle;*/
+            }
+            .machine-actions > paper-button.left-icon iron-icon {
+                /*padding-right: 8px;*/
+            }
+            .machine-actions > paper-button.right-icon iron-icon {
+                /*padding-left: 8px;*/
+            }
+            item-actions {
+                display: flex;
+                font-size: 1em;
+            }
+            item-actions ::content .actions {
+                height: auto;
+                display: flex;
+                vertical-align: auto;
+                padding: 0;
+            }
         </style>
 
         <div id="content">
@@ -192,7 +211,7 @@
                         [[machine.state]] <span class="desc" hidden$="[[isState(machine)]]">[[machine.extra.status]]</span>
                     </div>
                 </div>
-                <div class="item-actions">
+                <div class="machine-actions">
                     <!-- can_destroy:true
                     can_start:false
                     can_stop:true
@@ -203,9 +222,9 @@
                     can_tag:true
                     can_undefine:false -->
 
-                    <!-- <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" org="[[model.org]]"></item-actions> -->
+                    <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" actions="[[actions]]" org="[[model.org]]"></item-actions>
 
-                    <paper-button on-tap="start" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
+                    <!-- <paper-button on-tap="start" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
                     <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
                     <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="_editTags" class="simple" hidden$="[[!machine.can_tag]]">tags</paper-button>
                     <paper-menu-button id="moreMachineActions" horizontal-align="right">
@@ -220,7 +239,7 @@
                         </paper-menu>
                     </paper-menu-button>
                     <paper-button on-tap="shell" class="simple white left-icon" style$="color: [[section.color]]"><iron-icon style$="color: [[section.color]]" icon="vaadin-icons:terminal"></iron-icon> SHELL</paper-button>
-                    <paper-button on-tap="monitor" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[isMonitored]]" disabled>monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button>
+                    <paper-button on-tap="monitor" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[isMonitored]]" disabled>monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button> -->
                 </div>
             </paper-material>
             <div class="columns">
@@ -306,6 +325,68 @@
     </template>
 </dom-module>
 <script>
+MACHINEACTIONS = {
+  'shell': {
+    'name': 'shell',
+    'icon': 'vaadin-icons:terminal',
+    'confirm': false,
+    'multi': true
+  },
+  'tag': {
+    'name': 'tag',
+    'icon': 'label',
+    'confirm': true,
+    'multi': true
+  },
+  'reboot': {
+    'name': 'reboot',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'start': {
+    'name': 'start',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'stop': {
+    'name': 'stop',
+    'icon': 'av:stop',
+    'confirm': true,
+    'multi': true
+  },
+  'suspend': {
+    'name': 'suspend',
+    'icon': 'av:stop',
+    'confirm': true,
+    'multi': true
+  },
+  'rename': {
+    'name': 'rename',
+    'icon': 'editor:mode-edit',
+    'confirm': true,
+    'multi': false
+  },
+  'resume': {
+    'name': 'resume',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'undefine': {
+    'name': 'undefine',
+    'icon': 'image:panorama-fish-eye',
+    'confirm': true,
+    'multi': true
+  },
+  'destroy': {
+    'name': 'destroy',
+    'icon': 'delete',
+    'confirm': true,
+    'multi': true
+  }
+}
     Polymer({
         is: 'machine-page',
 
@@ -383,6 +464,10 @@
             itemUid: {
                 type: Array,
                 computed: '_computeThisItemUid(machine)'
+            },
+            actions: {
+                type: Array,
+                computed: '_computeActions(machine)'
             }
         },
         observers: [
@@ -425,6 +510,40 @@
 
             }, 5000);
 
+        },
+        _computeActions: function(item){
+            var ret = [];
+            if (item.state == 'running') {
+              // if key then add shell / run script
+              // if not monitoring then enable monitoring
+              ret.push('shell');
+            }
+            if (item.can_tag)
+                ret.push('tag');
+            if (item.can_start)
+                ret.push('start');
+            if (item.can_stop)
+                ret.push('stop');
+            if (item.can_suspend)
+                ret.push('suspend');
+            if (item.can_reboot)
+                ret.push('reboot');
+            if (item.can_resume)
+                ret.push('resume');
+            // rename needs its own dialog element
+            // if (item.can_rename)
+            //     ret.push('rename');
+            if (item.can_destroy)
+                ret.push('destroy');
+            if (item.can_undefine)
+                ret.push('undefine');
+
+            var actions = [];
+            for (var i=0; i<ret.length; i++) {
+                actions.push(MACHINEACTIONS[ret[i]]);
+            }
+
+            return actions;
         },
         _computeMachine: function(params, machines) {
             this.dashboard = {

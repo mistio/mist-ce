@@ -57,7 +57,7 @@
             }
             paper-dialog {
                 padding: 0;
-                position: fixed;
+                /*position: fixed;*/
             }
             :host paper-dialog > h2 {
                 text-transform: capitalize;
@@ -414,9 +414,14 @@ Polymer({
 
     selectedItemsType: function(s) {
         var item_type = this.selectedItems.length && this.items[this.itemIndex(this.selectedItems[0])] && this.items[this.itemIndex(this.selectedItems[0])].type;
+        
         if (this.get('selectedItems.length') != 1)
             item_type+='s';
-        return item_type;
+
+        if (item_type != "undefined")
+            return item_type;
+        if (item_type == "undefined")
+            return this.section.id;
     },
 
     itemIndex: function(itemUid) {
