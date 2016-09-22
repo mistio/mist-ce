@@ -141,7 +141,15 @@
 </dom-module>
 
 <script>
-
+// can_destroy:true
+// can_start:false
+// can_stop:true
+// can_suspend:false
+// can_reboot:true
+// can_rename:true
+// can_resume:false
+// can_tag:true
+// can_undefine:false 
 ACTIONS = {
   'shell': {
     'name': 'shell',
@@ -158,6 +166,42 @@ ACTIONS = {
   'reboot': {
     'name': 'reboot',
     'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'start': {
+    'name': 'start',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'stop': {
+    'name': 'stop',
+    'icon': 'av:stop',
+    'confirm': true,
+    'multi': true
+  },
+  'suspend': {
+    'name': 'suspend',
+    'icon': 'av:stop',
+    'confirm': true,
+    'multi': true
+  },
+  'rename': {
+    'name': 'rename',
+    'icon': 'editor:mode-edit',
+    'confirm': true,
+    'multi': false
+  },
+  'resume': {
+    'name': 'resume',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'undefine': {
+    'name': 'undefine',
+    'icon': 'image:panorama-fish-eye',
     'confirm': true,
     'multi': true
   },
@@ -372,15 +416,33 @@ Polymer({
 
         item.type = item_type;
         var ret = [];
-        ret.push('tag');
+        if (item.type != 'machine') {
+            ret.push('tag');
+        }
         if (item.type == 'machine') {
+            if (item.can_tag)
+                ret.push('tag');
+            if (item.can_start)
+                ret.push('start');
+            if (item.can_stop)
+                ret.push('stop');
+            if (item.can_suspend)
+                ret.push('suspend');
+            if (item.can_reboot)
+                ret.push('reboot');
+            if (item.can_resume)
+                ret.push('resume');
+            if (item.can_rename)
+                ret.push('rename');
+            if (item.can_destroy)
+                ret.push('destroy');
+            if (item.can_undefine)
+                ret.push('undefine');
             if (item.state == 'running') {
               // if key then add shell / run script
               // if not monitoring then enable monitoring
               ret.push('shell');
-              ret.push('reboot');
             }
-            ret.push('destroy');
         } else if (item.type == 'image') {
             if (item.star) {
                 ret.push('unstar');

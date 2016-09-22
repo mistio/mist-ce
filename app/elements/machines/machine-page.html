@@ -193,7 +193,7 @@
                     </div>
                 </div>
                 <div class="item-actions">
-                <!-- can_destroy:true
+                    <!-- can_destroy:true
                     can_start:false
                     can_stop:true
                     can_suspend:false
@@ -202,6 +202,9 @@
                     can_resume:false
                     can_tag:true
                     can_undefine:false -->
+
+                    <!-- <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" section="[[section]]" org="[[model.org]]"></item-actions> -->
+
                     <paper-button on-tap="start" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
                     <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
                     <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="_editTags" class="simple" hidden$="[[!machine.can_tag]]">tags</paper-button>
@@ -291,7 +294,6 @@
                 </div>
             </paper-material>
         </div>
-        <item-actions id="actions" items="[[_itemInArray(machine)]]" selected-items="[[thisItemUid]]" section="[[section]]" org="[[model.org]]"></item-actions>
         <dialog-element></dialog-element>
         <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key>
         <run-script-on-machine model="[[model]]" machine="[[machine]]" cloud-id="[[machine.cloud.id]]"></run-script-on-machine>
@@ -352,11 +354,7 @@
                 type: Boolean,
                 computed: '_computeIsloading(machine)',
                 value: true
-            },
-            thisItemUid: {
-                type: Array,
-                computed: '_computeThisItemUid(machine)'
-            },
+            },            
             associatedKeys: {
                 type: Array,
                 computed:'_computeAssociatedKeys(machine, model.keysArray)'
@@ -378,6 +376,14 @@
             hideAssociatedKeys: {
                 type: Boolean
             },
+            itemInArray: {
+                type: Array,
+                computed: '_computeItemInArray(machine)'
+            },
+            itemUid: {
+                type: Array,
+                computed: '_computeThisItemUid(machine)'
+            }
         },
         observers: [
             '_isMonitored(machine, model.monitoring.machines.*)',
@@ -474,7 +480,7 @@
                 return machine.uuid == params.uuid;
             }, this);
         },
-        _itemInArray: function(machine){
+        _computeItemInArray: function(){
             var arr = [];
             arr.push(this.machine);
             return arr;
