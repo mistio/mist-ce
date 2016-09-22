@@ -203,7 +203,7 @@
                     can_tag:true
                     can_undefine:false -->
 
-                    <!-- <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" section="[[section]]" org="[[model.org]]"></item-actions> -->
+                    <!-- <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" org="[[model.org]]"></item-actions> -->
 
                     <paper-button on-tap="start" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
                     <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>

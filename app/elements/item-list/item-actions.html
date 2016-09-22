@@ -17,18 +17,24 @@
                 text-transform: none;
             }
 
+            #select-multi-action-dropdown,
             #select-action {
                 width: 200px;
             }
+            #select-multi-action-dropdown paper-listbox,
             #select-action paper-listbox {
                 margin-top: 0;
                 margin-bottom: 0;
             }
+            #select-multi-action-dropdown paper-listbox ::content iron-icon,
             #select-action paper-listbox ::content iron-icon {
                 vertical-align: top;
             }
+            #select-multi-action-dropdown paper-button,
             #select-action paper-button {text-align: left;}
+            #select-multi-action-dropdown paper-item,
             #select-action paper-item {padding: 0; margin: 0; width: 200px;}
+            #select-multi-action-dropdown paper-item iron-icon,
             #select-action paper-item iron-icon {padding: 0 8px;}
 
             div.actions {
@@ -88,9 +94,17 @@
               </template>
             </template>
             <template is="dom-if" if="[[moreActions.length]]">
-              <paper-button class="more"><iron-icon icon="more-vert"></iron-icon></paper-button>
+              <paper-button class="more" on-tap="openMoreItemsActions"><iron-icon icon="more-vert"></iron-icon></paper-button>
             </template>
           </div>
+
+          <paper-dialog id="select-multi-action-dropdown">
+            <paper-listbox class="dropdown-content">
+              <template is="dom-repeat" items="[[moreActions]]">
+                  <paper-item><paper-button on-tap="_selectAction"><iron-icon icon="[[item.icon]]"></iron-icon> [[item.name]]</paper-button></paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dialog>
 
           <paper-dialog id="select-action">
             <paper-listbox class="dropdown-content">
@@ -347,6 +361,27 @@ Polymer({
         }, 25);
     },
 
+    openMoreItemsActions: function (event) {
+        // ugly hack that displays dialog only after it is correctly positioned
+        var elemRect =  event.target.tagName == 'PAPER-BUTTON' ?
+                        event.target.getBoundingClientRect() :
+                        event.target.parentNode.getBoundingClientRect(),
+            offsetTop   = elemRect.top;
+            offsetLeft  = elemRect.left - 200; // minus element width
+
+        console.log('DIALOG position ', offsetTop, offsetRight);
+        var selectActionDialog = this.$['select-multi-action-dropdown'];
+
+        selectActionDialog.set('hidden', true);
+        selectActionDialog.open();
+        setTimeout(function() {
+            selectActionDialog.set('style.top', offsetTop +'px');
+            selectActionDialog.set('style.right', 'auto');
+            selectActionDialog.set('style.left', offsetLeft + 'px');
+            selectActionDialog.set('hidden', false);
+        }, 25);
+    },
+
     selectedItemsChanged: function (changeRecord) {
         // recompute the actions array property as the intersection
         // of the available actions of the selected items
@@ -418,8 +453,14 @@ Polymer({
         var ret = [];
         if (item.type != 'machine') {
             ret.push('tag');
+            console.log('itemActions');
         }
         if (item.type == 'machine') {
+            if (item.state == 'running') {
+              // if key then add shell / run script
+              // if not monitoring then enable monitoring
+              ret.push('shell');
+            }
             if (item.can_tag)
                 ret.push('tag');
             if (item.can_start)
@@ -438,11 +479,6 @@ Polymer({
                 ret.push('destroy');
             if (item.can_undefine)
                 ret.push('undefine');
-            if (item.state == 'running') {
-              // if key then add shell / run script
-              // if not monitoring then enable monitoring
-              ret.push('shell');
-            }
         } else if (item.type == 'image') {
             if (item.star) {
                 ret.push('unstar');
@@ -628,11 +664,11 @@ Polymer({
     },
 
     _topActions: function (actions) {
-        return this.get('actions').slice(0, 4);
+        return this.get('actions').slice(0, 3);
     },
 
     _moreActions: function (actions) {
-        return this.get('actions').slice(4);
+        return this.get('actions').slice(3);
     },
 
     computeModel: function(){
