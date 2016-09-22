@@ -46,10 +46,6 @@
                 height: 54px;
             }
 
-            div.actions .more {
-                width: 95px;
-            }
-
             div.actions iron-icon {
                 fill: #fff;
                 margin-top: -2px;
@@ -83,8 +79,10 @@
             paper-dialog p.item-actions {
                 max-height: 200px;
                 overflow: scroll;
+            } 
+            tags-list {
+                position: absolute;
             }
-
         </style>
         <content>
           <div class="actions">
@@ -101,7 +99,7 @@
           <paper-dialog id="select-multi-action-dropdown">
             <paper-listbox class="dropdown-content">
               <template is="dom-repeat" items="[[moreActions]]">
-                  <paper-item><paper-button on-tap="_selectAction"><iron-icon icon="[[item.icon]]"></iron-icon> [[item.name]]</paper-button></paper-item>
+                  <paper-item><paper-button on-tap="_selectMultiAction"><iron-icon icon="[[item.icon]]"></iron-icon> [[item.name]]</paper-button></paper-item>
               </template>
             </paper-listbox>
           </paper-dialog>
@@ -148,7 +146,7 @@
               <paper-button dialog-confirm class="red" on-tap="_confirmAction">[[selectedAction.name]]</paper-button>
             </div>
           </paper-dialog>
-          <dialog-element></dialog-element>
+          <dialog-element hidden></dialog-element>
           <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
         </content>
     </template>
@@ -369,7 +367,6 @@ Polymer({
             offsetTop   = elemRect.top;
             offsetLeft  = elemRect.left - 200; // minus element width
 
-        console.log('DIALOG position ', offsetTop, offsetRight);
         var selectActionDialog = this.$['select-multi-action-dropdown'];
 
         selectActionDialog.set('hidden', true);
@@ -473,8 +470,9 @@ Polymer({
                 ret.push('reboot');
             if (item.can_resume)
                 ret.push('resume');
-            if (item.can_rename)
-                ret.push('rename');
+            // rename needs its own dialog element
+            // if (item.can_rename)
+            //     ret.push('rename');
             if (item.can_destroy)
                 ret.push('destroy');
             if (item.can_undefine)
