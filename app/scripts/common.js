@@ -440,7 +440,7 @@ var CLOUD_ADD_FORM_FIELDS = [{
         required: true,
         errorMessage: "Please enter title"
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "text",
         value: "",
@@ -450,7 +450,7 @@ var CLOUD_ADD_FORM_FIELDS = [{
         helpText: 'You can find your API key on your Amazon console',
         helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2'
     }, {
-        name: "api_secret",
+        name: "apisecret",
         label: "Password *",
         type: "password",
         value: "",
@@ -510,7 +510,7 @@ var CLOUD_ADD_FORM_FIELDS = [{
         required: true,
         errorMessage: "Please enter title"
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "password",
         value: "",
@@ -657,7 +657,7 @@ var CLOUD_ADD_FORM_FIELDS = [{
         required: true,
         errorMessage: "Please enter title"
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "text",
         value: "",
@@ -776,7 +776,7 @@ var CLOUD_ADD_FORM_FIELDS = [{
         required: true,
         errorMessage: "Please enter title"
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "password",
         value: "",
@@ -830,7 +830,7 @@ var CLOUD_ADD_FORM_FIELDS = [{
         errorMessage: "Please enter title",
         helpText: 'The username you use to connect to the RackSpace portal'
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "password",
         value: "",
@@ -865,7 +865,7 @@ var CLOUD_ADD_FORM_FIELDS = [{
         errorMessage: "Please enter username",
         helpText: 'The username you use to connect to the SoftLayer portal'
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "password",
         value: "",
@@ -987,7 +987,7 @@ var CLOUD_ADD_FORM_FIELDS = [{
         required: true,
         errorMessage: "Please enter title"
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "password",
         value: "",
