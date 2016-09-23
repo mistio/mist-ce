@@ -77,8 +77,8 @@ class AmazonController(BaseController):
         apikey = kwargs.get('apikey')
         apisecret = kwargs.get('apisecret')
         if apisecret == 'getsecretfromdb':
-            cloud = type(self.cloud).objects.first(owner=self.cloud.owner,
-                                                   apikey=apikey)
+            cloud = type(self.cloud).objects(owner=self.cloud.owner,
+                                             apikey=apikey).first()
             if cloud is not None:
                 kwargs['apisecret'] = cloud.apisecret
 
@@ -252,8 +252,8 @@ class RackSpaceController(BaseController):
         username = kwargs.get('username')
         apikey = kwargs.get('apikey')
         if apikey == 'getsecretfromdb':
-            cloud = type(self.cloud).objects.first(owner=self.cloud.owner,
-                                                   username=username)
+            cloud = type(self.cloud).objects(owner=self.cloud.owner,
+                                             username=username).first()
             if cloud is not None:
                 kwargs['apikey'] = cloud.apikey
 
