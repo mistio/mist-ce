@@ -87,7 +87,9 @@ class AmazonController(BaseController):
         if region.startswith('ec2_'):
             region = region[4:]
             parts = region.split('_')
-            if parts[-1] == 'northeast':
+            if parts[-1] == 'oregon':
+                parts[-1] = '2'
+            if not parts[-1].isdigit():
                 parts.append('1')
             kwargs['region'] = '-'.join(parts)
 
