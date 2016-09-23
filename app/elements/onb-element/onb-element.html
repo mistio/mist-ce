@@ -165,11 +165,11 @@
                         <div class="grid-row">
                             <div class="xs12 m6 l6">
                                 <paper-dropdown-menu id="selectteam" label="Team">
-                                    <paper-listbox class="dropdown-content">
+                                    <paper-menu class="dropdown-content" attr-for-selected="value">
                                         <template is="dom-repeat" items="[[model.teamsArray]]">
                                             <paper-item id="teamoption" value="[[item.id]]">[[item.name]]</paper-item>
                                         </template>
-                                    </paper-listbox>
+                                    </paper-menu>
                                 </paper-dropdown-menu>
                             </div>
                             <div class="field-helptext xs12 m6 l6">
