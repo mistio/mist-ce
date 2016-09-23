@@ -102,33 +102,21 @@ def add_cloud_v_2(owner, title, provider, params):
     cloud_cls = cloud_models.CLOUDS[provider]  # Class of Cloud model.
 
     # Add the cloud.
-    ret = {}
-    if provider == 'bare_metal':
-        # Add empty dummy, or 'other' cloud.
-        cloud = cloud_cls.add(owner, title)
-        try:
-            # Add actual server to dummy cloud.
-            machine = cloud.ctl.add_machine_wrapper(
-                cloud.title, remove_on_error=remove_on_error,
-                fail_on_invalid_params=False, **params
-            )
-        except:
-            if remove_on_error:
-                cloud.delete()
-            raise
+    cloud = cloud_cls.add(owner, title, remove_on_error=remove_on_error,
+                          fail_on_invalid_params=False, **params)
+    ret = {'cloud_id': cloud.id}
+    if provider == 'bare_metal' and monitoring:
         # Let's overload this a bit more by also combining monitoring.
-        if monitoring:
-            try:
-                from mist.core.methods import enable_monitoring as _en_mon
-            except ImportError:
-                _en_mon = enable_monitoring
-            ret['monitoring'] = _en_mon(owner, cloud.id, machine.machine_id,
-                                        no_ssh=not use_ssh)
-    else:
-        # Common clouds are thankfully simple.
-        cloud = cloud_cls.add(owner, title, remove_on_error=remove_on_error,
-                              fail_on_invalid_params=False, **params)
-    ret['cloud_id'] = cloud.id
+        machine = Machine.objects.get(cloud=cloud)
+        try:
+            from mist.core.methods import enable_monitoring as _en_mon
+        except ImportError:
+            _en_mon = enable_monitoring
+        ret['monitoring'] = _en_mon(
+            owner, cloud.id, machine.machine_id,
+            no_ssh=not (machine.os_type == 'unix' and
+                        machine.key_associations)
+        )
     log.info("Cloud with id '%s' added succesfully.", cloud.id)
     trigger_session_update(owner, ['clouds'])
     return ret
