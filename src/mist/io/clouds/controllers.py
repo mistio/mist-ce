@@ -817,13 +817,13 @@ class LibvirtController(BaseController):
                                                 hypervisor=self.cloud.host,
                                                 user=self.cloud.username,
                                                 ssh_key=self.cloud.key.private,
-                                                ssh_port=port)
+                                                ssh_port=int(port))
         else:
             host, port = dnat(self.cloud.owner, self.cloud.host, 5000)
             return get_driver(Provider.LIBVIRT)(host,
                                                 hypervisor=self.cloud.host,
                                                 user=self.cloud.username,
-                                                tcp_port=port)
+                                                tcp_port=int(port))
 
     def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'machine_hostname', 'host')
