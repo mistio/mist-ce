@@ -77,8 +77,8 @@ class AmazonController(BaseController):
         apikey = kwargs.get('apikey')
         apisecret = kwargs.get('apisecret')
         if apisecret == 'getsecretfromdb':
-            cloud = type(self.cloud).objects.first(owner=self.cloud.owner,
-                                                   apikey=apikey)
+            cloud = type(self.cloud).objects(owner=self.cloud.owner,
+                                             apikey=apikey).first()
             if cloud is not None:
                 kwargs['apisecret'] = cloud.apisecret
 
@@ -87,7 +87,9 @@ class AmazonController(BaseController):
         if region.startswith('ec2_'):
             region = region[4:]
             parts = region.split('_')
-            if parts[-1] == 'northeast':
+            if parts[-1] == 'oregon':
+                parts[-1] = '2'
+            if not parts[-1].isdigit():
                 parts.append('1')
             kwargs['region'] = '-'.join(parts)
 
@@ -252,8 +254,8 @@ class RackSpaceController(BaseController):
         username = kwargs.get('username')
         apikey = kwargs.get('apikey')
         if apikey == 'getsecretfromdb':
-            cloud = type(self.cloud).objects.first(owner=self.cloud.owner,
-                                                   username=username)
+            cloud = type(self.cloud).objects(owner=self.cloud.owner,
+                                             username=username).first()
             if cloud is not None:
                 kwargs['apikey'] = cloud.apikey
 
@@ -815,13 +817,13 @@ class LibvirtController(BaseController):
                                                 hypervisor=self.cloud.host,
                                                 user=self.cloud.username,
                                                 ssh_key=self.cloud.key.private,
-                                                ssh_port=port)
+                                                ssh_port=int(port))
         else:
             host, port = dnat(self.cloud.owner, self.cloud.host, 5000)
             return get_driver(Provider.LIBVIRT)(host,
                                                 hypervisor=self.cloud.host,
                                                 user=self.cloud.username,
-                                                tcp_port=port)
+                                                tcp_port=int(port))
 
     def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'machine_hostname', 'host')
@@ -906,6 +908,9 @@ class OtherController(BaseController):
         a cloud. Fields `owner` and `title` are already populated in
         `self.cloud`. The `self.cloud` model is not yet saved.
 
+        If appropriate kwargs are passed, this can currently also act as a
+        shortcut to also add the first machine on this dummy cloud.
+
         """
         # Attempt to save.
         try:
@@ -916,11 +921,31 @@ class OtherController(BaseController):
         except me.NotUniqueError:
             raise CloudExistsError()
 
+        # Add machine.
+        if kwargs:
+            try:
+                self.add_machine_wrapper(
+                    self.cloud.title, remove_on_error=remove_on_error,
+                    fail_on_invalid_params=fail_on_invalid_params, **kwargs
+                )
+            except Exception as exc:
+                if remove_on_error:
+                    self.cloud.delete()
+                raise
+
+    def add_machine_wrapper(self, name, remove_on_error=True,
+                            fail_on_invalid_params=True, **kwargs):
+        """Wrapper around add_machine for kwargs backwards compatibity
+
+        FIXME: This wrapper should be deprecated
+
+        """
         # Sanitize params.
         rename_kwargs(kwargs, 'machine_ip', 'host')
         rename_kwargs(kwargs, 'machine_user', 'ssh_user')
         rename_kwargs(kwargs, 'machine_key', 'ssh_key')
         rename_kwargs(kwargs, 'machine_port', 'ssh_port')
+        rename_kwargs(kwargs, 'remote_desktop_port', 'rdp_port')
         if kwargs.pop('windows', False):
             kwargs['os_type'] = 'windows'
         else:
@@ -942,14 +967,8 @@ class OtherController(BaseController):
             })
 
         # Add machine.
-        try:
-            self.add_machine(
-                self.cloud.title, remove_on_error=remove_on_error, **kwargs
-            )
-        except Exception as exc:
-            if remove_on_error:
-                self.cloud.delete()
-            raise
+        return self.add_machine(name, remove_on_error=remove_on_error,
+                                **kwargs)
 
     def add_machine(self, name, host='',
                     ssh_user='root', ssh_port=22, ssh_key=None,
@@ -1026,40 +1045,6 @@ class OtherController(BaseController):
                 raise
 
         return machine
-
-    def add_machine_wrapper(self, name, remove_on_error=True,
-                            fail_on_invalid_params=True, **kwargs):
-        """Wrapper around add_machine to accept stupid
-
-        FIXME: This wrapper should be deprecated"""
-        # Sanitize params.
-        rename_kwargs(kwargs, 'machine_ip', 'host')
-        rename_kwargs(kwargs, 'machine_user', 'ssh_user')
-        rename_kwargs(kwargs, 'machine_key', 'ssh_key')
-        rename_kwargs(kwargs, 'machine_port', 'ssh_port')
-        if kwargs.pop('windows', False):
-            kwargs['os_type'] = 'windows'
-        else:
-            kwargs['os_type'] = 'unix'
-        errors = {}
-        for key in kwargs:
-            if key not in ('host', 'ssh_user', 'ssh_port', 'ssh_key',
-                           'os_type', 'rdp_port'):
-                error = "Invalid parameter %s=%r." % (key, kwargs[key])
-                if fail_on_invalid_params:
-                    errors[key] = error
-                else:
-                    log.warning(error)
-                    kwargs.pop(key)
-        if errors:
-            raise BadRequestError({
-                'msg': "Invalid parameters %s." % errors.keys(),
-                'errors': errors,
-            })
-
-        # Add machine.
-        return self.add_machine(name, remove_on_error=remove_on_error,
-                                **kwargs)
 
     # m.extra['can_reboot'] = False
     # if machine_entry.key_associations:
