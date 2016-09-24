@@ -410,8 +410,6 @@ class MainConnection(MistConnection):
                 self.list_templates()
             if 'stacks' in sections:
                 self.list_stacks()
-            if 'teams' in sections:
-                self.list_teams()
             if 'tags' in sections:
                 self.list_tags()
             if 'tunnels' in sections:

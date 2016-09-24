@@ -23,7 +23,7 @@
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <!--link rel="import" href="../bower_components/iron-form/iron-form.html"-->
 
-<!--link rel="import" href="../elements/logs/log-list.html"-->
+<link rel="import" href="../elements/logs/log-list.html">
 <link rel="import" href="../elements/onb-element/onb-element.html">
 <link rel="import" href="../elements/clouds/cloud-info.html">
 <link rel="import" href="../elements/clouds/cloud-chip.html">
@@ -191,7 +191,7 @@
             margin: 0 auto;
         }
         #content.onb-true {
-            background: url('../images/onboarding/mount.svg') center bottom transparent no-repeat;
+            background: url('/assets/onboarding/mount.svg') center bottom transparent no-repeat;
             padding-bottom: 0;
             min-height: 100vh;
             margin-right: -24px;
@@ -375,7 +375,7 @@ Polymer({
     listeners: {
         'close-cloud-info': '_closeCloudChips'
     },
-    ready: function() {        
+    ready: function() {
     },
     attached: function() {
         // initialise chips position matrix
@@ -460,12 +460,12 @@ Polymer({
 
         }, 5000, this);
 
-        this.async(function() {
-            this.importHref(this.resolveUrl('../elements/logs/log-list.html'),
+        /*this.async(function() {
+            this.importHref(this.resolveUrl('/elements/logs/log-list.html'),
                             null,
                             null,
                             true)},
-            500);
+            500);*/
     },
     isOnline: function(cloud) {
         return cloud.state == 'online' && 'online';
