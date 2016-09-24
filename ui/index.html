@@ -11,6 +11,9 @@
   <meta name="theme-color" content="#fff">
   <link rel="manifest" href="/manifest.json">
 
+  <script tal:content="string: var BUILD_PATH='${build_path}'">
+      var BUILD_PATH='/';
+  </script>
   <script>
 
     // setup Polymer options
@@ -25,7 +28,7 @@
       } else {
         // polyfill web components
         var e = document.createElement('script');
-        e.src = '/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+        e.src = 'bower_components/webcomponentsjs/webcomponents-lite.min.js';
         document.head.appendChild(e);
       }
     })();
@@ -33,13 +36,13 @@
     // load pre-caching service worker
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/service-worker.js');
+        navigator.serviceWorker.register(BUILD_PATH + 'service-worker.js');
       });
     }
 
   </script>
 
-  <link rel="import" href="/src/mist-app.html">
+  <link rel="import" href="/src/mist-app.html" tal:attributes="href string:${build_path}src/mist-app.html">
   <link rel="stylesheet" href="/styles/main.css" inline>
   <link rel="stylesheet" href="/styles/grid.css" inline>
 
