@@ -181,6 +181,9 @@
                         that.debounce(that._updateOrg(data), function() {
                             console.debug('Loaded org data');
                         }, 250);
+                    },
+                    logout: function(data){
+                        document.location.pathname = '/';
                     }
                 },
                 shell: {
