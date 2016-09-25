@@ -1,8 +1,11 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/iron-label/iron-label.html">
+
 
 <dom-module id="feedback-page">
     <template>
@@ -230,7 +233,6 @@
             </template>
         </paper-material>
         <iron-ajax id="feedbackAjaxRequest" url="/account" method="POST" on-response="_feedbackAjaxResponse" on-error="_feedbackAjaxError"></iron-ajax>
-        <iron-signals on-iron-signal-user-menu="_updateUser"></iron-signals>
     </template>
     <script>
         (function() {
@@ -441,11 +443,11 @@
                     },
                     secondFormReady: {
                         type: Boolean,
-                        computed: '_computeSecondFormReady(user.feedback.hosted.*, this.hasExtraHosted, this.extraHosted)'
+                        computed: '_computeSecondFormReady(user.feedback.hosted.*, hasExtraHosted, extraHosted)'
                     },
                     thirdFormReady: {
                         type: Boolean,
-                        computed: '_computeThirdFormReady(this.discover, this.hasExtraDiscover, this.extraDiscover, this.satisfaction, this.alternative, this.hasExtraAlternative, this.extraAlternative, this.improve, sendingData)'
+                        computed: '_computeThirdFormReady(discover, hasExtraDiscover, extraDiscover, satisfaction, alternative, hasExtraAlternative, extraAlternative, improve, sendingData)'
                     },
                     sendingData: {
                         type: Boolean,
@@ -458,8 +460,8 @@
                 },
                 observers: [
                     '_hostedChanged(user.feedback.hosted.*)',
-                    '_discoverChanged(this.discover)',
-                    '_alternativeChanged(this.alternative)'
+                    '_discoverChanged(discover)',
+                    '_alternativeChanged(alternative)'
                 ],
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
@@ -503,17 +505,17 @@
                 _hostedChanged: function(changeRecord) {
                     var hasExtraHosted = changeRecord.base.indexOf('other') != -1;
                     if (hasExtraHosted) {
-                        this.set('this.extraHosted', null);
+                        this.set('extraHosted', null);
                     }
-                    this.set('this.hasExtraHosted', hasExtraHosted);
+                    this.set('hasExtraHosted', hasExtraHosted);
                 },
                 _discoverChanged: function(discover) {
-                    this.set('this.extraDiscover', null);
-                    this.set('this.hasExtraDiscover', discover == 'other');
+                    this.set('extraDiscover', null);
+                    this.set('hasExtraDiscover', discover == 'other');
                 },
                 _alternativeChanged: function(alternative) {
-                    this.set('this.extraAlternative', null);
-                    this.set('this.hasExtraAlternative', alternative == 'other');
+                    this.set('extraAlternative', null);
+                    this.set('hasExtraAlternative', alternative == 'other');
                 },
                 _pageChange: function(e) {
                     e.preventDefault();

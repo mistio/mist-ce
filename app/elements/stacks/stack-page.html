@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
@@ -416,13 +416,13 @@
                 <div class="item-actions">
                     <paper-button on-tap="_editTags" class="simple">tags</paper-button>
                     <!-- buttons to show normally-->
-                    <paper-button id="[[workflows.0.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.0.name]]</paper-button>
-                    <paper-button id="[[workflows.1.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.1.name]]</paper-button>
+                    <paper-button id$="[[workflows.0.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.0.name]]</paper-button>
+                    <paper-button id$="[[workflows.1.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.1.name]]</paper-button>
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="stack_actions" class="dropdown-content">
                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflow.name]]</paper-button>
+                                <paper-button id$="[[workflow.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflow.name]]</paper-button>
                             </template>
                         </paper-menu>
                     </paper-menu-button>
@@ -446,7 +446,7 @@
                         <p>[[timestamp]]
                         </p>
                     </div>
-                    <div class="page-block" hidden="[[!stack.tags]]">
+                    <div class="page-block" hidden$="[[!stack.tags]]">
                         <h3 class="smallcaps">Tags
                             <template is="dom-if" if="[[stack.tags]]">
                                 <span class="id">([[stack.tags.length]])</span>
@@ -457,7 +457,7 @@
                         </h3>
                         <template is="dom-if" if="[[stack.tags]]">
                             <template is="dom-repeat" items="[[stack.tags]]">
-                                <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
+                                <span class="id tag">[[item.key]] <span hidden$="[[!item.value]]">= [[item.value]]</span></span>
                             </template>
                         </template>
                     </div>
@@ -509,7 +509,7 @@
                 </paper-material>
             </template>
 
-            <paper-material id="workflows" class="no-pad closed" hidden="[[hideWorkflows]]">
+            <paper-material id="workflows" class="no-pad closed" hidden$="[[hideWorkflows]]">
                 <paper-icon-button id="closeworkflows" icon="close" on-tap="_closeworkflows"></paper-icon-button>
                 <div id="workflows-panel">
                     <div id="workflowsNavigation">
@@ -532,7 +532,7 @@
                                 <template is="dom-if" if=[[!workflow.params.length]]>
                                     <p class="text-center" hidden$="[[!workflow.description]]">[[workflow.description]]</p>
                                     <p class="text-center">
-                                        <paper-button id="[[workflow.name]]" on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
+                                        <paper-button id$="[[workflow.name]]" on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
                                     </p>
                                     <h5 class="text-center">*no paremetres required</h5>
                                 </template>
@@ -552,7 +552,7 @@
                             <iron-icon icon$="[[computeLogIcon(log,index)]]"></iron-icon>
                             <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
                             [[log.action]]
-                            <span class="error" hidden="[[!log.error]]">error: [[log.error]]</span>
+                            <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
                         </div>
                     </template>
                 </paper-material>

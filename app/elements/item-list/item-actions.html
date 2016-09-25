@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../helpers/xterm-dialog.html">
 <link rel="import" href="../tags/tags-list.html">
@@ -326,7 +327,8 @@ Polymer({
         selectedAction: {
             type: String
         },
-        selectedItem: Object
+        selectedItem: Object,
+        multi: Boolean
     },
 
     observers: [

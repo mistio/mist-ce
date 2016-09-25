@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/app-route/app-route.html">
 
+<link rel="import" href="../elements/pages/page-items.html">
 <link rel="import" href="../elements/teams/member-page.html">
 
 <dom-module id="page-members">
@@ -23,7 +24,8 @@
       is: 'page-members',
 
       properties: {
-        model: Object
+        model: Object,
+        onboarding: Object
       },
       _isListActive: function(path) {
           return !path;

@@ -72,7 +72,7 @@
 
     <paper-header-panel mode="standard" class="fit">
         <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{page}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
-        <mist-header model="[[model]]" title="[[page]]" class="paper-header" style$="[[style]]"></mist-header>
+        <mist-header model="[[model]]" title$="[[page]]" class="paper-header" style$="[[style]]"></mist-header>
 
         <iron-pages id="iron-pages" role="main" selected="[[page]]" attr-for-selected="name" smallscreen$="{{smallscreen}}">
           <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-dashboard>
@@ -147,7 +147,11 @@
             notify: true
         },
 
-        tag: String
+        tag: String,
+
+        routeData: Object,
+
+        subroute: Object
 
       },
 
