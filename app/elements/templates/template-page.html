@@ -473,7 +473,8 @@
                     return isinline ? "command-container" : "";
                 },
                 _createStack: function(e) {
-                    document.querySelector('app-location').path = '/stacks/+create?id=' + this.template._id;
+                    document.querySelector('app-location').set('queryParams.template', this.template._id);
+                    document.querySelector('app-location').set('path', '/stacks/+create');
                 },
                 _editTemplate: function(e) {
                     var el = this.querySelector('template-edit');

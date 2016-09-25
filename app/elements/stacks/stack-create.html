@@ -170,9 +170,9 @@
             },
             ready: function() {},
             _fromTemplate: function(params, templates) {
-                if (params.id && this.model.templates) {
+                if (params.template && this.model.templates) {
                     var yaml_inputs = '';
-                    this.model.templates[params.id].inputs.forEach(function(inp) {
+                    this.model.templates[params.template].inputs.forEach(function(inp) {
                         yaml_inputs += inp.name + ': ';
                         var val = inp.value = !undefined ? inp.value : inp.defaultValue || inp.default;
                         yaml_inputs += val + '\n';
@@ -189,7 +189,7 @@
 
 
                     var yaml_or_form = 'form';
-                    var template = this.model.templates[params.id];
+                    var template = this.model.templates[params.template];
                     console.log('Computing Fields started');
 
                     if (this.fields) {
@@ -357,7 +357,7 @@
                     this.set('fields', ret);
 
 
-                    return this.model.templates[params.id];
+                    return this.model.templates[params.template];
                 } else {
                     return {
                         name: "Template is missing"
