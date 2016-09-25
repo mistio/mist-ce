@@ -174,8 +174,9 @@
       },
 
       _routePageChanged: function(page, subpath) {
+        if (page == 'index.html')
+            page = 'dashboard';
         this.page = page || 'dashboard';
-
         if (subpath == '') { // Update iron-list
             var i = this.querySelector('iron-list');
             if (i) {
