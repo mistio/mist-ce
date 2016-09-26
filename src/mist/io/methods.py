@@ -313,7 +313,6 @@ def associate_key(user, key_id, cloud_id, machine_id,
     # associations will otherwise be created by shell.autoconfigure upon
     # succesful connection
     if isinstance(port, basestring):
-        port = 22
         if port.isdigit():
             port = int(port)
         else:
