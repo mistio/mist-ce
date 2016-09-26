@@ -289,7 +289,7 @@ function itemUid(item, section) {
     var item_type = item && item.type ? item.type : (section &&
                                              section.id.slice(0,-1));
     var cloudId = item && item.cloud ? item.cloud.id : '';
-    var itemId = item.id ? item.id : '';
+    var itemId = item &&item.id ? item.id : '';
 
     return item_type + ':' + cloudId + ':' + itemId;
 }
