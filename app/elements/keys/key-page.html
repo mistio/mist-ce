@@ -310,11 +310,6 @@
                         type: Boolean,
                         value: false
                     },
-                    baseUrl: {
-                        type: String,
-                        computed: '_baseUrl(params)',
-                        notify: true
-                    },
                     isLoading: {
                         type: Boolean,
                         computed: '_computeIsloading(key)',
@@ -331,10 +326,13 @@
                     }
                 },
                 observers: [
-                    'update(params, model.keys.*)'
+                    'update(key)'
                 ],
                 listeners: {
                     'confirmation': '_deleteKeyEventResponse'
+                },
+                update: function(key){
+                    this.set('visiblePrivateKey', false);
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
@@ -422,10 +420,6 @@
                 _editKey: function(e) {
                     var el = this.querySelector('key-edit');
                     el._openEditKeyModal();
-                },
-                _updateKey: function(e) {
-                    var key = e.detail.key;
-                    this.set('key.id', key.id);
                 },
                 _makeDefaultKey: function(e) {
                     this.$.keyMakeDefaultAjaxRequest.headers["Content-Type"] = 'application/json';
