@@ -7,13 +7,16 @@ import time
 import json
 import random
 import socket
-import tempfile
 import logging
+import datetime
+import tempfile
 import functools
 from hashlib import sha1
 from contextlib import contextmanager
 
+import iso8601
 import netaddr
+
 from amqp import Message
 from amqp.connection import Connection
 from amqp.exceptions import NotFound as AmqpNotFound
@@ -415,3 +418,36 @@ def transform_key_machine_associations(machines, key):
                                         key_assoc.sudo,
                                         key_assoc.port])
     return key_associations
+
+
+def get_datetime(timestamp):
+    """Parse several representations of time into a datetime object"""
+    if isinstance(timestamp, datetime.datetime):
+        # Timestamp is already a datetime object.
+        return timestamp
+    if isinstance(timestamp, (int, float)):
+        try:
+            # Handle Unix timestamps.
+            return datetime.datetime.fromtimestamp(timestamp)
+        except ValueError:
+            pass
+        try:
+            # Handle Unix timestamps in milliseconds.
+            return datetime.datetime.fromtimestamp(timestamp / 1000)
+        except ValueError:
+            pass
+    if isinstance(timestamp, basestring):
+        try:
+            timestamp = float(timestamp)
+        except (ValueError, TypeError):
+            pass
+        else:
+            # Timestamp is probably Unix timestamp given as string.
+            return parse_timestamp_to_datetime(timestamp)
+        try:
+            # Try to parse as string date in common formats.
+            return iso8601.parse_date(timestamp)
+        except:
+            pass
+    # Fuck this shit.
+    raise ValueError("Couldn't extract date object from %r" % timestamp)

@@ -243,7 +243,6 @@ def add_cloud(request):
       - libvirt
       - openstack
       - vsphere
-      - coreos
       - ec2
       - rackspace
       - nephoscale
@@ -297,19 +296,8 @@ def add_cloud(request):
         add_tags_to_resource(owner, cloud, cloud_tags.items())
 
     c_count = Cloud.objects(owner=owner).count()
-    ret = {
-        'index': c_count - 1,
-        'id': cloud_id,
-        'apikey': cloud.apikey,
-        'apiurl': cloud.apiurl,
-        'tenant_name': cloud.tenant_name,
-        'title': cloud.title,
-        'provider': cloud.provider,
-        'poll_interval': cloud.poll_interval,
-        'region': cloud.region,
-        'status': 'off',
-        'enabled': cloud.enabled,
-    }
+    ret = cloud.as_dict()
+    ret['index'] = c_count - 1
     if monitoring:
         ret['monitoring'] = monitoring
     return ret
