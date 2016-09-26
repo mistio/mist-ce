@@ -601,13 +601,11 @@ Polymer({
                     parent.insertBefore(xterm, parent.firstChild);
                 }
                 return;
-            } else if (action.name == 'reboot') {
+            } else if ( ['reboot','start', 'stop', 'suspend', 'resume', 'undefine', 'destroy'].indexOf(action.name) > -1) {
+                // rename excluded
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
-                payload = {'action': 'reboot'};
-                console.log('rebooting');
-            } else if (action.name == 'destroy') {
-                uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
-                payload = {'action': 'destroy'};
+                payload = {'action': action.name};
+                console.log(action.name);
             //templates
             } else if (action.name == 'delete' && item.type == 'template') {
                 uri = '/api/v1/templates/' + item.id;
