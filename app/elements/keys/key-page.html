@@ -251,9 +251,9 @@
             </div>
         </div>
         <template is="dom-if" if="{{key.id}}">
-            <iron-ajax auto id="keyPublicRequest" url="{{baseUrl}}/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
+            <iron-ajax auto id="keyPublicRequest" url="/keys/[[key.id]]/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
         </template>
-        <iron-ajax id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
+        <iron-ajax id="keyPrivateRequest" url="/keys/[[key.id]]/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/[[key.id]]" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
         <iron-ajax id="keyDeleteAjaxRequest" url="/api/v1/keys/[[key.id]]" method="DELETE" on-response="_handleKeyDeleteAjaxResponse" on-error="_handleKeyDeleteAjaxError"></iron-ajax>
         <key-edit key="[[key]]"></key-edit>
@@ -286,11 +286,6 @@
                     key: {
                         type: Object,
                         computed: '_computeKey(params, model.keysArray.*)',
-                        notify: true
-                    },
-                    id: {
-                        type: String,
-                        computed: '_computeId(params)',
                         notify: true
                     },
                     isDefault: {
@@ -356,19 +351,11 @@
                     this.visiblePrivateKey = false;
                     this.set('privateKey', null);
                 },
-                _baseUrl: function(params) {
-                    return '/keys/' + this.params.id;
-                },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
                 _computeKey: function(params, keys) {
-                    return keys.base.find(function(key) {
-                        return key.id == params.id;
-                    });
-                },
-                _computeId: function(params) {
-                    return params.id;
+                    return params;
                 },
                 _computeTagsExist: function(key, tags){
                     if (this.key.tags.length > 0 && this.key.tags[0] && this.key.tags[0]['key'] && this.key.tags[0]['key'] != "") {
