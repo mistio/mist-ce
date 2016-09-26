@@ -410,45 +410,45 @@ class DockerShell(DockerWebSocket):
         shell_type = 'logging' if kwargs.get('job_id', '') else 'interactive'
         config_method = '%s_shell' % shell_type
 
-        getattr(self, config_method)(user, cloud_id=cloud_id, machine_id=machine_id, 
+        getattr(self, config_method)(user, 
+                                     cloud_id=cloud_id, machine_id=machine_id, 
                                      job_id=kwargs.get('job_id', ''))
         self.connect()
         # This is for compatibility purposes with the ParamikoShell
         return None, None
 
     def interactive_shell(self, user, **kwargs):
-        cloud_id, container_id = kwargs['cloud_id'], kwargs['machine_id']
-        log.info("Autoconfiguring DockerShell for machine %s:%s", cloud_id, 
+        cloud, container_id = self.get_container(user, 
+                                                 cloud_id=kwargs['cloud_id'], 
+                                                 machine_id=kwargs['machine_id'])
+        log.info("Autoconfiguring DockerShell for machine %s:%s", cloud.id, 
                                                                   container_id)
-        cloud = Cloud.objects.get(owner=user, id=cloud_id)
-        docker_port = cloud.docker_port
 
-        self.host, docker_port = dnat(user, self.host, docker_port)
+        self.host, docker_port = dnat(user, self.host, cloud.docker_port)
         ssl_enabled = cloud.key_file and cloud.cert_file
         self.uri = self.build_uri(container_id, docker_port, cloud=cloud, 
                                   ssl_enabled=ssl_enabled)
 
     def logging_shell(self, user, log_type='CFY', **kwargs):
-        container_id = self.get_container(user, kwargs['job_id'])
+        container_id = self.get_container(user, job_id=kwargs['job_id'])
         log.info('Autoconfiguring DockerShell to stream %s logs from ' \
                  'container %s (User: %s)', log_type, container_id, user.id)
-        self.host, docker_port = self.container_endpoint(log_type)
-        self.uri = self.build_uri(container_id, docker_port, allow_logs=1, allow_stdin=0)
+        self.host, docker_port = config.DOCKER_IP, config.DOCKER_PORT
+        # TODO: SSL for CFY container
+        self.uri = self.build_uri(container_id, docker_port, allow_logs=1, 
+                                                             allow_stdin=0)
 
-    def get_container(self, user, job_id):
-        event = get_story(job_id)
-        assert user.id == event['owner_id'], 'Owner ID mismatch!'
-        return event['logs'][0]['container_id']
+    def get_container(self, user, cloud_id=None, machine_id=None, job_id=None):
+        if job_id:
+            event = get_story(job_id)
+            assert user.id == event['owner_id'], 'Owner ID mismatch!'
+            return event['logs'][0]['container_id']
 
-    def container_endpoint(self, log_type):
-        if log_type == 'CFY':
-            return config.DOCKER_IP, config.DOCKER_PORT
-        else:
-            raise NotImplementedError()
+        cloud = Cloud.objects.get(owner=user, id=cloud_id)
+        return cloud, machine_id
 
     def build_uri(self, container_id, docker_port, cloud=None, ssl_enabled=False, 
                   allow_logs=0, allow_stdin=1):
-        # TODO: SSL for CFY container
         if ssl_enabled:
             self.protocol = 'wss'
             ssl_key, ssl_cert = self.ssl_credentials(cloud)
