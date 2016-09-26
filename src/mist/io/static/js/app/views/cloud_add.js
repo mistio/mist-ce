@@ -105,12 +105,12 @@ define('app/views/cloud_add', ['app/views/controlled'],
                     if (cloud.getSimpleProvider() == provider.provider) {
 
                         if (provider.provider == 'ec2') {
-                            fields.findBy('name', 'api_key').set('value', cloud.apikey);
-                            fields.findBy('name', 'api_secret').set('value', 'getsecretfromdb');
+                            fields.findBy('name', 'apikey').set('value', cloud.apikey);
+                            fields.findBy('name', 'apisecret').set('value', 'getsecretfromdb');
                         }
                         if (provider.provider == 'rackspace') {
                             fields.findBy('name', 'username').set('value', cloud.apikey);
-                            fields.findBy('name', 'api_key').set('value', 'getsecretfromdb');
+                            fields.findBy('name', 'apikey').set('value', 'getsecretfromdb');
                         }
                         if (provider.provider == 'hpcloud') {
                             fields.findBy('name', 'username').set('value', cloud.apikey);

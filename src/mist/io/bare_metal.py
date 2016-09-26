@@ -130,11 +130,3 @@ class BareMetalDriver(object):
         ping = super_ping(owner=user, host=hostname, pkts=1)
         response = 0 if int(ping['packets_rx']) > 0 else 256
         return response
-
-
-class CoreOSDriver(BareMetalDriver):
-    type = 'coreos'
-    name = 'CoreOS'
-
-    def __repr__(self):
-        return ('<CoreOSDriver>')
