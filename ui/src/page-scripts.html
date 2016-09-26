@@ -18,7 +18,7 @@
 
     <page-items model="[[model]]" items="[[model.scriptsArray]]" section="[[sections.scripts]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
     <script-add model="[[model]]" section="[[sections.scripts]]" hidden$=[[!_isAddPageActive(route.path)]]></script-add>
-    <script-page model="[[model]]" params="[[_getScript(data.script, model.scripts)]]" section="[[sections.scripts]]" hidden$=[[!_isDetailsPageActive(route.path)]]></script-page>
+    <script-page model="[[model]]" script="[[_getScript(data.script, model.scripts)]]" section="[[sections.scripts]]" hidden$=[[!_isDetailsPageActive(route.path)]]></script-page>
     <script-run model="[[model]]" script="[[_getScript(data.script, model.scripts)]]" section="[[sections.scripts]]" hidden$=[[!_isRunPageActive(route.path)]]></script-run>
 
   </template>

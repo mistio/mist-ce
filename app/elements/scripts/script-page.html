@@ -197,19 +197,11 @@
                     type: String,
                     computed: '_getHeaderStyle(section)'
                 },
-                params: {
-                    type: Object
-                },
                 model: {
                     type: Object
                 },
                 script: {
-                    type: Object,
-                    computed: '_computeScript(params, model.scriptsArray.*)'
-                },
-                scriptid: {
-                    type: String,
-                    computed: '_computeScriptId(params)'
+                    type: Object
                 },
                 isInline: {
                     type: Boolean,
@@ -224,21 +216,9 @@
             },
             listeners: {
                 'confirmation': '_deleteScriptEventResponse',
-                'updateSelectedScript': '_updateScript'
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
-            },
-            _computeId: function(params) {
-                return params.id;
-            },
-            _computeScript: function(params, scripts) {
-                return scripts.base.find(function(script) {
-                    return script.id == params.id;
-                });
-            },
-            _computeScriptId: function(params) {
-                return params.id;
             },
             _computeIsInline: function(location_type) {
                 if (location_type)
@@ -254,16 +234,11 @@
                 el._openDialog();
             },
             _runScript: function(e) {
-                document.querySelector('app-location').set('path', '/scripts/' + this.params.id + '/+run');
+                document.querySelector('app-location').set('path', '/scripts/' + this.script.id + '/+run');
             },
             _editScript: function(e) {
                 var el = this.querySelector('script-edit');
                 el._openEditScriptModal();
-            },
-            _updateScript: function(e) {
-                var script = e.detail.script;
-                this.set('script.name', script.name);
-                this.set('script.description', script.description);
             },
             _deleteScript: function(e) {
                 this._showDialog({
