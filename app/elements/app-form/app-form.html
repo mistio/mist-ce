@@ -321,12 +321,12 @@
                 _handleError: function(e,d) {
                     this.set('sendingData', false);
                     this.set('formError', true);
-                    console.log('FAIL', e)
+                    // console.log('FAIL', e)
                     // this.$.errormsg.textContent = e.detail.request.xhr.response.body.innerText;
                     this.$.errormsg.textContent = e.detail.request.xhr.responseText;
                 },
                 _fieldsChanged: function(fields, sendingData) {
-                    console.log('_fieldsChanged',fields);
+                    // console.log('_fieldsChanged',fields);
                     if (this.formError){
                         this.set('formError', false);
                     }
