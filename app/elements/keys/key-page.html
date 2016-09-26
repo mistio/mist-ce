@@ -251,9 +251,9 @@
             </div>
         </div>
         <template is="dom-if" if="{{key.id}}">
-            <iron-ajax auto id="keyPublicRequest" url="/keys/[[key.id]]/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
+            <iron-ajax auto id="keyPublicRequest" url="/api/v1/keys/[[key.id]]/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
         </template>
-        <iron-ajax id="keyPrivateRequest" url="/keys/[[key.id]]/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
+        <iron-ajax id="keyPrivateRequest" url="/api/v1/keys/[[key.id]]/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/[[key.id]]" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
         <iron-ajax id="keyDeleteAjaxRequest" url="/api/v1/keys/[[key.id]]" method="DELETE" on-response="_handleKeyDeleteAjaxResponse" on-error="_handleKeyDeleteAjaxError"></iron-ajax>
         <key-edit key="[[key]]"></key-edit>
@@ -279,14 +279,8 @@
                         type: String,
                         computed: '_getHeaderStyle(section)'
                     },
-                    params: {
-                        type: Object,
-                        notify: true
-                    },
                     key: {
-                        type: Object,
-                        computed: '_computeKey(params, model.keysArray.*)',
-                        notify: true
+                        type: Object
                     },
                     isDefault: {
                         type: String,
@@ -340,22 +334,10 @@
                     'update(params, model.keys.*)'
                 ],
                 listeners: {
-                    'confirmation': '_deleteKeyEventResponse',
-                    'updateSelectedKey': '_updateKey',
-                    'paramsChanged': 'update'
-                },
-                update: function(params) {
-                    if (this.$.keyPublicRequest) {
-                        this.$.keyPublicRequest.generateRequest();
-                    }
-                    this.visiblePrivateKey = false;
-                    this.set('privateKey', null);
+                    'confirmation': '_deleteKeyEventResponse'
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
-                },
-                _computeKey: function(params, keys) {
-                    return params;
                 },
                 _computeTagsExist: function(key, tags){
                     if (this.key.tags.length > 0 && this.key.tags[0] && this.key.tags[0]['key'] && this.key.tags[0]['key'] != "") {
@@ -366,19 +348,24 @@
                     }
                 },
                 computeTagItems: function(key){
-                    var arr = [];
-                    var item = itemUid(key, this.section);
-                    arr.push(item);
-                    return arr;
+                    if (key) {
+                        var arr = [];
+                        var item = itemUid(key, this.section);
+                        arr.push(item);
+                        return arr;
+                    } 
                 },
                 _computeKeyMachines: function(key) {
-                    return key.machines;
+                    if (key)
+                        return key.machines;
                 },
                 _keyHasMachines: function(keyMachines) {
-                    return keyMachines.length > 0 ? true : false;
+                    if (keyMachines)
+                        return keyMachines.length > 0 ? true : false;
                 },
                 _keyHasMachinesMoreThanOne: function(keyMachines) {
-                    return keyMachines.length > 1 ? true : false;
+                    if (keyMachines)
+                        return keyMachines.length > 1 ? true : false;
                 },
                 getMachineUrl: function(keymachine) {
                     var url;
@@ -416,7 +403,8 @@
                     this._showToast(msg);
                 },
                 handlePublicResponse: function(data) {
-                    this.publicKey = data.detail.response;
+                    console.log(data);
+                    this.set('publicKey', data.detail.response);
                 },
                 showPrivateKey: function() {
                     this.$.keyPrivateRequest.headers["Content-Type"] = 'application/json';
