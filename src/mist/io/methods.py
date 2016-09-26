@@ -92,7 +92,6 @@ def add_cloud_v_2(owner, title, provider, params):
     monitoring = params.pop('monitoring', False)
     params.pop('title', None)
     params.pop('provider', None)
-
     # Find proper Cloud subclass.
     if not provider:
         raise RequiredParameterMissingError("provider")
@@ -128,7 +127,10 @@ def rename_cloud(owner, cloud_id, new_name):
     log.info("Renaming cloud: %s", cloud_id)
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     cloud.title = new_name
-    cloud.save()
+    try:
+        cloud.save()
+    except NotUniqueError:
+        raise BadRequestError('Cloud with name %s already exists' % new_name)
     log.info("Succesfully renamed cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
 
@@ -315,7 +317,6 @@ def associate_key(user, key_id, cloud_id, machine_id,
     # associations will otherwise be created by shell.autoconfigure upon
     # succesful connection
     if isinstance(port, basestring):
-        port = 22
         if port.isdigit():
             port = int(port)
         else:
