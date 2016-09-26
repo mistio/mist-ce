@@ -286,11 +286,12 @@ function itemUid(item, section) {
     // TODO replace with mist uuids
 
     // if item type is not defined derive it fro the current section id
-    var item_type = item.type ? item.type : (section &&
+    var item_type = item && item.type ? item.type : (section &&
                                              section.id.slice(0,-1));
-    var cloudId = item.cloud ? item.cloud.id : '';
+    var cloudId = item && item.cloud ? item.cloud.id : '';
+    var itemId = item.id ? item.id : '';
 
-    return item_type + ':' + cloudId + ':' + item.id;
+    return item_type + ':' + cloudId + ':' + itemId;
 }
 
 Polymer({
@@ -458,7 +459,6 @@ Polymer({
         var ret = [];
         if (item.type != 'machine') {
             ret.push('tag');
-            console.log('itemActions');
         }
         if (item.type == 'machine') {
             if (item.state == 'running') {
