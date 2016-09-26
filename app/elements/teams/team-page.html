@@ -287,9 +287,6 @@
                     section: {
                         type: Object
                     },
-                    params: {
-                        type: Object
-                    },
                     model: {
                         type: Object
                     },
@@ -337,9 +334,7 @@
                     }
                 },
                 listeners: {
-                    'confirmation': '_deleteResponse',
-                    'updateSelectedTeam': '_updateTeam',
-                    // 'confirmation': '_deleteMemberEventResponse'
+                    'confirmation': '_deleteResponse'
                 },
                 ready: function() {
                     var wh = window.innerHeight;
@@ -402,11 +397,6 @@
                 _editTeam: function(e) {
                     var el = this.querySelector('team-edit');
                     el._openEditTeamModal();
-                },
-                _updateTeam: function(e) {
-                    var team = e.detail.team;
-                    this.set('team.name', team.name);
-                    this.set('team.description', team.description);
                 },
                 _deleteTeam: function(e) {
                     this._showDialog({
