@@ -33,7 +33,7 @@
         model: Object,
         onboarding: Object
       },
-
+      
       attached: function() {
 
       },
@@ -51,10 +51,9 @@
           return !path;
       },
       _getTeam: function(id) {
-          if (this.model.teams)
+          if (this.model.teams && this.model.teams[id])
               return this.model.teams[id];
       },
-
 
     });
   </script>

@@ -347,7 +347,7 @@
                     });
                 },
                 _hasOnlyYou: function(team) {
-                    if (team.members && team.members.length == 1 && team.members[0].email == this.model.user.email){
+                    if (team && team.members && team.members.length == 1 && team.members[0].email == this.model.user.email){
                         return true;
                     }
                     else {
