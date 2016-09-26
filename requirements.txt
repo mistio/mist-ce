@@ -9,6 +9,7 @@ gevent-subprocess==0.1.1
 mongoengine==0.10.6
 netaddr==0.7.18
 -e git+https://github.com/mgogoulos/paramiko.git@master#egg=paramikoPasteDeploy==1.5.2
+PasteDeploy==1.5.2
 PasteScript==2.0.2
 pika==0.10.0
 pretty

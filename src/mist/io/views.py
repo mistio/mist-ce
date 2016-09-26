@@ -429,8 +429,8 @@ def add_key(request):
       description: The private key
       required: true
       type: string
-    public:
-      description: The public key, for signed ssh keys
+    certificate:
+      description: The signed public key, when using signed ssh keys
       required: false
       type: string
 
@@ -438,11 +438,11 @@ def add_key(request):
     params = params_from_request(request)
     key_name = params.get('name', '')
     private_key = params.get('priv', '')
-    public_key = params.get('public', '')
+    certificate = params.get('certificate', '')
 
     auth_context = auth_context_from_request(request)
     key_tags = auth_context.check_perm("key", "add", None)
-    key_name = methods.add_key(auth_context.owner, key_name, private_key, public_key=public_key)
+    key_name = methods.add_key(auth_context.owner, key_name, private_key, certificate=certificate)
 
     key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
 

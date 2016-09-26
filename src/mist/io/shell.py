@@ -282,7 +282,7 @@ class ParamikoShell(object):
                         self.connect(username=ssh_user,
                                      key=key.private,
                                      password=password,
-                                     cert_file=key.public,
+                                     cert_file=key.certificate,
                                      port=port)
                     except MachineUnauthorizedError:
                         continue
@@ -301,7 +301,7 @@ class ParamikoShell(object):
                             self.connect(username=new_ssh_user,
                                          key=key.private,
                                          password=password,
-                                         cert_file=key.public,
+                                         cert_file=key.certificate,
                                          port=port)
                             ssh_user = new_ssh_user
                         except MachineUnauthorizedError:
