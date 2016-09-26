@@ -181,7 +181,6 @@
             },
             _addTunnelAjaxResponse: function(e) {
                 var response = YAML.parse(e.detail.xhr.response);
-                console.log('_addTunnelAjaxResponse', e.detail.xhr);
                 if (response.id) {
                     document.querySelector('app-location').set('path', '/tunnels/'+ response.id);
                 }
