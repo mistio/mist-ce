@@ -355,7 +355,7 @@
                     }
                 },
                 _hasOtherMembers: function(team) {
-                    if (team.members && !this._hasOnlyYou && team.members.length > 0){
+                    if (teams && team.members && !this._hasOnlyYou && team.members.length > 0){
                         return true;
                     }
                     else {
@@ -363,7 +363,7 @@
                     }
                 },
                 _hasMembers: function(team) {
-                    if (team.members)
+                    if (team && team.members)
                         return team.members.length > 0 ? true : false;
                 },
                 _computeMembers: function(team, teamMembers, members) {
