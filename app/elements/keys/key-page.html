@@ -250,9 +250,8 @@
                 </paper-material>
             </div>
         </div>
-        <template is="dom-if" if="{{key.id}}">
-            <iron-ajax auto id="keyPublicRequest" url="/api/v1/keys/[[key.id]]/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
-        </template>
+        
+        <iron-ajax id="keyPublicRequest" url="/api/v1/keys/[[key.id]]/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyPrivateRequest" url="/api/v1/keys/[[key.id]]/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/[[key.id]]" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
         <iron-ajax id="keyDeleteAjaxRequest" url="/api/v1/keys/[[key.id]]" method="DELETE" on-response="_handleKeyDeleteAjaxResponse" on-error="_handleKeyDeleteAjaxError"></iron-ajax>
@@ -332,6 +331,12 @@
                     'confirmation': '_deleteKeyEventResponse'
                 },
                 update: function(key){
+                    if (key){
+                        this.$.keyPublicRequest.headers["Content-Type"] = 'application/json';
+                        this.$.keyPublicRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.keyPublicRequest.body = {};
+                        this.$.keyPublicRequest.generateRequest();
+                    }
                     this.set('visiblePrivateKey', false);
                 },
                 _getHeaderStyle: function(section) {
@@ -415,7 +420,7 @@
                     this.visiblePrivateKey = false;
                 },
                 handlePrivateResponse: function(data) {
-                    this.privateKey = data.detail.response;
+                    this.set('privateKey', data.detail.response);
                 },
                 _editKey: function(e) {
                     var el = this.querySelector('key-edit');
