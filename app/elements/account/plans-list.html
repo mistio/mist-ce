@@ -1,26 +1,26 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
 <dom-module id="plans-list">
     <template>
         <style include="shared-styles">
         :host {
             display: block;
         }
-        
+
         :host paper-material {
             display: block;
             padding: 0;
         }
-        
+
         .plans {
             @apply(--layout-horizontal);
         }
-        
+
         .plan {
             @apply(--layout-flex);
             @apply(--shadow-elevation-2dp);
         }
-        
+
         .plans {
             padding-left: 0 !important;
             padding-right: 0 !important;
@@ -37,15 +37,15 @@
         .grid-row {
             padding: 24px;
         }
-        
+
         .head {
             margin-bottom: 16px;
         }
-        
+
         h2.title {
             font-weight: 500;
         }
-        
+
         h2.title,
         h2.title~p {
             margin-top: 0;
@@ -95,7 +95,7 @@
                 },
                 plans: {
                     type: Array,
-                    computed: 'computePlans(user,org)'  
+                    computed: 'computePlans(user,org)'
                 }
             },
             computeIsCurrent: function(plan, user) {

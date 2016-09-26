@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
@@ -9,6 +9,7 @@
 <link rel="import" href="../element-for-in/element-for-in.html">
 
 <link rel="import" href="associate-key.html">
+<link rel="import" href="machine-edit.html">
 <link rel="import" href="run-script-on-machine.html">
 
 <dom-module id="machine-page">
@@ -435,7 +436,7 @@ MACHINEACTIONS = {
                 type: Boolean,
                 computed: '_computeIsloading(machine)',
                 value: true
-            },            
+            },
             associatedKeys: {
                 type: Array,
                 computed:'_computeAssociatedKeys(machine, model.keysArray)'

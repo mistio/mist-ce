@@ -1,7 +1,9 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../helpers/dialog-element.html">
+<link rel="import" href="../helpers/xterm-dialog.html">
 <link rel="import" href="../tags/tags-list.html">
 
 <dom-module id="item-actions">
@@ -79,7 +81,7 @@
             paper-dialog p.item-actions {
                 max-height: 200px;
                 overflow: scroll;
-            } 
+            }
             tags-list {
                 position: absolute;
             }
@@ -128,7 +130,7 @@
                     </p>
                 </template>
 
-                <template is="dom-if" if="[[multi]]">                  
+                <template is="dom-if" if="[[multi]]">
                     <p>
                         You are about to [[selectedAction.name]] {{selectedItemsType(selectedItems.length, items.length)}}:
                         <ul>
@@ -161,7 +163,7 @@
 // can_rename:true
 // can_resume:false
 // can_tag:true
-// can_undefine:false 
+// can_undefine:false
 ACTIONS = {
   'shell': {
     'name': 'shell',
@@ -325,7 +327,8 @@ Polymer({
         selectedAction: {
             type: String
         },
-        selectedItem: Object
+        selectedItem: Object,
+        multi: Boolean
     },
 
     observers: [
@@ -414,7 +417,7 @@ Polymer({
 
     selectedItemsType: function(s) {
         var item_type = this.selectedItems.length && this.items[this.itemIndex(this.selectedItems[0])] && this.items[this.itemIndex(this.selectedItems[0])].type;
-        
+
         if (this.get('selectedItems.length') != 1)
             item_type+='s';
 
@@ -589,7 +592,7 @@ Polymer({
             if (action.name == 'shell') {
                 console.warn('opening shell');
                 // load page import on demand.
-                el.importHref(el.resolveUrl('../helpers/xterm-dialog.html'), null, null, true);
+                //el.importHref(el.resolveUrl('/elements/helpers/xterm-dialog.html'), null, null, true);
                 var xterm = el.querySelector("xterm-dialog");
                 if (!xterm) {
                     xterm = document.createElement("xterm-dialog");

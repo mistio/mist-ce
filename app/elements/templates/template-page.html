@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
@@ -10,7 +10,6 @@
 <link rel="import" href="../tags/tags-list.html">
 
 <link rel="import" href="template-edit.html">
-<link rel="import" href="template-run.html">
 <link rel="import" href="template-stack-item.html">
 
 <dom-module id="template-page">
@@ -253,17 +252,17 @@
             </paper-material>
 
             <paper-material class="flex-horizontal-with-ratios">
-                <div class="page-block" hidden="[[!template.description]]">
+                <div class="page-block" hidden$="[[!template.description]]">
                     <h3 class="smallcaps">Description</h3>
                     <p>[[template.description]]</p>
                 </div>
-                <div class="page-block" hidden="[[!template.timestamp]]">
+                <div class="page-block" hidden$="[[!template.timestamp]]">
                     <h3 class="smallcaps">Created</h3>
                     <p>[[timestamp]]
                         <!-- <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a> -->
                     </p>
                 </div>
-                <div class="page-block" hidden="[[!template.tags]]">
+                <div class="page-block" hidden$="[[!template.tags]]">
                     <h3 class="smallcaps">Tags
                         <template is="dom-if" if="[[template.tags]]">
                             <span class="id">([[template.tags.length]])</span>
@@ -274,7 +273,7 @@
                     </h3>
                     <template is="dom-if" if="[[template.tags]]">
                         <template is="dom-repeat" items="[[template.tags]]">
-                            <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
+                            <span class="id tag">[[item.key]] <span hidden$="[[!item.value]]">= [[item.value]]</span></span>
                         </template>
                     </template>
                 </div>
@@ -364,7 +363,7 @@
                             <table class="info-table">
                                 <template is="dom-repeat" items="[[template.inputs]]">
                                     <tr>
-                                        <td>[[item.name]] <span id="required" class="red" hidden="[[!item.required]]">*</span></td>
+                                        <td>[[item.name]] <span id="required" class="red" hidden$="[[!item.required]]">*</span></td>
                                         <td>
                                             [[item.description]]</td>
                                     </tr>
@@ -473,7 +472,8 @@
                     return isinline ? "command-container" : "";
                 },
                 _createStack: function(e) {
-                    document.querySelector('app-location').path = '/stacks/+create?id=' + this.template._id;
+                    document.querySelector('app-location').set('queryParams.template', this.template._id);
+                    document.querySelector('app-location').set('path', '/stacks/+create');
                 },
                 _editTemplate: function(e) {
                     var el = this.querySelector('template-edit');

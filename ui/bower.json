@@ -34,7 +34,8 @@
     "iron-validator-behavior": "^1.0.1",
     "xterm.js": "^1.1.3",
     "anchorme": "anchorme.js#^0.6.0",
-    "Sortable": "^1.4.2"
+    "Sortable": "^1.4.2",
+    "iron-label": "^1.0.2"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

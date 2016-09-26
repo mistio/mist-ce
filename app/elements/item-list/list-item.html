@@ -1,4 +1,3 @@
-<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
 <script src="../../bower_components/moment/moment.js"></script>
 
 <link rel="import" href="../app-image-icons/app-image-icons.html">
@@ -85,8 +84,6 @@
             display: none;
         }
         </style>
-        <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
-        <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
         <content></content>
         <template is="dom-repeat" items="{{fields}}" as="field">
           <a href="[[uri]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false">

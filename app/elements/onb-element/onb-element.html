@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 
 <link rel="import" href="../teams/team-add.html">
 
@@ -129,7 +130,7 @@
         </style>
 
         <div id="onboarding-area">
-            <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
+            <img class="onb-graphics top" src="/assets/onboarding/clouds.svg"/>
             <div id="org-form" hidden$="[[hasOrg]]">
                 <h1>Welcome!</h1>
                 <p>One small step to complete your sign up:<br/>
@@ -189,7 +190,7 @@
                         <paper-progress error hidden$="[[!hasError]]"></paper-progress>
                         <div id="errormsg" hidden$="[[!hasError]]"></div>
                     </div>
-                    <paper-button on-tap="invitePeople" class="blue wide" disabled="[[!formReady]]" noink>Invite People</paper-button>
+                    <paper-button on-tap="invitePeople" class="blue wide" noink>Invite People</paper-button>
                     <div class="spacer"></div>
                     <paper-button noink on-tap="hideInviteForm" class="blue-link">Cancel</paper-button>
                 </div>
