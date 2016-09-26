@@ -26,7 +26,9 @@
       is: 'page-images',
       properties: {
         model: Object,
-        onboarding: Object
+        onboarding: Object,
+        data: Object,
+        route: Object
       },
       _isDetailsPageActive: function(path) {
           return path;
@@ -34,7 +36,7 @@
       _isListActive: function(path) {
           return !path;
       },
-      _getImage: function(id) {
+      _getImage: function(id, model) {
           if (this.model.images)
               return this.model.images[id];
       }

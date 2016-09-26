@@ -227,10 +227,6 @@
                         computed: '_computeImage(params, model.imagesArray.*)',
                         notify: true
                     },
-                    imageid: {
-                        type: String,
-                        computed: '_computeImageId(params)'
-                    },
                     isStarred: {
                         type: Boolean,
                         computed: '_computeIsStarred(image.star)'
@@ -242,18 +238,12 @@
                     }
                 },
                 ready: function() {
-                    console.log(this.params, this.model);
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
                 _computeImage: function(params, images) {
-                    return images.base.find(function(image) {
-                        return image.id == params.id;
-                    });
-                },
-                _computeImageId: function(params) {
-                    return params.id;
+                    return params;
                 },
                 _computeIsStarred: function(star) {
                     return star;
