@@ -418,34 +418,35 @@ class DockerShell(DockerWebSocket):
         return None, None
 
     def interactive_shell(self, user, **kwargs):
-        cloud, container_id = self.get_container(user, 
-                                                 cloud_id=kwargs['cloud_id'], 
-                                                 machine_id=kwargs['machine_id'])
-        log.info("Autoconfiguring DockerShell for machine %s:%s", cloud.id, 
-                                                                  container_id)
+        docker_port, cloud = \
+            self.get_docker_endpoint(user, cloud_id=kwargs['cloud_id'])
+        log.info("Autoconfiguring DockerShell for machine %s:%s", 
+                 cloud.id, kwargs['machine_id'])
 
-        self.host, docker_port = dnat(user, self.host, cloud.docker_port)
         ssl_enabled = cloud.key_file and cloud.cert_file
-        self.uri = self.build_uri(container_id, docker_port, cloud=cloud, 
+        self.uri = self.build_uri(kwargs['machine_id'], docker_port, cloud=cloud, 
                                   ssl_enabled=ssl_enabled)
 
     def logging_shell(self, user, log_type='CFY', **kwargs):
-        container_id = self.get_container(user, job_id=kwargs['job_id'])
+        docker_port, container_id = \
+            self.get_docker_endpoint(user, cloud_id=None, job_id=kwargs['job_id'])
         log.info('Autoconfiguring DockerShell to stream %s logs from ' \
                  'container %s (User: %s)', log_type, container_id, user.id)
-        self.host, docker_port = config.DOCKER_IP, config.DOCKER_PORT
+
         # TODO: SSL for CFY container
         self.uri = self.build_uri(container_id, docker_port, allow_logs=1, 
                                                              allow_stdin=0)
 
-    def get_container(self, user, cloud_id=None, machine_id=None, job_id=None):
+    def get_docker_endpoint(self, user, cloud_id, job_id=None):
         if job_id:
             event = get_story(job_id)
             assert user.id == event['owner_id'], 'Owner ID mismatch!'
-            return event['logs'][0]['container_id']
+            self.host, docker_port = config.DOCKER_IP, config.DOCKER_PORT
+            return docker_port, event['logs'][0]['container_id']
 
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
-        return cloud, machine_id
+        self.host, docker_port = dnat(user, self.host, cloud.port)
+        return docker_port, cloud
 
     def build_uri(self, container_id, docker_port, cloud=None, ssl_enabled=False, 
                   allow_logs=0, allow_stdin=1):
@@ -459,9 +460,9 @@ class DockerShell(DockerWebSocket):
             }
             self.ws = websocket.WebSocket(sslopt=self.sslopt) 
 
-        if cloud and cloud.apikey and cloud.apisecret:
+        if cloud and cloud.username and cloud.password:
             uri = '%s://%s:%s@%s:%s/containers/%s/attach/ws?logs=%s&stream=1&stdin=%s&stdout=1&stderr=1' % \
-                   (self.protocol, cloud.apikey, cloud.apisecret, self.host, 
+                   (self.protocol, cloud.username, cloud.password, self.host, 
                     docker_port, container_id, allow_logs, allow_stdin)
         else:
             uri = '%s://%s:%s/containers/%s/attach/ws?logs=%s&stream=1&stdin=%s&stdout=1&stderr=1' % \
