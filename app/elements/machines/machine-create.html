@@ -2370,7 +2370,7 @@
                 },
                 _cloudChanged: function(selectedCloud, machinesFields) {
                     this._resetForm();
-                    console.log('HEREER',this.selectedCloud);
+                    // console.log('_cloudChanged',this.selectedCloud);
                     if (selectedCloud){
                         var cloudName =  this.model.clouds[selectedCloud].provider.split('_')[0];
                         var machineFields = this.machinesFields[cloudName].machine;
