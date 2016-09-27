@@ -6,6 +6,9 @@ import logging
 import tornado.web
 import tornado.ioloop
 
+import tornalet
+import trequests
+
 import mist.io.sock
 
 
@@ -49,6 +52,10 @@ def heartbeat():
 
 
 class MainHandler(tornado.web.RequestHandler):
+
+    # We use this decorator to make requests library not block tornado, with
+    # trequests (tornado safe requests) and tornalet (greenlet-like tornado).
+    @tornalet.tornalet
     def get(self):
         ret = {}
         for conn in mist.io.sock.CONNECTIONS:
@@ -61,19 +68,26 @@ class MainHandler(tornado.web.RequestHandler):
 
 
 if __name__ == '__main__':
+
     if len(sys.argv) > 1:
         port = int(sys.argv[1])
     else:
         port = 8081
 
+    # Set up signal handlers
     signal.signal(signal.SIGTERM, sig_handler)
     signal.signal(signal.SIGINT, sig_handler)  # also catch KeyboardInterrupt
     signal.signal(signal.SIGUSR1, usr1_handler)
     signal.signal(signal.SIGUSR2, usr2_handler)
 
+    # Tell requests to use AsyncHTTPadapter from trequests
+    trequests.setup_session()
+
+    # Set up periodic heartbeat
     heartbeat_pc = tornado.ioloop.PeriodicCallback(heartbeat, 25 * 1000)
     heartbeat_pc.start()
 
+    # Initialize and start tornado IO loop
     app = tornado.web.Application([
         (r"/", MainHandler),
     ] + make_router().urls)
