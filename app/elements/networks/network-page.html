@@ -97,20 +97,12 @@
                 color: #D48900 !important;
             }
 
-            h4.key {
-                @apply(--layout-flex);
+            h4.id {
+                display: inline-block;
                 text-transform: uppercase;
                 font-size: 0.9rem;
                 font-weight: 700;
-            }
-
-            [size=xs] > * {
-                display: none;
-            }
-
-            [size=xs] app-sidebar {
-                min-width: 100%;
-                height: auto;
+                margin-right: 16px;
             }
 
             paper-icon-bottom.bottom {
@@ -130,13 +122,17 @@
                         [[network.provider]]
                     </div>
                 </div>
-                <div class="item-actions">
+                <div class="item-actions">                    
                     <paper-button on-tap="_deleteNetwork" class="simple">delete
                         <iron-icon icon="delete"></iron-icon>
                     </paper-button>
                 </div>
             </paper-material>
             <paper-material>
+                <h4 class="id">Network ID:</h4><span class="id">[[network.id]]</span>
+            </paper-material>
+            <paper-material>
+                <h4 class="id">Network Info</h4>
                 <div class="info-table">
                     <div class="info-body info-group">
                         <div class="info-item flex-horizontal-with-ratios">
@@ -151,11 +147,22 @@
                             <div class="flexchild">Status</div>
                             <div class="flexchild">[[network.status]]</div>
                         </div>
+                        <div class="info-item flex-horizontal-with-ratios">
+                            <div class="flexchild">Subnets</div>
+                            <div class="flexchild">
+                                <template is="dom-if" if="[[!hasSubnets]]">
+                                    0
+                                </template>
+                                <template is="dom-if" if="[[hasSubnets]]">
+                                    [[network.subnets.length]]
+                                </template>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </paper-material>
-            <paper-material hidden$="[[!network.subnets]]">
-                <h4>[[network.subnets.length]] Subnets</h4>
+            <paper-material hidden$="[[!hasSubnets]]">
+                <h4 class="id">Subnets</h4>
                 <div class="info-table">
                     <div class="info-body">
                         <template is="dom-repeat" items="[[network.subnets]]" as="subnet">
@@ -243,7 +250,8 @@
                 },
                 _computeIsloading: function(network) {
                     return !this.network ? true : false;
-                }
+                },
+
             });
         })();
     </script>
