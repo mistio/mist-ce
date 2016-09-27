@@ -119,7 +119,7 @@
                 <div class="title flex">
                     <h2>[[network.name]]</h2>
                     <div class="subtitle">
-                        [[network.provider]]
+                        [[networkCloud]]
                     </div>
                 </div>
                 <div class="item-actions">                    
@@ -193,10 +193,6 @@
                     network: {
                         type: Object
                     },
-                    isOpenstack: {
-                        type: Boolean,
-                        computed: '_computeIsOpenstack(network.cloud.provider)'
-                    },
                     hasSubnets: {
                         type: Boolean,
                         computed: '_computeHasSubnets(network.subnets)'
@@ -205,6 +201,10 @@
                         type: Boolean,
                         computed: '_computeIsloading(network)',
                         value: true
+                    },
+                    networkCloud: {
+                        type: String,
+                        computed: '_computeNetworkCloud(network, model.clouds)' 
                     }
                 },
                 listeners: {
@@ -213,8 +213,8 @@
                 _computeHasSubnets: function(subnets) {
                     return subnets && subnets.length;
                 },
-                _computeIsOpenstack: function(provider) {
-                    return provider == 'openstack';
+                _computeNetworkCloud: function(network, clouds){
+                    return this.model.clouds[this.network.cloud_id].title
                 },
                 _editNetwork: function(e) {
                     console.log(e);
