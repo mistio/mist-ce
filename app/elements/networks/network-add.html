@@ -52,10 +52,9 @@
                 Add and enable an Openstack cloud using the <a href="/clouds/+add" is="pushstate-anchor" class="blue-link regular">Add Cloud form</a>.</p>
             </paper-material>
             <paper-material hidden$="[[!hasOpenstackClouds]]">
-                <app-form fields="[[fields]]" form="[[network]]" url="/api/v1/networks" on-request="_addNetworkRequest" on-response="_handleAddNetworkResponse"></app-form>
+                <app-form fields="[[fields]]" form="[[network]]" url="/api/v1/clouds/[[cloud]]/networks" on-request="_addNetworkRequest" on-response="_handleAddNetworkResponse"></app-form>
             </paper-material>
         </div>
-        <iron-ajax id="addNetworkRequest" url="/api/v1/clouds/[[network.cloud.id]]/networks" method="POST" on-response="_handleAddNetworkResponse" on-error="_handleAddNetworkError"></iron-ajax>
     </template>
     <script>
     (function() {
@@ -70,6 +69,11 @@
                 },
                 model: {
                     type: Object
+                },
+                cloud: {
+                    type: String,
+                    value: '',
+                    notify: true
                 },
                 network: {
                     type: Object,
@@ -290,7 +294,8 @@
                 '_cloudsChanged(model.clouds.*)'
             ],
             listeners: {
-                'change': 'updateFields'
+                'change': 'updateFields',
+                'iron-select': 'updateUrl'
             },
             _cloudsChanged: function(clouds) {
                 var openstackClouds = this.model.cloudsArray.filter(function(cloud) {
@@ -336,6 +341,15 @@
                     if (this.fields[createSubnet].value == false) {
                         this.set('fields.'+subnet_name+'.value', '')
                     }
+                }                
+            },
+            updateUrl: function(e){
+                //update url when cloud is selected
+                if(e.target.id == "cloud"){
+                    var cloud = this.fields.findIndex(function(field) {
+                        return field.name == "cloud";
+                    }, this);
+                    this.set('cloud',this.fields[cloud].value)
                 }
             },
             _goBack: function() {
