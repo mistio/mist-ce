@@ -18,7 +18,6 @@
             paper-material {
                 display: block;
                 padding: 20px;
-                margin: 36px;
             }
 
             paper-menu-button paper-button {
@@ -128,7 +127,7 @@
                 <div class="title flex">
                     <h2>[[network.name]]</h2>
                     <div class="subtitle">
-                        [[network.cloud.title]]
+                        [[network.provider]]
                     </div>
                 </div>
                 <div class="item-actions">
@@ -155,8 +154,8 @@
                     </div>
                 </div>
             </paper-material>
-            <paper-material hidden$="[[network.subnets.length < 1]]">
-                <h4>[[network.subnets.length]] Subnet<span hidden$="[[network.subnets.length >= 2]]">s</span></h4>
+            <paper-material hidden$="[[!network.subnets]]">
+                <h4>[[network.subnets.length]] Subnets</h4>
                 <div class="info-table">
                     <div class="info-body">
                         <template is="dom-repeat" items="[[network.subnets]]" as="subnet">
@@ -184,21 +183,8 @@
                     section: {
                         type: Object
                     },
-                    color: {
-                        type: String,
-                        computed: '_getHeaderStyle(section)'
-                    },
-                    params: {
-                        type: Object,
-                        notify: true
-                    },
                     network: {
-                        type: Object,
-                        computed: '_computeNetwork(params, model.networksArray.*)'
-                    },
-                    netid: {
-                        type: String,
-                        computed: '_computeNetworkId(params)'
+                        type: Object
                     },
                     isOpenstack: {
                         type: Boolean,
@@ -216,17 +202,6 @@
                 },
                 listeners: {
                     'confirmation': '_deleteNetworkEventResponse'
-                },
-                _getHeaderStyle: function(section) {
-                    return 'background-color: ' + section.color + '; color: #fff;';
-                },
-                _computeNetwork: function(params, networks) {
-                    return networks.base.find(function(network) {
-                        return network.name == params.name;
-                    });
-                },
-                _computeNetworkId: function(params) {
-                    return params.id;
                 },
                 _computeHasSubnets: function(subnets) {
                     return subnets && subnets.length;
