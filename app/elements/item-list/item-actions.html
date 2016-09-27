@@ -457,7 +457,7 @@ Polymer({
 
         item.type = item_type;
         var ret = [];
-        if (item.type != 'machine') {
+        if (item.type != 'machine' && item.type != 'network') {
             ret.push('tag');
         }
         if (item.type == 'machine') {
