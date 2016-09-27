@@ -92,7 +92,6 @@ def add_cloud_v_2(owner, title, provider, params):
     monitoring = params.pop('monitoring', False)
     params.pop('title', None)
     params.pop('provider', None)
-
     # Find proper Cloud subclass.
     if not provider:
         raise RequiredParameterMissingError("provider")
@@ -128,7 +127,10 @@ def rename_cloud(owner, cloud_id, new_name):
     log.info("Renaming cloud: %s", cloud_id)
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     cloud.title = new_name
-    cloud.save()
+    try:
+        cloud.save()
+    except NotUniqueError:
+        raise BadRequestError('Cloud with name %s already exists' % new_name)
     log.info("Succesfully renamed cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
 
@@ -176,7 +178,7 @@ def delete_cloud(owner, cloud_id):
     trigger_session_update(owner, ['clouds'])
 
 
-def add_key(user, key_name, private_key):
+def add_key(user, key_name, private_key, certificate=None):
     """Adds a new key by name and returns the new key_name."""
 
     log.info("Adding key with name '%s'.", key_name)
@@ -192,6 +194,8 @@ def add_key(user, key_name, private_key):
     key = Keypair()
     key.private = private_key
     key.name = key_name
+    if certificate and certificate.startswith('ssh-rsa-cert-v01@openssh.com'):
+        key.certificate = certificate
     key.construct_public_from_private()
     if not Keypair.objects(owner=user, default=True):
         key.default = True
