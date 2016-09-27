@@ -346,14 +346,14 @@ class DockerShell(object):
         log.info("autoconfiguring DockerShell for machine %s:%s",
                  cloud_id, machine_id)
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
-        docker_port = cloud.docker_port
+        docker_port = cloud.port
 
         self.host, docker_port = dnat(user, self.host, docker_port)
 
         # For basic auth
         if cloud.apikey and cloud.apisecret:
             self.uri = "://%s:%s@%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
-                       (cloud.apikey, cloud.apisecret, self.host, docker_port, machine_id)
+                       (cloud.username, cloud.password, self.host, docker_port, machine_id)
         else:
             self.uri = "://%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
                        (self.host, docker_port, machine_id)
