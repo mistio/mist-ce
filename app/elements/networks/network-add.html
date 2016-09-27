@@ -307,6 +307,7 @@
                 }
             },
             updateFields: function(e){
+                //hide gateway if field if subnet_disableGateway is true
                 if(e.target.id == "subnet_disableGateway"){
                     var subnet_disableGateway = this.fields.findIndex(function(f){
                         return f.name == "subnet_disableGateway"
@@ -321,6 +322,18 @@
                     else {
                         this.set('fields.'+subnet_gatewayIp+'.show', true)   
                         this.set('fields.'+subnet_gatewayIp+'.hidden', false)
+                    }
+                }
+                //clear subnet name if field if createSubnet is false
+                if(e.target.id == "createSubnet"){
+                    var createSubnet = this.fields.findIndex(function(f){
+                        return f.name == "createSubnet"
+                    });
+                    var subnet_name = this.fields.findIndex(function(f){
+                        return f.name == "subnet_name"
+                    });
+                    if (this.fields[createSubnet].value == false) {
+                        this.set('fields.'+subnet_name+'.value', '')
                     }
                 }
             },
