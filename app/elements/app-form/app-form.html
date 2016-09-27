@@ -292,7 +292,7 @@
                     },
                     referral:  {
                         type: String
-                    },
+                    }
                 },
                 observers: [
                     '_fieldsChanged(fields.*, sendingData)',
@@ -429,7 +429,7 @@
                     // }
                     // console.log(this.form.stackinputs);
                 },
-                _submitForm: function() {
+                _submitForm: function(e) {
                     var payload;
 
                     if (this.workflow) {

@@ -52,7 +52,7 @@
                 Add and enable an Openstack cloud using the <a href="/clouds/+add" is="pushstate-anchor" class="blue-link regular">Add Cloud form</a>.</p>
             </paper-material>
             <paper-material hidden$="[[!hasOpenstackClouds]]">
-                <app-form fields="[[fields]]" form="[[network]]" url="/api/v1/clouds/[[cloud]]/networks" on-request="_addNetworkRequest" on-response="_handleAddNetworkResponse"></app-form>
+                <app-form fields="[[fields]]" form="[[network]]" url="/api/v1/clouds/[[cloud]]/networks" on-response="_handleAddNetworkResponse" on-error="_handleError"></app-form>
             </paper-material>
         </div>
     </template>
@@ -79,20 +79,24 @@
                     type: Object,
                     value: function() {
                         return {
-                            name: '',
-                            cloud: '',
-                            adminStateUp: '',
-                            createSubnet: '',
-                            subnet_name: '',
-                            subnet_address: '',
-                            subnet_ipv: '',
-                            subnet_gatewayIp: '',
-                            subnet_disableGateway: '',
-                            subnet_enableDHCP: '',
-                            subnet_createRouter: '',
-                            subnet_routerNname: '',
-                            network_routerPublicGateway: '',
-                            subnet_allocationPools: ''
+                            network: {
+                                name: '', 
+                                admin_state_up: '',
+                            },
+                            subnet: {
+                                name: '',
+                                ip_version:  '',
+                                cidr:  '',
+                                gateway_ip:  '',
+                                enable_dhcp: '',
+                                allocation_pools: {
+                                    starts: '',
+                                    ends: ''
+                                }
+                            },
+                            router: {
+                                name: ''
+                            }
                         }
                     }
                 },
@@ -313,6 +317,7 @@
                 }
             },
             updateFields: function(e){
+                this.set('formError', false);
                 //hide gateway if field if subnet_disableGateway is true
                 if(e.target.id == "subnet_disableGateway"){
                     var subnet_disableGateway = this.fields.findIndex(function(f){
@@ -341,7 +346,33 @@
                     if (this.fields[createSubnet].value == false) {
                         this.set('fields.'+subnet_name+'.value', '')
                     }
-                }                
+                }
+                // update payload
+                var payload = {
+                    network: {
+                        name: this.fields[0].value, 
+                        admin_state_up: this.fields[2].value,
+                    }
+                }
+                if (this.fields[3].value == true) {
+                    var allocationPools = [];
+                    var lines = this.fields[13].value.split('\n');
+                    lines.forEach(function(l){
+                        allocationPools.push({
+                            starts: l.replace(',','').split('-')[0].trim(),
+                            ends: l.replace(',','').split('-')[1].trim()
+                        })
+                    })
+                    payload.subnet = {
+                        name: this.fields[4].value,
+                        ip_version:  this.fields[6].value,
+                        cidr:  this.fields[5].value,
+                        gateway_ip:  this.fields[7].value,
+                        enable_dhcp: !this.fields[8].value,
+                        allocation_pools: allocationPools
+                    };
+                }
+                this.set('network', payload);
             },
             updateUrl: function(e){
                 //update url when cloud is selected
@@ -351,6 +382,15 @@
                     }, this);
                     this.set('cloud',this.fields[cloud].value)
                 }
+            },
+            _handleAddNetworkResponse: function(e){
+                console.log(e);
+                this.set('sendingData', false);
+            },
+            _handleError: function(e) {
+                console.log(e);
+                this.$.errormsg.textContent = e.detail.request.xhr.responseText;
+                this.set('formError', true);
             },
             _goBack: function() {
                 history.back();
