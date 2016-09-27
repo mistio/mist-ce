@@ -8,6 +8,7 @@
 <link rel="import" href="../../styles/app-theme.html">
 <link rel="import" href="../../styles/shared-styles.html">
 
+<link rel="import" href="../mist-header/mist-header.html">
 <link rel="import" href="../app-styles/app-styles.html">
 <link rel="import" href="../app-socket/app-socket.html">
 <link rel="import" href="../app-icons/app-icons.html">
@@ -110,7 +111,7 @@
 
         <paper-header-panel mode="standard" class="fit">
             <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
-            <app-header model="[[model]]" title="{{title}}" class="paper-header" style$="[[style]]"></app-header>
+            <mist-header model="[[model]]" title="[[title]]" class="paper-header" style$="[[style]]"></mist-header>
 
             <iron-pages id="app-main" main smallscreen$={{smallscreen}} selected="{{selected}}">
                 <!-- dashboard -->
@@ -156,7 +157,7 @@
                 <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
                 <script-run model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-run>
 
-                <page-account user="[[model.user]]"></page-account>
+                <page-account org="[[model.org]]" user="[[model.user]]"></page-account>
 
                 <page-not-found></page-not-found>
             </iron-pages>
@@ -204,7 +205,6 @@
             style: {
                 computed: "_style(current, sections)",
                 value: "background-color: #424242;",
-                notify: true
             },
             selected: {
                 type: Number,
@@ -430,16 +430,16 @@
                 this.current = "dashboard";
                 this.title = "dashboard";
             }
-            else if (details && 
-                details.item && 
-                details.item.nodeName != 'IRON-SELECT' && 
-                details.item.title && 
+            else if (details &&
+                details.item &&
+                details.item.nodeName != 'IRON-SELECT' &&
+                details.item.title &&
                 details.item.getAttribute("current")) {
 
                 var el = e.detail.item;
                 this.current = el.getAttribute("current");
                 this.title = el.title;
-                
+
                 if (el.nodeName == 'IRON-ROUTE') {
                     this.current = el.getAttribute("current");
                     this.title = el.title;

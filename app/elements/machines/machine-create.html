@@ -1,7 +1,9 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 
 <dom-module id="machine-create">
     <template>
@@ -56,7 +58,7 @@
                         Create machine
                     </h2>
                     <div class="subtitle">
-                        Create your machines 
+                        Create your machines
                     </div>
                 </div>
             </paper-material>
@@ -2355,8 +2357,7 @@
                     }
                 },
                 observers: [
-                    '_cloudChanged(selectedCloud, machinesFields)',
-                    '_fieldsChanged(machinesFields.*, sendingData)',
+                    '_cloudChanged(selectedCloud, machinesFields)'
                 ],
                 _computeProviderLogo: function(className) {
                     var identifier = className.split('_')[0];
@@ -2369,7 +2370,7 @@
                 },
                 _cloudChanged: function(selectedCloud, machinesFields) {
                     this._resetForm();
-                    console.log('HEREER',this.selectedCloud);
+                    // console.log('_cloudChanged',this.selectedCloud);
                     if (selectedCloud){
                         var cloudName =  this.model.clouds[selectedCloud].provider.split('_')[0];
                         var machineFields = this.machinesFields[cloudName].machine;

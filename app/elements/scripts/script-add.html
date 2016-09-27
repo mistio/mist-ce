@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
@@ -63,9 +63,6 @@
             is: 'script-add',
 
             properties: {
-                sections: {
-                    type: Object
-                },
                 section: {
                     type: Object
                 },
@@ -246,11 +243,10 @@
             _addScriptAjaxRequest: function() {
             },
             _addScriptAjaxResponse: function(e) {
-                // 
+                //
                 // console.log('XHR', e.detail);
                 var response = YAML.parse(e.detail.xhr.response);
-                page('/scripts/'+ response.id);
-                page('/scripts/');
+                document.querySelector('app-location').set('path', '/scripts/' + response.id);
             },
         });
     })();

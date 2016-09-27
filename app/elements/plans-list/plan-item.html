@@ -49,7 +49,7 @@
         <p>[[descriptionText]]</p>
         <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
         <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
-        <paper-button id="select" class="btn-block submit-btn" disabled$="[[isCurrent]]" raised on-tap="_selectPlan">Select</paper-button>
+        <paper-button id="select" class="btn-block submit-btn" disabled$="[[iscurrent]]" raised on-tap="_selectPlan">Select</paper-button>
 
     </template>
 
@@ -61,9 +61,8 @@
                 is: 'plan-item',
 
                 properties: {
-                    user: {
-                        type: Object,
-                        notify: true
+                    org: {
+                        type: Object
                     },
                     plan: {
                         type: Object

@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
@@ -10,7 +10,6 @@
 <link rel="import" href="../tags/tags-list.html">
 
 <link rel="import" href="template-edit.html">
-<link rel="import" href="template-run.html">
 <link rel="import" href="template-stack-item.html">
 
 <dom-module id="template-page">
@@ -197,7 +196,6 @@
                 right: 0;
                 bottom: 0;
                 display: block;
-                width: 100%;
                 height: 100vh;
                 background-color: #eee;
             }
@@ -254,17 +252,17 @@
             </paper-material>
 
             <paper-material class="flex-horizontal-with-ratios">
-                <div class="page-block" hidden="[[!template.description]]">
+                <div class="page-block" hidden$="[[!template.description]]">
                     <h3 class="smallcaps">Description</h3>
                     <p>[[template.description]]</p>
                 </div>
-                <div class="page-block" hidden="[[!template.timestamp]]">
+                <div class="page-block" hidden$="[[!template.timestamp]]">
                     <h3 class="smallcaps">Created</h3>
                     <p>[[timestamp]]
                         <!-- <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a> -->
                     </p>
                 </div>
-                <div class="page-block" hidden="[[!template.tags]]">
+                <div class="page-block" hidden$="[[!template.tags]]">
                     <h3 class="smallcaps">Tags
                         <template is="dom-if" if="[[template.tags]]">
                             <span class="id">([[template.tags.length]])</span>
@@ -275,7 +273,7 @@
                     </h3>
                     <template is="dom-if" if="[[template.tags]]">
                         <template is="dom-repeat" items="[[template.tags]]">
-                            <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
+                            <span class="id tag">[[item.key]] <span hidden$="[[!item.value]]">= [[item.value]]</span></span>
                         </template>
                     </template>
                 </div>
@@ -283,7 +281,7 @@
             <div class="section">
                 <div class="flex-horizontal-with-ratios">
                     <div class="width100">
-                        <template is="dom-if" if="[[hasStacks]]">
+                        <template is="dom-if" if="[[stacks]]">
                             <paper-material class="no-pad">
                                 <h3 class="smallcaps resource-head">stacks created from this template</h3>
                                 <template is="dom-repeat" items="[[stacks]]">
@@ -365,7 +363,7 @@
                             <table class="info-table">
                                 <template is="dom-repeat" items="[[template.inputs]]">
                                     <tr>
-                                        <td>[[item.name]] <span id="required" class="red" hidden="[[!item.required]]">*</span></td>
+                                        <td>[[item.name]] <span id="required" class="red" hidden$="[[!item.required]]">*</span></td>
                                         <td>
                                             [[item.description]]</td>
                                     </tr>
@@ -421,15 +419,9 @@
                     },
                     template: {
                         type: Object,
-                        computed: '_computeTemplate(params.id, model.templates.*)'
                     },
                     stacks: {
                         type: Array,
-                        computed: '_computeStacks(params.id, model.stacksArray.*)'
-                    },
-                    hasStacks: {
-                        type: Boolean,
-                        computed: '_computeHasStacks(stacks.*, model.stacksArray.*, template.id)'
                     },
                     isInline: {
                         type: Boolean,
@@ -476,16 +468,12 @@
                 _computeIsInline: function(source) {
                     return source == 'inline';
                 },
-                _computeStacks: function(templateid, stacks) {
-                    return this.model.stacksArray.filter(function(stack) {
-                        return stack.template == this.template.id;
-                    }, this);
-                },
                 _class: function(isinline) {
                     return isinline ? "command-container" : "";
                 },
                 _createStack: function(e) {
-                    page.show('/create-stack/' + this.template._id);
+                    document.querySelector('app-location').set('queryParams.template', this.template._id);
+                    document.querySelector('app-location').set('path', '/stacks/+create');
                 },
                 _editTemplate: function(e) {
                     var el = this.querySelector('template-edit');
@@ -517,7 +505,7 @@
 
                     if (response.confirmed && reason == "delete_template") {
                         console.log('i ll delete the template');
-                        page.show('/templates');
+                        document.querySelector('app-location').path = '/templates';
                     }
                 },
                 _showDialog: function(info) {
@@ -540,7 +528,7 @@
                         el.open = true;
                     });
                 },
-                _computeIsloading(template) {
+                _computeIsloading: function(template) {
                     return !this.template ? true : false;
                 }
             });

@@ -1,0 +1,60 @@
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../elements/pages/page-items.html">
+<link rel="import" href="../elements/templates/template-add.html">
+<link rel="import" href="../elements/templates/template-page.html">
+
+
+<dom-module id="page-templates">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <app-route route="{{route}}"
+                pattern="/:template"
+                data="{{data}}"></app-route>
+
+    <page-items model="[[model]]" items="[[model.templatesArray]]" section="[[sections.templates]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
+    <template-add model="[[model]]" section="[[sections.templates]]" hidden$=[[!_isAddPageActive(route.path)]]></template-add>
+    <template-page model="[[model]]" template$="[[_getTemplate(data.template, model.templates)]]" stacks$="[[_getTemplateStacks(data.template, model.templates, model.stacks)]]" section="[[sections.templates]]" hidden$=[[!_isDetailsPageActive(route.path)]]></template-page>
+  </template>
+
+  <script>
+    Polymer({
+        is: 'page-templates',
+
+        properties: {
+            model: Object,
+            onboarding: Object
+        },
+
+        attached: function() {
+
+        },
+
+        _isAddPageActive: function(path) {
+            return path == '/+add';
+        },
+        _isDetailsPageActive: function(path) {
+            return path && path != '/+add';
+        },
+        _isListActive: function(path) {
+            return !path;
+        },
+        _getTemplate: function(id) {
+            if (this.model.templates)
+                return this.model.templates[id];
+        },
+
+        _getTemplateStacks: function(id){
+            return this.model.stacksArray.filter(
+                function(stack) {
+                    return stack.template == id;
+                },
+                this);
+        }
+    });
+  </script>
+</dom-module>

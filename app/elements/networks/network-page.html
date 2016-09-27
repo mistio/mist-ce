@@ -5,8 +5,6 @@
 
 <link rel="import" href="../helpers/dialog-element.html">
 
-<link rel="import" href="network-item.html">
-<link rel="import" href="network-add.html">
 <link rel="import" href="subnet-item.html">
 
 <dom-module id="network-page">
@@ -119,23 +117,6 @@
             paper-icon-bottom.bottom {
                 padding-right: 8px;
             }
-            .is-loading {
-                top: 15px;
-                left: 200px;
-                position: fixed;
-                right: 0;
-                bottom: 0;
-                display: block;
-                width: 100%;
-                height: 100vh;
-                background-color: #eee;
-            }
-            .is-loading paper-spinner {
-                width: 80px;
-                height: 80px;
-                margin: 10% auto;
-                display: block;
-            }
         </style>
 
         <div id="content">
@@ -199,9 +180,6 @@
                     model: {
                         type: Object,
                         notify: true
-                    },
-                    sections: {
-                        type: Object
                     },
                     section: {
                         type: Object
@@ -279,7 +257,7 @@
                     }
                 },
                 _handleNetworDeletekAjaxResponse: function(e) {
-                    page.show('/networks');
+                    document.querySelector('app-location').path = '/networks';
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element');
@@ -288,7 +266,7 @@
                     }
                     dialog._openDialog();
                 },
-                _computeIsloading(network) {
+                _computeIsloading: function(network) {
                     return !this.network ? true : false;
                 }
             });

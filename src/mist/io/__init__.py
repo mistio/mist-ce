@@ -31,10 +31,12 @@ def main(global_config, **settings):
     json_renderer.add_adapter(object, string_adapter)
     configurator.add_renderer('json', json_renderer)
     configurator.add_static_view('resources', 'mist.io:static')
+    configurator.add_static_view('src', path='../../../ui/src')
+
     configurator.add_static_view('docs', path='../../../docs/build')
 
     # polymer resources
-    configurator.add_static_view('bower_components', path='../../../bower_components')
+    configurator.add_static_view('bower_components', path='../../../ui/bower_components')
     configurator.add_static_view('elements', path='../../../app/elements')
     configurator.add_static_view('images', path='../../../app/images')
     configurator.add_static_view('styles', path='../../../app/styles')
