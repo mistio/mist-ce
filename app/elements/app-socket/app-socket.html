@@ -484,6 +484,7 @@
                 if (net.id){
                     net["network_type"] = "private";
                     net["provider"] = this.model.clouds[data.cloud_id].provider;
+                    net["cloud_id"] = data.cloud_id;
                     cloudNetworks.push(net);
                 }
             }, this);
@@ -491,6 +492,7 @@
                 if (net.id){
                     net["network_type"] = "public";
                     net["provider"] = this.model.clouds[data.cloud_id].provider;
+                    net["cloud_id"] = data.cloud_id;
                     cloudNetworks.push(net);
                 }
             }, this);
@@ -498,6 +500,7 @@
                 if (net.id){
                     net["network_type"] = "router";
                     net["provider"] = this.model.clouds[data.cloud_id].provider;
+                    net["cloud_id"] = data.cloud_id;
                     cloudNetworks.push(net);
                 }
             }, this);
