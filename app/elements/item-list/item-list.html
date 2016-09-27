@@ -563,7 +563,7 @@ Polymer({
             return ['name', 'machines', 'id', 'default']
         }
         if (this.isNetworks(this.section)) {
-            return ['name', 'provider', 'status', 'id', 'type', 'subnets']
+            return ['name', 'provider', 'status', 'id', 'network_type', 'subnets']
         }
         if (this.isTunnels(this.section)) {
             return ['name', 'cidrs', 'id']

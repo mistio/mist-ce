@@ -482,29 +482,28 @@
             var cloudNetworks = [];
             data.networks.private.forEach(function(net){
                 if (net.id){
-                    net["type"] = "private";
+                    net["network_type"] = "private";
                     net["provider"] = this.model.clouds[data.cloud_id].provider;
                     cloudNetworks.push(net);
                 }
             }, this);
             data.networks.public.forEach(function(net){
                 if (net.id){
-                    net["type"] = "public";
+                    net["network_type"] = "public";
                     net["provider"] = this.model.clouds[data.cloud_id].provider;
                     cloudNetworks.push(net);
                 }
             }, this);
             data.networks.routers.forEach(function(net){
                 if (net.id){
-                    net["type"] = "router";
+                    net["network_type"] = "router";
                     net["provider"] = this.model.clouds[data.cloud_id].provider;
                     cloudNetworks.push(net);
                 }
             }, this);
 
-            console.log(cloudNetworks);
             var changed = this._updateModel('clouds.' + data.cloud_id + '.networks', cloudNetworks);
-            console.log(changed);
+
             if (!changed)
                 return false;
 
