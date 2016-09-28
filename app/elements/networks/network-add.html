@@ -78,27 +78,9 @@
                 network: {
                     type: Object,
                     value: function() {
-                        return {
-                            network: {
-                                name: '', 
-                                admin_state_up: '',
-                            },
-                            subnet: {
-                                name: '',
-                                ip_version:  '',
-                                cidr:  '',
-                                gateway_ip:  '',
-                                enable_dhcp: '',
-                                allocation_pools: {
-                                    starts: '',
-                                    ends: ''
-                                }
-                            },
-                            router: {
-                                name: ''
-                            }
-                        }
-                    }
+                        return {}
+                    },
+                    notify: true
                 },
                 fields: {
                     type: Array,
@@ -125,7 +107,7 @@
                         required: true,
                         options: []
                     }, {
-                        name: "adminStateUp",
+                        name: "admin_state_up",
                         label: "Admin State *",
                         type: "dropdown",
                         value: true,
@@ -179,17 +161,17 @@
                         name: "subnet_ipv",
                         label: "IP Version",
                         type: "dropdown",
-                        value: "ipv4",
-                        defaultValue: "ipv4",
+                        value: 4,
+                        defaultValue: 4,
                         placeholder: "",
                         show: false,
                         required: false,
                         options: [{
                             title: "IPv4",
-                            val: "ipv4"
+                            val: 4
                         }, {
                             title: "IPv6",
-                            val: "ipv6"
+                            val: 6
                         }],
                         showIf: {
                             fieldName: "subnet_address",
@@ -233,45 +215,6 @@
                         showIf: {
                             fieldName: "subnet_address",
                             fieldExists: true
-                        }
-                    }, {
-                        name: "subnet_createRouter",
-                        label: "Create Router",
-                        type: "toggle",
-                        value: false,
-                        defaultValue: false,
-                        placeholder: "",
-                        show: false,
-                        required: false,
-                        showIf: {
-                            fieldName: "subnet_address",
-                            fieldExists: true
-                        }
-                    }, {
-                        name: "subnet_routerName",
-                        label: "Router Name",
-                        type: "text",
-                        value: "",
-                        defaultValue: "",
-                        placeholder: "",
-                        show: false,
-                        required: false,
-                        showIf: {
-                            fieldName: "subnet_createRouter",
-                            fieldValues: [true]
-                        }
-                    }, {
-                        name: "network_routerPublicGateway",
-                        label: "Set Public Gateway",
-                        type: "toggle",
-                        value: true,
-                        defaultValue: true,
-                        placeholder: "",
-                        show: false,
-                        required: false,
-                        showIf: {
-                            fieldName: "subnet_createRouter",
-                            fieldValues: [true]
                         }
                     }, {
                         name: "subnet_allocationPools",
@@ -343,36 +286,13 @@
                     var subnet_name = this.fields.findIndex(function(f){
                         return f.name == "subnet_name"
                     });
+                    console.log(this.fields[createSubnet].value);
                     if (this.fields[createSubnet].value == false) {
                         this.set('fields.'+subnet_name+'.value', '')
                     }
                 }
-                // update payload
-                var payload = {
-                    network: {
-                        name: this.fields[0].value, 
-                        admin_state_up: this.fields[2].value,
-                    }
-                }
-                if (this.fields[3].value == true) {
-                    var allocationPools = [];
-                    var lines = this.fields[13].value.split('\n');
-                    lines.forEach(function(l){
-                        allocationPools.push({
-                            starts: l.replace(',','').split('-')[0].trim(),
-                            ends: l.replace(',','').split('-')[1].trim()
-                        })
-                    })
-                    payload.subnet = {
-                        name: this.fields[4].value,
-                        ip_version:  this.fields[6].value,
-                        cidr:  this.fields[5].value,
-                        gateway_ip:  this.fields[7].value,
-                        enable_dhcp: !this.fields[8].value,
-                        allocation_pools: allocationPools
-                    };
-                }
-                this.set('network', payload);
+
+                this.updatePayoad();            
             },
             updateUrl: function(e){
                 //update url when cloud is selected
@@ -382,6 +302,48 @@
                     }, this);
                     this.set('cloud',this.fields[cloud].value)
                 }
+                this.updatePayoad();
+            },
+            updatePayoad: function(){
+                // update payload
+                var payload = {};
+                payload = {
+                    network: {
+                        name: this.fields[0].value, 
+                        admin_state_up: this.fields[2].value
+                    }
+                }
+                //create subnet
+                if (this.fields[3].value == true) { 
+                    //parse allocation pools
+                    var allocationPools = [];
+                    var lines = this.fields[10].value.split('\n');
+                    lines.forEach(function(l){
+                        if (l) 
+                        allocationPools.push({
+                            start: l.replace(',','').split('-')[0].trim(),
+                            end: l.replace(',','').split('-')[1].trim()
+                        })
+                    })
+                    payload.subnet = {
+                        name: this.fields[4].value,
+                        ip_version:  parseInt(this.fields[6].value),
+                        cidr:  this.fields[5].value,                        
+                        enable_dhcp: this.fields[8].value,
+                        allocation_pools: allocationPools
+                    };
+                    // if subnet disable Gateway delete property
+                    var subnet_disableGateway = this.fields.findIndex(function(f){
+                        return f.name == "subnet_disableGateway"
+                    });
+                    if (this.fields[subnet_disableGateway].value == false){
+                        payload.subnet.gateway_ip = this.fields[7].value;
+                    }
+                    else {
+                        delete payload.subnet['gateway_ip'];
+                    }
+                }
+                this.set('network', payload);
             },
             _handleAddNetworkResponse: function(e){
                 console.log(e);
