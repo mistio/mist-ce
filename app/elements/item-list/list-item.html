@@ -196,6 +196,9 @@ Polymer({
 
         var ret = item[field];
 
+        if (field == 'subnets')
+            return ret ? ret.length : '';
+
         // return cloud title
         if (field == 'cloud')
             return ret.title;
