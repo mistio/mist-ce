@@ -635,7 +635,7 @@ Polymer({
                 method = 'POST';
             //networks
             } else if (action.name == 'delete' && item.type == 'network') {
-                uri = '/api/v1/networks/' + item.id;
+                uri = '/api/v1/clouds/'+ item.cloud_id +'/networks/' + item.id;
                 method = 'DELETE';
             //tunnels
             } else if (action.name == 'delete' && item.type == 'tunnel') {
