@@ -496,14 +496,16 @@
                     cloudNetworks.push(net);
                 }
             }, this);
-            data.networks.routers.forEach(function(net){
-                if (net.id){
-                    net["network_type"] = "router";
-                    net["provider"] = this.model.clouds[data.cloud_id].provider;
-                    net["cloud_id"] = data.cloud_id;
-                    cloudNetworks.push(net);
-                }
-            }, this);
+            // data.networks.routers.forEach(function(net){
+            //     if (net.id){
+            //         net["network_type"] = "router";
+            //         net["provider"] = this.model.clouds[data.cloud_id].provider;
+            //         net["cloud_id"] = data.cloud_id;
+            //         cloudNetworks.push(net);
+            //     }
+            // }, this);
+
+            console.log(data);
 
             var changed = this._updateModel('clouds.' + data.cloud_id + '.networks', cloudNetworks);
 
