@@ -1093,11 +1093,15 @@ def machine_actions(request):
     name:
       description: The new name of the renamed machine
       type: string
+    size:
+      description: The size id of the plan to resize
+      type: string
     """
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
     action = params.get('action', '')
+    plan_id = params.get('plan_id', '')
     name = params.get('name', '')
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
@@ -1114,13 +1118,20 @@ def machine_actions(request):
     if action not in actions:
         raise BadRequestError("Action '%s' should be one of %s" % (action,
                                                                    actions))
-    elif action == 'destroy':
+
+    if action == 'destroy':
         methods.destroy_machine(auth_context.owner, cloud_id, machine_id)
-    else:
-        methods.trigger_machine_action(auth_context.owner, cloud_id,
-                                       machine_id, action, name)
-    # return OK
-    # TODO: We shouldn't return list_machines, just 200. Save the API!
+    elif action in ('start', 'stop', 'reboot',
+                    'undefine', 'suspend', 'resume'):
+        getattr(machine.ctl, action)()
+    elif action == 'rename':
+        if not name:
+            raise BadRequestError("You must give a name!")
+        getattr(machine.ctl, action)(name)
+    elif action == 'resize':
+        getattr(machine.ctl, action)(plan_id)
+
+    # TODO: We shouldn't return list_machines, just OK. Save the API!
     return mist.core.methods.filter_list_machines(auth_context, cloud_id)
 
 

@@ -1326,41 +1326,6 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
     return node
 
 
-def trigger_machine_action(user, cloud_id, machine_id, action, name=None):
-    """For each action call the relevant machine controller"""
-    try:
-        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-    except me.DoesNotExist:
-        raise NotFoundError("Machine %s doesn't exist" % machine_id)
-
-    actions = ('start', 'stop', 'reboot', 'destroy', 'resize',
-               'rename', 'undefine', 'suspend', 'resume')
-
-    # add this check also here cause other functions call this one
-    if action not in actions:
-        raise BadRequestError("Action '%s' should be one of %s" % (action,
-                                                                   actions))
-
-    if action == 'start':
-        machine.ctl.start()
-    elif action == 'stop':
-        machine.ctl.stop()
-    elif action == 'undefine':
-        machine.ctl.undefine()
-    elif action == 'suspend':
-         machine.ctl.suspend()
-    elif action == 'resume':
-        machine.ctl.resume()
-    elif action == 'resize':
-        machine.ctl.resize()
-    elif action == 'rename':
-        machine.ctl.rename(name)
-    elif action == 'reboot':
-        machine.ctl.reboot()
-    elif action == 'destroy':
-        machine.ctl.destroy()
-
-
 def destroy_machine(user, cloud_id, machine_id):
     """Destroys a machine on a certain cloud.
 
@@ -1394,9 +1359,8 @@ def destroy_machine(user, cloud_id, machine_id):
             log.warning("Didn't manage to disable monitoring, maybe the "
                         "machine never had monitoring enabled. Error: %r", exc)
 
-    trigger_machine_action(user, cloud_id, machine_id, 'destroy')
-
-    # we dont have to disassociate keys because
+    machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+    machine.ctl.destroy()
 
 
 def ssh_command(user, cloud_id, machine_id, host, command,
