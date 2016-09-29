@@ -8,7 +8,7 @@
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 
-<link rel="import" href="associate-key.html">
+<!-- <link rel="import" href="associate-key.html"> -->
 <link rel="import" href="machine-edit.html">
 <link rel="import" href="run-script-on-machine.html">
 
@@ -188,7 +188,7 @@
             }
             item-actions {
                 display: flex;
-                font-size: 1em;
+                font-size: 1em;                
             }
             item-actions ::content .actions {
                 height: auto;
@@ -223,23 +223,22 @@
                     can_tag:true
                     can_undefine:false -->
 
+                    <!-- 
+                        rename
+                        run script on machine
+                        monitor
+                     -->
+
                     <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" actions="[[actions]]" org="[[model.org]]"></item-actions>
 
-                    <!-- <paper-button on-tap="start" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
-                    <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
-                    <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="_editTags" class="simple" hidden$="[[!machine.can_tag]]">tags</paper-button>
+                    <!-- 
                     <paper-menu-button id="moreMachineActions" horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
-                            <paper-button on-tap="suspend" class="simple" hidden$="[[!machine.can_suspend]]">suspend</paper-button>
-                            <paper-button on-tap="destroy" class="simple" hidden$="[[!machine.can_destroy]]">destroy</paper-button>
-                            <paper-button on-tap="rename" class="simple" hidden$="[[!machine.can_rename]]">rename</paper-button>
-                            <paper-button on-tap="undefine" class="simple" hidden$="[[!machine.can_undefine]]">undefine</paper-button>
                             <paper-button on-tap="associateKey" class="simple">Associate a key</paper-button>
                             <paper-button on-tap="_runScript" class="simple">Run a Script</paper-button>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button on-tap="shell" class="simple white left-icon" style$="color: [[section.color]]"><iron-icon style$="color: [[section.color]]" icon="vaadin-icons:terminal"></iron-icon> SHELL</paper-button>
                     <paper-button on-tap="monitor" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[isMonitored]]" disabled>monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button> -->
                 </div>
             </paper-material>
@@ -314,10 +313,10 @@
                 </div>
             </paper-material>
         </div>
-        <dialog-element></dialog-element>
-        <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key>
+        <dialog-element id="machinedialog"></dialog-element>
+        <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
         <run-script-on-machine model="[[model]]" machine="[[machine]]" cloud-id="[[machine.cloud.id]]"></run-script-on-machine>
-        <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax>
+        <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
@@ -336,6 +335,12 @@ MACHINEACTIONS = {
   'tag': {
     'name': 'tag',
     'icon': 'label',
+    'confirm': true,
+    'multi': true
+  },
+  'associate-key': {
+    'name': 'associate key',
+    'icon': 'communication:vpn-key',
     'confirm': true,
     'multi': true
   },
@@ -518,6 +523,7 @@ MACHINEACTIONS = {
               // if key then add shell / run script
               // if not monitoring then enable monitoring
               ret.push('shell');
+              ret.push('associate-key');
             }
             if (item.can_tag)
                 ret.push('tag');
@@ -531,7 +537,7 @@ MACHINEACTIONS = {
                 ret.push('reboot');
             if (item.can_resume)
                 ret.push('resume');
-            // rename needs its own dialog element
+            // rename/monitor/runscript on machine needs its own dialog element
             // if (item.can_rename)
             //     ret.push('rename');
             if (item.can_destroy)
@@ -607,7 +613,7 @@ MACHINEACTIONS = {
         },
         _computeThisItemUid: function(machine){
             var itemUidInArray = [];
-            itemUidInArray.push(itemUid(this.machine, this.section));
+            itemUidInArray.push(itemUid(this.machine, this.sections['machines']));
             return itemUidInArray;
         },
         _computeAssociatedKeys: function(machine, keys){
@@ -675,7 +681,7 @@ MACHINEACTIONS = {
         _editTags: function() {
             var el = this.querySelector('tags-list'),
             items = [];
-            items.push(itemUid(this.machine, this.section));
+            items.push(itemUid(this.machine, this.sections['machines']));
             el.items = items;
             el._openDialog();
         },
@@ -806,7 +812,7 @@ MACHINEACTIONS = {
             });
         },
         _showDialog: function(info) {
-            var dialog = this.querySelector('dialog-element');
+            var dialog = this.querySelector('#machinedialog');
             for (var i in info) {
                 dialog[i] = info[i];
             }
@@ -823,14 +829,20 @@ MACHINEACTIONS = {
         _computeIsloading: function(machine) {
             return !this.machine ? true : false;
         },
-        associateKey:  function(e){
-            var keysDialog = this.querySelector('associate-key');
-            keysDialog._openDialog();
-        },
+        // associateKey:  function(e){
+        //     var keysDialog = this.querySelector('associate-key');
+        //     keysDialog._openDialog();
+        // },
         disassociateKey: function(e){
             var keyId = e.target['dataKeyid'];
             var keyName = e.target['dataKeyname'];
+
+            console.log('disassociateKey',keyId, keyName);
+
             this.set('disassociateKeyId', keyId);
+            
+            console.log(this.disassociateKeyId);
+
             this._showDialog({
                 title: 'Disassociate key',
                 body: "You are about to disassociate key '" + keyName + "' from machine.",
@@ -861,7 +873,6 @@ MACHINEACTIONS = {
                 this.set('isPendingKeyRequest', false);
                 this._showToast(e.detail.errormsg);
             }
-            this.querySelector("#moreMachineActions").close();
         },
         _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
             var hide =  !(associatedKeys.base.length > 0 || isPendingKeyRequest);
@@ -878,7 +889,6 @@ MACHINEACTIONS = {
             if (e.detail.error) {
                 this._showToast(e.detail.errormsg);
             }
-            this.querySelector("#moreMachineActions").close();
         }
     });
 </script>
