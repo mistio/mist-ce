@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 
 <link rel="import" href="../teams/team-add.html">
 
@@ -129,7 +130,7 @@
         </style>
 
         <div id="onboarding-area">
-            <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
+            <img class="onb-graphics top" src="/assets/onboarding/clouds.svg"/>
             <div id="org-form" hidden$="[[hasOrg]]">
                 <h1>Welcome!</h1>
                 <p>One small step to complete your sign up:<br/>
@@ -165,11 +166,11 @@
                         <div class="grid-row">
                             <div class="xs12 m6 l6">
                                 <paper-dropdown-menu id="selectteam" label="Team">
-                                    <paper-listbox class="dropdown-content">
+                                    <paper-menu class="dropdown-content" attr-for-selected="value">
                                         <template is="dom-repeat" items="[[model.teamsArray]]">
                                             <paper-item id="teamoption" value="[[item.id]]">[[item.name]]</paper-item>
                                         </template>
-                                    </paper-listbox>
+                                    </paper-menu>
                                 </paper-dropdown-menu>
                             </div>
                             <div class="field-helptext xs12 m6 l6">
@@ -189,14 +190,14 @@
                         <paper-progress error hidden$="[[!hasError]]"></paper-progress>
                         <div id="errormsg" hidden$="[[!hasError]]"></div>
                     </div>
-                    <paper-button on-tap="invitePeople" class="blue wide" disabled="[[!formReady]]" noink>Invite People</paper-button>
+                    <paper-button on-tap="invitePeople" class="blue wide" noink>Invite People</paper-button>
                     <div class="spacer"></div>
                     <paper-button noink on-tap="hideInviteForm" class="blue-link">Cancel</paper-button>
                 </div>
             </div>
         </div>
 
-        <team-add referrel="onb"></team-add>
+        <team-add referral="onb" organization="[[model.org]]"></team-add>
         <iron-ajax id="saveOrgRequest" method="PUT" url="/api/v1/org/[[model.org.id]]"></iron-ajax>
         <iron-ajax id="invitePeopleRequest" method="POST" on-response="invitePeopleResponse" on-error="invitePeopleError" url$="api/v1/org/[[model.org.id]]/teams/[[selectedTeamId]]/members"></iron-ajax>
 
@@ -258,11 +259,11 @@
                 this.$.saveOrgRequest.generateRequest();
             },
             goToAddTeam: function(){
-                page.show('/add-team');
+                document.querySelector('app-location').set('path', '/team/+add');
                 this.showSidebar();
             },
             goToAddCloud: function(){
-                page.show('/add-cloud');
+                document.querySelector('app-location').set('path', '/clouds/+add');
                 this.showSidebar();
             },
             showInviteForm: function(){
@@ -284,7 +285,7 @@
             invitePeople: function(){
                 this.showProgress = true;
 
-                var emails = document.querySelector('#membersemails').value; 
+                var emails = document.querySelector('#membersemails').value;
                 if (emails){
                     this.$.invitePeopleRequest.headers["Content-Type"] = 'application/json';
                     this.$.invitePeopleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
@@ -296,7 +297,7 @@
                 }
             },
             invitePeopleResponse: function(){
-                page('/teams/' + this.selectedTeamId);
+                document.querySelector('app-location').set('path', '/teams/' + this.selectedTeamId);
                 this.set('showProgress', false);
                 this.async(function(){
                     this.hideInviteForm();
@@ -309,7 +310,7 @@
                     this.$.errormsg.textContent = e.detail.error.message;
                 }
                 else {
-                    this.$.errormsg.textContent = "You have not provided any emails";   
+                    this.$.errormsg.textContent = "You have not provided any emails";
                 }
             },
             updateSelectTeamId: function(e){

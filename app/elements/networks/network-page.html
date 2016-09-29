@@ -5,8 +5,6 @@
 
 <link rel="import" href="../helpers/dialog-element.html">
 
-<link rel="import" href="network-item.html">
-<link rel="import" href="network-add.html">
 <link rel="import" href="subnet-item.html">
 
 <dom-module id="network-page">
@@ -20,7 +18,6 @@
             paper-material {
                 display: block;
                 padding: 20px;
-                margin: 36px;
             }
 
             paper-menu-button paper-button {
@@ -100,41 +97,16 @@
                 color: #D48900 !important;
             }
 
-            h4.key {
-                @apply(--layout-flex);
+            h4.id {
+                display: inline-block;
                 text-transform: uppercase;
                 font-size: 0.9rem;
                 font-weight: 700;
-            }
-
-            [size=xs] > * {
-                display: none;
-            }
-
-            [size=xs] app-sidebar {
-                min-width: 100%;
-                height: auto;
+                margin-right: 16px;
             }
 
             paper-icon-bottom.bottom {
                 padding-right: 8px;
-            }
-            .is-loading {
-                top: 15px;
-                left: 200px;
-                position: fixed;
-                right: 0;
-                bottom: 0;
-                display: block;
-                width: 100%;
-                height: 100vh;
-                background-color: #eee;
-            }
-            .is-loading paper-spinner {
-                width: 80px;
-                height: 80px;
-                margin: 10% auto;
-                display: block;
             }
         </style>
 
@@ -147,16 +119,20 @@
                 <div class="title flex">
                     <h2>[[network.name]]</h2>
                     <div class="subtitle">
-                        [[network.cloud.title]]
+                        [[networkCloud]]
                     </div>
                 </div>
-                <div class="item-actions">
+                <div class="item-actions">                    
                     <paper-button on-tap="_deleteNetwork" class="simple">delete
                         <iron-icon icon="delete"></iron-icon>
                     </paper-button>
                 </div>
             </paper-material>
             <paper-material>
+                <h4 class="id">Network ID:</h4><span class="id">[[network.id]]</span>
+            </paper-material>
+            <paper-material>
+                <h4 class="id">Network Info</h4>
                 <div class="info-table">
                     <div class="info-body info-group">
                         <div class="info-item flex-horizontal-with-ratios">
@@ -171,11 +147,22 @@
                             <div class="flexchild">Status</div>
                             <div class="flexchild">[[network.status]]</div>
                         </div>
+                        <div class="info-item flex-horizontal-with-ratios">
+                            <div class="flexchild">Subnets</div>
+                            <div class="flexchild">
+                                <template is="dom-if" if="[[!hasSubnets]]">
+                                    0
+                                </template>
+                                <template is="dom-if" if="[[hasSubnets]]">
+                                    [[network.subnets.length]]
+                                </template>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </paper-material>
-            <paper-material hidden$="[[network.subnets.length < 1]]">
-                <h4>[[network.subnets.length]] Subnet<span hidden$="[[network.subnets.length >= 2]]">s</span></h4>
+            <paper-material hidden$="[[!hasSubnets]]">
+                <h4 class="id">Subnets</h4>
                 <div class="info-table">
                     <div class="info-body">
                         <template is="dom-repeat" items="[[network.subnets]]" as="subnet">
@@ -185,7 +172,7 @@
                 </div>
             </paper-material>
         </div>
-        <iron-ajax id="networkDeleteAjaxRequest" url="/api/v1/clouds/[[network.cloud.id]]/networks/[[network.id]]" method="DELETE" on-response="_handleNetworDeletekAjaxResponse" on-error="_handleNetworDeletekAjaxError"></iron-ajax>
+        <iron-ajax id="networkDeleteAjaxRequest" url="/api/v1/clouds/[[network.cloud_id]]/networks/[[network.id]]" method="DELETE" on-response="_handleNetworDeletekAjaxResponse" on-error="_handleNetworDeletekAjaxError"></iron-ajax>
         <dialog-element></dialog-element>
     </template>
     <script>
@@ -200,31 +187,11 @@
                         type: Object,
                         notify: true
                     },
-                    sections: {
-                        type: Object
-                    },
                     section: {
                         type: Object
                     },
-                    color: {
-                        type: String,
-                        computed: '_getHeaderStyle(section)'
-                    },
-                    params: {
-                        type: Object,
-                        notify: true
-                    },
                     network: {
-                        type: Object,
-                        computed: '_computeNetwork(params, model.networksArray.*)'
-                    },
-                    netid: {
-                        type: String,
-                        computed: '_computeNetworkId(params)'
-                    },
-                    isOpenstack: {
-                        type: Boolean,
-                        computed: '_computeIsOpenstack(network.cloud.provider)'
+                        type: Object
                     },
                     hasSubnets: {
                         type: Boolean,
@@ -234,27 +201,21 @@
                         type: Boolean,
                         computed: '_computeIsloading(network)',
                         value: true
+                    },
+                    networkCloud: {
+                        type: String,
+                        computed: '_computeNetworkCloud(network, model.clouds)' 
                     }
                 },
                 listeners: {
                     'confirmation': '_deleteNetworkEventResponse'
                 },
-                _getHeaderStyle: function(section) {
-                    return 'background-color: ' + section.color + '; color: #fff;';
-                },
-                _computeNetwork: function(params, networks) {
-                    return networks.base.find(function(network) {
-                        return network.name == params.name;
-                    });
-                },
-                _computeNetworkId: function(params) {
-                    return params.id;
-                },
                 _computeHasSubnets: function(subnets) {
                     return subnets && subnets.length;
                 },
-                _computeIsOpenstack: function(provider) {
-                    return provider == 'openstack';
+                _computeNetworkCloud: function(network, clouds){
+                    if (network)
+                        return this.model.clouds[this.network.cloud_id].title
                 },
                 _editNetwork: function(e) {
                     console.log(e);
@@ -279,7 +240,7 @@
                     }
                 },
                 _handleNetworDeletekAjaxResponse: function(e) {
-                    page.show('/networks');
+                    document.querySelector('app-location').path = '/networks';
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element');
@@ -288,9 +249,10 @@
                     }
                     dialog._openDialog();
                 },
-                _computeIsloading(network) {
+                _computeIsloading: function(network) {
                     return !this.network ? true : false;
-                }
+                },
+
             });
         })();
     </script>

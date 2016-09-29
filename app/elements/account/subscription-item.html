@@ -1,0 +1,98 @@
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<dom-module id="subscription-item">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                width: 100%;
+            }
+
+            paper-card {
+                display: block;
+            }
+
+            .plan-action {
+                color: var(--green-color);
+            }
+
+            .plan-end .plan-action {
+                color: var(--red-color);
+            }
+
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+            }
+
+            .flexchild {
+                @apply(--layout-flex);
+            }
+        </style>
+
+        <paper-item class$="info-item flex-horizontal-with-ratios plan-record [[isExpiringClass]] [[zebraClasses]]">
+            <div class="flexchild plan-date">[[dateText]]</div>
+            <div class="flexchild plan-title text-center"><div class="name">[[titleText]]</div></div>
+            <div class="flexchild plan-action text-right">[[subscription.action]]</div>
+        </paper-item>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'subscription-item',
+
+                properties: {
+                    subscription: {
+                        type: Object
+                    },
+                    index: {
+                        type: Number
+                    },
+                    count: {
+                        type: Number
+                    },
+                    titleText: {
+                        type: String,
+                        computed: '_computeTitleText(subscription.title, subscription.isTrial, subscription.promo_code)'
+                    },
+                    dateText: {
+                        type: String,
+                        computed: '_computeDateText(subscription.time)'
+                    },
+                    isExpiringClass: {
+                        type: String,
+                        computed: '_computeIsExpiringClass(subscription.action)'
+                    },
+                    zebraClasses: {
+                        type: String,
+                        computed: '_computeZebraClasses(index, count)'
+                    }
+                },
+                ready: function() {
+
+                },
+                _computeZebraClasses: function(index, count) {
+                    var classes = [];
+                    classes.push(
+                        (index + 1) % 2 == 0 ? 'even' : 'odd',
+                        index + 1 == count ? 'last' : null
+                    );
+                    return classes.join(' ');
+                },
+                _computeTitleText: function(title, isTrial, promoCode) {
+                    return title + (isTrial ? ' (trial)' : (promoCode ? ' (promo)' : null));
+                },
+                _computeDateText: function(time) {
+                    var date = new Date(time * 1000);
+                    var month = new Date();
+                    return moment().format("MMMM") + ' - ' + date.getDate() + ' - ' + date.getFullYear();
+                },
+                _computeIsExpiringClass: function(action) {
+                    return action == 'started' ? null : 'plan-end';
+                }
+            });
+        })();
+    </script>
+</dom-module>

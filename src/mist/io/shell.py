@@ -64,7 +64,7 @@ class ParamikoShell(object):
 
     """
 
-    def __init__(self, host, username=None, key=None, password=None, port=22):
+    def __init__(self, host, username=None, key=None, password=None, cert_file=None, port=22):
         """Initialize a Shell instance
 
         Initializes a Shell instance for host. If username is provided, then
@@ -83,9 +83,9 @@ class ParamikoShell(object):
 
         # if username provided, try to connect
         if username:
-            self.connect(username, key, password, port)
+            self.connect(username, key, password, cert_file, port)
 
-    def connect(self, username, key=None, password=None, port=22):
+    def connect(self, username, key=None, password=None, cert_file=None, port=22):
         """Initialize an SSH connection.
 
         Tries to connect and configure self. If only password is provided, it
@@ -102,7 +102,12 @@ class ParamikoShell(object):
             raise RequiredParameterMissingError("neither key nor password "
                                                 "provided.")
         if key:
-            rsa_key = paramiko.RSAKey.from_private_key(StringIO(key))
+            if cert_file and cert_file.startswith('ssh-rsa-cert-v01@openssh.com'):
+                # signed ssh key, use RSACert
+                rsa_key = paramiko.RSACert(privkey_file_obj=StringIO(key),
+                       cert_file_obj=StringIO(cert_file))
+            else:
+                rsa_key = paramiko.RSAKey.from_private_key(StringIO(key))
         else:
             rsa_key = None
 
@@ -277,6 +282,7 @@ class ParamikoShell(object):
                         self.connect(username=ssh_user,
                                      key=key.private,
                                      password=password,
+                                     cert_file=key.certificate,
                                      port=port)
                     except MachineUnauthorizedError:
                         continue
@@ -295,6 +301,7 @@ class ParamikoShell(object):
                             self.connect(username=new_ssh_user,
                                          key=key.private,
                                          password=password,
+                                         cert_file=key.certificate,
                                          port=port)
                             ssh_user = new_ssh_user
                         except MachineUnauthorizedError:
@@ -346,14 +353,14 @@ class DockerShell(object):
         log.info("autoconfiguring DockerShell for machine %s:%s",
                  cloud_id, machine_id)
         cloud = Cloud.objects.get(owner=user, id=cloud_id)
-        docker_port = cloud.docker_port
+        docker_port = cloud.port
 
         self.host, docker_port = dnat(user, self.host, docker_port)
 
         # For basic auth
-        if cloud.apikey and cloud.apisecret:
+        if cloud.username and cloud.password:
             self.uri = "://%s:%s@%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
-                       (cloud.apikey, cloud.apisecret, self.host, docker_port, machine_id)
+                       (cloud.username, cloud.password, self.host, docker_port, machine_id)
         else:
             self.uri = "://%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
                        (self.host, docker_port, machine_id)
@@ -445,7 +452,7 @@ class Shell(object):
     Proxy Shell Class to distinguish weather we are talking about Docker or Paramiko Shell
     """
     def __init__(self, host, provider=None, username=None, key=None,
-                 password=None, port=22, enforce_paramiko=False):
+                 password=None, cert_file=None, port=22, enforce_paramiko=False):
         """
 
         :param provider: If docker, then DockerShell
@@ -464,7 +471,7 @@ class Shell(object):
             self._shell = DockerShell(host)
         else:
             self._shell = ParamikoShell(host, username=username, key=key,
-                                        password=password, port=port)
+                                        password=password, cert_file=cert_file, port=port)
             self.ssh = self._shell.ssh
 
     def autoconfigure(self, user, cloud_id, machine_id, key_id=None,
@@ -477,10 +484,10 @@ class Shell(object):
         elif isinstance(self._shell, DockerShell):
             return self._shell.autoconfigure(user, cloud_id, machine_id)
 
-    def connect(self, username, key=None, password=None, port=22):
+    def connect(self, username, key=None, password=None, cert_file=None, port=22):
         if isinstance(self._shell, ParamikoShell):
             self._shell.connect(username, key=key, password=password,
-                                port=port)
+                        cert_file=cert_file, port=port)
         elif isinstance(self._shell, DockerShell):
             self._shell.connect()
 

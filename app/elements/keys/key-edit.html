@@ -72,9 +72,11 @@
                     'iron-overlay-closed': '_modalClosed'
                 },
                 _computeNewKey: function(key) {
-                    return {
-                        name: key.name
-                    };
+                    if (key) {
+                        return {
+                            name: key.name
+                        };
+                    }
                 },
                 _computeFormReady: function(name, newName, sendingData) {
                     var formReady = false;

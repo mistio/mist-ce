@@ -1,9 +1,12 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+
 <dom-module id="run-script-on-machine">
     <template>
         <style is="custom-style" include="dialogs"></style>
@@ -75,7 +78,7 @@ Polymer({
         this.$.scriptDialogModal.open();
     },
     _closeDialog: function(e) {
-        this.$.scriptDialogModal.close();        
+        this.$.scriptDialogModal.close();
     },
     associateKey: function(e){
         this.$.runScriptRequest.body = {

@@ -471,7 +471,6 @@ class GoogleController(BaseController):
         extra = machine_libcloud.extra
         # TODO delete this
         # Tags and metadata exist in special location for GCE.
-        # clean up a little bit
         # tags = tags_to_dict(extra.get('metadata', {}).get('items', []))
         # for key in ('gce-initial-windows-password',
         #             'gce-initial-windows-user'):
@@ -722,6 +721,7 @@ class OpenStackController(BaseController):
 
     def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'auth_url', 'url')
+        rename_kwargs(kwargs, 'tenant_name', 'tenant')
         url = kwargs.get('url')
         if url:
             if url.endswith('/v2.0/'):
@@ -978,7 +978,7 @@ class OtherController(BaseController):
             raise BadRequestError({'msg': exc.message,
                                    'errors': exc.to_dict()})
         except me.NotUniqueError:
-            raise CloudExistsError()
+            raise BadRequestError("Cloud with name %s already exists" % self.cloud.title)
 
         # Add machine.
         if kwargs:

@@ -1,0 +1,55 @@
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../elements/pages/page-items.html">
+<link rel="import" href="../elements/scripts/script-add.html">
+<link rel="import" href="../elements/scripts/script-page.html">
+
+<dom-module id="page-scripts">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <app-route route="{{route}}"
+                pattern="/:script"
+                data="{{data}}"></app-route>
+
+    <page-items model="[[model]]" items="[[model.scriptsArray]]" section="[[sections.scripts]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
+    <script-add model="[[model]]" section="[[sections.scripts]]" hidden$=[[!_isAddPageActive(route.path)]]></script-add>
+    <script-page model="[[model]]" script="[[_getScript(data.script, model.scripts)]]" section="[[sections.scripts]]" hidden$=[[!_isDetailsPageActive(route.path)]]></script-page>
+    <script-run model="[[model]]" script="[[_getScript(data.script, model.scripts)]]" section="[[sections.scripts]]" hidden$=[[!_isRunPageActive(route.path)]]></script-run>
+
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'page-scripts',
+
+      properties: {
+        model: Object,
+        sections: Array,
+        onboarding: Object
+      },
+
+      _isAddPageActive: function(path) {
+          return path == '/+add';
+      },
+      _isDetailsPageActive: function(path) {
+          return path && path != '/+add' & !path.endsWith('+run');
+      },
+      _isRunPageActive: function(path) {
+          return path && path.endsWith('+run');
+      },
+      _isListActive: function(path) {
+          return !path;
+      },
+      _getScript: function(id) {
+          return this.model.scripts[id];
+      }
+
+    });
+  </script>
+</dom-module>

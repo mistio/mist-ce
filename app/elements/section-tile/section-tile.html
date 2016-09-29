@@ -4,11 +4,9 @@
         <style>
         :host {
             display: block;
-            transition: var(--material-curve-320);
-            transform: translate(60px, 0);
             opacity: 0;
         }
-        
+
         :host(.active) {
             transform: translate(0, 0);
             opacity: 1;
@@ -26,19 +24,19 @@
             text-align: center;
             min-height: 1em;
         }
-        
+
         :host(.active) h2 {
             transform: translate(0, 0);
             opacity: 1;
             color: rgba(0,0,0,0.32)
         }
-        
+
         h3 {
             transform: translate(-50px, 0);
             opacity: 0;
             transition: all 600ms 320ms;
             transition-timing-function: var(--material-curve-320);
-            text-transform: uppercase;            
+            text-transform: uppercase;
             display: inline;
             font-size: 16px;
             font-weight: 400;
@@ -70,11 +68,11 @@
         :host[incidents] paper-material {
             background-color: var(--red-color);
         }
-        :host[incidents] iron-icon {            
+        :host[incidents] iron-icon {
             background-color: var(--red-color);
             color: #fff;
         }
-        :host[incidents] h2, 
+        :host[incidents] h2,
         :host[incidents] h3 {
             color: #fff;
         }
@@ -96,7 +94,7 @@ Polymer({
     is: 'section-tile',
     enableCustomStyleProperties: true,
     properties: {
-        section: {
+        name: {
             type: String
         },
         count: {

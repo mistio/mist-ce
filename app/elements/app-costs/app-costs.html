@@ -108,7 +108,7 @@
             height: 20px;
             opacity: 0.54;
             float: right;
-        }                
+        }
         </style>
 
         <div class="flex">
@@ -125,14 +125,14 @@
             <table>
                 <template is="dom-repeat" items="[[topClouds]]">
                     <tr>
-                        <td colspan="2" class="name"">[[item.name]] </td>
+                        <td colspan="2" class="name">[[item.name]] </td>
                         <td class="count">[[item.machinesCount]] machines </td>
                         <td class="text-right cost">$[[item.cost]]</td>
                     </tr>
                 </template>
             </table>
             <div class="zero-clouds" hidden$="[[!zeroCostClouds.length]]">
-                and [[zeroCostClouds.length]] more clouds of $0 cost: 
+                and [[zeroCostClouds.length]] more clouds of $0 cost:
                 <template is="dom-repeat" items="[[zeroCostClouds]]">
                     <span class="zero-cloud">[[item.name]]</span>
                 </template>

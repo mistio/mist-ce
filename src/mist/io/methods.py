@@ -93,7 +93,6 @@ def add_cloud_v_2(owner, title, provider, params):
     monitoring = params.pop('monitoring', False)
     params.pop('title', None)
     params.pop('provider', None)
-
     # Find proper Cloud subclass.
     if not provider:
         raise RequiredParameterMissingError("provider")
@@ -129,7 +128,10 @@ def rename_cloud(owner, cloud_id, new_name):
     log.info("Renaming cloud: %s", cloud_id)
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     cloud.title = new_name
-    cloud.save()
+    try:
+        cloud.save()
+    except NotUniqueError:
+        raise BadRequestError('Cloud with name %s already exists' % new_name)
     log.info("Succesfully renamed cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
 
@@ -177,7 +179,7 @@ def delete_cloud(owner, cloud_id):
     trigger_session_update(owner, ['clouds'])
 
 
-def add_key(user, key_name, private_key):
+def add_key(user, key_name, private_key, certificate=None):
     """Adds a new key by name and returns the new key_name."""
 
     log.info("Adding key with name '%s'.", key_name)
@@ -193,6 +195,8 @@ def add_key(user, key_name, private_key):
     key = Keypair()
     key.private = private_key
     key.name = key_name
+    if certificate and certificate.startswith('ssh-rsa-cert-v01@openssh.com'):
+        key.certificate = certificate
     key.construct_public_from_private()
     if not Keypair.objects(owner=user, default=True):
         key.default = True
@@ -314,7 +318,6 @@ def associate_key(user, key_id, cloud_id, machine_id,
     # associations will otherwise be created by shell.autoconfigure upon
     # succesful connection
     if isinstance(port, basestring):
-        port = 22
         if port.isdigit():
             port = int(port)
         else:
@@ -1698,13 +1701,13 @@ def associate_ip(user, cloud_id, network_id, ip, machine_id=None, assign=True):
     return conn.ex_associate_ip(ip, server=machine_id, assign=assign)
 
 
-def create_network(user, cloud_id, network, subnet, router):
+def create_network(owner, cloud_id, network, subnet, router):
     """
     Creates a new network. If subnet dict is specified, after creating the network
     it will use the new network's id to create a subnet
 
     """
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     conn = connect_provider(cloud)
     if conn.type not in (Provider.OPENSTACK,):
         raise NetworkActionNotSupported()
@@ -1713,8 +1716,8 @@ def create_network(user, cloud_id, network, subnet, router):
         ret = _create_network_openstack(conn, network, subnet, router)
 
     task = mist.io.tasks.ListNetworks()
-    task.clear_cache(user.email, cloud_id)
-    trigger_session_update(user, ['clouds'])
+    task.clear_cache(owner.id, cloud_id)
+    trigger_session_update(owner, ['clouds'])
     return ret
 
 
@@ -1735,7 +1738,9 @@ def _create_network_hpcloud(conn, network, subnet, router):
     # First we create the network
 
     try:
-        new_network = conn.ex_create_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
+        new_network = conn.ex_create_network(name=network_name,
+                                             admin_state_up=admin_state_up,
+                                             shared=shared)
     except Exception as e:
         raise NetworkCreationError("Got error %s" % str(e))
 
@@ -1755,9 +1760,12 @@ def _create_network_hpcloud(conn, network, subnet, router):
         enable_dhcp = subnet.get('enable_dhcp', True)
 
         try:
-            subnet = conn.ex_create_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
-                                           allocation_pools=allocation_pools, gateway_ip=gateway_ip,
-                                           ip_version=ip_version, enable_dhcp=enable_dhcp)
+            subnet = conn.ex_create_subnet(name=subnet_name,
+                                           network_id=network_id, cidr=cidr,
+                                           allocation_pools=allocation_pools,
+                                           gateway_ip=gateway_ip,
+                                           ip_version=ip_version,
+                                           enable_dhcp=enable_dhcp)
         except Exception as e:
             conn.ex_delete_network(network_id)
             raise NetworkError(e)
@@ -1785,11 +1793,14 @@ def _create_network_hpcloud(conn, network, subnet, router):
                     ext_net_id = ""
 
             # First we create the router
-            router_obj = conn.ex_create_router(name=router_name, external_gateway=external_gateway,
+            router_obj = conn.ex_create_router(name=router_name,
+                                               external_gateway=external_gateway,
                                                ext_net_id=ext_net_id)
 
             # Then we attach the router to the subnet
-            router_obj = conn.ex_add_router_interface(router_obj['router']['id'], subnet_id)
+            router_obj = conn.ex_add_router_interface(
+                         router_obj['router']['id'], subnet_id
+            )
 
     else:
         ret = openstack_network_to_dict(new_network)
@@ -1811,7 +1822,9 @@ def _create_network_openstack(conn, network, subnet, router):
 
     # First we create the network
     try:
-        new_network = conn.ex_create_network(name=network_name, admin_state_up=admin_state_up, shared=shared)
+        new_network = conn.ex_create_network(name=network_name,
+                                             admin_state_up=admin_state_up,
+                                             shared=shared)
     except Exception as e:
         raise NetworkCreationError("Got error %s" % str(e))
 
@@ -1831,9 +1844,12 @@ def _create_network_openstack(conn, network, subnet, router):
         enable_dhcp = subnet.get('enable_dhcp', True)
 
         try:
-            subnet = conn.ex_create_subnet(name=subnet_name, network_id=network_id, cidr=cidr,
-                                           allocation_pools=allocation_pools, gateway_ip=gateway_ip,
-                                           ip_version=ip_version, enable_dhcp=enable_dhcp)
+            subnet = conn.ex_create_subnet(name=subnet_name,
+                                           network_id=network_id, cidr=cidr,
+                                           allocation_pools=allocation_pools,
+                                           gateway_ip=gateway_ip,
+                                           ip_version=ip_version,
+                                           enable_dhcp=enable_dhcp)
         except Exception as e:
             conn.ex_delete_network(network_id)
             raise NetworkError(e)
@@ -1847,12 +1863,11 @@ def _create_network_openstack(conn, network, subnet, router):
     return ret
 
 
-def delete_network(user, cloud_id, network_id):
+def delete_network(owner, cloud_id, network_id):
     """
     Delete a neutron network
-
     """
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     conn = connect_provider(cloud)
 
     if conn.type is Provider.OPENSTACK:
@@ -1865,8 +1880,8 @@ def delete_network(user, cloud_id, network_id):
 
     try:
         task = mist.io.tasks.ListNetworks()
-        task.clear_cache(user.email, cloud_id)
-        trigger_session_update(user, ['clouds'])
+        task.clear_cache(owner.id, cloud_id)
+        trigger_session_update(owner, ['clouds'])
     except Exception as e:
         pass
 

@@ -429,14 +429,20 @@ def add_key(request):
       description: The private key
       required: true
       type: string
+    certificate:
+      description: The signed public key, when using signed ssh keys
+      required: false
+      type: string
+
     """
     params = params_from_request(request)
     key_name = params.get('name', '')
     private_key = params.get('priv', '')
+    certificate = params.get('certificate', '')
 
     auth_context = auth_context_from_request(request)
     key_tags = auth_context.check_perm("key", "add", None)
-    key_name = methods.add_key(auth_context.owner, key_name, private_key)
+    key_name = methods.add_key(auth_context.owner, key_name, private_key, certificate=certificate)
 
     key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
 
@@ -1418,11 +1424,9 @@ def create_network(request):
     work it will use the new network's id to create a subnet
     CREATE_RESOURCES permission required on cloud.
     ---
-    cloud:
+    cloud_id:
       in: path
       required: true
-      type: string
-    cloud_id:
       description: The Cloud ID
       type: string
     network:
@@ -1455,7 +1459,7 @@ def delete_network(request):
     Delete a network
     CREATE_RESOURCES permission required on cloud.
     ---
-    cloud:
+    cloud_id:
       in: path
       required: true
       type: string

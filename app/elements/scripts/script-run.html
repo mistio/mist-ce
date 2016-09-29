@@ -65,9 +65,9 @@
                     Heads up! Make sure you select a machine you have already associated a key with. Otherwise the the request may be accepted but the script will never finish run.
                 </p>
                 <p class="error" hidden$="[[machineHasKeys]]">
-                    <iron-icon icon="icons:warning"></iron-icon> Machine [[machine.name]] has no associated keys. 
+                    <iron-icon icon="icons:warning"></iron-icon> Machine [[machine.name]] has no associated keys.
                 </p>
-                <app-form fields="[[fields]]" url="/api/v1/scripts/[[params.id]]" on-response="_runScriptResponse" btncontent="run"></app-form>
+                <app-form fields="[[fields]]" url="/api/v1/scripts/[[script.id]]" on-response="_runScriptResponse" btncontent="run"></app-form>
             </paper-material>
         </div>
         <paper-toast id="run-script-toast"></paper-toast>
@@ -82,12 +82,10 @@
 
                 properties: {
                     model: Object,
-                    params: Object,
                     script: {
                         type: Object,
-                        computed: '_computeScript(params, model.scriptsArray.*)'
                     },
-                    section: Object,                    
+                    section: Object,
                     fields: {
                         type: Array,
                     },
@@ -115,13 +113,13 @@
                     }
                 },
                 observers: [
-                    '_cloudsChanged(model.cloudsArray.*, model.machinesArray.*, model.keysArray.*)'
+                    '_cloudsChanged(fields.length, model.cloudsArray.*, model.machinesArray.*, model.keysArray.*)'
                 ],
                 listeners: {
                     'iron-select': '_fieldsChanged'
                 },
                 ready: function(){
-                    var arr = [];
+                    var arr = this.machinesOptions || [];
                     var fields = [{
                             name: "machine_id",
                             label: "Select Machine *",
@@ -162,12 +160,6 @@
                          }];
                     this.set('fields', fields);
                 },
-                _computeScript: function(params, model) {
-                    var script = this.model.scriptsArray.find(function(script) {
-                        return script.id == this.params.id;
-                    },this);
-                    return script;
-                },
                 _computeMachinesOptions: function(clouds) {
                     return this.model.machinesArray.filter(function(cloud) {
                             return cloud.enabled;
@@ -190,7 +182,7 @@
                     });
                     var cloud = this.fields.find(function(f, index){
                         return f.name.startsWith("cloud");
-                    }); 
+                    });
                     if (machine && machine.value) {
                         var machineID = machine.value;
                         var machineCloud = this.model.machinesArray.find(function(m){
@@ -218,8 +210,7 @@
                         }
                     }
                 },
-                _cloudsChanged: function(clouds, machines, keys) {
-                    
+                _cloudsChanged: function(fieldsLength, clouds, machines, keys) {
                     // make an array of machines with keys
                     var machinesWithKeys = [];
                     this.model.keysArray.forEach(function(k){
@@ -231,16 +222,16 @@
                             }
                         }, this);
                     }, this);
-                    
+
                     this.set('fields.0.options', this.model.machinesArray);
-                    // 
+
                     if (this.fields) {
                         this.fields[0].options.forEach(function(o, index){
                             if (machinesWithKeys.indexOf(o.uuid) > -1){
                                 this.set('fields.0.options.'+index+'.icon', 'communication:vpn-key');
                             }
                             else {
-                                this.set('fields.0.options.'+index+'.icon', 'nokey');   
+                                this.set('fields.0.options.'+index+'.icon', 'nokey');
                             }
                         }, this);
                     }
@@ -249,7 +240,7 @@
                     var msg = 'Run script request was successfull. Redirecting to script...';
                     this._showToast(msg);
                     this.async(function(){
-                        page('/scripts/'+this.script.id);
+                        document.querySelector('app-location').set('path', '/scripts/'+this.script.id);
                     }, 3300)
                 },
                 _showToast: function(msg) {

@@ -1,8 +1,9 @@
+<link rel="import" href="../../bower_components/sc-timeago/sc-timeago.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../../bower_components/sc-timeago/sc-timeago.html">
 <link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
+<link rel="import" href="../machines/machine-page.html">
 
 <dom-module id="app-incidents">
     <template>
@@ -17,7 +18,7 @@
             margin: 0;
         }
 
-        :host(.active) {
+        :host.active {
             transform: translate(0, 0);
             opacity: 1;
         }
@@ -77,7 +78,7 @@
             height: inherit;
         }
 
-        :host(.active) .block {
+        :host.active .block {
             transform: translate(0, 0);
             opacity: 1;
             height: 100%;
@@ -142,9 +143,6 @@
 Polymer({
     is: 'app-incidents',
     properties: {
-        title: {
-            String, value: "Incidents"
-        },
         model: {
             type: Object
         },
@@ -156,18 +154,9 @@ Polymer({
             type: Number,
             notify: true
         },
-        state: {
-            String, value: "ONBOARD"
-        },
         sections: {
             type: Object
-        },
-        whatTriggeredIt: {
-            String, value: "#"
-        }, // whatTriggeredIt will be func(machine,rule) to find url#anchore to the machine page and specific rule that trigered the alert
-        alertstateclass: {
-            String, value: "red"
-        } // alert > red, resolved > green
+        }
     },
     observers: [
         '_incidents(model.incidents.*)'

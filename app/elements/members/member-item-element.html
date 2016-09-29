@@ -73,7 +73,7 @@
                     });
                 },
                 _viewMember: function(e) {
-                    page.show('/members/' + this.member.id);
+                    document.querySelector('app-location').path = '/members/' + this.member.id;
                 },
                 _selectMember: function(e) {
                     // This is used to prevent event bubbling

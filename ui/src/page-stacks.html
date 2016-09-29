@@ -1,0 +1,53 @@
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../elements/pages/page-items.html">
+<link rel="import" href="../elements/stacks/stack-create.html">
+<link rel="import" href="../elements/stacks/stack-page.html">
+
+<dom-module id="page-stacks">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <app-route route="{{route}}"
+                pattern="/:stack"
+                data="{{data}}"></app-route>
+
+    <page-items model="[[model]]" items="[[model.stacksArray]]" section="[[sections.stacks]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
+    <stack-create model="[[model]]" section="[[sections.stacks]]" params="[[route.__queryParams]]" hidden$=[[!_isAddPageActive(route.path)]]></stack-create>
+    <stack-page model="[[model]]" stack$="[[_getStack(data.stack, model.stacks)]]" section="[[sections.stacks]]" hidden$=[[!_isDetailsPageActive(route.path)]]></template-page>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'page-stacks',
+
+      properties: {
+        model: Object,
+        onboarding: Object
+      },
+
+      attached: function() {
+
+      },
+
+      _isAddPageActive: function(path) {
+          return path.split('?')[0] == '/+create';
+      },
+      _isDetailsPageActive: function(path) {
+          return path && path.split('?')[0] != '/+create';
+      },
+      _isListActive: function(path) {
+          return !path;
+      },
+      _getStack: function(id) {
+          if (this.model.stacks)
+              return this.model.stacks[id];
+      },
+
+    });
+  </script>
+</dom-module>
