@@ -5,6 +5,7 @@
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../helpers/xterm-dialog.html">
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../machines/associate-key.html">
 
 <dom-module id="item-actions">
     <template>
@@ -54,6 +55,7 @@
             }
 
             div.actions paper-button {
+                white-space: nowrap;
                 padding: 16px 16px;
                 margin-left: 16px;
             }
@@ -150,6 +152,7 @@
           </paper-dialog>
           <dialog-element hidden></dialog-element>
           <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
+          <associate-key id="associatekeydialog"></associate-key>
         </content>
     </template>
 </dom-module>
@@ -174,6 +177,12 @@ ACTIONS = {
   'tag': {
     'name': 'tag',
     'icon': 'label',
+    'confirm': true,
+    'multi': true
+  },
+  'associate-key': {
+    'name': 'associate key',
+    'icon': 'communication:vpn-key',
     'confirm': true,
     'multi': true
   },
@@ -422,9 +431,9 @@ Polymer({
         if (this.get('selectedItems.length') != 1)
             item_type+='s';
 
-        if (item_type != "undefined")
-            return item_type;
-        if (item_type == "undefined")
+        // if (item_type != "undefined")
+        //     return item_type;
+        // if (item_type == "undefined")
             return this.section.id;
     },
 
@@ -464,12 +473,14 @@ Polymer({
             if (item.state == 'running') {
               // if key then add shell / run script
               // if not monitoring then enable monitoring
+              ret.push('associate-key');
               ret.push('shell');
             }
             if (item.can_tag)
                 ret.push('tag');
             if (item.can_start)
                 ret.push('start');
+            if (item.can_stop)
             if (item.can_stop)
                 ret.push('stop');
             if (item.can_suspend)
@@ -520,7 +531,7 @@ Polymer({
     },
 
     itemActionsDetails: function (item) {
-        return actionDetails(this.itemActions(itemUid(item)));
+        return actionDetails(this.itemActions(itemUid(item, this.section)));
     },
 
     _selectAction: function (event, item) {
@@ -529,9 +540,15 @@ Polymer({
         if (event.model.item.confirm) {
             if(event.model.item.name == 'tag') {
                 var items = [];
-                items.push(itemUid(this.selectedItem));
+                items.push(itemUid(this.selectedItem, this.section));
                 this.$['tagsdialog'].items = items;
                 this.$['tagsdialog']._openDialog();
+            }
+            else if(event.model.item.name == 'associate key') {
+                var items = [];
+                items.push(itemUid(this.selectedItem, this.section));
+                this.$['associatekeydialog'].items = items;
+                this.$['associatekeydialog']._openDialog();
             }
             else {
                 this.$['confirmation'].toggle();
@@ -552,6 +569,10 @@ Polymer({
             if(event.model.item.name == 'tag') {
                 this.$['tagsdialog'].items = this.selectedItems;
                 this.$['tagsdialog']._openDialog();
+            }
+            else if(event.model.item.name == 'associate key') {
+                this.$['associatekeydialog'].items = this.selectedItems;
+                this.$['associatekeydialog']._openDialog();
             }
             else {
                 this.$['confirmation'].toggle();
