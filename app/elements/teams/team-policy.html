@@ -313,19 +313,12 @@
                     type: Array
                 },
                 sendingData: {
-<<<<<<< HEAD
-                    type: Boolean
-                },
-                formError: {
-                    type: Boolean
-=======
                     type: Boolean,
                     value: false
                 },
                 formError: {
                     type: Boolean,
                     value: false
->>>>>>> 7cf49c8a22e2251733f1a804e04e63eb6132ec10
                 },
                 newOrder: {
                     type: Array,
@@ -362,15 +355,7 @@
                 'update-rid': '_updateRid'
 
             },
-<<<<<<< HEAD
-            ready: function(){
-                this.set('sendingData', false);
-                this.set('formError', false);
-            },
-            attached: function(){
-=======
             attached: function() {
->>>>>>> 7cf49c8a22e2251733f1a804e04e63eb6132ec10
                 var el = document.getElementById('rules');
                 var sortable = Sortable.create(el, {
                     filter: '.head'
