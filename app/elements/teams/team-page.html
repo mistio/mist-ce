@@ -374,7 +374,7 @@
                         confirmedMembers = [];
 
                     team.members.forEach(function(member) {
-                        if (members.base[member].pending){
+                        if (members.base[member] && members.base[member].pending){
                             pendingMembers.push(members.base[member]);
                         }
                         else {
