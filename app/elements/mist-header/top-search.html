@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 
+<link rel="import" href="search-suggestions.html">
+
 <dom-module id="top-search">
   <template>
     <style is="custom-style">
@@ -22,12 +24,17 @@
         margin-right: 15px;
         cursor: pointer;
       }
-
       #search iron-icon {
-        margin-right: 0;
-        margin-left: 8px;
         color: inherit;
         align-self: center;
+      }
+      #search iron-icon[icon="search"] {
+        margin-right: 0;
+        margin-left: 8px;
+      }
+      #search iron-icon[icon="close"] {
+        margin-right: 8px;
+        margin-left: 0;
       }
 
       #search input {
@@ -52,13 +59,20 @@
       ::-webkit-input-placeholder {
         color: #fff !important;
       }
+
+      ::-webkit-search-cancel-button {
+        display: none;
+      }
+
     </style>
     <div id="search" class="horizontal layout center">
       <iron-icon icon="search"></iron-icon>
       <form on-submit="performSearch" class="flex">
           <input type="search" id="query" value="{{query::keyup}}" autocomplete="off" placeholder="Search">
       </form>
+      <iron-icon icon="close" on-tap="clearSearch" hidden$="[[!query.length]]"></iron-icon>
     </div>
+    <search-suggestions query="[[query]]" model="[[model]]"></search-suggestions>
   </template>
   <script>
   Polymer({
@@ -67,6 +81,11 @@
     properties: {
       query: {
         type: String,
+        notify: true,
+        value: ""
+      },
+      model: {
+        type: Object,
         notify: true
       }
     },
@@ -76,7 +95,7 @@
     ],
 
     listeners: {
-      keyup: 'hotkeys',
+      keyup: 'hotkeys'  
     },
 
     performSearch: function(e) {
@@ -87,7 +106,7 @@
     },
     
     _queryChanged: function(q) {
-      if (q) {
+      // if (q) {
         this.async(function() {
           this.$.query.focus();
           // make sure to force the cursor to the end of the
@@ -95,8 +114,11 @@
           this.$.query.setSelectionRange(q.length, q.length);
           this.fire('search', q);
         });
-      }
+      // }
     },
+    clearSearch: function(e){
+      this.set('query',"");
+    }
   });
   </script>
 </dom-module>

@@ -1,4 +1,5 @@
-<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
+<script src="../../bower_components/moment/moment.js"></script>
+
 <link rel="import" href="../app-image-icons/app-image-icons.html">
 
 <dom-module id="list-item">
@@ -60,7 +61,7 @@
             padding: 20px 0 0;
             white-space: inherit;
         }
-        
+
         .field.machines,
         .field.default,
         .field.id {
@@ -185,7 +186,7 @@ Polymer({
     },
 
     itemField: function(item, field) {
-        
+
         if (field == 'cost') {
             if (item.extra.cost_per_month) {
                 return '$'+Math.round(item.extra.cost_per_month);
@@ -197,13 +198,16 @@ Polymer({
 
         var ret = item[field];
 
+        if (field == 'subnets')
+            return ret ? ret.length : '';
+
         // return cloud title
         if (field == 'cloud')
-            return ret.title;        
+            return ret.title;
 
         if (field == 'template'){
-            if ( document.querySelector('app-main').model.templates[ret] )
-                return document.querySelector('app-main').model.templates[ret].name;
+            if ( document.querySelector('mist-app').model.templates[ret] )
+                return document.querySelector('mist-app').model.templates[ret].name;
             else {
                 return 'missing template';
             }
@@ -221,15 +225,15 @@ Polymer({
                 return '';
             }
         }
-        
+
         // field could be in the 'extra' section, but should not be an object
         if (!ret && item.extra && item.extra[field] && typeof(item.extra[field]) != 'object')
             ret = item.extra[field];
 
 
-        // image info stored inside: 
-        // extra.image_id on ec2, 
-        // item.extra.image.name or item.extra.image.slug in digital ocean, 
+        // image info stored inside:
+        // extra.image_id on ec2,
+        // item.extra.image.name or item.extra.image.slug in digital ocean,
         // item.imageId in openstack
         // TODO: complete the above list
         if (field == 'image' && !ret && item.extra && (item.extra[field+'_id'] || item.imageId || item.extra.image)){
@@ -256,7 +260,7 @@ Polymer({
             if (item.extra && item.extra.maxCpu && item.extra.maxMemory)
                 return item.extra.maxCpu + 'cpu, ' + item.extra.maxMemory + 'M ram';
             if (item.extra && item.extra.PLANID) {
-                var cloud = document.querySelector('app-main').model.clouds[item.cloud.id];
+                var cloud = document.querySelector('mist-app').model.clouds[item.cloud.id];
                 return (cloud && cloud.sizes) ? cloud.sizes[item.extra.PLANID] : item.extra.PLANID;
             }
             if (item.extra && item.extra.service_type)
@@ -264,22 +268,22 @@ Polymer({
         }
 
         if (field == 'cloud_id') {
-            return document.querySelector('app-main').model.clouds[ret].title;
+            return document.querySelector('mist-app').model.clouds[ret].title;
         }
         if (field == 'machine_id') {
-            return document.querySelector('app-main').model.clouds[item.cloud_id].machines[item.machine_id].name;
+            return document.querySelector('mist-app').model.clouds[item.cloud_id].machines[item.machine_id].name;
         }
 
         if (field == 'default') {
-            return document.querySelector('app-main').model.keys[item.id].isDefault ? 'Default' : '';
+            return document.querySelector('mist-app').model.keys[item.id].isDefault ? 'Default' : '';
         }
 
         if (field == 'machines') {
-            return document.querySelector('app-main').model.keys[item.id].machines.length;
+            return document.querySelector('mist-app').model.keys[item.id].machines.length;
         }
 
         if (field == 'stack state') {
-            var status = document.querySelector('app-main').model.stacks[item.id].status;
+            var status = document.querySelector('mist-app').model.stacks[item.id].status;
             if (status && status != 'ok'){
                 return status
             }
@@ -287,15 +291,15 @@ Polymer({
 
         if (field == 'members') {
 
-            var num = document.querySelector('app-main').model.teams[item.id].members.length;
+            var num = document.querySelector('mist-app').model.teams[item.id].members.length;
             return num ;
 
             // if (num == 0)
             //     return "No members yet";
             // if (num == 1)
-            //     return "1 member: "+document.querySelector('app-main').model.teams[item.id].members[0].email;
+            //     return "1 member: "+document.querySelector('mist-app').model.teams[item.id].members[0].email;
             // if (num > 1)
-            //     return num+" members: "+document.querySelector('app-main').model.teams[item.id].members[0].email+', '+document.querySelector('app-main').model.teams[item.id].members[1].email+', ...';
+            //     return num+" members: "+document.querySelector('mist-app').model.teams[item.id].members[0].email+', '+document.querySelector('mist-app').model.teams[item.id].members[1].email+', ...';
         }
 
 

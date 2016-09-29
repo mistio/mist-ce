@@ -1,5 +1,3 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
@@ -165,24 +163,7 @@
                 .wide {
                     display: inline;
                 }
-            }
-            .is-loading {
-                top: 15px;
-                left: 200px;
-                position: fixed;
-                right: 0;
-                bottom: 0;
-                display: block;
-                width: 100%;
-                height: 100vh;
-                background-color: #eee;
-            }
-            .is-loading paper-spinner {
-                width: 80px;
-                height: 80px;
-                margin: 10% auto;
-                display: block;
-            }
+            }            
         </style>
         <div id="content">
             <div class="is-loading" hidden$="[[!isLoading]]">
@@ -215,7 +196,6 @@
             </paper-material>
 
             <div class="key-info">
-                <!-- <paper-material></paper-material> -->
                 <paper-material>
                     <h4 class="id">Key ID:</h4><span class="id">[[key.id]]</span>
                     <template is="dom-if" if="[[tagsExist]]">
@@ -269,12 +249,9 @@
                 </paper-material>
             </div>
         </div>
-        <template is="dom-if" if="{{key.id}}">
-            <iron-ajax auto id="keyPublicRequest" url="{{baseUrl}}/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
-        </template>
-        <template is="dom-if" if="{{key.id}}">
-            <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
-        </template>
+        
+        <iron-ajax id="keyPublicRequest" url="/api/v1/keys/[[key.id]]/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
+        <iron-ajax id="keyPrivateRequest" url="/api/v1/keys/[[key.id]]/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/[[key.id]]" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
         <iron-ajax id="keyDeleteAjaxRequest" url="/api/v1/keys/[[key.id]]" method="DELETE" on-response="_handleKeyDeleteAjaxResponse" on-error="_handleKeyDeleteAjaxError"></iron-ajax>
         <key-edit key="[[key]]"></key-edit>
@@ -290,9 +267,6 @@
                 is: 'key-page',
 
                 properties: {
-                    sections: {
-                        type: Object
-                    },
                     section: {
                         type: Object
                     },
@@ -303,19 +277,8 @@
                         type: String,
                         computed: '_getHeaderStyle(section)'
                     },
-                    params: {
-                        type: Object,
-                        notify: true
-                    },
                     key: {
-                        type: Object,
-                        computed: '_computeKey(params, model.keysArray.*)',
-                        notify: true
-                    },
-                    id: {
-                        type: String,
-                        computed: '_computeId(params)',
-                        notify: true
+                        type: Object
                     },
                     isDefault: {
                         type: String,
@@ -345,11 +308,6 @@
                         type: Boolean,
                         value: false
                     },
-                    baseUrl: {
-                        type: String,
-                        computed: '_baseUrl(params)',
-                        notify: true
-                    },
                     isLoading: {
                         type: Boolean,
                         computed: '_computeIsloading(key)',
@@ -366,33 +324,22 @@
                     }
                 },
                 observers: [
-                    'update(params, model.keys.*)'
+                    'update(key)'
                 ],
                 listeners: {
-                    'confirmation': '_deleteKeyEventResponse',
-                    'updateSelectedKey': '_updateKey',
-                    'paramsChanged': 'update'
+                    'confirmation': '_deleteKeyEventResponse'
                 },
-                update: function(params) {
-                    if (this.$.keyPublicRequest) {
+                update: function(key){
+                    if (key){
+                        this.$.keyPublicRequest.headers["Content-Type"] = 'application/json';
+                        this.$.keyPublicRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.keyPublicRequest.body = {};
                         this.$.keyPublicRequest.generateRequest();
                     }
-                    this.visiblePrivateKey = false;
-                    this.set('privateKey', null);
-                },
-                _baseUrl: function(params) {
-                    return '/keys/' + this.params.id;
+                    this.set('visiblePrivateKey', false);
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
-                },
-                _computeKey: function(params, keys) {
-                    return keys.base.find(function(key) {
-                        return key.id == params.id;
-                    });
-                },
-                _computeId: function(params) {
-                    return params.id;
                 },
                 _computeTagsExist: function(key, tags){
                     if (this.key.tags.length > 0 && this.key.tags[0] && this.key.tags[0]['key'] && this.key.tags[0]['key'] != "") {
@@ -403,19 +350,24 @@
                     }
                 },
                 computeTagItems: function(key){
-                    var arr = [];
-                    var item = itemUid(key, this.section);
-                    arr.push(item);
-                    return arr;
+                    if (key) {
+                        var arr = [];
+                        var item = itemUid(key, this.section);
+                        arr.push(item);
+                        return arr;
+                    } 
                 },
                 _computeKeyMachines: function(key) {
-                    return key.machines;
+                    if (key)
+                        return key.machines;
                 },
                 _keyHasMachines: function(keyMachines) {
-                    return keyMachines.length > 0 ? true : false;
+                    if (keyMachines)
+                        return keyMachines.length > 0 ? true : false;
                 },
                 _keyHasMachinesMoreThanOne: function(keyMachines) {
-                    return keyMachines.length > 1 ? true : false;
+                    if (keyMachines)
+                        return keyMachines.length > 1 ? true : false;
                 },
                 getMachineUrl: function(keymachine) {
                     var url;
@@ -439,7 +391,7 @@
                 copyPublicKey: function() {
                     this.clearSelection();
                     var el = this.$.keyPublic;
-                    this.setSelection(el);            
+                    this.setSelection(el);
                     var successful = document.execCommand('copy');
                     var msg = successful ? 'The Public Key was copied to clipboard!' : 'There was an error copying to clipboard!';
                     this._showToast(msg);
@@ -447,32 +399,31 @@
                 copyPrivateKey: function() {
                     this.clearSelection();
                     var el = this.$.keyPrivate;
-                    this.setSelection(el);            
+                    this.setSelection(el);
                     var successful = document.execCommand('copy');
                     var msg = successful ? 'The Private Key was copied to clipboard!' : 'There was an error copying to clipboard!';
                     this._showToast(msg);
                 },
                 handlePublicResponse: function(data) {
-                    this.publicKey = data.detail.response;
+                    //console.log(data);
+                    this.set('publicKey', data.detail.response);
                 },
                 showPrivateKey: function() {
-                    // this.$.keyPrivateRequest.generateRequest();
+                    this.$.keyPrivateRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyPrivateRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyPrivateRequest.body = {};
+                    this.$.keyPrivateRequest.generateRequest();
                     this.visiblePrivateKey = true;
                 },
                 hidePrivateKey: function() {
-                    // this.$.keyPrivateRequest.generateRequest();
                     this.visiblePrivateKey = false;
                 },
                 handlePrivateResponse: function(data) {
-                    this.privateKey = data.detail.response;
+                    this.set('privateKey', data.detail.response);
                 },
                 _editKey: function(e) {
                     var el = this.querySelector('key-edit');
                     el._openEditKeyModal();
-                },
-                _updateKey: function(e) {
-                    var key = e.detail.key;
-                    this.set('key.id', key.id);
                 },
                 _makeDefaultKey: function(e) {
                     this.$.keyMakeDefaultAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -510,7 +461,7 @@
                     }
                 },
                 _handleKeyDeleteAjaxResponse: function(e) {
-                    page.show('/keys');
+                    this.shadowRoot.querySelector('app-location').path = '/keys';
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element');
@@ -524,8 +475,8 @@
                     toast.text = msg;
                     toast.show();
                 },
-                _computeIsloading(key) {
-                    return !this.key ? true : false;
+                _computeIsloading: function(key) {
+                    return !key ? true : false;
                 },
                 clearSelection: function(){
                 if (window.getSelection) {

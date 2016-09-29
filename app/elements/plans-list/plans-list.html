@@ -1,7 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 
-
 <dom-module id="plans-list">
     <template>
         <style include="shared-styles">
@@ -26,11 +25,11 @@
 
         <paper-material>
             <h3>Your plan</h3>
-            <plan-item user="[[user]]" plan="[[user.current_plan]]" iscurrent="true" index="0" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
+            <plan-item org="[[org]]" plan="[[org.current_plan]]" iscurrent="true" index="0" class$="[[computeCurrentClass(plan, org)]] plan"></plan-item>
             <h3>Other plans</h3>
             <div class="plans">
-                <template is="dom-repeat" items=[[plans]] as="plan">
-                    <plan-item user="[[user]]" plan="[[plan]]" index="[[index]]" iscurrent$="[[computeIsCurrent(plan, user)]]" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
+                <template is="dom-repeat" items=[[org.plans]] as="plan">
+                    <plan-item org="[[org]]" plan="[[plan]]" index="[[index]]" iscurrent$="[[computeIsCurrent(plan, org)]]" class$="[[computeCurrentClass(plan, org)]] plan"></plan-item>
                 </template>
             </div>
         </paper-material>
@@ -44,22 +43,13 @@
                 is: 'plans-list',
 
                 properties: {
-                    user: {
-                        type: Object,
-                        notify: true
-                    },
-                    plans: {
-                        type: Array,
-                        value: function() {
-                            return PLANS.filter(function(plan) {
-                                return plan.visible;
-                            });
-                        }
+                    org: {
+                        type: Object
                     }
                 },
-                computeIsCurrent: function(plan, user) {
-                  if (this.user.current_plan) {
-                    return plan.title == this.user.current_plan.title ? true : false;
+                computeIsCurrent: function(plan, org) {
+                  if (this.org.current_plan) {
+                    return plan.title == this.org.current_plan.title ? true : false;
                   }
                   else {
                     return false;

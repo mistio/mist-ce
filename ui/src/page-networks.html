@@ -1,0 +1,54 @@
+<link rel="import" href="../bower_components/app-route/app-route.html">
+
+<link rel="import" href="../elements/pages/page-items.html">
+<link rel="import" href="../elements/networks/network-add.html">
+<link rel="import" href="../elements/networks/network-page.html">
+
+<dom-module id="page-networks">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <app-route route="{{route}}"
+                pattern="/:network"
+                data="{{data}}"></app-route>
+
+    <page-items model="[[model]]" items="[[model.networksArray]]" section="[[sections.networks]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
+    <network-add model="[[model]]" section="[[sections.networks]]" hidden$=[[!_isAddPageActive(route.path)]]></network-add>
+    <network-page model="[[model]]" network$="[[_getNetwork(data.network, model.networks)]]" section="[[sections.networks]]" hidden$=[[!_isDetailsPageActive(route.path)]]></network-page>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'page-networks',
+
+      properties: {
+        model: Object,
+        onboarding: Object
+      },
+
+      attached: function() {
+
+      },
+
+      _isAddPageActive: function(path) {
+          return path == '/+add';
+      },
+      _isDetailsPageActive: function(path) {
+          return path && path != '/+add';
+      },
+      _isListActive: function(path) {
+          return !path;
+      },
+      _getNetwork: function(id) {
+          if (this.model.networks)
+              return this.model.networks[id];
+      }
+
+    });
+  </script>
+</dom-module>

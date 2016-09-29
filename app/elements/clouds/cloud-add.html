@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 
 <link rel="import" href="../app-form/app-form.html">
 
@@ -143,7 +144,7 @@
 
                 },
                 _cloudAddAjaxResponse: function(response) {
-                    page('/');
+                    document.querySelector('app-location').set('path', '/');
                 },
                 _cloudAddAjaxError: function(response) {
                     console.error('add-cloud error', response);
@@ -224,19 +225,19 @@
                     history.back();
                 },
                 _updateCloudTitle: function(e){
-                    var form = this.querySelector('app-form');                    
+                    var form = this.querySelector('app-form');
                     if (e.target.id == 'region') {
                         var region = e.detail.item.textContent.trim();
                         var index;
                         var title = '';
                         var titleField = this.providerFields.find(function(f, ind){
                             index = ind;
-                            title = f.defaultValue; 
+                            title = f.defaultValue;
                             return f.name == "title";
                         });
                         this.set('providerFields.'+index+'.value', title+' '+region);
                     }
-                    
+
                 }
             });
         })();

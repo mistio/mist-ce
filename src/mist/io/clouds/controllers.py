@@ -713,6 +713,7 @@ class OpenStackController(BaseController):
 
     def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'auth_url', 'url')
+        rename_kwargs(kwargs, 'tenant_name', 'tenant')
         url = kwargs.get('url')
         if url:
             if url.endswith('/v2.0/'):
@@ -919,7 +920,7 @@ class OtherController(BaseController):
             raise BadRequestError({'msg': exc.message,
                                    'errors': exc.to_dict()})
         except me.NotUniqueError:
-            raise CloudExistsError()
+            raise BadRequestError("Cloud with name %s already exists" % self.cloud.title)
 
         # Add machine.
         if kwargs:

@@ -1,5 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
@@ -131,7 +130,6 @@
                 right: 0;
                 bottom: 0;
                 display: block;
-                width: 100%;
                 height: 100vh;
                 background-color: #eee;
             }
@@ -229,10 +227,6 @@
                         computed: '_computeImage(params, model.imagesArray.*)',
                         notify: true
                     },
-                    imageid: {
-                        type: String,
-                        computed: '_computeImageId(params)'
-                    },
                     isStarred: {
                         type: Boolean,
                         computed: '_computeIsStarred(image.star)'
@@ -244,18 +238,12 @@
                     }
                 },
                 ready: function() {
-                    console.log(this.params, this.model);
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
                 _computeImage: function(params, images) {
-                    return images.base.find(function(image) {
-                        return image.id == params.id;
-                    });
-                },
-                _computeImageId: function(params) {
-                    return params.id;
+                    return params;
                 },
                 _computeIsStarred: function(star) {
                     return star;
@@ -293,7 +281,7 @@
                     toast.text = msg;
                     toast.show();
                 },
-                _computeIsloading(image) {
+                _computeIsloading: function(image) {
                     return !this.image ? true : false;
                 }
             });

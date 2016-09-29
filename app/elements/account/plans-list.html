@@ -1,0 +1,120 @@
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+
+<dom-module id="plans-list">
+    <template>
+        <style include="shared-styles">
+        :host {
+            display: block;
+        }
+
+        :host paper-material {
+            display: block;
+            padding: 0;
+        }
+
+        .plans {
+            @apply(--layout-horizontal);
+        }
+
+        .plan {
+            @apply(--layout-flex);
+            @apply(--shadow-elevation-2dp);
+        }
+
+        .plans {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
+        plan-item {
+            background-color: rgba(0,0,0,.06);
+        }
+        plan-item[iscurrent='true'] {
+            color: #ffffff;
+            background-color: #039BE5;
+        }
+
+        .grid-row {
+            padding: 24px;
+        }
+
+        .head {
+            margin-bottom: 16px;
+        }
+
+        h2.title {
+            font-weight: 500;
+        }
+
+        h2.title,
+        h2.title~p {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        </style>
+        <paper-material>
+            <div class="grid-row">
+                <div class="xs12 head">
+                    <h2 class="title">Your plan</h2>
+                    <p>Your current chosen plan, since [[_computeReadableDate(user.current_plan.started)]].</p>
+                </div>
+                <div class="plans xs12 l6">
+                    <plan-item user="[[user]]" plan="[[user.current_plan]]" iscurrent="true" index="0" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
+                </div>
+                <div class="xs12 l6">
+                    <p hidden$="[[!user.current_plan.promo_code.description]]">Your current plan offers you: [[user.current_plan.promo_code.description]]</p>
+                    <p>For questions and other information contact us at <a href="mailto:support@mist.io">support@mist.io</a></p>
+                </div>
+            </div>
+            <div class="grid-row">
+                <div class="xs12 head">
+                    <h2 class="title">Other plans</h2>
+                    <p>Other Mist.io available plans.</p>
+                </div>
+                <div class="plans xs12">
+                    <template is="dom-repeat" items=[[plans]] as="plan">
+                        <plan-item class="xs6 l3" user="[[user]]" plan="[[plan]]" index="[[index]]" iscurrent="[[computeIsCurrent(plan, user)]]" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
+                    </template>
+                </div>
+            </div>
+        </paper-material>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'plans-list',
+
+            properties: {
+                user: {
+                    type: Object
+                },
+                org: {
+                    type: Object
+                },
+                plans: {
+                    type: Array,
+                    computed: 'computePlans(user,org)'
+                }
+            },
+            computeIsCurrent: function(plan, user) {
+                if (this.user.current_plan) {
+                    return plan.title == this.user.current_plan.title ? true : false;
+                } else {
+                    return false;
+                }
+            },
+            computePlans:  function(user, org){
+                return this.org.plans.filter(function(p){
+                    return p.visible && p.title != this.user.current_plan.title;
+                }, this);
+            },
+            _computeReadableDate: function(date) {
+                console.log('date', date, moment(date))
+                return moment(date * 1000).format("MMMM Do YYYY");
+            }
+        });
+    })();
+    </script>
+</dom-module>

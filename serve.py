@@ -1,7 +1,6 @@
 import sys
 import time
 import signal
-import logging
 
 import tornado.web
 import tornado.ioloop
@@ -15,10 +14,9 @@ except ImportError:
     from mist.io.sock import make_router
 
 
-log = logging.getLogger(__name__)
-
-
 def sig_handler(sig, frame):
+    import logging
+    log = logging.getLogger(__name__)
     log.warning("SockJS-Tornado process received SIGTERM/SIGINT")
     if heartbeat_pc.is_running():
         heartbeat_pc.stop()
@@ -28,17 +26,23 @@ def sig_handler(sig, frame):
 
 
 def usr1_handler(sig, frame):
+    import logging
+    log = logging.getLogger(__name__)
     log.warning("SockJS-Tornado process received SIGUSR1")
     for conn in list(mist.io.sock.CONNECTIONS):
         log.info(conn)
 
 def usr2_handler(sig, frame):
+    import logging
+    log = logging.getLogger(__name__)
     log.warning("SockJS-Tornado process received SIGUSR2. Reloading clients")
     for conn in list(mist.io.sock.CONNECTIONS):
         log.info(conn)
         conn.send('reload')
 
 def heartbeat():
+    import logging
+    log = logging.getLogger(__name__)
     now = time.time()
     connections = list(mist.io.sock.CONNECTIONS)
     for conn in connections:

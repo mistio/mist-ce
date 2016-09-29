@@ -1,5 +1,9 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="organization-add">
     <template>
@@ -19,7 +23,6 @@
 
         <paper-dialog id="organizationAddModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
             <h2>Add Organization</h2>
-            <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
                 <div hidden$="[[success]]">
                     <p>
@@ -27,6 +30,7 @@
                     </p>
                     <div id="errormsg" hidden$="[[!fail]]"></div>
                     <div class="clearfix btn-group">
+                        <paper-button class="blue-link" dialog-dismiss> Cancel </paper-button> 
                         <paper-button class="submit-btn btn-block blue" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
                     </div>
                 </div>
@@ -35,9 +39,9 @@
                         New organisation created successfully. You can switch to the new organization context.
                     </p>
                     <p>
-                       <paper-button class="submit-btn btn-block blue" on-tap="_switchOrg">Switch</paper-button> 
+                       <paper-button class="submit-btn btn-block blue" on-tap="_switchOrg">Switch</paper-button>
                     </p>
-                </div>    
+                </div>
             </paper-dialog-scrollable>
         </paper-dialog>
 
@@ -73,7 +77,7 @@
                     newOrgId: String,
                     fail: {
                         type: Boolean,
-                        value: false  
+                        value: false
                     }
                 },
                 _computeFormReady: function(name, sendingData) {
