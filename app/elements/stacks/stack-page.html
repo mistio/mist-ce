@@ -819,19 +819,24 @@
                     return stack.status == 'workflow_started';
                 },
                 is_ok: function(stack) {
-                    return stack.status == 'ok';
+                    if (stack)
+                        return stack.status == 'ok';
                 },
                 _showAll: function(stack) {
-                    return stack.status == 'ok' || stack.status == 'error';
+                    if (stack)
+                        return stack.status == 'ok' || stack.status == 'error';
                 },
                 _hideWorkflows: function(stack) {
-                    return !stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
+                    if (stack)
+                        return !stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
                 },
                 _hideDeployNow: function(stack) {
-                    return stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
+                    if (stack)
+                        return stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
                 },
                 _disabledButtons: function(stack) {
-                    return stack.status == 'workflow_started' || stack.status == 'start_creation';
+                    if (stack)
+                        return stack.status == 'workflow_started' || stack.status == 'start_creation';
                 },
                 _closeworkflows: function() {
                     this.$.workflows.classList.remove('open');
@@ -868,8 +873,9 @@
 
                     return sum > 0 ? true : false;
                 },
-                _computeTemplate: function(stack) {
-                    return this.model.templates[stack.template];
+                _computeTemplate: function(stack, templates) {
+                    if (stack)
+                        return this.model.templates[stack.template];
                 },
                 _computeJobID: function(stack) {
                     return stack.job_id ? stack.job_id : false;
@@ -1000,9 +1006,10 @@
                     return workflows;
                 },
                 _getFormattedTimestamp: function(stack) {
-                    return new Date(this.stack.created_at).toLocaleString('en-US', {
-                        timeZoneName: 'short'
-                    });
+                    if (stack)
+                        return new Date(this.stack.created_at).toLocaleString('en-US', {
+                            timeZoneName: 'short'
+                        });
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element'),
@@ -1106,7 +1113,7 @@
                     return anchorme.js(YAML.dump(info).replace(/\'/g, ""));
                 },
                 _updateLogs: function(that){
-                    if (that.stack && that.stack.status == 'workflow_started' || that.stack.status == 'start_creation'){
+                    if (that.stack && (that.stack.status == 'workflow_started' || that.stack.status == 'start_creation')){
                         console.log('_updateLogs');
                         that.$.getJobLog.generateRequest();
                     }

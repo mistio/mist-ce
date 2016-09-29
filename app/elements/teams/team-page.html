@@ -341,10 +341,12 @@
                     this.vpHeight = 'height:' + wh + 'px; overflow: auto;';
                 },
                 _getFormattedTimestamp: function(team) {
-                    var timestamp = parseInt(team.created_at);
-                    return Date(timestamp).toLocaleString('en-US', {
-                        timeZoneName: 'short'
-                    });
+                    if (team) {
+                        var timestamp = parseInt(team.created_at);
+                        return Date(timestamp).toLocaleString('en-US', {
+                            timeZoneName: 'short'
+                        });
+                    }
                 },
                 _hasOnlyYou: function(team) {
                     if (team && team.members && team.members.length == 1 && team.members[0].email == this.model.user.email){
