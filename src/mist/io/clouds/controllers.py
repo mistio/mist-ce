@@ -57,7 +57,7 @@ from mist.core.vpn.methods import to_tunnel
 
 from mist.io.bare_metal import BareMetalDriver
 
-from mist.io.clouds.base import BaseController, tags_to_dict, rename_kwargs
+from mist.io.clouds.base import BaseController, rename_kwargs
 
 
 log = logging.getLogger(__name__)
@@ -102,10 +102,9 @@ class AmazonController(BaseController):
                machine, machine_libcloud)
         machine.actions.rename = True
 
-    def _list_machines__postparse_machine(self, machine,
-                                          machine_libcloud, tags):
+    def _list_machines__postparse_machine(self, machine, machine_libcloud):
         # This is windows for windows servers and None for Linux.
-        machine.os_type = machine.extra.get('platform', 'linux')
+        machine.os_type = machine_libcloud.extra.get('platform', 'linux')
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
         image_id = machine_libcloud.extra.get('image_id')
@@ -211,12 +210,13 @@ class LinodeController(BaseController):
         if machine_libcloud.state is NodeState.PENDING:
             machine.actions.start = True
 
-    def _list_machines__postparse_machine(self, machine,
-                                          machine_libcloud, tags):
-        datacenter = machine.extra.get('DATACENTER')
-        datacenter = config.LINODE_DATACENTERS.get(datacenter)
-        if datacenter:
-            tags['DATACENTERID'] = datacenter
+    # FIXME why we need this?
+    # def _list_machines__postparse_machine(self, machine, machine_libcloud):
+        # datacenter = machine_libcloud.extra.get('DATACENTER')
+        # datacenter = config.LINODE_DATACENTERS.get(datacenter)
+        # if datacenter:
+        #     # TODO insert tags in machine.extra
+        #     machine.extra['provider_tags']['DATACENTERID'] = datacenter
 
     def _list_machines__cost_machine(self, machine, machine_libcloud):
         size = machine_libcloud.extra.get('PLANID')
@@ -294,11 +294,10 @@ class SoftLayerController(BaseController):
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return machine_libcloud.extra.get('created')  # iso8601 string
 
-    def _list_machines__postparse_machine(self,  machine,
-                                          machine_libcloud, tags):
-        machine.extra['os_type'] = machine.os_type = 'linux'
-        if 'windows' in str(machine.extra.get('image', '')).lower():
-            machine.extra['os_type'] = machine.os_type = 'windows'
+    def _list_machines__postparse_machine(self, machine, machine_libcloud):
+        machine.os_type = 'linux'
+        if 'windows' in str(machine_libcloud.extra.get('image', '')).lower():
+            machine.os_type = 'windows'
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
         # SoftLayer includes recurringFee on the VM metadata but
@@ -315,8 +314,8 @@ class SoftLayerController(BaseController):
                     extra_fee += float(item.get('recurringFee'))
             return 0, cpu_fee + extra_fee
         else:
-            # machine_libcloud.extra.get('recurringFee') here will show what it has
-            # cost for the current month, up to now.
+            # machine_libcloud.extra.get('recurringFee')
+            # here will show what it has cost for the current month, up to now.
             cpu_fee = float(machine_libcloud.extra.get('hourlyRecurringFee'))
             for item in machine_libcloud.extra.get('billingItemChildren', ()):
                 # don't calculate billing that is cancelled
@@ -333,7 +332,6 @@ class SoftLayerController(BaseController):
         self.connection.destroy_node(machine_libcloud)
 
 
-
 class NephoScaleController(BaseController):
 
     provider = 'nephoscale'
@@ -347,13 +345,12 @@ class NephoScaleController(BaseController):
                machine, machine_libcloud)
         machine.actions.rename = True
 
-    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return machine_libcloud.extra.get('create_time')  # iso8601 string
 
-    def _list_machines__postparse_machine(self,  machine,
-                                          machine_libcloud, tags):
-        machine.extra['os_type'] = machine.os_type = 'linux'
-        if 'windows' in str(machine.extra.get('image', '')).lower():
+    def _list_machines__postparse_machine(self, machine, machine_libcloud):
+        machine.os_type = 'linux'
+        if 'windows' in str(machine_libcloud.extra.get('image', '')).lower():
             machine.extra['os_type'] = machine.os_type = 'windows'
 
     def _list_sizes__fetch_sizes(self):
@@ -405,8 +402,8 @@ class AzureController(BaseController):
 
     def _get_machine_libcloud(self, machine, no_fail=False):
         cloud_service = self._cloud_service(machine.machine_id)
-        for node in self.connection.list_nodes(ex_cloud_service_name=
-                                               cloud_service):
+        for node in self.connection.list_nodes(
+                ex_cloud_service_name=cloud_service):
             if node.id == machine.machine_id:
                 return node
             if no_fail:
@@ -466,44 +463,29 @@ class GoogleController(BaseController):
             except:
                 raise MistError("Make sure you upload a valid json file.")
 
-    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
-        return machine_libcloud.extra.get('creationTimestamp')  # iso8601 string
+    def _list_machines__machine_creation_date(self, machine, machine_libcloud):
+        # iso8601 string
+        return machine_libcloud.extra.get('creationTimestamp')
 
-    def _list_machines__postparse_machine(self,  machine,
-                                          machine_libcloud, tags):
-        extra = machine.extra
-
+    def _list_machines__postparse_machine(self, machine, machine_libcloud):
+        extra = machine_libcloud.extra
+        # TODO delete this
         # Tags and metadata exist in special location for GCE.
-        provider_tags = tags_to_dict(extra.get('metadata', {}).get('items', []))
-        for key in ('gce-initial-windows-password',
-                    'gce-initial-windows-user'):
-            # Windows specific metadata including user/password.
-# <<<<<<< HEAD
-            if key in provider_tags:
-                extra[key] = provider_tags.pop(key)
-        tags.update(provider_tags)
-# =======
-#             if key in tags:
-#                 extra[key] = tags.pop(key)
-
-        # FIXME only for now and not forever
-        # we mist change in list_machines the order of libcloud tags
-        # and post_parse machine, better in the oomachines branch
-        for key in ('items', 'fingerprint', 'kind'):
-            if key in extra['tags']:
-                extra['tags'].pop(key)
-
-        tags.update(extra['tags'])
-        extra['tags'] = tags
-# >>>>>>> staging
+        # clean up a little bit
+        # tags = tags_to_dict(extra.get('metadata', {}).get('items', []))
+        # for key in ('gce-initial-windows-password',
+        #             'gce-initial-windows-user'):
+        #     # Windows specific metadata including user/password.
+        #     if key in tags:
+        #         extra[key] = tags.pop(key)
 
         # Wrap in try/except to prevent from future GCE API changes.
 
         # Identify server OS.
-        machine.extra['os_type'] = 'linux'
+        machine.os_type = 'linux'
         try:
             if 'windows-cloud' in extra['disks'][0]['licenses'][0]:
-                machine.extra['os_type'] = 'windows'
+                machine.os_type = 'windows'
         except:
             log.exception("Couldn't parse os_type for machine %s:%s for %s",
                           machine.id, machine.name, self.cloud)
@@ -512,8 +494,8 @@ class GoogleController(BaseController):
         try:
             if extra.get('boot_disk'):
                 machine.extra['boot_disk_size'] = extra['boot_disk'].size
-                machine.extra['boot_disk_type'] = extra['boot_disk'].extra.get(
-                    'type')
+                machine.extra['boot_disk_type'] = extra[
+                                            'boot_disk'].extra.get('type')
                 machine.extra.pop('boot_disk')
         except:
             log.exception("Couldn't parse disk for machine %s:%s for %s",
@@ -530,8 +512,8 @@ class GoogleController(BaseController):
         # Get machine type.
         try:
             if extra.get('machineType'):
-                machine.extra['machine_type'] = extra['machineType'].split(
-                    '/')[-1]
+                machine.extra['machine_type'] = extra[
+                                                'machineType'].split('/')[-1]
         except:
             log.exception("Couldn't parse machine type "
                           "for machine %s:%s for %s",
@@ -623,7 +605,7 @@ class PacketController(BaseController):
         return get_driver(Provider.PACKET)(self.cloud.apikey,
                                            project=self.cloud.project_id)
 
-    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return machine_libcloud.extra.get('created_at')  # iso8601 string
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
@@ -640,7 +622,7 @@ class VultrController(BaseController):
     def _connect(self):
         return get_driver(Provider.VULTR)(self.cloud.apikey)
 
-    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return machine_libcloud.extra.get('date_created')  # iso8601 string
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
@@ -699,15 +681,16 @@ class VCloudController(BaseController):
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(VCloudController, self)._list_machines__machine_actions(
-               machine, machine_libcloud)
+              machine, machine_libcloud)
         if machine_libcloud.state is NodeState.PENDING:
             machine.actions.start = True
             machine.actions.stop = True
 
-    def _list_machines__postparse_machine(self,  machine,
-                                          machine_libcloud, tag):
-        if machine.extra.get('vdc'):
-            tag['vdc'] = machine.extra['vdc']
+    # TODO delete this, we don't use providers tag anymore
+    # def _list_machines__postparse_machine(self,  machine, machine_libcloud):
+    #     if machine_libcloud.extra.get('vdc'):
+    #         vdc = machine_libcloud.extra.get('vdc')
+    #         machine.extra['provider_tags']['vdc'] = vdc
 
 
 class IndonesianVCloudController(VCloudController):
@@ -748,7 +731,7 @@ class OpenStackController(BaseController):
             kwargs['url'] = url.rstrip('/')
             check_host(sanitize_host(kwargs['url']))
 
-    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return machine_libcloud.extra.get('created')  # iso8601 string
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
@@ -802,7 +785,7 @@ class DockerController(BaseController):
             kwargs['host'] = sanitize_host(kwargs['host'])
             check_host(kwargs['host'])
 
-    def _list_machines__machine_creation_date(self,  machine, machine_libcloud):
+    def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return machine_libcloud.created_at  # unix timestamp
 
     def _list_images__fetch_images(self, search=None):
@@ -831,8 +814,8 @@ class DockerController(BaseController):
         else:
             node_info = self.connection.inspect_node(machine_libcloud)
             try:
-                port = node_info.extra['network_settings']['Ports'
-                ]['22/tcp'][0]['HostPort']
+                port = node_info.extra[
+                    'network_settings']['Ports']['22/tcp'][0]['HostPort']
             except KeyError:
                 port = 22
 
@@ -842,7 +825,7 @@ class DockerController(BaseController):
 
     def _start_machine(self,  machine, machine_libcloud):
         self.connection.ex_start_node(machine_libcloud)
-        self._action_change_port( machine, machine_libcloud)
+        self._action_change_port(machine, machine_libcloud)
 
     def _reboot_machine(self,  machine, machine_libcloud):
         machine_libcloud.reboot()
@@ -903,7 +886,7 @@ class LibvirtController(BaseController):
             **kwargs
         )
         if self.cloud.key is not None:
-            # FIMXE
+            # FIXME
             from mist.io.methods import associate_key
             associate_key(self.cloud.owner, self.cloud.key.id, self.cloud.id,
                           self.cloud.host,  # hypervisor id is the hostname
@@ -915,7 +898,7 @@ class LibvirtController(BaseController):
         if machine.extra.get('tags', {}).get('type') == 'hypervisor':
             # Allow only reboot and tag actions for hypervisor.
             for action in ('start', 'stop', 'destroy', 'rename'):
-                machine.actions[action] == False
+                setattr(machine.actions, action, False)
         else:
             machine.actions.undefine = True
             if machine_libcloud.state is NodeState.TERMINATED:
@@ -926,9 +909,8 @@ class LibvirtController(BaseController):
             if machine_libcloud.state is NodeState.SUSPENDED:
                 machine.actions.resume = True
 
-    def _list_machines__postparse_machine(self,  machine,
-                                          machine_libcloud, tags):
-        xml_desc = machine.extra.get('xml_description')
+    def _list_machines__postparse_machine(self,  machine, machine_libcloud):
+        xml_desc = machine_libcloud.extra.get('xml_description')
         if xml_desc:
             machine.extra['xml_description'] = escape(xml_desc)
 
@@ -936,13 +918,13 @@ class LibvirtController(BaseController):
         return self.connection.list_images(location=self.cloud.images_location)
 
     def _reboot_machine(self, machine, machine_libcloud):
-        if machine_libcloud.extra.get('tags', {}).get('type',
-                                                      None) == 'hypervisor':
+        hypervisor = machine_libcloud.extra.get('tags', {}).get('type',None)
+        if hypervisor == 'hypervisor':
             # issue an ssh command for the libvirt hypervisor
             try:
                 hostname = machine_libcloud.public_ips[0] if \
-                    machine_libcloud.public_ips else \
-                    machine_libcloud.private_ips[0]
+                           machine_libcloud.public_ips else \
+                           machine_libcloud.private_ips[0]
                 command = '$(command -v sudo) shutdown -r now'
                 # todo move it up
                 from mist.core.methods import ssh_command
@@ -963,7 +945,7 @@ class LibvirtController(BaseController):
     def _undefine_machine(self, machine, machine_libcloud):
         self.connection.ex_undefine_node(machine_libcloud)
 
-# FIXME
+
 class OtherController(BaseController):
 
     provider = 'bare_metal'
