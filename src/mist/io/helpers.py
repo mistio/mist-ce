@@ -143,12 +143,15 @@ def parse_ping(stdout):
 
 
 def amqp_publish(exchange, routing_key, data,
-                 ex_type='fanout', ex_declare=False):
+                 ex_type='fanout', ex_declare=False, 
+                 dump_to_json=True):
     connection = Connection(config.AMQP_URI)
     channel = connection.channel()
     if ex_declare:
         channel.exchange_declare(exchange=exchange, type=ex_type)
-    msg = Message(json.dumps(data))
+    if dump_to_json:
+        data = json.dumps(data)
+    msg = Message(data)
     channel.basic_publish(msg, exchange=exchange, routing_key=routing_key)
     channel.close()
     connection.close()
