@@ -27,8 +27,8 @@
             <p>
                 <span class="grey"> Choose from your existing scripts. </span>
                 <paper-dropdown-menu label="Select script" horizontal-align="left">
-                    <paper-menu id="scripts" attr-for-selected="value" selected="[[selected]]" class="dropdown-content">
-                        <template is="dom-repeat" items="[[model.scriptsArray]]" as="script">
+                    <paper-menu id="scripts" attr-for-selected="value" selected="{{selected}}" class="dropdown-content">
+                        <template is="dom-repeat" items="[[scripts]]" as="script">
                             <paper-item value="[[script.id]]">[[script.name]]</paper-item>
                         </template>
                     </paper-menu>
@@ -41,7 +41,7 @@
                 <paper-button dialog-dismiss>
                     Cancel
                 </paper-button>
-                <paper-button class="blue" on-tap="associateKey" dialog-confirm disabled$="[[!selectedScriptId]]">
+                <paper-button class="blue" on-tap="runScript" dialog-confirm disabled$="[[!selectedScriptId]]">
                     Run Script
                 </paper-button>
             </div>
@@ -56,13 +56,18 @@ Polymer({
     is: 'run-script-on-machine',
 
     properties: {
-        model: Object,
-        machine: Object,
-        cloudId: String,
+        items: {
+            type: Array,
+            notify: true
+        },
         selected: String,
         selectedScriptId: {
             type: String,
             value: false
+        },
+        scripts: {
+            type: Array,
+            computed: 'computeScripts(items)'
         },
         params: String
     },
@@ -75,31 +80,58 @@ Polymer({
         this.set('selectedScriptId', this.querySelector('#scripts').selected || '');
     },
     _openDialog: function(e) {
+        this.set('selected', false);
+        this.set('selectedScriptId', false);        
         this.$.scriptDialogModal.open();
     },
     _closeDialog: function(e) {
         this.$.scriptDialogModal.close();
     },
-    associateKey: function(e){
-        this.$.runScriptRequest.body = {
-            machine_id: this.machine.id,
-            cloud_id: this.cloudId,
-            params: this.params
+    runScript: function(e){
+        var request = this.$.runScriptRequest;
+        var scriptparams = this.params || '';
+
+        console.log('runScript',request.id, items, scriptparams);
+
+        var items = this.items.slice(0);
+        var run = function(el) {
+            var item = items.shift(),
+                itemType = item.split(':')[0],
+                itemCloud = item.split(':')[1],
+                itemId = item.split(':')[2];
+
+            request.body = {
+                machine_id: itemId,
+                cloud_id: itemCloud,
+                params: scriptparams
+            }
+
+            request.headers["Content-Type"] = 'application/json';
+            request.headers["Csrf-Token"] = CSRF_TOKEN;
+            request.generateRequest();
+
+            if (items.length) {
+                run(el);
+            }
         }
-        this.$.runScriptRequest.headers["Content-Type"] = 'application/json';
-        this.$.runScriptRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-        this.$.runScriptRequest.generateRequest();
+        run(this); 
     },
     _runScriptRequest: function(e){
-        this.fire('run-script-request', {request: true, scriptId: this.selectedScriptId, machine: this.machine.uuid});
+        this.fire('run-script-request', {request: true, scriptId: this.selectedScriptId});
     },
     _runScriptResponse: function(e){
         console.log(e, e.detail);
-        this.fire('run-script-request', {response: e.detail.xhr.response, scriptId: this.selectedScriptId, machine: this.machine.uuid});
+        this.fire('run-script-request', {response: e.detail.xhr.response, scriptId: this.selectedScriptId});
     },
     _runScriptError: function(e){
-        console.log(e, e.detail.xhr.responseText);
-        this.fire('run-script-request', {error: true, errormsg: e.detail.xhr.responseText, scriptId: this.selectedScriptId, machine: this.machine.uuid});
+        console.log(e, e.detail);
+        this.fire('run-script-request', {error: true, errormsg: e.detail.xhr.responseText, scriptId: this.selectedScriptId});
     },
+    computeModel: function(){
+        return document.querySelector("app-main") ? document.querySelector("app-main").model : document.querySelector("mist-app").model;
+    },
+    computeScripts: function(items){
+        return this.computeModel().scriptsArray;
+    }
 });
 </script>

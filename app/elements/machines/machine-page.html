@@ -8,9 +8,7 @@
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 
-<!-- <link rel="import" href="associate-key.html"> -->
 <link rel="import" href="machine-edit.html">
-<link rel="import" href="run-script-on-machine.html">
 
 <dom-module id="machine-page">
     <template>
@@ -22,7 +20,7 @@
                 display: block;
             }
             .columns {
-                @apply(--layout-horizontal);
+                @apply(--layout-horizontal);  
                 flex: 1 100%;
                 margin-bottom: 16px;
             }
@@ -315,7 +313,6 @@
         </div>
         <dialog-element id="machinedialog"></dialog-element>
         <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
-        <run-script-on-machine model="[[model]]" machine="[[machine]]" cloud-id="[[machine.cloud.id]]"></run-script-on-machine>
         <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
@@ -337,6 +334,12 @@ MACHINEACTIONS = {
     'icon': 'label',
     'confirm': true,
     'multi': true
+  },
+  'run-script': {
+    'name': 'run script',
+    'icon': 'image:movie-creation',
+    'confirm': true,
+    'multi': false
   },
   'associate-key': {
     'name': 'associate key',
@@ -524,6 +527,8 @@ MACHINEACTIONS = {
               // if not monitoring then enable monitoring
               ret.push('shell');
               ret.push('associate-key');
+              if(this.hideAssociatedKeys)
+                ret.push('run-script');
             }
             if (item.can_tag)
                 ret.push('tag');
@@ -688,110 +693,7 @@ MACHINEACTIONS = {
         _editMachine: function(e) {
             var el = this.querySelector('machine-edit');
             el._openEditMachineModal();
-        },
-        shell: function(){
-            console.warn('opening shell');
-            var el = this;
-            // load page import on demand.
-            el.importHref(el.resolveUrl('../helpers/xterm-dialog.html'), null, null, true);
-            var xterm = el.querySelector("xterm-dialog");
-            if (!xterm) {
-                xterm = document.createElement("xterm-dialog");
-                xterm.target = this.machine;
-                var parent = el.parentElement.parentElement;
-                parent.insertBefore(xterm, parent.firstChild);
-            }
-            return;
-        },
-        start: function(_, params) {
-            this.confirmAction("start");
-        },
-        stop: function(_, params) {
-            this.confirmAction("stop");
-        },
-        suspend: function(_, params) {
-            this.confirmAction("suspend");
-        },
-        reboot: function(_, params) {
-            this.confirmAction("reboot");
-        },
-        resume: function(_, params) {
-            this.confirmAction("resume");
-        },
-        undefine: function(_, params) {
-            this.confirmAction("undefine");
-        },
-        destroy: function(_, params) {
-            this._showDialog({
-                title: 'Destroy Machine?',
-                body: "Destroying a machine can not be undone. You are about to delete machine '" + this.machine.name + "'.",
-                danger: true,
-                reason: "machine.destroy",
-                action: "destroy"
-            });
-        },
-        _deleteMachine: function(e) {
-            this._showDialog({
-                title: 'Delete Machine?',
-                body: "Deleting a machine can not be undone. You are about to destroy machine '" + this.machine.name + "'.",
-                danger: true,
-                reason: "machine.delete"
-            });
-        },
-        _machineActionConfirmation: function(e) {
-            var reason = e.detail.reason,
-                response = e.detail.response;
-
-            if (response.confirmed && reason == "machine.delete") {
-                this.$.machineDeleteAjaxRequest.body = {};
-                this.$.machineDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
-                this.$.machineDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                this.$.machineDeleteAjaxRequest.generateRequest();
-            }
-
-            if (response.confirmed && reason != "machine.delete") {
-                if (reason == "machine.start")
-                    payload = {'action': 'start'};
-                if (reason == "machine.stop")
-                    payload = {'action': 'stop'};
-                if (reason == "machine.suspend")
-                    payload = {'action': 'suspend'};
-                if (reason == "machine.reboot")
-                    payload = {'action': 'reboot'};
-                if (reason == "machine.resume")
-                    payload = {'action': 'resume'};
-                if (reason == "machine.undefine")
-                    payload = {'action': 'undefine'};
-                if (reason == "machine.destroy")
-                    payload = {'action': 'destroy'};
-                if (reason == "disassociate.key"){
-                    payload = {'host': this.machineIp};
-                    this.$.disassociateKeyRequest.body = payload;
-                    this.$.disassociateKeyRequest.headers["Content-Type"] = 'application/json';
-                    this.$.disassociateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.disassociateKeyRequest.generateRequest();
-                }
-
-                if (reason != "disassociate.key"){
-                    this.$.actionRequest.body = payload;
-                    this.$.actionRequest.headers["Content-Type"] = 'application/json';
-                    this.$.actionRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.actionRequest.generateRequest();
-                }
-            }
-        },
-        _actionRequest: function(e){
-            this._showToast('Action request was sent. Waiting for response.');
-        },
-        _actionResponse: function(e){
-            this._showToast('Requested action is being processed');
-        },
-        _actionError: function(e){
-            this._showToast('Action request failed');
-        },
-        _handleMachineDeleteAjaxResponse: function(e) {
-            document.querySelector('app-location').path = '/machines';
-        },
+        },    
         _computeReplaceTargets: function(machine) {
             var ret = {'bucky.': ''};
             var m = this.machine;
@@ -829,10 +731,6 @@ MACHINEACTIONS = {
         _computeIsloading: function(machine) {
             return !this.machine ? true : false;
         },
-        // associateKey:  function(e){
-        //     var keysDialog = this.querySelector('associate-key');
-        //     keysDialog._openDialog();
-        // },
         disassociateKey: function(e){
             var keyId = e.target['dataKeyid'];
             var keyName = e.target['dataKeyname'];
@@ -877,10 +775,6 @@ MACHINEACTIONS = {
         _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
             var hide =  !(associatedKeys.base.length > 0 || isPendingKeyRequest);
             this.set('hideAssociatedKeys', hide);
-        },
-        _runScript: function(e){
-            var scriptDialog = this.querySelector('run-script-on-machine');
-            scriptDialog._openDialog();
         },
         _feedbackOnScript: function(e){
             if (e.detail.response) {
