@@ -563,7 +563,7 @@ Polymer({
             return ['name', 'machines', 'id', 'default']
         }
         if (this.isNetworks(this.section)) {
-            return ['name', 'cloud', 'state', 'id', 'public']
+            return ['name', 'provider', 'status', 'id', 'network_type', 'subnets']
         }
         if (this.isTunnels(this.section)) {
             return ['name', 'cidrs', 'id']
@@ -685,7 +685,7 @@ Polymer({
         if (s == "machines")
             p = item.uuid
         else if (s == "networks")
-            p = item.name
+            p = item.id
         else if (s == "incidents")
             p = item.machine_id
         else

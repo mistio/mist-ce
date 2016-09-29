@@ -358,7 +358,7 @@ class DockerShell(object):
         self.host, docker_port = dnat(user, self.host, docker_port)
 
         # For basic auth
-        if cloud.apikey and cloud.apisecret:
+        if cloud.username and cloud.password:
             self.uri = "://%s:%s@%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
                        (cloud.username, cloud.password, self.host, docker_port, machine_id)
         else:

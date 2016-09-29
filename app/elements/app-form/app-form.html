@@ -153,7 +153,10 @@
                     </template>
                     <template is="dom-if" if="[[_computeFieldType(field, 'toggle', field.show)]]">
                         <div class="xs12 m6">
-                            <paper-toggle-button checked="{{field.value}}" disabled="[[field.disabled]]" hidden="[[field.hidden]]">[[field.name]]</paper-toggle-button>
+                            <paper-toggle-button id="[[field.name]]" checked="{{field.value}}" disabled="[[field.disabled]]" hidden="[[field.hidden]]">
+                                <span hidden$="[[!field.label]]">[[field.label]]</span>
+                                <span hidden$="[[field.label]]">[[field.name]]</span>
+                            </paper-toggle-button>
                         </div>
                     </template>
                     <div class="field-helptext xs12 m6" hidden="[[field.hidden]]">[[field.helptext]]
@@ -289,7 +292,7 @@
                     },
                     referral:  {
                         type: String
-                    },
+                    }
                 },
                 observers: [
                     '_fieldsChanged(fields.*, sendingData)',
@@ -408,8 +411,11 @@
                         }, this);
 
                         var valid = fields.base.every(function(el, index) {
-                           if(el.type == "ip_textarea") {
+                           if (el.type == "ip_textarea") {
                              return el.show ? this.validatecidr(el.value, index) : true;
+                           }
+                           else if (el.name == "admin_state_up") {
+                             return true;
                            }
                            else {
                              return el.show && el.required ? el.value : true;
@@ -426,7 +432,7 @@
                     // }
                     // console.log(this.form.stackinputs);
                 },
-                _submitForm: function() {
+                _submitForm: function(e) {
                     var payload;
 
                     if (this.workflow) {

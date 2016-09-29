@@ -477,31 +477,52 @@
 
         _updateNetworks: function(data) {
             this.set('onboarding.isLoadingNetworks', false);
-            var changed = this._updateModel('clouds.' + data.cloud_id + '.networks', data.networks);
+
+            //update cloud's networks
+            var cloudNetworks = [];
+            data.networks.private.forEach(function(net){
+                if (net.id){
+                    net["network_type"] = "private";
+                    net["provider"] = this.model.clouds[data.cloud_id].provider;
+                    net["cloud_id"] = data.cloud_id;
+                    cloudNetworks.push(net);
+                }
+            }, this);
+            data.networks.public.forEach(function(net){
+                if (net.id){
+                    net["network_type"] = "public";
+                    net["provider"] = this.model.clouds[data.cloud_id].provider;
+                    net["cloud_id"] = data.cloud_id;
+                    cloudNetworks.push(net);
+                }
+            }, this);
+            // data.networks.routers.forEach(function(net){
+            //     if (net.id){
+            //         net["network_type"] = "router";
+            //         net["provider"] = this.model.clouds[data.cloud_id].provider;
+            //         net["cloud_id"] = data.cloud_id;
+            //         cloudNetworks.push(net);
+            //     }
+            // }, this);
+
+            console.log(data);
+
+            var changed = this._updateModel('clouds.' + data.cloud_id + '.networks', cloudNetworks);
+
             if (!changed)
                 return false;
 
+            this.set('model.clouds.' + data.cloud_id + '.networksArray', cloudNetworks);
+            this.set('model.clouds.' + data.cloud_id + '.networks', _generateMap(cloudNetworks));
+
+            //update all networks array
             var allNetworks = [];
             if (this.model != undefined) {
-                this.model.cloudsArray.forEach(
-                    function(cloud) {
-                        if (cloud.networksArray != undefined && 0 < cloud.networksArray.public.length + cloud.networksArray.private.length + cloud.networksArray.routers.length && cloud.enabled) {
-                            cloud.networksArray.public.forEach(function(net) {
-                                net["type"] = "public";
-                                net["provider"] = cloud.provider;
+                this.model.cloudsArray.forEach(function(cloud) {
+                        if (cloud.networksArray != undefined && cloud.enabled) {
+                            cloud.networksArray.forEach(function(net){
                                 allNetworks.push(net);
-                            });
-                            cloud.networksArray.private.forEach(function(net) {
-                                net["type"] = "private";
-                                net["provider"] = cloud.provider;
-                                allNetworks.push(net);
-                            });
-                            cloud.networksArray.routers.forEach(function(net) {
-                                net["type"] = "router";
-                                net["provider"] = cloud.provider;
-                                allNetworks.push(net);
-                            });
-                            return allNetworks;
+                            })
                         }
                     }
                 );

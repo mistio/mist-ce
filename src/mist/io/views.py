@@ -1428,11 +1428,9 @@ def create_network(request):
     work it will use the new network's id to create a subnet
     CREATE_RESOURCES permission required on cloud.
     ---
-    cloud:
+    cloud_id:
       in: path
       required: true
-      type: string
-    cloud_id:
       description: The Cloud ID
       type: string
     network:
@@ -1465,7 +1463,7 @@ def delete_network(request):
     Delete a network
     CREATE_RESOURCES permission required on cloud.
     ---
-    cloud:
+    cloud_id:
       in: path
       required: true
       type: string
