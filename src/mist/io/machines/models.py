@@ -5,11 +5,10 @@ import mongoengine as me
 
 import mist.core.tag.models
 from mist.io.clouds.models import Cloud
-from mist.core.keypair.models import Keypair
 from mist.io.machines.controllers import MachineController
 
 
-class Actions(me.EmbeddedDocument):  # TODO default
+class Actions(me.EmbeddedDocument):
     start = me.BooleanField(default=False)
     stop = me.BooleanField(default=False)
     reboot = me.BooleanField(default=False)
@@ -34,10 +33,16 @@ class Monitoring(me.EmbeddedDocument):
     metrics = me.ListField()  # list of metric_id's
     installation_status = me.EmbeddedDocumentField(InstallationStatus)
 
+    def as_dict(self):
+        return json.loads(self.to_json())
+
 
 class Cost(me.EmbeddedDocument):
     hourly = me.FloatField(default=0)
     monthly = me.FloatField(default=0)
+
+    def as_dict(self):
+        return json.loads(self.to_json())
 
 
 class Machine(me.Document):
@@ -52,23 +57,24 @@ class Machine(me.Document):
     # Be more specific about what this is.
     # We should perhaps come up with a better name.
     machine_id = me.StringField(required=True, unique_with="cloud")
-    hostname = me.StringField()  # Rename to host or hostname
+    hostname = me.StringField()
     public_ips = me.ListField()
     private_ips = me.ListField()
     ssh_port = me.IntField(default=22)
     os_type = me.StringField(default='unix', choices=('unix',
                                                       'linux', 'windows'))
     rdp_port = me.IntField(default=3389)
-
-    #  TODO maybe EmbeddedDocumentListField
     actions = me.EmbeddedDocumentField(Actions, default=lambda: Actions())
     extra = me.DictField()
     cost = me.EmbeddedDocumentField(Cost, default=lambda: Cost())
     image_id = me.StringField()
     size = me.StringField()
-    state = me.StringField()  # TODO choices maybe
-    # TODO better DictField and in as_dict() make it list for js
-    # tags = me.ListField()
+    # libcloud.compute.types.NodeState
+    state = me.StringField(choices=('running', 'starting', 'rebooting',
+                                    'terminated', 'pending', 'unknown',
+                                    'stopping', 'stopped', 'suspended',
+                                    'error', 'paused', 'reconfiguring')
+                           )
 
     # We should think this through a bit.
     key_associations = me.EmbeddedDocumentListField(KeyAssociation)
@@ -99,6 +105,14 @@ class Machine(me.Document):
 
     def as_dict(self):
         # Return a dict as it will be returned to the API
+
+        # tags as a list return for the ui
+        tags = {tag.key: tag.value for tag in mist.core.tag.models.Tag.objects(
+            owner=self.cloud.owner, resource=self).only('key', 'value')}
+        # Optimize tags data structure for js...
+        if isinstance(tags, dict):
+            tags = [{'key': key, 'value': value}
+                    for key, value in tags.iteritems()]
         return {
             'id': self.id,
             'hostname': self.hostname,
@@ -109,19 +123,15 @@ class Machine(me.Document):
             'os_type': self.os_type,
             'rdp_port': self.rdp_port,
             'machine_id': self.machine_id,
-            'actions': [('%s:' % (action), self.actions[action])
-                        for action in self.actions], # TODO check this
+            'actions': {'%s:%s' % (action, self.actions[action]
+                                   )for action in self.actions},
             'extra': self.extra,
-            'cost_per_hour': self.cost.hourly,
-            'cost_per_month': self.cost.monthly,
+            'cost': self.cost.as_dict(),
             'image_id': self.image_id,
             'size': self.size,
             'state': self.state,
-            # 'tags': mist.core.tag.models.Tag.objects(resource=self,)
-            'hasMonitoring': self.monitoring.hasmonitoring,
-            'monitor_server': self.monitoring.monitor_server,
-            'collectd_password': self.monitoring.collectd_password,
-            'installation_status': self.monitoring.installation_status,
+            'tags': tags,
+            'monitoring': self.monitoring.as_dict(),
             'key_associations': self.key_associations,
             'cloud': self.cloud.id,
             'last_seen': str(self.last_seen or ''),
