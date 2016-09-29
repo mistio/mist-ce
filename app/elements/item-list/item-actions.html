@@ -161,7 +161,7 @@
           <associate-key id="associatekeydialog"></associate-key>
           <run-script-on-machine id="runscriptdialog" items="[[selectedItems]]"></run-script-on-machine>
         </content>
-        <paper-toast></paper-toast>
+        <paper-toast id="item-actions-toast"></paper-toast>
     </template>
 </dom-module>
 
@@ -732,11 +732,16 @@ Polymer({
     },
     _feedbackOnScript: function(e){
         if (e.detail.response) {
-            this._showToast('Script run request succeded. Script '+this.model.scripts[e.detail.scriptId].name+' has been queued for execution');
+            this._showToast('Script run request succeded. Script '+this.computeModel().scripts[e.detail.scriptId].name+' has been queued for execution');
         }
         if (e.detail.error) {
             this._showToast(e.detail.errormsg);
         }
-    }
+    },
+    _showToast: function(msg) {
+            var toast = this.querySelector('#item-actions-toast');
+            toast.text = msg;
+            toast.show();
+        },
 });
 </script>
