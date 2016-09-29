@@ -797,26 +797,29 @@
                     return this.listMachines.length || this.networks.length || this.keys.length;
                 },
                 _computeOutputsAreEmpty: function(stack) {
-                    for(var p in stack.outputs){
-                        return false
-                    }
+                    if (stack)
+                        for(var p in stack.outputs){
+                            return false;
+                        }
                     return true;
                 },
                 _computeOutputs: function(outputs) {
                     return Object.keys(outputs).map(function(key) {return {name: key, value: outputs[key]}});
                 },
                 is_start_creation: function(stack) {
-                    return stack.status == 'start_creation';
+                    if (stack)
+                        return stack.status == 'start_creation';
                 },
                 is_error: function(stack) {
                     //update logs once to view the error
-                    if (this.job && stack.status == 'error'){
+                    if (this.job && stack && stack.status == 'error'){
                         this.$.getJobLog.generateRequest();
                     }
                     return stack.status == 'error';
                 },
                 is_workflow_started: function(stack) {
-                    return stack.status == 'workflow_started';
+                    if (stack)
+                        return stack.status == 'workflow_started';
                 },
                 is_ok: function(stack) {
                     if (stack)
