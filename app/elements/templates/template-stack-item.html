@@ -6,30 +6,30 @@
         :host {
             display: block;
         }
-        
+
         :host:hover {
             background-color: #eee;
         }
-        
+
         paper-item {
             padding: 0 0 0 20px;
             height: 48px;
         }
-        
+
         paper-item a > * {
             padding: 8px 0;
         }
-        
+
         .flex-horizontal-with-ratios {
             @apply(--layout-horizontal);
             align-items: center;
             flex: 1 100%;
         }
-        
+
         .flexchild {
             @apply(--layout-flex);
         }
-        
+
         .icon {
             border-radius: 100px;
             width: 32px;
@@ -42,7 +42,7 @@
             opacity: 0.32;
             margin-right: 16px;
         }
-        
+
         .capitalize {
             text-transform: capitalize;
         }
@@ -54,7 +54,7 @@
             <div class="icon">
                 <iron-icon icon="maps:layers"></iron-icon>
             </div>
-            <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href="/stacks/[[stack.id]]">
+            <a is="pushstate-anchor" class="regular flexchild flex-horizontal-with-ratios" href$="/stacks/[[stack.id]]">
                 <div class="flexchild"><span class="name">[[stack.name]]</span></div>
                 <div class="flexchild">[[stack.description]]</div>
                 <div class$="flexchild [[stack.status]]">[[stack.status]]</div>

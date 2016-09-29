@@ -1,17 +1,22 @@
 ansible==1.9.3
 apache-libcloud
 amqp==1.4.6
+deepdiff
 celery==3.1.17
+flake8
 gevent==1.0.2
 gevent-subprocess==0.1.1
-mongoengine==0.10.5
+mongoengine==0.10.6
 netaddr==0.7.18
-paramiko==1.16.0
+-e git+https://github.com/mgogoulos/paramiko.git@master#egg=paramiko
 PasteDeploy==1.5.2
 PasteScript==2.0.2
 pika==0.10.0
+pretty
 pycrypto==2.6.1
 pyramid==1.4
+pytest==3.0.2
+pytest-env==0.6.0
 python-memcached==1.57
 PyYAML==3.10
 requests==2.7.0
@@ -22,3 +27,4 @@ sphinx-rtd-theme==0.1.8
 sphinxcontrib-httpdomain==1.4.0
 websocket-client==0.29.0
 iso8601
+

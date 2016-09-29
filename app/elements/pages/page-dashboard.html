@@ -1,5 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
+<!--link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html"-->
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
@@ -26,11 +26,10 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input-behavior.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input-addon-behavior.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<!--link rel="import" href="../../bower_components/iron-form/iron-form.html"-->
 
 <link rel="import" href="../logs/log-list.html">
 <link rel="import" href="../onb-element/onb-element.html">
-<link rel="import" href="../app-header/app-header.html">
 <link rel="import" href="../clouds/cloud-info.html">
 <link rel="import" href="../clouds/cloud-chip.html">
 
@@ -252,7 +251,7 @@
             </p>
         </div>
         <template is="dom-if" if="[[showDashboard]]">
-                <div class="clouds top flexchild-wide-top">                    
+                <div class="clouds top flexchild-wide-top">
                     <div id="cloudslist" class="flex">
                         <template is="dom-repeat" items="[[model.cloudsArray]]" restamp="true">
                             <cloud-chip label="{{item.title}}" class$="link" index$=[[index]] on-tap="_showCloudInfoDialog" id$="[[item.id]]" cloud="[[item]]">
@@ -360,7 +359,7 @@ Polymer({
         showDashboard: {
             type: Boolean,
             // value: true,
-            computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds)',
+            computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds, model.org.name)',
             notify: true
         },
         hasIncidents: {
@@ -471,9 +470,9 @@ Polymer({
              return false;
          }
      },
-    _computeshowDashboard: function(cloudslength, isLoadingClouds) {
+    _computeshowDashboard: function(cloudslength, isLoadingClouds, orgName) {
         var show;
-        if (cloudslength > 0 && isLoadingClouds == false) {
+        if (orgName && cloudslength > 0 && isLoadingClouds == false) {
             show =  true;
         }
         else {
@@ -526,7 +525,7 @@ Polymer({
 
         if (this.openedCloud && this.openedCloud == cloudId) {
             dialog.removeAttribute('opened');
-            this._closeCloudChips();            
+            this._closeCloudChips();
         }
         else {
             var cloudChips = this.querySelectorAll('cloud-chip'),
@@ -593,4 +592,3 @@ Polymer({
     },
 });
 </script>
-f

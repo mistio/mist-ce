@@ -180,12 +180,12 @@
             _addTunnelAjaxRequest: function() {
             },
             _addTunnelAjaxResponse: function(e) {
-                var response = e.detail.xhr.response;            
+                var response = YAML.parse(e.detail.xhr.response);
                 if (response.id) {
-                    page('/tunnels/'+ response.id);
+                    document.querySelector('app-location').set('path', '/tunnels/'+ response.id);
                 }
                 else {
-                    page('/tunnels/');
+                    document.querySelector('app-location').set('path', '/tunnels');
                 }
             },
         });

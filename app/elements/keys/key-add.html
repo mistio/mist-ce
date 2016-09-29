@@ -1,7 +1,10 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 <link rel="import" href="../helpers/custom-validator.html">
 <link rel="import" href="../helpers/file-upload.html">
@@ -59,13 +62,13 @@
             </paper-material>
             <paper-material>
                 <custom-validator validator-name="isUniqueValidator"></custom-validator>
-                
+
                 <div class="grid-row">
 
                     <paper-input id="name" class="xs12 ms" label="Name" required allowed-pattern="[A-Za-z0-9]" validator="isUniqueValidator" auto-validate error-message="Please enter a unique key's name" value="{{key.name}}"></paper-input>
                     <hr class="xs12" />
                     <paper-textarea id="privateKey" class="xs12 m6" label="Private Key" rows="5" required auto-validate error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
-                    
+
                     <div class="field-helptext xs12 m6">
                         Copy-paste your private key, upload it, or use the generator to create a key for you.
                     </div>
@@ -75,9 +78,9 @@
                     <hr class="xs12" />
                     <div class="clearfix bottom-actions xs12">
                         <div class="flexchild">
-                            <paper-button class="submit-btn pull-left" raised on-tap="_generateKey">Generate 
+                            <paper-button class="submit-btn pull-left" raised on-tap="_generateKey">Generate
                                 <iron-icon icon="communication:vpn-key"></iron-icon> </paper-button>
-                            <paper-button class="submit-btn pull-left" raised on-tap="_uploadKey">Upload 
+                            <paper-button class="submit-btn pull-left" raised on-tap="_uploadKey">Upload
                             <iron-icon icon="icons:file-upload"></iron-icon></paper-button>
                         </div>
                         <paper-button class="submit-btn pull-right" disabled$="[[!formReady]]" raised on-tap="_submitForm">Add</paper-button>
@@ -208,10 +211,10 @@
                     this.set('sendingData', false);
                     if (!this.origin) {
                         var keyID = e.detail.response.id;
-                        page('/keys/' + keyID);
+                        document.querySelector('app-location').path = '/keys/' + keyID;
                     }
                     else {
-                        page(this.origin);
+                        document.querySelector('app-location').path = this.origin;
                     }
 
                     this.debounce('formReset', function() {

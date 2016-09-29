@@ -59,9 +59,6 @@
             is: 'members-add',
 
             properties: {
-                sections: {
-                    type: Object
-                },
                 section: {
                     type: Object
                 },
@@ -99,7 +96,7 @@
             },
             _computeTeam: function(params, teamsArray) {
                 var team = this.model.teamsArray.find(function(t){
-                    return t.id == params.id
+                    return t.id == params.team
                 });
                 if (team){
                     return team;
@@ -114,7 +111,7 @@
                 this.set('sendingData', true);
             },
             _addMembersResponse: function(e) {
-                page('/teams/'+this.team.id);
+                document.querySelector('app-location').set('path', '/teams/'+this.team.id);
                 this.set('sendingData', false);
             },
         });

@@ -1,5 +1,5 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
 <!-- shared styles for all elements and index.html -->
 <dom-module id="shared-styles">
     <template>
@@ -130,6 +130,10 @@
         .blue[disabled] {
             background-color: #eaeaea;
             color: #a8a8a8;
+        }
+
+        .on-dark.blue[disabled] {
+            background-color: rgba(255,255,255,0.15);
         }
 
         .mist-dark {
@@ -263,7 +267,7 @@
         }
 
         :host >::content .input-content.label-is-floating.paper-input-container label {
-            color: rgba(0, 0, 0, 0.54) !important;
+            /*color: rgba(0, 0, 0, 0.54);*/
             text-transform: uppercase;
         }
 
@@ -382,11 +386,21 @@
         .paper-header .cartButton {
             margin-right: 10px;
         }
-        iron-overlay-backdrop {
-            z-index: 1000 !important;
+        .is-loading {
+            top: 15px;
+            left: 200px;
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            display: block;
+            height: 100vh;
+            background-color: #eee;
         }
-        paper-dialog {
-            z-index: 1001 !important;   
+        .is-loading paper-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 10% auto;
+            display: block;
         }
         </style>
     </template>
@@ -721,7 +735,7 @@
 </dom-module>
 <dom-module id="single-page">
     <template>
-        <style>         
+        <style>
         #content {
             -webkit-overflow-scrolling: touch;
             max-width: 1500px;
@@ -782,7 +796,7 @@
         .single-head .title h2 {
             font-size: 1.5em;
             line-height: initial;
-        }        
+        }
         .single-head .subtitle {
             margin-top: 4px;
         }
@@ -797,7 +811,7 @@
         .subtitle a {
             color: inherit;
         }
-        
+
         .single-head .item-actions {
             display: inline-block;
             flex: 0 0 auto;
@@ -939,7 +953,7 @@
             margin: 32px 0 8px 0;
         }
         ::content hr.appform {
-            margin: 0;   
+            margin: 0;
         }
 
         paper-material > h2 {
@@ -1013,7 +1027,7 @@
         }
 
         paper-dialog-scrollable p {
-            margin: 0 24px 24px 24px;
+            margin: 0;
             font-size: 16px;
             color: rgba(0, 0, 0, 0.54);
         }
@@ -1032,7 +1046,7 @@
         .btn-group {
             display: flex;
             justify-content: flex-end;
-            margin: 0 24px;
+            margin: 24px 0 0 0;
         }
         </style>
     </template>

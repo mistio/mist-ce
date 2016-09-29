@@ -1,0 +1,72 @@
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../elements/account/details-page.html">
+<link rel="import" href="../elements/account/password-page.html">
+<link rel="import" href="../elements/account/feedback-page.html">
+<link rel="import" href="../elements/account/plans-list.html">
+<link rel="import" href="../elements/account/plan-item.html">
+<link rel="import" href="../elements/account/subscriptions-list.html">
+<link rel="import" href="../elements/account/subscription-item.html">
+
+<dom-module id="page-my-account">
+
+    <template>
+        <style is="custom-style" include="single-page">
+            #container {
+                max-width: 600px;
+            }
+            paper-tabs,
+            paper-toolbar {
+                background-color: #d3d3d3;
+                color: #000;
+                --paper-tabs-selection-bar-color: #2196F3;
+            }
+            iron-pages > * ::content paper-material {
+                padding: 0;
+                display: block;
+            }
+            #content {
+                max-width: 900px;
+            }
+        </style>
+        <div id="content">
+            <paper-tabs attr-for-selected="data-route" selected="{{selected}}">
+                <paper-tab data-route="0" current="account" title="Account">Profile</paper-tab>
+                <paper-tab data-route="1" current="account" title="Account">Password</paper-tab>
+                <paper-tab data-route="2" current="account" title="Account">Billing</paper-tab>
+                <paper-tab data-route="3" current="account" title="Account">Acive Sessions</paper-tab>
+                <paper-tab data-route="4" current="account" title="Account">API Tokens</paper-tab>
+                <paper-tab data-route="5" current="account" title="Account">Subscription History</paper-tab>
+            </paper-tabs>
+
+            <iron-pages selected="{{selected}}">
+                <details-page org="[[org]]" user="[[user]]" data-route="0"></details-page>
+                <password-page user="[[user]]" data-route="1"></password-page>
+                <plans-list org="[[org]]" user="[[user]]" data-route="2"></plans-list>
+                <div data-route="3"></div>
+                <div data-route="4"></div>
+                <subscriptions-list user="[[user]]" data-route="5"></subscriptions-list>
+                <feedback-page user="[[user]]" data-route="6"></feedback-page>
+            </iron-pages>
+
+        </div>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is: 'page-my-account',
+        properties: {
+            user: {
+                type: Object
+            },
+            org: {
+                type: Object
+            },
+            selected: {
+                value: 0
+            }
+        }
+    });
+</script>
