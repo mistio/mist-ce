@@ -5,8 +5,8 @@ class MachineController(object):
         Most times one is expected to access a controller from inside the
         machine, like this:
 
-            machine = mist.io.machines.models.Machine.objects.get(id=machine_id)
-            machine.cloud.ctl.reboot()
+          machine = mist.io.machines.models.Machine.objects.get(id=machine_id)
+          machine.cloud.ctl.reboot()
         """
 
         self.machine = machine
@@ -31,13 +31,11 @@ class MachineController(object):
     def destroy(self):
         return self.machine.cloud.ctl.destroy_machine(self.machine)
 
-    def resize(self):
+    def resize(self, plan_id):
         """Resize a machine on an other plan."""
-        return self.machine.cloud.ctl.resize_machine(self.machine,
-                                                     self.machine.cloud.
-                                                     owner.plan_id)
+        return self.machine.cloud.ctl.resize_machine(self.machine, plan_id)
 
-    def rename(self, name=None):
+    def rename(self, name):
         """Renames a machine on a certain cloud."""
         return self.machine.cloud.ctl.rename_machine(self.machine, name)
 
