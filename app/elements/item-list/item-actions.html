@@ -152,7 +152,7 @@
           </paper-dialog>
           <dialog-element hidden></dialog-element>
           <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
-          <associate-key id="associatekeydialog"></associate-key>
+          <associate-key id="associatekeydialog" items="[[selectedItemsOfCurrentSection]]"></associate-key>
         </content>
     </template>
 </dom-module>
@@ -547,7 +547,6 @@ Polymer({
             else if(event.model.item.name == 'associate key') {
                 var items = [];
                 items.push(itemUid(this.selectedItem, this.section));
-                this.$['associatekeydialog'].items = items;
                 this.$['associatekeydialog']._openDialog();
             }
             else {
