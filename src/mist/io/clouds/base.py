@@ -8,11 +8,13 @@ to db etc. Cloud specific controllers are in `mist.io.clouds.controllers`.
 
 import ssl
 import json
+import copy
 import logging
 import datetime
 import calendar
 
 import mongoengine as me
+from mongoengine import ValidationError
 
 from libcloud.common.types import InvalidCredsError
 from libcloud.compute.types import NodeState
@@ -22,6 +24,7 @@ from mist.io import config
 
 from mist.io.exceptions import MistError
 from mist.io.exceptions import BadRequestError
+from mist.io.exceptions import ForbiddenError
 from mist.io.exceptions import CloudExistsError
 from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import MachineNotFoundError
@@ -415,16 +418,6 @@ class BaseController(object):
             size = (node.size or node.extra.get('flavorId')
                     or node.extra.get('instancetype'))
 
-            # Get libcloud tags.
-            tags = tags_to_dict(node.extra.get('tags') or
-                                node.extra.get('metadata') or {})
-
-            # Get machine tags from db and update libcloud's tag list,
-            # overriding in case of conflict.
-            tags.update({tag.key: tag.value for tag in Tag.objects(
-                owner=self.cloud.owner, resource=machine,
-            ).only('key', 'value')})
-
             machine.machine_id = node.id
             machine.name = node.name
             machine.image_id = image_id
@@ -432,7 +425,23 @@ class BaseController(object):
             machine.state = config.STATES[node.state]
             machine.private_ips = node.private_ips
             machine.public_ips = node.public_ips
-            machine.extra = node.extra
+
+            extra = copy.copy(node.extra)
+
+            # Make sure we don't meet any surprises when we try to json encode
+            # later on in the HTTP response.
+            for key, val in extra.items():
+                try:
+                    json.dumps(val)
+                except TypeError:
+                    extra[key] = str(val)
+
+            machine.extra = extra
+
+            # Get machine tags from db
+            tags = {tag.key: tag.value for tag in Tag.objects(
+                    owner=self.cloud.owner, resource=machine,
+                    ).only('key', 'value')}
 
             # Get machine creation date.
             try:
@@ -457,7 +466,7 @@ class BaseController(object):
 
             # Apply any cloud/provider specific post processing.
             try:
-                self._list_machines__postparse_machine(machine, node, tags)
+                self._list_machines__postparse_machine(machine, node)
             except Exception as exc:
                 log.exception("Error while post parsing machine %s:%s for %s",
                               machine.id, node.name, self.cloud)
@@ -495,24 +504,9 @@ class BaseController(object):
                 machine.cost.hourly = 0
                 machine.cost.monthly = 0
 
-            # Make sure we don't meet any surprises when we try to json encode
-            # later on in the HTTP response.
-            for key, val in machine.extra.items():
-                try:
-                    json.dumps(val)
-                except TypeError:
-                    machine.extra[key] = str(val)
-
-            # Optimize tags data structure for js...
-            if isinstance(tags, dict):
-                tags = dict([(key, value) for key, value in tags.iteritems()
-                             if key != 'Name'])
-
-            # save updated tags to tag model on the database
-            from mist.core.tag.methods import add_tags_to_resource
-            add_tags_to_resource(self.cloud.owner, machine, tags.items())
             # Save all changes to machine model on the database.
-            machine.save()
+                machine.save()
+
             machines.append(machine)
 
         # Set last_seen on machine models we didn't see for the first time now.
@@ -533,8 +527,8 @@ class BaseController(object):
 
         machine: A machine mongoengine model. The model may not have yet
             been saved in the database.
-        machine_libcloud: An instance of a libcloud compute node, as returned by
-            libcloud's list_nodes.
+        machine_libcloud: An instance of a libcloud compute node, as
+            returned by libcloud's list_nodes.
         This method is expected to edit `machine` in place and not return
         anything.
 
@@ -546,8 +540,8 @@ class BaseController(object):
         machine.actions.stop = True
         machine.actions.reboot = True
         machine.actions.destroy = True
-        machine.actions.rename = False  # Most providers do not support renaming
-        machine.actions.tag = True   # Always True now that we store tags in db.
+        machine.actions.rename = False  # Most providers do not support this
+        machine.actions.tag = True   # Always True now that we store tags in db
 
         # Actions resume, suspend and undefine are states related to KVM.
         machine.actions.resume = False
@@ -571,7 +565,7 @@ class BaseController(object):
             machine.actions.destroy = False
             machine.actions.rename = False
 
-    def _list_machines__postparse_machine(self, machine, machine_libcloud, tags):
+    def _list_machines__postparse_machine(self, machine, machine_libcloud):
         """Post parse a machine before returning it in list_machines
 
         Any subclass that wishes to specially handle its cloud's tags and
@@ -579,9 +573,8 @@ class BaseController(object):
 
         machine: A machine mongoengine model. The model may not have yet
             been saved in the database.
-        machine_libcloud: An instance of a libcloud compute node, as returned by
-            libcloud's list_nodes.
-        tags: This is exists only gfor now, we will delete it when we plan out
+        machine_libcloud: An instance of a libcloud compute node,
+            as returned by libcloud's list_nodes.
 
         This method is expected to edit its arguments in place and not return
         anything.
@@ -816,18 +809,25 @@ class BaseController(object):
             return Node(machine.machine_id, name=machine.machine_id,
                         state=0, public_ips=[], private_ips=[],
                         driver=self.connection)
-        raise MachineNotFoundError("Machine with id '%s'." %
-                                    machine.machine_id)
+        raise MachineNotFoundError(
+            "Machine with id '%s'." % machine.machine_id
+        )
 
     def start_machine(self, machine):
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.start:
-            raise Exception("Machine doesn't support start.")
+            raise ForbiddenError("Machine doesn't support start.")
         log.debug("Starting machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._start_machine(machine, machine_libcloud)
+        try:
+            self._start_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not start machine %s", machine)
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
 
     def _start_machine(self, machine, machine_libcloud):
         self.connection.ex_start_node(machine_libcloud)
@@ -836,11 +836,17 @@ class BaseController(object):
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.stop:
-            raise Exception("Machine doesn't support stop.")
+            raise ForbiddenError("Machine doesn't support stop.")
         log.debug("Stopping machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._stop_machine(machine, machine_libcloud)
+        try:
+            self._stop_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not stop machine %s", machine)
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
 
     def _stop_machine(self, machine, machine_libcloud):
         self.connection.ex_stop_node(machine_libcloud)
@@ -850,11 +856,17 @@ class BaseController(object):
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.reboot:
-            raise Exception("Machine doesn't support reboot.")
+            raise ForbiddenError("Machine doesn't support reboot.")
         log.debug("Rebooting machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._reboot_machine(machine, machine_libcloud)
+        try:
+            self._reboot_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not reboot machine %s", machine)
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
 
     def _reboot_machine(self, machine, machine_libcloud):
         machine_libcloud.reboot()
@@ -863,11 +875,18 @@ class BaseController(object):
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.destroy:
-            raise Exception("Machine doesn't support destroy.")
+            raise ForbiddenError("Machine doesn't support destroy.")
         log.debug("Destroying machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._destroy_machine(machine, machine_libcloud)
+        try:
+            self._destroy_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not destroy machine %s", machine)
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
+
         while machine.key_associations:
             machine.key_associations.pop()
         machine.save()
@@ -876,77 +895,103 @@ class BaseController(object):
         machine_libcloud.destroy()
 
     # It isn't implemented in the ui
-    def resize_machine(self, machine):
+    def resize_machine(self, machine, plan_id):
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.resize:
-            raise Exception("Machine doesn't support resize.")
+            raise ForbiddenError("Machine doesn't support resize.")
         log.debug("Resizing machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._resize_machine(machine, machine_libcloud)
+        try:
+            self._resize_machine(machine, machine_libcloud, plan_id)
+        except MistError as exc:
+            log.error("Could not resize machine %s", machine)
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
 
-    def _resize_machine(self, machine, machine_libcloud):
-        self.connection.ex_resize_node(machine_libcloud,
-                                       self.cloud.owner.plan_id)
+    def _resize_machine(self, machine, machine_libcloud, plan_id):
+        self.connection.ex_resize_node(machine_libcloud, plan_id)
 
-    def rename_machine(self, machine, name=None):
+    def rename_machine(self, machine, name):
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.rename:
-            raise Exception("Machine doesn't support rename.")
+            raise ForbiddenError("Machine doesn't support rename.")
         log.debug("Renaming machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._rename_machine(machine, machine_libcloud, name)
+        try:
+            self._rename_machine(machine, machine_libcloud, name)
+        except MistError as exc:
+            log.error("Could not rename machine %s", machine)
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
 
     def _rename_machine(self, machine, machine_libcloud, name):
         self.connection.ex_rename_node(machine_libcloud, name)
-
-    # TODO we need tag method or not?
 
     def resume_machine(self, machine):
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.resume:
-            raise Exception("Machine doesn't support resume.")
+            raise ForbiddenError("Machine doesn't support resume.")
         log.debug("Resuming machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._resume_machine(machine, machine_libcloud)
+        try:
+            self._resume_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not resume machine %s", machine)
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
 
     def _resume_machine(self, machine, machine_libcloud):
         """Only LibvirtController subclass implement this method"""
-
-        return
+        raise NotImplementedError()
 
     def suspend_machine(self, machine):
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.suspend:
-            raise Exception("Machine doesn't support suspend.")
+            raise ForbiddenError("Machine doesn't support suspend.")
         log.debug("Suspending machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._undefine_machine(machine, machine_libcloud)
+        try:
+            self._suspend_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not suspend machine %s", machine)
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
 
     def _suspend_machine(self, machine, machine_libcloud):
         """Only LibvirtController subclass implement this method"""
-        return
+        raise NotImplementedError()
 
     def undefine_machine(self, machine):
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.undefine:
-            raise Exception("Machine doesn't support undefine.")
+            raise ForbiddenError("Machine doesn't support undefine.")
         log.debug("Undefining machine %s", machine)
 
         machine_libcloud = self._get_machine_libcloud(machine)
-        self._undefine_machine(machine, machine_libcloud)
+        try:
+            self._undefine_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not undefine machine %s", machine)
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
 
     def _undefine_machine(self, machine, machine_libcloud):
         """Only LibvirtController subclass implement this method"""
-        return
+        raise NotImplementedError()
 
     def __del__(self):
         """Disconnect libcloud connection upon garbage collection"""
