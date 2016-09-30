@@ -152,7 +152,7 @@
           </paper-dialog>
           <dialog-element hidden></dialog-element>
           <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
-          <associate-key id="associatekeydialog" items="[[selectedItemsOfCurrentSection]]"></associate-key>
+          <associate-key id="associatekeydialog" items="[[selectedItemsOfCurrentSection]]" model="[[model]]"></associate-key>
         </content>
     </template>
 </dom-module>
@@ -309,6 +309,7 @@ Polymer({
     properties: {
         org: Object,
         section: Object,
+        model: Object,
         items: {
             type: Array,
             value: [],
