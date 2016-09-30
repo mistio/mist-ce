@@ -182,22 +182,24 @@
                         else {
                             itemObj = this.model[itemType+'s'][itemId];
                         }
+                        if (itemObj) {
 
-                        if (!itemObj.tags) 
-                            itemObj.tags = [];
+                            if (!itemObj.tags) 
+                                itemObj.tags = [];
 
-                        if (i == 0) {
-                            tagset.addItems(itemObj.tags.map(function(tag){
-                                return tag.key+'='+tag.value;
-                            }) || []);
-                        }
-                        else {
-                            isection.clear()
-                            isection.addItems(tagset.intersection(itemObj.tags.map(function(tag){
+                            if (i == 0) {
+                                tagset.addItems(itemObj.tags.map(function(tag){
                                     return tag.key+'='+tag.value;
-                                }) || []));
-                            tagset.clear();
-                            tagset.addItems(isection.items());
+                                }) || []);
+                            }
+                            else {
+                                isection.clear()
+                                isection.addItems(tagset.intersection(itemObj.tags.map(function(tag){
+                                        return tag.key+'='+tag.value;
+                                    }) || []));
+                                tagset.clear();
+                                tagset.addItems(isection.items());
+                            }
                         }
                     }
 
