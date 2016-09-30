@@ -97,7 +97,8 @@
         a.main-section {
             min-width: 150px;
         }
-        paper-icon-button {
+        .delBtn iron-icon {
+            margin: 8px;
             opacity: 0.32
         }
         </style>
@@ -127,8 +128,8 @@
                                     [[incidentTime(item)]]
                                 </span>
                             </a>
-                            <div class="">
-                                <paper-icon-button data-attr="[[item.incident_id]]" icon="close" on-tap="deleteIncident"></paper-icon-button>
+                            <div class="delBtn">
+                                <iron-icon data-attr="[[item.incident_id]]" icon="close" on-tap="deleteIncident"></iron-icon>
                             </div>
                         </div>
                     </template>
@@ -219,7 +220,6 @@ Polymer({
         return ''
     },
     deleteIncident: function(e){
-        console.log(e, e.target.dataAttr);
         this.set('selectedInc', e.target.dataAttr);
         this.querySelector('#delInc').headers["Content-Type"] = 'application/json';
         this.querySelector('#delInc').headers["Csrf-Token"] = CSRF_TOKEN;
