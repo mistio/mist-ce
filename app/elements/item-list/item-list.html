@@ -276,7 +276,7 @@
                   </paper-dropdown-menu>[[_isSortedBy(sortBy, sortBy, sortOrder)]]
               </div>
             </template>
-            <item-actions id="actions" items="[[items]]" selected-items="[[selectedItems]]" section="[[section]]" org="[[org]]"></item-actions>
+            <item-actions id="actions" items="[[items]]" selected-items="[[selectedItems]]" section="[[section]]" org="[[org]]" model="[[model]]"></item-actions>
         </div>
         <div class="row no-data" hidden$="[[items.length]]">
             no data yet
@@ -315,6 +315,7 @@ Polymer({
     is: 'item-list',
 
     properties: {
+        model: Object,
         org: Object,
         items: {
             type: Array

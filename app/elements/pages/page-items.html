@@ -186,7 +186,7 @@
                     <item-cards id="item-cards" section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}"></item-cards>
                 </template>
                 <template is="dom-if" if="[[_stampTable(view)]]"-->
-                    <item-list section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}" org="[[model.org]]" hidden$="[[!filteredItems.length]]"></item-list>
+                    <item-list section="[[section]]" items="[[filteredItems]]" sort-by="{{sortBy}}" sort-order="{{sortOrder}}" org="[[model.org]]" model="[[model]]" hidden$="[[!filteredItems.length]]"></item-list>
                 <!--/template-->
             </div>
             <div class="is-loading" hidden$="[[!isLoading]]">
