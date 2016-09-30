@@ -34,9 +34,12 @@
             overflow: hidden !important;
         }
 
-        .list-item {
+        .list {
             border-bottom: 1px solid #eee;
-            padding: 10px;
+        }
+
+        .list-item {            
+            padding: 8px;
         }
 
         .list-item:last-child {
@@ -94,6 +97,10 @@
         a.main-section {
             min-width: 150px;
         }
+        .delBtn iron-icon {
+            margin: 8px;
+            opacity: 0.32
+        }
         </style>
 
         <template is="dom-if" if="[[incidents.length]]">
@@ -108,21 +115,23 @@
                     <template is="dom-repeat" items="{{incidents}}">
                         <!-- Only red incidents sould count and show. keep it temp/ly due to lacj of data -->
                         <!-- [[incidentColor(item)]] -->
-                        <a class="list-item red layout horizontal wrap" href$="[[machineUri(item)]]">
-                            <div class="flexchild expression">
-                                <iron-icon icon="[[sections.machines.icon]]"></iron-icon>
-                                <span class="machine flexchild">[[machineName(item)]]</span>: <span class="rule-condition">[[ruleCondition(item)]]</span>
+                        <div class="list layout horizontal wrap">
+                            <a class="list-item red flexchild layout horizontal" href$="[[machineUri(item,model)]]">
+                                <div class="flexchild expression">
+                                    <iron-icon icon="[[sections.machines.icon]]"></iron-icon>
+                                    <span class="machine flexchild">[[machineName(item)]]</span>: <span class="rule-condition">[[ruleCondition(item)]]</span>
+                                </div>
+                                <span class="time">
+                                    <template is="dom-if" if="[[!item.finished_at]]">
+                                        <sc-timeago datetime="[[incidentDuration(item)]]"></sc-timeago>
+                                    </template>
+                                    [[incidentTime(item)]]
+                                </span>
+                            </a>
+                            <div class="delBtn">
+                                <iron-icon data-attr="[[item.incident_id]]" icon="close" on-tap="deleteIncident"></iron-icon>
                             </div>
-                            <span class="time">
-                                <template is="dom-if" if="[[!item.finished_at]]">
-                                    <sc-timeago datetime="[[incidentDuration(item)]]"></sc-timeago>
-                                </template>
-                                [[incidentTime(item)]]
-                            </span>
-                            <div>
-                                <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                            </div>
-                        </a>
+                        </div>
                     </template>
                     <a class="list-item layout horizontal wrap" href="/incidents" hidden$="{{!resolvedCount}}">
                         <div class="flexchild expression">
@@ -135,7 +144,8 @@
                         </div>
                     </a>
                 </div>
-            </paper-material>
+            </paper-material>            
+            <iron-ajax id="delInc" url="/api/v1/story/[[selectedInc]]" contentType="application/json" handle-as="xml" method="DELETE" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
         </template>
     </template>
 </dom-module>
@@ -156,7 +166,8 @@ Polymer({
         },
         sections: {
             type: Object
-        }
+        },
+        selectedInc: String
     },
     observers: [
         '_incidents(model.incidents.*)'
@@ -171,8 +182,8 @@ Polymer({
     _incidents: function (incidents){
         var arr = incidents.base ? incidents.base : [];
         this.incidents = arr.filter(function(inc){
-            return !inc.finished_at;
-        });
+            return !inc.finished_at //&& this.model.clouds[inc.cloud_id] && this.model.clouds[inc.cloud_id].machines[inc.machine_id];
+        }, this);
         this.resolvedCount = incidents.base ? incidents.base.length - 1 : 0;
     },
     incidentColor: function(item){
@@ -190,9 +201,9 @@ Polymer({
             return item.logs[0].machine_name;
         return this.model.clouds[item.cloud_id].machines[item.machine_id].name;
     },
-    machineUri: function(item) {
+    machineUri: function(item, model) {
         // console.log(this.model.clouds, item.cloud_id, this.model.incidents, this.model.monitoring);
-        return '/machines/'  + item.uuid;
+        return '/machines/'  + this.model.clouds[item.cloud_id].machines[item.machine_id].uuid;
     },
     ruleCondition: function(item) {
         return item.logs.length && item.logs[0].condition;
@@ -208,5 +219,20 @@ Polymer({
             return 'for '
         return ''
     },
+    deleteIncident: function(e){
+        this.set('selectedInc', e.target.dataAttr);
+        this.querySelector('#delInc').headers["Content-Type"] = 'application/json';
+        this.querySelector('#delInc').headers["Csrf-Token"] = CSRF_TOKEN;
+        this.querySelector('#delInc').generateRequest();
+    },
+    _handleRequest: function(e){
+
+    },
+    _handleResponse: function(e){
+        this.set('selectedInc','')
+    },
+    _handleError:  function(e){
+        this.set('selectedInc','');
+    }
 });
 </script>
