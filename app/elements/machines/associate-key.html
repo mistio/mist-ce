@@ -35,6 +35,10 @@
         .collapsible[open] {
             height: auto;
         }
+        :host paper-button.wide.blue {
+            margin: 8px;
+            text-align: center;
+        }
         :host paper-dropdown-menu ::content .dropdown-content {
             top: 55px !important;
         }
@@ -46,9 +50,9 @@
                 <paper-dropdown-menu label="Select key" horizontal-align="left">
                     <paper-menu id="keys" attr-for-selected="value" selected="{{selected}}" class="dropdown-content">
                         <template is="dom-repeat" items="[[keys]]" as="key">
-                            <paper-item value="[[key.id]]" disabled$="[[itemsHaveThisKey(key.id,items)]]">[[key.name]]</paper-item>
+                            <paper-item value="[[key.id]]" disabled$="[[itemsHaveThisKey(key.id,items,model)]]">[[key.name]]</paper-item>
                         </template>
-                        <!-- <paper-button class="blue">Add key</paper-button> -->
+                        <paper-button class="blue wide" on-tap="_addKey">Add key</paper-button>
                     </paper-menu>
                 </paper-dropdown-menu>
             </p>
@@ -78,9 +82,10 @@ Polymer({
     is: 'associate-key',
 
     properties: {
+        model: Object,
         keys: {
             type: Array,
-            computed: "computeKeys(items)"
+            computed: "computeKeys(model.keysArray)"
         },
         items: {
             type: Array,
@@ -137,9 +142,15 @@ Polymer({
         }
     },
     _addKey: function(){
+        this.$.dialogModal.close();
         //set attribute origin
         var origin = window.location.pathname;
-        document.querySelector('app-location').set('path', '/keys/+add?origin=' + origin);
+        console.log('_addKey',origin);
+        var qParams = {
+            'origin': origin
+        }
+        document.querySelector('app-location').set('path', '/keys/+add');
+        document.querySelector('app-location').set('queryParams', qParams);
     },
     associateKey: function(e){
         var user = this.querySelector('paper-input#user').value || 'root',
@@ -196,16 +207,16 @@ Polymer({
             col.setAttribute('open', true);
         }
     },
-    computeKeys: function(item){
-        return this.computeModel().keysArray;
+    computeKeys: function(model){
+        return this.model.keysArray || [];
     },
     computeModel: function(){
         return document.querySelector("app-main") ? document.querySelector("app-main").model : document.querySelector("mist-app").model;
     },
-    itemsHaveThisKey: function(key, items){
+    itemsHaveThisKey: function(key, items, model){
         // test if all items have this key and if so disable
         var count = 0;
-        var model = this.computeModel();
+        var model = this.model;
         for (var i=0; i<this.items.length; i++) {
             var itemCloud = this.items[i].split(':')[1],
                 itemId = this.items[i].split(':')[2];

@@ -144,7 +144,8 @@
                 },
                 ready: function() {
                     this.querySelector('custom-validator').validate = this.isUniqueValidator.bind(this);
-                    this.set('origin',this.getURLParameter('origin'));
+                    // this.set('origin',this.getURLParameter('origin'));
+                    this.set('origin', document.querySelector('app-location').queryParams.origin)
                 },
                 listeners: {
                     'iron-overlay-closed': '_modalClosed',
@@ -215,6 +216,7 @@
                     }
                     else {
                         document.querySelector('app-location').path = this.origin;
+                        document.querySelector('app-location').queryParams = {};
                     }
 
                     this.debounce('formReset', function() {
