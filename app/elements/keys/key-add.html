@@ -47,6 +47,15 @@
                 height: 20px;
                 color: inherit;
             }
+            paper-progress#progresserror ::content #primaryProgress {
+                background-color: var(--red-color);
+            }
+            .errormsg-container {
+                color: var(--red-color);
+            }
+            .errormsg-container iron-icon {
+                color: inherit;
+            }
         </style>
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
@@ -65,7 +74,7 @@
 
                 <div class="grid-row">
 
-                    <paper-input id="name" class="xs12 ms" label="Name" required allowed-pattern="[A-Za-z0-9]" validator="isUniqueValidator" auto-validate error-message="Please enter a unique key's name" value="{{key.name}}"></paper-input>
+                    <paper-input id="name" class="xs6 m6" label="Name" required allowed-pattern="[A-Za-z0-9]" validator="isUniqueValidator" auto-validate error-message="Please enter a unique key's name" value="{{key.name}}"></paper-input>
                     <hr class="xs12" />
                     <paper-textarea id="privateKey" class="xs12 m6" label="Private Key" rows="5" required auto-validate error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
 
@@ -76,6 +85,7 @@
 
                     <paper-progress class="xs12" indeterminate hidden$="[[!showProgress]]"></paper-progress>
                     <hr class="xs12" />
+                    <p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
                     <div class="clearfix bottom-actions xs12">
                         <div class="flexchild">
                             <paper-button class="submit-btn pull-left" raised on-tap="_generateKey">Generate
@@ -94,7 +104,7 @@
         <file-upload></file-upload>
 
         <iron-ajax id="keyGenerateAjaxRequest" url="/api/v1/keys" method="POST" on-response="_handleKeyGenerateAjaxResponse" on-error="_handleKeyGenerateAjaxError"></iron-ajax>
-        <iron-ajax id="keyAddAjaxRequest" url="/api/v1/keys" method="PUT" on-response="_handleKeyAddAjaxResponse" on-error="_handleKeyAddAjaxError"></iron-ajax>
+        <iron-ajax id="keyAddAjaxRequest" url="/api/v1/keys" method="PUT" on-response="_handleKeyAddAjaxResponse" on-error="_handleKeyAddAjaxError" handle-as="xml"></iron-ajax>
     </template>
 
     <script>
@@ -140,6 +150,10 @@
                     },
                     origin: {
                         type: String
+                    },
+                    formError: {
+                        type: Boolean,
+                        value: false
                     }
                 },
                 ready: function() {
@@ -155,6 +169,7 @@
                     '_filedsChanged(key.*, sendingData)'
                 ],
                 _filedsChanged: function(key, sendingData) {
+                    this.set('formError', false);
                     this.async(function() {
                         var inputs = this.querySelectorAll("paper-input, paper-textarea"),
                             valid = [].every.call(inputs, function(el) {
@@ -210,8 +225,9 @@
                 },
                 _handleKeyAddAjaxResponse: function(e) {
                     this.set('sendingData', false);
+                    console.log(e);
                     if (!this.origin) {
-                        var keyID = e.detail.response.id;
+                        var keyID = JSON.parse(e.detail.xhr.response).id;
                         document.querySelector('app-location').path = '/keys/' + keyID;
                     }
                     else {
@@ -224,7 +240,11 @@
                     }, 500);
                 },
                 _handleKeyAddAjaxError: function(e) {
+                    console.log('_handleKeyAddAjaxError',e);
                     this.set('sendingData', false);
+                    this.set('formError', true);
+                    this.$.errormsg.textContent = e.detail.request.xhr.responseText;
+                    // this.$.errormsg.textContent = e.detail.response;
                 },
                 _formReset: function() {
                     this.set('key.name', '');
@@ -252,7 +272,7 @@
                     this.set('showPublicKey', true);
                 },
                 _handleKeyGenerateAjaxError: function(e) {
-                    this.set('sendingData', false);
+                    this.set('sendingData', false);                    
                 },
                 getURLParameter: function(name) {
                     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
