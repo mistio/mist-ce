@@ -14,7 +14,6 @@ import datetime
 import calendar
 
 import mongoengine as me
-from mongoengine import ValidationError
 
 from libcloud.common.types import InvalidCredsError
 from libcloud.compute.types import NodeState
@@ -23,8 +22,9 @@ from libcloud.compute.base import NodeLocation, Node
 from mist.io import config
 
 from mist.io.exceptions import MistError
-from mist.io.exceptions import BadRequestError
+from mist.io.exceptions import ConflictError
 from mist.io.exceptions import ForbiddenError
+from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudExistsError
 from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import MachineNotFoundError
@@ -505,7 +505,15 @@ class BaseController(object):
                 machine.cost.monthly = 0
 
             # Save all changes to machine model on the database.
-            machine.save()
+            try:
+                machine.save()
+            except me.ValidationError as exc:
+                log.error("Error adding %s: %s", machine.name, exc.to_dict())
+                raise BadRequestError({"msg": exc.message,
+                                       "errors": exc.to_dict()})
+            except me.NotUniqueError as exc:
+                log.error("Machine %s not unique error: %s", machine.name, exc)
+                raise ConflictError("Machine with this name already exists")
 
             machines.append(machine)
 
