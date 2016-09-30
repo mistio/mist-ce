@@ -22,7 +22,8 @@ from pyramid.renderers import render_to_response
 from mist.core.helpers import view_config
 from mist.core.auth.methods import user_from_request
 from mist.core.keypair.models import Keypair
-from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+from mist.io.clouds.models import Cloud
+from mist.core.cloud.models import Machine, KeyAssociation
 from mist.core.exceptions import PolicyUnauthorizedError
 from mist.core import config
 import mist.core.methods

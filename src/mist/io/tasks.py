@@ -32,7 +32,8 @@ from mist.io.shell import Shell
 from mist.io.helpers import get_auth_header
 
 from mist.core.user.models import User, Owner, Organization
-from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+from mist.io.clouds.models import Cloud
+from mist.core.cloud.models import Machine, KeyAssociation
 from mist.core.keypair.models import Keypair
 from mist.core import config
 
