@@ -320,6 +320,8 @@
                 _handleResponse: function(e, d) {
                     this.fire("response", e.detail);
                     this.set('sendingData', false);
+                    //clear form only on response not on error
+                    this._resetForm();
                 },
                 _handleError: function(e,d) {
                     this.set('sendingData', false);
@@ -412,7 +414,7 @@
 
                         var valid = fields.base.every(function(el, index) {
                            if (el.type == "ip_textarea") {
-                             return el.show ? this.validatecidr(el.value, index) : true;
+                             return el.show && el.required ? this.validatecidr(el.value, index) : true;
                            }
                            else if (el.name == "admin_state_up") {
                              return true;
@@ -516,7 +518,15 @@
                     return true;
                 },
                 validatecidr: function(value, index) {
+                    console.log('value', value);
+
+                    if(value == '' || value == undefined)
+                        return false;
+
                     var ipArray = value.split('\n');
+                    if(ipArray.length == 0)
+                        return false;
+
                     for(var i=0;i<ipArray.length;i++){
                         if (ipArray[i] && !(/^([0-9]{1,3}\.){3}[0-9]{1,3}(\/([0-9]|[1-2][0-9]|3[0-2]))?$/.test(ipArray[i].trim()))){
                             return false;

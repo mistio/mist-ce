@@ -567,7 +567,6 @@ Polymer({
             else if(event.model.item.name == 'associate key') {
                 var items = [];
                 items.push(itemUid(this.selectedItem, this.section));
-                this.$['associatekeydialog'].items = items;
                 this.$['associatekeydialog']._openDialog();
             }
             else if(event.model.item.name == 'run script') {

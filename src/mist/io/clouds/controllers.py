@@ -457,16 +457,6 @@ class GoogleController(BaseController):
             if key in tags:
                 extra[key] = tags.pop(key)
 
-        # FIXME only for now and not forever
-        # we mist change in list_machines the order of libcloud tags
-        # and post_parse machine, better in the oomachines branch
-        for key in ('items', 'fingerprint', 'kind'):
-            if key in machine_dict['tags']:
-                machine_dict['tags'].pop(key)
-
-        tags.update(machine_dict['tags'])
-        machine_dict['tags'] = tags
-
         # Wrap in try/except to prevent from future GCE API changes.
 
         # Identify server OS.
