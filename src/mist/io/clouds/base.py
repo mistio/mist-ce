@@ -374,7 +374,7 @@ class BaseController(object):
         # FIXME: Move this to top of the file once Machine model is migrated.
         # The import statement is currently here to avoid circular import
         # issues.
-        from mist.io.machines.models import Machine
+        from mist.core.cloud.models import Machine
 
         # Try to query list of machines from provider API.
         try:
@@ -505,7 +505,7 @@ class BaseController(object):
                 machine.cost.monthly = 0
 
             # Save all changes to machine model on the database.
-                machine.save()
+            machine.save()
 
             machines.append(machine)
 
