@@ -56,6 +56,11 @@
             .errormsg-container iron-icon {
                 color: inherit;
             }
+            paper-icon-button.docs {
+                opacity: 0.54;
+                width: 36px;
+                height: 36px;
+            }
         </style>
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
@@ -79,7 +84,11 @@
                     <paper-textarea id="privateKey" class="xs12 m6" label="Private Key" rows="5" required auto-validate error-message="Please enter private key" value="{{key.privateKey}}" max-rows="5"></paper-textarea>
 
                     <div class="field-helptext xs12 m6">
-                        Copy-paste your private key, upload it, or use the generator to create a key for you.
+                        Copy-paste your private key, upload it, or use the generator to create a key for you. 
+                        <a href="http://docs.mist.io/article/34-importing-your-ssh-keys-in-mist-io" target="new">
+                            <paper-icon-button suffix icon="icons:help" alt="open docs" title="open docs" class="docs">
+                            </paper-icon-button>
+                        </a>
                     </div>
                     <paper-textarea id="publicKey" class="xs12" hidden$="[[!showPublicKey]]" label="Public Key" rows="5" value="{{key.publicKey}}" max-rows="5"></paper-textarea>
 
