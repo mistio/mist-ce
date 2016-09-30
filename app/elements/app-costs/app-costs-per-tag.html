@@ -65,13 +65,20 @@
         }
         table td {
             padding: 4px 6px;
+            overflow: hidden;
+            max-width: 100%;
         }
         .name, .cost {
             font-weight: 500;
         }
         .count {
             color: rgba(0,0,0,0.54);
+            text-align: right;
         }
+        /*.count ,
+        .cost {
+            width: 120px;
+        }*/
         .text-right {
             text-align: right;
         }
@@ -91,19 +98,6 @@
             color: rgba(0,0,0,0.32);
             display: block;
         }
-        .zero-clouds {
-            padding: 0 12px 12px;
-            font-size: 0.9em;
-            opacity: 0.54;
-        }
-        .zero-cloud:after {
-            position: relative;
-            content: ", ";
-        }
-        .zero-cloud:last-of-type:after {
-            position: relative;
-            content: ".";
-        }
         iron-icon#costdocs {
             width: 20px;
             height: 20px;
@@ -118,9 +112,7 @@
             <table>
                 <template is="dom-repeat" items="[[tags]]">
                     <tr>
-                        <td colspan="2" class="tag">[[item.key]] 
-                            <span hidden$="[[!item.value]]"> = [[item.value]] </span>
-                        </td>
+                        <td colspan="3" class="tag">[[item.key]] <span hidden$="[[!item.value]]"> = [[item.value]] </span></td>
                         <td class="count">[[item.count]] machines </td>
                         <td class="text-right cost">$[[item.cost]]</td>
                     </tr>
