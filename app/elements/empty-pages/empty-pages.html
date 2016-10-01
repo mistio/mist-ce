@@ -50,7 +50,7 @@
         }
         </style>
         <div id="list-form">
-          <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
+          <img class="onb-graphics top" src="/assets/onboarding/clouds.svg"/>
             <div hidden$="[[!isStacks]]">
                 <div>To create [[section.id]] you need to use a template.</div>
                 <paper-button class="wide blue" on-tap="_goToTemplate"> VIEW YOUR TEMPLATES </paper-button>
@@ -66,7 +66,7 @@
                 <div hidden$="[[isStacks]]">
                     <div>No [[section.id]] available. Yet.</div>
                     <paper-button class="wide blue" on-tap="_fabAction"> ADD YOUR [[section.id]] </paper-button>
-                </div>            
+                </div>
               </template>
             </div>
         </div>
@@ -97,21 +97,19 @@ Polymer({
     needCloudChange: function(clouds, section){
         if (this.clouds.length > 0) {
             return false;
-        }
-        else {
-          if(this.section.id == "machines" || this.section.id == "networks" || this.section.id == "images" || this.section.id == "stacks"){
-            return true;
-          }
-          else {
-            return false;
-          }
+        } else {
+            if(this.section.id == "machines" || this.section.id == "networks" || this.section.id == "images" || this.section.id == "stacks"){
+                return true;
+            } else {
+                return false;
+            }
         }
     },
     _addCloudAction: function(){
-        page("/add-cloud");
+        document.querySelector('app-location').set('path', '/clouds/+add');
     },
     _goToTemplate: function(){
-        page("/templates");
+        document.querySelector('app-location').set('path', '/templates');
     },
     _computeIsStacks: function(section){
         return this.section.id == "stacks";
@@ -119,12 +117,11 @@ Polymer({
     _fabAction: function(e) {
         if(this.section.id != "teams")
         {
-          console.debug('fabAction', e, this.section.add);
-          page(this.section.add);
-        }
-        else{
-          var dialog = this.querySelector('team-add');
-          dialog.openDialog();
+            console.debug('fabAction', e, this.section.add);
+            document.querySelector('app-location').set('path', this.section.add);
+        } else {
+            var dialog = this.querySelector('team-add');
+            dialog.openDialog();
         }
     }
 

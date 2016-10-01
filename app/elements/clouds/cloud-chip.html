@@ -228,21 +228,51 @@
 
         _elevation: {
           type: Number
-        }
+        },
+
+        cloud: {
+          type: Object, 
+          notify: true
+        },
+        online: {
+          type: Boolean,
+          reflectToAttribute: true,
+          notify: true,
+          value: true
+        },
+        offline: {
+          type: Boolean,
+          reflectToAttribute: true,
+          notify: true,
+          value: false
+        },
       },
       listeners: {
         up: '_upAction',
         blur: '_blurAction'
       },
       observers: [
-        '_calculateElevation(opened, focused, disabled, active, pressed)'
+        '_calculateElevation(opened, focused, disabled, active, pressed)',
+        '_computeIsOnline(cloud.enabled,cloud.state)',
       ],
 
       ready: function() {
+        this.cloud = {};
         if (this.$.removeBtn) {
           // disable tabindex on remove button so that tabindex can be used for chips
           this.$.removeBtn.removeAttribute('tabindex');
         }
+      },
+      _computeIsOnline: function(enabled, state){
+        console.log('_computeIsOnline', this.cloud.state, state, this.cloud.title);
+        if (state == 'online'){
+            this.set('online', true);
+            this.set('offline', false);
+        }
+        else if (state != 'online'){
+            this.set('online', false);
+            this.set('offline', true);
+        }   
       },
       _calculateElevation: function() {
         var e = 0;

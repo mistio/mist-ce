@@ -279,7 +279,7 @@ PROVIDERS.push({
         required: true,
         errorMessage: "Please enter title"
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "text",
         value: "",
@@ -289,7 +289,7 @@ PROVIDERS.push({
         helptext: 'You can find your API key on your Amazon console',
         helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2'
     }, {
-        name: "api_secret",
+        name: "apisecret",
         label: "API Secret *",
         type: "password",
         value: "",
@@ -355,7 +355,7 @@ PROVIDERS.push({
         required: true,
         errorMessage: "Please enter title"
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "password",
         value: "",
@@ -511,7 +511,7 @@ PROVIDERS.push({
         required: true,
         errorMessage: "Please enter title"
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "text",
         value: "",
@@ -639,7 +639,7 @@ PROVIDERS.push({
         required: true,
         errorMessage: "Please enter title"
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "password",
         value: "",
@@ -697,7 +697,7 @@ PROVIDERS.push({
         errorMessage: "Please enter title",
         helptext: 'The username you use to connect to the RackSpace portal'
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "password",
         value: "",
@@ -735,7 +735,7 @@ PROVIDERS.push({
         errorMessage: "Please enter username",
         helptext: 'The username you use to connect to the SoftLayer portal'
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "password",
         value: "",
@@ -866,7 +866,7 @@ PROVIDERS.push({
         required: true,
         errorMessage: "Please enter title"
     }, {
-        name: "api_key",
+        name: "apikey",
         label: "API Key *",
         type: "password",
         value: "",

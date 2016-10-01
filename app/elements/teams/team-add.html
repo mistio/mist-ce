@@ -1,8 +1,7 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
@@ -13,6 +12,8 @@
             :host {
                 display: block;
                 width: 100%;
+                position: relative;
+                z-index: 104;
             }
             paper-button.blue {
                 margin-right: 0;
@@ -24,7 +25,7 @@
         </style>
 
         <paper-dialog id="teamAddModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
-            <h2>Add Team</h2>            
+            <h2>Add Team</h2>
             <paper-dialog-scrollable>
                 <p>
                     <paper-input id="name" label="Name" error-message="Please enter team's name" value="{{newTeam.name}}"></paper-input>
@@ -64,10 +65,7 @@
                         },
                     },
                     organization: {
-                        type: Object,
-                        value: function() {
-                            return ORGANIZATION;
-                        }
+                        type: Object
                     },
                     sendingData: {
                         type: Boolean,

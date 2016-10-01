@@ -1,10 +1,9 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../item-list/item-actions.html">
 
 <link rel="import" href="key-edit.html">
 
@@ -48,8 +47,8 @@
                 padding-right: 8px;
             }
 
-            #keyPublicContainer textarea,
-            #keyPrivateContainer textarea {
+            #keyPublicContainer .textarea,
+            #keyPrivateContainer .textarea {
                 height: 120px;
                 overflow: auto;
                 font-family: monospace;
@@ -61,11 +60,12 @@
                 background-color: #f8f8f8;
                 border-color: #eeedeb;
                 color: rgba(0, 0, 0, 0.54);
-                white-space: normal;
+                white-space: pre-line;
+                word-wrap: break-word;
                 text-align: left;
             }
 
-            #keyPublicContainer textarea {
+            #keyPublicContainer .textarea {
                 height: 120px;
             }
 
@@ -73,7 +73,7 @@
                 text-align: center;
             }
 
-            #keyPrivateContainer textarea {
+            #keyPrivateContainer .textarea {
                 height: 440px;
             }
 
@@ -163,24 +163,7 @@
                 .wide {
                     display: inline;
                 }
-            }
-            .is-loading {
-                top: 15px;
-                left: 200px;
-                position: fixed;
-                right: 0;
-                bottom: 0;
-                display: block;
-                width: 100%;
-                height: 100vh;
-                background-color: #eee;
-            }
-            .is-loading paper-spinner {
-                width: 80px;
-                height: 80px;
-                margin: 10% auto;
-                display: block;
-            }
+            }            
         </style>
         <div id="content">
             <div class="is-loading" hidden$="[[!isLoading]]">
@@ -213,13 +196,10 @@
             </paper-material>
 
             <div class="key-info">
-                <!-- <paper-material></paper-material> -->
                 <paper-material>
                     <h4 class="id">Key ID:</h4><span class="id">[[key.id]]</span>
-                    <template is="dom-if" if="[[key.tags]]">
-                        <h4 class="id tags" hidden$="[[!key.tags.length]]">
-                            Tags <span class="id">([[key.tags.length]])</span>:
-                        </h4>
+                    <template is="dom-if" if="[[tagsExist]]">
+                        <h4 class="id tags">Tags </h4>
                         <template is="dom-repeat" items="[[key.tags]]">
                             <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
                         </template>
@@ -233,9 +213,7 @@
                         </paper-button>
                     </div>
                     <div id="keyPublicContainer">
-                        <textarea id="keyPublic">
-                            [[publicKey]]
-                        </textarea>
+                        <div class="textarea" id="keyPublic">[[publicKey]]</div>
                     </div>
                 </paper-material>
                 <paper-material>
@@ -251,9 +229,7 @@
                     <div id="keyPrivateContainer">
                         <paper-button hidden$="[[visiblePrivateKey]]" id="showPrivateKeybtn" on-tap="showPrivateKey">
                             <iron-icon icon="icons:visibility"></iron-icon> View Private Key</paper-button>
-                        <textarea hidden$="[[!visiblePrivateKey]]" id="keyPrivate">
-                        [[privateKey]]
-                        </textarea>
+                        <div class="textarea" hidden$="[[!visiblePrivateKey]]" id="keyPrivate">[[privateKey]]</div>
                     </div>
                 </paper-material>
                 <br/>
@@ -273,18 +249,15 @@
                 </paper-material>
             </div>
         </div>
-        <template is="dom-if" if="{{key.id}}">
-            <iron-ajax auto id="keyPublicRequest" url="{{baseUrl}}/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
-        </template>
-        <template is="dom-if" if="{{key.id}}">
-            <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
-        </template>
+        
+        <iron-ajax id="keyPublicRequest" url="/api/v1/keys/[[key.id]]/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
+        <iron-ajax id="keyPrivateRequest" url="/api/v1/keys/[[key.id]]/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/[[key.id]]" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
         <iron-ajax id="keyDeleteAjaxRequest" url="/api/v1/keys/[[key.id]]" method="DELETE" on-response="_handleKeyDeleteAjaxResponse" on-error="_handleKeyDeleteAjaxError"></iron-ajax>
         <key-edit key="[[key]]"></key-edit>
         <dialog-element></dialog-element>
         <paper-toast></paper-toast>
-        <tags-list resource="key"></tags-list>
+        <tags-list model="[[model]]"></tags-list>
     </template>
     <script>
         (function() {
@@ -294,9 +267,6 @@
                 is: 'key-page',
 
                 properties: {
-                    sections: {
-                        type: Object
-                    },
                     section: {
                         type: Object
                     },
@@ -307,18 +277,8 @@
                         type: String,
                         computed: '_getHeaderStyle(section)'
                     },
-                    params: {
-                        type: Object,
-                        notify: true
-                    },
                     key: {
-                        type: Object,
-                        computed: '_computeKey(params, model.keysArray.*)'
-                    },
-                    id: {
-                        type: String,
-                        computed: '_computeId(params)',
-                        notify: true
+                        type: Object
                     },
                     isDefault: {
                         type: String,
@@ -348,54 +308,66 @@
                         type: Boolean,
                         value: false
                     },
-                    baseUrl: {
-                        type: String,
-                        computed: '_baseUrl(params)',
-                        notify: true
-                    },
                     isLoading: {
                         type: Boolean,
                         computed: '_computeIsloading(key)',
                         value: true
+                    },
+                    tagsExist: {
+                        type: Boolean,
+                        computed: '_computeTagsExist(key, key.tags.*)',
+                        value: false
+                    },
+                    itemsfortags: {
+                        type: Array,
+                        computed: 'computeTagItems(key)'
                     }
                 },
                 observers: [
-                    'update(params, model.keys.*)'
+                    'update(key)'
                 ],
                 listeners: {
-                    'confirmation': '_deleteKeyEventResponse',
-                    'updateSelectedKey': '_updateKey',
-                    'paramsChanged': 'update'
+                    'confirmation': '_deleteKeyEventResponse'
                 },
-                update: function(params) {
-                    if (this.$.keyPublicRequest) {
+                update: function(key){
+                    if (key){
+                        this.$.keyPublicRequest.headers["Content-Type"] = 'application/json';
+                        this.$.keyPublicRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.keyPublicRequest.body = {};
                         this.$.keyPublicRequest.generateRequest();
                     }
-                    this.visiblePrivateKey = false;
-                    this.set('privateKey', null);
-                },
-                _baseUrl: function(params) {
-                    return '/keys/' + this.params.id;
+                    this.set('visiblePrivateKey', false);
                 },
                 _getHeaderStyle: function(section) {
                     return 'background-color: ' + section.color + '; color: #fff;';
                 },
-                _computeKey: function(params, keys) {
-                    return keys.base.find(function(key) {
-                        return key.id == params.id;
-                    });
+                _computeTagsExist: function(key, tags){
+                    if (this.key.tags.length > 0 && this.key.tags[0] && this.key.tags[0]['key'] && this.key.tags[0]['key'] != "") {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
                 },
-                _computeId: function(params) {
-                    return params.id;
+                computeTagItems: function(key){
+                    if (key) {
+                        var arr = [];
+                        var item = itemUid(key, this.section);
+                        arr.push(item);
+                        return arr;
+                    } 
                 },
                 _computeKeyMachines: function(key) {
-                    return key.machines;
+                    if (key)
+                        return key.machines;
                 },
                 _keyHasMachines: function(keyMachines) {
-                    return keyMachines.length > 0 ? true : false;
+                    if (keyMachines)
+                        return keyMachines.length > 0 ? true : false;
                 },
                 _keyHasMachinesMoreThanOne: function(keyMachines) {
-                    return keyMachines.length > 1 ? true : false;
+                    if (keyMachines)
+                        return keyMachines.length > 1 ? true : false;
                 },
                 getMachineUrl: function(keymachine) {
                     var url;
@@ -417,36 +389,41 @@
                     return isDefault;
                 },
                 copyPublicKey: function() {
-                    this.$.keyPublic.select();
-                    document.execCommand('copy');
-                    this._showToast('The Public Key was copied to clipboard!');
+                    this.clearSelection();
+                    var el = this.$.keyPublic;
+                    this.setSelection(el);
+                    var successful = document.execCommand('copy');
+                    var msg = successful ? 'The Public Key was copied to clipboard!' : 'There was an error copying to clipboard!';
+                    this._showToast(msg);
                 },
                 copyPrivateKey: function() {
-                    this.$.keyPrivate.select();
-                    document.execCommand('copy');
-                    this._showToast('The Private Key was copied to clipboard!');
+                    this.clearSelection();
+                    var el = this.$.keyPrivate;
+                    this.setSelection(el);
+                    var successful = document.execCommand('copy');
+                    var msg = successful ? 'The Private Key was copied to clipboard!' : 'There was an error copying to clipboard!';
+                    this._showToast(msg);
                 },
                 handlePublicResponse: function(data) {
-                    this.publicKey = data.detail.response;
+                    //console.log(data);
+                    this.set('publicKey', data.detail.response);
                 },
                 showPrivateKey: function() {
-                    // this.$.keyPrivateRequest.generateRequest();
+                    this.$.keyPrivateRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyPrivateRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyPrivateRequest.body = {};
+                    this.$.keyPrivateRequest.generateRequest();
                     this.visiblePrivateKey = true;
                 },
                 hidePrivateKey: function() {
-                    // this.$.keyPrivateRequest.generateRequest();
                     this.visiblePrivateKey = false;
                 },
                 handlePrivateResponse: function(data) {
-                    this.privateKey = data.detail.response;
+                    this.set('privateKey', data.detail.response);
                 },
                 _editKey: function(e) {
                     var el = this.querySelector('key-edit');
                     el._openEditKeyModal();
-                },
-                _updateKey: function(e) {
-                    var key = e.detail.key;
-                    this.set('key.id', key.id);
                 },
                 _makeDefaultKey: function(e) {
                     this.$.keyMakeDefaultAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -460,7 +437,7 @@
                 _editTags: function() {
                     var el = this.querySelector('tags-list'),
                     items = [];
-                    items.push(this.key);
+                    items.push(itemUid(this.key, this.section));
                     el.items = items;
                     el._openDialog();
                 },
@@ -484,7 +461,7 @@
                     }
                 },
                 _handleKeyDeleteAjaxResponse: function(e) {
-                    page.show('/keys');
+                    this.shadowRoot.querySelector('app-location').path = '/keys';
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element');
@@ -497,14 +474,32 @@
                     var toast = this.querySelector('paper-toast');
                     toast.text = msg;
                     toast.show();
-                    var newnot = {};
-                    newnot["text"] = msg;
-                    newnot["type"] = 'green';
-                    document.querySelector("notifications-element").notifications.push(newnot);
                 },
-                _computeIsloading(key) {
-                    return !this.key ? true : false;
-                }
+                _computeIsloading: function(key) {
+                    return !key ? true : false;
+                },
+                clearSelection: function(){
+                if (window.getSelection) {
+                        if (window.getSelection().empty) {  // Chrome
+                            window.getSelection().empty();
+                        } else if (window.getSelection().removeAllRanges) {  // Firefox
+                            window.getSelection().removeAllRanges();
+                        }
+                    } else if (document.selection) {  // IE?
+                        document.selection.empty();
+                    }
+                },
+                setSelection: function(el){
+                    if (document.selection) {
+                        var range = document.body.createTextRange();
+                            range.moveToElementText(el);
+                        range.select();
+                    } else if (window.getSelection) {
+                        var range = document.createRange();
+                        range.selectNode(el);
+                        window.getSelection().addRange(range);
+                    }
+                },
             });
         })();
     </script>

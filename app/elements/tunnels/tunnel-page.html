@@ -1,4 +1,3 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
@@ -9,9 +8,9 @@
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../item-list/item-actions.html">
 
 <link rel="import" href="tunnel-edit.html">
-<!-- <link rel="import" href="script-run.html"> -->
 
 <dom-module id="tunnel-page">
     <template>
@@ -131,23 +130,6 @@
         #copyscript[show] {
             display: inline-block;
         }
-        .is-loading {
-            top: 15px;
-            left: 200px;
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            display: block;
-            width: 100%;
-            height: 100vh;
-            background-color: #eee;
-        }
-        .is-loading paper-spinner {
-            width: 80px;
-            height: 80px;
-            margin: 10% auto;
-            display: block;
-        }
         </style>
 
         <div id="content">
@@ -172,7 +154,7 @@
                             <paper-button on-tap="_disableTunnel" class="simple" hidden$="[[!tunnel.active]]" disabled>Disable Tunnel</paper-button>
                             <paper-button on-tap="_editTunnel" class="simple">Edit Tunnel</paper-button>
                             <paper-button on-tap="_deleteTunnel" class="simple">Delete Tunnel</paper-button>
-                        </paper-menu>                        
+                        </paper-menu>
                     </paper-menu-button>
                     <paper-button on-tap="_enableTunnel" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[tunnel.active]]" disabled> Enable Tunnel <iron-icon icon="av:play-arrow" style$="color: [[section.color]]"></iron-icon></paper-button>
                 </div>
@@ -183,20 +165,20 @@
                         <pre><code>
 Options for installing your VPN client:
 
-1.  Via `curl`: Hit the button below in order to be provided with 
-    a simple `curl` command, which you can directly run in your shell 
-    and will take care of installing the VPN client. This is the 
-    recommended option, especially if you are not planning on modifying 
+1.  Via `curl`: Hit the button below in order to be provided with
+    a simple `curl` command, which you can directly run in your shell
+    and will take care of installing the VPN client. This is the
+    recommended option, especially if you are not planning on modifying
     the configuration script provided.
 
-2.  Alternatively, you can request and then copy &amp; paste the configuration 
-    script in your shell, make it executable, and run it. This option is 
+2.  Alternatively, you can request and then copy &amp; paste the configuration
+    script in your shell, make it executable, and run it. This option is
     useful in case you want to make any changes to the configuration provided.
 </code></pre>
                         <pre><code>
 ==============================================================================
 CURL Command:</code></pre>
-                        <pre><code id="tunnelscommand"></code></pre>
+                        <pre><code id="tunnelcommand"></code></pre>
                         <paper-button id="copycurl" on-tap="copyCurl" class="pull-right link"> <iron-icon icon="content-copy"> </iron-icon>Copy command</paper-button>
                         <paper-button id="getcurl" on-tap="_requestCommand" class="pull-right link"> <iron-icon icon="content-copy"> </iron-icon>Request command</paper-button>
                         <pre><code>
@@ -206,7 +188,7 @@ Script:</code></pre>
                         <paper-button id="getscript" handle-as="json" on-tap="_requestScript" class="pull-right link"><iron-icon icon="content-copy"></iron-icon> Request Script</paper-button>
                         <paper-button id="copyscript" on-tap="copyScript" class="pull-right link"><iron-icon icon="content-copy"></iron-icon> Copy Script </paper-button>
                         <pre><code>
-                            
+
                         </code></pre>
                     </div>
                 </div>
@@ -267,9 +249,8 @@ Script:</code></pre>
         <iron-ajax id="tunnelDeleteAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]" method="DELETE" on-response="_handleTunnelDeleteAjaxResponse" on-error="_handleTunnelDeleteAjaxError"></iron-ajax>
         <iron-ajax id="scriptAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]/script" method="GET" on-response="_handleScriptAjaxRequest" on-error="_handleScriptAjaxError"></iron-ajax>
         <iron-ajax id="commandAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]/command" method="GET" on-response="_handleCommandAjaxRequest" handle-as="xml" on-error="_handleCommandAjaxError"></iron-ajax>
-        <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
-        <tags-list resource="tunnel"></tags-list>
+        <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
     </template>
     <script>
@@ -290,19 +271,11 @@ Script:</code></pre>
                     type: String,
                     computed: '_getHeaderStyle(section)'
                 },
-                params: {
-                    type: Object
-                },
                 model: {
                     type: Object
                 },
                 tunnel: {
-                    type: Object,
-                    computed: '_computeTunnel(params, model.tunnelsArray.*)'
-                },
-                tunnelid: {
-                    type: String,
-                    computed: '_computeTunnelId(params)'
+                    type: Object
                 },
                 isInline: {
                     type: Boolean,
@@ -330,17 +303,6 @@ Script:</code></pre>
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
             },
-            _computeId: function(params) {
-                return params.id;
-            },
-            _computeTunnel: function(params, tunnels) {
-                return tunnels.base.find(function(tunnel) {
-                    return tunnel.id == params.id;
-                });
-            },
-            _computeTunnelId: function(params) {
-                return params.id;
-            },
             _computeIsInline: function(location_type) {
                 if (location_type)
                     return location_type == 'inline';
@@ -350,12 +312,9 @@ Script:</code></pre>
             _editTags: function() {
                 var el = this.querySelector('tags-list'),
                 items = [];
-                items.push(this.tunnel);
+                items.push(itemUid(this.tunnel, this.section));
                 el.items = items;
                 el._openDialog();
-            },
-            _runScript: function(e) {
-                page.show('/run-script/' + this.tunnel.id);
             },
             _editTunnel: function(e) {
                 var el = this.querySelector('tunnel-edit');
@@ -386,14 +345,14 @@ Script:</code></pre>
                 }
             },
             _handleTunnelDeleteAjaxResponse: function(e) {
-                page.show('/tunnels');
+                document.querySelector('app-location').set('path', '/tunnels');
             },
             _handleTunnelDeleteAjaxError: function(e) {
                 var toast = this.querySelector('paper-toast');
                 toast.text = "There was a problem deleting the tunnel";
                 toast.show();
             },
-            // script 
+            // script
             _requestScript: function(){
                 this.$.scriptAjaxRequest.body = {};
                 this.$.scriptAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -409,9 +368,9 @@ Script:</code></pre>
                 }
             },
             _handleScriptAjaxError: function(e){
-                
+
             },
-            // command 
+            // command
             _requestCommand: function(){
                 this.$.commandAjaxRequest.body = {};
                 this.$.commandAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -422,14 +381,14 @@ Script:</code></pre>
                 console.log(e);
                 var response = e.detail.xhr.responseText;
                 if (e.detail.type != "error"){
-                    this.$.tunnelscommand.textContent = response;
+                    this.$.tunnelcommand.textContent = response;
                     this.$.copycurl.setAttribute('show', true);
                 }
             },
             _handleCommandAjaxError: function(e){
                 console.log(e);
                 var response = e.detail.error;
-                this.$.tunnelscommand.textContent = response;
+                this.$.tunnelcommand.textContent = response;
             },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element');
@@ -441,7 +400,7 @@ Script:</code></pre>
             copyScript: function(e) {
                 this.clearSelection();
                 var el = this.$.tunnelscript;
-                this.setSelection(el);            
+                this.setSelection(el);
                 var successful = document.execCommand('copy');
                 var msg = successful ? 'The script was copied to clipboard!' : 'There was an error copying to clipboard!';
 
@@ -449,8 +408,8 @@ Script:</code></pre>
             },
             copyCurl: function(e) {
                 this.clearSelection();
-                var el = this.$.tunnelscommand;
-                this.setSelection(el);            
+                var el = this.$.tunnelcommand;
+                this.setSelection(el);
                 var successful = document.execCommand('copy');
                 var msg = successful ? 'The command was copied to clipboard!' : 'There was an error copying to clipboard!';
 
@@ -465,7 +424,7 @@ Script:</code></pre>
 
             },
             _disableTunnel: function(){
-                
+
             },
             clearSelection: function(){
                 if (window.getSelection) {
@@ -489,7 +448,7 @@ Script:</code></pre>
                     window.getSelection().addRange(range);
                 }
             },
-            _computeIsloading(tunnel) {
+            _computeIsloading: function(tunnel) {
                 return !this.tunnel ? true : false;
             }
         });

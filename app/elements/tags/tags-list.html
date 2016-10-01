@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
 <link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 
 <link rel="import" href="tag-item.html">
 
@@ -16,7 +17,7 @@
             }
 
             .tag-list {
-                padding: 0 8px 24px 24px;
+                padding: 0 0 24px 0;
             }
 
             .bottom-actions {
@@ -49,24 +50,45 @@
                 padding-left: 16px;
                 padding-right: 16px;
             }
+            #progress {
+                margin-bottom: 16px;
+                margin-top: 0;
+                border-bottom: 1px solid #ddd;
+            }
+            #errormsg {
+                color: var(--red-color) !important;
+                padding: 16px 24px;
+            }
+            #progress paper-progress {
+                width: 100%;
+                margin: 0 auto;
+            }
+            #progress paper-progress[error]>::content #primaryProgress {
+                background-color: var(--red-color) !important;
+            }
         </style>
 
         <paper-dialog id="tagsModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
             <h2>Tags</h2>
-            <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
                 <div class="tag-list">
                     <template is="dom-repeat" items="[[tags]]" as="tag">
                         <tag-item tag="[[tag]]" index=[[index]]></tag-item>
                     </template>
                 </div>
-
-                <div class="clearfix bottom-actions xs12">
-                    <paper-button class="submit-btn add" on-tap="_addTag">
-                        <iron-icon icon="add"></iron-icon> Add Tag</paper-button>
-                    <paper-button class="submit-btn pull-right blue save" on-tap="_saveTags">Save Tags</paper-button>
-                </div>
             </paper-dialog-scrollable>
+            <div id="progress">
+                <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
+                <paper-progress error hidden$="[[!hasError]]"></paper-progress>
+                <div id="errormsg" hidden$="[[!hasError]]"></div>
+            </div>
+
+            <div class="clearfix bottom-actions xs12">
+                <paper-button class="submit-btn add" on-tap="_addTag">
+                    <iron-icon icon="add"></iron-icon> Add Tag</paper-button>
+                <paper-button class="submit-btn pull-right blue save" on-tap="_saveTags">Save Tags</paper-button>
+                <paper-button class="pull-right blue-link" dialog-dismiss>Cancel</paper-button>
+            </div>
         </paper-dialog>
         <paper-toast></paper-toast>
         <iron-ajax id="tagsAjaxRequest" url="/api/v1/tags" method="POST" on-response="_handleTagsAjaxResponse" on-error="_handleTagsAjaxError"></iron-ajax>
@@ -81,19 +103,39 @@
 
                 properties: {
                     resource: String,
-                    items: Array,
-                    tags: {
+                    model: Object,
+                    items: {
                         type: Array,
-                        computed: '_computeTags(items)'
+                        notify: true
                     },
-                    newItems: {
-                        type: Array,
-                        computed: '_computeNewItems(items, tags)'
+                    tags: {
+                        type: Array
+                    },
+                    tagsToDelete: {
+                        type: Array
+                    },
+                    hasError: {
+                        type: Boolean,
+                        value: false
+                    },
+                    showProgress: {
+                        type: Boolean,
+                        value: false
                     }
                 },
+                observers: [
+                    'selectedItemsChanged(items.splices, items.length)',
+                    '_computeTags(items)'
+                ],
                 listeners: {
                     'iron-overlay-closed': '_modalClosed',
-                    'tag-delete': '_tagDeleteHandler'
+                    'tag-delete': '_tagDeleteHandler',
+                    'tag-change': '_tagUpdate'
+                },
+                ready: function(){
+                    this.set('items', []);
+                    this.set('tags', []);
+                    this.set('tagsToDelete', []);
                 },
                 _openDialog: function(e) {
                     this.querySelector('paper-dialog').open();
@@ -102,51 +144,69 @@
                     this.querySelector('paper-dialog').close();
                 },
                 _modalClosed: function(e) {
-                    if (e.srcElement.id == 'tagsModal') {
-                        console.log(e);
-                    }
+                    this.set('tagsToDelete', []);
+                    this.set('showProgress', false);
+                    this.set('hasError', false);
+                    this.$.errormsg.textContent = '';
                 },
-                _computeNewItems: function(items, tags) {
-                    var newItems = items.slice();
-
-                    newItems.forEach(function(item) {
-                        var newTags = item.tags
-                            .filter(function(tag, index) {
-                                return tags.indexOf(tag) == -1;
-                            });
-                        item.tags = newTags;
-                    });
-
-                    return newItems;
+                selectedItemsChanged: function(items, length){
+                    this._computeTags(this.items);
                 },
                 _computeTags: function(items) {
                     var tags = this._computeCommonTags(items);
-
                     if (!tags.length) {
-                        return [{
+                        tags = [{
                             key: '',
                             value: ''
                         }];
                     }
 
-                    return tags;
+                    this.set('tags', tags);
                 },
                 _computeCommonTags: function(items) {
-                    var tags = [];
+                    var tags = [],
+                        tagset = new swiftSet.Set(),
+                        isection = new swiftSet.Set();
 
-                    items.forEach(function(item) {
-                        if (item.tags) {
-                            item.tags.forEach(function(tag) {
-                                if (tags.indexOf(tag) == -1) {
-                                    tags.push(tag);
-                                }
-                            });
-                        } else {
-                            item.tags = [];
+                    for (var i = 0; i < items.length; i++) {
+
+                        var item = items[i];
+
+                        var itemType = item.split(":")[0],
+                            itemCloudId = item.split(":")[1],
+                            itemId = item.split(":")[2],
+                            itemObj = {}; 
+                            
+                        if (['machine', 'image', 'network'].indexOf(itemType) != -1 && itemCloudId)
+                            itemObj = this.model.clouds[itemCloudId][itemType+'s'][itemId];
+                        else {
+                            itemObj = this.model[itemType+'s'][itemId];
                         }
-                    });
+                        if (itemObj) {
 
-                    return tags;
+                            if (!itemObj.tags) 
+                                itemObj.tags = [];
+
+                            if (i == 0) {
+                                tagset.addItems(itemObj.tags.map(function(tag){
+                                    return tag.key+'='+tag.value;
+                                }) || []);
+                            }
+                            else {
+                                isection.clear()
+                                isection.addItems(tagset.intersection(itemObj.tags.map(function(tag){
+                                        return tag.key+'='+tag.value;
+                                    }) || []));
+                                tagset.clear();
+                                tagset.addItems(isection.items());
+                            }
+                        }
+                    }
+
+                    return tagset.items().map(function(item){
+                        return {key: item.split('=')[0],
+                                value: item.split('=')[1]};
+                    }) || [];
                 },
                 _addTag: function() {
                     var newTag = {
@@ -159,35 +219,77 @@
                     var tag = e.detail.tag,
                         index = this.tags.indexOf(tag);
                     this.splice('tags', index, 1);
+
+                    tag.op = "-";
+                    this.push('tagsToDelete', tag);
+                    console.log(this.tagsToDelete);
+                },
+                _tagUpdate: function(e){
+                    // this._tagDeleteHandler(e);
+                    console.log(e.detail);
+
+                    var oldTag = e.detail.oldTag;
+                    var newTag = e.detail.newTag;
+
+                    //move old tag to tags to delete
+                    if (oldTag.key != newTag.key){
+                        oldTag.op = "-";
+                        this.push('tagsToDelete', oldTag);
+                    }
                 },
                 _saveTags: function() {
+                    // console.log('_saveTags', this.items);
                     var newTags = this.tags.filter(function(tag) {
                             return tag.key;
                         }),
                         payload = [];
 
-                    payload = this.newItems.map(function(item) {
+                    payload = this.items.map(function(item) {
+                        var itemType = item.split(":")[0],
+                            itemCloudId = item.split(":")[1],
+                            itemId = item.split(":")[2],
+                            itemObj;
+                        
+                        if (['machine', 'image', 'network'].indexOf(itemType) != -1 && itemCloudId)
+                            itemObj = this.model.clouds[itemCloudId][itemType+'s'][itemId];
+                        else {
+                            itemObj = this.model[itemType+'s'][itemId];
+                        }
+
                         var newItem = {};
 
                         newItem.resource = {
-                            type: this.resource,
-                            item_id: item.id,
-                            cloud_id: ['machine', 'image', 'network'].indexOf(this.resource) != -1 ? item.cloud.id : ''
+                            type: itemType,
+                            item_id: itemId,
+                            cloud_id: ['machine', 'image', 'network'].indexOf(itemType) != -1 ? itemCloudId : ''
                         };
-                        newItem.tags = item.tags.concat(newTags);
+                        newItem.tags = newTags;
 
+                        if (this.tagsToDelete.length > 0) {
+                            this.tagsToDelete.forEach(function(tag){
+                                newItem.tags.push(tag);
+                            })
+                        }
                         return newItem;
                     }, this);
-                    console.log(payload);
+                    console.log('payload',payload);
 
                     this.$.tagsAjaxRequest.body = payload;
                     this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.tagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.tagsAjaxRequest.generateRequest();
+
+                    this.set('showProgress', true);
                 },
                 _handleTagsAjaxResponse: function(e) {
                     this._closeDialog();
                     this._showToast('Tags were updated!');
+                },
+                _handleTagsAjaxError: function(e){
+                    console.log(e.detail.error.message);
+                    this.set('showProgress', false);
+                    this.set('hasError', true);
+                    this.$.errormsg.textContent = e.detail.error.message;
                 },
                 _showToast: function(msg) {
                     var toast = this.querySelector('paper-toast');

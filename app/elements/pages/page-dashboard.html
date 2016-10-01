@@ -1,5 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
+<!--link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html"-->
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
@@ -26,11 +26,10 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input-behavior.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input-addon-behavior.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<!--link rel="import" href="../../bower_components/iron-form/iron-form.html"-->
 
 <link rel="import" href="../logs/log-list.html">
 <link rel="import" href="../onb-element/onb-element.html">
-<link rel="import" href="../app-header/app-header.html">
 <link rel="import" href="../clouds/cloud-info.html">
 <link rel="import" href="../clouds/cloud-chip.html">
 
@@ -72,14 +71,12 @@
             cursor: pointer;
             z-index: 9;
         }
-        .clouds cloud-chip.online .icon {
-            background-color: var(--green-color) !important;
-        }
-
-        .clouds cloud-chip.offline .icon {
+        .clouds cloud-chip[offline] .icon {
             background-color: var(--red-color) !important;
         }
-
+        .clouds cloud-chip[online] .icon {
+            background-color: var(--green-color) !important;
+        }
         paper-button.blue {
             line-height: 30px;
             font-weight: 500;
@@ -254,10 +251,10 @@
             </p>
         </div>
         <template is="dom-if" if="[[showDashboard]]">
-                <div class="clouds top flexchild-wide-top">                    
+                <div class="clouds top flexchild-wide-top">
                     <div id="cloudslist" class="flex">
-                        <template is="dom-repeat" items="[[model.cloudsArray]]">
-                            <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" index$=[[index]] on-tap="_showCloudInfoDialog" id$="[[item.id]]">
+                        <template is="dom-repeat" items="[[model.cloudsArray]]" restamp="true">
+                            <cloud-chip label="{{item.title}}" class$="link" index$=[[index]] on-tap="_showCloudInfoDialog" id$="[[item.id]]" cloud="[[item]]">
                                 <div class="icon"></div>
                                 <!-- src="[[_computeProviderLogo(item.provider)]]" -->
                                 <h1 class="cloud-title">[[item.title]]</h1>
@@ -362,7 +359,7 @@ Polymer({
         showDashboard: {
             type: Boolean,
             // value: true,
-            computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds)',
+            computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds, model.org.name)',
             notify: true
         },
         hasIncidents: {
@@ -462,12 +459,6 @@ Polymer({
         }, 5000);
         //this.cloudLayoutMatrix();
     },
-    isOnline: function(cloud) {
-        return cloud.state == 'online' && 'online';
-    },
-    isOffline: function(cloud) {
-        return cloud.state == 'offline' && 'offline';
-    },
     _computeHasIncidents: function(incidents){
          if (incidents.base && incidents.base.length > 0){
             var unclosedInc = incidents.base.find(function(inc){
@@ -479,9 +470,9 @@ Polymer({
              return false;
          }
      },
-    _computeshowDashboard: function(cloudslength, isLoadingClouds) {
+    _computeshowDashboard: function(cloudslength, isLoadingClouds, orgName) {
         var show;
-        if (cloudslength > 0 && isLoadingClouds == false) {
+        if (orgName && cloudslength > 0 && isLoadingClouds == false) {
             show =  true;
         }
         else {
@@ -506,10 +497,11 @@ Polymer({
     },
     _computeReplaceTargets: function(monitoring) {
         var ret = {'bucky.': ''},
-            mIds = Object.keys(this.get('model.monitoring.monitored_machines') || {});
+            mIds = Object.keys(this.get('model.monitoring.monitored_machines') || []);
+
         for (var i=0; i<mIds.length; i++) {
             var mref = this.model.monitoring.monitored_machines[mIds[i]],
-                m = mref && this.model.clouds[mref.cloud_id].machines[mref.machine_id];
+                m = mref && this.model.clouds[mref.cloud_id].enabled && this.model.clouds[mref.cloud_id].machines && this.model.clouds[mref.cloud_id].machines[mref.machine_id];
             ret[mIds[i]] = m ? m.name : 'unknown';
         }
         return ret;
@@ -533,7 +525,7 @@ Polymer({
 
         if (this.openedCloud && this.openedCloud == cloudId) {
             dialog.removeAttribute('opened');
-            this._closeCloudChips();            
+            this._closeCloudChips();
         }
         else {
             var cloudChips = this.querySelectorAll('cloud-chip'),
@@ -600,4 +592,3 @@ Polymer({
     },
 });
 </script>
-f

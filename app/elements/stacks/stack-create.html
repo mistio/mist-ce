@@ -1,86 +1,85 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
-
 <link rel="import" href="../app-form/app-form.html">
 <dom-module id="stack-create">
     <template>
         <style is="custom-style" include="forms"></style>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
-            :host {
-                display: block;
-            }
+        :host {
+            display: block;
+        }
 
-            paper-material {
-                display: block;
-                padding: 24px;
-            }
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
 
-            #content {
-                max-width: 900px;
-            }
+        #content {
+            max-width: 900px;
+        }
 
-            paper-progress {
-                position: absolute;
-                bottom: 87px;
-                width: 100%;
-                left: 0;
-                right: 0;
-            }
+        paper-progress {
+            position: absolute;
+            bottom: 87px;
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
 
-            :host >::content paper-input-container {
-                padding-top: 16px;
-                padding-bottom: 16px;
-            }
+        :host >::content paper-input-container {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
 
-            paper-item.lead {
-                font-size: 2em;
-            }
+        paper-item.lead {
+            font-size: 2em;
+        }
 
-            paper-toggle-button[disabled]::content {
-                color: rgba(0, 0, 0, 0.32);
-            }
+        paper-toggle-button[disabled]::content {
+            color: rgba(0, 0, 0, 0.32);
+        }
 
-            paper-toggle-button::content paper-input-container input {
-                color: color: rgba(0, 0, 0, 0.54);
-            }
+        paper-toggle-button::content paper-input-container input {
+            color: color: rgba(0, 0, 0, 0.54);
+        }
 
-            .spacer {
-                display: block;
-                height: 24px;
-                width: 100%;
-            }
+        .spacer {
+            display: block;
+            height: 24px;
+            width: 100%;
+        }
 
-            .bottom-actions {
-                padding-left: 20px;
-            }
+        .bottom-actions {
+            padding-left: 20px;
+        }
 
-            *:not(paper-button)[disabled] {
+        *:not(paper-button)[disabled] {
+            display: none;
+        }
+
+        paper-radio-group {
+            padding: 16px 8px;
+        }
+
+        @media (max-width: 800px) {
+            .desc {
                 display: none;
             }
+        }
 
-            paper-radio-group {
-                padding: 16px 8px;
-            }
-            @media (max-width: 800px) {
-                .desc {
-                    display: none;
-                }
-            }
-            .desc {
-                width: 250px;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
+        .desc {
+            width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         </style>
-
-
         <div id="content">
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
@@ -101,117 +100,106 @@
                 <app-form fields="{{fields}}" templateid="{{template.id}}" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
             </paper-material>
         </div>
-
-
     </template>
     <script>
-        (function() {
-            'use strict';
+    (function() {
+        'use strict';
 
-            Polymer({
-                is: 'stack-create',
+        Polymer({
+            is: 'stack-create',
 
-                properties: {
-                    model: {
-                        type: Object
-                    },
-                    sections: {
-                        type: Object
-                    },
-                    section: {
-                        type: Object
-                    },
-                    color: {
-                        type: String,
-                        computed: '_getHeaderStyle(section)'
-                    },
-                    stack: {
-                        type: Object,
-                        value: {}
-                    },
-                    form: {
-                        type: Object,
-                        value: {}
-                    },
-                    params: {
-                        type: Object
-                    },
-                    template: {
-                        type: Object,
-                        computed: '_fromTemplate(params, model.templates.*)'
-                    },
-                    fields: {
-                        type: Array
-                    },
-                    keys: {
-                        type: Array,
-                        computed: "_keys(model)"
-                    },
-                    clouds: {
-                        type: Array,
-                        computed: "_clouds(model)"
-                    },
-                    images: {
-                        type: Array,
-                        computed: "_images(model)"
-                    },
-                    uri: {
-                        type: String,
-                        computed: "_uri(model)"
-                    },
-                    yaml_inputs: {
-                        type: String,
-                        notify: true
-                    }
+            properties: {
+                model: {
+                    type: Object
                 },
-
-                observers: [
-                    '_computeFields(template, template.inputs, template.inputs.*, model.templatesArray.*, model.cloudsArray.*, model.keysArray.*, params)'
-                ],
-
-                listeners: {
-                    'change' : '_updateFields',
-                    'iron-select' : '_updateFields',
+                section: {
+                    type: Object
                 },
-
-                _fromTemplate: function(params, templates) {
-                    if (params.id && this.model.templates) {
-                        var yaml_inputs = '';
-                        this.model.templates[params.id].inputs.forEach(function(inp) {
-                            yaml_inputs += inp.name+ ': ';
-                            var val = inp.value =! undefined ? inp.value : inp.defaultValue || inp.default;
-                            yaml_inputs += val+'\n';
-                        }, this);
-                        this.set('yaml_inputs', yaml_inputs);
-                        // pass values into form's stackinputs default value
-                        var ind;
-                        var stackinputsField = this.fields.find(function(f, index){
-                            ind=index;
-                            return f.name == "stackinputs";
-                        });
-                        this.set('fields.'+ind+'.defaultValue', this.yaml_inputs);
-                        console.log('template is redefined');
-                        return this.model.templates[params.id];
-                    } else {
-                        return {
-                            name: "Template is missing"
-                        }
-                        console.log('template is missing');
-                    }
+                color: {
+                    type: String,
+                    computed: '_getHeaderStyle(section)'
                 },
+                stack: {
+                    type: Object
+                },
+                form: {
+                    type: Object,
+                    value: {}
+                },
+                params: {
+                    type: Object
+                },
+                template: {
+                    type: Object,
+                    computed: '_fromTemplate(params, model.templates.*)'
+                },
+                fields: {
+                    type: Array,
+                    value: [],
+                    notify: true
+                },
+                keys: {
+                    type: Array,
+                    computed: "_keys(model)"
+                },
+                clouds: {
+                    type: Array,
+                    computed: "_clouds(model)"
+                },
+                images: {
+                    type: Array,
+                    computed: "_images(model)"
+                },
+                uri: {
+                    type: String,
+                    computed: "_uri(model)"
+                },
+                yaml_inputs: {
+                    type: String,
+                    notify: true
+                }
+            },
 
-                _computeFields: function(template, templateInps, templateInputs, modelTemplates, clouds, keys, params) {
-                    var yaml_or_form = 'yaml';
+            observers: [
+                '_computeFields(template, template.inputs, template.inputs.*, model.templatesArray.*, model.cloudsArray.*, model.keysArray.*, params)'
+            ],
+
+            listeners: {
+                'change': '_updateFields',
+                'iron-select': '_updateFields',
+            },
+            ready: function() {},
+            _fromTemplate: function(params, templates) {
+                if (params.template && this.model.templates) {
+                    var yaml_inputs = '';
+                    this.model.templates[params.template].inputs.forEach(function(inp) {
+                        yaml_inputs += inp.name + ': ';
+                        var val = inp.value = !undefined ? inp.value : inp.defaultValue || inp.default;
+                        yaml_inputs += val + '\n';
+                    }, this);
+                    this.set('yaml_inputs', yaml_inputs);
+                    // pass values into form's stackinputs default value
+                    var ind;
+                    var stackinputsField = this.fields.find(function(f, index) {
+                        ind = index;
+                        return f.name == "stackinputs";
+                    });
+                    this.set('fields.' + ind + '.defaultValue', this.yaml_inputs);
+                    console.log('template is redefined');
+
+
+                    var yaml_or_form = 'form';
+                    var template = this.model.templates[params.template];
                     console.log('Computing Fields started');
 
                     if (this.fields) {
-                        var yf = this.fields.find(function(f){
-                                return f.name == 'yaml_or_form'
-                            });
+                        var yf = this.fields.find(function(f) {
+                            return f.name == 'yaml_or_form'
+                        });
                         if (yf && yf.value)
                             yaml_or_form = yf.value;
                         else
-                            yaml_or_form = 'yaml';
+                            yaml_or_form = 'form';
                     }
 
                     var ret = [{
@@ -241,17 +229,17 @@
                         label: "YAML or form",
                         type: "radio",
                         value: yaml_or_form,
-                        defaultValue: "yaml",
+                        defaultValue: "form",
                         helptext: "Choose the way you want to insert inputs",
                         errorMessage: "Choose an input format",
                         show: true,
                         required: true,
                         options: [{
-                            title: "YAML",
-                            val: "yaml"
-                        }, {
                             title: "Form",
                             val: "form"
+                        }, {
+                            title: "YAML",
+                            val: "yaml"
                         }]
                     }, {
                         name: "stackinputs",
@@ -276,7 +264,7 @@
                                 fieldName: "yaml_or_form",
                                 fieldValues: ["form"]
                             }
-                            inp['label'] = inp.name.replace(/_/g,' ');
+                            inp['label'] = inp.name.replace(/_/g, ' ');
                             inp['defaultValue'] = inp.default;
                             inp['value'] = inp['value'] || inp.default;
 
@@ -293,7 +281,7 @@
                                 inp.type = 'ssh_key';
                                 // inp.type = 'dropdown';
                                 inp.helptext = 'Select key';
-                                inp.options = this.model.keysArray;
+                                inp.options = []; //this.model.keysArray;
                             }
 
                             // make cloud dropdown
@@ -301,7 +289,11 @@
                                 inp.label = 'cloud';
                                 inp.type = 'mist_dropdown';
                                 inp.helptext = 'Select cloud';
-                                inp.options = this.model.cloudsArray;
+                                inp.options = []; //this.model.cloudsArray;
+
+                                inp.options.forEach(function(o) {
+                                    o.disabled = !o.enabled;
+                                });
                             }
 
                             // make image dropdown & dependent on cloud
@@ -363,127 +355,154 @@
                         required: false
                     });
                     this.set('fields', ret);
-                },
 
-                _updateFields: function(e){
-                    var changeInYaml = e.path.indexOf(document.querySelector("paper-textarea#stackinputs")) >-1
-                    if (changeInYaml) {
-                        var yaml = document.querySelector("paper-textarea#stackinputs").value;
-                        var yaml_array = yaml.split('\n');
-                        var inputs = [];
-                        yaml_array.forEach(function(line){
-                            var name = line.split(':')[0].trim();
-                            var value = line.split(':')[1];
-                            if (value)
-                                value = value.trim();
-                            inputs[name] = value;
-                        });
 
-                        this.fields.forEach(function(f, index){
-                            if (inputs[f.name])
-                                this.set('fields.' + index + '.value', inputs[f.name])
-                        }, this)
-                    } else {
-                        var cloud = this.fields.find(function(f){
-                            return f.name.startsWith("mist_cloud");
-                        });
-                        var yaml_inputs = '';
-                        this.fields.forEach(function(inp) {
-                            var fieldCloud;
-
-                            if (['name', 'description', 'yaml_or_form','stackinputs', 'deploy'].indexOf(inp.name) == -1) {
-                                yaml_inputs += inp.name+ ': ';
-                                var val = inp.value || inp.defaultValue;
-                                yaml_inputs += val+'\n';
-                            }                            
-                            if (cloud && cloud.value){
-                                if(inp.name.startsWith("mist_location")) {
-                                    var xid = inp.name.split("mist_location")[0];
-                                    fieldCloud = this.fields.find(function(f){
-                                        return f.name.startsWith("mist_cloud" + xid);
-                                    }) || cloud;
-                                    var cloudId = fieldCloud.value;
-                                    if (cloudId)
-                                        inp.options = this.model.clouds[cloudId].locationsArray;
-                                }
-                                if(inp.name.startsWith("mist_image")) {
-                                  var xid = inp.name.split("mist_image")[0];
-                                  fieldCloud = this.fields.find(function(f){
-                                      return f.name.startsWith("mist_cloud" + xid);
-                                  }) || cloud;
-                                  var cloudId = fieldCloud.value;
-                                  if (this.model && cloudId)
-                                      inp.options = this.model.clouds[cloudId].imagesArray;
-                                }
-                                if(inp.name.startsWith("mist_size")) {
-                                    console.warn('mist_size');
-                                    var xid = inp.name.split("mist_size")[0];
-                                    fieldCloud = this.fields.find(function(f){
-                                        return f.name.startsWith("mist_cloud" + xid);
-                                    }) || cloud;
-                                    var cloudId = fieldCloud.value;
-                                    console.warn('xid', xid, 'cloud', fieldCloud);
-                                    if (cloudId)
-                                        inp.options = this.model.clouds[cloudId].sizesArray;
-                                }
-                            }
-                        }, this);
-
-                        this.set('yaml_inputs', yaml_inputs);
-
-                        // pass values into form's stackinputs value
-                        var ind;
-                        var stackinputsField = this.fields.find(function(f, index){
-                            ind=index;
-                            return f.name == "stackinputs";
-                        });
-
-                        this.set('fields.' + ind + '.value', this.yaml_inputs);
+                    return this.model.templates[params.template];
+                } else {
+                    return {
+                        name: "Template is missing"
                     }
-                },
+                    console.log('template is missing');
+                }
+            },
 
-                _handleRequest: function(e) {
-
-                },
-
-                _handleResponse: function(e) {
-                    // console.log('create stack ', e);
-                    var response = YAML.parse(e.detail.xhr.response);
-                    var sid = response.stack.id;
-                    page('/stacks/' + sid);
-
-                    this.debounce('resetForm', function() {
-                        this._resetForm();
-                    }, 500);
-                },
-
-                _handleError: function(e) {
-
-                },
-
-                _resetForm: function(e) {
-                    // Reset form
-                    for (var attr in this.form) {
-                        this.set('form.' + attr, '');
+            _computeFields: function(template, templateInps, templateInputs, modelTemplates, clouds, keys, params) {
+                this.fields.filter(function(inp, index) {
+                    if (inp.name.startsWith('mist_key')){
+                        this.set('fields.' + index + '.options', this.model.keysArray);
                     }
-                    // Reset Form Fields
-                    this.fields.forEach(function(el, index) {
-                        if (el.showIf) {
-                            this.set('fields.' + index + '.show', false);
+
+                }, this);
+
+                this.fields.filter(function(inp, index) {
+                    if (inp.name.startsWith('mist_cloud')){
+                        this.set('fields.' + index + '.options', this.model.cloudsArray);
+                        this.fields[index].options.forEach(function(o){
+                            o.disabled = !o.enabled;
+                        })
+                    }
+                }, this);
+            },
+
+            _updateFields: function(e) {
+                var changeInYaml = e.path.indexOf(document.querySelector("paper-textarea#stackinputs")) > -1
+                if (changeInYaml) {
+                    var yaml = document.querySelector("paper-textarea#stackinputs").value;
+                    var yaml_array = yaml.split('\n');
+                    var inputs = [];
+                    yaml_array.forEach(function(line) {
+                        var name = line.split(':')[0].trim();
+                        var value = line.split(':')[1];
+                        if (value)
+                            value = value.trim();
+                        inputs[name] = value;
+                    });
+
+                    this.fields.forEach(function(f, index) {
+                        if (inputs[f.name])
+                            this.set('fields.' + index + '.value', inputs[f.name])
+                    }, this)
+                } else {
+                    var cloud = this.fields.find(function(f) {
+                        return f.name.startsWith("mist_cloud");
+                    });
+                    var yaml_inputs = '';
+                    this.fields.forEach(function(inp) {
+                        var fieldCloud;
+
+                        if (['name', 'description', 'yaml_or_form', 'stackinputs', 'deploy'].indexOf(inp.name) == -1) {
+                            yaml_inputs += inp.name + ': ';
+                            var val = inp.value || inp.defaultValue;
+                            yaml_inputs += val + '\n';
                         }
-                        // Reset Form Fields Validation
-                        this._resetField(el, index);
+                        if (cloud && cloud.value) {
+                            if (inp.name.startsWith("mist_location")) {
+                                var xid = inp.name.split("mist_location")[0];
+                                fieldCloud = this.fields.find(function(f) {
+                                    return f.name.startsWith("mist_cloud" + xid);
+                                }) || cloud;
+                                var cloudId = fieldCloud.value;
+                                if (cloudId)
+                                    inp.options = this.model.clouds[cloudId].locationsArray;
+                            }
+                            if (inp.name.startsWith("mist_image")) {
+                                var xid = inp.name.split("mist_image")[0];
+                                fieldCloud = this.fields.find(function(f) {
+                                    return f.name.startsWith("mist_cloud" + xid);
+                                }) || cloud;
+                                var cloudId = fieldCloud.value;
+                                if (this.model && cloudId)
+                                    inp.options = this.model.clouds[cloudId].imagesArray;
+                            }
+                            if (inp.name.startsWith("mist_size")) {
+                                console.warn('mist_size');
+                                var xid = inp.name.split("mist_size")[0];
+                                fieldCloud = this.fields.find(function(f) {
+                                    return f.name.startsWith("mist_cloud" + xid);
+                                }) || cloud;
+                                var cloudId = fieldCloud.value;
+                                console.warn('xid', xid, 'cloud', fieldCloud);
+                                if (cloudId)
+                                    inp.options = this.model.clouds[cloudId].sizesArray;
+                            }
+                        }
                     }, this);
-                },
-                _resetField: function(el, index) {
-                    // this.set('fields.' + index + '.value', el.defaultValue);
-                    // var input = this.querySelector('#' + el.name);
-                    // if (input) {
-                    //     input.invalid = false;
-                    // }
-                },
 
-            });
-        })();
+                    this.set('yaml_inputs', yaml_inputs);
+
+                    // pass values into form's stackinputs value
+                    var ind;
+                    var stackinputsField = this.fields.find(function(f, index) {
+                        ind = index;
+                        return f.name == "stackinputs";
+                    });
+
+                    this.set('fields.' + ind + '.value', this.yaml_inputs);
+                }
+            },
+
+            _handleRequest: function(e) {
+
+            },
+
+            _handleResponse: function(e) {
+                // console.log('create stack ', e);
+                var response = YAML.parse(e.detail.xhr.response);
+                var sid = response.stack.id;
+                document.querySelector('app-location').set('path', '/stacks/' + sid);
+
+                this.debounce('resetForm', function() {
+                    this._resetForm();
+                }, 500);
+            },
+
+            _handleError: function(e) {
+
+            },
+
+            _resetForm: function(e) {
+                // Reset form
+                for (var attr in this.form) {
+                    this.set('form.' + attr, '');
+                }
+                // Reset Form Fields
+                this.fields.forEach(function(el, index) {
+                    if (el.showIf) {
+                        this.set('fields.' + index + '.show', false);
+                    }
+                    // Reset Form Fields Validation
+                    this._resetField(el, index);
+                }, this);
+            },
+            _resetField: function(el, index) {
+                // this.set('fields.' + index + '.value', el.defaultValue);
+                // var input = this.querySelector('#' + el.name);
+                // if (input) {
+                //     input.invalid = false;
+                // }
+            },
+
+        });
+    })();
     </script>
 </dom-module>

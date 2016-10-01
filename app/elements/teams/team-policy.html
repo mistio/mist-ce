@@ -15,7 +15,7 @@
         <style is="custom-style" include="shared-styles">
         :host {
             display: block;
-            padding-bottom: 16px; 
+            padding-bottom: 16px;
         }
         .rule span {
         	padding-right: 8px;
@@ -52,7 +52,7 @@
         	display: table-cell;
             border-left: 1px solid #eee;
         	padding: 8px;
-        }        
+        }
         .rule .tag {
         	display: inline-block;
         	vertical-align: middle;
@@ -62,7 +62,7 @@
         }
         .sub {
         	font-size: 0.9em;
-        	color: rgba(0,0,0,0.54); 
+        	color: rgba(0,0,0,0.54);
             font-weight: 300;
         }
         .default {
@@ -170,7 +170,7 @@
         .notice iron-icon {
             opacity: 0.6;
         }
-        @media (max-width: 1380px) { 
+        @media (max-width: 1380px) {
             .rule > span {
                 vertical-align: bottom;
                 display: table-cell;
@@ -204,7 +204,7 @@
 	        <template is="dom-repeat" items="[[rules]]" as="rule" id="rulesrepeat">
 	            <div id="[[index]]" class$="rule ruleitem-[[index]]">
 	            	<span class="index">
-	            		[[index]]. 
+	            		[[index]].
 	            	</span>
 	            	<span class="operator">
                         <paper-toggle-button id$="index-[[index]]" class="operator" checked$="[[_computeToggle(rule.operator)]]" on-tap="_changeOperator" data-attr="[[index]]"></paper-toggle-button>
@@ -212,13 +212,13 @@
                     </span>
                     <span class="resource">
                         <span class="narrow-hide">
-                            on 
+                            on
                         </span>
                         <span class="uppercase">
                             <paper-dropdown-menu no-animations data-attr="[[index]]">
                               <paper-listbox class="dropdown-content" selected="[[_computeSelectedType(index, rule.rtype)]]" data-attr="[[index]]">
                                 <template is="dom-repeat" items="[[resources]]">
-                                    <paper-item value="[[item]]" class="rtype">[[item]]</paper-item>    
+                                    <paper-item value="[[item]]" class="rtype">[[item]]</paper-item>
                                 </template>
                               </paper-listbox>
                             </paper-dropdown-menu>
@@ -229,7 +229,7 @@
                             <paper-dropdown-menu no-animations data-attr="[[index]]">
                               <paper-listbox class="dropdown-content" selected="[[_computeSelectedAction(index, rule.rtype, rule.action)]]" data-attr="[[index]]">
                                 <template is="dom-repeat" items="[[_computeActions(index, rule.rtype)]]">
-                                    <paper-item value="[[item]]" class="raction">[[pretify(item)]]</paper-item>    
+                                    <paper-item value="[[item]]" class="raction">[[pretify(item)]]</paper-item>
                                 </template>
                               </paper-listbox>
                             </paper-dropdown-menu>
@@ -242,7 +242,7 @@
                         <iron-icon id$="delete-[[index]]" icon="close" on-tap="_deleteRule" data-attr="[[index]]"></iron-icon>
                     </span>
 	            </div>
-	        </template>            
+	        </template>
         </div>
         <div class="rules">
             <div class="rule add">
@@ -252,9 +252,9 @@
             </div>
             <paper-item class="default">
                 <paper-toggle-button id="defaultoperator" class="operator" checked$="[[_computeToggle(defaultOperator)]]" [[_computeDisabled(team)]] on-tap="_changeOperator"></paper-toggle-button>
-                <span id="defaultoperator" class="operator-text">[[defaultOperator]] </span> 
+                <span id="defaultoperator" class="operator-text">[[defaultOperator]] </span>
                 every other action ON any other resource
-                <span class="notice" hidden$="[[!_computeToggle(defaultOperator)]]"> 
+                <span class="notice" hidden$="[[!_computeToggle(defaultOperator)]]">
                     <iron-icon icon="icons:warning"></iron-icon> This option will allow EVERY action on any resource not specified in the policy above.
                 </span>
             </paper-item>
@@ -306,18 +306,18 @@
                 },
                 hasChanges: {
                     type: Boolean,
-                    value: false  
+                    value: false
                 },
                 changes: {
                     type: Array
                 },
                 sendingData: {
                     type: Boolean,
-                    value: false  
+                    value: false
                 },
                 formError: {
                     type: Boolean,
-                    value: false  
+                    value: false
                 },
                 newOrder: {
                     type: Array,
@@ -352,15 +352,15 @@
                 'update-rtags': '_updateRtags',
                 'update-rid': '_updateRid'
 
-            },            
-            attached: function(){
+            },
+            attached: function() {
                 var el = document.getElementById('rules');
                 var sortable = Sortable.create(el, {
                     filter: '.head'
                 });
 
             },
-            _computeCommonPermissions: function(model){
+            _computeCommonPermissions: function(model) {
                 var commonPermissions = this.model.permissions['cloud'],
                     that = this;
                 ['machine', 'key', 'script', 'template', 'stack', 'team'].forEach(function(t){
@@ -369,13 +369,13 @@
                 });
                 return commonPermissions;
             },
-            _orderChanged: function(e){
+            _orderChanged: function(e) {
                 var reorderElements = this.$.rules.children;
                 this.newOrder = [];
                 [].forEach.call(reorderElements, function(el){
                     el.classList.forEach(function(c){
                         if(c.indexOf('ruleitem') > -1){
-                            var ind = parseInt(c.split('-')[1]);                            
+                            var ind = parseInt(c.split('-')[1]);
                             this.push('newOrder',this.rules[ind]);
                         }
                     },this)
@@ -383,7 +383,7 @@
 
                 this.ruleHasChanges();
             },
-            _teamChanged: function(team, rules, teams){
+            _teamChanged: function(team, rules, teams) {
                 // copy default operator to a new string
                 var initialOp = this.team.policy.operator;
                 var newString = initialOp.slice(0);
@@ -428,14 +428,14 @@
                 for (var i=0; i<this.team.policy.rules.length; i++){
                      this.push('newOrder', this.rules[i])
                 }
-            },            
+            },
             _computeToggle: function(operator) {
                 return operator == 'ALLOW'? true : false;
             },
             _computeDisabled: function(team) {
                 return team.name == 'Owners'? 'disabled' : '';
             },
-            _updateRule: function(e){
+            _updateRule: function(e) {
                 //get rule index
                 var ind = e.target.dataAttr;
                 //case of editing rtype
@@ -457,7 +457,7 @@
 
                 this.ruleHasChanges();
             },
-            _deleteRtag: function(e){
+            _deleteRtag: function(e) {
                 var ind = e.detail.index,
                     tag = e.detail.tag;
                 //clean copy rules
@@ -472,24 +472,24 @@
                 }
                 delete rtags[tag];
                 this.set('rules.#'+ind+'.rtags', rtags);
-                
+
                 this.ruleHasChanges();
             },
-            _updateRtags: function(e){
+            _updateRtags: function(e) {
                 var ind = e.detail.index,
                     rtags = e.detail.rtags;
                 this.set('rules.#'+ind+'.rid', '');
                 this.set('rules.#'+ind+'.rtags', rtags);
                 this.ruleHasChanges();
             },
-            _updateRid: function(e){
+            _updateRid: function(e) {
                 var ind = e.detail.index,
                     rid = e.detail.rid;
                 this.set('rules.#'+ind+'.rid', rid);
                 this.set('rules.#'+ind+'.rtags', {});
                 this.ruleHasChanges();
             },
-            _addRule: function(e){
+            _addRule: function(e) {
                 var emptyRuleObj = {
                     action: '',
                     operator: 'DENY',
@@ -503,7 +503,7 @@
 
                 this.ruleHasChanges();
             },
-            _deleteRule: function(e){
+            _deleteRule: function(e) {
                 var index = e.target.dataAttr;
                 this.splice('rules',index,1);
                 this.set('formReady', true);
@@ -511,7 +511,7 @@
 
                 this.ruleHasChanges();
             },
-            _changeOperator: function(event){
+            _changeOperator: function(event) {
                 var e = Polymer.dom(event);
                 var path = e.path;
                 var index = e.localTarget.getAttribute('id').split('-')[1];
@@ -525,7 +525,7 @@
                 this.ruleHasChanges();
                 console.log('_changeOperator',e);
             },
-            _resetForm: function(){
+            _resetForm: function() {
                 // var initial = this.team.policy.rules;
                 // var newArr = initial.slice(0);
                 // this.set("rules", newArr);
@@ -569,7 +569,7 @@
 
                 this.set('formReady', false);
             },
-            _submitForm: function(){            
+            _submitForm: function() {
                 var policy = {};
                 policy.rules = this.newOrder;
 
@@ -580,9 +580,9 @@
                 this.$.postPolicy.generateRequest();
 
                 this.set('sendingData', true);
-                this.set('formReady', false);              
+                this.set('formReady', false);
             },
-            _handleResponse: function(e){
+            _handleResponse: function(e) {
                 var toast = this.querySelector('paper-toast');
                     toast.text = 'Team policy updated successfully.';
                     toast.show();
@@ -595,47 +595,47 @@
                 this.$.errormsg.textContent = e.detail.request.xhr.responseText;
                 this.set('formReady', true);
             },
-            _computeSelectedType(index,type){
+            _computeSelectedType: function(index,type) {
                 //index of type in resources list
                 var typeIndex = this.resources.indexOf(type.toUpperCase());
                 return typeIndex > -1 ? typeIndex : 0;
             },
-            _computeActions: function(index, rtype){
+            _computeActions: function(index, rtype) {
                 var type = rtype.toLowerCase();
 
                 if (type != ''){
                     return ['all'].concat(this.model.permissions[type]);
                 }
-                else {                    
+                else {
                     return ['all'].concat(this.commonPermissions);
                 }
             },
-            _computeSelectedAction: function(index, rtype, raction){
+            _computeSelectedAction: function(index, rtype, raction) {
                 var actionIndex = 0;
                 var type = rtype.toLowerCase();
                 var action = raction.toLowerCase();
 
                 if (type && action != ''){
-                    actionIndex = this.model.permissions[type.toLowerCase()].indexOf(action);                
+                    actionIndex = this.model.permissions[type.toLowerCase()].indexOf(action);
                 }
                 else {
                     actionIndex = this.commonPermissions.indexOf(action);
-                }   
+                }
                 // add one to include concatenated 'all' action
                 return actionIndex > -1 ? actionIndex+1 : 0;
             },
-            pretify: function(item){
+            pretify: function(item) {
                 return item.replace('_',' ').toUpperCase();
             },
-            ruleHasChanges: function(){
+            ruleHasChanges: function() {
                 if(this.formError){
                     this.set('formError', false);
                 }
                 this.set('formReady', true);
 
-                console.log(this.rules[0], this.team.policy.rules[0] );
+                // console.log(this.rules[0], this.team.policy.rules[0] );
             }
-            
+
         });
     })();
 </script>

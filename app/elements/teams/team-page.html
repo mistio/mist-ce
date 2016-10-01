@@ -172,23 +172,6 @@
         .delete-member {
             opacity: 0.32;
         }
-        .is-loading {
-            top: 15px;
-            left: 200px;
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            display: block;
-            width: 100%;
-            height: 100vh;
-            background-color: #eee;
-        }
-        .is-loading paper-spinner {
-            width: 80px;
-            height: 80px;
-            margin: 10% auto;
-            display: block;
-        }
         </style>
 
         <div id="content">
@@ -276,7 +259,7 @@
                     <paper-material class="no-pad">
                         <!-- TODO: make interactive add edit of rules -->
                         <h3 class="smallcaps resource-head">Team Policy</h3>
-                        <team-policy model="[[model]]" team="[[team]]"></team-policy>                        
+                        <team-policy model="[[model]]" team="[[team]]"></team-policy>
                     </paper-material>
                 </div>
             </div>
@@ -289,7 +272,7 @@
         <team-edit team="[[team]]" org="[[model.org]]"></team-edit>
         <iron-ajax id="teamDeleteAjaxRequest" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]" method="DELETE" on-response="_handleTeamDeleteAjaxResponse" on-error="_handleTeamDeleteAjaxError"></iron-ajax>
         <iron-ajax id="deleteMember" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/members/[[memberToDelete]]" method="DELETE" on-response="_deleteMemberResponse" on-error="_deleteMemberError"></iron-ajax>
-        
+
         <dialog-element></dialog-element>
         <paper-toast></paper-toast>
     </template>
@@ -301,13 +284,7 @@
                 is: 'team-page',
 
                 properties: {
-                    sections: {
-                        type: Object
-                    },
                     section: {
-                        type: Object
-                    },
-                    params: {
                         type: Object
                     },
                     model: {
@@ -318,9 +295,7 @@
                         notify: true
                     },
                     team: {
-                        type: Object,
-                        computed: '_computeTeam(params, model.teams.*)',
-                        notify: true
+                        type: Object
                     },
                     hasMembers: {
                         type: Boolean,
@@ -359,22 +334,22 @@
                     }
                 },
                 listeners: {
-                    'confirmation': '_deleteResponse',
-                    'updateSelectedTeam': '_updateTeam',
-                    // 'confirmation': '_deleteMemberEventResponse'
+                    'confirmation': '_deleteResponse'
                 },
                 ready: function() {
                     var wh = window.innerHeight;
                     this.vpHeight = 'height:' + wh + 'px; overflow: auto;';
                 },
                 _getFormattedTimestamp: function(team) {
-                    var timestamp = parseInt(team.created_at);
-                    return Date(timestamp).toLocaleString('en-US', {
-                        timeZoneName: 'short'
-                    });
+                    if (team) {
+                        var timestamp = parseInt(team.created_at);
+                        return Date(timestamp).toLocaleString('en-US', {
+                            timeZoneName: 'short'
+                        });
+                    }
                 },
                 _hasOnlyYou: function(team) {
-                    if (team.members && team.members.length == 1 && team.members[0].email == this.model.user.email){
+                    if (team && team.members && team.members.length == 1 && team.members[0].email == this.model.user.email){
                         return true;
                     }
                     else {
@@ -382,7 +357,7 @@
                     }
                 },
                 _hasOtherMembers: function(team) {
-                    if (team.members && !this._hasOnlyYou && team.members.length > 0){
+                    if (team && team.members && !this._hasOnlyYou && team.members.length > 0){
                         return true;
                     }
                     else {
@@ -390,14 +365,8 @@
                     }
                 },
                 _hasMembers: function(team) {
-                    if (team.members)
+                    if (team && team.members)
                         return team.members.length > 0 ? true : false;
-                },
-                _computeId: function(params) {
-                    return params.id;
-                },
-                _computeTeam: function(params, teams) {
-                    return teams.base[params.id];
                 },
                 _computeMembers: function(team, teamMembers, members) {
                     var teamMembers = [],
@@ -405,7 +374,7 @@
                         confirmedMembers = [];
 
                     team.members.forEach(function(member) {
-                        if (members.base[member].pending){
+                        if (members.base[member] && members.base[member].pending){
                             pendingMembers.push(members.base[member]);
                         }
                         else {
@@ -416,7 +385,7 @@
 
                     if (pendingMembers.length > 0) { this.set("hasPending", true); }
                     else { this.set("hasPending", false); }
-                    
+
                     if (teamMembers.length > 0) { this.set("hasMembers", true);}
                     else { this.set("hasMembers", false);}
 
@@ -425,16 +394,11 @@
                     return teamMembers;
                 },
                 _addMember: function(e) {
-                    page('/add-members/' + this.team.id);
+                    document.querySelector('app-location').set('path', '/teams/' + this.team.id + '/+add');
                 },
                 _editTeam: function(e) {
                     var el = this.querySelector('team-edit');
                     el._openEditTeamModal();
-                },
-                _updateTeam: function(e) {
-                    var team = e.detail.team;
-                    this.set('team.name', team.name);
-                    this.set('team.description', team.description);
                 },
                 _deleteTeam: function(e) {
                     this._showDialog({
@@ -453,7 +417,7 @@
                         this.$.teamDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
                         this.$.teamDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                         this.$.teamDeleteAjaxRequest.generateRequest();
-                        page('/teams');
+                        document.querySelector('app-location').set('path', '/teams');
                     }
                     if (response.confirmed && reason == "member.delete") {
                         this.$.deleteMember.body = {};
@@ -463,7 +427,7 @@
                     }
                 },
                 _handleTeamDeleteAjaxResponse: function(e) {
-                    page('/teams');
+                    document.querySelector('app-location').set('path', '/teams');
                 },
                 _deleteMemberFromTeam: function(e){
                     var membId = e.target.attributes.memberid.value,
@@ -489,7 +453,7 @@
                     }
                     dialog._openDialog();
                 },
-                _computeIsloading(team) {
+                _computeIsloading: function(team) {
                     return !this.team ? true : false;
                 }
             });

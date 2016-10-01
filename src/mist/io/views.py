@@ -243,7 +243,6 @@ def add_cloud(request):
       - libvirt
       - openstack
       - vsphere
-      - coreos
       - ec2
       - rackspace
       - nephoscale
@@ -293,22 +292,12 @@ def add_cloud(request):
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
     if cloud_tags:
-        mist.core.methods.set_cloud_tags(owner, cloud_tags, cloud_id)
+        from mist.core.tag.methods import add_tags_to_resource
+        add_tags_to_resource(owner, cloud, cloud_tags.items())
 
     c_count = Cloud.objects(owner=owner).count()
-    ret = {
-        'index': c_count - 1,
-        'id': cloud_id,
-        'apikey': cloud.apikey,
-        'apiurl': cloud.apiurl,
-        'tenant_name': cloud.tenant_name,
-        'title': cloud.title,
-        'provider': cloud.provider,
-        'poll_interval': cloud.poll_interval,
-        'region': cloud.region,
-        'status': 'off',
-        'enabled': cloud.enabled,
-    }
+    ret = cloud.as_dict()
+    ret['index'] = c_count - 1
     if monitoring:
         ret['monitoring'] = monitoring
     return ret
@@ -440,20 +429,26 @@ def add_key(request):
       description: The private key
       required: true
       type: string
+    certificate:
+      description: The signed public key, when using signed ssh keys
+      required: false
+      type: string
+
     """
     params = params_from_request(request)
     key_name = params.get('name', '')
     private_key = params.get('priv', '')
+    certificate = params.get('certificate', '')
 
     auth_context = auth_context_from_request(request)
     key_tags = auth_context.check_perm("key", "add", None)
-    key_name = methods.add_key(auth_context.owner, key_name, private_key)
+    key_name = methods.add_key(auth_context.owner, key_name, private_key, certificate=certificate)
 
     key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
 
     if key_tags:
-        mist.core.methods.set_keypair_tags(auth_context.owner,
-                                           key_tags, key.id)
+        from mist.core.tag.methods import add_tags_to_resource
+        add_tags_to_resource(auth_context.owner, key, key_tags.items())
     # since its a new key machines fields should be an empty list
 
     clouds = Cloud.objects(owner=auth_context.owner)
@@ -1433,11 +1428,9 @@ def create_network(request):
     work it will use the new network's id to create a subnet
     CREATE_RESOURCES permission required on cloud.
     ---
-    cloud:
+    cloud_id:
       in: path
       required: true
-      type: string
-    cloud_id:
       description: The Cloud ID
       type: string
     network:
@@ -1470,7 +1463,7 @@ def delete_network(request):
     Delete a network
     CREATE_RESOURCES permission required on cloud.
     ---
-    cloud:
+    cloud_id:
       in: path
       required: true
       type: string

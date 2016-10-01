@@ -8,13 +8,16 @@
             @apply(--layout-horizontal);
             align-items: flex-end;
         }
+        paper-input.value {
+            padding-left: 8px;
+        }
         paper-input {
             padding-right: 8px;
         }
         </style>
-
-        <paper-input label$="tag [[newIndex]]" value="{{tag.key}}" class="flex"></paper-input>
-        <paper-input value="{{tag.value}}"  class="flex"></paper-input>
+        
+        <paper-input label$="tag [[newIndex]]" value="{{tag.key}}" class="flex key"></paper-input> 
+        <paper-input value="{{tag.value}}"  class="flex value"></paper-input>
         <paper-icon-button icon="icons:close" on-tap="_deleteTag"></paper-icon-button>
 
     </template>
@@ -28,11 +31,29 @@
                 type: Object,
                 notify: true
             },
+            oldTag: {
+                type: Object,
+                value: {},
+                computed: 'storeOldTag(tag)'
+            },
             index: Number,
             newIndex: {
                 type: Number,
                 computed: '_computeNewIndex(index)'
             }
+        },
+        listeners: {
+            'change' : '_tagChange'
+        },
+        ready: function(){
+        },
+        storeOldTag: function(tag){
+            //store tag
+            var oldTag = {};
+            oldTag.key = this.tag.key;
+            oldTag.value = this.tag.value;
+            
+            return oldTag;
         },
         _computeNewIndex: function(index) {
             return index + 1;
@@ -41,6 +62,9 @@
             this.fire('tag-delete', {
                 tag: this.tag
             });
+        },
+        _tagChange: function(e){
+            this.fire('tag-change',{'oldTag': this.oldTag, 'newTag': this.tag});            
         }
     });
 </script>

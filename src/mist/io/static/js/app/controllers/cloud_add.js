@@ -100,18 +100,6 @@ define('app/controllers/cloud_add', ['app/models/cloud'],
                             }
                         ]
                     });
-                else if (payload.provider == 'coreos')
-                    showCommand({
-                        body: [
-                            {
-                                paragraph: 'Run this command on your server\'s terminal' +
-                                    ' to install the monitoring agent:'
-                            },
-                            {
-                                command: cloud.monitoring.coreos_command
-                            }
-                        ]
-                    });
                 else
                     showCommand({
                         body: [

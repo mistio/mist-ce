@@ -5,6 +5,7 @@
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../item-list/item-actions.html">
 
 <link rel="import" href="script-edit.html">
 <link rel="import" href="script-run.html">
@@ -13,7 +14,7 @@
     <template>
         <style is="custom-style" include="single-page"></style>
         <style is="custom-style" include="tags-and-labels"></style>
-        <style include="shared-styles">
+        <style is="custom-style" include="shared-styles">
         :host {
             display: block;
         }
@@ -94,23 +95,6 @@
         .info-table {
             border-top: 1px solid #ddd;
         }
-        .is-loading {
-            top: 15px;
-            left: 200px;
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            display: block;
-            width: 100%;
-            height: 100vh;
-            background-color: #eee;
-        }
-        .is-loading paper-spinner {
-            width: 80px;
-            height: 80px;
-            margin: 10% auto;
-            display: block;
-        }
         </style>
 
         <div id="content">
@@ -130,7 +114,7 @@
                     </div>
                 </div>
                 <div class="item-actions">
-                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>                    
+                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
@@ -150,22 +134,14 @@
                 <paper-material id="rightcolumn" class="right">
                 <div class="info-table">
                     <div class="info-body info-group">
-                        <div class="info-item flex-horizontal-with-ratios">
-                            <h4 class="id tags">Tags
-                                <template is="dom-if" if="[[script.tags]]">
-                                    <span class="id">([[script.tags.length]])</span>
-                                </template>
-                                <template is="dom-if" if="[[!script.tags]]">
-                                    <span class="id">(0)</span>
-                                </template>
-                                :
-                            </h4>
-                            <template is="dom-if" if="[[script.tags]]">
+                        <template is="dom-if" if="[[script.tags.length]]">
+                            <div class="info-item flex-horizontal-with-ratios">
+                                <h4 class="id tags">Tags</h4>
                                 <template is="dom-repeat" items="[[script.tags]]">
                                     <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
                                 </template>
-                            </template>
-                        </div>
+                            </div>
+                        </template>
                         <div class="info-item flex-horizontal-with-ratios">
                             <div class="flexchild">ID</div>
                             <div class="flexchild">[[script.id]]</div>
@@ -204,7 +180,7 @@
         <iron-ajax id="scriptDeleteAjaxRequest" url="/api/v1/scripts/[[script.id]]" method="DELETE" on-response="_handleScriptDeleteAjaxResponse" on-error="_handleScriptDeleteAjaxError"></iron-ajax>
         <script-edit script="[[script]]"></script-edit>
         <dialog-element></dialog-element>
-        <tags-list resource="script"></tags-list>
+        <tags-list model="[[model]]"></tags-list>
     </template>
     <script>
     (function() {
@@ -214,9 +190,6 @@
             is: 'script-page',
 
             properties: {
-                sections: {
-                    type: Object
-                },
                 section: {
                     type: Object
                 },
@@ -224,19 +197,11 @@
                     type: String,
                     computed: '_getHeaderStyle(section)'
                 },
-                params: {
-                    type: Object
-                },
                 model: {
                     type: Object
                 },
                 script: {
-                    type: Object,
-                    computed: '_computeScript(params, model.scriptsArray.*)'
-                },
-                scriptid: {
-                    type: String,
-                    computed: '_computeScriptId(params)'
+                    type: Object
                 },
                 isInline: {
                     type: Boolean,
@@ -251,21 +216,9 @@
             },
             listeners: {
                 'confirmation': '_deleteScriptEventResponse',
-                'updateSelectedScript': '_updateScript'
             },
             _getHeaderStyle: function(section) {
                 return 'background-color: ' + section.color + '; color: #fff;';
-            },
-            _computeId: function(params) {
-                return params.id;
-            },
-            _computeScript: function(params, scripts) {
-                return scripts.base.find(function(script) {
-                    return script.id == params.id;
-                });
-            },
-            _computeScriptId: function(params) {
-                return params.id;
             },
             _computeIsInline: function(location_type) {
                 if (location_type)
@@ -276,21 +229,16 @@
             _editTags: function() {
                 var el = this.querySelector('tags-list'),
                 items = [];
-                items.push(this.script);
+                items.push(itemUid(this.script, this.section));
                 el.items = items;
                 el._openDialog();
             },
             _runScript: function(e) {
-                page.show('/run-script/' + this.script.id);
+                document.querySelector('app-location').set('path', '/scripts/' + this.script.id + '/+run');
             },
             _editScript: function(e) {
                 var el = this.querySelector('script-edit');
                 el._openEditScriptModal();
-            },
-            _updateScript: function(e) {
-                var script = e.detail.script;
-                this.set('script.name', script.name);
-                this.set('script.description', script.description);
             },
             _deleteScript: function(e) {
                 this._showDialog({
@@ -312,7 +260,7 @@
                 }
             },
             _handleScriptDeleteAjaxResponse: function(e) {
-                page.show('/scripts');
+                document.querySelector('app-location').path = '/scripts';
             },
             _showDialog: function(info) {
                 var dialog = this.querySelector('dialog-element');
@@ -321,7 +269,7 @@
                 }
                 dialog._openDialog();
             },
-            _computeIsloading(script) {
+            _computeIsloading: function(script) {
                 return !this.script ? true : false;
             }
         });

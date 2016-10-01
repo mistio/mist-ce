@@ -5,50 +5,70 @@
 <link rel="import" href="../app-user-menu/app-user-menu.html">
 <!--link rel="import" href="../notifications-element/notifications-element.html"-->
 <link rel="import" href="top-search.html">
-<dom-module id="app-header">
+
+<dom-module id="mist-header">
     <template>
         <style is="custom-style">
         :host {
-            background-color: #424242;
             position: relative;
-            z-index: 999;
+            z-index: 100;
         }
-        
-        paper-toolbar::content .title {
+
+        paper-toolbar ::content .title {
             pointer-events: all !important;
         }
-        
         paper-toolbar.dark {
+            background-color: inherit;
             --paper-toolbar-background: inherit;
             color: #fff;
+            width: 100%;
         }
-        
-        paper-icon-button::content iron-icon {
+        paper-icon-button ::content iron-icon {
             color: inherit;
         }
-        
         #header {
             color: #fff;
         }
-        
         .logo-and-title {
             padding: 6px 0;
             line-height: 36px;
         }
-        
+
+        paper-toolbar::content .title {
+            pointer-events: all !important;
+        }
+
+        paper-toolbar.dark {
+            --paper-toolbar-background: inherit;
+            color: #fff;
+        }
+
+        paper-icon-button::content iron-icon {
+            color: inherit;
+        }
+
+        #header {
+            color: #fff;
+        }
+
+        .logo-and-title {
+            padding: 6px 0;
+            line-height: 36px;
+        }
+
         a#logo-link {
             line-height: 36px;
             display: flex;
         }
-        
+
         .logo {
             cursor: pointer;
         }
-        
+
         .logo:focus {
             outline: none;
         }
-        
+
         .page-title {
             font-weight: 500;
             font-size: 20px;
@@ -60,12 +80,12 @@
             width: 100px;
             text-transform: capitalize;
         }
-        
+
         .container {
             position: relative;
             margin-left: 32px;
         }
-        
+
         .container > paper-badge {
             --paper-badge-margin-left: -40px;
             --paper-badge-margin-bottom: -16px;
@@ -78,8 +98,8 @@
                 <span class="page-title">[[title]]</span>
             </div>
             <span class="title layout horizontal">
-          <top-search tabindex="3"></top-search>
-      </span>
+                <top-search model="[[model]]" tabindex="3"></top-search>
+            </span>
             <div class="container" tabindex="4">
                 <!--notifications-element></notifications-element-->
             </div>
@@ -88,15 +108,19 @@
     </template>
     <script>
     Polymer({
-        is: 'app-header',
+        is: 'mist-header',
         properties: {
-            title: String
+            title: String,
+            model: Object
         },
         toggleSidebar: function() {
-            this.fire('toggle-sidebar');
+            document.querySelector("#sidebar").toggleClass('close');
+            document.querySelector("#iron-pages").toggleClass('center');
         },
         _goToDashboard: function(e) {
-            document.querySelector('app-main').updateCurrent('show-dashboard');
+            var main = document.querySelector('app-main');
+            if (main)
+                main.updateCurrent('show-dashboard');
         }
     });
     </script>

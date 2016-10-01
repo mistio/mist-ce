@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
@@ -10,6 +10,8 @@
 <link rel="import" href="../app-form/app-form.html">
 <link rel="import" href="../app-icons/app-icons.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
+<link rel="import" href="../item-list/item-actions.html">
+<link rel="import" href="../tags/tags-list.html">
 
 <link rel="import" href="stack-machine-item.html">
 <link rel="import" href="stack-network-item.html">
@@ -51,7 +53,7 @@
 
             paper-material.form-view,
             .app-form-title,
-            app-form, 
+            app-form,
             mist-form {
                 max-width: 900px;
                 box-sizing: border-box;
@@ -362,13 +364,11 @@
         paper-spinner[active] {
             display: block;
             position: absolute;
-            left: calc(50% - 28px);
+            left: calc(50% - 40px);
             top: 120px;
             z-index: 999;
-            background-color: #fff;
             padding: 8px;
             border-radius: 50%;
-            @apply(--shadow-elevation-8dp);
         }
         paper-button[disabled] {
             opacity: 0.87;
@@ -398,23 +398,6 @@
             text-transform: none;
             font-size: 0.9em;
         }
-        .is-loading {
-            top: 15px;
-            left: 200px;
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            display: block;
-            width: 100%;
-            height: 100vh;
-            background-color: #eee;
-        }
-        .is-loading paper-spinner {
-            width: 80px;
-            height: 80px;
-            margin: 10% auto;
-            display: block;
-        }
         </style>
         <div id="content">
             <div class="is-loading" hidden$="[[!isLoading]]">
@@ -431,14 +414,15 @@
                     </div>
                 </div>
                 <div class="item-actions">
+                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>
                     <!-- buttons to show normally-->
-                    <paper-button id="[[workflows.0.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.0.name]]</paper-button>
-                    <paper-button id="[[workflows.1.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.1.name]]</paper-button>
+                    <paper-button id$="[[workflows.0.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.0.name]]</paper-button>
+                    <paper-button id$="[[workflows.1.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.1.name]]</paper-button>
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="stack_actions" class="dropdown-content">
                             <template is="dom-repeat" items="[[workflows]]" as="workflow">
-                                <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflow.name]]</paper-button>
+                                <paper-button id$="[[workflow.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflow.name]]</paper-button>
                             </template>
                         </paper-menu>
                     </paper-menu-button>
@@ -462,7 +446,7 @@
                         <p>[[timestamp]]
                         </p>
                     </div>
-                    <div class="page-block" hidden="[[!stack.tags]]">
+                    <div class="page-block" hidden$="[[!stack.tags]]">
                         <h3 class="smallcaps">Tags
                             <template is="dom-if" if="[[stack.tags]]">
                                 <span class="id">([[stack.tags.length]])</span>
@@ -473,7 +457,7 @@
                         </h3>
                         <template is="dom-if" if="[[stack.tags]]">
                             <template is="dom-repeat" items="[[stack.tags]]">
-                                <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
+                                <span class="id tag">[[item.key]] <span hidden$="[[!item.value]]">= [[item.value]]</span></span>
                             </template>
                         </template>
                     </div>
@@ -525,7 +509,7 @@
                 </paper-material>
             </template>
 
-            <paper-material id="workflows" class="no-pad closed" hidden="[[hideWorkflows]]">
+            <paper-material id="workflows" class="no-pad closed" hidden$="[[hideWorkflows]]">
                 <paper-icon-button id="closeworkflows" icon="close" on-tap="_closeworkflows"></paper-icon-button>
                 <div id="workflows-panel">
                     <div id="workflowsNavigation">
@@ -548,7 +532,7 @@
                                 <template is="dom-if" if=[[!workflow.params.length]]>
                                     <p class="text-center" hidden$="[[!workflow.description]]">[[workflow.description]]</p>
                                     <p class="text-center">
-                                        <paper-button id="[[workflow.name]]" on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
+                                        <paper-button id$="[[workflow.name]]" on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
                                     </p>
                                     <h5 class="text-center">*no paremetres required</h5>
                                 </template>
@@ -565,10 +549,10 @@
                 <paper-material>
                     <template is="dom-repeat" items="[[job.logs]]" as="log">
                         <div class$="log error-[[log.error]]">
-                            <iron-icon icon$="[[computeLogIcon(log,index)]]"></iron-icon> 
-                            <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>  
+                            <iron-icon icon$="[[computeLogIcon(log,index)]]"></iron-icon>
+                            <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
                             [[log.action]]
-                            <span class="error" hidden="[[!log.error]]">error: [[log.error]]</span>
+                            <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
                         </div>
                     </template>
                 </paper-material>
@@ -628,6 +612,7 @@
             </div>
         </div>
         <dialog-element></dialog-element>
+        <tags-list model="[[model]]"></tags-list>
         <iron-ajax id="workflowRequest" method="POST" url="" on-response="handleWorkflowResponse" on-error="handleWorkflowError"></iron-ajax>
         <iron-ajax id="cancelJob" method="DELETE" url="/api/v1/jobs/[[stack.job_id]]" on-response="handleCanceled" on-error=""></iron-ajax>
         <iron-ajax id="getJobLog" method="GET" auto url="/api/v1/jobs/[[stack.job_id]]" handle-as="json" on-response="handleGetJobLog" on-error=""></iron-ajax>
@@ -644,8 +629,7 @@
 
                 properties: {
                     model: {
-                        type: Object,
-                        notify: true
+                        type: Object
                     },
                     selected: {
                         type: Number,
@@ -664,9 +648,6 @@
                         type: Boolean,
                         computed: '_hideDeployNow(stack)'
                     },
-                    sections: {
-                        type: Object
-                    },
                     section: {
                         type: Object
                     },
@@ -675,12 +656,10 @@
                     },
                     stack: {
                         type: Object,
-                        computed: '_computeStack(params, model.stacks.*)',
-                        notify: true
                     },
                     template: {
                         type: Object,
-                        computed: '_computeTemplate(stack)'
+                        computed: '_computeTemplate(stack, model.templates)'
                     },
                     machines: {
                         type: Array,
@@ -783,7 +762,7 @@
                           }, 1000, that);
                         console.log('setting interval for job', this.intervalID);
                     // }
-                    
+
                 },
                 jobFinished: function(finished_at){
                     //clear interval
@@ -818,41 +797,49 @@
                     return this.listMachines.length || this.networks.length || this.keys.length;
                 },
                 _computeOutputsAreEmpty: function(stack) {
-                    for(var p in stack.outputs){
-                        return false
-                    }
+                    if (stack)
+                        for(var p in stack.outputs){
+                            return false;
+                        }
                     return true;
                 },
                 _computeOutputs: function(outputs) {
                     return Object.keys(outputs).map(function(key) {return {name: key, value: outputs[key]}});
                 },
                 is_start_creation: function(stack) {
-                    return stack.status == 'start_creation';
+                    if (stack)
+                        return stack.status == 'start_creation';
                 },
                 is_error: function(stack) {
                     //update logs once to view the error
-                    if (this.job && stack.status == 'error'){
+                    if (this.job && stack && stack.status == 'error'){
                         this.$.getJobLog.generateRequest();
                     }
                     return stack.status == 'error';
                 },
                 is_workflow_started: function(stack) {
-                    return stack.status == 'workflow_started';
+                    if (stack)
+                        return stack.status == 'workflow_started';
                 },
                 is_ok: function(stack) {
-                    return stack.status == 'ok';
+                    if (stack)
+                        return stack.status == 'ok';
                 },
                 _showAll: function(stack) {
-                    return stack.status == 'ok' || stack.status == 'error';
+                    if (stack)
+                        return stack.status == 'ok' || stack.status == 'error';
                 },
                 _hideWorkflows: function(stack) {
-                    return !stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
+                    if (stack)
+                        return !stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
                 },
                 _hideDeployNow: function(stack) {
-                    return stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
+                    if (stack)
+                        return stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
                 },
                 _disabledButtons: function(stack) {
-                    return stack.status == 'workflow_started' || stack.status == 'start_creation';
+                    if (stack)
+                        return stack.status == 'workflow_started' || stack.status == 'start_creation';
                 },
                 _closeworkflows: function() {
                     this.$.workflows.classList.remove('open');
@@ -889,8 +876,9 @@
 
                     return sum > 0 ? true : false;
                 },
-                _computeTemplate: function(stack) {
-                    return this.model.templates[stack.template];
+                _computeTemplate: function(stack, templates) {
+                    if (stack)
+                        return this.model.templates[stack.template];
                 },
                 _computeJobID: function(stack) {
                     return stack.job_id ? stack.job_id : false;
@@ -1021,9 +1009,10 @@
                     return workflows;
                 },
                 _getFormattedTimestamp: function(stack) {
-                    return new Date(this.stack.created_at).toLocaleString('en-US', {
-                        timeZoneName: 'short'
-                    });
+                    if (stack)
+                        return new Date(this.stack.created_at).toLocaleString('en-US', {
+                            timeZoneName: 'short'
+                        });
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element'),
@@ -1033,8 +1022,12 @@
                     }
                     dialog._openDialog();
                 },
-                _goBack: function() {
-                    history.back();
+                _editTags: function() {
+                    var el = this.querySelector('tags-list'),
+                    items = [];
+                    items.push(itemUid(this.stack, this.section));
+                    el.items = items;
+                    el._openDialog();
                 },
                 _workflowNavigation: function(e) {
                     var action = e.target.id;
@@ -1123,7 +1116,7 @@
                     return anchorme.js(YAML.dump(info).replace(/\'/g, ""));
                 },
                 _updateLogs: function(that){
-                    if (that.stack && that.stack.status == 'workflow_started' || that.stack.status == 'start_creation'){
+                    if (that.stack && (that.stack.status == 'workflow_started' || that.stack.status == 'start_creation')){
                         console.log('_updateLogs');
                         that.$.getJobLog.generateRequest();
                     }
@@ -1147,7 +1140,7 @@
                     window.clearInterval(this.intervalID);
                     this.intervalID = null;
                 },
-                _computeIsloading(stack) {
+                _computeIsloading: function(stack) {
                     return !this.stack ? true : false;
                 }
             });

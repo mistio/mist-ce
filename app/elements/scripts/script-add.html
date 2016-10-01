@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
@@ -63,9 +63,6 @@
             is: 'script-add',
 
             properties: {
-                sections: {
-                    type: Object
-                },
                 section: {
                     type: Object
                 },
@@ -112,7 +109,8 @@
                         placeholder: "",
                         errorMessage: "Please enter script's description",
                         show: true,
-                        required: false
+                        required: false,
+                        helptext: "Optional."
                     }, {
                         name: "exec_type",
                         label: "Type *",
@@ -128,7 +126,9 @@
                         }, {
                             title: "Ansible Playbook",
                             val: "ansible"
-                        }]
+                        }],
+                        helptext: "Choose the type of your script. Consult the docs, on adding your scripts",
+                        helpHref: "http://docs.mist.io/category/57-managing-your-scripts"
                     }, {
                         name: "location_type",
                         label: "Source *",
@@ -147,7 +147,8 @@
                         }, {
                             title: "Inline",
                             val: "inline"
-                        }]
+                        }],
+                        helptext: "Specify the type of your script source."
                     }, {
                         name: "script",
                         label: "Url *",
@@ -161,21 +162,23 @@
                             fieldName: "location_type",
                             fieldValues: ["url"]
                         },
-                        errorMessage: "Please enter a url"
+                        errorMessage: "Please enter a url",
+                        helptext: "Specify the url where the script is located."
                     }, {
                         name: "script",
                         label: "Github Repo *",
                         type: "text",
-                        value: "https://github.com/owner/repo",
-                        defaultValue: "https://github.com/owner/repo",
-                        placeholder: "",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "https://github.com/owner/repo",
                         show: false,
                         required: true,
                         showIf: {
                             fieldName: "location_type",
                             fieldValues: ["github"]
                         },
-                        errorMessage: "Please enter a github repo"
+                        errorMessage: "Please enter a github repo",
+                        helptext: "Specify the github repo where the script is located."
                     }, {
                         name: "script",
                         label: "Script *",
@@ -186,6 +189,7 @@
                         show: false,
                         required: true,
                         errorMessage: "Please enter inline script",
+                        placeholder: "",
                         showIf: {
                             fieldName: "location_type",
                             fieldValues: ["inline"]
@@ -194,49 +198,55 @@
                             fieldName: "location_type",
                             fieldOptions: {
                                 "executable": "#!/bin/bash\necho 'hello world'",
-                                "ansible": "- name: Dummy ansible playbook\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug:\n\t\t\t\tmsg: 'Hello World'\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug: msg='Hello World'\n"
+                                "ansible": "- name: Dummy ansible playbook\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug:\n\t\t\t\tmsg: 'Hello World'\n"
                             }
-                        }
+                        },
+                        helptext: "Copy paste your script. Make sure the script's format is alligned to the examples"
                     }, {
                         name: "entrypoint",
                         label: "Entry point",
                         type: "text",
                         value: "",
                         defaultValue: "",
-                        placeholder: "",
+                        placeholder: "main.yaml",
                         show: false,
                         required: false,
                         showIf: {
                             fieldName: "location_type",
                             fieldValues: ["github", "url"]
                         },
-                        errorMessage: "Please enter entry point"
+                        errorMessage: "Please enter entry point",
+                        helptext: "Specify the .yml entrypoint file, otherwise 'main.yml' will be used as default."
                     }],
                     notify: true
                 },
-                // sendingData: {
-                //     type: Boolean,
-                //     value: false
-                // },
-                // formReady: {
-                //     type: Boolean,
-                //     value: false
-                // },
-                // hideprogress: {
-                //     type: Boolean,
-                //     value: true
-                // }
             },
             listeners: {
+                'iron-select': 'showAppropriatePlaceholder'
+            },
+            showAppropriatePlaceholder: function(e){
+                if (e.target.id == "exec_type"){
+                    var type = this.fields.find(function(f){return f.name == "exec_type"})
+                    var placeholder = "";
+
+                    if (type.value == "executable"){
+                        placeholder = "#!/bin/bash\necho 'hello world'";
+                    }
+                    else if (type.value == "ansible"){
+                        placeholder = "- name: Dummy ansible playbook\n\thosts: localhost\n\ttasks:\n\t\t- name: Dummy task\n\t\t\tdebug:\n\t\t\t\tmsg: 'Hello World'\n";
+                    }
+                    // placeholder does not rerender
+                    // this.set('fields.6.placeholder',placeholder);
+                    this.set('fields.6.value', placeholder);
+                }
             },
             _addScriptAjaxRequest: function() {
             },
             _addScriptAjaxResponse: function(e) {
-                // 
+                //
                 // console.log('XHR', e.detail);
                 var response = YAML.parse(e.detail.xhr.response);
-                page('/scripts/'+ response.id);
-                page('/scripts/');
+                document.querySelector('app-location').set('path', '/scripts/' + response.id);
             },
         });
     })();

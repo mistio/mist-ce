@@ -125,12 +125,6 @@ SUPPORTED_PROVIDERS_V_2 = [
         'provider': 'bare_metal',
         'regions': []
     },
-    # CoreOS
-    {
-        'title': 'CoreOS',
-        'provider': 'coreos',
-        'regions': [],
-    },
     # Azure
     {
         'title': 'Azure',
@@ -319,11 +313,6 @@ SUPPORTED_PROVIDERS = [
     {
         'title': 'Bare Metal Server',
         'provider': 'bare_metal'
-    },
-    # CoreOS
-    {
-        'title': 'CoreOS',
-        'provider': 'coreos'
     },
     # Azure
     {
@@ -527,7 +516,7 @@ EC2_IMAGES = {
         'ami-e0c19f83': 'Red Hat Enterprise Linux 7.2 (HVM), SSD Volume Type',
         'ami-0f510a6c': 'SUSE Linux Enterprise Server 12 SP 1 (HVM), SSD Volume Type',
         'ami-8ea3fbed': 'SUSE Linux Enterprise Server 11 SP4 (PV), SSD Volume Type',
-        'ami-bc3913df ': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
+        'ami-bc3913df': 'Ubuntu Server 14.04 LTS (PV), SSD Volume Type',
         'ami-ba3e14d9': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
         'ami-e8e4ce8b': 'CoreOS stable 1068.8.0 (HVM)',
         'ami-ede4ce8e': 'CoreOS stable 1068.8.0 (PV)',
