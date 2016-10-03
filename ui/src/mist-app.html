@@ -71,7 +71,7 @@
         tail="{{subroute}}"></app-route>
 
     <paper-header-panel mode="standard" class="fit">
-        <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{page}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
+        <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{page}}" drawer smallscreen$="{{smallscreen}}" with-backdrop></app-sidebar>
         <mist-header model="[[model]]" title$="[[page]]" class="paper-header" style$="[[style]]"></mist-header>
 
         <iron-pages id="iron-pages" role="main" selected="[[page]]" attr-for-selected="name" smallscreen$="{{smallscreen}}">
@@ -167,6 +167,10 @@
         '_routePageChanged(routeData.page, subroute.path)'
       ],
 
+      ready: function(){
+            
+      },
+
       _style: function(page, sections) {
           if (page) {
               return "background-color: " + sections[page].color;
@@ -195,8 +199,9 @@
             true
         );
         if (this.querySelector('iron-media-query').queryMatches){
-            document.querySelector("#sidebar").classList.add('close');
+            // document.querySelector("#sidebar").classList.add('close');
             document.querySelector("#iron-pages").classList.add('center');
+            document.querySelector('app-sidebar').closeSidebar();
         }
       },
 
