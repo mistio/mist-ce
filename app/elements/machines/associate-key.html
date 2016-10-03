@@ -35,17 +35,24 @@
         .collapsible[open] {
             height: auto;
         }
+        :host paper-button.wide.blue {
+            margin: 8px;
+            text-align: center;
+        }
+        :host paper-dropdown-menu ::content .dropdown-content {
+            top: 55px !important;
+        }
         </style>
         <paper-dialog id="dialogModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
             <h2>Associate a key</h2>
             <p>
                 <span class="grey"> Choose from your existing keys. </span>
                 <paper-dropdown-menu label="Select key" horizontal-align="left">
-                    <paper-menu id="keys" attr-for-selected="value" selected="[[selected]]" class="dropdown-content">
+                    <paper-menu id="keys" attr-for-selected="value" selected="{{selected}}" class="dropdown-content">
                         <template is="dom-repeat" items="[[keys]]" as="key">
-                            <paper-item value="[[key.id]]">[[key.name]]</paper-item>
+                            <paper-item value="[[key.id]]" disabled$="[[itemsHaveThisKey(key.id,items,model)]]">[[key.name]]</paper-item>
                         </template>
-                        <!-- <paper-button class="blue">Add key</paper-button> -->
+                        <paper-button class="blue wide" on-tap="_addKey">Add key</paper-button>
                     </paper-menu>
                 </paper-dropdown-menu>
             </p>
@@ -75,12 +82,15 @@ Polymer({
     is: 'associate-key',
 
     properties: {
+        model: Object,
         keys: {
             type: Array,
-            computed: "computeKeys(items)"
+            computed: "computeKeys(model.keysArray)"
         },
-        host: String,
-        items: Array,
+        items: {
+            type: Array,
+            notify: true
+        },
         user: {
             type: String,
             value: false
@@ -90,8 +100,10 @@ Polymer({
             value: false
         },
         cloudId: String,
-        machineId: String,
-        selected: String,
+        selected: {
+            type: String,
+            notify: true
+        },
         selectedKeyId: {
             type: String,
             value: false
@@ -114,6 +126,9 @@ Polymer({
             trigger.removeAttribute('open');
             col.removeAttribute('open');
         }
+        this.set('selected', false);
+        this.set('selectedKeyId', false);
+
         this.$.dialogModal.open();
     },
     _closeDialog: function(e) {
@@ -127,9 +142,14 @@ Polymer({
         }
     },
     _addKey: function(){
+        this.$.dialogModal.close();
         //set attribute origin
         var origin = window.location.pathname;
-        document.querySelector('app-location').set('path', '/keys/+add?origin=' + origin);
+        var qParams = {
+            'origin': origin
+        }
+        document.querySelector('app-location').set('path', '/keys/+add');
+        document.querySelector('app-location').set('queryParams', qParams);
     },
     associateKey: function(e){
         var user = this.querySelector('paper-input#user').value || 'root',
@@ -153,23 +173,23 @@ Polymer({
             request.url = uri;
             request.headers["Content-Type"] = 'application/json';
             request.headers["Csrf-Token"] = CSRF_TOKEN;
-            request.body = { host: machineHost, ssh_user: user, ssh_port: port};
+            request.body = { host: machineHost, user: user, port: port};
             request.generateRequest();
 
             if (items.length) {
                 run(el, model);
             }
         }
-        run(this, this.computeModel());        
+        run(this, this.computeModel());
     },
     _associateKeyRequest: function(){
-        this.fire('pending-key-request', {request: true, keyId: this.selectedKeyId, machine: this.machineId});
+        this.fire('pending-key-request', {request: true, keyId: this.selectedKeyId});
     },
     _associateKeyResponse: function(){
-        this.fire('pending-key-request', {response: true, keyId: this.selectedKeyId, machine: this.machineId});
+        this.fire('pending-key-request', {response: true, keyId: this.selectedKeyId});
     },
     _associateKeyError: function(e){
-        this.fire('pending-key-request', {error: true, errormsg: e.detail.request.xhr.responseText ,keyId: this.selectedKeyId, machine: this.machineId});
+        this.fire('pending-key-request', {error: true, errormsg: e.detail.request.xhr.responseText ,keyId: this.selectedKeyId});
     },
     updateInputs: function(e){
         var target = e.target.id;
@@ -186,11 +206,29 @@ Polymer({
             col.setAttribute('open', true);
         }
     },
-    computeKeys: function(item){
-        return this.computeModel().keysArray;
+    computeKeys: function(model){
+        return this.model.keysArray || [];
     },
     computeModel: function(){
         return document.querySelector("app-main") ? document.querySelector("app-main").model : document.querySelector("mist-app").model;
+    },
+    itemsHaveThisKey: function(key, items, model){
+        // test if all items have this key and if so disable
+        var count = 0;
+        var model = this.model;
+        for (var i=0; i<this.items.length; i++) {
+            var itemCloud = this.items[i].split(':')[1],
+                itemId = this.items[i].split(':')[2];
+            for (var j=0; j<model.keys[key].machines.length; j++) {
+                if (model.keys[key].machines[j][0] == itemCloud && model.keys[key].machines[j][1] == itemId){
+                    count++;
+                }
+            }
+        }
+        if (count == this.items.length)
+            return true;
+        else
+            return false;
     }
 });
 </script>

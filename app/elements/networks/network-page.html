@@ -214,7 +214,8 @@
                     return subnets && subnets.length;
                 },
                 _computeNetworkCloud: function(network, clouds){
-                    return this.model.clouds[this.network.cloud_id].title
+                    if (network)
+                        return this.model.clouds[this.network.cloud_id].title
                 },
                 _editNetwork: function(e) {
                     console.log(e);

@@ -2,10 +2,13 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../helpers/xterm-dialog.html">
 <link rel="import" href="../tags/tags-list.html">
 <link rel="import" href="../machines/associate-key.html">
+<link rel="import" href="../machines/run-script-on-machine.html">
 
 <dom-module id="item-actions">
     <template>
@@ -52,6 +55,7 @@
             div.actions iron-icon {
                 fill: #fff;
                 margin-top: -2px;
+                margin-right: 4px;
             }
 
             div.actions paper-button {
@@ -84,8 +88,14 @@
                 max-height: 200px;
                 overflow: scroll;
             }
-            tags-list {
+            tags-list,
+            associate-key,
+            run-script-on-machine {
                 position: absolute;
+            }
+            paper-toast#item-actions-toast {
+                margin-top: 24px !important;
+                padding: 16px 24px !important;
             }
         </style>
         <content>
@@ -152,8 +162,10 @@
           </paper-dialog>
           <dialog-element hidden></dialog-element>
           <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
-          <associate-key id="associatekeydialog"></associate-key>
+          <run-script-on-machine id="runscriptdialog" items="[[selectedItems]]"></run-script-on-machine>
+          <associate-key id="associatekeydialog" items="[[selectedItemsOfCurrentSection]]" model="[[model]]"></associate-key>
         </content>
+        <paper-toast id="item-actions-toast"></paper-toast>
     </template>
 </dom-module>
 
@@ -185,6 +197,12 @@ ACTIONS = {
     'icon': 'communication:vpn-key',
     'confirm': true,
     'multi': true
+  },
+  'run-script': {
+    'name': 'run script',
+    'icon': 'image:movie-creation',
+    'confirm': true,
+    'multi': false
   },
   'reboot': {
     'name': 'reboot',
@@ -309,6 +327,7 @@ Polymer({
     properties: {
         org: Object,
         section: Object,
+        model: Object,
         items: {
             type: Array,
             value: [],
@@ -344,6 +363,10 @@ Polymer({
     observers: [
         'selectedItemsChanged(selectedItems.splices, items.length)',
     ],
+
+    listeners:  {
+        'run-script-request':'_feedbackOnScript'
+    },
 
     ready: function () {
     },
@@ -474,7 +497,9 @@ Polymer({
               // if key then add shell / run script
               // if not monitoring then enable monitoring
               ret.push('associate-key');
+              // if (item.keys.length)
               ret.push('shell');
+              ret.push('run-script');              
             }
             if (item.can_tag)
                 ret.push('tag');
@@ -547,8 +572,13 @@ Polymer({
             else if(event.model.item.name == 'associate key') {
                 var items = [];
                 items.push(itemUid(this.selectedItem, this.section));
-                this.$['associatekeydialog'].items = items;
                 this.$['associatekeydialog']._openDialog();
+            }
+            else if(event.model.item.name == 'run script') {
+                var items = [];
+                items.push(itemUid(this.selectedItem, this.section));
+                this.$['runscriptdialog'].items = items;
+                this.$['runscriptdialog']._openDialog();
             }
             else {
                 this.$['confirmation'].toggle();
@@ -573,6 +603,10 @@ Polymer({
             else if(event.model.item.name == 'associate key') {
                 this.$['associatekeydialog'].items = this.selectedItems;
                 this.$['associatekeydialog']._openDialog();
+            }
+            else if(event.model.item.name == 'run script') {
+                this.$['runscriptdialog'].items = this.selectedItems;
+                this.$['runscriptdialog']._openDialog();
             }
             else {
                 this.$['confirmation'].toggle();
@@ -699,7 +733,19 @@ Polymer({
 
     computeModel: function(){
         return document.querySelector("app-main") ? document.querySelector("app-main").model : document.querySelector("mist-app").model;
-    }
-
+    },
+    _feedbackOnScript: function(e){
+        if (e.detail.response) {
+            this._showToast('Script run request succeded. Script '+this.computeModel().scripts[e.detail.scriptId].name+' has been queued for execution');
+        }
+        if (e.detail.error) {
+            this._showToast(e.detail.errormsg);
+        }
+    },
+    _showToast: function(msg) {
+            var toast = this.querySelector('#item-actions-toast');
+            toast.text = msg;
+            toast.show();
+        },
 });
 </script>

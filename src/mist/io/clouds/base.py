@@ -413,15 +413,10 @@ class BaseController(object):
             size = (node.size or node.extra.get('flavorId')
                     or node.extra.get('instancetype'))
 
-            # Get libcloud tags.
-            tags = tags_to_dict(node.extra.get('tags') or
-                                node.extra.get('metadata') or {})
-
-            # Get machine tags from db and update libcloud's tag list,
-            # overriding in case of conflict.
-            tags.update({tag.key: tag.value for tag in Tag.objects(
+            # Get machine tags from db.
+            tags = {tag.key: tag.value for tag in Tag.objects(
                 owner=self.cloud.owner, resource=machine_model,
-            ).only('key', 'value')})
+            ).only('key', 'value')}
 
             # Construct machine dict.
             machine = {

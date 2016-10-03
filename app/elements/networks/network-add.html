@@ -346,8 +346,8 @@
                 this.set('network', payload);
             },
             _handleAddNetworkResponse: function(e){
-                console.log(e);
-                this.set('sendingData', false);
+                var response = YAML.parse(e.detail.xhr.response);
+                document.querySelector('app-location').set('path', '/networks/' + response.id);
             },
             _handleError: function(e) {
                 console.log(e);
