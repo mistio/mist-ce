@@ -93,6 +93,10 @@
             run-script-on-machine {
                 position: absolute;
             }
+            paper-toast#item-actions-toast {
+                margin-top: 24px !important;
+                padding: 16px 24px !important;
+            }
         </style>
         <content>
           <div class="actions">
@@ -158,8 +162,8 @@
           </paper-dialog>
           <dialog-element hidden></dialog-element>
           <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
-          <associate-key id="associatekeydialog"></associate-key>
           <run-script-on-machine id="runscriptdialog" items="[[selectedItems]]"></run-script-on-machine>
+          <associate-key id="associatekeydialog" items="[[selectedItemsOfCurrentSection]]" model="[[model]]"></associate-key>
         </content>
         <paper-toast id="item-actions-toast"></paper-toast>
     </template>
@@ -323,6 +327,7 @@ Polymer({
     properties: {
         org: Object,
         section: Object,
+        model: Object,
         items: {
             type: Array,
             value: [],

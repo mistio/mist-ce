@@ -442,7 +442,7 @@
                         for (var p in inps) {
                             if (p.startsWith('mist_location'))
                             {
-                                inps[p] = inps[p] ? inps[p].toString() : '';
+                                inps[p] = inps[p] != undefined ? inps[p].toString() : '';
                             }
                         }
 
@@ -545,7 +545,12 @@
                 _addKey: function(){
                     //set attribute origin
                     var origin = window.location.pathname;
-                    document.querySelector('app-location').set('path', '/keys/+add?origin=' + origin);
+                    var qParams = {
+                        'origin': origin
+                    }
+                    // document.querySelector('app-location').set('path', '/keys/+add?origin=' + origin);
+                    document.querySelector('app-location').set('path', '/keys/+add');
+                    document.querySelector('app-location').set('queryParams', qParams);
                 }
             });
         })();
