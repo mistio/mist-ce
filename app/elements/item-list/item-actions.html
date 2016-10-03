@@ -145,12 +145,12 @@
                 <template is="dom-if" if="[[multi]]">
                     <p>
                         You are about to [[selectedAction.name]] {{selectedItemsType(selectedItems.length, items.length)}}:
-                        <ul>
-                            <template is="dom-repeat" items="{{selectedItemsDetails(selectedItemsOfCurrentSection.length)}}">
-                              <li>[[item.name]]</li>
-                            </template>
-                        </ul>
                     </p>
+                    <ul>
+                        <template is="dom-repeat" items="{{selectedItemsDetails(selectedItemsOfCurrentSection.length)}}">
+                          <li>[[item.name]]</li>
+                        </template>
+                    </ul>
                 </template>
 
               </paper-dialog-scrollable>
