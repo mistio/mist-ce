@@ -683,6 +683,7 @@ class IndonesianVCloudController(VCloudController):
         if kwargs['host'] not in ('my.idcloudonline.com',
                                   'compute.idcloudonline.com'):
             raise me.ValidationError("Invalid host '%s'." % kwargs['host'])
+        super(IndonesianVCloudController, self)._add__preparse_kwargs(kwargs)
 
 
 class OpenStackController(BaseController):
