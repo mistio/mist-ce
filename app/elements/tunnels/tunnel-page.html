@@ -203,21 +203,14 @@ Script:</code></pre>
                             <div class="flexchild">TUNNEL ID</div>
                             <div class="flexchild">[[tunnel.tunnel_id]]</div>
                         </div>
-                        <template is="dom-if" if="[[tunnel.tags.length]]">
+                        <template is="dom-if" if="[[tunnel.tags]]">
                             <div class="info-item flex-horizontal-with-ratios">
-                                <h4 class="id tags">TAGS
-                                    <template is="dom-if" if="[[tunnel.tags]]">
-                                        <span class="id">[[tunnel.tags]]</span>
-                                    </template>
-                                    <template is="dom-if" if="[[!tunnel.tags]]">
-                                        <span class="id">(0)</span>
-                                    </template>
-                                </h4>
-                                <template is="dom-if" if="[[tunnel.tags]]">
+                                <div class="flexchild">TAGS</div>
+                                <div class="flexchild">
                                     <template is="dom-repeat" items="[[tunnel.tags]]">
                                         <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
                                     </template>
-                                </template>
+                                </div>
                             </div>
                         </template>
                         <div class="info-item flex-horizontal-with-ratios">
@@ -229,7 +222,7 @@ Script:</code></pre>
                             </div>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
-                            <div class="flexchild">Port</div>
+                            <div class="flexchild">PORT</div>
                             <div class="flexchild">[[tunnel.port]]</div>
                         </div>
                         <div class="info-item flex-horizontal-with-ratios">
@@ -288,14 +281,14 @@ Script:</code></pre>
                 }
             },
             observers: [
-                "_updateCommandArea(tunnel.id)"
+                "_clearCommandArea(tunnel.id)"
             ],
             listeners: {
                 'confirmation': '_deleteTunnelEventResponse',
                 'updateSelectedScript': '_updateScript'
             },
-            _updateCommandArea: function(id){
-                this.$.tunnelcommand.textContent = '';
+            _clearCommandArea: function(id){
+                this.$.tunnelscommand.textContent = '';
                 this.$.tunnelscript.textContent = '';
                 this.$.copyscript.removeAttribute('show');
                 this.$.copycurl.removeAttribute('show');
