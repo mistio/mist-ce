@@ -685,6 +685,7 @@ class IndonesianVCloudController(VCloudController):
             raise me.ValidationError("Invalid host '%s'." % kwargs['host'])
         super(IndonesianVCloudController, self)._add__preparse_kwargs(kwargs)
 
+
 class OpenStackController(BaseController):
 
     provider = 'openstack'
