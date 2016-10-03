@@ -412,6 +412,24 @@ class AzureController(BaseController):
         return images_dict.values()
 
 
+
+class AzureArmController(BaseController):
+
+    provider = 'azure_arm'
+
+    def _connect(self):
+        return get_driver(Provider.AZURE_ARM)(self.cloud.tenant_id,
+                                              self.cloud.subscription_id,
+                                              self.cloud.key,
+                                              self.cloud.secret)
+
+    def _list_machines__cost_machine(self, machine_api):
+        return 0, 0
+
+    def _list_images__fetch_images(self, search=None):
+        return []]
+
+
 class GoogleController(BaseController):
 
     provider = 'gce'

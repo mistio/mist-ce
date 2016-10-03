@@ -1472,7 +1472,7 @@ def _machine_action(user, cloud_id, machine_id, action, plan_id=None, name=None)
                 machine.destroy()
             elif conn.type == 'azure':
                 conn.destroy_node(machine, ex_cloud_service_name=cloud_service)
-            elif conn.type == 'softlayer':
+            elif conn.type in ['softlayer', 'azure_arm']:
                 conn.destroy_node(machine)
             else:
                 machine.destroy()

@@ -646,6 +646,39 @@ var PROVIDER_MAP = {
         }
     ],
 
+    azure_arm: [
+        {
+            name: 'title',
+            type: 'text',
+            defaultValue: 'Azure ARM',
+        },
+        {
+            name: 'tenant_id',
+            type: 'text',
+            helpText: 'You can find your tenant_id on the Azure portal',
+            helpHref: 'http://docs.mist.io/article/110-adding-azure-arm'
+        },
+        {
+            name: 'subscription_id',
+            type: 'text',
+            helpText: 'You can find your subscription_id on the Azure portal',
+            helpHref: 'http://docs.mist.io/article/110-adding-azure-arm'
+        },
+        {
+            name: 'key',
+            type: 'text',
+            helpText: 'You can find your client key on the Azure portal',
+            helpHref: 'http://docs.mist.io/article/110-adding-azure-arm'
+        },
+        {
+            name: 'secret',
+            type: 'password',
+            helpText: 'You can find your client secret on the Azure portal',
+            helpHref: 'http://docs.mist.io/article/110-adding-azure-arm'
+        },
+
+    ],
+
     bare_metal: [
         {
             name: 'title',
