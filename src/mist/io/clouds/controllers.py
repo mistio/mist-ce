@@ -423,6 +423,9 @@ class AzureArmController(BaseController):
                                               self.cloud.key,
                                               self.cloud.secret)
 
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.created_at  # datetime
+
     def _list_machines__cost_machine(self, machine_api):
         return 0, 0
 
