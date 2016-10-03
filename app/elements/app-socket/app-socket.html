@@ -545,7 +545,15 @@
         },
 
         _probe: function(data) {
-            // TODO
+            if (!this.model.probes)
+                this.set('model.probes', {})
+
+            try {
+                var uuid = this.model.clouds[data.cloud_id].machines[data.machine_id].uuid;
+                this.set('model.probes.'  + uuid, data.result);
+            } catch (e) {
+                console.warn('cannot find uuid for machine with cloud_id ', data.cloud_id, ' and machine_id', data.machine_id);
+            }
         },
 
         _ping: function(data) {
