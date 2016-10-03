@@ -910,7 +910,8 @@ class OtherController(BaseController):
             raise BadRequestError({'msg': exc.message,
                                    'errors': exc.to_dict()})
         except me.NotUniqueError:
-            raise BadRequestError("Cloud with name %s already exists" % self.cloud.title)
+            raise CloudExistsError("Cloud with name %s already exists"
+                                   % self.cloud.title)
 
         # Add machine.
         if kwargs:
