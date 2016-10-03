@@ -442,7 +442,7 @@
                         for (var p in inps) {
                             if (p.startsWith('mist_location'))
                             {
-                                inps[p] = inps[p] ? inps[p].toString() : '';
+                                inps[p] = inps[p] != undefined ? inps[p].toString() : '';
                             }
                         }
 
