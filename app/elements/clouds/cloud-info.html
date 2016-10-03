@@ -1,9 +1,8 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/neon-animation/animations/slide-from-top-animation.html">
 <link rel="import" href="../../bower_components/neon-animation/animations/slide-up-animation.html">
+<link rel="import" href="../../bower_components/iron-label/iron-label.html">
 
 <dom-module id="cloud-info">
     <template>
@@ -16,7 +15,7 @@
                 --primary-background-color: #424242;
                 --secondary-background-color: #424242;
                 --paper-input-container-input-color: rgba(255,255,255,0.87);
-                --paper-input-container-focus-color: #424242;
+                --paper-input-container-focus-color: rgba(255,255,255,0.54);
             }
             :host {
                 box-sizing: border-box;
@@ -100,6 +99,11 @@
             paper-toast {
                 z-index: 999;
             }
+
+            :host >::content .input-content.label-is-floating.paper-input-container label {
+                color: rgba(255, 255, 255, 0.54) !important;
+            }
+
         </style>
 
         <div class="cloud-block">
@@ -108,7 +112,7 @@
                 <div class="cloud-overview-item">
                     <paper-input class="flex" label="Title" value="{{newCloud.title}}"></paper-input>
                     <div class="button">
-                        <paper-button disabled$="[[!formReady]]" on-tap="_changeTitle" class="blue">Save</paper-button>
+                        <paper-button disabled$="[[!formReady]]" on-tap="_changeTitle" class="on-dark blue">Save</paper-button>
                     </div>
                 </div>
                 <div class="cloud-overview-item">
@@ -251,7 +255,7 @@
                 },
                 _handleCloudDeletionAjaxError: function(e){
                     var msg = 'There was an error deleting ' + this.cloud.title + '.';
-                    this._showToast(msg);  
+                    this._showToast(msg);
                 },
                 _copyId: function() {
                     this.querySelector('#cloudId input').select();

@@ -139,7 +139,7 @@ class ConflictError(MistError):
 
 
 class CloudExistsError(ConflictError):
-    msg = "Cloud exists"
+    msg = "Cloud with this name already exists"
 
 
 class CloudNameExistsError(ConflictError):

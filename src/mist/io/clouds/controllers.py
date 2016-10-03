@@ -457,16 +457,6 @@ class GoogleController(BaseController):
             if key in tags:
                 extra[key] = tags.pop(key)
 
-        # FIXME only for now and not forever
-        # we mist change in list_machines the order of libcloud tags
-        # and post_parse machine, better in the oomachines branch
-        for key in ('items', 'fingerprint', 'kind'):
-            if key in machine_dict['tags']:
-                machine_dict['tags'].pop(key)
-
-        tags.update(machine_dict['tags'])
-        machine_dict['tags'] = tags
-
         # Wrap in try/except to prevent from future GCE API changes.
 
         # Identify server OS.
@@ -713,6 +703,7 @@ class OpenStackController(BaseController):
 
     def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'auth_url', 'url')
+        rename_kwargs(kwargs, 'tenant_name', 'tenant')
         url = kwargs.get('url')
         if url:
             if url.endswith('/v2.0/'):
@@ -919,7 +910,7 @@ class OtherController(BaseController):
             raise BadRequestError({'msg': exc.message,
                                    'errors': exc.to_dict()})
         except me.NotUniqueError:
-            raise CloudExistsError()
+            raise BadRequestError("Cloud with name %s already exists" % self.cloud.title)
 
         # Add machine.
         if kwargs:

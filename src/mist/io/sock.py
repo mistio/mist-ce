@@ -34,7 +34,7 @@ except ImportError:
 
 from mist.core.auth.methods import auth_context_from_session_id
 
-from mist.io.exceptions import BadRequestError
+from mist.io.exceptions import BadRequestError, UnauthorizedError
 from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
@@ -78,11 +78,18 @@ class MistConnection(SockJSConnection):
     def on_open(self, conn_info):
         log.info("%s: Initializing", self.__class__.__name__)
         self.ip, self.user_agent, session_id = get_conn_info(conn_info)
-        self.auth_context = auth_context_from_session_id(session_id)
-        self.user = self.auth_context.user
-        self.owner = self.auth_context.owner
-        self.session_id = uuid.uuid4().hex
-        CONNECTIONS.add(self)
+        try:
+            self.auth_context = auth_context_from_session_id(session_id)
+        except UnauthorizedError:
+            log.error("%s: Unauthorized session_id", self.__class__.__name__)
+            self.send('logout')
+            self.close()
+            raise
+        else:
+            self.user = self.auth_context.user
+            self.owner = self.auth_context.owner
+            self.session_id = uuid.uuid4().hex
+            CONNECTIONS.add(self)
 
     def send(self, msg, data=None):
         super(MistConnection, self).send(json.dumps({msg: data}))
@@ -404,8 +411,6 @@ class MainConnection(MistConnection):
                 self.list_templates()
             if 'stacks' in sections:
                 self.list_stacks()
-            if 'teams' in sections:
-                self.list_teams()
             if 'tags' in sections:
                 self.list_tags()
             if 'tunnels' in sections:

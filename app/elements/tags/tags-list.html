@@ -17,7 +17,7 @@
             }
 
             .tag-list {
-                padding: 0 8px 24px 24px;
+                padding: 0 0 24px 0;
             }
 
             .bottom-actions {
@@ -52,6 +52,7 @@
             }
             #progress {
                 margin-bottom: 16px;
+                margin-top: 0;
                 border-bottom: 1px solid #ddd;
             }
             #errormsg {
@@ -68,28 +69,26 @@
         </style>
 
         <paper-dialog id="tagsModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
-            <h2>Tags</h2>            
+            <h2>Tags</h2>
             <paper-dialog-scrollable>
                 <div class="tag-list">
                     <template is="dom-repeat" items="[[tags]]" as="tag">
                         <tag-item tag="[[tag]]" index=[[index]]></tag-item>
                     </template>
                 </div>
-                <div id="progress">
-                    <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
-                    <paper-progress error hidden$="[[!hasError]]"></paper-progress>
-                    <div id="errormsg" hidden$="[[!hasError]]"></div>
-                </div>
-
-                <div class="clearfix bottom-actions xs12">
-                    <paper-button class="submit-btn add" on-tap="_addTag">
-                        <iron-icon icon="add"></iron-icon> Add Tag</paper-button>
-                    <paper-button class="submit-btn pull-right blue save" on-tap="_saveTags">Save Tags</paper-button>
-                    <paper-button class="pull-right blue-link" dialog-dismiss>Cancel</paper-button>
-                </div>
-
-
             </paper-dialog-scrollable>
+            <div id="progress">
+                <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
+                <paper-progress error hidden$="[[!hasError]]"></paper-progress>
+                <div id="errormsg" hidden$="[[!hasError]]"></div>
+            </div>
+
+            <div class="clearfix bottom-actions xs12">
+                <paper-button class="submit-btn add" on-tap="_addTag">
+                    <iron-icon icon="add"></iron-icon> Add Tag</paper-button>
+                <paper-button class="submit-btn pull-right blue save" on-tap="_saveTags">Save Tags</paper-button>
+                <paper-button class="pull-right blue-link" dialog-dismiss>Cancel</paper-button>
+            </div>
         </paper-dialog>
         <paper-toast></paper-toast>
         <iron-ajax id="tagsAjaxRequest" url="/api/v1/tags" method="POST" on-response="_handleTagsAjaxResponse" on-error="_handleTagsAjaxError"></iron-ajax>
@@ -176,29 +175,31 @@
                         var itemType = item.split(":")[0],
                             itemCloudId = item.split(":")[1],
                             itemId = item.split(":")[2],
-                            itemObj; 
-
+                            itemObj = {}; 
+                            
                         if (['machine', 'image', 'network'].indexOf(itemType) != -1 && itemCloudId)
                             itemObj = this.model.clouds[itemCloudId][itemType+'s'][itemId];
                         else {
                             itemObj = this.model[itemType+'s'][itemId];
                         }
+                        if (itemObj) {
 
-                        if (!itemObj.tags) 
-                            itemObj.tags = [];
+                            if (!itemObj.tags) 
+                                itemObj.tags = [];
 
-                        if (i == 0) {
-                            tagset.addItems(itemObj.tags.map(function(tag){
-                                return tag.key+'='+tag.value;
-                            }) || []);
-                        }
-                        else {
-                            isection.clear()
-                            isection.addItems(tagset.intersection(itemObj.tags.map(function(tag){
+                            if (i == 0) {
+                                tagset.addItems(itemObj.tags.map(function(tag){
                                     return tag.key+'='+tag.value;
-                                }) || []));
-                            tagset.clear();
-                            tagset.addItems(isection.items());
+                                }) || []);
+                            }
+                            else {
+                                isection.clear()
+                                isection.addItems(tagset.intersection(itemObj.tags.map(function(tag){
+                                        return tag.key+'='+tag.value;
+                                    }) || []));
+                                tagset.clear();
+                                tagset.addItems(isection.items());
+                            }
                         }
                     }
 

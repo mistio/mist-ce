@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
@@ -8,8 +8,7 @@
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 
-<link rel="import" href="associate-key.html">
-<link rel="import" href="run-script-on-machine.html">
+<link rel="import" href="machine-edit.html">
 
 <dom-module id="machine-page">
     <template>
@@ -21,7 +20,7 @@
                 display: block;
             }
             .columns {
-                @apply(--layout-horizontal);
+                @apply(--layout-horizontal);  
                 flex: 1 100%;
                 margin-bottom: 16px;
             }
@@ -154,23 +153,6 @@
             paper-button.right-icon iron-icon {
                 margin: 0 0 0 4px;
             }
-            .is-loading {
-                top: 15px;
-                left: 200px;
-                position: fixed;
-                right: 0;
-                bottom: 0;
-                display: block;
-                width: 100%;
-                height: 100vh;
-                background-color: #eee;
-            }
-            .is-loading paper-spinner {
-                width: 80px;
-                height: 80px;
-                margin: 10% auto;
-                display: block;
-            }
             .machine-key {
                 line-height: 24px;
                 display: inline-block;
@@ -193,6 +175,25 @@
                 height: 24px !important;
                 vertical-align: middle !important;
             }
+            .machine-actions > * {
+                /*vertical-align: middle;*/
+            }
+            .machine-actions > paper-button.left-icon iron-icon {
+                /*padding-right: 8px;*/
+            }
+            .machine-actions > paper-button.right-icon iron-icon {
+                /*padding-left: 8px;*/
+            }
+            item-actions {
+                display: flex;
+                font-size: 1em;                
+            }
+            item-actions ::content .actions {
+                height: auto;
+                display: flex;
+                vertical-align: auto;
+                padding: 0;
+            }
         </style>
 
         <div id="content">
@@ -209,8 +210,8 @@
                         [[machine.state]] <span class="desc" hidden$="[[isState(machine)]]">[[machine.extra.status]]</span>
                     </div>
                 </div>
-                <div class="item-actions">
-                <!-- can_destroy:true
+                <div class="machine-actions">
+                    <!-- can_destroy:true
                     can_start:false
                     can_stop:true
                     can_suspend:false
@@ -219,22 +220,24 @@
                     can_resume:false
                     can_tag:true
                     can_undefine:false -->
-                    <paper-button on-tap="start" class="simple" hidden$="[[!machine.can_start]]">start</paper-button>
-                    <paper-button on-tap="stop" class="simple" hidden$="[[!machine.can_stop]]">stop</paper-button>
-                    <paper-button on-tap="reboot" class="simple" hidden$="[[!machine.can_reboot]]">reboot</paper-button><paper-button on-tap="_editTags" class="simple" hidden$="[[!machine.can_tag]]">tags</paper-button>
+
+                    <!-- 
+                        rename
+                        run script on machine
+                        monitor
+                     -->
+
+                    <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" actions="[[actions]]" org="[[model.org]]" model="[[model]]"></item-actions>
+
+                    <!-- 
                     <paper-menu-button id="moreMachineActions" horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
-                            <paper-button on-tap="suspend" class="simple" hidden$="[[!machine.can_suspend]]">suspend</paper-button>
-                            <paper-button on-tap="destroy" class="simple" hidden$="[[!machine.can_destroy]]">destroy</paper-button>
-                            <paper-button on-tap="rename" class="simple" hidden$="[[!machine.can_rename]]">rename</paper-button>
-                            <paper-button on-tap="undefine" class="simple" hidden$="[[!machine.can_undefine]]">undefine</paper-button>
                             <paper-button on-tap="associateKey" class="simple">Associate a key</paper-button>
                             <paper-button on-tap="_runScript" class="simple">Run a Script</paper-button>
                         </paper-menu>
                     </paper-menu-button>
-                    <paper-button on-tap="shell" class="simple white left-icon" style$="color: [[section.color]]"><iron-icon style$="color: [[section.color]]" icon="vaadin-icons:terminal"></iron-icon> SHELL</paper-button>
-                    <paper-button on-tap="monitor" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[isMonitored]]" disabled>monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button>
+                    <paper-button on-tap="monitor" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[isMonitored]]" disabled>monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button> -->
                 </div>
             </paper-material>
             <div class="columns">
@@ -250,7 +253,7 @@
                         <template is="dom-repeat" items="[[associatedKeys]]">
                             <div class="machine-key">
                                 <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
-                                <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon> 
+                                <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
                             </div>
                         </template>
                         <div class="machine-key" id="pendingKeyRequest">
@@ -268,8 +271,8 @@
             <!--<paper-material class="info-card" hidden$="{{!isMonitored}}">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
                 <div>
-                    <paper-material>graph data</paper-material> 
-                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard> 
+                    <paper-material>graph data</paper-material>
+                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                 </div>
             </paper-material>-->
             <paper-material class="info-card">
@@ -308,11 +311,9 @@
                 </div>
             </paper-material>
         </div>
-        <item-actions id="actions" items="[[_itemInArray(machine)]]" selected-items="[[thisItemUid]]" section="[[section]]" org="[[model.org]]"></item-actions>
-        <dialog-element></dialog-element>
-        <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key>
-        <run-script-on-machine model="[[model]]" machine="[[machine]]" cloud-id="[[machine.cloud.id]]"></run-script-on-machine>
-        <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax>
+        <dialog-element id="machinedialog"></dialog-element>
+        <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
+        <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
@@ -321,20 +322,79 @@
     </template>
 </dom-module>
 <script>
-function itemUid(item, section) {
-    // Returns a universal resource id of the form
-    //      resourceType:[cloudId]:itemId
-    // e.g. machine:3tm7aaHHZcMxpZ:bf04f27e924fa67023582,
-    //      key::MnhLdx9u22YjVJ
-    //
-    // TODO replace with mist uuids
-
-    // if item type is not defined derive it fro the current section id
-    var item_type = item.type ? item.type : (section &&
-                                             section.id.slice(0,-1));
-    var cloudId = item.cloud ? item.cloud.id : '';
-
-    return item_type + ':' + cloudId + ':' + item.id;
+MACHINEACTIONS = {
+  'shell': {
+    'name': 'shell',
+    'icon': 'vaadin-icons:terminal',
+    'confirm': false,
+    'multi': true
+  },
+  'tag': {
+    'name': 'tag',
+    'icon': 'label',
+    'confirm': true,
+    'multi': true
+  },
+  'run-script': {
+    'name': 'run script',
+    'icon': 'image:movie-creation',
+    'confirm': true,
+    'multi': false
+  },
+  'associate-key': {
+    'name': 'associate key',
+    'icon': 'communication:vpn-key',
+    'confirm': true,
+    'multi': true
+  },
+  'reboot': {
+    'name': 'reboot',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'start': {
+    'name': 'start',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'stop': {
+    'name': 'stop',
+    'icon': 'av:stop',
+    'confirm': true,
+    'multi': true
+  },
+  'suspend': {
+    'name': 'suspend',
+    'icon': 'av:stop',
+    'confirm': true,
+    'multi': true
+  },
+  'rename': {
+    'name': 'rename',
+    'icon': 'editor:mode-edit',
+    'confirm': true,
+    'multi': false
+  },
+  'resume': {
+    'name': 'resume',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'undefine': {
+    'name': 'undefine',
+    'icon': 'image:panorama-fish-eye',
+    'confirm': true,
+    'multi': true
+  },
+  'destroy': {
+    'name': 'destroy',
+    'icon': 'delete',
+    'confirm': true,
+    'multi': true
+  }
 }
     Polymer({
         is: 'machine-page',
@@ -385,10 +445,6 @@ function itemUid(item, section) {
                 computed: '_computeIsloading(machine)',
                 value: true
             },
-            thisItemUid: {
-                type: Array,
-                computed: '_computeThisItemUid(machine)'
-            },
             associatedKeys: {
                 type: Array,
                 computed:'_computeAssociatedKeys(machine, model.keysArray)'
@@ -410,6 +466,18 @@ function itemUid(item, section) {
             hideAssociatedKeys: {
                 type: Boolean
             },
+            itemInArray: {
+                type: Array,
+                computed: '_computeItemInArray(machine)'
+            },
+            itemUid: {
+                type: Array,
+                computed: '_computeThisItemUid(machine)'
+            },
+            actions: {
+                type: Array,
+                computed: '_computeActions(machine)'
+            }
         },
         observers: [
             '_isMonitored(machine, model.monitoring.machines.*)',
@@ -443,7 +511,7 @@ function itemUid(item, section) {
               "isDefault": false,
               "jsonData": null
               }
-            ];            
+            ];
             var that = this;
             setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
                 if (that.querySelector('dashboard-panel'))
@@ -451,6 +519,43 @@ function itemUid(item, section) {
 
             }, 5000);
 
+        },
+        _computeActions: function(item){
+            var ret = [];
+            if (item.state == 'running') {
+              // if key then add shell / run script
+              // if not monitoring then enable monitoring
+              ret.push('shell');
+              ret.push('associate-key');
+              if(this.hideAssociatedKeys)
+                ret.push('run-script');
+            }
+            if (item.can_tag)
+                ret.push('tag');
+            if (item.can_start)
+                ret.push('start');
+            if (item.can_stop)
+                ret.push('stop');
+            if (item.can_suspend)
+                ret.push('suspend');
+            if (item.can_reboot)
+                ret.push('reboot');
+            if (item.can_resume)
+                ret.push('resume');
+            // rename/monitor/runscript on machine needs its own dialog element
+            // if (item.can_rename)
+            //     ret.push('rename');
+            if (item.can_destroy)
+                ret.push('destroy');
+            if (item.can_undefine)
+                ret.push('undefine');
+
+            var actions = [];
+            for (var i=0; i<ret.length; i++) {
+                actions.push(MACHINEACTIONS[ret[i]]);
+            }
+
+            return actions;
         },
         _computeMachine: function(params, machines) {
             this.dashboard = {
@@ -506,14 +611,14 @@ function itemUid(item, section) {
                 return machine.uuid == params.uuid;
             }, this);
         },
-        _itemInArray: function(machine){
+        _computeItemInArray: function(){
             var arr = [];
             arr.push(this.machine);
             return arr;
         },
         _computeThisItemUid: function(machine){
             var itemUidInArray = [];
-            itemUidInArray.push(itemUid(this.machine, this.section));
+            itemUidInArray.push(itemUid(this.machine, this.sections['machines']));
             return itemUidInArray;
         },
         _computeAssociatedKeys: function(machine, keys){
@@ -559,7 +664,7 @@ function itemUid(item, section) {
         rename: function(_, params) {
             console.log("clicked rename");
         },
-        
+
         _getHeaderStyle: function(color) {
             return 'background-color: ' + color + '; color: #fff;';
         },
@@ -581,117 +686,14 @@ function itemUid(item, section) {
         _editTags: function() {
             var el = this.querySelector('tags-list'),
             items = [];
-            items.push(itemUid(this.machine, this.section));
+            items.push(itemUid(this.machine, this.sections['machines']));
             el.items = items;
             el._openDialog();
         },
         _editMachine: function(e) {
             var el = this.querySelector('machine-edit');
             el._openEditMachineModal();
-        },
-        shell: function(){
-            console.warn('opening shell');
-            var el = this;
-            // load page import on demand.
-            el.importHref(el.resolveUrl('../helpers/xterm-dialog.html'), null, null, true);
-            var xterm = el.querySelector("xterm-dialog");
-            if (!xterm) {
-                xterm = document.createElement("xterm-dialog");
-                xterm.target = this.machine;
-                var parent = el.parentElement.parentElement;
-                parent.insertBefore(xterm, parent.firstChild);
-            }
-            return;
-        },
-        start: function(_, params) {
-            this.confirmAction("start");
-        },
-        stop: function(_, params) {
-            this.confirmAction("stop");
-        },
-        suspend: function(_, params) {
-            this.confirmAction("suspend");
-        },
-        reboot: function(_, params) {
-            this.confirmAction("reboot");
-        },
-        resume: function(_, params) {
-            this.confirmAction("resume");
-        },
-        undefine: function(_, params) {
-            this.confirmAction("undefine");
-        },
-        destroy: function(_, params) {
-            this._showDialog({
-                title: 'Destroy Machine?',
-                body: "Destroying a machine can not be undone. You are about to delete machine '" + this.machine.name + "'.",
-                danger: true,
-                reason: "machine.destroy",
-                action: "destroy"
-            });
-        },
-        _deleteMachine: function(e) {
-            this._showDialog({
-                title: 'Delete Machine?',
-                body: "Deleting a machine can not be undone. You are about to destroy machine '" + this.machine.name + "'.",
-                danger: true,
-                reason: "machine.delete"
-            });
-        },
-        _machineActionConfirmation: function(e) {
-            var reason = e.detail.reason,
-                response = e.detail.response;
-
-            if (response.confirmed && reason == "machine.delete") {
-                this.$.machineDeleteAjaxRequest.body = {};
-                this.$.machineDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
-                this.$.machineDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                this.$.machineDeleteAjaxRequest.generateRequest();
-            }
-
-            if (response.confirmed && reason != "machine.delete") {
-                if (reason == "machine.start")
-                    payload = {'action': 'start'};
-                if (reason == "machine.stop")
-                    payload = {'action': 'stop'};
-                if (reason == "machine.suspend")
-                    payload = {'action': 'suspend'};
-                if (reason == "machine.reboot")
-                    payload = {'action': 'reboot'};
-                if (reason == "machine.resume")
-                    payload = {'action': 'resume'};
-                if (reason == "machine.undefine")
-                    payload = {'action': 'undefine'};
-                if (reason == "machine.destroy")
-                    payload = {'action': 'destroy'};
-                if (reason == "disassociate.key"){
-                    payload = {'host': this.machineIp};
-                    this.$.disassociateKeyRequest.body = payload;
-                    this.$.disassociateKeyRequest.headers["Content-Type"] = 'application/json';
-                    this.$.disassociateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.disassociateKeyRequest.generateRequest();
-                }
-
-                if (reason != "disassociate.key"){
-                    this.$.actionRequest.body = payload;
-                    this.$.actionRequest.headers["Content-Type"] = 'application/json';
-                    this.$.actionRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.actionRequest.generateRequest();
-                }
-            }
-        },
-        _actionRequest: function(e){
-            this._showToast('Action request was sent. Waiting for response.');
-        },
-        _actionResponse: function(e){
-            this._showToast('Requested action is being processed');
-        },
-        _actionError: function(e){
-            this._showToast('Action request failed');
-        },
-        _handleMachineDeleteAjaxResponse: function(e) {
-            page.show('/machines');
-        },
+        },    
         _computeReplaceTargets: function(machine) {
             var ret = {'bucky.': ''};
             var m = this.machine;
@@ -712,7 +714,7 @@ function itemUid(item, section) {
             });
         },
         _showDialog: function(info) {
-            var dialog = this.querySelector('dialog-element');
+            var dialog = this.querySelector('#machinedialog');
             for (var i in info) {
                 dialog[i] = info[i];
             }
@@ -726,17 +728,19 @@ function itemUid(item, section) {
         isState: function(machine){
             return machine.state == machine.extra.status ;
         },
-        _computeIsloading(machine) {
+        _computeIsloading: function(machine) {
             return !this.machine ? true : false;
-        },
-        associateKey:  function(e){
-            var keysDialog = this.querySelector('associate-key');
-            keysDialog._openDialog();
         },
         disassociateKey: function(e){
             var keyId = e.target['dataKeyid'];
             var keyName = e.target['dataKeyname'];
+
+            console.log('disassociateKey',keyId, keyName);
+
             this.set('disassociateKeyId', keyId);
+            
+            console.log(this.disassociateKeyId);
+
             this._showDialog({
                 title: 'Disassociate key',
                 body: "You are about to disassociate key '" + keyName + "' from machine.",
@@ -767,15 +771,10 @@ function itemUid(item, section) {
                 this.set('isPendingKeyRequest', false);
                 this._showToast(e.detail.errormsg);
             }
-            this.querySelector("#moreMachineActions").close();
         },
         _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
             var hide =  !(associatedKeys.base.length > 0 || isPendingKeyRequest);
             this.set('hideAssociatedKeys', hide);
-        },
-        _runScript: function(e){
-            var scriptDialog = this.querySelector('run-script-on-machine');
-            scriptDialog._openDialog();
         },
         _feedbackOnScript: function(e){
             if (e.detail.response) {
@@ -784,7 +783,6 @@ function itemUid(item, section) {
             if (e.detail.error) {
                 this._showToast(e.detail.errormsg);
             }
-            this.querySelector("#moreMachineActions").close();
         }
     });
 </script>

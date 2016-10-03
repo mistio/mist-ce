@@ -77,7 +77,7 @@
             exec_type: "cloudify",
             location_type: "github",
             template_github: "https://github.com/mistio/kubernetes-blueprint",
-            entrypoint: "blueprint.yaml"   
+            entrypoint: "blueprint.yaml"
         }
     ];
 
@@ -100,6 +100,7 @@
                     },
                     selected: {
                         type: Number,
+                        value: -1,
                         notify: true
                     },
                     template: {
@@ -244,7 +245,7 @@
                     defaultTemplates: Array
                 },
                 observers: [
-                    'useCatalogueTemplate(selected)'
+                    'useCatalogueTemplate(selected, fields)'
                 ],
                 listeners: {
                     'reset-form' : 'clearDropDown'
@@ -259,9 +260,9 @@
                 _addTemplateAjaxRequest: function() {
                     this.set('sendingData', true);
                 },
-                _addTemplateAjaxResponse: function(e) {                    
+                _addTemplateAjaxResponse: function(e) {
                     var response = YAML.parse(e.detail.xhr.response);
-                    page('/templates/'+ response.template.id);
+                    document.querySelector('app-location').set('path', '/templates/' + response.template.id);
                     console.log(response.template.id);
 
                     this.debounce('resetForm', function() {

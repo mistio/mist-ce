@@ -7,8 +7,15 @@ README = open(os.path.join(BASEDIR, 'README.txt')).read()
 CHANGES = open(os.path.join(BASEDIR, 'CHANGES.txt')).read()
 
 with open(os.path.join(BASEDIR, 'requirements.txt')) as fobj:
-    REQUIRES = [line.strip() for line in fobj.readlines()
-                if not line.startswith('#')]
+    REQUIRES = list()
+    DEPENDENCIES = list()
+    for line in fobj.readlines():
+        if line.startswith('#'):
+            continue
+        if line.startswith('-e'):
+            DEPENDENCIES.append(line[2:].strip())
+        else:
+            REQUIRES.append(line.strip())
 
 setup(name='mist.io',
       version='0.9.9',
@@ -32,6 +39,7 @@ setup(name='mist.io',
       include_package_data=True,
       zip_safe=False,
       install_requires=REQUIRES,
+      dependency_links=DEPENDENCIES,
       tests_require=REQUIRES,
       test_suite="mist.io",
       entry_points="""\

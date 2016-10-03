@@ -12,8 +12,9 @@
                 display: block;
             }
 
-            paper-material {
+            :host paper-material {
                 display: block;
+                padding: 0;
             }
 
             label {
@@ -21,12 +22,25 @@
                 font-size: 12px;
             }
 
-            #numberOfPeople {
-                padding-top: 6px;
+            .grid-row {
+                padding: 24px;
+            }
+            
+            .head {
+                margin-bottom: 16px;
+            }
+            
+            h2.title {
+                font-weight: 500;
             }
 
-            #numberOfServers {
-                padding-top: 6px;
+            h2.title, h2.title~p {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+
+            .dropdown-block {
+                padding-top: 16px;
             }
 
             paper-radio-button {
@@ -34,54 +48,75 @@
                 --paper-radio-button-checked-ink-color: var(--paper-light-blue-500);
                 --paper-radio-button-unchecked-ink-color: var(--paper-light-blue-900);
             }
-
+            hr {
+                margin-left: -16px;
+                margin-right: -16px;
+                width: 100%;
+            }
             paper-progress {
                 position: absolute;
-                bottom: 91px;
+                bottom: 85px;
                 width: 100%;
                 left: 0;
                 right: 0;
             }
+            .bottom-actions {
+                padding-bottom: 24px;
+                padding-left: 2rem;
+            }
         </style>
         <paper-material>
-            <h2>Account Details</h2>
             <div class="grid-row">
-                <paper-input class="xs12 l6" id="firstName" label="NAME" required error-message="Please enter your first name" value="{{user.firstName}}" auto-validate always-float-label></paper-input>
+                <div class="xs12 head">
+                    <h2 class="title">User Profile</h2>
+                    <p>Enter your name and email.</p>
+                </div>
+                <paper-input class="xs12 l6" id="firstName" label="First Name" required error-message="Please enter your first name" value="[[user.first_name]]" auto-validate></paper-input>
 
-                <paper-input class="xs12 l6" id="lastName" label="SURNAME" required error-message="Please enter your last name" value="{{user.lastName}}" auto-validate always-float-label></paper-input>
+                <paper-input class="xs12 l6" id="lastName" label="Last Name" required error-message="Please enter your last name" value="[[user.last_name]]" auto-validate></paper-input>
 
-                <paper-input class="xs12 l6" id="companyName" label="COMPAMY NAME" required error-message="Please enter your company's name" value="{{user.companyName}}" auto-validate always-float-label></paper-input>
+                <paper-input class="xs12 l6" id="email" label="Email" required error-message="Please enter your email" value="[[user.email]]" auto-validate disabled></paper-input>
 
-                <paper-dropdown-menu class="dropdown-block xs12 l6" id="country" label="COMPANY LOCATION" horizontal-align="left" always-float-label>
-                    <paper-menu attr-for-selected="value" selected="{{user.country}}" class="dropdown-content">
+                <p class="xs12 l12">Currently you cannot change your account's email for security reasons. Please contact us at <a href="mailto:support@mist.io">support@mist.io</a>, if you wish to do so.</p>
+            </div>
+            <br/>
+            <div class="grid-row">
+                <div class="xs12 head">
+                    <h2 class="title">Organisation Profile</h2>
+                    <p>Enter your organisation details. To switch organisation use the  user menu in the top right corner of your screen.</p>
+                </div>
+                <paper-input class="dropdown-block xs12 l6" id="companyName" label="Company Name" required error-message="Please enter your company's name" value="[[model.org.name]]" auto-validate></paper-input>
+
+                <paper-dropdown-menu class="dropdown-block xs12 l6" id="country" label="Company Location" horizontal-align="left">
+                    <paper-menu attr-for-selected="value" selected="[[user.feedback.country]]" class="dropdown-content">
                         <template is="dom-repeat" items="[[countriesOptions]]" as="country">
                             <paper-item value="[[country]]">[[country]]</paper-item>
                         </template>
                     </paper-menu>
                 </paper-dropdown-menu>
 
-                <div class="dropdown-block xs12 l6" id="numberOfPeople" horizontal-align="left">
-                    <label id="label1">NUMBER OF EMPLOYEES</label>
-                    <paper-radio-group attr-for-selected="value" selected="{{user.numberOfPeople}}" aria-labelledby="label1">
+                <div class="dropdown-block xs12" horizontal-align="left">
+                    <label id="label1">Number of Employees</label> <br/>
+                    <paper-radio-group id="numberOfPeople" attr-for-selected="value" selected="[[user.feedback.number_of_people]]" aria-labelledby="label1">
                         <template is="dom-repeat" items="[[numberOfPeopleOptions]]" as="people">
                             <paper-radio-button value="[[people]]">[[people]]</paper-radio-button>
                         </template>
                     </paper-radio-group>
                 </div>
 
-                <div class="dropdown-block xs12 l6" id="numberOfServers" horizontal-align="left">
-                    <label id="label2">NUMBER OF SERVERS</label>
-                    <paper-radio-group attr-for-selected="value" selected="{{user.numberOfServers}}" aria-labelledby="label2">
+                <div class="dropdown-block xs12" horizontal-align="left">
+                    <label id="label2">Number of Servers</label> <br/>
+                    <paper-radio-group  id="numberOfServers"  attr-for-selected="value" selected="[[user.feedback.number_of_servers]]" aria-labelledby="label2">
                         <template is="dom-repeat" items="[[numberOfServersOptions]]" as="servers">
                             <paper-radio-button value="[[servers]]">[[servers]]</paper-radio-button>
                         </template>
                     </paper-radio-group>
                 </div>
-                <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress>
-                <hr class="xs12" />
-                <div class="bottom-actions clearfix xs12">
-                    <paper-button class="pull-right" disabled$="[[!formReady]]" raised on-tap="_submitForm" page="second">Submit</paper-button>
-                </div>
+            </div>
+            <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress> <!--   -->
+            <hr class="xs12" />
+            <div class="bottom-actions clearfix xs12">
+                <paper-button class="pull-right" disabled$="[[!formReady]]" raised on-tap="_submitForm" page="second">Save Changes</paper-button>
             </div>
         </paper-material>
         <iron-ajax id="detailsAjaxRequest" url="/account" method="POST" on-response="_handleDetailsAjaxResponse" on-error="_handleDetailsAjaxError"></iron-ajax>
@@ -94,6 +129,9 @@
                 is: 'details-page',
 
                 properties: {
+                    model: {
+                        type: Object
+                    },
                     user: {
                         type: Object
                     },
@@ -179,6 +217,14 @@
                             "Zambia", "Zimbabwe"
                         ]
                     },
+                    firstName: {
+                        type: String,
+                        // computed: 'userFisrtName(user)'
+                    },
+                    lastName: {
+                        type: String,
+                        // computed: 'lastName(user)'
+                    }, 
                     numberOfPeopleOptions: {
                         type: Array,
                         value: ['1-5', '6-20', '21-100', '100+']
@@ -200,6 +246,12 @@
                         computed: '_computeShowProgress(sendingData)'
                     }
                 },
+                // userFisrtName: function(user){
+                //     return user.first_name;
+                // },
+                // userFisrtName: function(user){
+                //     return user.first_name;
+                // },
                 _computeFormReady: function(firstName, lastName, country, companyName, numberOfPeople, numberOfServers, sendingData) {
                     var formReady = false;
 
@@ -217,14 +269,21 @@
                     return sendingData;
                 },
                 _submitForm: function(e, user) {
+                    var fn = this.querySelector('#firstName').value;
+                    var ln = this.querySelector('#lastName').value;
+                    var cn = this.querySelector('#companyName').value;
+                    var cc = this.querySelector('#country').value;
+                    var nos = this.querySelector('#numberOfServers').selected;
+                    var nop = this.querySelector('#numberOfPeople').selected;
+
                     var payload = {
                         action: 'update_details',
-                        first_name: user.firstName,
-                        last_name: user.lastName,
-                        company_name: user.companyName,
-                        country: user.country,
-                        number_of_servers: user.numberOfServers,
-                        number_of_people: user.numberOfPeople
+                        first_name: fn,
+                        last_name: ln,
+                        company_name: cn,
+                        country: cc,
+                        number_of_servers: nos,
+                        number_of_people: nop
                     };
 
                     this.set('sendingData', true);

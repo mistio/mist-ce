@@ -1,5 +1,6 @@
 <script src="../../bower_components/sockjs-client/dist/sockjs.min.js"></script>
 <script>
+    CSRF_TOKEN = '';
     DEBUG_SOCKET = false;
     Polymer({
         is: 'app-socket',
@@ -40,12 +41,14 @@
 
         ready: function() {
             // Create the socket if it does not exist
+            console.warn('ready');
             if (this.socket)
                 return;
             this.connect();
         },
 
         connect: function() {
+            console.warn('connecting at ', this.url);
             // Create the SockJS object
             this.socket = new SockJS(this.url, null, {
                 'transports': ['websocket', 'xhr-polling']
@@ -178,6 +181,9 @@
                         that.debounce(that._updateOrg(data), function() {
                             console.debug('Loaded org data');
                         }, 250);
+                    },
+                    logout: function(data){
+                        document.location.pathname = '/';
                     }
                 },
                 shell: {
@@ -351,7 +357,7 @@
             if (data.length && (this.get('onboarding.hasCloud') != true))
                 this.set('onboarding.hasCloud', true);
             if (!data.length)
-                this.set('onboarding.hasCloud', false);            
+                this.set('onboarding.hasCloud', false);
             var ret = this._updateModel('clouds', data);
             this.set('onboarding.isLoadingClouds', false);
             return ret;
@@ -369,6 +375,7 @@
 
         _updateUser: function(data) {
             this.set('model.user', data);
+            CSRF_TOKEN = data.csrf_token;
         },
 
         _updateOrg: function(data) {
@@ -434,6 +441,7 @@
             }
 
             this.set('model.imagesArray', allImages);
+            this.set('model.images', _generateMap(allImages));
         },
 
         _updateMachines: function(data) {
@@ -464,41 +472,63 @@
 
             this.set('onboarding.isLoadingMachines', false);
             this.set('model.machinesArray', allMachines);
-            this.set('machinesArray', allMachines);
+            this.set('model.machines', _generateMap(allMachines, 'uuid'));
         },
 
         _updateNetworks: function(data) {
             this.set('onboarding.isLoadingNetworks', false);
-            var changed = this._updateModel('clouds.' + data.cloud_id + '.networks', data.networks);
+
+            //update cloud's networks
+            var cloudNetworks = [];
+            data.networks.private.forEach(function(net){
+                if (net.id){
+                    net["network_type"] = "private";
+                    net["provider"] = this.model.clouds[data.cloud_id].provider;
+                    net["cloud_id"] = data.cloud_id;
+                    cloudNetworks.push(net);
+                }
+            }, this);
+            data.networks.public.forEach(function(net){
+                if (net.id){
+                    net["network_type"] = "public";
+                    net["provider"] = this.model.clouds[data.cloud_id].provider;
+                    net["cloud_id"] = data.cloud_id;
+                    cloudNetworks.push(net);
+                }
+            }, this);
+            // data.networks.routers.forEach(function(net){
+            //     if (net.id){
+            //         net["network_type"] = "router";
+            //         net["provider"] = this.model.clouds[data.cloud_id].provider;
+            //         net["cloud_id"] = data.cloud_id;
+            //         cloudNetworks.push(net);
+            //     }
+            // }, this);
+
+            // console.log(data);
+
+            var changed = this._updateModel('clouds.' + data.cloud_id + '.networks', cloudNetworks);
+
             if (!changed)
                 return false;
 
+            this.set('model.clouds.' + data.cloud_id + '.networksArray', cloudNetworks);
+            this.set('model.clouds.' + data.cloud_id + '.networks', _generateMap(cloudNetworks));
+
+            //update all networks array
             var allNetworks = [];
             if (this.model != undefined) {
-                this.model.cloudsArray.forEach(
-                    function(cloud) {
-                        if (cloud.networksArray != undefined && 0 < cloud.networksArray.public.length + cloud.networksArray.private.length + cloud.networksArray.routers.length && cloud.enabled) {
-                            cloud.networksArray.public.forEach(function(net) {
-                                net["type"] = "public";
-                                net["provider"] = cloud.provider;
+                this.model.cloudsArray.forEach(function(cloud) {
+                        if (cloud.networksArray != undefined && cloud.enabled) {
+                            cloud.networksArray.forEach(function(net){
                                 allNetworks.push(net);
-                            });
-                            cloud.networksArray.private.forEach(function(net) {
-                                net["type"] = "private";
-                                net["provider"] = cloud.provider;
-                                allNetworks.push(net);
-                            });
-                            cloud.networksArray.routers.forEach(function(net) {
-                                net["type"] = "router";
-                                net["provider"] = cloud.provider;
-                                allNetworks.push(net);
-                            });
-                            return allNetworks;
+                            })
                         }
                     }
                 );
             }
             this.set('model.networksArray', allNetworks);
+            this.set('model.networks', _generateMap(allNetworks));
         },
         _updateTunnels: function(data) {
             this.set('onboarding.isLoadingTunnels', false);
@@ -534,10 +564,12 @@
         }
     });
 
-    var _generateMap = function(list) {
+    var _generateMap = function(list, field) {
         var out = {};
+        if (field == undefined)
+            field = 'id';
         for (var i = 0; i < list.length; i++) {
-            out[list[i].id] = list[i];
+            out[list[i][field]] = list[i];
         }
         return out;
     };

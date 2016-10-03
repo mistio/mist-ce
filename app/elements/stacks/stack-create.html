@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
@@ -14,16 +14,16 @@
         :host {
             display: block;
         }
-        
+
         paper-material {
             display: block;
             padding: 24px;
         }
-        
+
         #content {
             max-width: 900px;
         }
-        
+
         paper-progress {
             position: absolute;
             bottom: 87px;
@@ -31,48 +31,48 @@
             left: 0;
             right: 0;
         }
-        
+
         :host >::content paper-input-container {
             padding-top: 16px;
             padding-bottom: 16px;
         }
-        
+
         paper-item.lead {
             font-size: 2em;
         }
-        
+
         paper-toggle-button[disabled]::content {
             color: rgba(0, 0, 0, 0.32);
         }
-        
+
         paper-toggle-button::content paper-input-container input {
             color: color: rgba(0, 0, 0, 0.54);
         }
-        
+
         .spacer {
             display: block;
             height: 24px;
             width: 100%;
         }
-        
+
         .bottom-actions {
             padding-left: 20px;
         }
-        
+
         *:not(paper-button)[disabled] {
             display: none;
         }
-        
+
         paper-radio-group {
             padding: 16px 8px;
         }
-        
+
         @media (max-width: 800px) {
             .desc {
                 display: none;
             }
         }
-        
+
         .desc {
             width: 250px;
             white-space: nowrap;
@@ -112,9 +112,6 @@
                 model: {
                     type: Object
                 },
-                sections: {
-                    type: Object
-                },
                 section: {
                     type: Object
                 },
@@ -123,8 +120,7 @@
                     computed: '_getHeaderStyle(section)'
                 },
                 stack: {
-                    type: Object,
-                    value: {}
+                    type: Object
                 },
                 form: {
                     type: Object,
@@ -139,6 +135,7 @@
                 },
                 fields: {
                     type: Array,
+                    value: [],
                     notify: true
                 },
                 keys: {
@@ -173,9 +170,9 @@
             },
             ready: function() {},
             _fromTemplate: function(params, templates) {
-                if (params.id && this.model.templates) {
+                if (params.template && this.model.templates) {
                     var yaml_inputs = '';
-                    this.model.templates[params.id].inputs.forEach(function(inp) {
+                    this.model.templates[params.template].inputs.forEach(function(inp) {
                         yaml_inputs += inp.name + ': ';
                         var val = inp.value = !undefined ? inp.value : inp.defaultValue || inp.default;
                         yaml_inputs += val + '\n';
@@ -192,7 +189,7 @@
 
 
                     var yaml_or_form = 'form';
-                    var template = this.model.templates[params.id];
+                    var template = this.model.templates[params.template];
                     console.log('Computing Fields started');
 
                     if (this.fields) {
@@ -284,7 +281,7 @@
                                 inp.type = 'ssh_key';
                                 // inp.type = 'dropdown';
                                 inp.helptext = 'Select key';
-                                inp.options = []; //this.model.keysArray;                                
+                                inp.options = []; //this.model.keysArray;
                             }
 
                             // make cloud dropdown
@@ -360,7 +357,7 @@
                     this.set('fields', ret);
 
 
-                    return this.model.templates[params.id];
+                    return this.model.templates[params.template];
                 } else {
                     return {
                         name: "Template is missing"
@@ -372,7 +369,7 @@
             _computeFields: function(template, templateInps, templateInputs, modelTemplates, clouds, keys, params) {
                 this.fields.filter(function(inp, index) {
                     if (inp.name.startsWith('mist_key')){
-                        this.set('fields.' + index + '.options', this.model.keysArray);                        
+                        this.set('fields.' + index + '.options', this.model.keysArray);
                     }
 
                 }, this);
@@ -472,7 +469,7 @@
                 // console.log('create stack ', e);
                 var response = YAML.parse(e.detail.xhr.response);
                 var sid = response.stack.id;
-                page('/stacks/' + sid);
+                document.querySelector('app-location').set('path', '/stacks/' + sid);
 
                 this.debounce('resetForm', function() {
                     this._resetForm();

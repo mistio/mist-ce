@@ -68,10 +68,12 @@
                     'iron-overlay-closed': '_modalClosed'
                 },
                 _computeNewScript: function(script) {
-                    return {
-                        name: script.name,
-                        description: script.description
-                    };
+                    if (script){
+                        return {
+                            name: script.name,
+                            description: script.description
+                        };
+                    }
                 },
                 _computeFormReady: function(name, sendingData) {
                     var formReady = false;
