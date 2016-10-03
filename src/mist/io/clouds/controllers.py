@@ -679,19 +679,11 @@ class IndonesianVCloudController(VCloudController):
     provider = 'indonesian_vcloud'
 
     def _add__preparse_kwargs(self, kwargs):
-        if not kwargs.get('username'):
-            raise RequiredParameterMissingError('username')
-        if not kwargs.get('organization'):
-            if '@' not in kwargs['username']:
-                raise RequiredParameterMissingError('organization')
-        else:
-            kwargs['username'] = '%s@%s' % (kwargs['username'],
-                                            kwargs.pop('organization'))
         kwargs.setdefault('host', 'my.idcloudonline.com')
         if kwargs['host'] not in ('my.idcloudonline.com',
                                   'compute.idcloudonline.com'):
             raise me.ValidationError("Invalid host '%s'." % kwargs['host'])
-
+        super(IndonesianVCloudController, self)._add__preparse_kwargs(kwargs)
 
 class OpenStackController(BaseController):
 
