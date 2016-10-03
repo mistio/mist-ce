@@ -401,18 +401,18 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter password",
-        helptext: 'The password you use to login Indonesian Cloud\'s portal'
+        helptext: 'The password you use to login Indonesian Cloud\'s portal',
+        helpHref: 'http://docs.mist.io/article/23-adding-indonesian-cloud'
     }, {
-        name: "host",
-        label: "Hostname *",
+        name: "organization",
+        label: "Organization *",
         type: "text",
         value: "",
         defaultValue: "",
         show: true,
         required: true,
-        errorMessage: "Please enter hostname",
-        helptext: 'The URL or IP vCloud listens to',
-        helpHref: 'http://docs.mist.io/article/31-adding-vmware-vcloud'
+        errorMessage: "Please enter organization",
+        helptext: 'The name of your organization'
     }, {
         name: "indonesianRegion",
         label: "Region",

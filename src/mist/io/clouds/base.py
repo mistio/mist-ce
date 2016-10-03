@@ -400,7 +400,8 @@ class BaseController(object):
                 machine_model = Machine.objects.get(cloud=self.cloud,
                                                     machine_id=node.id)
             except Machine.DoesNotExist:
-                machine_model = Machine(cloud=self.cloud, machine_id=node.id).save()
+                machine_model = Machine(cloud=self.cloud,
+                                        machine_id=node.id).save()
 
             # Update machine_model's last_seen fields.
             machine_model.last_seen = now
