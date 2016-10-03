@@ -44,7 +44,7 @@ PROVIDERS.push({
 PROVIDERS.push({
     title: 'Azure ARM',
     val: 'azure_arm',
-    className: 'provider-azure_arm',
+    className: 'provider-azure',
     options: [{
         name: "title",
         label: "Title *",
