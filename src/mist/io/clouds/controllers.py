@@ -430,7 +430,7 @@ class AzureArmController(BaseController):
         return 0, 0
 
     def _list_images__fetch_images(self, search=None):
-        return []]
+        return []
 
 
 class GoogleController(BaseController):
