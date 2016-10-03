@@ -225,6 +225,64 @@ var CLOUD_ADD_FORM_FIELDS = [{
         helpHref: "http://docs.mist.io/article/18-adding-microsoft-azure"
     }]
 }, {
+    title: 'Azure ARM',
+    val: 'azure_arm',
+    className: 'provider-azure_arm',
+    options: [{
+        name: "title",
+        label: "Title *",
+        type: "text",
+        value: "Azure ARM",
+        defaultValue: "Azure ARM",
+        show: true,
+        required: true,
+        errorMessage: "Please enter title"
+    }, {
+        name: "tenant_id",
+        label: "Tenant ID *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        errorMessage: "Please enter tenant id",
+        helpText: "You can find your tenant ID on the Azure portal",
+        helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
+    }, {
+        name: "subscription_id",
+        label: "Subscription ID *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        errorMessage: "Please enter subscription id",
+        helpText: "You can find your subscriptionID on the Azure portal",
+        helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
+    }, {
+        name: "key",
+        label: "Client key *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        errorMessage: "Please enter client key",
+        helpText: "You can find your client key on the Azure portal",
+        helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
+    }, {
+        name: "secret",
+        label: "Client secret *",
+        type: "password",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        errorMessage: "Please enter client secret",
+        helpText: "You can find your client secret on the Azure portal",
+        helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
+    }]
+}, {
     title: 'CoreOS',
     val: 'coreos',
     className: 'provider-coreos',
