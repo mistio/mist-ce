@@ -63,7 +63,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter tenant id",
-        helpText: "You can find your tenant ID on the Azure portal",
+        helptext: "You can find your tenant ID on the Azure portal",
         helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
     }, {
         name: "subscription_id",
@@ -74,7 +74,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter subscription id",
-        helpText: "You can find your subscriptionID on the Azure portal",
+        helptext: "You can find your subscriptionID on the Azure portal",
         helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
     }, {
         name: "key",
@@ -85,7 +85,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter client key",
-        helpText: "You can find your client key on the Azure portal",
+        helptext: "You can find your client key on the Azure portal",
         helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
     }, {
         name: "secret",
@@ -96,7 +96,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         errorMessage: "Please enter client secret",
-        helpText: "You can find your client secret on the Azure portal",
+        helptext: "You can find your client secret on the Azure portal",
         helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
     }]
 });
