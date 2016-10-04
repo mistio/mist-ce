@@ -715,7 +715,7 @@ def associate_key(request):
     port:
       default: 22
       type: integer
-    ssh_user:
+    user:
       description: The ssh user
       type: string
     """

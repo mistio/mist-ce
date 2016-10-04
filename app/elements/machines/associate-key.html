@@ -173,14 +173,14 @@ Polymer({
             request.url = uri;
             request.headers["Content-Type"] = 'application/json';
             request.headers["Csrf-Token"] = CSRF_TOKEN;
-            request.body = { host: machineHost, ssh_user: user, ssh_port: port};
+            request.body = { host: machineHost, user: user, port: port};
             request.generateRequest();
 
             if (items.length) {
                 run(el, model);
             }
         }
-        run(this, this.computeModel());        
+        run(this, this.computeModel());
     },
     _associateKeyRequest: function(){
         this.fire('pending-key-request', {request: true, keyId: this.selectedKeyId});
@@ -189,7 +189,7 @@ Polymer({
         this.fire('pending-key-request', {response: true, keyId: this.selectedKeyId});
     },
     _associateKeyError: function(e){
-        this.fire('pending-key-request', {error: true, errormsg: e.detail.request.xhr.responseText ,keyId: this.selectedKeyId});    
+        this.fire('pending-key-request', {error: true, errormsg: e.detail.request.xhr.responseText ,keyId: this.selectedKeyId});
     },
     updateInputs: function(e){
         var target = e.target.id;
@@ -221,7 +221,7 @@ Polymer({
                 itemId = this.items[i].split(':')[2];
             for (var j=0; j<model.keys[key].machines.length; j++) {
                 if (model.keys[key].machines[j][0] == itemCloud && model.keys[key].machines[j][1] == itemId){
-                    count++; 
+                    count++;
                 }
             }
         }
