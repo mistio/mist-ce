@@ -198,8 +198,12 @@ Polymer({
 
         var ret = item[field];
 
+        // networks
         if (field == 'subnets')
             return ret ? ret.length : '';
+
+        if (field == 'status' && !ret)
+            return '';
 
         // return cloud title
         if (field == 'cloud')
