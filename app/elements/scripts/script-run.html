@@ -64,7 +64,7 @@
                 <p>
                     Heads up! Make sure you select a machine you have already associated a key with. Otherwise the the request may be accepted but the script will never finish run.
                 </p>
-                <p class="error" hidden$="[[machineHasKeys]]">
+                <p class="error" hidden$="{{machineHasKeys}}">
                     <iron-icon icon="icons:warning"></iron-icon> Machine [[machine.name]] has no associated keys.
                 </p>
                 <app-form fields="[[fields]]" url="/api/v1/scripts/[[script.id]]" on-response="_runScriptResponse" btncontent="run"></app-form>
@@ -188,46 +188,22 @@
                         var machineCloud = this.model.machinesArray.find(function(m){
                             return m.id == machineID;
                         });
+                        console.log('_fieldsChanged', machineCloud.cloud.id, machineCloud);
                         this.set("machine", machineCloud);
                         this.set('fields.1.value', machineCloud.cloud.id);
                     };
 
                 },
                 _machineChanged: function(machine){
-                    if (machine){
-                        var machineID = machine.id;
-                        var key = this.model.keysArray.find(function(k){
-                            return k.machines.find(function(m){
-                                return m[1] == machineID;
-                            })
-                        });
-
-                        if (key){
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
-                    }
+                    return machine.keys.length>0?true:false;
                 },
                 _cloudsChanged: function(fieldsLength, clouds, machines, keys) {
-                    // make an array of machines with keys
-                    var machinesWithKeys = [];
-                    this.model.keysArray.forEach(function(k){
-                        k.machines.forEach(function(m){
-                            var cloudId = m[0];
-                            var machineId = m[1];
-                            if (this.model.clouds && this.model.clouds[cloudId] && this.model.clouds[cloudId].machines && this.model.clouds[cloudId].machines[machineId]) {
-                                machinesWithKeys.push(this.model.clouds[cloudId].machines[machineId].uuid);
-                            }
-                        }, this);
-                    }, this);
-
+                    
                     this.set('fields.0.options', this.model.machinesArray);
 
                     if (this.fields) {
                         this.fields[0].options.forEach(function(o, index){
-                            if (machinesWithKeys.indexOf(o.uuid) > -1){
+                            if (o.keys.length > 0){
                                 this.set('fields.0.options.'+index+'.icon', 'communication:vpn-key');
                             }
                             else {
