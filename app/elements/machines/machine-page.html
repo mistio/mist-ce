@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
@@ -268,13 +269,13 @@
                     </template>
                 </paper-material>
             </div>
-            <!--<paper-material class="info-card" hidden$="{{!isMonitored}}">
+            <paper-material class="info-card" hidden$="[[!isMonitored]]">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
                 <div>
                     <paper-material>graph data</paper-material>
-                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
                 </div>
-            </paper-material>-->
+            </paper-material>
             <paper-material class="info-card">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
                 <div class="card-content">
@@ -514,8 +515,8 @@ MACHINEACTIONS = {
             ];
             var that = this;
             setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-                if (that.querySelector('dashboard-panel'))
-                    that.querySelector('dashboard-panel').resize();
+                // if (that.querySelector('dashboard-panel'))
+                //     that.querySelector('dashboard-panel').resize();
 
             }, 5000);
 
@@ -659,10 +660,10 @@ MACHINEACTIONS = {
             return this.section && this.section.color ? this.section.color : '';
         },
         addKey: function(_, params) {
-            console.log("clicked addKey");
+            // console.log("clicked addKey");
         },
         rename: function(_, params) {
-            console.log("clicked rename");
+            // console.log("clicked rename");
         },
 
         _getHeaderStyle: function(color) {
@@ -735,11 +736,11 @@ MACHINEACTIONS = {
             var keyId = e.target['dataKeyid'];
             var keyName = e.target['dataKeyname'];
 
-            console.log('disassociateKey',keyId, keyName);
+            // console.log('disassociateKey',keyId, keyName);
 
             this.set('disassociateKeyId', keyId);
             
-            console.log(this.disassociateKeyId);
+            // console.log(this.disassociateKeyId);
 
             this._showDialog({
                 title: 'Disassociate key',
