@@ -318,7 +318,7 @@
                             <template is="dom-if" if="[[template.created_at]]">
                                 <div class="info-item flex-horizontal-with-ratios">
                                     <div class="flexchild">Created at</div>
-                                    <div class="flexchild">[[timestamp]]</div>
+                                    <div class="flexchild">[[template.created_at]]</div>
                                 </div>
                             </template>
                             <div class="info-item flex-horizontal-with-ratios">
@@ -431,10 +431,6 @@
                         type: String,
                         computed: '_class(isInline)'
                     },
-                    timestamp: {
-                        type: String,
-                        computed: '_getFormattedTimestamp(template.created_at)'
-                    },
                     hideprogress: {
                         type: Boolean,
                         value: true
@@ -453,11 +449,6 @@
                 ready: function() {
                     var wh = window.innerHeight;
                     this.vpHeight = 'height:' + wh + 'px; overflow: auto;';
-                },
-                _getFormattedTimestamp: function(created_at) {
-                    return new Date(created_at).toLocaleString('en-US', {
-                        timeZoneName: 'short'
-                    });
                 },
                 _computeReadableDate: function(date) {
                     return moment(date).fromNow();
