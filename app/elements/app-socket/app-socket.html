@@ -388,6 +388,17 @@
 
         _updateKeys: function(data) {
             this.set('onboarding.isLoadingKeys', false);
+            if(data){
+                console.log('update machine from keys', data)
+                for (var key in data) {
+                    if (this.model.clouds)
+                    key.machines.forEach(function(m){
+                        // if (this.model.clouds.m[0].machines.m[1] && this.model.clouds.m[0] && this._machineKeys(this.model.clouds.m[0].machines.m[1].id, this.model.clouds.m[0].id))
+                        // // assign the machine it's keys 
+                        // this.model.clouds.m[0].keys = this._machineKeys(this.model.clouds.m[0].machines.m[1].id, this.model.clouds.m[0].id);
+                    })
+                }
+            }
             return this._updateModel('keys', data);
         },
 
@@ -460,11 +471,12 @@
                                     'title': cloud.title,
                                     'provider': cloud.provider
                                 };
-                            });
+                                machine.keys = this._machineKeys(machine.id, machine.cloud.id);
+                            }, this);
 
                             return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])
                         }
-                    });
+                    }, this);
             }
 
             if (data.length && this.get('model.onboarding.hasMachines') != true)
@@ -561,6 +573,18 @@
                 }
             }
             return keywords;
+        },
+
+        _machineKeys: function(machineID, cloudID){
+            // console.log('Update _machineKeys',cloudID,machineID);
+            if (machineID && cloudID){
+                var keys = this.model.keysArray.filter(function(k){
+                    return k.machines.find(function(m){
+                        return m[1] == machineID && m[0] == cloudID;
+                    })
+                });
+                return keys || [];
+            }
         }
     });
 
