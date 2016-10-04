@@ -332,14 +332,14 @@ Polymer({
         this.updateResize();
     },
     updateResize: function(){
-        console.log('updateResize');
+        // console.log('updateResize');
         if (document.querySelector('iron-media-query').queryMatches)
             this.closeSidebar();
         else 
             this.openSidebar();
     },
     closeSidebar: function(){
-        console.log('close sidebar');
+        // console.log('close sidebar');
         if (document.querySelector('iron-media-query').queryMatches){
             this.close(); //control brackdrop
         }
@@ -349,7 +349,7 @@ Polymer({
         this.set('isclosed', true);
     },
     openSidebar: function(){
-        console.log('open sidebar')
+        // console.log('open sidebar')
         if (document.querySelector('iron-media-query').queryMatches){
             this.open(); //control brackdrop
         }
@@ -359,7 +359,7 @@ Polymer({
         this.set('isclosed', false);
     },
     toggleSidebar: function(){
-        console.log('toggle sidebar')
+        // console.log('toggle sidebar')
         if (document.querySelector('iron-media-query').queryMatches){
             this.toggle(); //control brackdrop
         }
