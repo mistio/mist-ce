@@ -766,7 +766,7 @@ MACHINEACTIONS = {
             }
         },
         _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
-            var hide =  !(associatedKeys.base.length > 0 || isPendingKeyRequest);
+            var hide =  !(this.machine.keys.length > 0 || isPendingKeyRequest);
             this.set('hideAssociatedKeys', hide);
         },
         _feedbackOnScript: function(e){
