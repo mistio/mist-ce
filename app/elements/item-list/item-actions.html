@@ -9,6 +9,7 @@
 <link rel="import" href="../tags/tags-list.html">
 <link rel="import" href="../machines/associate-key.html">
 <link rel="import" href="../machines/run-script-on-machine.html">
+<link rel="import" href="../machines/machine-edit.html">
 
 <dom-module id="item-actions">
     <template>
@@ -163,6 +164,7 @@
           <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
           <run-script-on-machine id="runscriptdialog" items="[[selectedItems]]"></run-script-on-machine>
           <associate-key id="associatekeydialog" items="[[selectedItemsOfCurrentSection]]" model="[[model]]"></associate-key>
+          <machine-edit id="renamedialog" items="[[selectedItemsOfCurrentSection]]" model="[[model]]"></machine-edit>
         </content>
         <paper-toast id="item-actions-toast"></paper-toast>
     </template>
@@ -512,10 +514,9 @@ Polymer({
             if (item.can_reboot)
                 ret.push('reboot');
             if (item.can_resume)
-                ret.push('resume');
-            // rename needs its own dialog element
-            // if (item.can_rename)
-            //     ret.push('rename');
+                ret.push('resume');            
+            if (item.can_rename)
+                ret.push('rename');
             if (item.can_destroy)
                 ret.push('destroy');
             if (item.can_undefine)
@@ -579,6 +580,11 @@ Polymer({
                 this.$['runscriptdialog'].items = items;
                 this.$['runscriptdialog']._openDialog();
             }
+            else if(event.model.item.name == 'rename') {
+                var items = [];
+                items.push(itemUid(this.selectedItem, this.section));
+                this.$['renamedialog']._openDialog();
+            }
             else {
                 this.$['confirmation'].toggle();
             }
@@ -606,6 +612,10 @@ Polymer({
             else if(event.model.item.name == 'run script') {
                 this.$['runscriptdialog'].items = this.selectedItems;
                 this.$['runscriptdialog']._openDialog();
+            }
+            else if(event.model.item.name == 'rename') {
+                this.$['renamedialog'].items = this.selectedItems;
+                this.$['renamedialog']._openDialog();
             }
             else {
                 this.$['confirmation'].toggle();

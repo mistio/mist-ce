@@ -31,7 +31,9 @@
             <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
                 <p>
-                    <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter machines's new name" value="{{machine.name}}"></paper-input>
+                    <template is="dom-repeat" items="[[itemsObj]]">
+                        <paper-input id="[[item.id]]" label="[[item.name]]" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter machines's new name" value="{{item.name}}"></paper-input>
+                    </template>
                 </p>
                 <div class="clearfix btn-group">
                 <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
@@ -50,6 +52,12 @@
                 is: 'machine-edit',
 
                 properties: {
+                    model: Object,
+                    items: Array,
+                    itemsObj: {
+                        type:Array,
+                        computed: '_computeItemsObj(items)'
+                    },
                     machine: {
                         type: Object,
                         value: {
@@ -72,6 +80,13 @@
                 ready: function() {
 
                 },
+                _computeItemsObj: function(items){
+                    return this.model.machinesArray.filter(function(m){
+                        var str = 'machine:'+m.cloud.id+':'+m.id;
+                        console.log(this.items, m.id,str.indexOf(this.items))
+                        return str.indexOf(this.items)>-1;
+                    }, this);
+                },
                 _computeFormReady: function(id, sendingData) {
                     var formReady = false;
 
@@ -85,10 +100,10 @@
 
                     return formReady;
                 },
-                _openEditMachineModal: function(e) {
+                _openDialog: function(e) {
                     this.$.editMachineModal.open();
                 },
-                _closeEditMachineModal: function(e) {
+                _closeDialod: function(e) {
                     this.$.editMachineModal.close();
                 },
                 _modalClosed: function() {
@@ -101,10 +116,12 @@
                     this._closeEditMachineModal();
                 },
                 _formReset: function() {
-                    //   this.set('machine.uuid', '');
+                      this.set('machine.uuid', '');
                 },
                 _editMachineAjax: function(e) {
-                    //   this.$.editMachineAjax.generateRequest();
+                    this.$.editMachineAjax.headers["Content-Type"] = 'application/json';
+                    this.$.editMachineAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.editMachineAjax.generateRequest();
                 },
                 _editMachineRequest: function() {
                     this.set('sendingData', true);
