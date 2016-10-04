@@ -395,7 +395,6 @@
                     key.machines.forEach(function(m, index){
                         var cloud = m[0],
                             machine = m[1];
-                        console.log('m',cloud, machine);
                         if (this.model.clouds[cloud] && this.model.clouds[cloud].machines[machine])
                         // check if machine has this key, if not add
                         var keyexists = this.model.clouds[cloud].machines[machine].keys.find(function(k){
