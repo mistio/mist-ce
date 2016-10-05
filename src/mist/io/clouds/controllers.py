@@ -943,6 +943,17 @@ class OtherController(BaseController):
         from mist.io.machines.models import Machine
         return BareMetalDriver(Machine.objects(cloud=self.cloud))
 
+    def _list_machines__machine_actions(self, machine, machine_libcloud):
+        super(OtherController, self)._list_machines__machine_actions(
+            machine, machine_libcloud
+        )
+        machine.actions.reboot = False
+        machine.actions.stop = False
+        machine.actions.destroy = False
+        # allow reboot action for bare metal with key associated
+        if machine.key_associations:
+            machine.actions.reboot = True
+
     def add(self, remove_on_error=True, fail_on_invalid_params=True, **kwargs):
         """Add new Cloud to the database
 
@@ -1107,14 +1118,3 @@ class OtherController(BaseController):
             return True
         except:
             return False
-
-    # m.extra['can_reboot'] = False
-    # if machine_entry.key_associations:
-    #     m.extra['can_reboot'] = True
-    # can_start = False
-    # can_destroy = False
-    # can_stop = False
-    # can_reboot = False
-    # if extra.get('can_reboot', False):
-    # # allow reboot action for bare metal with key associated
-    #     can_reboot = True
