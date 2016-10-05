@@ -275,12 +275,8 @@
             </div>
             <paper-material class="info-card" hidden$="[[!isMonitored]]">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
-                <div>
-                    <paper-material>graph data</paper-material>
-                     <!-- <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard> -->
-                </div>
+                <polyana-dashboard machines="[[machineInArray]]" dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
             </paper-material>
-            <polyana-dashboard machines="[[machineInArray]]" dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
             <paper-material class="info-card">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
                 <div class="card-content">
@@ -432,7 +428,7 @@ MACHINEACTIONS = {
             },
             isMonitored: {
                 type: Boolean,
-                value: true,
+                value: false,
                 notify: true
             },
             machineImage: {
@@ -658,17 +654,17 @@ MACHINEACTIONS = {
         _isEqual: function(a, b) {
             return a === b;
         },
-        _isMonitored: function(machine, machines){
-            if (machines){
-                var mach =  machines.base.find(function(m){
-                    return m[1] == machine.id ;
+        _isMonitored: function(machine, monitoredMachines){
+            if (monitoredMachines){
+                var mach =  monitoredMachines.base.find(function(m){
+                    return m[1] == machine.id && m[0] == machine.cloud.id;
                 }, this);
             }
-            if (mach){
-                this.isMonitored = true;
+            if (monitoredMachines && mach){
+                this.set('isMonitored', true);
             }
             else{
-                this.isMonitored = false;
+                this.set('isMonitored', false);
             }
         },
         _getColor: function() {
