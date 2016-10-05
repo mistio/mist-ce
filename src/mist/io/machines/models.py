@@ -61,8 +61,8 @@ class Machine(me.Document):
     public_ips = me.ListField()
     private_ips = me.ListField()
     ssh_port = me.IntField(default=22)
-    os_type = me.StringField(default='unix', choices=('unix',
-                                                      'linux', 'windows'))
+    os_type = me.StringField(default='unix', choices=('unix', 'linux',
+                                                      'windows', 'coreos'))
     rdp_port = me.IntField(default=3389)
     actions = me.EmbeddedDocumentField(Actions, default=lambda: Actions())
     extra = me.DictField()
