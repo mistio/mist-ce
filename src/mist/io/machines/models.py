@@ -6,6 +6,8 @@ import mongoengine as me
 import mist.core.tag.models
 from mist.io.clouds.models import Cloud
 from mist.io.machines.controllers import MachineController
+# # TODO move these when keys port is completed
+from mist.core.cloud.models import KeyAssociation, InstallationStatus
 
 
 class Actions(me.EmbeddedDocument):
@@ -19,10 +21,6 @@ class Actions(me.EmbeddedDocument):
     resume = me.BooleanField(default=False)
     suspend = me.BooleanField(default=False)
     undefine = me.BooleanField(default=False)
-
-
-# # TODO move these when keys port is completed
-from mist.core.cloud.models import KeyAssociation, InstallationStatus
 
 
 class Monitoring(me.EmbeddedDocument):
