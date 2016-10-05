@@ -100,6 +100,7 @@
                     },
                     selected: {
                         type: Number,
+                        value: -1,
                         notify: true
                     },
                     template: {
@@ -244,7 +245,7 @@
                     defaultTemplates: Array
                 },
                 observers: [
-                    'useCatalogueTemplate(selected)'
+                    'useCatalogueTemplate(selected, fields)'
                 ],
                 listeners: {
                     'reset-form' : 'clearDropDown'

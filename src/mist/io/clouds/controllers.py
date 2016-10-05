@@ -701,6 +701,7 @@ class IndonesianVCloudController(VCloudController):
         if kwargs['host'] not in ('my.idcloudonline.com',
                                   'compute.idcloudonline.com'):
             raise me.ValidationError("Invalid host '%s'." % kwargs['host'])
+        super(IndonesianVCloudController, self)._add__preparse_kwargs(kwargs)
 
 
 class OpenStackController(BaseController):
@@ -978,7 +979,8 @@ class OtherController(BaseController):
             raise BadRequestError({'msg': exc.message,
                                    'errors': exc.to_dict()})
         except me.NotUniqueError:
-            raise BadRequestError("Cloud with name %s already exists" % self.cloud.title)
+            raise CloudExistsError("Cloud with name %s already exists"
+                                   % self.cloud.title)
 
         # Add machine.
         if kwargs:

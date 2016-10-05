@@ -198,8 +198,12 @@ Polymer({
 
         var ret = item[field];
 
+        // networks
         if (field == 'subnets')
             return ret ? ret.length : '';
+
+        if (field == 'status' && !ret)
+            return '';
 
         // return cloud title
         if (field == 'cloud')
@@ -214,15 +218,12 @@ Polymer({
         }
 
         // some providers dont provide this info
-        if (field == 'create_date' && !ret && item.extra) {
-            if (!item.extra[field]){
+        if (field == 'created') {
+            if (!ret){
                 return '';
-            }
-            else if (item.extra[field] && item.extra['create_date_timestamp']) {
-                return moment(item.extra['create_date_timestamp']*1000).fromNow();
             }
             else {
-                return '';
+                return moment(item['created']).fromNow();
             }
         }
 
