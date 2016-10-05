@@ -43,9 +43,10 @@ from mist.io.exceptions import MistError
 from mist.io.exceptions import NotFoundError
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudExistsError
+from mist.io.exceptions import InternalServerError
+from mist.io.exceptions import MachineNotFoundError
 from mist.io.exceptions import CloudUnauthorizedError
 from mist.io.exceptions import ServiceUnavailableError
-from mist.io.exceptions import MachineNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
 
@@ -209,14 +210,6 @@ class LinodeController(BaseController):
         # After resize, node gets to pending mode, needs to be started.
         if machine_libcloud.state is NodeState.PENDING:
             machine.actions.start = True
-
-    # FIXME why we need this?
-    # def _list_machines__postparse_machine(self, machine, machine_libcloud):
-        # datacenter = machine_libcloud.extra.get('DATACENTER')
-        # datacenter = config.LINODE_DATACENTERS.get(datacenter)
-        # if datacenter:
-        #     # TODO insert tags in machine.extra
-        #     machine.extra['provider_tags']['DATACENTERID'] = datacenter
 
     def _list_machines__cost_machine(self, machine, machine_libcloud):
         size = machine_libcloud.extra.get('PLANID')
@@ -395,7 +388,10 @@ class AzureController(BaseController):
         return images_dict.values()
 
     def _cloud_service(self, machine_libcloud_id):
-        # Azure needs the cloud service specified as well as the node
+        """
+        Azure libcloud driver needs the cloud service
+        specified as well as the node
+        """
         cloud_service = self.connection.get_cloud_service_from_node_id(
             machine_libcloud_id)
         return cloud_service
@@ -469,17 +465,8 @@ class GoogleController(BaseController):
 
     def _list_machines__postparse_machine(self, machine, machine_libcloud):
         extra = machine_libcloud.extra
-        # TODO delete this
-        # Tags and metadata exist in special location for GCE.
-        # tags = tags_to_dict(extra.get('metadata', {}).get('items', []))
-        # for key in ('gce-initial-windows-password',
-        #             'gce-initial-windows-user'):
-        #     # Windows specific metadata including user/password.
-        #     if key in tags:
-        #         extra[key] = tags.pop(key)
 
         # Wrap in try/except to prevent from future GCE API changes.
-
         # Identify server OS.
         machine.os_type = 'linux'
         try:
@@ -511,8 +498,8 @@ class GoogleController(BaseController):
         # Get machine type.
         try:
             if extra.get('machineType'):
-                machine.extra['machine_type'] = extra[
-                                                'machineType'].split('/')[-1]
+                machine_type = extra['machineType'].split('/')[-1]
+                machine.extra['machine_type'] = machine_type
         except:
             log.exception("Couldn't parse machine type "
                           "for machine %s:%s for %s",
@@ -685,12 +672,6 @@ class VCloudController(BaseController):
             machine.actions.start = True
             machine.actions.stop = True
 
-    # TODO delete this, we don't use providers tag anymore
-    # def _list_machines__postparse_machine(self,  machine, machine_libcloud):
-    #     if machine_libcloud.extra.get('vdc'):
-    #         vdc = machine_libcloud.extra.get('vdc')
-    #         machine.extra['provider_tags']['vdc'] = vdc
-
 
 class IndonesianVCloudController(VCloudController):
 
@@ -811,18 +792,18 @@ class DockerController(BaseController):
         """
         # this exist here cause of docker host implementation
         if machine_libcloud.extra.get('tags', {}).get('type') == 'docker_host':
-            pass
-        else:
-            node_info = self.connection.inspect_node(machine_libcloud)
-            try:
-                port = node_info.extra[
-                    'network_settings']['Ports']['22/tcp'][0]['HostPort']
-            except KeyError:
-                port = 22
+            return
 
-            for key_assoc in machine.key_associations:
-                key_assoc.port = port
-            machine.save()
+        node_info = self.connection.inspect_node(machine_libcloud)
+        try:
+            port = node_info.extra[
+                'network_settings']['Ports']['22/tcp'][0]['HostPort']
+        except KeyError:
+            port = 22
+
+        for key_assoc in machine.key_associations:
+            key_assoc.port = port
+        machine.save()
 
     def _start_machine(self,  machine, machine_libcloud):
         self.connection.ex_start_node(machine_libcloud)
@@ -919,7 +900,7 @@ class LibvirtController(BaseController):
         return self.connection.list_images(location=self.cloud.images_location)
 
     def _reboot_machine(self, machine, machine_libcloud):
-        hypervisor = machine_libcloud.extra.get('tags', {}).get('type',None)
+        hypervisor = machine_libcloud.extra.get('tags', {}).get('type', None)
         if hypervisor == 'hypervisor':
             # issue an ssh command for the libvirt hypervisor
             try:
@@ -932,8 +913,12 @@ class LibvirtController(BaseController):
                 ssh_command(self.cloud.owner, self.cloud.id,
                             machine_libcloud.id, hostname, command)
                 return True
-            except:
-                return False
+            except MistError as exc:
+                log.error("Could not ssh machine %s", machine.name)
+                raise
+            except Exception as exc:
+                log.exception(exc)
+                raise InternalServerError(exc=exc)
         else:
             machine_libcloud.reboot()
 

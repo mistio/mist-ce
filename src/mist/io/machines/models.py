@@ -108,7 +108,8 @@ class Machine(me.Document):
 
         # tags as a list return for the ui
         tags = {tag.key: tag.value for tag in mist.core.tag.models.Tag.objects(
-            owner=self.cloud.owner, resource=self).only('key', 'value')}
+             owner=self.cloud.owner, resource=self
+        ).only('key', 'value')}
         # Optimize tags data structure for js...
         if isinstance(tags, dict):
             tags = [{'key': key, 'value': value}
@@ -123,8 +124,8 @@ class Machine(me.Document):
             'os_type': self.os_type,
             'rdp_port': self.rdp_port,
             'machine_id': self.machine_id,
-            'actions': {'%s:%s' % (action, self.actions[action]
-                                   )for action in self.actions},
+            'actions': {'%s:%s' % (action, self.actions[action])
+                        for action in self.actions},
             'extra': self.extra,
             'cost': self.cost.as_dict(),
             'image_id': self.image_id,

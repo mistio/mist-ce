@@ -1117,6 +1117,10 @@ def machine_actions(request):
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
     except me.DoesNotExist:
         raise NotFoundError("Machine %s doesn't exist" % machine_id)
+
+    if machine.cloud.owner != auth_context.owner:
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
+
     auth_context.check_perm("machine", action, machine.id)
 
     actions = ('start', 'stop', 'reboot', 'destroy', 'resize',
