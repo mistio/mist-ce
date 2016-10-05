@@ -1,4 +1,4 @@
-<!--link rel="import" href="../bower_components/polyana-dashboard/polyana-dashboard.html"-->
+<link rel="import" href="../bower_components/polyana-dashboard/polyana-dashboard.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-menu/paper-menu.html">
@@ -297,9 +297,9 @@
                                 <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
                             </a>
                         </div>
-                        <!-- <paper-material class="graphs">
-                            <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
-                        </paper-material> -->
+                        <paper-material class="graphs">
+                            <polyana-dashboard machines="[[model.monitoring.machines]]" dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+                        </paper-material>
                     </div>
                     <div class="left">
                         <div class="costs">
@@ -379,6 +379,7 @@ Polymer({
         'close-cloud-info': '_closeCloudChips'
     },
     ready: function() {
+
     },
     attached: function() {
         // initialise chips position matrix
@@ -396,7 +397,7 @@ Polymer({
           "id": 1,
           "orgId": 1,
           "name": "mistphite",
-          "type": "graphite",
+          "type": "mist.monitor",
           "access": "proxy",
           "uri": "/graphite/",
           "password": "",
@@ -423,7 +424,7 @@ Polymer({
               "targets": [
                 {
                 "refId": "A",
-                "target": "bucky.*.load.shortterm"
+                "target": 'asPercent(aliasByNode(sumSeriesWithWildcards(exclude(%(head)s.cpu.*.*,"idle"),3),3),alias(sumSeries(%(head)s.cpu.*.*),"total"))'
                 },
               ],
               "timeFrom": null,
@@ -456,13 +457,11 @@ Polymer({
           "timezone": "browser"
         };
 
-        var that = this;
-        setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-            if (that.querySelector('dashboard-panel'))
-                that.querySelector('dashboard-panel').resize();
-
-        }, 5000, this);
-
+        // var that = this;
+        // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
+        //     if (that.querySelector('dashboard-panel'))
+        //         that.querySelector('dashboard-panel').resize();
+        // }, 5000, this);
         /*this.async(function() {
             this.importHref(this.resolveUrl('/elements/logs/log-list.html'),
                             null,

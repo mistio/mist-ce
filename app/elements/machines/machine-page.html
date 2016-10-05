@@ -21,7 +21,7 @@
                 display: block;
             }
             .columns {
-                @apply(--layout-horizontal);  
+                @apply(--layout-horizontal);
                 flex: 1 100%;
                 margin-bottom: 16px;
             }
@@ -187,13 +187,17 @@
             }
             item-actions {
                 display: flex;
-                font-size: 1em;                
+                font-size: 1em;
             }
             item-actions ::content .actions {
                 height: auto;
                 display: flex;
                 vertical-align: auto;
                 padding: 0;
+            }
+            polyana-dashboard {
+              height: 600px;
+              display: block;
             }
         </style>
 
@@ -222,7 +226,7 @@
                     can_tag:true
                     can_undefine:false -->
 
-                    <!-- 
+                    <!--
                         rename
                         run script on machine
                         monitor
@@ -230,7 +234,7 @@
 
                     <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" actions="[[actions]]" org="[[model.org]]" model="[[model]]"></item-actions>
 
-                    <!-- 
+                    <!--
                     <paper-menu-button id="moreMachineActions" horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
@@ -273,9 +277,10 @@
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
                 <div>
                     <paper-material>graph data</paper-material>
-                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
+                     <!-- <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard> -->
                 </div>
             </paper-material>
+            <polyana-dashboard machines="[[machineInArray]]" dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
             <paper-material class="info-card">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
                 <div class="card-content">
@@ -478,6 +483,10 @@ MACHINEACTIONS = {
             actions: {
                 type: Array,
                 computed: '_computeActions(machine)'
+            },
+            machineInArray: {
+                type: Array,
+                computed: '_computeMachineInArray(machine)'
             }
         },
         observers: [
@@ -499,7 +508,7 @@ MACHINEACTIONS = {
               "id": 1,
               "orgId": 1,
               "name": "mistphite",
-              "type": "graphite",
+              "type": "mist.monitor",
               "access": "proxy",
               "uri": "/graphite/",
               "password": "",
@@ -520,6 +529,11 @@ MACHINEACTIONS = {
 
             }, 5000);
 
+        },
+        _computeMachineInArray: function(machines){
+          var arr = [];
+            arr.push(this.machine);
+          return arr;
         },
         _computeActions: function(item){
             var ret = [];
@@ -563,6 +577,7 @@ MACHINEACTIONS = {
               "id": 1,
               "refresh": "10s",
               "rows": [{
+                "height": "500px",
                 "panels": [{
                   "aliasColors": {},
                   "datasource": "mistphite",
@@ -572,7 +587,7 @@ MACHINEACTIONS = {
                   "targets": [
                     {
                     "refId": "A",
-                    "target": "bucky."+params.uuid+".load.shortterm"
+                    "target": 'asPercent(aliasByNode(sumSeriesWithWildcards(exclude(%(head)s.cpu.*.*,"idle"),3),3),alias(sumSeries(%(head)s.cpu.*.*),"total"))'
                     },
                   ],
                   "timeFrom": null,
@@ -694,7 +709,7 @@ MACHINEACTIONS = {
         _editMachine: function(e) {
             var el = this.querySelector('machine-edit');
             el._openEditMachineModal();
-        },    
+        },
         _computeReplaceTargets: function(machine) {
             var ret = {'bucky.': ''};
             var m = this.machine;
@@ -739,7 +754,7 @@ MACHINEACTIONS = {
             // console.log('disassociateKey',keyId, keyName);
 
             this.set('disassociateKeyId', keyId);
-            
+
             // console.log(this.disassociateKeyId);
 
             this._showDialog({
