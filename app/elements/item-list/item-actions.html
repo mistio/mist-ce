@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../helpers/xterm-dialog.html">
@@ -99,6 +100,7 @@
             }
         </style>
         <content>
+          <iron-media-query query="(max-width: 1200px)" query-matches="{{lessactions}}"></iron-media-query>
           <div class="actions">
             <template is="dom-if" if="[[topActions.length]]">
               <template is="dom-repeat" items="{{topActions}}">
@@ -357,7 +359,8 @@ Polymer({
             type: String
         },
         selectedItem: Object,
-        multi: Boolean
+        multi: Boolean,
+        lessactions: Boolean
     },
 
     observers: [
@@ -724,11 +727,17 @@ Polymer({
     },
 
     _topActions: function (actions) {
-        return this.get('actions').slice(0, 3);
+        if (this.lessactions)
+            return this.get('actions').slice(0, 1);
+        else
+            return this.get('actions').slice(0, 3);
     },
 
     _moreActions: function (actions) {
-        return this.get('actions').slice(3);
+        if (this.lessactions)
+            return this.get('actions').slice(1);
+        else
+            return this.get('actions').slice(3);
     },
 
     computeModel: function(){
