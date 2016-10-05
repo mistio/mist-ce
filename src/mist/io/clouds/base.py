@@ -997,6 +997,7 @@ class BaseController(object):
 
         while machine.key_associations:
             machine.key_associations.pop()
+        machine.state = 'terminated'
         machine.save()
 
     def _destroy_machine(self, machine, machine_libcloud):
