@@ -418,7 +418,6 @@ class BaseController(object):
             size = (node.size or node.extra.get('flavorId')
                     or node.extra.get('instancetype'))
 
-            machine.machine_id = node.id
             machine.name = node.name
             machine.image_id = image_id
             machine.size = size
@@ -440,8 +439,8 @@ class BaseController(object):
 
             # Get machine tags from db
             tags = {tag.key: tag.value for tag in Tag.objects(
-                    owner=self.cloud.owner, resource=machine,
-                    ).only('key', 'value')}
+                owner=self.cloud.owner, resource=machine,
+            ).only('key', 'value')}
 
             # Get machine creation date.
             try:
@@ -490,11 +489,11 @@ class BaseController(object):
                                                                      node))
                 if cph or cpm:
                     if not cph:
-                        cph = cpm / month_days / 24
+                        cph = float(cpm) / month_days / 24
                     elif not cpm:
                         cpm = cph * 24 * month_days
-                    machine.cost.hourly = round(cph, 2)
-                    machine.cost.monthly = round(cpm, 2)
+                    machine.cost.hourly = cph
+                    machine.cost.monthly = cpm
 
             except Exception as exc:
                 log.exception("Error while calculating cost "
@@ -810,6 +809,12 @@ class BaseController(object):
                                  driver=self.connection)]
 
     def _get_machine_libcloud(self, machine, no_fail=False):
+        """Return an instance of a libcloud node
+
+        This is a private method, used mainly by machine action methods.
+        """
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
         for node in self.connection.list_nodes():
             if node.id == machine.machine_id:
                 return node
@@ -818,10 +823,26 @@ class BaseController(object):
                         state=0, public_ips=[], private_ips=[],
                         driver=self.connection)
         raise MachineNotFoundError(
-            "Machine with id '%s'." % machine.machine_id
+            "Machine with machine_id '%s'." % machine.machine_id
         )
 
     def start_machine(self, machine):
+        """Start machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to start a machine would be to run
+
+            machine.ctl.start()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are started, it should override `_start_machine` method instead.
+
+        """
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.start:
@@ -833,14 +854,40 @@ class BaseController(object):
             self._start_machine(machine, machine_libcloud)
         except MistError as exc:
             log.error("Could not start machine %s", machine)
+            raise
         except Exception as exc:
             log.exception(exc)
             raise InternalServerError(exc=exc)
 
     def _start_machine(self, machine, machine_libcloud):
+        """Private method to start a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `start_machine`.
+        """
         self.connection.ex_start_node(machine_libcloud)
 
     def stop_machine(self, machine):
+        """Stop machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to stop a machine would be to run
+
+            machine.ctl.stop()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are stoped, it should override `_stop_machine` method instead.
+
+        """
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.stop:
@@ -852,15 +899,41 @@ class BaseController(object):
             self._stop_machine(machine, machine_libcloud)
         except MistError as exc:
             log.error("Could not stop machine %s", machine)
+            raise
         except Exception as exc:
             log.exception(exc)
             raise InternalServerError(exc=exc)
 
     def _stop_machine(self, machine, machine_libcloud):
+        """Private method to stop a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `stop_machine`.
+        """
         self.connection.ex_stop_node(machine_libcloud)
         return True
 
     def reboot_machine(self, machine):
+        """Reboot machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to reboot a machine would be to run
+
+            machine.ctl.reboot()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are rebooted, it should override `_reboot_machine` method instead.
+
+        """
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.reboot:
@@ -872,14 +945,40 @@ class BaseController(object):
             self._reboot_machine(machine, machine_libcloud)
         except MistError as exc:
             log.error("Could not reboot machine %s", machine)
+            raise
         except Exception as exc:
             log.exception(exc)
             raise InternalServerError(exc=exc)
 
     def _reboot_machine(self, machine, machine_libcloud):
+        """Private method to reboot a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `reboot_machine`.
+        """
         machine_libcloud.reboot()
 
     def destroy_machine(self, machine):
+        """Destroy machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to destroy a machine would be to run
+
+            machine.ctl.destroy()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are destroyed, it should override `_destroy_machine` method instead.
+
+        """
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.destroy:
@@ -891,6 +990,7 @@ class BaseController(object):
             self._destroy_machine(machine, machine_libcloud)
         except MistError as exc:
             log.error("Could not destroy machine %s", machine)
+            raise
         except Exception as exc:
             log.exception(exc)
             raise InternalServerError(exc=exc)
@@ -899,11 +999,36 @@ class BaseController(object):
             machine.key_associations.pop()
         machine.save()
 
-    def _destroy_machine(self, machine,  machine_libcloud):
+    def _destroy_machine(self, machine, machine_libcloud):
+        """Private method to destroy a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `destroy_machine`.
+        """
         machine_libcloud.destroy()
 
     # It isn't implemented in the ui
     def resize_machine(self, machine, plan_id):
+        """Resize machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to resize a machine would be to run
+
+            machine.ctl.resize(plan_id)
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are resizeed, it should override `_resize_machine` method instead.
+
+        """
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.resize:
@@ -915,14 +1040,40 @@ class BaseController(object):
             self._resize_machine(machine, machine_libcloud, plan_id)
         except MistError as exc:
             log.error("Could not resize machine %s", machine)
+            raise
         except Exception as exc:
             log.exception(exc)
             raise InternalServerError(exc=exc)
 
     def _resize_machine(self, machine, machine_libcloud, plan_id):
+        """Private method to resize a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `resize_machine`.
+        """
         self.connection.ex_resize_node(machine_libcloud, plan_id)
 
     def rename_machine(self, machine, name):
+        """Rename machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to rename a machine would be to run
+
+            machine.ctl.rename(name)
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are renameed, it should override `_rename_machine` method instead.
+
+        """
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.rename:
@@ -934,14 +1085,40 @@ class BaseController(object):
             self._rename_machine(machine, machine_libcloud, name)
         except MistError as exc:
             log.error("Could not rename machine %s", machine)
+            raise
         except Exception as exc:
             log.exception(exc)
             raise InternalServerError(exc=exc)
 
     def _rename_machine(self, machine, machine_libcloud, name):
+        """Private method to rename a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `rename_machine`.
+        """
         self.connection.ex_rename_node(machine_libcloud, name)
 
     def resume_machine(self, machine):
+        """Resume machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to resume a machine would be to run
+
+            machine.ctl.resume()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are resumed, it should override `_resume_machine` method instead.
+
+        """
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.resume:
@@ -953,15 +1130,42 @@ class BaseController(object):
             self._resume_machine(machine, machine_libcloud)
         except MistError as exc:
             log.error("Could not resume machine %s", machine)
+            raise
         except Exception as exc:
             log.exception(exc)
             raise InternalServerError(exc=exc)
 
     def _resume_machine(self, machine, machine_libcloud):
-        """Only LibvirtController subclass implement this method"""
+        """Private method to resume a given machine
+
+        Only LibvirtController subclass implements this method.
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `resume_machine`.
+        """
         raise NotImplementedError()
 
     def suspend_machine(self, machine):
+        """Suspend machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to suspend a machine would be to run
+
+            machine.ctl.suspend()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are suspended, it should override `_suspend_machine` method instead.
+
+        """
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.suspend:
@@ -973,15 +1177,42 @@ class BaseController(object):
             self._suspend_machine(machine, machine_libcloud)
         except MistError as exc:
             log.error("Could not suspend machine %s", machine)
+            raise
         except Exception as exc:
             log.exception(exc)
             raise InternalServerError(exc=exc)
 
     def _suspend_machine(self, machine, machine_libcloud):
-        """Only LibvirtController subclass implement this method"""
+        """Private method to suspend a given machine
+
+        Only LibvirtController subclass implements this method.
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `suspend_machine`.
+        """
         raise NotImplementedError()
 
     def undefine_machine(self, machine):
+        """Undefine machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to undefine a machine would be to run
+
+            machine.ctl.undefine()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are undefineed, it should override `_undefine_machine` method instead.
+
+        """
         # assert isinstance(machine.cloud, Machine)
         assert self.cloud == machine.cloud
         if not machine.actions.undefine:
@@ -993,12 +1224,23 @@ class BaseController(object):
             self._undefine_machine(machine, machine_libcloud)
         except MistError as exc:
             log.error("Could not undefine machine %s", machine)
+            raise
         except Exception as exc:
             log.exception(exc)
             raise InternalServerError(exc=exc)
 
     def _undefine_machine(self, machine, machine_libcloud):
-        """Only LibvirtController subclass implement this method"""
+        """Private method to undefine a given machine
+
+        Only LibvirtController subclass implements this method.
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `undefine_machine`.
+        """
         raise NotImplementedError()
 
     def __del__(self):
