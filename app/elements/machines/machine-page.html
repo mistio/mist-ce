@@ -622,14 +622,7 @@ MACHINEACTIONS = {
             return itemUidInArray;
         },
         _computeAssociatedKeys: function(machine, keys){
-            var machineId = this.machine.id;
-            var associatedKeys = [];
-                associatedKeys = this.model.keysArray.filter(function(key){
-                return key.machines.filter(function(machine){
-                    return machine[1] == machineId;
-                }).length;
-            }, this);
-            return associatedKeys || [];
+            return machine.keys || [];
         },
         computeMachineIp: function(machineips){
             if (this.machine.public_ips){
@@ -773,7 +766,7 @@ MACHINEACTIONS = {
             }
         },
         _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
-            var hide =  !(associatedKeys.base.length > 0 || isPendingKeyRequest);
+            var hide =  !(this.machine.keys.length > 0 || isPendingKeyRequest);
             this.set('hideAssociatedKeys', hide);
         },
         _feedbackOnScript: function(e){

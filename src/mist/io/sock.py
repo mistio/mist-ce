@@ -23,7 +23,8 @@ try:
     from mist.io import config as ioconfig
     from mist.core import config
     from mist.core.methods import get_stats
-    from mist.core.cloud.models import Cloud, Machine
+    from mist.io.clouds.models import Cloud
+    from mist.core.cloud.models import Machine
     from mist.core.keypair.models import Keypair
     multi_user = True
 except ImportError:

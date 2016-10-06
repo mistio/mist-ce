@@ -219,12 +219,14 @@ Polymer({
 
         // some providers dont provide this info
         if (field == 'created') {
-            if (!ret){
+            var cr;
+            if (! item['created'] && item.extra && item.extra['created'])
+                cr = item.extra['created']
+            else if (item['created'])
+                cr = item['created'];
+            else
                 return '';
-            }
-            else {
-                return moment(item['created']).fromNow();
-            }
+            return moment(cr).fromNow();
         }
 
         // field could be in the 'extra' section, but should not be an object
