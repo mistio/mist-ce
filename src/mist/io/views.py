@@ -22,7 +22,8 @@ from pyramid.renderers import render_to_response
 from mist.core.helpers import view_config
 from mist.core.auth.methods import user_from_request
 from mist.core.keypair.models import Keypair
-from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+from mist.io.clouds.models import Cloud
+from mist.core.cloud.models import Machine, KeyAssociation
 from mist.core.exceptions import PolicyUnauthorizedError
 from mist.core import config
 import mist.core.methods
@@ -1073,7 +1074,7 @@ def create_machine(request):
 def machine_actions(request):
     """
     Call an action on machine
-    Calls a machine action on clouds that support it
+    Calls a machine action on cloud that support it
     READ permission required on cloud.
     ACTION permission required on machine(ACTION can be START,
     STOP, DESTROY, REBOOT).
@@ -1097,56 +1098,56 @@ def machine_actions(request):
       required: true
       type: string
     name:
+      description: The new name of the renamed machine
       type: string
     size:
       description: The size id of the plan to resize
       type: string
     """
-    # TODO: We shouldn't return list_machines, just 200. Save the API!
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
     action = params.get('action', '')
     plan_id = params.get('plan_id', '')
-    # plan_id is the id of the plan to resize
     name = params.get('name', '')
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
-    if action in ('start', 'stop', 'reboot', 'destroy', 'resize'):
-        try:
-            machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-            machine_uuid = machine.id
-        except me.DoesNotExist:
-            machine_uuid = ""
-        auth_context.check_perm("machine", action, machine_uuid)
 
-    if action in ('start', 'stop', 'reboot', 'destroy', 'resize', 'rename',
-                  'undefine', 'suspend', 'resume'):
-        if action == 'start':
-            methods.start_machine(auth_context.owner, cloud_id, machine_id)
-        elif action == 'stop':
-            methods.stop_machine(auth_context.owner, cloud_id, machine_id)
-        elif action == 'reboot':
-            methods.reboot_machine(auth_context.owner, cloud_id, machine_id)
-        elif action == 'destroy':
-            methods.destroy_machine(auth_context.owner, cloud_id, machine_id)
-        elif action == 'resize':
-            methods.resize_machine(auth_context.owner, cloud_id, machine_id, plan_id)
-        elif action == 'rename':
-            methods.rename_machine(auth_context.owner, cloud_id, machine_id, name)
-        elif action == 'undefine':
-            methods.undefine_machine(auth_context.owner, cloud_id, machine_id)
-        elif action == 'resume':
-            methods.resume_machine(auth_context.owner, cloud_id, machine_id)
-        elif action == 'suspend':
-            methods.suspend_machine(auth_context.owner, cloud_id, machine_id)
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+    except me.DoesNotExist:
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
 
-        # return OK
-        return mist.core.methods.filter_list_machines(auth_context, cloud_id)
-    raise BadRequestError()
+    if machine.cloud.owner != auth_context.owner:
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
+
+    auth_context.check_perm("machine", action, machine.id)
+
+    actions = ('start', 'stop', 'reboot', 'destroy', 'resize',
+               'rename', 'undefine', 'suspend', 'resume')
+
+    if action not in actions:
+        raise BadRequestError("Action '%s' should be one of %s" % (action,
+                                                                   actions))
+
+    if action == 'destroy':
+        methods.destroy_machine(auth_context.owner, cloud_id, machine_id)
+    elif action in ('start', 'stop', 'reboot',
+                    'undefine', 'suspend', 'resume'):
+        getattr(machine.ctl, action)()
+    elif action == 'rename':
+        if not name:
+            raise BadRequestError("You must give a name!")
+        getattr(machine.ctl, action)(name)
+    elif action == 'resize':
+        getattr(machine.ctl, action)(plan_id)
+
+    # TODO: We shouldn't return list_machines, just OK. Save the API!
+    return mist.core.methods.filter_list_machines(auth_context, cloud_id)
 
 
-@view_config(route_name='api_v1_machine_rdp', request_method='GET', renderer='json')
+@view_config(route_name='api_v1_machine_rdp', request_method='GET',
+             renderer='json')
 def machine_rdp(request):
     """
     Rdp file for windows machines
