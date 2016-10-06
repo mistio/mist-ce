@@ -396,6 +396,7 @@
         <template-edit template="[[template]]"></template-edit>
         <dialog-element></dialog-element>
         <tags-list model="[[model]]"></tags-list>
+        <iron-ajax id="formAjax" url="" contentType="application/json" handle-as="json" method="DELETE" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
     </template>
     <script>
         (function() {
@@ -486,9 +487,10 @@
                     this.set('template.description', template.description);
                 },
                 _deleteTemplate: function(e) {
+                    var message = "Deleting templates cannot be undone. You are about to delete template: " + this.template.name,
                     this._showDialog({
                         title: 'Delete Template?',
-                        body: "Deleting templates cannot be undone. You are about to delete template: " + this.template.name,
+                        body: message,
                         danger: true,
                         reason: "delete_template"
                     });
@@ -498,7 +500,6 @@
                         response = e.detail.response;
 
                     if (response.confirmed && reason == "delete_template") {
-                        console.log('i ll delete the template');
                         document.querySelector('app-location').path = '/templates';
                     }
                 },
