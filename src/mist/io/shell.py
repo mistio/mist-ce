@@ -27,7 +27,8 @@ from mist.io.helpers import sanitize_host
 
 try:
     from mist.core.user.models import User
-    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+    from mist.io.clouds.models import Cloud
+    from mist.core.cloud.models import Machine, KeyAssociation
     from mist.core.keypair.models import Keypair
     from mist.core import config
 except ImportError:
