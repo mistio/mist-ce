@@ -368,9 +368,9 @@
             this.set('onboarding.isLoadingClouds', false);
 
             // the case when clouds have loaded but handlers list_machines/list_images/list_networks
-            // have not been triggered (ex. all clouds are disabled, list_machines never gets data)
-            var cloudsResources = this.model.machines && this.model.networks && this.model.images;
-            if (data.length && !cloudsResources)
+            // have never been triggered (ex. all clouds are disabled, list_machines never gets data)
+            var cloudsResources = !(!this.model.machines && !this.model.networks && !this.model.images);
+            if (data.length && !cloudsResources && ret)
                 cloudsResources = data.map(function(d){
                     return d.machines || d.images || d.networks ? true : false ;
                 }).reduce(function(b1, b2){
