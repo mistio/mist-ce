@@ -36,7 +36,9 @@ class MistInventory(object):
             ip_addr, port = dnat(self.user, ip_addr, port)
             if key_id not in self.keys:
                 keypair = Keypair.objects.get(owner=self.user, name=key_id)
-                self.keys[key_id] = keypair.private
+                self.keys[key_id] = {}
+                self.keys[key_id]['private'] = keypair.private
+                self.keys[key_id]['certificate'] = keypair.certificate
             if name in self.hosts:
                 num = 2
                 while ('%s-%d' % (name, num)) in self.hosts:
@@ -62,7 +64,12 @@ class MistInventory(object):
         ans_cfg = '[defaults]\nhostfile=./inventory\nhost_key_checking=False\n'
         files = {'ansible.cfg': ans_cfg, 'inventory': ans_inv}
         for key_id, private_key in self.keys.items():
-             files.update({'id_rsa/%s' % key_id: private_key})
+             files.update({'id_rsa/%s' % key_id: private_key['private']})
+             # if signed ssh key, provide the key appending a -cert.pub
+             # on the name since this is how ssh will include it as
+             # an identify file
+             if private_key['certificate']:
+                 files.update({'id_rsa/%s-cert.pub' % key_id: private_key['certificate']})
         return files
 
     def _list_machines(self, cloud_id):
