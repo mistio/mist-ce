@@ -487,10 +487,22 @@
                     this.set('template.description', template.description);
                 },
                 _deleteTemplate: function(e) {
-                    var message = "Deleting templates cannot be undone. You are about to delete template: " + this.template.name,
+                    var hasStacksMessage = '',
+                        alert = '',
+                        subscript = '';
+                    if (this._computeHasStacks()){
+                        alert = this.stacks.length+' associated stack';
+                        if (this.stacks.length > 1)
+                            alert += 's'
+                        alert += '.'
+                        subscript = 'Stacks are not deleted, when their template is deleted.'
+                    }
+
                     this._showDialog({
-                        title: 'Delete Template?',
-                        body: message,
+                        title: 'Delete Template '+this.template.name+' ?',
+                        body: "Deleting templates cannot be undone. You are about to delete template: " + this.template.name,
+                        alert: alert,
+                        subscript: subscript,
                         danger: true,
                         reason: "delete_template"
                     });
@@ -500,6 +512,8 @@
                         response = e.detail.response;
 
                     if (response.confirmed && reason == "delete_template") {
+                        
+
                         document.querySelector('app-location').path = '/templates';
                     }
                 },
