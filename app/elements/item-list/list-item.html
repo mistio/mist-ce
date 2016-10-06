@@ -252,8 +252,10 @@ Polymer({
         // TODO: harmonize these on the backend
 
         if (field == 'size') {
-            if (item.extra && item.extra.size)
-                return item.extra.size.vcpus + 'vcpu, ' + item.extra.size.memory + 'M ram';;
+            if (item.extra && item.extra.size && item.extra.size.vcpus)
+                return item.extra.size.vcpus + 'vcpu, ' + item.extra.size.memory + 'M ram';
+            if (item.extra && item.extra.size && typeof(item.extra.size) == 'string')
+                return item.extra.size;
             if (item.extra && item.extra.instance_type)
                 return item.extra.instance_type;
             if (item.extra && item.extra.instance_size)
