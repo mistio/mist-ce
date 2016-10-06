@@ -8,6 +8,7 @@ to db etc. Cloud specific controllers are in `mist.io.clouds.controllers`.
 
 import ssl
 import json
+import copy
 import logging
 import datetime
 import calendar
@@ -16,14 +17,17 @@ import mongoengine as me
 
 from libcloud.common.types import InvalidCredsError
 from libcloud.compute.types import NodeState
-from libcloud.compute.base import NodeLocation
+from libcloud.compute.base import NodeLocation, Node
 
 from mist.io import config
 
 from mist.io.exceptions import MistError
+from mist.io.exceptions import ConflictError
+from mist.io.exceptions import ForbiddenError
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudExistsError
 from mist.io.exceptions import InternalServerError
+from mist.io.exceptions import MachineNotFoundError
 from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
@@ -349,8 +353,8 @@ class BaseController(object):
     def list_machines(self):
         """Return list of machines for cloud
 
-        This returns the results obtained from libcloud, after some processing,
-        formatting and injection of extra information in a sane format.
+        A list of nodes is fetched from libcloud, the data is processed, stored
+        on machine models, and a list of machine models is returned.
 
         Subclasses SHOULD NOT override or extend this method.
 
@@ -397,14 +401,15 @@ class BaseController(object):
 
             # Fetch machine mongoengine model from db, or initialize one.
             try:
-                machine_model = Machine.objects.get(cloud=self.cloud,
-                                                    machine_id=node.id)
+                machine = Machine.objects.get(cloud=self.cloud,
+                                              machine_id=node.id)
             except Machine.DoesNotExist:
-                machine_model = Machine(cloud=self.cloud, machine_id=node.id).save()
+                machine = Machine(cloud=self.cloud,
+                                  machine_id=node.id).save()
 
             # Update machine_model's last_seen fields.
-            machine_model.last_seen = now
-            machine_model.missing_since = None
+            machine.last_seen = now
+            machine.missing_since = None
 
             # Get misc libcloud metadata.
             image_id = str(node.image or node.extra.get('imageId') or
@@ -413,58 +418,57 @@ class BaseController(object):
             size = (node.size or node.extra.get('flavorId')
                     or node.extra.get('instancetype'))
 
-            # Get machine tags from db.
-            tags = {tag.key: tag.value for tag in Tag.objects(
-                owner=self.cloud.owner, resource=machine_model,
-            ).only('key', 'value')}
+            machine.name = node.name
+            machine.image_id = image_id
+            machine.size = size
+            machine.state = config.STATES[node.state]
+            machine.private_ips = node.private_ips
+            machine.public_ips = node.public_ips
 
-            # Construct machine dict.
-            machine = {
-                'id': node.id,
-                'uuid': machine_model.id,
-                'name': node.name,
-                'image_id': image_id,
-                'size': size,
-                'state': config.STATES[node.state],
-                'private_ips': node.private_ips,
-                'public_ips': node.public_ips,
-                'tags': tags,
-                'extra': node.extra,
-                'last_seen': str(machine_model.last_seen or ''),
-                'missing_since': str(machine_model.missing_since or ''),
-                'created': str(machine_model.created or ''),
-            }
+            extra = copy.copy(node.extra)
+
+            # Make sure we don't meet any surprises when we try to json encode
+            # later on in the HTTP response.
+            for key, val in extra.items():
+                try:
+                    json.dumps(val)
+                except TypeError:
+                    extra[key] = str(val)
+
+            machine.extra = extra
+
+            # Get machine tags from db
+            tags = {tag.key: tag.value for tag in Tag.objects(
+                owner=self.cloud.owner, resource=machine,
+            ).only('key', 'value')}
 
             # Get machine creation date.
             try:
-                created = self._list_machines__machine_creation_date(node)
+                created = self._list_machines__machine_creation_date(machine,
+                                                                     node)
                 if created:
-                    machine_model.created = get_datetime(created)
+                    machine.created = get_datetime(created)
             except Exception as exc:
                 log.exception("Error finding creation date for %s in %s.",
-                              self.cloud, machine_model)
+                              self.cloud, machine)
             # TODO: Consider if we should fall back to using current date.
             # if not machine_model.created:
             #     machine_model.created = datetime.datetime.utcnow()
 
             # Update with available machine actions.
             try:
-                self._list_machines__machine_actions(
-                    machine_model.id, node.id, node, machine_model, machine
-                )
+                self._list_machines__machine_actions(machine, node)
             except Exception as exc:
                 log.exception("Error while finding machine actions "
                               "for machine %s:%s for %s",
-                              machine_model.id, node.name, self.cloud)
+                              machine.id, node.name, self.cloud)
 
             # Apply any cloud/provider specific post processing.
             try:
-                self._list_machines__postparse_machine(
-                    machine_model.id, node.id, node, machine_model, machine
-                )
+                self._list_machines__postparse_machine(machine, node)
             except Exception as exc:
                 log.exception("Error while post parsing machine %s:%s for %s",
-                              machine_model.id, node.name, self.cloud)
+                              machine.id, node.name, self.cloud)
 
             # Apply any cloud/provider cost reporting.
             try:
@@ -477,145 +481,107 @@ class BaseController(object):
 
                 month_days = calendar.monthrange(now.year, now.month)[1]
 
-                cph = parse_num(machine['tags'].get('cost_per_hour'))
-                cpm = parse_num(machine['tags'].get('cost_per_month'))
+                cph = parse_num(tags.get('cost_per_hour'))
+                cpm = parse_num(tags.get('cost_per_month'))
                 if not (cph or cpm) or cph > 100 or cpm > 100 * 24 * 31:
                     cph, cpm = map(parse_num,
-                                   self._list_machines__cost_machine(node))
+                                   self._list_machines__cost_machine(machine,
+                                                                     node))
                 if cph or cpm:
                     if not cph:
-                        cph = cpm / month_days / 24
+                        cph = float(cpm) / month_days / 24
                     elif not cpm:
                         cpm = cph * 24 * month_days
-                    machine['extra']['cost_per_hour'] = '%.2f' % cph
-                    machine['extra']['cost_per_month'] = '%.2f' % cpm
+                    machine.cost.hourly = cph
+                    machine.cost.monthly = cpm
 
             except Exception as exc:
                 log.exception("Error while calculating cost "
                               "for machine %s:%s for %s",
-                              machine_model.id, node.name, self.cloud)
+                              machine.id, node.name, self.cloud)
             if node.state.lower() == 'terminated':
-                machine['extra'].pop('cost_per_hour', None)
-                machine['extra'].pop('cost_per_month', None)
+                machine.cost.hourly = 0
+                machine.cost.monthly = 0
 
-            # Make sure we don't meet any surprises when we try to json encode
-            # later on in the HTTP response.
-            for key, val in machine['extra'].items():
-                try:
-                    json.dumps(val)
-                except TypeError:
-                    machine['extra'][key] = str(val)
-
-            # Optimize tags data structure for js...
-            tags = machine['tags']
-            if isinstance(tags, dict):
-                machine['tags'] = [{'key': key, 'value': value}
-                                   for key, value in tags.iteritems()
-                                   if key != 'Name']
             # Save all changes to machine model on the database.
-            machine_model.save()
+            try:
+                machine.save()
+            except me.ValidationError as exc:
+                log.error("Error adding %s: %s", machine.name, exc.to_dict())
+                raise BadRequestError({"msg": exc.message,
+                                       "errors": exc.to_dict()})
+            except me.NotUniqueError as exc:
+                log.error("Machine %s not unique error: %s", machine.name, exc)
+                raise ConflictError("Machine with this name already exists")
 
             machines.append(machine)
 
         # Set last_seen on machine models we didn't see for the first time now.
         Machine.objects(cloud=self.cloud,
-                        id__nin=[m['uuid'] for m in machines],
+                        id__nin=[m.id for m in machines],
                         missing_since=None).update(missing_since=now)
 
         return machines
 
-    def _list_machines__machine_creation_date(self, machine_api):
+    def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return
 
-    def _list_machines__machine_actions(self, mist_machine_id, api_machine_id,
-                                        machine_api, machine_model,
-                                        machine_dict):
+    def _list_machines__machine_actions(self, machine, machine_libcloud):
         """Add metadata on the machine dict on the allowed actions
 
         Any subclass that wishes to specially handle its allowed actions, can
         implement this internal method.
 
-        mist_machine_id: The id assigned to the machine by mist. This is the
-            machine's primary key in the database and the mist API.
-        api_machine_id: The id assigned to the machine by its cloud. This is
-            not guaranteed to be globally unique.
-        machine_api: An instance of a libcloud compute node, as returned by
-            libcloud's list_nodes.
-        machine_dict: A dict containing all machine metadata gathered from
-            libcloud and the database. This is what gets returned by mist's
-            API.
-        machine_model: A machine mongoengine model. The model may not have yet
+        machine: A machine mongoengine model. The model may not have yet
             been saved in the database.
-
-        This method is expected to edit `machine_dict` in place and not return
+        machine_libcloud: An instance of a libcloud compute node, as
+            returned by libcloud's list_nodes.
+        This method is expected to edit `machine` in place and not return
         anything.
 
         Subclasses MAY extend this method.
 
         """
         # Defaults for running state and common clouds.
-        can_start = False
-        can_stop = True
-        can_reboot = True
-        can_destroy = True
-        can_rename = False  # Most providers do not support renaming.
-        can_tag = True  # Always True now that we store tags in db.
+        machine.actions.start = False
+        machine.actions.stop = True
+        machine.actions.reboot = True
+        machine.actions.destroy = True
+        machine.actions.rename = False  # Most providers do not support this
+        machine.actions.tag = True   # Always True now that we store tags in db
 
         # Actions resume, suspend and undefine are states related to KVM.
-        can_resume = False
-        can_suspend = False
-        can_undefine = False
+        machine.actions.resume = False
+        machine.actions.suspend = False
+        machine.actions.undefine = False
 
         # Default actions for other states.
-        if machine_api.state in (NodeState.REBOOTING, NodeState.PENDING):
-            can_start = False
-            can_stop = False
-            can_reboot = False
-        elif machine_api.state in (NodeState.STOPPED, NodeState.UNKNOWN):
+        if machine_libcloud.state in (NodeState.REBOOTING, NodeState.PENDING):
+            machine.actions.start = False
+            machine.actions.stop = False
+            machine.actions.reboot = False
+        elif machine_libcloud.state in (NodeState.STOPPED, NodeState.UNKNOWN):
             # We assume unknown state means stopped.
-            can_start = True
-            can_stop = False
-            can_reboot = False
-        elif machine_api.state in (NodeState.TERMINATED, ):
-            can_start = False
-            can_stop = False
-            can_reboot = False
-            can_destroy = False
-            can_rename = False
+            machine.actions.start = True
+            machine.actions.stop = False
+            machine.actions.reboot = False
+        elif machine_libcloud.state in (NodeState.TERMINATED, ):
+            machine.actions.start = False
+            machine.actions.stop = False
+            machine.actions.reboot = False
+            machine.actions.destroy = False
+            machine.actions.rename = False
 
-        machine_dict.update({
-            'can_start': can_start,
-            'can_stop': can_stop,
-            'can_reboot': can_reboot,
-            'can_destroy': can_destroy,
-            'can_rename': can_rename,
-            'can_tag': can_tag,
-            'can_resume': can_resume,
-            'can_suspend': can_suspend,
-            'can_undefine': can_undefine,
-        })
-
-    def _list_machines__postparse_machine(self, mist_machine_id,
-                                          api_machine_id, machine_api,
-                                          machine_model, machine_dict):
+    def _list_machines__postparse_machine(self, machine, machine_libcloud):
         """Post parse a machine before returning it in list_machines
 
         Any subclass that wishes to specially handle its cloud's tags and
         metadata, can implement this internal method.
 
-        mist_machine_id: The id assigned to the machine by mist. This is the
-            machine's primary key in the database and the mist API.
-        api_machine_id: The id assigned to the machine by its cloud. This is
-            not guaranteed to be globally unique.
-        machine_api: An instance of a libcloud compute node, as returned by
-            libcloud's list_nodes.
-        machine_dict: A dict containing all machine metadata gathered from
-            libcloud and the database. This is what gets returned by mist's
-            API.
-        machine_model: A machine mongoengine model. The model may not have yet
+        machine: A machine mongoengine model. The model may not have yet
             been saved in the database.
-
-        Note: machine_dict['tags'] is a list of {key: value} pairs.
+        machine_libcloud: An instance of a libcloud compute node,
+            as returned by libcloud's list_nodes.
 
         This method is expected to edit its arguments in place and not return
         anything.
@@ -625,17 +591,18 @@ class BaseController(object):
         """
         return
 
-    def _list_machines__cost_machine(self, machine_api):
+    def _list_machines__cost_machine(self, machine, machine_libcloud):
         """Perform cost calculations for a machine
 
         Any subclass that wishes to handle its cloud's pricing, can implement
         this internal method.
 
-        Params:
-        machine_api: An instance of a libcloud compute node, as returned by
+       machine: A machine mongoengine model. The model may not have yet
+            been saved in the database.
+       machine_libcloud: An instance of a libcloud compute node, as returned by
             libcloud's list_nodes.
 
-        This method is expected to return a tuple of two values:
+       This method is expected to return a tuple of two values:
             (cost_per_hour, cost_per_month)
 
         Subclasses MAY override this method.
@@ -840,6 +807,442 @@ class BaseController(object):
         except:
             return [NodeLocation('', name='default', country='',
                                  driver=self.connection)]
+
+    def _get_machine_libcloud(self, machine, no_fail=False):
+        """Return an instance of a libcloud node
+
+        This is a private method, used mainly by machine action methods.
+        """
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
+        for node in self.connection.list_nodes():
+            if node.id == machine.machine_id:
+                return node
+        if no_fail:
+            return Node(machine.machine_id, name=machine.machine_id,
+                        state=0, public_ips=[], private_ips=[],
+                        driver=self.connection)
+        raise MachineNotFoundError(
+            "Machine with machine_id '%s'." % machine.machine_id
+        )
+
+    def start_machine(self, machine):
+        """Start machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to start a machine would be to run
+
+            machine.ctl.start()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are started, it should override `_start_machine` method instead.
+
+        """
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
+        if not machine.actions.start:
+            raise ForbiddenError("Machine doesn't support start.")
+        log.debug("Starting machine %s", machine)
+
+        machine_libcloud = self._get_machine_libcloud(machine)
+        try:
+            self._start_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not start machine %s", machine)
+            raise
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
+
+    def _start_machine(self, machine, machine_libcloud):
+        """Private method to start a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `start_machine`.
+        """
+        self.connection.ex_start_node(machine_libcloud)
+
+    def stop_machine(self, machine):
+        """Stop machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to stop a machine would be to run
+
+            machine.ctl.stop()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are stoped, it should override `_stop_machine` method instead.
+
+        """
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
+        if not machine.actions.stop:
+            raise ForbiddenError("Machine doesn't support stop.")
+        log.debug("Stopping machine %s", machine)
+
+        machine_libcloud = self._get_machine_libcloud(machine)
+        try:
+            self._stop_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not stop machine %s", machine)
+            raise
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
+
+    def _stop_machine(self, machine, machine_libcloud):
+        """Private method to stop a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `stop_machine`.
+        """
+        self.connection.ex_stop_node(machine_libcloud)
+        return True
+
+    def reboot_machine(self, machine):
+        """Reboot machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to reboot a machine would be to run
+
+            machine.ctl.reboot()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are rebooted, it should override `_reboot_machine` method instead.
+
+        """
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
+        if not machine.actions.reboot:
+            raise ForbiddenError("Machine doesn't support reboot.")
+        log.debug("Rebooting machine %s", machine)
+
+        machine_libcloud = self._get_machine_libcloud(machine)
+        try:
+            self._reboot_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not reboot machine %s", machine)
+            raise
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
+
+    def _reboot_machine(self, machine, machine_libcloud):
+        """Private method to reboot a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `reboot_machine`.
+        """
+        machine_libcloud.reboot()
+
+    def destroy_machine(self, machine):
+        """Destroy machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to destroy a machine would be to run
+
+            machine.ctl.destroy()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are destroyed, it should override `_destroy_machine` method instead.
+
+        """
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
+        if not machine.actions.destroy:
+            raise ForbiddenError("Machine doesn't support destroy.")
+        log.debug("Destroying machine %s", machine)
+
+        machine_libcloud = self._get_machine_libcloud(machine)
+        try:
+            self._destroy_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not destroy machine %s", machine)
+            raise
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
+
+        while machine.key_associations:
+            machine.key_associations.pop()
+        machine.state = 'terminated'
+        machine.save()
+
+    def _destroy_machine(self, machine, machine_libcloud):
+        """Private method to destroy a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `destroy_machine`.
+        """
+        machine_libcloud.destroy()
+
+    # It isn't implemented in the ui
+    def resize_machine(self, machine, plan_id):
+        """Resize machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to resize a machine would be to run
+
+            machine.ctl.resize(plan_id)
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are resizeed, it should override `_resize_machine` method instead.
+
+        """
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
+        if not machine.actions.resize:
+            raise ForbiddenError("Machine doesn't support resize.")
+        log.debug("Resizing machine %s", machine)
+
+        machine_libcloud = self._get_machine_libcloud(machine)
+        try:
+            self._resize_machine(machine, machine_libcloud, plan_id)
+        except MistError as exc:
+            log.error("Could not resize machine %s", machine)
+            raise
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
+
+    def _resize_machine(self, machine, machine_libcloud, plan_id):
+        """Private method to resize a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `resize_machine`.
+        """
+        self.connection.ex_resize_node(machine_libcloud, plan_id)
+
+    def rename_machine(self, machine, name):
+        """Rename machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to rename a machine would be to run
+
+            machine.ctl.rename(name)
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are renameed, it should override `_rename_machine` method instead.
+
+        """
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
+        if not machine.actions.rename:
+            raise ForbiddenError("Machine doesn't support rename.")
+        log.debug("Renaming machine %s", machine)
+
+        machine_libcloud = self._get_machine_libcloud(machine)
+        try:
+            self._rename_machine(machine, machine_libcloud, name)
+        except MistError as exc:
+            log.error("Could not rename machine %s", machine)
+            raise
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
+
+    def _rename_machine(self, machine, machine_libcloud, name):
+        """Private method to rename a given machine
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `rename_machine`.
+        """
+        self.connection.ex_rename_node(machine_libcloud, name)
+
+    def resume_machine(self, machine):
+        """Resume machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to resume a machine would be to run
+
+            machine.ctl.resume()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are resumed, it should override `_resume_machine` method instead.
+
+        """
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
+        if not machine.actions.resume:
+            raise ForbiddenError("Machine doesn't support resume.")
+        log.debug("Resuming machine %s", machine)
+
+        machine_libcloud = self._get_machine_libcloud(machine)
+        try:
+            self._resume_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not resume machine %s", machine)
+            raise
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
+
+    def _resume_machine(self, machine, machine_libcloud):
+        """Private method to resume a given machine
+
+        Only LibvirtController subclass implements this method.
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `resume_machine`.
+        """
+        raise NotImplementedError()
+
+    def suspend_machine(self, machine):
+        """Suspend machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to suspend a machine would be to run
+
+            machine.ctl.suspend()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are suspended, it should override `_suspend_machine` method instead.
+
+        """
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
+        if not machine.actions.suspend:
+            raise ForbiddenError("Machine doesn't support suspend.")
+        log.debug("Suspending machine %s", machine)
+
+        machine_libcloud = self._get_machine_libcloud(machine)
+        try:
+            self._suspend_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not suspend machine %s", machine)
+            raise
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
+
+    def _suspend_machine(self, machine, machine_libcloud):
+        """Private method to suspend a given machine
+
+        Only LibvirtController subclass implements this method.
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `suspend_machine`.
+        """
+        raise NotImplementedError()
+
+    def undefine_machine(self, machine):
+        """Undefine machine
+
+        The param `machine` must be an instance of a machine model of this
+        cloud.
+
+        Not that the usual way to undefine a machine would be to run
+
+            machine.ctl.undefine()
+
+        which would in turn call this method, so that its cloud can customize
+        it as needed.
+
+        If a subclass of this controller wishes to override the way machines
+        are undefineed, it should override `_undefine_machine` method instead.
+
+        """
+        # assert isinstance(machine.cloud, Machine)
+        assert self.cloud == machine.cloud
+        if not machine.actions.undefine:
+            raise ForbiddenError("Machine doesn't support undefine.")
+        log.debug("Undefining machine %s", machine)
+
+        machine_libcloud = self._get_machine_libcloud(machine)
+        try:
+            self._undefine_machine(machine, machine_libcloud)
+        except MistError as exc:
+            log.error("Could not undefine machine %s", machine)
+            raise
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
+
+    def _undefine_machine(self, machine, machine_libcloud):
+        """Private method to undefine a given machine
+
+        Only LibvirtController subclass implements this method.
+
+        Params:
+            machine: instance of machine model of this cloud
+            machine_libcloud: instance of corresponding libcloud node
+
+        Differnent cloud controllers should override this private method, which
+        is called by the public method `undefine_machine`.
+        """
+        raise NotImplementedError()
 
     def __del__(self):
         """Disconnect libcloud connection upon garbage collection"""

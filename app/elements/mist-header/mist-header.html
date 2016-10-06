@@ -114,8 +114,7 @@
             model: Object
         },
         toggleSidebar: function() {
-            document.querySelector("#sidebar").toggleClass('close');
-            document.querySelector("#iron-pages").toggleClass('center');
+            document.querySelector('app-sidebar').toggleSidebar(); // update classes
         },
         _goToDashboard: function(e) {
             var main = document.querySelector('app-main');

@@ -352,7 +352,6 @@ class LibvirtCloud(Cloud):
         return cdict
 
 
-# FIXME
 class OtherCloud(Cloud):
 
     _controller_cls = controllers.OtherController
