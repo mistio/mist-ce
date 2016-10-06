@@ -494,7 +494,7 @@ Polymer({
                 var m = inc.machine_id;
                 // TODO: this array should store the uuids, but returns errors and undefined in case two Docker machine exist: model.incidents[i] has machine_id correct but cloud_id is the wrong Docker cloud, which throws errors
                 // return document.querySelector('app-main').model.clouds[c].machines[m].uuid;
-                console.log('machine with incidents',c, m)
+                // console.log('machine with incidents',c, m)
                 return inc.machine_id;
         });
         this.set('incidents', machinesWithIncidents || [])
