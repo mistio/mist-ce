@@ -52,22 +52,24 @@
         <div id="list-form">
           <img class="onb-graphics top" src="/assets/onboarding/clouds.svg"/>
             <div hidden$="[[!isStacks]]">
-                <div>To create [[section.id]] you need to use a template.</div>
-                <paper-button class="wide blue" on-tap="_goToTemplate"> VIEW YOUR TEMPLATES </paper-button>
+                <template is="dom-if" if="[[!needCloud]]">
+                    <div>To create [[section.id]] you need to use a template.</div>
+                    <paper-button class="wide blue" on-tap="_goToTemplate"> VIEW YOUR TEMPLATES </paper-button>
+                </template>
+                <template is="dom-if" if="[[needCloud]]">
+                    <div>To create [[section.id]] you need to first add clouds.</div>
+                    <paper-button class="wide blue" on-tap="_addCloudAction"> ADD YOUR CLOUDS </paper-button>
+                </template>
             </div>
             <div hidden$="[[isStacks]]">
-                <template is="dom-if" if="[[needCloud]]">
-                <div hidden$="[[!isStacks]]">
-                    <div>To create [[section.id]] you need to have added templates.</div>
-                    <paper-button class="wide blue" on-tap="_addTemplate"> ADD YOUR TEMPLATES </paper-button>
-                </div>
-              </template>
               <template is="dom-if" if="[[!needCloud]]">
-                <div hidden$="[[isStacks]]">
                     <div>No [[section.id]] available. Yet.</div>
                     <paper-button class="wide blue" on-tap="_fabAction"> ADD YOUR [[section.id]] </paper-button>
-                </div>
               </template>
+              <template is="dom-if" if="[[needCloud]]">
+                    <div>To view [[section.id]] you need to first add clouds.</div>
+                    <paper-button class="wide blue" on-tap="_addCloudAction"> ADD YOUR CLOUDS </paper-button>
+                </template>
             </div>
         </div>
         <team-add></team-add>
@@ -98,7 +100,7 @@ Polymer({
         if (this.clouds.length > 0) {
             return false;
         } else {
-            if(this.section.id == "machines" || this.section.id == "networks" || this.section.id == "images" || this.section.id == "stacks"){
+            if( ["machines", "networks", "images", "stacks"].indexOf(this.section.id) > -1 ){
                 return true;
             } else {
                 return false;
