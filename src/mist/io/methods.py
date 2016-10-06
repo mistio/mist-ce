@@ -2935,4 +2935,4 @@ def create_dns_a_record(user, domain_name, ip_addr):
     except Exception as exc:
         raise MistError(msg + " failed: %r" % repr(exc))
     log.info(msg + " succeeded.")
-    return records
+    return record
