@@ -2717,4 +2717,222 @@ def run_playbook(user, cloud_id, machine_id, playbook_path, extra_vars=None,
             return ret_dict
         log.debug("%s: Ansible result = %s", log_prefix, result)
         mresult = result[machine_name]
-        re
+        ret_dict['stats'] = mresult
+        if mresult['failures'] or mresult['unreachable']:
+            log.error("%s: Ansible run failed: %s", log_prefix, mresult)
+            return ret_dict
+        log.info("%s: Ansible run succeeded: %s", log_prefix, mresult)
+        ret_dict['success'] = True
+        return ret_dict
+    finally:
+        os.chdir(old_dir)
+        if not debug:
+            shutil.rmtree(tmp_dir)
+
+
+def _notify_playbook_result(user, res, cloud_id=None, machine_id=None,
+                            extra_vars=None, label='Ansible playbook'):
+    title = label + (' succeeded' if res['success'] else ' failed')
+    kwargs = {
+        'cloud_id': cloud_id,
+        'machine_id': machine_id,
+        'duration': res['finished_at'] - res['started_at'],
+        'error': False if res['success'] else res['error_msg'] or True,
+    }
+    if not res['success']:
+        kwargs['output'] = res['stdout']
+    notify_user(user, title, **kwargs)
+
+
+def deploy_collectd(user, cloud_id, machine_id, extra_vars):
+    ret_dict = run_playbook(
+        user, cloud_id, machine_id,
+        playbook_path='src/deploy_collectd/ansible/enable.yml',
+        extra_vars=extra_vars,
+        force_handlers=True,
+        # debug=True,
+    )
+    _notify_playbook_result(user, ret_dict, cloud_id, machine_id,
+                            label='Collectd deployment')
+    return ret_dict
+
+
+def undeploy_collectd(user, cloud_id, machine_id):
+    ret_dict = run_playbook(
+        user, cloud_id, machine_id,
+        playbook_path='src/deploy_collectd/ansible/disable.yml',
+        force_handlers=True,
+        # debug=True,
+    )
+    _notify_playbook_result(user, ret_dict, cloud_id, machine_id,
+                            label='Collectd undeployment')
+    return ret_dict
+
+
+def get_deploy_collectd_command_unix(uuid, password, monitor, port=25826):
+    url = "https://github.com/mistio/deploy_collectd/raw/master/local_run.py"
+    cmd = "wget -O mist_collectd.py %s && $(command -v sudo) python mist_collectd.py %s %s" % (url, uuid, password)
+    if monitor != 'monitor1.mist.io':
+        cmd += " -m %s" % monitor
+    if str(port) != '25826':
+        cmd += " -p %s" % port
+    return cmd
+
+
+def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
+    return 'Set-ExecutionPolicy -ExecutionPolicy RemoteSigned ' \
+           '-Scope CurrentUser -Force;(New-Object System.Net.WebClient).' \
+           'DownloadFile(\'https://raw.githubusercontent.com/mistio/' \
+           'deploy_collectm/master/collectm.remote.install.ps1\',' \
+           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 '\
+           '-SetupConfigFile -setupArgs \'-username "%s" -password "%s" ' \
+           '-servers @("%s:%s")\''  % (uuid, password, monitor, port)
+
+
+def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
+    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s -e COLLECTD_PORT=%s mist/collectd" % (uuid, password, monitor, port)
+
+
+def machine_name_validator(provider, name):
+    """
+    Validates machine names before creating a machine
+    Provider specific
+    """
+    if not name and provider not in config.EC2_PROVIDERS:
+        raise MachineNameValidationError("machine name cannot be empty")
+    if provider is Provider.DOCKER:
+        pass
+    elif provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
+        pass
+    elif provider in [Provider.OPENSTACK]:
+        pass
+    elif provider in config.EC2_PROVIDERS:
+        if len(name) > 255:
+            raise MachineNameValidationError("machine name max chars allowed is 255")
+    elif provider is Provider.NEPHOSCALE:
+        pass
+    elif provider is Provider.GCE:
+        if not re.search(r'^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$', name):
+            raise MachineNameValidationError("name must be 1-63 characters long, with the first " + \
+                "character being a lowercase letter, and all following characters must be a dash, " + \
+                "lowercase letter, or digit, except the last character, which cannot be a dash.")
+    elif provider is Provider.SOFTLAYER:
+        pass
+    elif provider is Provider.DIGITAL_OCEAN:
+        if not re.search(r'^[0-9a-zA-Z]+[0-9a-zA-Z-.]{0,}[0-9a-zA-Z]+$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and dots")
+    elif provider is Provider.PACKET:
+        if not re.search(r'^[0-9a-zA-Z-.]+$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and periods")
+    elif provider == Provider.AZURE:
+        pass
+    elif provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+        pass
+    elif provider is Provider.LINODE:
+        if len(name) < 3:
+            raise MachineNameValidationError("machine name should be at least 3 chars")
+        if not re.search(r'^[0-9a-zA-Z][0-9a-zA-Z-_]+[0-9a-zA-Z]$', name):
+            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
+                "or numbers, dashes and underscores. Must begin and end with letters or numbers, " + \
+                "and be at least 3 characters long")
+    return name
+
+
+def create_dns_a_record(user, domain_name, ip_addr):
+    """Will try to create DNS A record for specified domain name and IP addr.
+
+    All clouds for which there is DNS support will be tried to see if the
+    relevant zone exists.
+
+    """
+
+    # split domain_name in dot separated parts
+    parts = [part for part in domain_name.split('.') if part]
+    # find all possible domains for this domain name, longest first
+    all_domains = {}
+    for i in range(1, len(parts) - 1):
+        host = '.'.join(parts[:i])
+        domain = '.'.join(parts[i:]) + '.'
+        all_domains[domain] = host
+    if not all_domains:
+        raise MistError("Couldn't extract a valid domain from '%s'."
+                        % domain_name)
+
+    # iterate over all clouds that can also be used as DNS providers
+    providers = {}
+    clouds = Cloud.objects(owner=user)
+    for cloud in clouds:
+        if cloud.provider.startswith('ec2_'):
+            provider = DnsProvider.ROUTE53
+            creds = cloud.apikey, cloud.apisecret
+        #TODO: add support for more providers
+        #elif cloud.provider == Provider.LINODE:
+        #    pass
+        #elif cloud.provider == Provider.RACKSPACE:
+        #    pass
+        else:
+            # no DNS support for this provider, skip
+            continue
+        if (provider, creds) in providers:
+            # we have already checked this provider with these creds, skip
+            continue
+
+        try:
+            conn = get_dns_driver(provider)(*creds)
+            zones = conn.list_zones()
+        except InvalidCredsError:
+            log.error("Invalid creds for DNS provider %s.", provider)
+            continue
+        except Exception as exc:
+            log.error("Error listing zones for DNS provider %s: %r",
+                      provider, exc)
+            continue
+
+        # for each possible domain, starting with the longest match
+        best_zone = None
+        for domain in all_domains:
+            for zone in zones:
+                if zone.domain == domain:
+                    log.info("Found zone '%s' in provider '%s'.",
+                             domain, provider)
+                    best_zone = zone
+                    break
+            if best_zone:
+                break
+
+        # add provider/creds combination to checked list, in case multiple
+        # clouds for same provider with same creds exist
+        providers[(provider, creds)] = best_zone
+
+    best = None
+    for provider, creds in providers:
+        zone = providers[(provider, creds)]
+        if zone is None:
+            continue
+        if best is None or len(zone.domain) > len(best[2].domain):
+            best = provider, creds, zone
+
+    if not best:
+        raise MistError("No DNS zone matches specified domain name.")
+
+    provider, creds, zone = best
+    name = all_domains[zone.domain]
+    log.info("Will use name %s and zone %s in provider %s.",
+             name, zone.domain, provider)
+
+    # debug
+    #log.debug("Will print all existing A records for zone '%s'.", zone.domain)
+    #for record in zone.list_records():
+    #    if record.type == 'A':
+    #        log.info("%s -> %s", record.name, record.data)
+
+    msg = ("Creating A record with name %s for %s in zone %s in %s"
+           % (name, ip_addr, zone.domain, provider))
+    try:
+        record = zone.create_record(name, RecordType.A, ip_addr)
+    except Exception as exc:
+        raise MistError(msg + " failed: %r" % repr(exc))
+    log.info(msg + " succeeded.")
+    return records
