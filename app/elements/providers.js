@@ -972,7 +972,7 @@ PROVIDERS.push({
     }, {
         name: "monitoring",
         label: "Enable monitoring",
-        type: "switch",
+        type: "toggle",
         value: true,
         defaultValue: true,
         show: true,
