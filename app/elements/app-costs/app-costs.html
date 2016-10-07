@@ -184,7 +184,7 @@ Polymer({
         if (machines.base.length > 0){
             // map machines costs in an array
             var machinesWithCost = this.model.machinesArray.map(function(m){
-                return m.extra.cost_per_month ? m.extra.cost_per_month : 0;
+                return m.state!='stopped' && m.extra.cost_per_month ? m.extra.cost_per_month : 0;
             });
             // add all cost values
             cost = machinesWithCost.reduce(function(previous, current, index){
