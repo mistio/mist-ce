@@ -23,9 +23,9 @@ try:
     from mist.io import config as ioconfig
     from mist.core import config
     from mist.core.methods import get_stats
-    from mist.core.cloud.models import Cloud, Machine
+    from mist.io.clouds.models import Cloud
+    from mist.core.cloud.models import Machine
     from mist.core.keypair.models import Keypair
-    from mist.core.vpn.models import Tunnel
     multi_user = True
 except ImportError:
     from mist.io import config
@@ -257,10 +257,8 @@ class MainConnection(MistConnection):
                   orchestration_methods.filter_list_stacks(self.auth_context))
 
     def list_tunnels(self):
-        if self.auth_context.is_owner():
-            tunnels = [tunnel.as_dict()
-                       for tunnel in Tunnel.objects(owner=self.auth_context.owner)]
-            self.send('list_tunnels', tunnels)
+        self.send('list_tunnels', 
+                  core_methods.filter_list_vpn_tunnels(self.auth_context))
 
     def list_clouds(self):
         self.send('list_clouds',

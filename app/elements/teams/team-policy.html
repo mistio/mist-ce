@@ -79,7 +79,7 @@
             cursor: pointer;
         }
         .add .index {
-            padding: 12px;
+            padding: 16px 24px;
         }
         .bottom-actions {
             display: flex;
@@ -166,6 +166,7 @@
             font-size: 0.9em;
             opacity: 0.54;
             padding-left: 40px;
+            flex: 2;
         }
         .notice iron-icon {
             opacity: 0.6;
@@ -331,6 +332,7 @@
                         "MACHINE",
                         "SCRIPT",
                         "KEY",
+                        "TUNNEL",
                         "TEMPLATE",
                         "STACK",
                         "TEAM"
@@ -389,9 +391,7 @@
                 var newString = initialOp.slice(0);
                 this.set("defaultOperator", newString);
 
-                // copy the rules array to a new array by .slice(0)
-                // var initial = this.team.policy.rules;
-                // var newArr = initial.slice(0);
+                // copy the rules array to a new array by
                 // clean copy of items
                 var newArr = [];
                 this.team.policy.rules.forEach(function(rule, i){

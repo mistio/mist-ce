@@ -37,7 +37,7 @@
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <iron-ajax id="editTemplateAjax" url="/templates/[[template._id]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+        <iron-ajax id="editTemplateAjax" url="/api/v1/templates/[[template._id]]" method="POST" on-request="_editTemplateAjax" on-response="_ajaxResponse"></iron-ajax>
     </template>
 
     <script>
@@ -97,13 +97,16 @@
                     this.fire('updateSelectedTemplate', {
                         template: this.template
                     });
+                    this.$.editTemplateAjax.headers["Content-Type"] = 'application/json';
+                    this.$.editTemplateAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.editTemplateAjax.generateRequest();
                     this._closeEditTemplateModal();
                 },
                 _formReset: function() {
                     //   this.set('template.id', '');
                 },
                 _editTemplateAjax: function(e) {
-                    //   this.$.editTemplateAjax.generateRequest();
+                    console.log('edit', this.$.editTemplateAjax);
                 },
                 _editTemplateRequest: function() {
                     this.set('sendingData', true);
