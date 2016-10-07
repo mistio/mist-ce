@@ -17,6 +17,9 @@
             paper-dialog ::content h2 {
                 text-transform: capitalize;
             }
+            p.margin {
+                margin: 16px 0 !important; 
+            }
         </style>
 
         <paper-dialog id="dialogModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
@@ -24,6 +27,12 @@
             <paper-dialog-scrollable>
                 <p>
                     [[body]]
+                </p>
+                <p hidden$="[[!alert]]" class="margin">
+                    <strong>[[alert]]</strong>
+                </p>
+                <p hidden$="[[!subscript]]">
+                    [[subscript]]
                 </p>
                 <div hidden$="[[!_computeType(type, 'isYesNo')]]" class="clearfix btn-group">
                     <paper-button hidden$="[[danger]]" class="link" dialog-dismiss>Cancel</paper-button>
@@ -73,7 +82,15 @@
                     action: {
                         type: String,
                         value: null
-                    }
+                    },
+                    alert: {
+                        type: String,
+                        value: false
+                    },
+                    subscript: {
+                        type: String,
+                        value: false
+                    },
                 },
                 listeners: {
                     'iron-overlay-closed': '_modalClosed'

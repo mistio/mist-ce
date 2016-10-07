@@ -498,9 +498,10 @@ Polymer({
               // if key then add shell / run script
               // if not monitoring then enable monitoring
               ret.push('associate-key');
-              // if (item.keys.length)
               ret.push('shell');
-              ret.push('run-script');              
+              if (item.keys.length) {
+                  ret.push('run-script');
+              }
             }
             if (item.can_tag)
                 ret.push('tag');

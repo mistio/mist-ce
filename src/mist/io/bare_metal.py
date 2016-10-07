@@ -68,14 +68,15 @@ class BareMetalDriver(object):
         return result in VALID_RESPONSE_CODES
 
     def _to_node(self, machine_id, machine):
-        hostname = machine.dns_name or (machine.private_ips[0] if machine.private_ips else '')
+        hostname = machine.hostname or (
+            machine.private_ips[0] if machine.private_ips else '')
         state = self.check_host(machine.cloud.owner, hostname, machine.ssh_port)
         extra = {}
         if hasattr(machine, 'os_type') and machine.os_type:
             extra['os_type'] = machine.os_type
             if machine.os_type == 'windows' and hasattr(machine,
                                                         'remote_desktop_port'):
-                extra['remote_desktop_port'] = machine.remote_desktop_port
+                extra['remote_desktop_port'] = machine.rdp_port
 
         node = Node(id=machine_id, name=machine.name, state=state,
                     public_ips=machine.public_ips, private_ips=machine.private_ips,
