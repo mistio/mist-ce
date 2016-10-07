@@ -162,7 +162,7 @@
           </paper-dialog>
           <dialog-element hidden></dialog-element>
           <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
-          <run-script-on-machine id="runscriptdialog" items="[[selectedItems]]"></run-script-on-machine>
+          <run-script-on-machine id="runscriptdialog" items="[[selectedItems]]" scripts="[[model.scriptsArray]]"></run-script-on-machine>
           <associate-key id="associatekeydialog" items="[[selectedItemsOfCurrentSection]]" model="[[model]]"></associate-key>
           <machine-edit id="renamedialog" items="[[selectedItemsOfCurrentSection]]" model="[[model]]"></machine-edit>
         </content>
@@ -366,7 +366,8 @@ Polymer({
     ],
 
     listeners:  {
-        'run-script-request':'_feedbackOnScript'
+        'run-script-request':'_feedbackOnScript',
+        'rename-request':'_feedbackOnRename'
     },
 
     ready: function () {
@@ -747,6 +748,18 @@ Polymer({
     _feedbackOnScript: function(e){
         if (e.detail.response) {
             this._showToast('Script run request succeded. Script '+this.computeModel().scripts[e.detail.scriptId].name+' has been queued for execution');
+        }
+        if (e.detail.error) {
+            this._showToast(e.detail.errormsg);
+        }
+    },
+    _feedbackOnRename: function(e){
+        console.log("_feedbackOnRename")
+        if (e.detail.request) {
+            this._showToast('Rename request sent. Waiting for machine to respond');
+        }
+        if (e.detail.response) {
+            this._showToast('Renaming was successful.');
         }
         if (e.detail.error) {
             this._showToast(e.detail.errormsg);

@@ -40,7 +40,7 @@
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
-        <iron-ajax id="editMachineAjax" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+        <iron-ajax id="editMachineAjax" method="POST" on-request="_editMachineRequest" on-response="_editMachineResponse" on-erro="_editMachineError" handle-as="xml"></iron-ajax>
     </template>
 
     <script>
@@ -80,9 +80,9 @@
 
                 },
                 _computeItemsObj: function(items){
+                    if (items)
                     return this.model.machinesArray.filter(function(m){
                         var str = 'machine:'+m.cloud.id+':'+m.id;
-                        // console.log(this.items, m.id,str.indexOf(this.items))
                         return str.indexOf(this.items)>-1;
                     }, this);
                 },
@@ -142,9 +142,15 @@
                     
                 },
                 _editMachineRequest: function() {
+                    this.fire('rename-request', {request: true})
                     this.set('sendingData', true);
                 },
                 _editMachineResponse: function(e) {
+                    this.fire('rename-request', {response: e.detail.xhr.response})
+                    this.set('sendingData', false);
+                },
+                _editMachineError: function(e) {
+                    this.fire('rename-request', {error: true, errormsg: e.detail.xhr.responseText});
                     this.set('sendingData', false);
                 }
             });

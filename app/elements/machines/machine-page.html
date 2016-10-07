@@ -486,7 +486,8 @@ MACHINEACTIONS = {
         listeners: {
             'confirmation': '_machineActionConfirmation',
             'pending-key-request': '_updateKeyLoader',
-            'run-script-request':'_feedbackOnScript'
+            'run-script-request':'_feedbackOnScript',
+            'rename-request':'_feedbackOnRename'
         },
         ready: function(){
             this.set('hideAssociatedKeys', true);
@@ -775,6 +776,18 @@ MACHINEACTIONS = {
             if (e.detail.error) {
                 this._showToast(e.detail.errormsg);
             }
+        },
+        _feedbackOnRename: function(e){
+        console.log("_feedbackOnRename")
+        if (e.detail.request) {
+            this._showToast('Rename request sent. Waiting for machine to respond');
         }
+        if (e.detail.response) {
+            this._showToast('Renaming was successful.');
+        }
+        if (e.detail.error) {
+            this._showToast(e.detail.errormsg);
+        }
+    },
     });
 </script>
