@@ -518,12 +518,12 @@ MACHINEACTIONS = {
               "jsonData": null
               }
             ];
-            var that = this;
-            setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-                // if (that.querySelector('dashboard-panel'))
-                //     that.querySelector('dashboard-panel').resize();
-
-            }, 5000);
+            // var that = this;
+            // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
+            //     // if (that.querySelector('dashboard-panel'))
+            //     //     that.querySelector('dashboard-panel').resize();
+            //
+            // }, 5000);
 
         },
         _computeMachineInArray: function(machines){
@@ -571,7 +571,7 @@ MACHINEACTIONS = {
         _computeMachine: function(params, machines) {
             this.dashboard = {
               "id": 1,
-              "refresh": "10s",
+              // "refresh": "",
               "rows": [{
                 "height": "500px",
                 "panels": [{
@@ -707,14 +707,14 @@ MACHINEACTIONS = {
             el._openEditMachineModal();
         },
         _computeReplaceTargets: function(machine) {
-            var ret = {'bucky.': ''};
-            var m = this.machine;
-            var mId = this.machine.id;
-            var m = this.machine.name;
-            ret[mId] = m ? m.name : 'unknown';
-            // Object {bucky.: "", 3e3a36a5a2694f859a2dc2ccbc192619: "unknown", a203e912f9e744df8ac10179403b8248: "monitor-docker"}
-            this.dashboard.rows[0].panels[0].targets[0].target = 'bucky.'+this.machine.id+'.load.shortterm';
-            return ret;
+            // var ret = {'bucky.': ''};
+            // var m = this.machine;
+            // var mId = this.machine.id;
+            // var m = this.machine.name;
+            // ret[mId] = m ? m.name : 'unknown';
+            // // Object {bucky.: "", 3e3a36a5a2694f859a2dc2ccbc192619: "unknown", a203e912f9e744df8ac10179403b8248: "monitor-docker"}
+            // this.dashboard.rows[0].panels[0].targets[0].target = 'bucky.'+this.machine.id+'.load.shortterm';
+            // return ret;
         },
         confirmAction: function(action){
             this._showDialog({
