@@ -31,7 +31,7 @@
             <paper-dialog-scrollable>
                 <p>
                     <template is="dom-repeat" items="[[itemsObj]]">
-                        <paper-input id="item[[item.uuid]]" label="[[item.name]]" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter machines's new name" value="{{item.name}}"></paper-input>
+                        <paper-input id="item[[item.uuid]]" label="[[_computeLabel(item.name)]]" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter machines's new name" value="[[item.name]]"></paper-input>
                     </template>
                 </p>
                 <div class="clearfix btn-group">
@@ -152,6 +152,10 @@
                 _editMachineError: function(e) {
                     this.fire('rename-request', {error: true, errormsg: e.detail.xhr.responseText});
                     this.set('sendingData', false);
+                },
+                _computeLabel: function(itemname){
+                    var l = itemname.slice(0);
+                    return l;
                 }
             });
         })();
