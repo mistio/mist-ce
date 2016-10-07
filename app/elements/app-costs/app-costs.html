@@ -137,6 +137,9 @@
                     <span class="zero-cloud">[[item.name]]</span>
                 </template>
             </div>
+            <div class="zero-clouds" hidden$="[[!saved]]">
+                Currently saving $[[saved]] from [[stoppedMachines.length]] stopped machines.
+            </div>
         </paper-material>
     </template>
 </dom-module>
@@ -160,6 +163,13 @@ Polymer({
         },
         zeroCostClouds: {
             type: Array
+        },
+        stoppedMachines: {
+            type: Array
+        },
+        saved: {
+            type: Number,
+            value: 0
         }
     },
     attached: function() {
@@ -192,6 +202,8 @@ Polymer({
     _computeTopClouds: function(clouds, machines) {
         var topCloudsArray = [];
         var zeroCostClouds = [];
+        var saved = 0;
+        var stoppedMachines = [];
         if (clouds.base.length > 0) {
             this.model.cloudsArray.forEach(function(c){
                 var cloudCost = 0;
@@ -206,7 +218,12 @@ Polymer({
                             else {
                                 mcost = c.machines[m].extra.cost_per_month;
                             }
-                            cloudCost = cloudCost + mcost;
+                            if (c.machines[m].state != 'stopped')
+                                cloudCost = cloudCost + mcost;
+                            else {
+                                saved = saved + mcost;
+                                stoppedMachines.push(c.machines[m]);
+                            }
                         }
                         machinesCount ++;
                     }
@@ -222,6 +239,8 @@ Polymer({
                 }
             });
         }
+        this.set('saved', Math.round(saved));
+        this.set('stoppedMachines', stoppedMachines);
         this.set('zeroCostClouds', zeroCostClouds);
         // sort by cost
         topCloudsArray.sort(function (a, b) {
