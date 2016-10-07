@@ -28,7 +28,6 @@
 
         <paper-dialog id="editMachineModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
             <h2>Rename Machine</h2>
-            <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
                 <p>
                     <template is="dom-repeat" items="[[itemsObj]]">
@@ -36,7 +35,8 @@
                     </template>
                 </p>
                 <div class="clearfix btn-group">
-                <paper-button class="submit-btn btn-block" raised on-tap="_submitForm">Submit</paper-button>
+                    <paper-button class="link" dialog-dismiss>Cancel</paper-button>
+                    <paper-button class="submit-btn btn-block" raised on-tap="_submitForm">Submit</paper-button>
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
