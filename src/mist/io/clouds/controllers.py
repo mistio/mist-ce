@@ -430,7 +430,6 @@ class AzureController(BaseController):
                                      ex_cloud_service_name=cloud_service)
 
 
-
 class AzureArmController(BaseController):
 
     provider = 'azure_arm'
