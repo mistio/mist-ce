@@ -41,4 +41,4 @@ pip-selfcheck.json
 test_settings.py
 error*.png
 .cache
-
+ui/fullstack_ssh_key

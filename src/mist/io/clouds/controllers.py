@@ -430,6 +430,38 @@ class AzureController(BaseController):
                                      ex_cloud_service_name=cloud_service)
 
 
+class AzureArmController(BaseController):
+
+    provider = 'azure_arm'
+
+    def _connect(self):
+        return get_driver(Provider.AZURE_ARM)(self.cloud.tenant_id,
+                                              self.cloud.subscription_id,
+                                              self.cloud.key,
+                                              self.cloud.secret)
+
+    def _list_machines__machine_creation_date(self, machine_api):
+        return machine_api.created_at  # datetime
+
+    def _list_machines__cost_machine(self, machine_api):
+        return 0, 0
+
+    def _list_images__fetch_images(self, search=None):
+        return []
+
+    def _start_machine(self,  machine, machine_libcloud):
+        self.connection.ex_start_node(machine_libcloud)
+
+    def _stop_machine(self, machine, machine_libcloud):
+        self.connection.ex_stop_node(machine_libcloud)
+
+    def _reboot_machine(self, machine, machine_libcloud):
+        self.connection.reboot_node(machine_libcloud)
+
+    def _destroy_machine(self, machine, machine_libcloud):
+        self.connection.destroy_node(machine_libcloud)
+
+
 class GoogleController(BaseController):
 
     provider = 'gce'

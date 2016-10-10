@@ -251,6 +251,7 @@ def add_cloud(request):
       - softlayer
       - gce
       - azure
+      - azure_arm
       - linode
       - indonesian_vcloud
       - hostvirtual

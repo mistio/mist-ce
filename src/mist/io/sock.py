@@ -302,7 +302,7 @@ class MainConnection(MistConnection):
         error = False
         try:
             data = get_stats(self.owner, cloud_id, machine_id,
-                             start, stop, step)
+                             start, stop, step, metrics=metrics)
         except BadRequestError as exc:
             error = str(exc)
             data = []
