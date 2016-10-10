@@ -40,6 +40,67 @@ PROVIDERS.push({
     }]
 });
 
+// AZURE ARM
+PROVIDERS.push({
+    title: 'Azure ARM',
+    val: 'azure_arm',
+    className: 'provider-azure',
+    options: [{
+        name: "title",
+        label: "Title *",
+        type: "text",
+        value: "Azure ARM",
+        defaultValue: "Azure ARM",
+        show: true,
+        required: true,
+        errorMessage: "Please enter title"
+    }, {
+        name: "tenant_id",
+        label: "Tenant ID *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        errorMessage: "Please enter tenant id",
+        helptext: "You can find your tenant ID on the Azure portal",
+        helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
+    }, {
+        name: "subscription_id",
+        label: "Subscription ID *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        errorMessage: "Please enter subscription id",
+        helptext: "You can find your subscriptionID on the Azure portal",
+        helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
+    }, {
+        name: "key",
+        label: "Client key *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        errorMessage: "Please enter client key",
+        helptext: "You can find your client key on the Azure portal",
+        helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
+    }, {
+        name: "secret",
+        label: "Client secret *",
+        type: "password",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        errorMessage: "Please enter client secret",
+        helptext: "You can find your client secret on the Azure portal",
+        helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
+    }]
+});
+
 /*
 // COREOS
 PROVIDERS.push(

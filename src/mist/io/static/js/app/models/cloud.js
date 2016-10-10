@@ -84,7 +84,7 @@ define('app/models/cloud', ['app/controllers/machines', 'app/controllers/images'
 
             canCreateMachine: function () {
                 return this.enabled &&
-                    ['indonesian_vcloud', 'bare_metal', 'vsphere'].indexOf(this.provider) == -1;
+                    ['indonesian_vcloud', 'bare_metal', 'vsphere', 'azure_arm'].indexOf(this.provider) == -1;
             }.property('provider', 'enabled'),
 
             className: function () {
