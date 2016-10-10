@@ -108,6 +108,10 @@ class AmazonController(BaseController):
         machine.os_type = machine_libcloud.extra.get('platform', 'linux')
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
+        # stopped nodes don't get charged
+        if machine_libcloud.state != NodeState.RUNNING:
+            return 0, 0
+
         image_id = machine_libcloud.extra.get('image_id')
         try:
             # FIXME: This is here to avoid circular imports.
@@ -365,6 +369,9 @@ class AzureController(BaseController):
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
         # TODO: Get prices per location
+        # stopped nodes don't get charged
+        if machine_libcloud.state != NodeState.RUNNING:
+            return 0, 0
         os_type = machine_libcloud.extra.get('os_type', 'linux')
         size = machine_libcloud.extra.get('instance_size')
         price = get_size_price(driver_type='compute', driver_name='azure',
@@ -440,10 +447,14 @@ class AzureArmController(BaseController):
                                               self.cloud.key,
                                               self.cloud.secret)
 
-    def _list_machines__machine_creation_date(self, machine_api):
-        return machine_api.created_at  # datetime
+    def _list_machines__machine_creation_date(self, machine, machine_libcloud):
+        return machine_libcloud.created_at  # datetime
 
-    def _list_machines__cost_machine(self, machine_api):
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
+        # stopped nodes don't get charged
+        if machine_libcloud.state != NodeState.RUNNING:
+            return 0, 0
+        # TODO: implement!
         return 0, 0
 
     def _list_images__fetch_images(self, search=None):
@@ -545,6 +556,10 @@ class GoogleController(BaseController):
         return images
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
+        # stopped nodes don't get charged
+        if machine_libcloud.state != NodeState.RUNNING:
+            return 0, 0
+
         # https://cloud.google.com/compute/pricing
         size = machine_libcloud.extra.get('machineType')
         # eg europe-west1-d
