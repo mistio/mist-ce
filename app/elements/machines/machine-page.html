@@ -200,7 +200,7 @@
             <div class="is-loading" hidden$="[[!isLoading]]">
                 <paper-spinner active hidden$="[[!isLoading]]"></paper-spinner>
             </div>
-            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+            <paper-material class="single-head layout horizontal" style$="color:#fff;background-color: [[section.color]];">
                 <span class="icon"><iron-icon class$=" machine-state-icon [[machine.state]]" icon="[[section.icon]]"></iron-icon></span>
                 <div class="title flex">
                     <h2>
@@ -211,33 +211,7 @@
                     </div>
                 </div>
                 <div class="machine-actions">
-                    <!-- can_destroy:true
-                    can_start:false
-                    can_stop:true
-                    can_suspend:false
-                    can_reboot:true
-                    can_rename:true
-                    can_resume:false
-                    can_tag:true
-                    can_undefine:false -->
-
-                    <!-- 
-                        rename
-                        run script on machine
-                        monitor
-                     -->
-
                     <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" actions="[[actions]]" org="[[model.org]]" model="[[model]]"></item-actions>
-
-                    <!-- 
-                    <paper-menu-button id="moreMachineActions" horizontal-align="right">
-                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
-                        <paper-menu id="machine_actions" class="dropdown-content">
-                            <paper-button on-tap="associateKey" class="simple">Associate a key</paper-button>
-                            <paper-button on-tap="_runScript" class="simple">Run a Script</paper-button>
-                        </paper-menu>
-                    </paper-menu-button>
-                    <paper-button on-tap="monitor" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[isMonitored]]" disabled>monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button> -->
                 </div>
             </paper-material>
             <div class="columns">
@@ -269,14 +243,14 @@
                 </paper-material>
             </div>
             <!--<paper-material class="info-card" hidden$="{{!isMonitored}}">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
+                <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
                 <div>
                     <paper-material>graph data</paper-material>
                      <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                 </div>
             </paper-material>-->
             <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
+                <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
                 <div class="card-content">
                     <table class="info-table">
                         <template is="dom-if" if="[[machine.public_ips]]">
@@ -305,7 +279,7 @@
                 </div>
             </paper-material>
             <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">More Info</h2>
+                <h2 style$="color:#fff;background-color: [[section.color]];">More Info</h2>
                 <div class="card-content">
                     <element-for-in content="[[machine.extra]]"></element-for-in>
                 </div>
@@ -648,25 +622,6 @@ MACHINEACTIONS = {
                 this.isMonitored = false;
             }
         },
-        _getColor: function() {
-            return this.section && this.section.color ? this.section.color : '';
-        },
-        addKey: function(_, params) {
-            console.log("clicked addKey");
-        },
-        rename: function(_, params) {
-            console.log("clicked rename");
-        },
-
-        _getHeaderStyle: function(color) {
-            return 'background-color: ' + color + '; color: #fff;';
-        },
-        toggle: function() {
-            this.$.collapse.toggle();
-        },
-        togglefull: function() {
-            this.$.collapsefull.toggle();
-        },
         _machineImage: function(id) {
             var image = this.model.imagesArray.find(function(image) {
                 return image.id == id;
@@ -675,17 +630,6 @@ MACHINEACTIONS = {
                 return image.name;
             else
                 return "";
-        },
-        _editTags: function() {
-            var el = this.querySelector('tags-list'),
-            items = [];
-            items.push(itemUid(this.machine, this.sections['machines']));
-            el.items = items;
-            el._openDialog();
-        },
-        _editMachine: function(e) {
-            var el = this.querySelector('machine-edit');
-            el._openEditMachineModal();
         },    
         _computeReplaceTargets: function(machine) {
             var ret = {'bucky.': ''};
