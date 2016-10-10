@@ -390,7 +390,10 @@ Polymer({
             type: Number,
             value: 0
         },
-        incidents: Array
+        incidents: {
+            type: Array,
+            computed: "_computeIncidents(model.incidents.*)"
+        }
     },
 
     listeners: {
@@ -416,6 +419,8 @@ Polymer({
     },
     itemHasIncidents: function(item, incidents){
         // console.log('itemHasIncidents', this.incidents, this.incidents.indexOf(item.uuid))
+        if (item.name == "mistio-mist-core")
+            // console.log(item.name, this.incidents, item.id, this.incidents.indexOf(item.id) > -1)
         if (this.incidents.length > 0 && this.incidents.indexOf(item.id) > -1) {
             return true;
         }
@@ -486,22 +491,18 @@ Polymer({
                 that.set('allselected', false);
 
         }, 50);
-
-        // update incidents
-        var machinesWithIncidents = [];
-        if (document.querySelector('mist-app').model.incidents) 
-            // only unresolved incidents should pass
-            machinesWithIncidents = this.model.incidents.filter(function(inc){
-                    return !inc.finished_at || inc.finished_at == 0;
-                }).map(function(inc){
-                    if (this.model.clouds[inc.cloud_id] &&  this.model.machines[inc.machine_id] && this.model.clouds[inc.cloud_id].machines[inc.machine_id]) 
-                        return this.model.clouds[inc.cloud_id].machines[inc.machine_id].uuid;
-                    else 
-                        return;
-            });
-        this.set('incidents', machinesWithIncidents || [])
     },
-
+    _computeIncidents: function(incidents){
+         // update incidents
+        var machinesWithIncidents = [];
+        machinesWithIncidents = this.model.incidents.filter(function(inc){
+                return !inc.finished_at || inc.finished_at == 0;
+            }).map(function(inc){
+                if (this.model.clouds[inc.cloud_id] && this.model.clouds[inc.cloud_id].machines && this.model.clouds[inc.cloud_id].machines[inc.machine_id]) 
+                    return this.model.clouds[inc.cloud_id].machines[inc.machine_id].id;
+        }, this);
+        return machinesWithIncidents;
+    },
     selectedItemsChanged: function (changeRecord) {
         // recompute the actions array property as the intersection
         // of the available actions of the selected items
