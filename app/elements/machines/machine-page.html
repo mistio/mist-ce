@@ -244,7 +244,7 @@
                 <paper-material id="leftcolumn" class="left">
                     <h3 class="smallcaps">Info:</h3>
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
-                    <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
+                    <span hidden$="[[!machineImage]]">Image: [[machineImage]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
                 </paper-material>
                 <paper-material id="rightcolumn" class="right" hidden$="[[hideAssociatedKeys]]">
@@ -431,7 +431,7 @@ MACHINEACTIONS = {
             },
             machineImage: {
                 type: String,
-                computed: "_machineImage(machine.imageId)"
+                computed: "_machineImage(machine)"
             },
             dashboard: {
                 type: Object
@@ -667,14 +667,22 @@ MACHINEACTIONS = {
         togglefull: function() {
             this.$.collapsefull.toggle();
         },
-        _machineImage: function(id) {
-            var image = this.model.imagesArray.find(function(image) {
-                return image.id == id;
-            }, this);
-            if (image)
-                return image.name;
-            else
-                return "";
+        _machineImage: function(machine) {
+            // image info stored inside:
+            // extra.image_id on ec2,
+            // item.extra.image.name or item.extra.image.slug in digital ocean,
+            // item.imageId in openstack
+            // TODO: complete the above list
+            if (!machine['image'] && machine.extra && 
+                (machine.extra['image_id'] || machine.imageId || machine.extra.image)){
+                return machine.extra['image_id'] || machine.extra.image.distribution || machine.extra.image.slug || machine.extra.image.name || machine.imageId;
+            }
+            else if (machine['image'] && typeof(machine['image']) == 'string') {
+                return machine['image'];
+            }
+            else {
+                return false;
+            }
         },
         _editTags: function() {
             var el = this.querySelector('tags-list'),
