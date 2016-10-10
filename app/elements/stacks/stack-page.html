@@ -443,7 +443,7 @@
                     </div>
                     <div class="page-block">
                         <h3 class="smallcaps">Created</h3>
-                        <p>[[timestamp]]
+                        <p>[[_computeReadableDate(stack.created_at)]]
                         </p>
                     </div>
                     <div class="page-block" hidden$="[[!stack.tags]]">
@@ -683,10 +683,6 @@
                     workflows: {
                         type: Array,
                         computed: '_computeWorkflows(template.workflows.*, model.templates)'
-                    },
-                    timestamp: {
-                        type: String,
-                        computed: '_getFormattedTimestamp(stack)'
                     },
                     vpHeight: String,
                     payload: {
@@ -1008,11 +1004,8 @@
                     });
                     return workflows;
                 },
-                _getFormattedTimestamp: function(stack) {
-                    if (stack)
-                        return new Date(this.stack.created_at).toLocaleString('en-US', {
-                            timeZoneName: 'short'
-                        });
+                _computeReadableDate: function(date) {
+                    return moment(date).fromNow();
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element'),

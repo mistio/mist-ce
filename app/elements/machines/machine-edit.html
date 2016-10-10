@@ -28,18 +28,19 @@
 
         <paper-dialog id="editMachineModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
             <h2>Rename Machine</h2>
-            <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
             <paper-dialog-scrollable>
                 <p>
-                    <paper-input id="name" label="Name" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter machines's new name" value="{{machine.name}}"></paper-input>
+                    <template is="dom-repeat" items="[[itemsObj]]">
+                        <paper-input id="item[[item.uuid]]" label="[[_computeLabel(item.name)]]" required allowed-pattern="[A-Za-z0-9]" error-message="Please enter machines's new name" value="[[item.name]]"></paper-input>
+                    </template>
                 </p>
                 <div class="clearfix btn-group">
-                <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                    <paper-button class="link" dialog-dismiss>Cancel</paper-button>
+                    <paper-button class="submit-btn btn-block" raised on-tap="_submitForm">Submit</paper-button>
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
-
-        <iron-ajax id="editMachineAjax" url="/machines/[[machine.uuid]]" method="POST" on-request="_ajaxRequest" on-response="_ajaxResponse"></iron-ajax>
+        <iron-ajax id="editMachineAjax" method="POST" on-request="_editMachineRequest" on-response="_editMachineResponse" on-erro="_editMachineError" handle-as="xml"></iron-ajax>
     </template>
 
     <script>
@@ -50,6 +51,12 @@
                 is: 'machine-edit',
 
                 properties: {
+                    model: Object,
+                    items: Array,
+                    itemsObj: {
+                        type:Array,
+                        computed: '_computeItemsObj(items)'
+                    },
                     machine: {
                         type: Object,
                         value: {
@@ -72,6 +79,13 @@
                 ready: function() {
 
                 },
+                _computeItemsObj: function(items){
+                    if (items)
+                    return this.model.machinesArray.filter(function(m){
+                        var str = 'machine:'+m.cloud.id+':'+m.id;
+                        return str.indexOf(this.items)>-1;
+                    }, this);
+                },
                 _computeFormReady: function(id, sendingData) {
                     var formReady = false;
 
@@ -85,32 +99,63 @@
 
                     return formReady;
                 },
-                _openEditMachineModal: function(e) {
+                _openDialog: function(e) {
                     this.$.editMachineModal.open();
                 },
-                _closeEditMachineModal: function(e) {
+                _closeDialod: function(e) {
                     this.$.editMachineModal.close();
                 },
                 _modalClosed: function() {
                     this._formReset();
                 },
                 _submitForm: function(e) {
-                    this.fire('updateSelectedMachine', {
-                        machine: this.machine
-                    });
-                    this._closeEditMachineModal();
+                    // this.fire('updateSelectedMachine', {
+                    //     machine: this.machine
+                    // });
+
+                    var request = this.$.editMachineAjax;
+
+                    var items = this.itemsObj.slice(0);
+                    var run = function(el) {
+                        var item = items.shift(),
+                            itemName = el.querySelector('#item'+item.uuid).value;
+
+                        request.body = {'action': 'rename', 'name': itemName};
+                        request.url = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
+
+                        request.headers["Content-Type"] = 'application/json';
+                        request.headers["Csrf-Token"] = CSRF_TOKEN;
+                        request.generateRequest();
+
+                        if (items.length) {
+                            run(el);
+                        }
+                    }
+                    run(this); 
+
+                    this._closeDialod();
                 },
                 _formReset: function() {
-                    //   this.set('machine.uuid', '');
+                      this.set('machine.uuid', '');
                 },
                 _editMachineAjax: function(e) {
-                    //   this.$.editMachineAjax.generateRequest();
+                    
                 },
                 _editMachineRequest: function() {
+                    this.fire('rename-request', {request: true})
                     this.set('sendingData', true);
                 },
                 _editMachineResponse: function(e) {
+                    this.fire('rename-request', {response: e.detail.xhr.response})
                     this.set('sendingData', false);
+                },
+                _editMachineError: function(e) {
+                    this.fire('rename-request', {error: true, errormsg: e.detail.xhr.responseText});
+                    this.set('sendingData', false);
+                },
+                _computeLabel: function(itemname){
+                    var l = itemname.slice(0);
+                    return l;
                 }
             });
         })();

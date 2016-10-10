@@ -219,12 +219,14 @@ Polymer({
 
         // some providers dont provide this info
         if (field == 'created') {
-            if (!ret){
+            var cr;
+            if (! item['created'] && item.extra && item.extra['created'])
+                cr = item.extra['created']
+            else if (item['created'])
+                cr = item['created'];
+            else
                 return '';
-            }
-            else {
-                return moment(item['created']).fromNow();
-            }
+            return moment(cr).fromNow();
         }
 
         // field could be in the 'extra' section, but should not be an object
@@ -243,6 +245,7 @@ Polymer({
 
         // size info could be in all sorts of places
         //  - Azure: extra.instance_size
+        //  - Azure ARM: extra.size - string
         //  - EC2: extra.instance_type
         //  - Softlayer: extra.maxCpu / extra.maxMemory
         //  - Linode: cloud.sizes[extra.PLANID]
@@ -252,8 +255,10 @@ Polymer({
         // TODO: harmonize these on the backend
 
         if (field == 'size') {
-            if (item.extra && item.extra.size)
+            if (item.extra && item.extra.size && item.extra.size.vcpus)
                 return item.extra.size.vcpus + 'vcpu, ' + item.extra.size.memory + 'M ram';;
+            if (item.extra && item.extra.size && typeof(item.extra.size) == 'string')
+                return item.extra.size;
             if (item.extra && item.extra.instance_type)
                 return item.extra.instance_type;
             if (item.extra && item.extra.instance_size)
