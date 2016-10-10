@@ -1005,7 +1005,7 @@
                     return workflows;
                 },
                 _computeReadableDate: function(date) {
-                    return moment(date).fromNow();
+                    return moment.utc(date).fromNow();
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element'),
