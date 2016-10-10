@@ -257,7 +257,7 @@ class MainConnection(MistConnection):
                   orchestration_methods.filter_list_stacks(self.auth_context))
 
     def list_tunnels(self):
-        self.send('list_tunnels', 
+        self.send('list_tunnels',
                   core_methods.filter_list_vpn_tunnels(self.auth_context))
 
     def list_clouds(self):
@@ -301,7 +301,7 @@ class MainConnection(MistConnection):
         error = False
         try:
             data = get_stats(self.owner, cloud_id, machine_id,
-                             start, stop, step)
+                             start, stop, step, metrics=metrics)
         except BadRequestError as exc:
             error = str(exc)
             data = []
