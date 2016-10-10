@@ -2,6 +2,8 @@ import logging
 import requests
 import datetime
 
+import dns.resolver
+
 
 logging.getLogger().setLevel(logging.CRITICAL)
 
@@ -35,9 +37,14 @@ def query(host='127.0.0.1:8081'):
 
 
 if __name__ == '__main__':
-    for port in (8081, 8082, 8083, 8084):
-        print
-        host = '127.0.0.1:%d' % port
+    entries = dns.resolver.query("sockjs-headless", "A")
+    hosts = list()
+
+    for entry in entries:
+        hosts.append(entry.address)
+
+    for h in hosts:
+        host = '%s:80' % h
         try:
             query(host)
         except Exception as exc:
