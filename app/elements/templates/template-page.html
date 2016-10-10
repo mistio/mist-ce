@@ -455,7 +455,10 @@
                     return moment(date).fromNow();
                 },
                 _computeHasStacks: function(stacks) {
-                    return this.stacks.length > 0;
+                    if (stacks)
+                        return this.stacks.length > 0;
+                    else
+                        return false;
                 },
                 _computeTemplate: function(templateid, templates) {
                     return templates.base[templateid];
