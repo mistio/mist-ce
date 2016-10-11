@@ -205,7 +205,7 @@ Polymer({
     machineUri: function(item, model) {
         // give machine url only if machine axists
         if (this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id]){
-            return '/machines/'  + this.model.clouds[item.cloud_id].machines[item.machine_id].id;
+            return '/machines/'  + this.model.clouds[item.cloud_id].machines[item.machine_id].uuid;
         }
         else {
             console.log('incident for missing machine '+[item.machine_id]+' in cloud '+[item.cloud_id]);
