@@ -216,6 +216,13 @@ Polymer({
                 return 'missing template';
             }
         }
+        // incidents finished
+        if (field == 'started_at' || field == 'finished_at') {
+            if (ret)
+                return moment.utc(item[field] * 1000).fromNow();
+            else 
+                return "";
+        }
 
         // some providers dont provide this info
         if (field == 'created') {
