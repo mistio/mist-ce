@@ -517,7 +517,7 @@
                 //compare created date
                 else if (property == 'created'){
                     //if both properties exist
-                    if (a.extra.created && b.extra.created){
+                    if (a.extra && b.extra && a.extra.created && b.extra.created){
                         if (moment(a.extra.created).unix() > moment(b.extra.created).unix()) {
                             return -1 * order;
                         }
@@ -527,7 +527,7 @@
                         return 0;
                     }
                     else {
-                        if (!a.extra.created)
+                        if (!a.extra || !a.extra.created)
                             return 1;
                         else
                             return -1

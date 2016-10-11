@@ -233,7 +233,7 @@ Polymer({
                 cr = item['created'];
             else
                 return '';
-            return moment(cr).fromNow();
+            return moment.utc(cr).fromNow();
         }
 
         // field could be in the 'extra' section, but should not be an object
