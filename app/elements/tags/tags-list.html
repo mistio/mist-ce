@@ -191,15 +191,16 @@
                             else if (itemObj.tags && typeof(itemObj.tags) == 'object') {
                                 var foo = []
                                 for (var p in itemObj.tags) {
-                                    foo.push(itemObj.tags.p)
+                                    foo.push(itemObj.tags[p])
                                 }
                                 itemObj.tags = foo;
                             }
 
                             if (i == 0) {
+                                console.log('itemObj.tags',itemObj.tags);
                                 tagset.addItems(itemObj.tags.map(function(tag){
                                     return tag.key+'='+tag.value;
-                                }) || []);
+                                }));
                             }
                             else {
                                 isection.clear()
