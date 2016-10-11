@@ -317,8 +317,9 @@ function itemUid(item, section) {
     var item_type = item && item.type ? item.type : (section &&
                                              section.id.slice(0,-1));
     var cloudId = item && item.cloud ? item.cloud.id : '';
-    var itemId = item &&item.id ? item.id : '';
-
+    var itemId = item && item.id ? item.id : '';
+    if (item_type == 'incident')
+        itemId = item.incident_id
     return item_type + ':' + cloudId + ':' + itemId;
 }
 
@@ -711,7 +712,7 @@ Polymer({
                 method = 'DELETE';
             //incidents
             } else if (action.name == 'delete' && item.type == 'incident') {
-                uri = '/api/v1/stories/' + item.id;
+                uri = '/api/v1/stories/' + item.incident_id;
                 method = 'DELETE';
             } else {
                 console.error('unknown action', action, 'on item', item );
