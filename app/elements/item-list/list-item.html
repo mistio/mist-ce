@@ -277,7 +277,10 @@ Polymer({
             return document.querySelector('mist-app').model.clouds[ret].title;
         }
         if (field == 'machine_id') {
-            return document.querySelector('mist-app').model.clouds[item.cloud_id].machines[item.machine_id].name;
+            if (document.querySelector('mist-app').model.clouds[item.cloud_id].machines[item.machine_id])
+                return document.querySelector('mist-app').model.clouds[item.cloud_id].machines[item.machine_id].name;
+            else 
+                return 'missing machine';
         }
 
         if (field == 'default') {
