@@ -1388,7 +1388,7 @@ def ssh_command(user, cloud_id, machine_id, host, command,
 
 def list_images(user, cloud_id, term=None):
     """List images from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_images()
+    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_images(term)
 
 
 def _image_starred(user, cloud_id, image_id):
