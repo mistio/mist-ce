@@ -186,6 +186,15 @@
 
                             if (!itemObj.tags) 
                                 itemObj.tags = [];
+                            // TO FIX: network tags should not be type 'object', but Array of objects
+                            // only networks return their tags in such format. Below code patches it.
+                            else if (itemObj.tags && typeof(itemObj.tags) == 'object') {
+                                var foo = []
+                                for (var p in itemObj.tags) {
+                                    foo.push(itemObj.tags.p)
+                                }
+                                itemObj.tags = foo;
+                            }
 
                             if (i == 0) {
                                 tagset.addItems(itemObj.tags.map(function(tag){
