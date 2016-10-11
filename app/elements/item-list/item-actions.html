@@ -553,6 +553,8 @@ Polymer({
             ret.push('delete');
         } else if (item.type == 'team') {
             ret.push('delete');
+        } else if (item.type == 'incidents') {
+            ret.push('delete');
         }
         return ret;
     },
@@ -706,6 +708,10 @@ Polymer({
             //tunnels
             } else if (action.name == 'delete' && item.type == 'tunnel') {
                 uri = '/api/v1/tunnels/' + item.id;
+                method = 'DELETE';
+            //incidents
+            } else if (action.name == 'delete' && item.type == 'incident') {
+                uri = '/api/v1/stories/' + item.id;
                 method = 'DELETE';
             } else {
                 console.error('unknown action', action, 'on item', item );
