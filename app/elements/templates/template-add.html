@@ -263,8 +263,6 @@
                 _addTemplateAjaxResponse: function(e) {
                     var response = YAML.parse(e.detail.xhr.response);
                     document.querySelector('app-location').set('path', '/templates/' + response.template.id);
-                    console.log(response.template.id);
-
                     this.debounce('resetForm', function() {
                         this._resetForm();
                     }, 500);
@@ -301,8 +299,9 @@
                 useCatalogueTemplate: function(selected){
                     this.fields.forEach(function(f, index){
                         var key = f.name;
-                        if (selected > -1 && this.defaultTemplates[selected][key])
+                        if (selected!=-1 && this.defaultTemplates[selected] && this.defaultTemplates[selected][key]){
                             this.set('fields.'+index+'.value', this.defaultTemplates[selected][key]);
+                        }
                     }, this);
                 },
                 clearDropDown: function(){
