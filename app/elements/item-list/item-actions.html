@@ -9,6 +9,7 @@
 <link rel="import" href="../tags/tags-list.html">
 <link rel="import" href="../machines/associate-key.html">
 <link rel="import" href="../machines/run-script-on-machine.html">
+<link rel="import" href="../machines/machine-edit.html">
 
 <dom-module id="item-actions">
     <template>
@@ -86,7 +87,6 @@
 
             paper-dialog p.item-actions {
                 max-height: 200px;
-                overflow: scroll;
             }
             tags-list,
             associate-key,
@@ -145,12 +145,12 @@
                 <template is="dom-if" if="[[multi]]">
                     <p>
                         You are about to [[selectedAction.name]] {{selectedItemsType(selectedItems.length, items.length)}}:
-                        <ul>
-                            <template is="dom-repeat" items="{{selectedItemsDetails(selectedItemsOfCurrentSection.length)}}">
-                              <li>[[item.name]]</li>
-                            </template>
-                        </ul>
                     </p>
+                    <ul>
+                        <template is="dom-repeat" items="{{selectedItemsDetails(selectedItemsOfCurrentSection.length)}}">
+                          <li>[[item.name]]</li>
+                        </template>
+                    </ul>
                 </template>
 
               </paper-dialog-scrollable>
@@ -162,8 +162,9 @@
           </paper-dialog>
           <dialog-element hidden></dialog-element>
           <tags-list id="tagsdialog" model="[[computeModel()]]" items="[[selectedItems]]"></tags-list>
-          <run-script-on-machine id="runscriptdialog" items="[[selectedItems]]"></run-script-on-machine>
+          <run-script-on-machine id="runscriptdialog" items="[[selectedItems]]" scripts="[[model.scriptsArray]]"></run-script-on-machine>
           <associate-key id="associatekeydialog" items="[[selectedItemsOfCurrentSection]]" model="[[model]]"></associate-key>
+          <machine-edit id="renamedialog" items="[[selectedItemsOfCurrentSection]]" model="[[model]]"></machine-edit>
         </content>
         <paper-toast id="item-actions-toast"></paper-toast>
     </template>
@@ -365,7 +366,8 @@ Polymer({
     ],
 
     listeners:  {
-        'run-script-request':'_feedbackOnScript'
+        'run-script-request':'_feedbackOnScript',
+        'rename-request':'_feedbackOnRename'
     },
 
     ready: function () {
@@ -497,9 +499,10 @@ Polymer({
               // if key then add shell / run script
               // if not monitoring then enable monitoring
               ret.push('associate-key');
-              // if (item.keys.length)
               ret.push('shell');
-              ret.push('run-script');              
+              if (item.keys.length) {
+                  ret.push('run-script');
+              }
             }
             if (item.can_tag)
                 ret.push('tag');
@@ -513,10 +516,9 @@ Polymer({
             if (item.can_reboot)
                 ret.push('reboot');
             if (item.can_resume)
-                ret.push('resume');
-            // rename needs its own dialog element
-            // if (item.can_rename)
-            //     ret.push('rename');
+                ret.push('resume');            
+            if (item.can_rename)
+                ret.push('rename');
             if (item.can_destroy)
                 ret.push('destroy');
             if (item.can_undefine)
@@ -580,6 +582,11 @@ Polymer({
                 this.$['runscriptdialog'].items = items;
                 this.$['runscriptdialog']._openDialog();
             }
+            else if(event.model.item.name == 'rename') {
+                var items = [];
+                items.push(itemUid(this.selectedItem, this.section));
+                this.$['renamedialog']._openDialog();
+            }
             else {
                 this.$['confirmation'].toggle();
             }
@@ -607,6 +614,10 @@ Polymer({
             else if(event.model.item.name == 'run script') {
                 this.$['runscriptdialog'].items = this.selectedItems;
                 this.$['runscriptdialog']._openDialog();
+            }
+            else if(event.model.item.name == 'rename') {
+                this.$['renamedialog'].items = this.selectedItems;
+                this.$['renamedialog']._openDialog();
             }
             else {
                 this.$['confirmation'].toggle();
@@ -737,6 +748,18 @@ Polymer({
     _feedbackOnScript: function(e){
         if (e.detail.response) {
             this._showToast('Script run request succeded. Script '+this.computeModel().scripts[e.detail.scriptId].name+' has been queued for execution');
+        }
+        if (e.detail.error) {
+            this._showToast(e.detail.errormsg);
+        }
+    },
+    _feedbackOnRename: function(e){
+        console.log("_feedbackOnRename")
+        if (e.detail.request) {
+            this._showToast('Rename request sent. Waiting for machine to respond');
+        }
+        if (e.detail.response) {
+            this._showToast('Renaming was successful.');
         }
         if (e.detail.error) {
             this._showToast(e.detail.errormsg);

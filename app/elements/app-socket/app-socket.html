@@ -388,6 +388,24 @@
 
         _updateKeys: function(data) {
             this.set('onboarding.isLoadingKeys', false);
+            if(data){
+                for (var i=0;i<data.length;i++) {
+                    var key = data[i];
+                    if (this.model.clouds && key.machines)
+                    key.machines.forEach(function(m, index){
+                        var cloud = m[0],
+                            machine = m[1];
+                        if (this.model.clouds[cloud] && this.model.clouds[cloud].machines[machine])
+                        // check if machine has this key, if not add
+                        var keyexists = this.model.clouds[cloud].machines[machine].keys.find(function(k){
+                            return k.name == key.name;
+                        })
+                        if (!keyexists) {
+                            this.push('model.clouds.'+cloud+'.machines.'+machine+'.keys',key)
+                        }
+                    }, this)
+                }
+            }
             return this._updateModel('keys', data);
         },
 
@@ -460,11 +478,12 @@
                                     'title': cloud.title,
                                     'provider': cloud.provider
                                 };
-                            });
+                                machine.keys = this._machineKeys(machine.id, machine.cloud.id) || [];
+                            }, this);
 
                             return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])
                         }
-                    });
+                    }, this);
             }
 
             if (data.length && this.get('model.onboarding.hasMachines') != true)
@@ -545,7 +564,15 @@
         },
 
         _probe: function(data) {
-            // TODO
+            if (!this.model.probes)
+                this.set('model.probes', {})
+
+            try {
+                var uuid = this.model.clouds[data.cloud_id].machines[data.machine_id].uuid;
+                this.set('model.probes.'  + uuid, data.result);
+            } catch (e) {
+                console.warn('cannot find uuid for machine with cloud_id ', data.cloud_id, ' and machine_id', data.machine_id);
+            }
         },
 
         _ping: function(data) {
@@ -561,6 +588,18 @@
                 }
             }
             return keywords;
+        },
+
+        _machineKeys: function(machineID, cloudID){
+            // console.log('Update _machineKeys',cloudID,machineID);
+            if (machineID && cloudID){
+                var keys = this.model.keysArray.filter(function(k){
+                    return k.machines.find(function(m){
+                        return m[1] == machineID && m[0] == cloudID;
+                    })
+                });
+                return keys || [];
+            }
         }
     });
 

@@ -1,6 +1,7 @@
 try:
     from mist.core.user.models import User
-    from mist.core.cloud.models import Cloud, Machine, KeyAssociation
+    from mist.io.clouds.models import Cloud
+    from mist.core.cloud.models import Machine, KeyAssociation
     from mist.core.keypair.models import Keypair
     from mist.core import config
     from mist.core.vpn.methods import destination_nat as dnat
@@ -36,6 +37,11 @@ class MistInventory(object):
             if key_id not in self.keys:
                 keypair = Keypair.objects.get(owner=self.user, name=key_id)
                 self.keys[key_id] = keypair.private
+                if keypair.certificate:
+                    # if signed ssh key, provide the key appending a -cert.pub
+                    # on the name since this is how ssh will include it as
+                    # an identify file
+                    self.keys['%s-cert.pub' % key_id] = keypair.certificate
             if name in self.hosts:
                 num = 2
                 while ('%s-%d' % (name, num)) in self.hosts:

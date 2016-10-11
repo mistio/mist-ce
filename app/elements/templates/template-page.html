@@ -452,7 +452,7 @@
                     this.vpHeight = 'height:' + wh + 'px; overflow: auto;';
                 },
                 _computeReadableDate: function(date) {
-                    return moment(date).fromNow();
+                    return moment.utc(date).fromNow();
                 },
                 _computeHasStacks: function(stacks) {
                     if (stacks)
