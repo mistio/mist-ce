@@ -410,7 +410,9 @@
                         [[stack.name]]
                     </h2>
                     <div class="subtitle">
-                        Created from <a class="regular" href$="/templates/[[template.id]]"> [[template.name]] <iron-icon icon="icons:link"></iron-icon></a>
+                        Created from 
+                        <a class="regular" href$="/templates/[[template.id]]" hidden$="[[!template.name]]"> [[template.name]] <iron-icon icon="icons:link"></iron-icon></a>
+                        <span hidden$="[[template.id]]"> missing template</span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -874,7 +876,10 @@
                 },
                 _computeTemplate: function(stack, templates) {
                     if (stack)
-                        return this.model.templates[stack.template];
+                        if (this.model.templates[stack.template])
+                            return this.model.templates[stack.template];
+                        else
+                            return {};
                 },
                 _computeJobID: function(stack) {
                     return stack.job_id ? stack.job_id : false;
