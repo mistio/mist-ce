@@ -788,7 +788,8 @@ class DockerController(BaseController):
         # Username/Password authentication.
         return get_driver(Provider.DOCKER)(self.cloud.username,
                                            self.cloud.password,
-                                           host, port, docker_host=self.cloud.host)
+                                           host, port,
+                                           docker_host=self.cloud.host)
 
     def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'docker_port', 'port')
