@@ -751,16 +751,17 @@
                 },
                 newJob: function(id){
                     var that = this;
-                    // if (!this.intervalID) {
+                    if (!this.intervalID) {
                         this.intervalID = window.setInterval(
                           function(that) {
                             that._updateLogs(that);
                           }, 1000, that);
                         console.log('setting interval for job', this.intervalID);
-                    // }
-
+                    }
                 },
                 jobFinished: function(finished_at){
+                    // update logs one last time to get final log state
+                    this._updateLogs(this);
                     //clear interval
                     if (this.job && this.job.finished_at > 0 && this.intervalID){
                         window.clearInterval(this.intervalID);
@@ -808,9 +809,9 @@
                 },
                 is_error: function(stack) {
                     //update logs once to view the error
-                    if (this.job && stack && stack.status == 'error'){
-                        this.$.getJobLog.generateRequest();
-                    }
+                    // if (this.job && stack && stack.status == 'error'){
+                    //     this.$.getJobLog.generateRequest();
+                    // }
                     return stack.status == 'error';
                 },
                 is_workflow_started: function(stack) {
@@ -880,7 +881,8 @@
                     return stack.job_id ? stack.job_id : false;
                 },
                 _machines: function(stack) {
-                    return stack.machines;
+                    if (stack && stack.machines)
+                        return stack.machines;
                 },
                 _listMachines: function(nis) {
                     var machines = [];
@@ -1109,7 +1111,7 @@
                     return anchorme.js(YAML.dump(info).replace(/\'/g, ""));
                 },
                 _updateLogs: function(that){
-                    if (that.stack && (that.stack.status == 'workflow_started' || that.stack.status == 'start_creation')){
+                    if (that.stack){
                         console.log('_updateLogs');
                         that.$.getJobLog.generateRequest();
                     }
