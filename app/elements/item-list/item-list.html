@@ -709,12 +709,14 @@ Polymer({
 
     _itemLink: function(item) {
         var p, s = this.section.id;
-        if (s == "machines")
+        if (s == "machines" && item.uuid)
             p = item.uuid
         else if (s == "networks")
             p = item.id
-        else if (s == "incidents")
-            p = item.machine_id
+        else if (s == "incidents") {
+            if (this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id])
+                p = item.machine_id
+        }
         else
             p = item.id
 
@@ -722,7 +724,7 @@ Polymer({
         if (s != "incidents")
             return "/" + this.section.id + "/" + p;
         else
-            return "/machines/" + p;
+            return p ? "/machines/" + p : "/machines";
     },
 
     _getHeaderStyle: function(color, selectedItemsLength) {
