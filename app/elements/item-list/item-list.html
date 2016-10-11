@@ -418,9 +418,6 @@ Polymer({
         this.vpHeight = 'height:65px;';
     },
     itemHasIncidents: function(item, incidents){
-        // console.log('itemHasIncidents', this.incidents, this.incidents.indexOf(item.uuid))
-        if (item.name == "mistio-mist-core")
-            // console.log(item.name, this.incidents, item.id, this.incidents.indexOf(item.id) > -1)
         if (this.incidents.length > 0 && this.incidents.indexOf(item.id) > -1) {
             return true;
         }
