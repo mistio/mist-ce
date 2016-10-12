@@ -513,14 +513,14 @@ Polymer({
         return '../assets/providers/provider-' + className.split('_')[0] + '.png';
     },
     _computeReplaceTargets: function(monitoring) {
-        var ret = {'bucky.': ''},
-            mIds = Object.keys(this.get('model.monitoring.monitored_machines') || {});
-        for (var i=0; i<mIds.length; i++) {
-            var mref = this.model.monitoring.monitored_machines[mIds[i]],
-                m = mref && this.model.clouds[mref.cloud_id].machines[mref.machine_id];
-            ret[mIds[i]] = m ? m.name : 'unknown';
-        }
-        return ret;
+        // var ret = {'bucky.': ''},
+        //     mIds = Object.keys(this.get('model.monitoring.monitored_machines') || {});
+        // for (var i=0; i<mIds.length; i++) {
+        //     var mref = this.model.monitoring.monitored_machines[mIds[i]],
+        //         m = mref && this.model.clouds[mref.cloud_id].machines[mref.machine_id];
+        //     ret[mIds[i]] = m ? m.name : 'unknown';
+        // }
+        // return ret;
     },
     _showCloudInfoDialog: function(e) {
         var cloudId = e.currentTarget.getAttribute('id');
