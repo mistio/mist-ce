@@ -210,10 +210,11 @@
                         }
                     },
                     open_incidents: function(data) {
-                        that.set('onboarding.isLoadingIncidents', false);
                         if (DEBUG_SOCKET)
                             console.debug('got incidents', data);
-                        that.set('model.incidents', data);
+                        that.debounce(that._updateIncidents(data), function() {
+                            console.debug('Loaded incidents data');
+                        }, 250);
                     },
                     open_jobs: function(data) {
                         if (DEBUG_SOCKET)
@@ -552,6 +553,19 @@
         _updateTunnels: function(data) {
             this.set('onboarding.isLoadingTunnels', false);
             return this._updateModel('tunnels', data);
+        },
+
+        _updateIncidents: function(data) {
+            this.set('onboarding.isLoadingIncidents', false);
+            if (data) {
+                console.log(data);
+                for(var i=0;i<data.length;i++){
+                    var inc = data[i];
+                    inc.id = inc.incident_id
+                }
+            }
+            console.log(data);
+            return this._updateModel('incidents', data);
         },
 
         _updateProjects: function(data) {
