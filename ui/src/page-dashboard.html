@@ -361,7 +361,7 @@ Polymer({
         },
         hasIncidents: {
              type: Boolean,
-             computed: '_computeHasIncidents(model.incidents.*)',
+             computed: '_computeHasIncidents(model.incidentsArray.*)',
              value: false
         },
         sidebarIsOpen: {
@@ -477,8 +477,11 @@ Polymer({
         return cloud.state == 'offline' && 'offline';
     },
     _computeHasIncidents: function(incidents){
+        // incidents must be unresolved to count
          if (incidents.base){
-             return incidents.base.length > 0 ? true : false;
+             return incidents.base.filter(function(inc){
+                    return !inc.finished_at || inc.finished_at == 0;
+                }).length > 0 ? true : false;
          }
          else {
              return false;

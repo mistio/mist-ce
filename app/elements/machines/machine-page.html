@@ -316,7 +316,7 @@
         <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
-        <machine-edit machine="[[machine]]"></machine-edit>
+        <!-- <machine-edit machine="[[machine]]"></machine-edit> -->
         <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
     </template>
@@ -486,7 +486,8 @@ MACHINEACTIONS = {
         listeners: {
             'confirmation': '_machineActionConfirmation',
             'pending-key-request': '_updateKeyLoader',
-            'run-script-request':'_feedbackOnScript'
+            'run-script-request':'_feedbackOnScript',
+            'rename-request':'_feedbackOnRename'
         },
         ready: function(){
             this.set('hideAssociatedKeys', true);
@@ -542,9 +543,8 @@ MACHINEACTIONS = {
                 ret.push('reboot');
             if (item.can_resume)
                 ret.push('resume');
-            // rename/monitor/runscript on machine needs its own dialog element
-            // if (item.can_rename)
-            //     ret.push('rename');
+            if (item.can_rename)
+                ret.push('rename');
             if (item.can_destroy)
                 ret.push('destroy');
             if (item.can_undefine)
@@ -622,14 +622,7 @@ MACHINEACTIONS = {
             return itemUidInArray;
         },
         _computeAssociatedKeys: function(machine, keys){
-            var machineId = this.machine.id;
-            var associatedKeys = [];
-                associatedKeys = this.model.keysArray.filter(function(key){
-                return key.machines.filter(function(machine){
-                    return machine[1] == machineId;
-                }).length;
-            }, this);
-            return associatedKeys || [];
+            return machine.keys || [];
         },
         computeMachineIp: function(machineips){
             if (this.machine.public_ips){
@@ -773,7 +766,7 @@ MACHINEACTIONS = {
             }
         },
         _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
-            var hide =  !(associatedKeys.base.length > 0 || isPendingKeyRequest);
+            var hide =  !(this.machine.keys.length > 0 || isPendingKeyRequest);
             this.set('hideAssociatedKeys', hide);
         },
         _feedbackOnScript: function(e){
@@ -783,6 +776,18 @@ MACHINEACTIONS = {
             if (e.detail.error) {
                 this._showToast(e.detail.errormsg);
             }
+        },
+        _feedbackOnRename: function(e){
+        console.log("_feedbackOnRename")
+        if (e.detail.request) {
+            this._showToast('Rename request sent. Waiting for machine to respond');
         }
+        if (e.detail.response) {
+            this._showToast('Renaming was successful.');
+        }
+        if (e.detail.error) {
+            this._showToast(e.detail.errormsg);
+        }
+    },
     });
 </script>

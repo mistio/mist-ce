@@ -131,7 +131,8 @@
                     formReady: {
                         type: Boolean,
                         value: false
-                    }
+                    },
+                    clouds: Array
                 },
                 observers: [
                     '_providerChanged(selectedProvider, providers)',
@@ -174,6 +175,8 @@
                           show: false,
                           value: selectedProvider
                     }].concat(providerFields));
+                    
+                    this.fillInKnownData(selectedProvider, this.clouds);
                 },
                 _keysChanged: function(keys, providerFields) {
                     // Set list of keys in providerFields when model keys change
@@ -238,6 +241,36 @@
                         this.set('providerFields.'+index+'.value', title+' '+region);
                     }
 
+                },
+                fillInKnownData: function(provider, clouds){
+                    console.log('fillInKnownData',provider);
+                    if (provider){
+                        var cloudInSameProvider = this.clouds.find(function(c){
+                            return c.provider == provider
+                        });
+                        if (cloudInSameProvider) {
+                            // if there is an apikey we can fill in
+                            var apikey = cloudInSameProvider.apikey;
+                            var index = this.fieldIndexByName('apikey');
+                            if (apikey && index) {
+                                this.set('providerFields.'+index+'.value', apikey);
+                                // if there is apikey and an apisecret we can 'getsecretfromdb'
+                                var indexp = this.fieldIndexByName('apisecret');
+                                if (indexp) {
+                                    this.set('providerFields.'+indexp+'.value', 'getsecretfromdb');
+                                }
+                            }
+                        }
+                        console.log(cloudInSameProvider);
+                    }
+                },
+                fieldIndexByName: function(name){
+                    var index;
+                    var passField = this.providerFields.find(function(f, ind){
+                        index = ind;
+                        return f.name == name;
+                    });
+                    return index;
                 }
             });
         })();

@@ -68,10 +68,7 @@ Polymer({
             type: String,
             value: false
         },
-        scripts: {
-            type: Array,
-            computed: 'computeScripts(items)'
-        },
+        scripts: Array,
         params: String
     },
     listeners: {
@@ -129,12 +126,6 @@ Polymer({
     _runScriptError: function(e){
         console.log(e, e.detail);
         this.fire('run-script-request', {error: true, errormsg: e.detail.xhr.responseText, scriptId: this.selectedScriptId});
-    },
-    computeModel: function(){
-        return document.querySelector("app-main") ? document.querySelector("app-main").model : document.querySelector("mist-app").model;
-    },
-    computeScripts: function(items){
-        return this.computeModel().scriptsArray;
     }
 });
 </script>

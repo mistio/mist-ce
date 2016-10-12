@@ -410,7 +410,9 @@
                         [[stack.name]]
                     </h2>
                     <div class="subtitle">
-                        Created from <a class="regular" href$="/templates/[[template.id]]"> [[template.name]] <iron-icon icon="icons:link"></iron-icon></a>
+                        Created from 
+                        <a class="regular" href$="/templates/[[template.id]]" hidden$="[[!template.name]]"> [[template.name]] <iron-icon icon="icons:link"></iron-icon></a>
+                        <span hidden$="[[template.id]]"> missing template</span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -443,7 +445,7 @@
                     </div>
                     <div class="page-block">
                         <h3 class="smallcaps">Created</h3>
-                        <p>[[timestamp]]
+                        <p>[[_computeReadableDate(stack.created_at)]]
                         </p>
                     </div>
                     <div class="page-block" hidden$="[[!stack.tags]]">
@@ -684,10 +686,6 @@
                         type: Array,
                         computed: '_computeWorkflows(template.workflows.*, model.templates)'
                     },
-                    timestamp: {
-                        type: String,
-                        computed: '_getFormattedTimestamp(stack)'
-                    },
                     vpHeight: String,
                     payload: {
                         type: Object,
@@ -878,7 +876,10 @@
                 },
                 _computeTemplate: function(stack, templates) {
                     if (stack)
-                        return this.model.templates[stack.template];
+                        if (this.model.templates[stack.template])
+                            return this.model.templates[stack.template];
+                        else
+                            return {};
                 },
                 _computeJobID: function(stack) {
                     return stack.job_id ? stack.job_id : false;
@@ -1008,11 +1009,8 @@
                     });
                     return workflows;
                 },
-                _getFormattedTimestamp: function(stack) {
-                    if (stack)
-                        return new Date(this.stack.created_at).toLocaleString('en-US', {
-                            timeZoneName: 'short'
-                        });
+                _computeReadableDate: function(date) {
+                    return moment.utc(date).fromNow();
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element'),
