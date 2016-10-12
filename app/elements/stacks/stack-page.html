@@ -551,7 +551,7 @@
                 <paper-material>
                     <template is="dom-repeat" items="[[job.logs]]" as="log">
                         <div class$="log error-[[log.error]]">
-                            <iron-icon icon$="[[computeLogIcon(log,index)]]"></iron-icon>
+                            <iron-icon icon$="[[computeLogIcon(log,index, job)]]"></iron-icon>
                             <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
                             [[log.action]]
                             <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
@@ -737,7 +737,7 @@
                     }
                 },
                 observers: [
-                    'newStackPage(stack.id)',
+                    'newStackPage(stack.id, stack)',
                     'newJob(stack.job_id)',
                     'stackoutputsChanged(stack.outputs)'
                 ],
@@ -748,16 +748,17 @@
                 },
                 ready: function(){
                     this.set('job', {});
+                    this.set('intervalID', false);
                 },
                 attached: function(){
                 },
                 newJob: function(id){
                     var that = this;
-                    if (!this.intervalID) {
+                    if (!this.intervalID && !this.job.finished_at) {
                         this.intervalID = window.setInterval(
                           function(that) {
                             that._updateLogs(that);
-                          }, 1000, that);
+                          }, 3000, that);
                         console.log('setting interval for job', this.intervalID);
                     }
                 },
@@ -765,9 +766,9 @@
                     // update logs one last time to get final log state
                     this._updateLogs(this);
                     //clear interval
-                    if (this.job && this.job.finished_at > 0 && this.intervalID){
+                    if (this.job.job_id && this.job.finished_at > 0 && this.intervalID){
                         window.clearInterval(this.intervalID);
-                        this.intervalID = null;
+                        this.set('intervalID', false);
                     }
                 },
                 test: function() {
@@ -810,10 +811,7 @@
                         return stack.status == 'start_creation';
                 },
                 is_error: function(stack) {
-                    //update logs once to view the error
-                    // if (this.job && stack && stack.status == 'error'){
-                    //     this.$.getJobLog.generateRequest();
-                    // }
+                    if (stack)
                     return stack.status == 'error';
                 },
                 is_workflow_started: function(stack) {
@@ -1111,17 +1109,16 @@
                     this.$.stackOutputs.innerHTML = this._makeString(outputs);
                 },
                 _makeString: function(info){
-                    console.log(YAML.dump(info));
-                    console.log(anchorme.js(YAML.dump(info)));
+                    if (info)
                     return anchorme.js(YAML.dump(info).replace(/\'/g, ""));
                 },
                 _updateLogs: function(that){
-                    if (that.stack){
+                    if (that.stack && that.job.job_id && that.intervalID){
                         console.log('_updateLogs');
                         that.$.getJobLog.generateRequest();
                     }
                 },
-                computeLogIcon: function(log, index){
+                computeLogIcon: function(log, index, job){
                     if (log.error) {
                         return 'icons:error-outline'
                     }
@@ -1135,10 +1132,10 @@
                 _updateFields: function(){
 
                 },
-                newStackPage: function(id){
+                newStackPage: function(id, stack){
                     console.log('un setting interval for', this.intervalID);
-                    window.clearInterval(this.intervalID);
-                    this.intervalID = null;
+                    window.clearInterval();
+                    // this.set('intervalID', false);
                 },
                 _computeIsloading: function(stack) {
                     return !this.stack ? true : false;
