@@ -1005,6 +1005,9 @@ def create_machine(request):
     softlayer_backend_vlan_id = params.get('softlayer_backend_vlan_id', None)
     hourly = params.get('billing', True)
 
+    import uuid
+    job_id = params.get('job_id', uuid.uuid4().hex)
+
     # only for mist.core, parameters for cronjob
     if not params.get('cronjob_type'):
         cronjob = {}
@@ -1034,8 +1037,6 @@ def create_machine(request):
     if key_id:
         auth_context.check_perm("key", "read", key_id)
 
-    import uuid
-    job_id = uuid.uuid4().hex
     from mist.io import tasks
     args = (cloud_id, key_id, machine_name,
             location_id, image_id, size_id,
