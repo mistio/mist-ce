@@ -153,7 +153,7 @@
                     this._computeTags(this.items);
                 },
                 _computeTags: function(items) {
-                    var tags = this._computeCommonTags(this.items);
+                    var tags = this._computeCommonTags(items);
                     if (!tags.length) {
                         tags = [{
                             key: '',
@@ -197,7 +197,7 @@
                             }
 
                             if (i == 0) {
-                                // console.log('itemObj.tags',itemObj.tags);
+                                console.log('itemObj.tags',itemObj.tags);
                                 tagset.addItems(itemObj.tags.map(function(tag){
                                     return tag.key+'='+tag.value;
                                 }));
