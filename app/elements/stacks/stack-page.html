@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../app-togglable/app-togglable-list.html">
@@ -140,6 +141,11 @@
 
             paper-icon-button {
                 transition: all 200ms;
+            }
+
+            paper-icon-button.close {
+                float: right;
+                margin-top: -10px;
             }
 
             paper-icon-button.active-sort {
@@ -398,6 +404,10 @@
             text-transform: none;
             font-size: 0.9em;
         }
+        #cfyshell {
+            width: 100%;
+            margin-top: 30px;
+        }
         </style>
         <div id="content">
             <div class="is-loading" hidden$="[[!isLoading]]">
@@ -410,7 +420,7 @@
                         [[stack.name]]
                     </h2>
                     <div class="subtitle">
-                        Created from 
+                        Created from
                         <a class="regular" href$="/templates/[[template.id]]" hidden$="[[!template.name]]"> [[template.name]] <iron-icon icon="icons:link"></iron-icon></a>
                         <span hidden$="[[template.id]]"> missing template</span>
                     </div>
@@ -551,12 +561,16 @@
                 <paper-material>
                     <template is="dom-repeat" items="[[job.logs]]" as="log">
                         <div class$="log error-[[log.error]]">
-                            <iron-icon icon$="[[computeLogIcon(log,index)]]"></iron-icon>
+                            <iron-icon icon$="[[computeLogIcon(log, index, stack.status)]]"></iron-icon>
                             <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
                             [[log.action]]
                             <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
                         </div>
                     </template>
+                    <paper-button toggles active={{showOutput}} hidden$="[[showOutput]]">Show output</paper-button>
+                    <paper-icon-button class="close" toggles active={{showOutput}} hidden$="[[!showOutput]]" icon="icons:close"></paper-icon-button>
+
+                    <div id="cfyshell" hidden$="[[!showOutput]]"></div>
                 </paper-material>
             </div>
             <!-- </template> -->
@@ -650,6 +664,10 @@
                         type: Boolean,
                         computed: '_hideDeployNow(stack)'
                     },
+                    showOutput: {
+                        type: Boolean,
+                        value: false,
+                    },
                     section: {
                         type: Object
                     },
@@ -685,6 +703,10 @@
                     workflows: {
                         type: Array,
                         computed: '_computeWorkflows(template.workflows.*, model.templates)'
+                    },
+                    timestamp: {
+                        type: String,
+                        computed: '_getFormattedTimestamp(stack)'
                     },
                     vpHeight: String,
                     payload: {
@@ -739,7 +761,8 @@
                 observers: [
                     'newStackPage(stack.id)',
                     'newJob(stack.job_id)',
-                    'stackoutputsChanged(stack.outputs)'
+                    'stackoutputsChanged(stack.outputs)',
+                    'updateTerm(showOutput)'
                 ],
                 listeners: {
                     // 'change' : '_updateFields',
@@ -761,12 +784,39 @@
                         console.log('setting interval for job', this.intervalID);
                     // }
 
+                    if (this.stack && (this.stack.status == 'workflow_started' || this.stack.status == 'start_creation')){
+                        this.showOutput = true;
+                    }
+                },
+                updateTerm: function(show) {
+                    if (show) {
+                        this.attachTerm();
+                    } else {
+                      var xterm = this.querySelector("xterm-dialog");
+                      if (xterm)
+                          xterm.remove();
+                    }
+                },
+                attachTerm: function() {
+                    this.importHref(this.resolveUrl('/elements/helpers/xterm-dialog.html'), null, null, true);
+                    var xterm = this.querySelector("xterm-dialog");
+                    if (xterm)
+                        xterm.remove();
+                    xterm = document.createElement("xterm-dialog");
+                    xterm.target = {job_id: this.stack.job_id};
+                    xterm.height = 500;
+                    xterm.controls = false;
+                    var parent = this.querySelector("div#cfyshell");
+                    parent.insertBefore(xterm, parent.firstChild);
+                    console.warn('xterm open', xterm);
                 },
                 jobFinished: function(finished_at){
                     //clear interval
                     if (this.job && this.job.finished_at > 0 && this.intervalID){
                         window.clearInterval(this.intervalID);
                         this.intervalID = null;
+                        // update job logs one last time
+                        this.async(function(){this.$.getJobLog.generateRequest()}, 1000);
                     }
                 },
                 test: function() {
@@ -813,7 +863,7 @@
                     if (this.job && stack && stack.status == 'error'){
                         this.$.getJobLog.generateRequest();
                     }
-                    return stack.status == 'error';
+                    return stack && stack.status == 'error';
                 },
                 is_workflow_started: function(stack) {
                     if (stack)
@@ -885,7 +935,7 @@
                     return stack.job_id ? stack.job_id : false;
                 },
                 _machines: function(stack) {
-                    return stack.machines;
+                    return stack && stack.machines;
                 },
                 _listMachines: function(nis) {
                     var machines = [];
@@ -1117,13 +1167,14 @@
                     if (that.stack && (that.stack.status == 'workflow_started' || that.stack.status == 'start_creation')){
                         console.log('_updateLogs');
                         that.$.getJobLog.generateRequest();
+                        this.showOutput = true;
                     }
                 },
-                computeLogIcon: function(log, index){
+                computeLogIcon: function(log, index, status){
                     if (log.error) {
                         return 'icons:error-outline'
                     }
-                    else if (index == this.job.logs.length -1 && this.job.finished_at == 0){
+                    else if (index == this.job.logs.length -1 && this.job.finished_at == 0 && status != 'ok'){
                         return '';
                     }
                     else {
@@ -1137,6 +1188,11 @@
                     console.log('un setting interval for', this.intervalID);
                     window.clearInterval(this.intervalID);
                     this.intervalID = null;
+                    var xterm = this.querySelector("xterm-dialog");
+                    if (xterm)
+                        xterm.remove();
+                    this.showOutput = false;
+
                 },
                 _computeIsloading: function(stack) {
                     return !this.stack ? true : false;
