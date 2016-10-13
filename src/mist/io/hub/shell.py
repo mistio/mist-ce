@@ -41,8 +41,8 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
             return
         data = self.params
         self.provider = data.get('provider', '')
-        self.shell = mist.io.shell.Shell(data['host'])
         try:
+            self.shell = mist.io.shell.Shell(data['host'])
             key_id, ssh_user = self.shell.autoconfigure(
                 self.owner, data['cloud_id'], data['machine_id']
             )
@@ -51,7 +51,7 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
                 self.shell = mist.io.shell.Shell(data['host'],
                                                  provider='docker')
                 key_id, ssh_user = self.shell.autoconfigure(
-                    self.owner, data['cloud_id'], data['machine_id']
+                    self.owner, data['cloud_id'], data['machine_id'], job_id=data['job_id']
                 )
             else:
                 log.warning("%s: Couldn't connect with SSH, error %r.",

@@ -139,9 +139,10 @@ class ShellConnection(MistConnection):
         if self.ssh_info:
             self.close()
         self.ssh_info = {
-            'cloud_id': data['cloud_id'],
-            'machine_id': data['machine_id'],
-            'host': data['host'],
+            'job_id': data.get('job_id', ''),
+            'cloud_id': data.get('cloud_id', ''),
+            'machine_id': data.get('machine_id', ''),
+            'host': data.get('host'),
             'columns': data['cols'],
             'rows': data['rows'],
             'ip': self.ip,
@@ -262,7 +263,7 @@ class MainConnection(MistConnection):
                   orchestration_methods.filter_list_stacks(self.auth_context))
 
     def list_tunnels(self):
-        self.send('list_tunnels', 
+        self.send('list_tunnels',
                   core_methods.filter_list_vpn_tunnels(self.auth_context))
 
     def list_clouds(self):
@@ -306,7 +307,7 @@ class MainConnection(MistConnection):
         error = False
         try:
             data = get_stats(self.owner, cloud_id, machine_id,
-                             start, stop, step)
+                             start, stop, step, metrics=metrics)
         except BadRequestError as exc:
             error = str(exc)
             data = []

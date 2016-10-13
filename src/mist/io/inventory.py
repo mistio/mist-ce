@@ -37,6 +37,11 @@ class MistInventory(object):
             if key_id not in self.keys:
                 keypair = Keypair.objects.get(owner=self.user, name=key_id)
                 self.keys[key_id] = keypair.private
+                if keypair.certificate:
+                    # if signed ssh key, provide the key appending a -cert.pub
+                    # on the name since this is how ssh will include it as
+                    # an identify file
+                    self.keys['%s-cert.pub' % key_id] = keypair.certificate
             if name in self.hosts:
                 num = 2
                 while ('%s-%d' % (name, num)) in self.hosts:
