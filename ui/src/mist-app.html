@@ -13,7 +13,9 @@
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-<link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../bower_components/iron-media-query/
+iron-media-query.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 
 <script type="text/javascript" src="../bower_components/swiftSet/swiftSet.js" inline></script>
 
@@ -58,6 +60,29 @@
     iron-pages[smallscreen]::content #content {
         padding: 0;
     }
+    iron-pages::content>* {
+        background-color: #eee;
+    }
+    .is-loading-html {
+        top: 15px;
+        left: 200px;
+        right: 0;
+        bottom: 0;
+        position: absolute;
+        height: 100vh;
+        background-color: #eee;
+        display: block;
+        z-index: 0;
+    }
+    .is-loading-html.center {
+        left: 0
+    }
+    paper-spinner {
+        width: 80px;
+        height: 80px;
+        margin: 10% auto;
+        display: block;
+    }
     </style>
 
     <style is="custom-style" include="shared-styles"></style>
@@ -73,7 +98,9 @@
     <paper-header-panel mode="standard" class="fit">
         <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{page}}" drawer smallscreen$="{{smallscreen}}" with-backdrop></app-sidebar>
         <mist-header model="[[model]]" title$="[[page]]" class="paper-header" style$="[[style]]"></mist-header>
-
+        <div class="is-loading-html">
+          <paper-spinner active></paper-spinner>
+        </div>
         <iron-pages id="iron-pages" role="main" selected="[[page]]" attr-for-selected="name" smallscreen$="{{smallscreen}}">
           <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-dashboard>
           <page-clouds name="clouds" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-clouds>

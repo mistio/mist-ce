@@ -32,10 +32,17 @@
 <dom-module id="page-dashboard">
     <template>
         <style is="custom-style" include="headings"></style>
-        <style>
+        <style is="custom-style" >
         :host {
             /*--layout-margin: 0.5em;*/
             --layout-margin: 16px;
+            background-color: #eee;
+            position: relative;
+            z-index: 1;
+        }
+        #content {
+            background-color: #eee;
+            display: block;
         }
         paper-material {
             overflow: auto !important;
