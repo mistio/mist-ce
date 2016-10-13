@@ -525,7 +525,7 @@
                                 <template is="dom-if" if=[[workflow.params.length]]>
                                     <paper-material class="app-form-title">[[workflow.name]]</paper-material>
                                     <paper-material>
-                                        <mist-form model=[[model]] fields="{{workflow.params}}" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[params.id]]" on-request="handleWorkflowRequest" on-response="handleWorkflowResponse" on-error="handleWorkflowError" btncontent="[[workflow.name]]">[[workflow.name]]</mist-form>
+                                        <mist-form model=[[model]] fields="{{workflow.params}}" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[stack.id]]" on-request="handleWorkflowRequest" on-response="handleWorkflowResponse" on-error="handleWorkflowError" btncontent="[[workflow.name]]">[[workflow.name]]</mist-form>
                                     </paper-material>
                                 </template>
 
