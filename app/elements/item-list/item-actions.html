@@ -664,7 +664,7 @@ Polymer({
                 //el.importHref(el.resolveUrl('/elements/helpers/xterm-dialog.html'), null, null, true);
 
                 // remove existing terminals from DOM
-                var xterm = this.querySelector("xterm-dialog");
+                var xterm = document.querySelector("xterm-dialog");
                 if (xterm)
                     xterm.remove();
 
