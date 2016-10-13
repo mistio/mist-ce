@@ -345,6 +345,7 @@ Polymer({
         }
         else {
             document.querySelector("#iron-pages").classList.add('center');
+            document.querySelector("#main-loader").classList.add('center');
         }
         this.set('isclosed', true);
     },
@@ -355,6 +356,7 @@ Polymer({
         }
         else {
             document.querySelector("#iron-pages").classList.remove('center');
+            document.querySelector("#main-loader").classList.remove('center');
         }
         this.set('isclosed', false);
     },
@@ -364,7 +366,8 @@ Polymer({
             this.toggle(); //control brackdrop
         }
         else {
-            document.querySelector("#iron-pages").toggleClass('center');
+            document.querySelector("#iron-pages").classList.toggle('center');
+            document.querySelector("#main-loader").classList.toggle('center');
         }
         this.set('isclosed', !this.isclosed);  
     },
