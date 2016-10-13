@@ -37,7 +37,7 @@
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <iron-ajax id="editTemplateAjax" url="/api/v1/templates/[[template._id]]" method="POST" on-request="_editTemplateAjax" on-response="_ajaxResponse"></iron-ajax>
+        <iron-ajax id="editTemplateAjax" url="/api/v1/templates/[[template._id]]" method="PUT" on-request="_editTemplateAjax" on-response="_ajaxResponse"></iron-ajax>
     </template>
 
     <script>
@@ -49,11 +49,11 @@
 
                 properties: {
                     template: {
+                        type: Object
+                    },
+                    newTemplate: {
                         type: Object,
-                        value: {
-                            name: null,
-                            description: null
-                        },
+                        computed: '_computeNewTemplate(template)',
                         notify: true
                     },
                     sendingData: {
@@ -70,6 +70,14 @@
                 },
                 ready: function() {
 
+                },
+                _computeNewTemplate: function(template) {
+                    if (template){
+                        return {
+                            name: template.name,
+                            description: template.description
+                        };
+                    }
                 },
                 _computeFormReady: function(name, sendingData) {
                     var formReady = false;
@@ -94,11 +102,12 @@
                     this._formReset();
                 },
                 _submitForm: function(e) {
-                    this.fire('updateSelectedTemplate', {
-                        template: this.template
-                    });
                     this.$.editTemplateAjax.headers["Content-Type"] = 'application/json';
                     this.$.editTemplateAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.editTemplateAjax.body = {                     
+                        name: this.template.name,
+                        description: this.template.description
+                    };
                     this.$.editTemplateAjax.generateRequest();
                     this._closeEditTemplateModal();
                 },
