@@ -24,15 +24,15 @@
         </style>
 
         <paper-dialog id="editTemplateModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
-            <h2>Edit Template</h2>
-            <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
+            <h2>Edit Template</h2>            
             <paper-dialog-scrollable>
                 <p>
-                    <paper-input id="name" label="Name" error-message="Please enter template's name" value="{{template.name}}"></paper-input>
-                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter template's description" value="{{template.description}}"></paper-textarea>
+                    <paper-input id="name" label="Name" error-message="Please enter template's name" value="{{newTemplate.name}}"></paper-input>
+                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter template's description" value="{{newTemplate.description}}"></paper-textarea>
                 </p>
                 <div class="clearfix btn-group">
-                    <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                    <paper-button class="close link" icon="clear" dialog-dismiss>Cancel</paper-button>
+                    <paper-button class="submit-btn btn-block blue" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
@@ -62,7 +62,7 @@
                     },
                     formReady: {
                         type: Boolean,
-                        computed: '_computeFormReady(template.name, sendingData)'
+                        computed: '_computeFormReady(newTemplate.name, sendingData)'
                     }
                 },
                 listeners: {
@@ -82,7 +82,7 @@
                 _computeFormReady: function(name, sendingData) {
                     var formReady = false;
 
-                    if (name) {
+                    if (name && name != "") {
                         formReady = true;
                     }
 
@@ -105,14 +105,14 @@
                     this.$.editTemplateAjax.headers["Content-Type"] = 'application/json';
                     this.$.editTemplateAjax.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.editTemplateAjax.body = {                     
-                        name: this.template.name,
-                        description: this.template.description
+                        name: this.newTemplate.name,
+                        description: this.newTemplate.description
                     };
                     this.$.editTemplateAjax.generateRequest();
                     this._closeEditTemplateModal();
                 },
                 _formReset: function() {
-                    //   this.set('template.id', '');
+                    this._computeNewTemplate(this.template);
                 },
                 _editTemplateAjax: function(e) {
                     console.log('edit', this.$.editTemplateAjax);
