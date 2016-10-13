@@ -517,7 +517,7 @@ Polymer({
             if (item.can_reboot)
                 ret.push('reboot');
             if (item.can_resume)
-                ret.push('resume');            
+                ret.push('resume');
             if (item.can_rename)
                 ret.push('rename');
             if (item.can_destroy)
@@ -662,7 +662,13 @@ Polymer({
                 console.warn('opening shell');
                 // load page import on demand.
                 //el.importHref(el.resolveUrl('/elements/helpers/xterm-dialog.html'), null, null, true);
-                var xterm = el.querySelector("xterm-dialog");
+
+                // remove existing terminals from DOM
+                var xterm = document.querySelector("xterm-dialog");
+                if (xterm)
+                    xterm.remove();
+
+                xterm = el.querySelector("xterm-dialog");
                 if (!xterm) {
                     xterm = document.createElement("xterm-dialog");
                     xterm.target = item;
