@@ -207,7 +207,7 @@ Polymer({
         }
     },
     computeKeys: function(model){
-        return this.model.keysArray || [];
+        return (this.model && this.model.keysArray) ? this.model.keysArray : [];
     },
     computeModel: function(){
         return document.querySelector("app-main") ? document.querySelector("app-main").model : document.querySelector("mist-app").model;

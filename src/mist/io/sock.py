@@ -23,7 +23,8 @@ try:
     from mist.io import config as ioconfig
     from mist.core import config
     from mist.core.methods import get_stats
-    from mist.core.cloud.models import Cloud, Machine
+    from mist.io.clouds.models import Cloud
+    from mist.core.cloud.models import Machine
     from mist.core.keypair.models import Keypair
     multi_user = True
 except ImportError:
@@ -257,7 +258,7 @@ class MainConnection(MistConnection):
                   orchestration_methods.filter_list_stacks(self.auth_context))
 
     def list_tunnels(self):
-        self.send('list_tunnels', 
+        self.send('list_tunnels',
                   core_methods.filter_list_vpn_tunnels(self.auth_context))
 
     def list_clouds(self):
@@ -301,7 +302,7 @@ class MainConnection(MistConnection):
         error = False
         try:
             data = get_stats(self.owner, cloud_id, machine_id,
-                             start, stop, step)
+                             start, stop, step, metrics=metrics)
         except BadRequestError as exc:
             error = str(exc)
             data = []

@@ -131,6 +131,12 @@ SUPPORTED_PROVIDERS_V_2 = [
         'provider': Provider.AZURE,
         'regions': []
     },
+    # AzureARM
+    {
+        'title': 'Azure ARM',
+        'provider': Provider.AZURE_ARM,
+        'regions': []
+    },
     # EC2
     {
         'title': 'EC2',
@@ -318,6 +324,11 @@ SUPPORTED_PROVIDERS = [
     {
         'title': 'Azure',
         'provider': Provider.AZURE
+    },
+    # Azure ARM
+    {
+        'title': 'Azure ARM',
+        'provider': Provider.AZURE_ARM
     },
     # EC2
     {

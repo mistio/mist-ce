@@ -16,7 +16,7 @@
                 data="{{data}}"></app-route>
 
     <page-items name="clouds" class="clouds" model="[[model]]" items="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.clouds]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
-    <cloud-add providers="[[providers]]" keys="[[model.keysArray]]" section="[[sections.clouds]]" hidden$=[[!_isAddPageActive(route.path)]]></cloud-add>
+    <cloud-add providers="[[providers]]" keys="[[model.keysArray]]" section="[[sections.clouds]]" clouds="[[model.cloudsArray]]" hidden$=[[!_isAddPageActive(route.path)]]></cloud-add>
 
   </template>
 
