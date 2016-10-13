@@ -418,8 +418,8 @@ class DockerShell(DockerWebSocket):
         shell_type = 'logging' if kwargs.get('job_id', '') else 'interactive'
         config_method = '%s_shell' % shell_type
 
-        getattr(self, config_method)(user, 
-                                     cloud_id=cloud_id, machine_id=machine_id, 
+        getattr(self, config_method)(user,
+                                     cloud_id=cloud_id, machine_id=machine_id,
                                      job_id=kwargs.get('job_id', ''))
         self.connect()
         # This is for compatibility purposes with the ParamikoShell
@@ -428,11 +428,11 @@ class DockerShell(DockerWebSocket):
     def interactive_shell(self, user, **kwargs):
         docker_port, cloud = \
             self.get_docker_endpoint(user, cloud_id=kwargs['cloud_id'])
-        log.info("Autoconfiguring DockerShell for machine %s:%s", 
+        log.info("Autoconfiguring DockerShell for machine %s:%s",
                  cloud.id, kwargs['machine_id'])
 
         ssl_enabled = cloud.key_file and cloud.cert_file
-        self.uri = self.build_uri(kwargs['machine_id'], docker_port, cloud=cloud, 
+        self.uri = self.build_uri(kwargs['machine_id'], docker_port, cloud=cloud,
                                   ssl_enabled=ssl_enabled)
 
     def logging_shell(self, user, log_type='CFY', **kwargs):
@@ -442,7 +442,7 @@ class DockerShell(DockerWebSocket):
                  'container %s (User: %s)', log_type, container_id, user.id)
 
         # TODO: SSL for CFY container
-        self.uri = self.build_uri(container_id, docker_port, allow_logs=1, 
+        self.uri = self.build_uri(container_id, docker_port, allow_logs=1,
                                                              allow_stdin=0)
 
     def get_docker_endpoint(self, user, cloud_id, job_id=None):
@@ -456,7 +456,7 @@ class DockerShell(DockerWebSocket):
         self.host, docker_port = dnat(user, self.host, cloud.port)
         return docker_port, cloud
 
-    def build_uri(self, container_id, docker_port, cloud=None, ssl_enabled=False, 
+    def build_uri(self, container_id, docker_port, cloud=None, ssl_enabled=False,
                   allow_logs=0, allow_stdin=1):
         if ssl_enabled:
             self.protocol = 'wss'
@@ -466,15 +466,15 @@ class DockerShell(DockerWebSocket):
                 'keyfile': ssl_key,
                 'certfile': ssl_cert
             }
-            self.ws = websocket.WebSocket(sslopt=self.sslopt) 
+            self.ws = websocket.WebSocket(sslopt=self.sslopt)
 
         if cloud and cloud.username and cloud.password:
             uri = '%s://%s:%s@%s:%s/containers/%s/attach/ws?logs=%s&stream=1&stdin=%s&stdout=1&stderr=1' % \
-                   (self.protocol, cloud.username, cloud.password, self.host, 
+                   (self.protocol, cloud.username, cloud.password, self.host,
                     docker_port, container_id, allow_logs, allow_stdin)
         else:
             uri = '%s://%s:%s/containers/%s/attach/ws?logs=%s&stream=1&stdin=%s&stdout=1&stderr=1' % \
-                  (self.protocol, self.host, docker_port, container_id, 
+                  (self.protocol, self.host, docker_port, container_id,
                    allow_logs, allow_stdin)
 
         return uri
@@ -488,7 +488,7 @@ class DockerShell(DockerWebSocket):
             with open(tempkey.name, 'w') as f:
                 f.write(_key)
             tempcert = tempfile.NamedTemporaryFile(delete=False)
-            with open(tempcert.name, 'w') as f:             
+            with open(tempcert.name, 'w') as f:
                 f.write(_cert)
 
             return tempkey.name, tempcert.name

@@ -140,9 +140,9 @@ class ShellConnection(MistConnection):
             self.close()
         self.ssh_info = {
             'job_id': data.get('job_id', ''),
-            'cloud_id': data['cloud_id'],
-            'machine_id': data['machine_id'],
-            'host': data['host'],
+            'cloud_id': data.get('cloud_id', ''),
+            'machine_id': data.get('machine_id', ''),
+            'host': data.get('host'),
             'columns': data['cols'],
             'rows': data['rows'],
             'ip': self.ip,

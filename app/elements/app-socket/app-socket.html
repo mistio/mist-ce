@@ -402,7 +402,10 @@
                             return k.name == key.name;
                         })
                         if (!keyexists) {
-                            this.push('model.clouds.'+cloud+'.machines.'+machine+'.keys',key)
+                            if (!this.get('model.clouds.'+cloud+'.machines.'+machine+'.keys'))
+                                this.set('model.clouds.'+cloud+'.machines.'+machine+'.keys', [key])
+                            else
+                                this.push('model.clouds.'+cloud+'.machines.'+machine+'.keys',key)
                         }
                     }, this)
                 }
