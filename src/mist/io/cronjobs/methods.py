@@ -7,6 +7,7 @@ from mist.core.cloud.models import Machine
 from mist.core.script.models import Script
 from mist.io.cronjobs.models import UserPeriodicTask
 
+from mist.io.exceptions import NotFoundError
 from mist.core.exceptions import InvalidCron
 from mist.core.exceptions import BadRequestError
 from mist.core.exceptions import ScriptNotFoundError
@@ -43,7 +44,7 @@ def add_cronjob_entry(auth_context, params):
     script_id = params.get('script_id', '')
     action = params.get('action', '')
 
-    if action not in ['', 'reboot', 'destroy', 'start', 'shutdown']:
+    if action not in ['', 'reboot', 'destroy', 'start', 'stop']:
         raise BadRequestError("Action is not correct")
 
     if script_id:
@@ -68,7 +69,7 @@ def add_cronjob_entry(auth_context, params):
             )
             machine_uuid = machine.id
         except me.DoesNotExist:
-            machine_uuid = ""
+            raise NotFoundError('Machine with that machine_id does not exist')
 
         if action:
             # SEC require permission ACTION on machine
@@ -191,7 +192,7 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
             )
             machine_uuid = machine.id
         except me.DoesNotExist:
-            machine_uuid = ""
+            raise NotFoundError('Machine with that machine_id does not exist')
 
         if action:
             # SEC require permission ACTION on machine
