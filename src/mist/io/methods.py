@@ -46,7 +46,6 @@ import ansible.constants
 from mist.core.tag.models import Tag
 from mist.core.cloud.models import KeyAssociation, CloudSize, CloudImage
 from mist.core.keypair.models import Keypair
-from mist.core.cronjobs.models import UserPeriodicTask
 from mist.core import config
 # except ImportError:
 #     print "Seems to be on IO version"
@@ -69,6 +68,7 @@ import mist.io.tasks
 import mist.io.inventory
 
 from mist.io.clouds.models import Cloud
+from mist.io.cronjobs.models import UserPeriodicTask
 from mist.core.cloud.models import Machine
 
 from mist.core.vpn.methods import destination_nat as dnat
