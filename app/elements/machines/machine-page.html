@@ -9,6 +9,7 @@
 <link rel="import" href="../element-for-in/element-for-in.html">
 
 <link rel="import" href="machine-edit.html">
+<link rel="import" href="app-rules.html">
 
 <dom-module id="machine-page">
     <template>
@@ -275,6 +276,10 @@
                      <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                 </div>
             </paper-material>-->
+            <paper-material class="info-card">
+                <h2 style$="[[_getHeaderStyle(section.color)]]">Rules</h2>
+                <app-rules model="[[model]]" rules="[[model.monitoring.rules]]" machine="[[machine]]"></app-rules>
+            </paper-material>
             <paper-material class="info-card">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
                 <div class="card-content">

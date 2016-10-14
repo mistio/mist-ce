@@ -1,0 +1,112 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="app-rules">
+    <template>
+        <style is="custom-style" include="shared-styles"></style>
+        <style is="custom-style">
+            :host {
+                display: block;
+                padding: 24px;
+            }
+            .rule {
+                padding: 8px 0;
+            }
+        </style>
+        <template is="dom-repeat" items="{{items}}" as="rule">
+            <div id="[[rule.id]]" class="rule">
+                if [[computeName(rule.metric)]] [[rule.operator]] [[rule.value]] [[computeUnits(rule.metric)]] for [[rule.aggregate]] value within [[computeTime(rule.reminder_offset)]] min then [[rule.action]]
+            </div>
+        </template>
+        <!-- get metrics: http://localhost/api/v1/clouds/[[cloud.id]]/machines/[[machine.id]]/metrics -->
+    </template>
+
+    <script>
+        Polymer({
+            is: 'app-rules',
+
+            properties: {
+                model: Object,
+                resource: Object,  // machine, cloud or other later
+                rules: Object,
+                items: {
+                    type: Array,
+                    computed: "_computeRules(rules)",
+                    notify: true
+                }
+            },
+            listeners: {
+                
+            },
+            ready: function() {
+
+            },
+            _computeRules: function (rules) {
+                var rulesArray = []
+                if (rules) {
+                    for (var rule in rules) {
+                        rulesArray.push(rules[rule]);
+                    }
+                }
+                return rulesArray;
+            },
+            computeUnits: function(metric) {
+                return DEFAULT_METRICS[metric].unit;
+            },
+            computeName: function(metric) {
+                return DEFAULT_METRICS[metric].name;
+            },
+            computeTime: function(time){
+                return time/60;
+            }
+        });
+DEFAULT_METRICS = {
+    "cpu.total.nonidle": {
+        "_target": "asPercent(sumSeries(exclude(%(head)s.cpu.*.*,'idle')),sumSeries( % (head) s.cpu.*.*))",
+        "max_value": 100,
+        "min_value": 0,
+        "priority": -50,
+        "id": "cpu.total.nonidle",
+        "unit": "%",
+        "name": "CPU"
+    },
+    "load.longterm": {
+        "_target": "%(head)s.load.longterm",
+        "max_value": null,
+        "min_value": 0,
+        "priority": 0,
+        "id": "load.longterm",
+        "unit": "",
+        "name": "Load (15 mins)"
+    },
+    "load.midterm": {
+        "_target": "%(head)s.load.midterm",
+        "max_value": null,
+        "min_value": 0,
+        "priority": 0,
+        "id": "load.midterm",
+        "unit": "",
+        "name": "Load (5 mins)"
+    },
+    "load.shortterm": {
+        "_target": "%(head)s.load.shortterm",
+        "max_value": null,
+        "min_value": 0,
+        "priority": -50,
+        "id": "load.shortterm",
+        "unit": "",
+        "name": "Load"
+    },
+    "memory.used_percent": {
+        "_target": "asPercent(%(head)s.memory.used,sumSeries( % (head) s.memory.*))",
+        "max_value": 100,
+        "min_value": 0,
+        "priority": 0,
+        "id": "memory.used_percent",
+        "unit": "%",
+        "name": "RAM used"
+    },
+}
+    </script>
+</dom-module>
