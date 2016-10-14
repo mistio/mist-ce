@@ -164,9 +164,6 @@
                 flex: 1 100%;
             }
         }
-        polyana-dashboard {
-            position: relative;
-        }
         log-list ::content h3,
         polyana-dashboard ::content h3 {
             text-transform: uppercase;
@@ -180,9 +177,6 @@
             right: 0;
             top: 12px;
         }
-        timerange-picker {
-            display: flex;
-        }
         polyana-dashboard ::content paper-button {
             margin: 0;
             min-width: 1px;
@@ -190,6 +184,10 @@
         polyana-dashboard ::content paper-spinner {
             display: block;
             margin: 0 auto;
+        }
+        polyana-dashboard {
+          height: 600px;
+          display: block;
         }
         #content.onb-true {
             background: url('/assets/onboarding/mount.svg') center bottom transparent no-repeat;
@@ -297,9 +295,9 @@
                                 <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
                             </a>
                         </div>
-                        <!-- <paper-material class="graphs">
-                            <polyana-dashboard machines="[[model.monitoring.machines]]" dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
-                        </paper-material> -->
+                        <paper-material class="graphs">
+                            <polyana-dashboard machines="[[model.machinesArray]]" dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+                        </paper-material>
                     </div>
                     <div class="left">
                         <div class="costs">
@@ -413,7 +411,7 @@ Polymer({
         ];
         this.dashboard = {
           "id": 1,
-          "refresh": "10s",
+          "refresh": "0",
           "rows": [{
             "panels": [{
               "aliasColors": {},
@@ -424,7 +422,7 @@ Polymer({
               "targets": [
                 {
                 "refId": "A",
-                "target": 'asPercent(aliasByNode(sumSeriesWithWildcards(exclude(%(head)s.cpu.*.*,"idle"),3),3),alias(sumSeries(%(head)s.cpu.*.*),"total"))'
+                "target": 'load*.'
                 },
               ],
               "timeFrom": null,

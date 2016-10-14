@@ -145,6 +145,10 @@
                 display: block;
                 margin: 0 auto;
             }
+            polyana-dashboard {
+              height: 600px;
+              display: block;
+            }
             paper-button[disabled] {
                 opacity: 0.54
             }
@@ -194,10 +198,6 @@
                 display: flex;
                 vertical-align: auto;
                 padding: 0;
-            }
-            polyana-dashboard {
-              height: 600px;
-              display: block;
             }
         </style>
 
@@ -583,7 +583,7 @@ MACHINEACTIONS = {
                   "targets": [
                     {
                     "refId": "A",
-                    "target": 'asPercent(aliasByNode(sumSeriesWithWildcards(exclude(%(head)s.cpu.*.*,"idle"),3),3),alias(sumSeries(%(head)s.cpu.*.*),"total"))'
+                    "target": 'load.*'
                     },
                   ],
                   "timeFrom": null,
