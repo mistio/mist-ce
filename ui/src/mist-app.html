@@ -73,7 +73,7 @@
         display: block;
         z-index: 0;
     }
-    .is-loading-html.center {
+    #main-loader.is-loading-html.center {
         left: 0
     }
     paper-spinner {
@@ -97,7 +97,7 @@
     <paper-header-panel mode="standard" class="fit">
         <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{page}}" drawer smallscreen$="{{smallscreen}}" with-backdrop></app-sidebar>
         <mist-header model="[[model]]" title$="[[page]]" class="paper-header" style$="[[style]]"></mist-header>
-        <div class="is-loading-html">
+        <div id="main-loader" class="is-loading-html">
           <paper-spinner active></paper-spinner>
         </div>
         <iron-pages id="iron-pages" role="main" selected="[[page]]" attr-for-selected="name" smallscreen$="{{smallscreen}}">
