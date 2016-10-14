@@ -90,7 +90,7 @@ class UserPeriodicTask(PeriodicTask):
     def as_dict(self):
         # Return a dict as it will be returned to the API
         return {
-            'cronjob_id': self.id,
+            'id': self.id,
             'cron_name': self.name,
             'description': self.description or '',
             'interval': self.interval,
