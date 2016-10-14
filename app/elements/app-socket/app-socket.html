@@ -635,11 +635,18 @@
         _machineRules: function(machineID, cloudID){
             // console.log('Update _machineKeys',cloudID,machineID);
             if (machineID && cloudID){
-                if (this.model.monitoring && this.model.monitoring)
+                if (this.model && this.model.monitoring)
                     var rules = [];
                     for (var rule in this.model.monitoring.rules) {
-                        if (rule.machine == machineID && rule.cloud == cloudID)
-                            rules.push(rule);
+                        if (rule.machine == machineID && rule.cloud == cloudID){
+                            var ruleExists;
+                            if(this.model.clouds[cloudID].machines[machineID].rules) 
+                                var ruleExists = this.model.clouds[cloudID].machines[machineID].rules.find(function(r){
+                                    return r.id == rule.id
+                                });
+                            if (!ruleExists)
+                                rules.push(rule);
+                        }
                     }
                 return rules;
             }
