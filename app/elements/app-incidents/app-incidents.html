@@ -99,7 +99,8 @@
         }
         .delBtn iron-icon {
             margin: 8px;
-            opacity: 0.32
+            opacity: 0.32;
+            cursor: pointer;
         }
         </style>
 
@@ -125,7 +126,7 @@
                                     <template is="dom-if" if="[[!item.finished_at]]">
                                         <sc-timeago datetime="[[incidentDuration(item)]]"></sc-timeago>
                                     </template>
-                                    [[incidentTime(item)]]
+                                    <!-- [[incidentTime(item)]] -->
                                 </span>
                             </a>
                             <div class="delBtn">
@@ -145,7 +146,7 @@
                     </a>
                 </div>
             </paper-material>            
-            <iron-ajax id="delInc" url="/api/v1/story/[[selectedInc]]" contentType="application/json" handle-as="xml" method="DELETE" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
+            <iron-ajax id="delInc" url="/api/v1/stories/[[selectedInc]]" contentType="application/json" handle-as="xml" method="DELETE" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
         </template>
     </template>
 </dom-module>
@@ -170,7 +171,7 @@ Polymer({
         selectedInc: String
     },
     observers: [
-        '_incidents(model.incidents.*)'
+        '_incidents(model.incidentsArray.*)'
     ],
     attached: function() {
         var rows = this.parentNode.querySelectorAll('block');
@@ -198,12 +199,18 @@ Polymer({
     },
     machineName: function(item) {
         if (item.logs.length)
-            return item.logs[0].machine_name;
+            return this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id] ? item.logs[0].machine_name : item.logs[0].machine_name +': Machine is missing';
         return this.model.clouds[item.cloud_id].machines[item.machine_id].name;
     },
     machineUri: function(item, model) {
-        // console.log(this.model.clouds, item.cloud_id, this.model.incidents, this.model.monitoring);
-        return '/machines/'  + this.model.clouds[item.cloud_id].machines[item.machine_id].uuid;
+        // give machine url only if machine axists
+        if (this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id]){
+            return '/machines/'  + this.model.clouds[item.cloud_id].machines[item.machine_id].uuid;
+        }
+        else {
+            console.log('incident for missing machine '+[item.machine_id]+' in cloud '+[item.cloud_id]);
+            return '/machines'
+        }
     },
     ruleCondition: function(item) {
         return item.logs.length && item.logs[0].condition;

@@ -15,6 +15,8 @@
         :host {
             position: relative;
             display: block;
+            background-color: #eee;
+            min-height: 50vh;
         }
 
         a {
@@ -374,7 +376,7 @@
             return function(a, b) {
                 // console.log('comparison', a[property], b[property]);
                 // string compare on fields other than members machines and cost, image ids, default
-                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size', 'create_date', 'stack state' ].indexOf(property) == -1) {
+                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size', 'created', 'stack state' ].indexOf(property) == -1) {
                     //if both properties exist
                     if(JSON.stringify(a[property]) && JSON.stringify(b[property])) {
                         if (JSON.stringify(a[property]).toLowerCase() < JSON.stringify(b[property]).toLowerCase()) {
@@ -515,19 +517,19 @@
                     }
                 }
                 //compare created date
-                else if (property == 'create_date'){
+                else if (property == 'created'){
                     //if both properties exist
-                    if (a.extra.create_date_timestamp && b.extra.create_date_timestamp){
-                        if (a.extra.create_date_timestamp > b.extra.create_date_timestamp) {
+                    if (a.extra && b.extra && a.extra.created && b.extra.created){
+                        if (moment(a.extra.created).unix() > moment(b.extra.created).unix()) {
                             return -1 * order;
                         }
-                        if (a.extra.create_date_timestamp < b.extra.create_date_timestamp) {
+                        if (moment(a.extra.created).unix() < moment(b.extra.created).unix()) {
                             return 1 * order;
                         }
                         return 0;
                     }
                     else {
-                        if (!a.extra.create_date_timestamp)
+                        if (!a.extra || !a.extra.created)
                             return 1;
                         else
                             return -1

@@ -286,7 +286,7 @@
                 <div class="row" data-index$="[[index]]">
                     <list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]" uri$="[[_itemLink(item)]]">
                         <template is="dom-if" if="[[ismachines]]">
-                            <template is="dom-if" if="[[itemHasIncidents(item)]]">
+                            <template is="dom-if" if="[[itemHasIncidents(item, incidents)]]">
                                 <span class="has-incidents"></span>
                             </template>
                         </template>
@@ -390,7 +390,10 @@ Polymer({
             type: Number,
             value: 0
         },
-        incidents: Array
+        incidents: {
+            type: Array,
+            computed: "_computeIncidents(model.incidentsArray.*)"
+        }
     },
 
     listeners: {
@@ -414,7 +417,7 @@ Polymer({
 
         this.vpHeight = 'height:65px;';
     },
-    itemHasIncidents: function(item){
+    itemHasIncidents: function(item, incidents){
         if (this.incidents.length > 0 && this.incidents.indexOf(item.id) > -1) {
             return true;
         }
@@ -485,21 +488,20 @@ Polymer({
                 that.set('allselected', false);
 
         }, 50);
-
-        // update incidents
-        var machinesWithIncidents = [];
-        if (document.querySelector('mist-app').model.incidents) 
-            machinesWithIncidents = document.querySelector('mist-app').model.incidents.map(function(inc){
-                var c = inc.cloud_id;
-                var m = inc.machine_id;
-                // TODO: this array should store the uuids, but returns errors and undefined in case two Docker machine exist: model.incidents[i] has machine_id correct but cloud_id is the wrong Docker cloud, which throws errors
-                // return document.querySelector('app-main').model.clouds[c].machines[m].uuid;
-                console.log('machine with incidents',c, m)
-                return inc.machine_id;
-        });
-        this.set('incidents', machinesWithIncidents || [])
     },
-
+    _computeIncidents: function(incidents){
+         // update incidents
+        var machinesWithIncidents = [];
+        if (this.model && this.model.incidentsArray) {
+            machinesWithIncidents = this.model.incidentsArray.filter(function(inc){
+                    return !inc.finished_at || inc.finished_at == 0;
+                }).map(function(inc){
+                    if (this.model.clouds[inc.cloud_id] && this.model.clouds[inc.cloud_id].machines && this.model.clouds[inc.cloud_id].machines[inc.machine_id]) 
+                        return this.model.clouds[inc.cloud_id].machines[inc.machine_id].id;
+            }, this);
+        }
+        return machinesWithIncidents;
+    },
     selectedItemsChanged: function (changeRecord) {
         // recompute the actions array property as the intersection
         // of the available actions of the selected items
@@ -709,12 +711,14 @@ Polymer({
 
     _itemLink: function(item) {
         var p, s = this.section.id;
-        if (s == "machines")
+        if (s == "machines" && item.uuid)
             p = item.uuid
         else if (s == "networks")
             p = item.id
-        else if (s == "incidents")
-            p = item.machine_id
+        else if (s == "incidents") {
+            if (this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id])
+                p = item.machine_id
+        }
         else
             p = item.id
 
@@ -722,7 +726,7 @@ Polymer({
         if (s != "incidents")
             return "/" + this.section.id + "/" + p;
         else
-            return "/machines/" + p;
+            return p ? "/machines/" + p : "/machines";
     },
 
     _getHeaderStyle: function(color, selectedItemsLength) {
