@@ -368,9 +368,22 @@
             console.warn('got monitoring', data);
             if (data.length && this.get('onboarding.hasMonitoring') != true)
                 this.set('onboarding.hasMonitoring', true);
-            if (!data.length)
+            if (!data) //data is an Object
                 this.set('onboarding.hasMonitoring', false);
             this.set('model.pending.monitoring', false);
+            // inform machines that have rules 
+            if (data.rules) {
+                for (var rule in data.rules) {
+                    if (this.model.clouds[rule.cloud] && this.model.clouds[rule.cloud].machines[rule.machine]){
+                        if (!this.get('model.clouds.'+rule.cloud+'.machines.'+rule.machine+'.rules')){
+                            this.set('model.clouds.'+rule.cloud+'.machines.'+rule.machine+'.rules', [rule])
+                            console.log('// inform machines that have rules ', rule.cloud, rule.machine, this.model.clouds[rule.cloud].machines[rule.machine].rules);
+                        }
+                        else
+                            this.push('model.clouds.'+rule.cloud+'.machines.'+rule.machine+'.rules',rule)
+                    }
+                }
+            }
             return this.set('model.monitoring', data);
         },
 
@@ -483,6 +496,7 @@
                                     'provider': cloud.provider
                                 };
                                 machine.keys = this._machineKeys(machine.id, machine.cloud.id) || [];
+                                machine.rules = this._machineRules(machine.id, machine.cloud.id);
                             }, this);
 
                             return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])
@@ -616,6 +630,18 @@
                     })
                 });
                 return keys || [];
+            }
+        },
+        _machineRules: function(machineID, cloudID){
+            // console.log('Update _machineKeys',cloudID,machineID);
+            if (machineID && cloudID){
+                if (this.model.monitoring && this.model.monitoring)
+                    var rules = [];
+                    for (var rule in this.model.monitoring.rules) {
+                        if (rule.machine == machineID && rule.cloud == cloudID)
+                            rules.push(rule);
+                    }
+                return rules;
             }
         }
     });
