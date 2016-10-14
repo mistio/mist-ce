@@ -289,7 +289,7 @@
                             </a>
                         </div>
                         <paper-material class="graphs">
-                            <polyana-dashboard machines="[[model.machinesArray]]" dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+                            <polyana-dashboard  machines="[[model.monitoring.monitored_machines]]" dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                         </paper-material>
                     </div>
                     <div class="left">
@@ -415,12 +415,12 @@ Polymer({
               "targets": [
                 {
                 "refId": "A",
-                "target": 'load*.'
+                "target": 'load.shortterm'
                 },
               ],
               "timeFrom": null,
               "timeShift": null,
-              "title": "Load on all monitored machines",
+              "title": "Load_on_all_monitored_machines",
               "type": "graph",
               "x-axis": true,
               "y-axis": true
