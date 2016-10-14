@@ -1,24 +1,19 @@
 import json
 import datetime
 import mongoengine as me
-
-from mongoengine import ValidationError
-from mongoengine import NotUniqueError
-from mongoengine import OperationError
+from celery.schedules import crontab_parser
 
 from mist.core.cloud.models import Machine
 from mist.core.script.models import Script
 from mist.io.cronjobs.models import UserPeriodicTask
 
-from mist.core.exceptions import BadRequestError
-from mist.core.exceptions import RequiredParameterMissingError
-from mist.core.exceptions import ScriptNotFoundError
-from mist.core.exceptions import CronjobNameExistsError
-from mist.core.exceptions import CronjobOperationError
-from mist.core.exceptions import PeriodicTaskNotFound
 from mist.core.exceptions import InvalidCron
-
-from celery.schedules import crontab_parser
+from mist.core.exceptions import BadRequestError
+from mist.core.exceptions import ScriptNotFoundError
+from mist.core.exceptions import PeriodicTaskNotFound
+from mist.core.exceptions import CronjobOperationError
+from mist.core.exceptions import CronjobNameExistsError
+from mist.core.exceptions import RequiredParameterMissingError
 
 
 def validate_cronjob_entry(cronj_entry):
@@ -68,7 +63,9 @@ def add_cronjob_entry(auth_context, params):
         # SEC require permission READ on cloud
         auth_context.check_perm("cloud", "read", cloud_id)
         try:
-            machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+            machine = Machine.objects.get(
+                      cloud=cloud_id, machine_id=machine_id
+            )
             machine_uuid = machine.id
         except me.DoesNotExist:
             machine_uuid = ""
@@ -124,12 +121,15 @@ def add_cronjob_entry(auth_context, params):
     if cronjob_type == 'crontab':
         cronj_entry = json.loads(params.get('cronjob_entry', '[]'))
         validate_cronjob_entry(cronj_entry)
-        pt_args.update({'crontab': UserPeriodicTask.UserCrontab(**cronj_entry)})
+        pt_args.update(
+            {'crontab': UserPeriodicTask.UserCrontab(**cronj_entry)}
+        )
 
     elif cronjob_type == 'interval':
         cronj_entry = json.loads(params.get('cronjob_entry', '[]'))
         pt_args.update(
-            {'interval': UserPeriodicTask.UserInterval(**cronj_entry)})
+            {'interval': UserPeriodicTask.UserInterval(**cronj_entry)}
+        )
 
     elif cronjob_type == 'one_off':
         delta = future_date - now
@@ -145,11 +145,11 @@ def add_cronjob_entry(auth_context, params):
     # Check if the action succeeded and saved
     try:
         ptask.save()
-    except ValidationError as e:
+    except me.ValidationError as e:
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
-    except NotUniqueError:
+    except me.NotUniqueError:
         raise CronjobNameExistsError()
-    except OperationError:
+    except me.OperationError:
         raise CronjobOperationError()
     return ptask
 
@@ -186,7 +186,9 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
         # SEC require permission READ on cloud
         auth_context.check_perm("cloud", "read", cloud_id)
         try:
-            machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+            machine = Machine.objects.get(
+                cloud=cloud_id, machine_id=machine_id
+            )
             machine_uuid = machine.id
         except me.DoesNotExist:
             machine_uuid = ""
@@ -249,22 +251,26 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
                                             ptask.machines_per_cloud)]})
 
     if params.get('script_id') or params.get('machines_per_cloud'):
-        pt_args.update({'args': [owner, params.get('script_id',
-                                                        ptask.script_id),
+        pt_args.update({'args': [owner,
+                                 params.get('script_id', ptask.script_id),
                                  params.get('machines_per_cloud',
-                                            ptask.machines_per_cloud)]})
+                                            ptask.machines_per_cloud)]}
+                       )
 
     if cronjob_type == 'crontab':
         cronj_entry = json.loads(params.get('cronjob_entry', '[]'))
         validate_cronjob_entry(cronj_entry)
         pt_args.update({'expires': future_date.strftime('%Y-%m-%d %H:%M:%S'),
                         'interval': None,
-                        'crontab': UserPeriodicTask.UserCrontab(**cronj_entry)})
+                        'crontab': UserPeriodicTask.UserCrontab(**cronj_entry)}
+                       )
 
     elif cronjob_type == 'interval':
         cronj_entry = json.loads(params.get('cronjob_entry', '[]'))
         pt_args.update({'crontab': None,
-                        'interval': UserPeriodicTask.UserInterval(**cronj_entry)})
+                        'interval': UserPeriodicTask.UserInterval(
+                                                    **cronj_entry)}
+                       )
 
     elif cronjob_type == 'one_off':
         delta = future_date - datetime.datetime.now()
@@ -278,7 +284,7 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
 
     try:
         ptask.update_validate(pt_args)
-    except ValidationError as e:
+    except me.ValidationError as e:
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
 
     return ptask

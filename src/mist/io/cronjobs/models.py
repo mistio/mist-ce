@@ -1,19 +1,13 @@
+"""UserPeriodicTask entity model."""
 import json
-import mongoengine as me
-
 from uuid import uuid4
-
-from celerybeatmongo.models import PeriodicTask
-
-from mist.core import config
+import mongoengine as me
 from mist.core.user.models import Owner
-
-# FIXME: Define db to use in model definition?
-# db=config.CELERY_SETTINGS.get('CELERY_MONGODB_SCHEDULER_DB')
+from celerybeatmongo.models import PeriodicTask
 
 
 class UserPeriodicTask(PeriodicTask):
-    """mongo database model that base on periodic task
+    """mongo database model that base on celery periodic task
        and create new fields for our cronjob scheduler
 
     Attributes:
@@ -26,7 +20,6 @@ class UserPeriodicTask(PeriodicTask):
         attr7(BooleanField): enabled
         attr8(StringField): description
         attr9(DateTimeField): expires
-        attr10(StringFiled): name
 
     """
 
@@ -45,13 +38,13 @@ class UserPeriodicTask(PeriodicTask):
     interval = me.EmbeddedDocumentField(UserInterval)
     crontab = me.EmbeddedDocumentField(UserCrontab)
     # use cloud_id as key
-    machines_per_cloud = \
-        me.ListField(me.ListField(me.StringField(required=True), required=True),
-                     required=True)
+    machines_per_cloud = me.ListField(me.ListField(me.StringField(
+                         required=True), required=True), required=True
+    )
 
     id = me.StringField(primary_key=True,
                         default=lambda: uuid4().hex)
-    # user = me.StringField(required=True)
+
     owner = me.ReferenceField(Owner, required=True)
 
     script_id = me.StringField()
