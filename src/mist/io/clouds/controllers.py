@@ -107,8 +107,8 @@ class AmazonController(BaseController):
         machine.os_type = machine_libcloud.extra.get('platform', 'linux')
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
-         if machine_libcloud.state != NodeState.RUNNING:
-             return 0, 0
+        if machine_libcloud.state != NodeState.RUNNING:
+            return 0, 0
         image_id = machine_libcloud.extra.get('image_id')
         try:
             # FIXME: This is here to avoid circular imports.
@@ -365,9 +365,9 @@ class AzureController(BaseController):
                                           tmp_cert_file.name)
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
-         if machine_libcloud.state != NodeState.RUNNING:
-             return 0, 0
-        return machine_libcloud.extra.get('cost_per_hour', 0)
+        if machine_libcloud.state != NodeState.RUNNING:
+            return 0, 0
+        return machine_libcloud.extra.get('cost_per_hour', 0), 0
 
     def _list_images__fetch_images(self, search=None):
         images = self.connection.list_images()
@@ -437,12 +437,12 @@ class AzureArmController(BaseController):
                                               self.cloud.secret)
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
-         if machine_libcloud.state != NodeState.RUNNING:
-             return 0, 0
-        return machine_libcloud.extra.get('cost_per_hour', 0)
+        if machine_libcloud.state not in [NodeState.RUNNING, NodeState.PAUSED]:
+            return 0, 0
+        return machine_libcloud.extra.get('cost_per_hour', 0), 0
 
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
-        return machine_api.created_at  # datetime
+        return machine_libcloud.created_at  # datetime
 
     def _list_images__fetch_images(self, search=None):
         return []
@@ -537,8 +537,8 @@ class GoogleController(BaseController):
         return images
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
-         if machine_libcloud.state != NodeState.RUNNING:
-             return 0, 0
+        if machine_libcloud.state == NodeState.TERMINATED:
+            return 0, 0
         # https://cloud.google.com/compute/pricing
         size = machine_libcloud.extra.get('machineType')
         # eg europe-west1-d
