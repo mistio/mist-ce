@@ -299,28 +299,27 @@ class MainConnection(MistConnection):
 
     def on_stats(self, cloud_id, machine_id, start, stop, step, request_id,
                  metrics):
-        error = False
+
+        def callback(data, error=False):
+            ret = {
+                'cloud_id': cloud_id,
+                'machine_id': machine_id,
+                'start': start,
+                'stop': stop,
+                'request_id': request_id,
+                'metrics': data,
+            }
+            if error:
+                ret['error'] = error
+            self.send('stats', ret)
+
         try:
-            data = get_stats(self.owner, cloud_id, machine_id,
-                             start, stop, step, metrics=metrics)
+            get_stats(self.owner, cloud_id, machine_id, start, stop, step,
+                      metrics=metrics, callback=callback, tornado_async=True)
         except BadRequestError as exc:
-            error = str(exc)
-            data = []
+            callback([], str(exc))
         except Exception as exc:
             log.error("Exception in get_stats: %r", exc)
-            return
-
-        ret = {
-            'cloud_id': cloud_id,
-            'machine_id': machine_id,
-            'start': start,
-            'stop': stop,
-            'request_id': request_id,
-            'metrics': data,
-        }
-        if error:
-            ret['error'] = error
-        self.send('stats', ret)
 
     def process_update(self, ch, method, properties, body):
         routing_key = method.routing_key
