@@ -365,7 +365,7 @@ class AzureController(BaseController):
                                           tmp_cert_file.name)
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
-        if machine_libcloud.state != NodeState.RUNNING:
+        if machine_libcloud.state not in [NodeState.RUNNING, NodeState.PAUSED]:
             return 0, 0
         return machine_libcloud.extra.get('cost_per_hour', 0), 0
 
@@ -425,6 +425,12 @@ class AzureController(BaseController):
         self.connection.destroy_node(machine_libcloud,
                                      ex_cloud_service_name=cloud_service)
 
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
+        super(AzureArmController, self)._list_machines__machine_actions(
+              machine, machine_libcloud)
+        if machine_libcloud.state is NodeState.PAUSED:
+            machine.actions.start = True
+
 
 class AzureArmController(BaseController):
 
@@ -452,6 +458,12 @@ class AzureArmController(BaseController):
 
     def _destroy_machine(self, machine, machine_libcloud):
         self.connection.destroy_node(machine_libcloud)
+
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
+        super(AzureArmController, self)._list_machines__machine_actions(
+              machine, machine_libcloud)
+        if machine_libcloud.state is NodeState.PAUSED:
+            machine.actions.start = True
 
 
 class GoogleController(BaseController):
