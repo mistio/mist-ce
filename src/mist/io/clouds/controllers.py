@@ -107,8 +107,6 @@ class AmazonController(BaseController):
         machine.os_type = machine_libcloud.extra.get('platform', 'linux')
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
-        if machine_libcloud.state != NodeState.RUNNING:
-            return 0, 0
         image_id = machine_libcloud.extra.get('image_id')
         try:
             # FIXME: This is here to avoid circular imports.
