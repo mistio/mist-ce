@@ -109,15 +109,16 @@ def add_cronjob_entry(auth_context, params):
     elif cronjob_type == 'one_off':
         future_date = params.get('cronjob_entry')
 
-    try:
-        future_date = datetime.datetime.strptime(future_date,
-                                                 '%Y-%m-%d %H:%M:%S')
-    except ValueError:
-        raise BadRequestError('Expiration date value was not valid')
-    now = datetime.datetime.now()
-    if future_date < now:
-        raise BadRequestError('Date of future task is in the past. Please'
-                              ' contact Marty McFly')
+    if future_date:
+        try:
+            future_date = datetime.datetime.strptime(future_date,
+                                                     '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            raise BadRequestError('Expiration date value was not valid')
+        now = datetime.datetime.now()
+        if future_date < now:
+            raise BadRequestError('Date of future task is in the past. Please'
+                                  ' contact Marty McFly')
 
     if cronjob_type == 'crontab':
         cronj_entry = json.loads(params.get('cronjob_entry', '[]'))
