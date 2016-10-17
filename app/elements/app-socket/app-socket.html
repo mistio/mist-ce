@@ -184,6 +184,11 @@
                     },
                     logout: function(data){
                         document.location.pathname = '/';
+                    },
+                    stats: function (){
+                      that.debounce(that._getStats(), function() {
+                          console.debug('hellooooo');
+                      }, 250);
                     }
                 },
                 shell: {
@@ -234,7 +239,9 @@
                 }
             };
         },
-
+        _getStats:function (){
+          console.log("helloooooooooooooo2")
+        },
         heartbeat: function() {
             console.debug('got heartbeat');
             this.send('h'); // reply with empty frame
