@@ -299,11 +299,13 @@
                     }
                 },
                 useCatalogueTemplate: function(selected){
-                    this.fields.forEach(function(f, index){
-                        var key = f.name;
-                        if (selected > -1 && this.defaultTemplates[selected][key])
-                            this.set('fields.'+index+'.value', this.defaultTemplates[selected][key]);
-                    }, this);
+                    if (selected && selected > -1) {
+                        this.fields.forEach(function(f, index){
+                            var key = f.name;
+                            if (this.defaultTemplates[selected][key])
+                                this.set('fields.'+index+'.value', this.defaultTemplates[selected][key]);
+                        }, this);
+                    }
                 },
                 clearDropDown: function(){
                     this.set('selected', null)
