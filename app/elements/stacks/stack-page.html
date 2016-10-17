@@ -23,6 +23,7 @@
 <dom-module id="stack-page">
     <template>
         <style is="custom-style" include="lists"></style>
+        <style is="custom-style" include="forms"></style>
         <style is="custom-style" include="tags-and-labels"></style>
         <style is="custom-style" include="single-page"></style>
         <style include="shared-styles">
@@ -57,7 +58,6 @@
             app-form,
             mist-form {
                 max-width: 900px;
-                box-sizing: border-box;
             }
 
             .app-form-title {
@@ -145,7 +145,6 @@
 
             paper-icon-button.close {
                 float: right;
-                margin-top: -10px;
             }
 
             paper-icon-button.active-sort {
@@ -405,11 +404,22 @@
             font-size: 0.9em;
         }
         #cfyshell {
-            width: 100%;
-            margin-top: 30px;
+            width: 100%;            
         }
         xterm-dialog::content .terminal .xterm-rows {
             width: 100%;
+        }
+        paper-button {
+            line-height: 1em;
+        }
+        .output {
+            position: relative;
+            overflow: hidden;
+            background-color: #eee;
+        }
+        .output paper-button {
+            float: right;
+            margin: 8px !important;
         }
         </style>
         <div id="content">
@@ -570,9 +580,12 @@
                             <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
                         </div>
                     </template>
-                    <paper-button toggles active={{showOutput}} hidden$="[[showOutput]]">Show output</paper-button>
-                    <paper-icon-button class="close" toggles active={{showOutput}} hidden$="[[!showOutput]]" icon="icons:close"></paper-icon-button>
-
+                </paper-material>
+                <paper-material class="no-pad">
+                    <div class="output">
+                        <paper-button toggles active={{showOutput}} hidden$="[[showOutput]]" class="blue">Show output</paper-button>
+                        <paper-icon-button class="close" toggles active={{showOutput}} hidden$="[[!showOutput]]" icon="icons:close"></paper-icon-button>
+                    </div>
                     <div id="cfyshell" hidden$="[[!showOutput]]"></div>
                 </paper-material>
             </div>
