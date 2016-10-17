@@ -668,9 +668,6 @@ class BaseController(object):
                 if image.id in self.cloud.starred:
                     # default and starred
                     sortvals[image.id] = 0
-                    else:
-                        # default and unstarred
-                        sortvals[image.id] = 3
                 else:
                     # default
                     sortvals[image.id] = 2
@@ -678,9 +675,6 @@ class BaseController(object):
                 if image.id in self.cloud.starred:
                     # not default and starred
                     sortvals[image.id] = 1
-                    else:
-                        # not default and unstarred
-                        sortvals[image.id] = 5
                 else:
                     # not default
                     sortvals[image.id] = 4
