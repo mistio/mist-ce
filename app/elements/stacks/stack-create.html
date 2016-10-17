@@ -382,6 +382,16 @@
                         })
                     }
                 }, this);
+
+                this.fields.forEach(function(f, index){
+                    if (f.options && f.options.length == 1){
+                        if (f.type == "dropdown")
+                           this.set('fields.'+index+'.value', f.options[0].val);
+                        else
+                           this.set('fields.'+index+'.value', f.options[0].id);
+                    }
+                }, this);
+
             },
 
             _updateFields: function(e) {
@@ -445,6 +455,15 @@
                                 if (cloudId)
                                     inp.options = this.model.clouds[cloudId].sizesArray;
                             }
+
+                            this.fields.forEach(function(f, index){
+                                if (f.options && f.options.length == 1){
+                                    if (f.type == "dropdown")
+                                       this.set('fields.'+index+'.value', f.options[0].val);
+                                    else
+                                       this.set('fields.'+index+'.value', f.options[0].id);
+                                }
+                            }, this);
                         }
                     }, this);
 
