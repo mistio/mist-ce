@@ -9,7 +9,7 @@
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../tags/tags-list.html">
 
-<link rel="import" href="template-edit.html">
+<!-- <link rel="import" href="template-edit.html"> -->
 <link rel="import" href="template-stack-item.html">
 
 <dom-module id="template-page">
@@ -221,8 +221,8 @@
                 <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
                 <div class="title flex">
                     <h2>
-                            [[template.name]]
-                        </h2>
+                        [[template.name]]
+                    </h2>
                     <div class="subtitle">
                         <span hidden$="[[!isInline]]">Inline Template</span>
                         <span hidden$="[[isInline]]">Script source <a href$="[[template.template]]" target="_blank" class="regular"> [[template.template]] <iron-icon icon="icons:link"></iron-icon>
@@ -236,7 +236,7 @@
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
-                            <paper-button on-tap="_editTemplate" class="simple">Edit Template</paper-button>
+                            <!-- <paper-button on-tap="_editTemplate" class="simple">Edit Template</paper-button> -->
                             <paper-button on-tap="_deleteTemplate" class="simple">Delete Template</paper-button>
                         </paper-menu>
                     </paper-menu-button>
@@ -256,13 +256,13 @@
                     <h3 class="smallcaps">Description</h3>
                     <p>[[template.description]]</p>
                 </div>
-                <div class="page-block" hidden$="[[!template.timestamp]]">
+                <div class="page-block" hidden$="[[!template.created_at]]">
                     <h3 class="smallcaps">Created</h3>
-                    <p>[[timestamp]]
+                    <p>[[_computeReadableDate(template.created_at)]]
                         <!-- <a href="/members/[[template.user]]" class="regular blue-link">[[template.user]]</a> -->
                     </p>
                 </div>
-                <div class="page-block" hidden$="[[!template.tags]]">
+                <div class="page-block" hidden$="[[!template.tags.length]]">
                     <h3 class="smallcaps">Tags
                         <template is="dom-if" if="[[template.tags]]">
                             <span class="id">([[template.tags.length]])</span>
@@ -318,7 +318,7 @@
                             <template is="dom-if" if="[[template.created_at]]">
                                 <div class="info-item flex-horizontal-with-ratios">
                                     <div class="flexchild">Created at</div>
-                                    <div class="flexchild">[[timestamp]]</div>
+                                    <div class="flexchild">[[template.created_at]]</div>
                                 </div>
                             </template>
                             <div class="info-item flex-horizontal-with-ratios">
@@ -396,6 +396,7 @@
         <template-edit template="[[template]]"></template-edit>
         <dialog-element></dialog-element>
         <tags-list model="[[model]]"></tags-list>
+        <iron-ajax id="templateDeleteRequest" url="/api/v1/templates/[[template.id]]" contentType="application/json" handle-as="json" method="DELETE" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
     </template>
     <script>
         (function() {
@@ -431,10 +432,6 @@
                         type: String,
                         computed: '_class(isInline)'
                     },
-                    timestamp: {
-                        type: String,
-                        computed: '_getFormattedTimestamp(template.created_at)'
-                    },
                     hideprogress: {
                         type: Boolean,
                         value: true
@@ -454,13 +451,14 @@
                     var wh = window.innerHeight;
                     this.vpHeight = 'height:' + wh + 'px; overflow: auto;';
                 },
-                _getFormattedTimestamp: function(created_at) {
-                    return new Date(created_at).toLocaleString('en-US', {
-                        timeZoneName: 'short'
-                    });
+                _computeReadableDate: function(date) {
+                    return moment.utc(date).fromNow();
                 },
                 _computeHasStacks: function(stacks) {
-                    return this.stacks.length > 0;
+                    if (stacks)
+                        return this.stacks.length > 0;
+                    else
+                        return false;
                 },
                 _computeTemplate: function(templateid, templates) {
                     return templates.base[templateid];
@@ -492,9 +490,21 @@
                     this.set('template.description', template.description);
                 },
                 _deleteTemplate: function(e) {
+                    var hasStacksMessage = '',
+                        alert = '',
+                        subscript = '';
+                    if (this._computeHasStacks()){
+                        alert = this.stacks.length+' associated stack';
+                        if (this.stacks.length > 1)
+                            alert += 's'
+                        alert += '.'
+                        subscript = 'Stacks are not deleted, when their template is deleted.'
+                    }
                     this._showDialog({
-                        title: 'Delete Template?',
+                        title: 'Delete Template '+this.template.name+' ?',
                         body: "Deleting templates cannot be undone. You are about to delete template: " + this.template.name,
+                        alert: alert,
+                        subscript: subscript,
                         danger: true,
                         reason: "delete_template"
                     });
@@ -504,9 +514,20 @@
                         response = e.detail.response;
 
                     if (response.confirmed && reason == "delete_template") {
-                        console.log('i ll delete the template');
-                        document.querySelector('app-location').path = '/templates';
+                        this.$.templateDeleteRequest.body = {
+                            'template_id': this.template.id
+                        };
+                        this.$.templateDeleteRequest.headers["Content-Type"] = 'application/json';
+                        this.$.templateDeleteRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.templateDeleteRequest.generateRequest();                        
                     }
+                },
+                _handleResponse: function(e){
+                    console.log('response',e);
+                    document.querySelector('app-location').path = '/templates';
+                },
+                _handleError: function(e){
+                    console.log('error',e);
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element'),
@@ -521,8 +542,6 @@
                 },
                 toggleAll: function(e) {
                     var t = e.target;
-
-
                     var els = this.querySelectorAll('app-togglable');
                     [].forEach.call(els, function(el, index) {
                         el.open = true;

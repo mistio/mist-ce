@@ -1,6 +1,6 @@
 [submodule "tests"]
 	path = tests
-	url = git@gitlab.ops.mist.io:mistio/mist.tests.git
+	url = ../../mistio/mist.tests.git
 [submodule "ui/bower_components/polyana-dashboard"]
 	path = ui/bower_components/polyana-dashboard
 	url = git@gitlab.ops.mist.io:mistio/polyana-dashboard.git

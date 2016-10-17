@@ -229,6 +229,17 @@ class AzureCloud(Cloud):
     _controller_cls = controllers.AzureController
 
 
+class AzureArmCloud(Cloud):
+
+    tenant_id = me.StringField(required=True)
+    subscription_id = me.StringField(required=True)
+    key = me.StringField(required=True)
+    secret = me.StringField(required=True)
+
+    _private_fields = ('secret', )
+    _controller_cls = controllers.AzureArmController
+
+
 class GoogleCloud(Cloud):
 
     email = me.StringField(required=True)
@@ -341,7 +352,6 @@ class LibvirtCloud(Cloud):
         return cdict
 
 
-# FIXME
 class OtherCloud(Cloud):
 
     _controller_cls = controllers.OtherController
