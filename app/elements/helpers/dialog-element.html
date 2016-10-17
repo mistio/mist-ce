@@ -108,7 +108,9 @@
                     this.$.dialogModal.close();
                 },
                 _modalClosed: function(e) {
-                    if (e.srcElement.id == 'dialogModal') {
+                    var normalizedEvent = Polymer.dom(e);
+                    console.log('_modalClosed',e, normalizedEvent);
+                    if (normalizedEvent.event.target.id == 'dialogModal') {
                         console.log(this.$.dialogModal.closingReason);
                         this.fire('confirmation', {
                             response: this.$.dialogModal.closingReason,
