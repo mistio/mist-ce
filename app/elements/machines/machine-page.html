@@ -248,27 +248,27 @@
                                 <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
                             </div>
                         </template>
-                        <div class="machine-key" id="pendingKeyRequest">
-                            <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
-                        </div>
-                    </div>
-                </paper-material>
-                <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
-                    <h3 class="smallcaps">TAGS:</h3>
-                    <template is="dom-repeat" items="[[machine.tags]]">
+    <div class="machine-key" id="pendingKeyRequest">
+        <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
+    </div>
+    </div>
+    </paper-material>
+    <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
+        <h3 class="smallcaps">TAGS:</h3>
+        <template is="dom-repeat" items="[[machine.tags]]">
                         <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
                     </template>
-                </paper-material>
-            </div>
-            <paper-material class="info-card" hidden$="[[!isMonitored]]">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
-                <polyana-dashboard machines="[[machineInArray]]" dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
-            </paper-material>
-            <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
-                <div class="card-content">
-                    <table class="info-table">
-                        <template is="dom-if" if="[[machine.public_ips]]">
+    </paper-material>
+    </div>
+    <paper-material class="info-card" hidden$="[[!isMonitored]]">
+        <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
+        <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+    </paper-material>
+    <paper-material class="info-card">
+        <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
+        <div class="card-content">
+            <table class="info-table">
+                <template is="dom-if" if="[[machine.public_ips]]">
                             <tr>
                                 <td>Machine ID</td>
                                 <td>[[machine.id]]</td>
@@ -281,110 +281,111 @@
                                 <td><template is="dom-repeat" items="[[machine.public_ips]]">
                                         [[item]]
                                     </template>
-                                </td>
-                            </tr>
-                            <tr><td>Private IPs</td>
-                                <td><template is="dom-repeat" items="[[machine.private_ips]]">
+                </td>
+                </tr>
+                <tr>
+                    <td>Private IPs</td>
+                    <td><template is="dom-repeat" items="[[machine.private_ips]]">
                                         [[item]]
                                     </template>
-                                </td>
-                            </tr>
-                        </template>
-                    </table>
-                </div>
-            </paper-material>
-            <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">More Info</h2>
-                <div class="card-content">
-                    <element-for-in content="[[machine.extra]]"></element-for-in>
-                </div>
-            </paper-material>
+                    </td>
+                </tr>
+                </template>
+            </table>
         </div>
-        <dialog-element id="machinedialog"></dialog-element>
-        <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
-        <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
-        <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-        <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
-        <machine-edit machine="[[machine]]"></machine-edit>
-        <tags-list model="[[model]]"></tags-list>
-        <paper-toast></paper-toast>
+    </paper-material>
+    <paper-material class="info-card">
+        <h2 style$="[[_getHeaderStyle(section.color)]]">More Info</h2>
+        <div class="card-content">
+            <element-for-in content="[[machine.extra]]"></element-for-in>
+        </div>
+    </paper-material>
+    </div>
+    <dialog-element id="machinedialog"></dialog-element>
+    <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
+    <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
+    <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+    <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
+    <machine-edit machine="[[machine]]"></machine-edit>
+    <tags-list model="[[model]]"></tags-list>
+    <paper-toast></paper-toast>
     </template>
 </dom-module>
 <script>
-MACHINEACTIONS = {
-  'shell': {
-    'name': 'shell',
-    'icon': 'vaadin-icons:terminal',
-    'confirm': false,
-    'multi': true
-  },
-  'tag': {
-    'name': 'tag',
-    'icon': 'label',
-    'confirm': true,
-    'multi': true
-  },
-  'run-script': {
-    'name': 'run script',
-    'icon': 'image:movie-creation',
-    'confirm': true,
-    'multi': false
-  },
-  'associate-key': {
-    'name': 'associate key',
-    'icon': 'communication:vpn-key',
-    'confirm': true,
-    'multi': true
-  },
-  'reboot': {
-    'name': 'reboot',
-    'icon': 'av:replay',
-    'confirm': true,
-    'multi': true
-  },
-  'start': {
-    'name': 'start',
-    'icon': 'av:replay',
-    'confirm': true,
-    'multi': true
-  },
-  'stop': {
-    'name': 'stop',
-    'icon': 'av:stop',
-    'confirm': true,
-    'multi': true
-  },
-  'suspend': {
-    'name': 'suspend',
-    'icon': 'av:stop',
-    'confirm': true,
-    'multi': true
-  },
-  'rename': {
-    'name': 'rename',
-    'icon': 'editor:mode-edit',
-    'confirm': true,
-    'multi': false
-  },
-  'resume': {
-    'name': 'resume',
-    'icon': 'av:replay',
-    'confirm': true,
-    'multi': true
-  },
-  'undefine': {
-    'name': 'undefine',
-    'icon': 'image:panorama-fish-eye',
-    'confirm': true,
-    'multi': true
-  },
-  'destroy': {
-    'name': 'destroy',
-    'icon': 'delete',
-    'confirm': true,
-    'multi': true
-  }
-}
+    MACHINEACTIONS = {
+        'shell': {
+            'name': 'shell',
+            'icon': 'vaadin-icons:terminal',
+            'confirm': false,
+            'multi': true
+        },
+        'tag': {
+            'name': 'tag',
+            'icon': 'label',
+            'confirm': true,
+            'multi': true
+        },
+        'run-script': {
+            'name': 'run script',
+            'icon': 'image:movie-creation',
+            'confirm': true,
+            'multi': false
+        },
+        'associate-key': {
+            'name': 'associate key',
+            'icon': 'communication:vpn-key',
+            'confirm': true,
+            'multi': true
+        },
+        'reboot': {
+            'name': 'reboot',
+            'icon': 'av:replay',
+            'confirm': true,
+            'multi': true
+        },
+        'start': {
+            'name': 'start',
+            'icon': 'av:replay',
+            'confirm': true,
+            'multi': true
+        },
+        'stop': {
+            'name': 'stop',
+            'icon': 'av:stop',
+            'confirm': true,
+            'multi': true
+        },
+        'suspend': {
+            'name': 'suspend',
+            'icon': 'av:stop',
+            'confirm': true,
+            'multi': true
+        },
+        'rename': {
+            'name': 'rename',
+            'icon': 'editor:mode-edit',
+            'confirm': true,
+            'multi': false
+        },
+        'resume': {
+            'name': 'resume',
+            'icon': 'av:replay',
+            'confirm': true,
+            'multi': true
+        },
+        'undefine': {
+            'name': 'undefine',
+            'icon': 'image:panorama-fish-eye',
+            'confirm': true,
+            'multi': true
+        },
+        'destroy': {
+            'name': 'destroy',
+            'icon': 'delete',
+            'confirm': true,
+            'multi': true
+        }
+    }
     Polymer({
         is: 'machine-page',
 
@@ -436,7 +437,7 @@ MACHINEACTIONS = {
             },
             associatedKeys: {
                 type: Array,
-                computed:'_computeAssociatedKeys(machine, model.keysArray)'
+                computed: '_computeAssociatedKeys(machine, model.keysArray)'
             },
             newKeyId: {
                 type: String,
@@ -467,10 +468,6 @@ MACHINEACTIONS = {
                 type: Array,
                 computed: '_computeActions(machine)'
             },
-            machineInArray: {
-                type: Array,
-                computed: '_computeMachineInArray(machine)'
-            }
         },
         observers: [
             '_isMonitored(machine, model.monitoring.machines.*)',
@@ -479,32 +476,30 @@ MACHINEACTIONS = {
         listeners: {
             'confirmation': '_machineActionConfirmation',
             'pending-key-request': '_updateKeyLoader',
-            'run-script-request':'_feedbackOnScript'
+            'run-script-request': '_feedbackOnScript'
         },
-        ready: function(){
+        ready: function() {
             this.set('hideAssociatedKeys', true);
             this.set('isPendingKeyRequest', false);
         },
-        attached: function(){
-            this.datasources = [
-              {
-              "id": 1,
-              "orgId": 1,
-              "name": "mistphite",
-              "type": "mist.monitor",
-              "access": "proxy",
-              "uri": "/graphite/",
-              "password": "",
-              "user": "",
-              "database": "",
-              "basicAuth": false,
-              "basicAuthUser": "",
-              "basicAuthPassword": "",
-              "withCredentials": false,
-              "isDefault": false,
-              "jsonData": null
-              }
-            ];
+        attached: function() {
+            this.datasources = [{
+                "id": 1,
+                "orgId": 1,
+                "name": "mistphite",
+                "type": "mist.monitor",
+                "access": "proxy",
+                "uri": "/graphite/",
+                "password": "",
+                "user": "",
+                "database": "",
+                "basicAuth": false,
+                "basicAuthUser": "",
+                "basicAuthPassword": "",
+                "withCredentials": false,
+                "isDefault": false,
+                "jsonData": null
+            }];
             // var that = this;
             // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
             //     // if (that.querySelector('dashboard-panel'))
@@ -513,20 +508,15 @@ MACHINEACTIONS = {
             // }, 5000);
 
         },
-        _computeMachineInArray: function(machines){
-          var arr = [];
-            arr.push(this.machine);
-          return arr;
-        },
-        _computeActions: function(item){
+        _computeActions: function(item) {
             var ret = [];
             if (item.state == 'running') {
-              // if key then add shell / run script
-              // if not monitoring then enable monitoring
-              ret.push('shell');
-              ret.push('associate-key');
-              if(this.hideAssociatedKeys)
-                ret.push('run-script');
+                // if key then add shell / run script
+                // if not monitoring then enable monitoring
+                ret.push('shell');
+                ret.push('associate-key');
+                if (this.hideAssociatedKeys)
+                    ret.push('run-script');
             }
             if (item.can_tag)
                 ret.push('tag');
@@ -549,7 +539,7 @@ MACHINEACTIONS = {
                 ret.push('undefine');
 
             var actions = [];
-            for (var i=0; i<ret.length; i++) {
+            for (var i = 0; i < ret.length; i++) {
                 actions.push(MACHINEACTIONS[ret[i]]);
             }
 
@@ -557,50 +547,49 @@ MACHINEACTIONS = {
         },
         _computeMachine: function(params, machines) {
             this.dashboard = {
-              "id": 1,
-              // "refresh": "",
-              "rows": [{
-                "height": "500px",
-                "panels": [{
-                  "aliasColors": {},
-                  "datasource": "mistphite",
-                  "id": 2,
-                  "span": 12,
-                  "stack": false,
-                  "targets": [
-                    {
-                    "refId": "A",
-                    "target": 'load.*'
-                    },
-                  ],
-                  "timeFrom": null,
-                  "timeShift": null,
-                  "title": "Load",
-                  "type": "graph",
-                  "x-axis": true,
-                  "y-axis": true
+                "id": 1,
+                // "refresh": "",
+                "rows": [{
+                    "height": "500px",
+                    "panels": [{
+                        "aliasColors": {},
+                        "datasource": "mistphite",
+                        "id": 2,
+                        "span": 12,
+                        "stack": false,
+                        "targets": [{
+                            "refId": "A",
+                            "target": 'load.*'
+                        }, ],
+                        "timeFrom": null,
+                        "timeShift": null,
+                        "title": "Load",
+                        "type": "graph",
+                        "urlPrefix": "",
+                        "x-axis": true,
+                        "y-axis": true
+                    }],
                 }],
-              }],
-              "time": {
-                "from": "now-10m",
-                "to": "now"
-              },
-              "timepicker": {
-                "now": true,
-                "refresh_intervals": [],
-                "time_options": [
-                  "5m",
-                  "15m",
-                  "1h",
-                  "6h",
-                  "12h",
-                  "24h",
-                  "2d",
-                  "7d",
-                  "30d"
-                ]
-              },
-              "timezone": "browser"
+                "time": {
+                    "from": "now-10m",
+                    "to": "now"
+                },
+                "timepicker": {
+                    "now": true,
+                    "refresh_intervals": [],
+                    "time_options": [
+                        "5m",
+                        "15m",
+                        "1h",
+                        "6h",
+                        "12h",
+                        "24h",
+                        "2d",
+                        "7d",
+                        "30d"
+                    ]
+                },
+                "timezone": "browser"
             };
 
             if (this.machine && this.machine.uuid && params.uuid != this.machine.uuid) {
@@ -610,47 +599,52 @@ MACHINEACTIONS = {
                 return machine.uuid == params.uuid;
             }, this);
         },
-        _computeItemInArray: function(){
+        _computeItemInArray: function() {
+            for (var i = 0; i < this.dashboard.rows.length; i++) {
+                for (var j = 0; j < this.dashboard.rows[i].panels.length; j++) {
+                    if (this.dashboard.rows[i].panels[j].datasource == "mistphite") {
+                        this.dashboard.rows[i].panels[j].urlPrefix = '/api/v1/clouds/' + this.machine.cloud.id + '/machines/' + this.machine.id + '/stats';
+                    }
+                }
+            }
             var arr = [];
             arr.push(this.machine);
             return arr;
         },
-        _computeThisItemUid: function(machine){
+        _computeThisItemUid: function(machine) {
             var itemUidInArray = [];
             itemUidInArray.push(itemUid(this.machine, this.sections['machines']));
             return itemUidInArray;
         },
-        _computeAssociatedKeys: function(machine, keys){
+        _computeAssociatedKeys: function(machine, keys) {
             var machineId = this.machine.id;
             var associatedKeys = [];
-                associatedKeys = this.model.keysArray.filter(function(key){
-                return key.machines.filter(function(machine){
+            associatedKeys = this.model.keysArray.filter(function(key) {
+                return key.machines.filter(function(machine) {
                     return machine[1] == machineId;
                 }).length;
             }, this);
             return associatedKeys || [];
         },
-        computeMachineIp: function(machineips){
-            if (this.machine.public_ips){
+        computeMachineIp: function(machineips) {
+            if (this.machine.public_ips) {
                 return this.machine.public_ips[0]
-            }
-            else {
+            } else {
                 return ''
             }
         },
         _isEqual: function(a, b) {
             return a === b;
         },
-        _isMonitored: function(machine, monitoredMachines){
-            if (monitoredMachines){
-                var mach =  monitoredMachines.base.find(function(m){
+        _isMonitored: function(machine, monitoredMachines) {
+            if (monitoredMachines) {
+                var mach = monitoredMachines.base.find(function(m) {
                     return m[1] == machine.id && m[0] == machine.cloud.id;
                 }, this);
             }
-            if (monitoredMachines && mach){
+            if (monitoredMachines && mach) {
                 this.set('isMonitored', true);
-            }
-            else{
+            } else {
                 this.set('isMonitored', false);
             }
         },
@@ -684,7 +678,7 @@ MACHINEACTIONS = {
         },
         _editTags: function() {
             var el = this.querySelector('tags-list'),
-            items = [];
+                items = [];
             items.push(itemUid(this.machine, this.sections['machines']));
             el.items = items;
             el._openDialog();
@@ -703,12 +697,12 @@ MACHINEACTIONS = {
             // this.dashboard.rows[0].panels[0].targets[0].target = 'bucky.'+this.machine.id+'.load.shortterm';
             // return ret;
         },
-        confirmAction: function(action){
+        confirmAction: function(action) {
             this._showDialog({
-                title: action+' Machine?',
-                body: "You are about to "+ action +" machine '" + this.machine.name + "'.",
+                title: action + ' Machine?',
+                body: "You are about to " + action + " machine '" + this.machine.name + "'.",
                 danger: false,
-                reason: "machine."+action,
+                reason: "machine." + action,
                 action: action
             });
         },
@@ -724,13 +718,13 @@ MACHINEACTIONS = {
             toast.text = msg;
             toast.show();
         },
-        isState: function(machine){
-            return machine.state == machine.extra.status ;
+        isState: function(machine) {
+            return machine.state == machine.extra.status;
         },
         _computeIsloading: function(machine) {
             return !this.machine ? true : false;
         },
-        disassociateKey: function(e){
+        disassociateKey: function(e) {
             var keyId = e.target['dataKeyid'];
             var keyName = e.target['dataKeyname'];
 
@@ -749,35 +743,33 @@ MACHINEACTIONS = {
                 key: keyId
             });
         },
-        _disassociateKeyRequest: function(e){
+        _disassociateKeyRequest: function(e) {
             this.set('isPendingKeyRequest', true);
         },
-        _disassociateKeyResponse: function(e){
+        _disassociateKeyResponse: function(e) {
             this.set('isPendingKeyRequest', false);
         },
-        _disassociateKeyError: function(e){
+        _disassociateKeyError: function(e) {
             this.set('isPendingKeyRequest', false);
         },
-        _updateKeyLoader: function(e){
+        _updateKeyLoader: function(e) {
             //console.log(e.detail);
             if (e.detail.request) {
                 this.set('isPendingKeyRequest', true);
-            }
-            else if (e.detail.response) {
+            } else if (e.detail.response) {
                 this.set('isPendingKeyRequest', false);
-            }
-            else if (e.detail.error) {
+            } else if (e.detail.error) {
                 this.set('isPendingKeyRequest', false);
                 this._showToast(e.detail.errormsg);
             }
         },
-        _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
-            var hide =  !(associatedKeys.base.length > 0 || isPendingKeyRequest);
+        _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest) {
+            var hide = !(associatedKeys.base.length > 0 || isPendingKeyRequest);
             this.set('hideAssociatedKeys', hide);
         },
-        _feedbackOnScript: function(e){
+        _feedbackOnScript: function(e) {
             if (e.detail.response) {
-                this._showToast('Script run request succeded. Script '+this.model.scripts[e.detail.scriptId].name+' has been queued for execution');
+                this._showToast('Script run request succeded. Script ' + this.model.scripts[e.detail.scriptId].name + ' has been queued for execution');
             }
             if (e.detail.error) {
                 this._showToast(e.detail.errormsg);
