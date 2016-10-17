@@ -236,25 +236,28 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
     elif cronjob_type == 'one_off':
         future_date = params.get('cronjob_entry')
 
-    try:
-        future_date = datetime.datetime.strptime(future_date,
-                                                 '%Y-%m-%d %H:%M:%S')
-    except ValueError:
-        raise BadRequestError('Expiration date value was not valid')
-    now = datetime.datetime.now()
-    if future_date < now:
-        raise BadRequestError('Date of future task is in the past. Please'
-                              ' contact Marty McFly')
+    if future_date:
+        try:
+            future_date = datetime.datetime.strptime(future_date,
+                                                     '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            raise BadRequestError('Expiration date value was not valid')
+        now = datetime.datetime.now()
+        if future_date < now:
+            raise BadRequestError('Date of future task is in the past. Please'
+                                  ' contact Marty McFly')
 
-    if params.get('action') or params.get('machines_per_cloud'):
-
-        pt_args.update({'args': [owner, params.get('action', ptask.action),
+    name = params.get('name') or ptask.name
+    if params.get('action') and params.get('machines_per_cloud'):
+        pt_args.update({'args': [owner.id, params.get('action', ptask.action),
+                                 name,
                                  params.get('machines_per_cloud',
                                             ptask.machines_per_cloud)]})
 
-    if params.get('script_id') or params.get('machines_per_cloud'):
-        pt_args.update({'args': [owner,
+    if params.get('script_id') and params.get('machines_per_cloud'):
+        pt_args.update({'args': [owner.id,
                                  params.get('script_id', ptask.script_id),
+                                 name,
                                  params.get('machines_per_cloud',
                                             ptask.machines_per_cloud)]}
                        )
