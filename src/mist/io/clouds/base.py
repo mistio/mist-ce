@@ -669,15 +669,22 @@ class BaseController(object):
                     # default and starred
                     sortvals[image.id] = 0
                 else:
-                    # default
-                    sortvals[image.id] = 2
+                    if search:
+                        # default and unstarred
+                        sortvals[image.id] = 3
+                    else:
+                        # default
+                        sortvals[image.id] = 2
             else:
                 if image.id in self.cloud.starred:
                     # not default and starred
                     sortvals[image.id] = 1
                 else:
-                    # not default
-                    sortvals[image.id] = 4
+                    if search:
+                        sortvals[image.id] = 5
+                    else:
+                        # not default
+                        sortvals[image.id] = 4
         images.sort(key=lambda image: (sortvals[image.id], image.name.lower()))
 
         # Images with sortvals 0, 1, 2 will be labeled as actually starred.
