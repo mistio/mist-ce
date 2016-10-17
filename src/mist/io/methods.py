@@ -68,6 +68,7 @@ import mist.io.tasks
 import mist.io.inventory
 
 from mist.io.clouds.models import Cloud
+from mist.io.cronjobs.models import UserPeriodicTask
 from mist.core.cloud.models import Machine
 
 from mist.core.vpn.methods import destination_nat as dnat
@@ -1362,6 +1363,17 @@ def destroy_machine(user, cloud_id, machine_id):
             log.warning("Didn't manage to disable monitoring, maybe the "
                         "machine never had monitoring enabled. Error: %r", exc)
 
+    # delete cronjobs for this machine or remove it from cron.machines_per_cloud
+    crons = UserPeriodicTask.objects(owner=user)
+    for cron in crons:
+        if [cloud_id, machine_id] in cron.machines_per_cloud:
+            if len(cron.machines_per_cloud) > 1:
+                cron.machines_per_cloud.remove([cloud_id, machine_id])
+                cron.save()
+            else:
+                cron.delete()
+
+    # we don't have to disassociate keys because
     machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
     machine.ctl.destroy()
 
