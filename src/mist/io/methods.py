@@ -1394,10 +1394,10 @@ def list_images(user, cloud_id, term=None):
 def _image_starred(user, cloud_id, image_id):
     """Check if an image should appear as starred or not to the user"""
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
-    if cloud.provider.startswith('ec2'):
+    if isinstance(cloud, cloud_models.AmazonCloud):
         default = False
-        if cloud.provider in config.EC2_IMAGES:
-            if image_id in config.EC2_IMAGES[cloud.provider]:
+        if cloud.region in config.EC2_IMAGES:
+            if image_id in config.EC2_IMAGES[cloud.region]:
                 default = True
     else:
         # consider all images default for clouds with few images
@@ -1899,7 +1899,10 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
     """
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
 
-    if cloud.provider not in config.EC2_PROVIDERS and cloud.provider not in ['gce', 'rackspace', 'openstack']:
+    if not isinstance(cloud, (cloud_models.AmazonCloud,
+                              cloud_models.GoogleCloud,
+                              cloud_models.RackSpaceCloud,
+                              cloud_models.OpenStackCloud)):
         return False
 
     conn = connect_provider(cloud)
@@ -1929,7 +1932,7 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
                 tag_value = tag_value.encode('utf-8')
             tags_dict[tag_key] = tag_value
 
-    if conn.type in config.EC2_PROVIDERS:
+    if isinstance(cloud, cloud_models.AmazonCloud):
         try:
             # first get a list of current tags. Make sure
             # the response dict gets utf-8 encoded
@@ -2016,7 +2019,7 @@ def delete_machine_tag(user, cloud_id, machine_id, tag):
         raise CloudUnavailableError(cloud_id, exc)
     if not machine:
         raise MachineNotFoundError(machine_id)
-    if conn.type in config.EC2_PROVIDERS:
+    if isinstance(cloud, cloud_models.AmazonCloud):
         tags = machine.extra.get('tags', None)
         pair = None
         for mkey, mdata in tags.iteritems():
@@ -2864,7 +2867,7 @@ def create_dns_a_record(user, domain_name, ip_addr):
     providers = {}
     clouds = Cloud.objects(owner=user)
     for cloud in clouds:
-        if cloud.provider.startswith('ec2_'):
+        if isinstance(cloud, cloud_models.AmazonCloud):
             provider = DnsProvider.ROUTE53
             creds = cloud.apikey, cloud.apisecret
         #TODO: add support for more providers
