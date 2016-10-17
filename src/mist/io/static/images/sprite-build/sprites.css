@@ -24,6 +24,7 @@ ilb { display: inline-block; }  .provider-vultr { background-image: url('icon-sp
 .provider-softlayer { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-softlayer { background-position: -0px -1034px; }
 .image-centos { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .image-centos { background-position: -0px -1082px; }
 .provider-azure { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-azure { background-position: -0px -1130px; }
+.provider-azure_arm { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .provider-azure_arm { background-position: -0px -1130px; }
 .image-fedora { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .image-fedora { background-position: -0px -1178px; }
 .image-oracle { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .image-oracle { background-position: -0px -1226px; }
 .image-ubuntu { background-image: url('icon-sprite-1432130152.png') !important; width: 48px; height: 48px; } .image-ubuntu { background-position: -0px -1272px; }

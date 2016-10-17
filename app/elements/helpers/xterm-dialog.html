@@ -2177,7 +2177,6 @@
             :host {
                 display: block;
                 width: 100% !important;
-                position: fixed;
                 z-index: 999999;
                 top: 0;
                 left: 0;
@@ -2219,11 +2218,11 @@
             }
         </style>
 
-        <div class="icon-buttons">
+        <div class="icon-buttons" hidden$=[[!controls]]>
             <!--paper-button dialog-confirm><iron-icon icon="icons:remove">minimize</iron-icon></paper-button-->
             <paper-button on-tap="remove"><iron-icon icon="icons:close">close</iron-icon></paper-button>
         </div>
-        <h2>
+        <h2 hidden$=[[!controls]]>
             <iron-icon icon="vaadin-icons:terminal"></iron-icon> {{target.name}}
         </h2>
         <div id="terminal-container">
@@ -2240,63 +2239,98 @@
                 properties: {
                     term: Object,
                     target: Object,
+                    height: {
+                        type: Number,
+                        value: 0
+                    },
                     reason: {
                         type: String,
                         value: null
+                    },
+                    controls: {
+                        type: Boolean,
+                        value: true
                     }
                 },
                 listeners: {
                     'iron-overlay-closed': '_modalClosed'
                 },
                 ready: function() {
-                    console.log('xterm loaded');
+                    console.debug('xterm loaded');
                 },
                 attached: function() {
-                    console.log('xterm attached');
+                    console.debug('xterm attached');
                     this.term = new Terminal({
                         cursorBlink: true
                     });
-                    var term = this.term,
-                        terminalContainer = this.querySelector('#terminal-container');
 
-                    term.open(terminalContainer);
+                    var newCols, newRows;
+                    [newCols, newRows] = this.resizeTerminal();
 
-                    var termBody = terminalContainer.querySelector('.xterm'),
-                        termHeight = window.innerHeight - 54;
-
-                    termBody.style.height = termHeight + 'px';
-
-                    var newRows = Math.floor(termHeight/22) - 1,
-                        newCols = Math.floor(terminalContainer.offsetWidth/10);
-
-                    console.warn('newrows', newRows);
-                    console.warn('newcols', newCols);
-                    term.resize(newCols, newRows);
+                    var ips = [].concat(this.target.public_ips).concat(this.target.private_ips);
+                    if (ips[0])
+                        this.term.write('Connecting to ' + ips[0] + '...\r\n');
 
                     var socket = document.querySelector('app-socket');
 
-                    term.on('data', function (data, ev) {
+                    this.term.on('data', function (data, ev) {
                         socket.send('msg', 'shell', 'shell_data', data);
                     });
 
                     socket.send('sub', 'shell');
-                    var ips = [].concat(this.target.public_ips).concat(this.target.private_ips);
-                    term.write('Connecting to ' + ips[0] + '...\r\n');
 
-                    socket.send('msg', 'shell', 'shell_open', {
-                        cloud_id: this.target.cloud.id,
-                        machine_id: this.target.id,
-                        provider: this.target.cloud.provider,
-                        host: ips[0],
+                    var payload = {
                         cols: newCols,
                         rows: newRows,
-                    });
+                        cloud_id: '',
+                        machine_id: '',
+                        host: ''
+                    };
 
-                    socket.set('term', term);
+                    if (this.target.job_id) {
+                        payload['job_id'] = this.target.job_id;
+                        payload['provider'] = 'docker';
+                        payload['host'] = '';
+                    } else {
+                        payload['cloud_id'] = this.target.cloud.id;
+                        payload['machine_id'] = this.target.id;
+                        payload['provider'] = this.target.cloud.provider;
+                        payload['host'] = ips[0];
+                        this.set("style.position", "fixed")
+                    }
+
+                    socket.send('msg', 'shell', 'shell_open', payload);
+
+                    socket.set('term', this.term);
 
                     // Add event handler for window resize
                     var that = this;
-                    window.addEventListener("resize", function() { that.windowResize(that); });
+                    window.addEventListener("resize", function() {
+                      that.windowResize(that);
+                    });
+                },
+
+                resizeTerminal: function(newRows, newCols) {
+                    var terminalContainer = this.querySelector('#terminal-container');
+
+                    this.term.open(terminalContainer);
+
+                    var termBody = terminalContainer.querySelector('.xterm'),
+                        termHeight = (this.height || window.innerHeight) - 54;
+
+                    termBody.style.height = terminalContainer.style.height = termHeight + 'px';
+                    termBody.style.width = this.parentElement.offsetWidth;
+
+                    if (!newRows)
+                        newRows = Math.floor(termHeight/22) - 1;
+                    if (!newCols)
+                        newCols = Math.floor(this.parentElement.parentElement.offsetWidth/10) || 80;
+
+                    console.debug('newrows', newRows);
+                    console.debug('newcols', newCols, this.parentElement.parentElement.offsetWidth, this.parentElement.parentElement);
+                    this.term.resize(newCols, newRows);
+                    terminalContainer.querySelector('.xterm-viewport').style.height = termHeight + 'px';
+                    return [newCols, newRows];
                 },
                 windowResize: function(that) {
                   var terminalContainer = that.querySelector('#terminal-container'),
@@ -2309,13 +2343,14 @@
                   var newRows = Math.floor(termHeight/22) - 1,
                       newCols = Math.floor(terminalContainer.offsetWidth/10);
 
-                    that.term.resize(newCols, newRows);
-                    document.querySelector('app-socket')
+                      console.log('resize term', newCols, newRows);
+                      document.querySelector('app-socket')
                             .send('msg',
                                   'shell',
                                   'shell_resize',
                                   newCols,
                                   newRows);
+                      that.term.resize(newCols, newRows);
                 },
                 detached: function() {
                     console.debug('xterm detached');

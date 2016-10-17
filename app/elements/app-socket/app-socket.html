@@ -211,10 +211,11 @@
                         }
                     },
                     open_incidents: function(data) {
-                        that.set('onboarding.isLoadingIncidents', false);
                         if (DEBUG_SOCKET)
                             console.debug('got incidents', data);
-                        that.set('model.incidents', data);
+                        that.debounce(that._updateIncidents(data), function() {
+                            console.debug('Loaded incidents data');
+                        }, 250);
                     },
                     open_jobs: function(data) {
                         if (DEBUG_SOCKET)
@@ -422,7 +423,10 @@
                             return k.name == key.name;
                         })
                         if (!keyexists) {
-                            this.push('model.clouds.'+cloud+'.machines.'+machine+'.keys',key)
+                            if (!this.get('model.clouds.'+cloud+'.machines.'+machine+'.keys'))
+                                this.set('model.clouds.'+cloud+'.machines.'+machine+'.keys', [key])
+                            else
+                                this.push('model.clouds.'+cloud+'.machines.'+machine+'.keys',key)
                         }
                     }, this)
                 }
@@ -576,6 +580,19 @@
             return this._updateModel('tunnels', data);
         },
 
+        _updateIncidents: function(data) {
+            this.set('onboarding.isLoadingIncidents', false);
+            if (data) {
+                console.log(data);
+                for(var i=0;i<data.length;i++){
+                    var inc = data[i];
+                    inc.id = inc.incident_id
+                }
+            }
+            console.log(data);
+            return this._updateModel('incidents', data);
+        },
+
         _updateProjects: function(data) {
             this.set('model.clouds.' + data.cloud_id + '.projects', _generateMap(data.projects));
             this.set('model.clouds.' + data.cloud_id + '.projectsArray', data.projects);
@@ -586,7 +603,15 @@
         },
 
         _probe: function(data) {
-            // TODO
+            if (!this.model.probes)
+                this.set('model.probes', {})
+
+            try {
+                var uuid = this.model.clouds[data.cloud_id].machines[data.machine_id].uuid;
+                this.set('model.probes.'  + uuid, data.result);
+            } catch (e) {
+                console.warn('cannot find uuid for machine with cloud_id ', data.cloud_id, ' and machine_id', data.machine_id);
+            }
         },
 
         _ping: function(data) {
