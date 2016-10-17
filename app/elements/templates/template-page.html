@@ -510,6 +510,7 @@
                     });
                 },
                 _deleteTemplateResponse: function(e) {
+                    console.log('_deleteTemplateResponse',e.detail, e.detail.reason, e.detail.response);
                     var reason = e.detail.reason,
                         response = e.detail.response;
 
@@ -523,7 +524,7 @@
                     }
                 },
                 _handleResponse: function(e){
-                    console.log('response',e);
+                    // console.log('response',e);
                     document.querySelector('app-location').path = '/templates';
                 },
                 _handleError: function(e){
