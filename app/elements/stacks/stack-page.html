@@ -13,6 +13,7 @@
 <link rel="import" href="../element-for-in/element-for-in.html">
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../helpers/xterm-dialog.html">
 
 <link rel="import" href="stack-machine-item.html">
 <link rel="import" href="stack-network-item.html">
@@ -798,7 +799,6 @@
                     }
                 },
                 attachTerm: function() {
-                    this.importHref(this.resolveUrl('/elements/helpers/xterm-dialog.html'), null, null, true);
                     var xterm = this.querySelector("xterm-dialog");
                     if (xterm)
                         xterm.remove();
