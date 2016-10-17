@@ -1403,27 +1403,11 @@ def list_images(user, cloud_id, term=None):
     return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_images(term)
 
 
-def _image_starred(user, cloud_id, image_id):
-    """Check if an image should appear as starred or not to the user"""
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
-    if isinstance(cloud, cloud_models.AmazonCloud):
-        default = False
-        if cloud.region in config.EC2_IMAGES:
-            if image_id in config.EC2_IMAGES[cloud.region]:
-                default = True
-    else:
-        # consider all images default for clouds with few images
-        default = True
-    starred = image_id in cloud.starred
-    unstarred = image_id in cloud.unstarred
-    return starred or (default and not unstarred)
-
-
 def star_image(user, cloud_id, image_id):
     """Toggle image star (star/unstar)"""
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
 
-    star = _image_starred(user, cloud_id, image_id)
+    star = cloud.ctl.image_is_starred(image_id)
     if star:
         if image_id in cloud.starred:
             cloud.starred.remove(image_id)
