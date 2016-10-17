@@ -155,6 +155,9 @@ class AmazonController(BaseController):
                 )
         return images
 
+    def image_is_default(self, image_id):
+        return image_id in config.EC2_IMAGES[self.cloud.region]
+
     def _list_locations__fetch_locations(self):
         """List availability zones for EC2 region
 
@@ -812,6 +815,11 @@ class DockerController(BaseController):
         images = [NodeImage(id=image, name=name,
                             driver=self.connection, extra={})
                   for image, name in config.DOCKER_IMAGES.items()]
+        # Add starred images
+        images += [NodeImage(id=image, name=image,
+                             driver=self.connection, extra={})
+                   for image in self.cloud.starred
+                   if image not in config.DOCKER_IMAGES]
         # Fetch images from libcloud (supports search).
         if search:
             images += self.connection.search_images(term=search)[:100]
