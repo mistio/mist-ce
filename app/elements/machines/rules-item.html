@@ -219,6 +219,7 @@
             	'input':'ruleUpdates',
             },
             observers: [
+            	'editModeChanged(editMode)'
             ],
             ready: function() {
             },
@@ -306,6 +307,11 @@
             	this.set('diff', changes);
             	this.set('noChanges', count);
             	this.set('formError', false);
+            },
+            editModeChanged: function(editMode) {
+            	if (editMode == true) {
+            		this.fire('edit-request', {rule: this.rule.id})
+            	}
             }
         });
 DEFAULT_METRICS = {
