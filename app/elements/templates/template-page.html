@@ -9,7 +9,7 @@
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../tags/tags-list.html">
 
-<!-- <link rel="import" href="template-edit.html"> -->
+<link rel="import" href="template-edit.html">
 <link rel="import" href="template-stack-item.html">
 
 <dom-module id="template-page">
@@ -236,7 +236,7 @@
                     <paper-menu-button horizontal-align="right">
                         <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
                         <paper-menu id="machine_actions" class="dropdown-content">
-                            <!-- <paper-button on-tap="_editTemplate" class="simple">Edit Template</paper-button> -->
+                            <paper-button on-tap="_editTemplate" class="simple">Edit Template</paper-button>
                             <paper-button on-tap="_deleteTemplate" class="simple">Delete Template</paper-button>
                         </paper-menu>
                     </paper-menu-button>
@@ -396,7 +396,7 @@
         <template-edit template="[[template]]"></template-edit>
         <dialog-element></dialog-element>
         <tags-list model="[[model]]"></tags-list>
-        <iron-ajax id="formAjax" url="" contentType="application/json" handle-as="json" method="DELETE" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="templateDeleteRequest" url="/api/v1/templates/[[template.id]]" contentType="application/json" handle-as="json" method="DELETE" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
     </template>
     <script>
         (function() {
@@ -452,10 +452,13 @@
                     this.vpHeight = 'height:' + wh + 'px; overflow: auto;';
                 },
                 _computeReadableDate: function(date) {
-                    return moment(date).fromNow();
+                    return moment.utc(date).fromNow();
                 },
                 _computeHasStacks: function(stacks) {
-                    return this.stacks.length > 0;
+                    if (stacks)
+                        return this.stacks.length > 0;
+                    else
+                        return false;
                 },
                 _computeTemplate: function(templateid, templates) {
                     return templates.base[templateid];
@@ -497,7 +500,6 @@
                         alert += '.'
                         subscript = 'Stacks are not deleted, when their template is deleted.'
                     }
-
                     this._showDialog({
                         title: 'Delete Template '+this.template.name+' ?',
                         body: "Deleting templates cannot be undone. You are about to delete template: " + this.template.name,
@@ -508,14 +510,25 @@
                     });
                 },
                 _deleteTemplateResponse: function(e) {
+                    console.log('_deleteTemplateResponse',e.detail, e.detail.reason, e.detail.response);
                     var reason = e.detail.reason,
                         response = e.detail.response;
 
                     if (response.confirmed && reason == "delete_template") {
-                        
-
-                        document.querySelector('app-location').path = '/templates';
+                        this.$.templateDeleteRequest.body = {
+                            'template_id': this.template.id
+                        };
+                        this.$.templateDeleteRequest.headers["Content-Type"] = 'application/json';
+                        this.$.templateDeleteRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.templateDeleteRequest.generateRequest();                        
                     }
+                },
+                _handleResponse: function(e){
+                    // console.log('response',e);
+                    document.querySelector('app-location').path = '/templates';
+                },
+                _handleError: function(e){
+                    console.log('error',e);
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element'),
@@ -530,8 +543,6 @@
                 },
                 toggleAll: function(e) {
                     var t = e.target;
-
-
                     var els = this.querySelectorAll('app-togglable');
                     [].forEach.call(els, function(el, index) {
                         el.open = true;

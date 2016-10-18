@@ -125,7 +125,7 @@
                 },
                 observers: [
                     'selectedItemsChanged(items.splices, items.length)',
-                    '_computeTags(items)'
+                    '_computeTags(items.length)'
                 ],
                 listeners: {
                     'iron-overlay-closed': '_modalClosed',
@@ -152,8 +152,8 @@
                 selectedItemsChanged: function(items, length){
                     this._computeTags(this.items);
                 },
-                _computeTags: function(items) {
-                    var tags = this._computeCommonTags(items);
+                _computeTags: function(lengths) {
+                    var tags = this._computeCommonTags(this.items);
                     if (!tags.length) {
                         tags = [{
                             key: '',
@@ -186,11 +186,21 @@
 
                             if (!itemObj.tags) 
                                 itemObj.tags = [];
+                            // TO FIX: network tags should not be type 'object', but Array of objects
+                            // only networks return their tags in such format. Below code patches it.
+                            else if (itemObj.tags && typeof(itemObj.tags) == 'object') {
+                                var foo = []
+                                for (var p in itemObj.tags) {
+                                    foo.push(itemObj.tags[p])
+                                }
+                                itemObj.tags = foo;
+                            }
 
                             if (i == 0) {
+                                // console.log('itemObj.tags',itemObj.tags);
                                 tagset.addItems(itemObj.tags.map(function(tag){
                                     return tag.key+'='+tag.value;
-                                }) || []);
+                                }));
                             }
                             else {
                                 isection.clear()

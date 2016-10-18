@@ -36,7 +36,6 @@ from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider, NodeState
 from libcloud.utils.networking import is_private_subnet
 
-
 from mist.io import config
 
 from mist.io.exceptions import MistError
@@ -155,6 +154,9 @@ class AmazonController(BaseController):
                     ex_filters={'name': '*%s*' % search}
                 )
         return images
+
+    def image_is_default(self, image_id):
+        return image_id in config.EC2_IMAGES[self.cloud.region]
 
     def _list_locations__fetch_locations(self):
         """List availability zones for EC2 region
@@ -364,14 +366,9 @@ class AzureController(BaseController):
                                           tmp_cert_file.name)
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
-        # TODO: Get prices per location
-        os_type = machine_libcloud.extra.get('os_type', 'linux')
-        size = machine_libcloud.extra.get('instance_size')
-        price = get_size_price(driver_type='compute', driver_name='azure',
-                               size_id=size)
-        if price:
-            return price.get(os_type) or price.get('linux') or 0, 0
-        return 0, 0
+        if machine_libcloud.state not in [NodeState.RUNNING, NodeState.PAUSED]:
+            return 0, 0
+        return machine_libcloud.extra.get('cost_per_hour', 0), 0
 
     def _list_images__fetch_images(self, search=None):
         images = self.connection.list_images()
@@ -429,6 +426,12 @@ class AzureController(BaseController):
         self.connection.destroy_node(machine_libcloud,
                                      ex_cloud_service_name=cloud_service)
 
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
+        super(AzureArmController, self)._list_machines__machine_actions(
+              machine, machine_libcloud)
+        if machine_libcloud.state is NodeState.PAUSED:
+            machine.actions.start = True
+
 
 class AzureArmController(BaseController):
 
@@ -440,26 +443,28 @@ class AzureArmController(BaseController):
                                               self.cloud.key,
                                               self.cloud.secret)
 
-    def _list_machines__machine_creation_date(self, machine_api):
-        return machine_api.created_at  # datetime
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
+        if machine_libcloud.state not in [NodeState.RUNNING, NodeState.PAUSED]:
+            return 0, 0
+        return machine_libcloud.extra.get('cost_per_hour', 0), 0
 
-    def _list_machines__cost_machine(self, machine_api):
-        return 0, 0
+    def _list_machines__machine_creation_date(self, machine, machine_libcloud):
+        return machine_libcloud.created_at  # datetime
 
     def _list_images__fetch_images(self, search=None):
         return []
-
-    def _start_machine(self,  machine, machine_libcloud):
-        self.connection.ex_start_node(machine_libcloud)
-
-    def _stop_machine(self, machine, machine_libcloud):
-        self.connection.ex_stop_node(machine_libcloud)
 
     def _reboot_machine(self, machine, machine_libcloud):
         self.connection.reboot_node(machine_libcloud)
 
     def _destroy_machine(self, machine, machine_libcloud):
         self.connection.destroy_node(machine_libcloud)
+
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
+        super(AzureArmController, self)._list_machines__machine_actions(
+              machine, machine_libcloud)
+        if machine_libcloud.state is NodeState.PAUSED:
+            machine.actions.start = True
 
 
 class GoogleController(BaseController):
@@ -545,6 +550,8 @@ class GoogleController(BaseController):
         return images
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
+        if machine_libcloud.state == NodeState.TERMINATED:
+            return 0, 0
         # https://cloud.google.com/compute/pricing
         size = machine_libcloud.extra.get('machineType')
         # eg europe-west1-d
@@ -788,7 +795,8 @@ class DockerController(BaseController):
         # Username/Password authentication.
         return get_driver(Provider.DOCKER)(self.cloud.username,
                                            self.cloud.password,
-                                           host, port)
+                                           host, port,
+                                           docker_host=self.cloud.host)
 
     def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'docker_port', 'port')
@@ -807,6 +815,11 @@ class DockerController(BaseController):
         images = [NodeImage(id=image, name=name,
                             driver=self.connection, extra={})
                   for image, name in config.DOCKER_IMAGES.items()]
+        # Add starred images
+        images += [NodeImage(id=image, name=image,
+                             driver=self.connection, extra={})
+                   for image in self.cloud.starred
+                   if image not in config.DOCKER_IMAGES]
         # Fetch images from libcloud (supports search).
         if search:
             images += self.connection.search_images(term=search)[:100]

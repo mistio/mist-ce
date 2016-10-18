@@ -216,6 +216,13 @@ Polymer({
                 return 'missing template';
             }
         }
+        // incidents finished
+        if (field == 'started_at' || field == 'finished_at') {
+            if (ret)
+                return moment.utc(item[field] * 1000).fromNow();
+            else 
+                return "";
+        }
 
         // some providers dont provide this info
         if (field == 'created') {
@@ -226,7 +233,7 @@ Polymer({
                 cr = item['created'];
             else
                 return '';
-            return moment(cr).fromNow();
+            return moment.utc(cr).fromNow();
         }
 
         // field could be in the 'extra' section, but should not be an object
@@ -274,10 +281,16 @@ Polymer({
         }
 
         if (field == 'cloud_id') {
-            return document.querySelector('mist-app').model.clouds[ret].title;
+            if (document.querySelector('mist-app').model.clouds[item.cloud_id])
+                return document.querySelector('mist-app').model.clouds[ret].title;
+            else 
+                return 'missing cloud';
         }
         if (field == 'machine_id') {
-            return document.querySelector('mist-app').model.clouds[item.cloud_id].machines[item.machine_id].name;
+            if (document.querySelector('mist-app').model.clouds[item.cloud_id].machines[item.machine_id])
+                return document.querySelector('mist-app').model.clouds[item.cloud_id].machines[item.machine_id].name;
+            else 
+                return 'missing machine';
         }
 
         if (field == 'default') {

@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../app-togglable/app-togglable-list.html">
@@ -12,6 +13,7 @@
 <link rel="import" href="../element-for-in/element-for-in.html">
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../tags/tags-list.html">
+<link rel="import" href="../helpers/xterm-dialog.html">
 
 <link rel="import" href="stack-machine-item.html">
 <link rel="import" href="stack-network-item.html">
@@ -21,10 +23,22 @@
 
 <dom-module id="stack-page">
     <template>
+        <style is="custom-style">
+            paper-button#minimal:not([disabled]) {
+                background-color: #eee;
+                text-transform: none;
+                font-weight: 400;
+                color: inherit;
+            }
+            paper-button#minimal::content iron-icon {
+                opacity: 0.32;
+            }
+        </style>
         <style is="custom-style" include="lists"></style>
+        <style is="custom-style" include="forms"></style>
         <style is="custom-style" include="tags-and-labels"></style>
         <style is="custom-style" include="single-page"></style>
-        <style include="shared-styles">
+        <style is="custom-style" include="shared-styles">
             :host {
                 display: block;
             }
@@ -56,7 +70,6 @@
             app-form,
             mist-form {
                 max-width: 900px;
-                box-sizing: border-box;
             }
 
             .app-form-title {
@@ -140,6 +153,10 @@
 
             paper-icon-button {
                 transition: all 200ms;
+            }
+
+            paper-icon-button.close {
+                float: right;
             }
 
             paper-icon-button.active-sort {
@@ -398,6 +415,48 @@
             text-transform: none;
             font-size: 0.9em;
         }
+        #cfyshell {
+            width: 100%;            
+        }
+        xterm-dialog::content .terminal .xterm-rows {
+            width: 100%;
+        }
+        paper-button {
+            line-height: 1em;
+        }
+        .output {
+            position: relative;
+            overflow: hidden;
+            background-color: #eee;
+        }
+        .output paper-button {
+            float: right;
+            margin: 8px !important;
+        }.
+        paper-icon-button.logs-show::content iron-icon {
+            transition: transform 300ms ease-in;
+            transform: rotate3d(0, 0, 1, 0);
+        }
+        paper-icon-button.logs-show[active]::content iron-icon {
+            transform: rotate3d(0, 0, 1, 180deg);
+        }
+        #logscollapse > .log:last-of-type{
+            margin-bottom: 24px;
+        }
+        #logscollapse[collapsed] {
+            height: 100px;
+            overflow: hidden;
+        }
+        .logscontrol {
+            margin-top: 16px;
+            padding: 0 8px;
+            
+        }
+
+        .log.more {
+            font-size: 0.9em;
+            color: rgba(0,0,0,0.54);
+        }
         </style>
         <div id="content">
             <div class="is-loading" hidden$="[[!isLoading]]">
@@ -410,7 +469,9 @@
                         [[stack.name]]
                     </h2>
                     <div class="subtitle">
-                        Created from <a class="regular" href$="/templates/[[template.id]]"> [[template.name]] <iron-icon icon="icons:link"></iron-icon></a>
+                        Created from
+                        <a class="regular" href$="/templates/[[template.id]]" hidden$="[[!template.name]]"> [[template.name]] <iron-icon icon="icons:link"></iron-icon></a>
+                        <span hidden$="[[template.id]]"> missing template</span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -525,7 +586,7 @@
                                 <template is="dom-if" if=[[workflow.params.length]]>
                                     <paper-material class="app-form-title">[[workflow.name]]</paper-material>
                                     <paper-material>
-                                        <mist-form model=[[model]] fields="{{workflow.params}}" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[params.id]]" on-request="handleWorkflowRequest" on-response="handleWorkflowResponse" on-error="handleWorkflowError" btncontent="[[workflow.name]]">[[workflow.name]]</mist-form>
+                                        <mist-form model=[[model]] fields="[[workflow.params]]" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[stack.id]]" on-request="handleWorkflowRequest" on-response="handleWorkflowResponse" on-error="handleWorkflowError" btncontent="[[workflow.name]]">[[workflow.name]]</mist-form>
                                     </paper-material>
                                 </template>
 
@@ -545,16 +606,32 @@
 
             <!-- <template is="dom-if" if="[[ok]]"> -->
             <div id="logs" class="page">
-                <h3 class="smallcaps">Job Logs <span class="small">job_id: [[stack.job_id]]</span></h3>
                 <paper-material>
-                    <template is="dom-repeat" items="[[job.logs]]" as="log">
-                        <div class$="log error-[[log.error]]">
-                            <iron-icon icon$="[[computeLogIcon(log,index)]]"></iron-icon>
-                            <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
-                            [[log.action]]
-                            <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
-                        </div>
-                    </template>
+                    <h3 class="smallcaps">Job Logs <span class="small">job_id: [[stack.job_id]]</span></h3>
+                    <div id="logscollapse" collapsed$="[[!showLogs]]">
+                        <template is="dom-repeat" items="[[job.logs]]" as="log">
+                            <div class$="log error-[[log.error]]">
+                                <iron-icon icon$="[[computeLogIcon(log, index, stack.status)]]"></iron-icon>
+                                <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
+                                [[log.action]]
+                                <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="log false more" hidden$="[[showLogs]]">
+                        ... and more. [[job.logs.length]] total log entries
+                    </div>
+                    <paper-button id="minimal" class="logscontrol" toggles active={{showLogs}} hidden$="[[!job.finished_at]]">
+                        <span hidden$="{{showLogs}}">expand logs <iron-icon icon="icons:unfold-more"></iron-icon> </span>
+                        <span hidden$="{{!showLogs}}">collapse logs <iron-icon icon="icons:unfold-less"></iron-icon> </span>
+                    </paper-button>
+                </paper-material>
+                <paper-material class="no-pad">
+                    <div class="output">
+                        <paper-button toggles active={{showOutput}} hidden$="[[showOutput]]" class="blue">Show output</paper-button>
+                        <paper-icon-button class="close" toggles active={{showOutput}} hidden$="[[!showOutput]]" icon="icons:close"></paper-icon-button>
+                    </div>
+                    <div id="cfyshell" hidden$="[[!showOutput]]"></div>
                 </paper-material>
             </div>
             <!-- </template> -->
@@ -642,11 +719,19 @@
                     },
                     hideWorkflows: {
                         type: Boolean,
-                        computed: '_hideWorkflows(stack)'
+                        computed: '_hideWorkflows(stack.status)'
                     },
                     hideDeployNow: {
                         type: Boolean,
                         computed: '_hideDeployNow(stack)'
+                    },
+                    showOutput: {
+                        type: Boolean,
+                        value: false,
+                    },
+                    showLogs: {
+                        type: Boolean,
+                        value: true,
                     },
                     section: {
                         type: Object
@@ -659,7 +744,7 @@
                     },
                     template: {
                         type: Object,
-                        computed: '_computeTemplate(stack, model.templates)'
+                        computed: '_computeTemplate(stack.template, model.templates)'
                     },
                     machines: {
                         type: Array,
@@ -682,7 +767,11 @@
                     },
                     workflows: {
                         type: Array,
-                        computed: '_computeWorkflows(template.workflows.*, model.templates)'
+                        computed: '_computeWorkflows(template)'
+                    },
+                    timestamp: {
+                        type: String,
+                        computed: '_getFormattedTimestamp(stack)'
                     },
                     vpHeight: String,
                     payload: {
@@ -737,11 +826,10 @@
                 observers: [
                     'newStackPage(stack.id)',
                     'newJob(stack.job_id)',
-                    'stackoutputsChanged(stack.outputs)'
+                    'stackoutputsChanged(stack.outputs)',
+                    'updateTerm(showOutput)'
                 ],
                 listeners: {
-                    // 'change' : '_updateFields',
-                    // 'iron-select' : '_updateFields',
                     'iron-activate': '_handleInterval'
                 },
                 ready: function(){
@@ -759,12 +847,38 @@
                         console.log('setting interval for job', this.intervalID);
                     // }
 
+                    if (this.stack && (this.stack.status == 'workflow_started' || this.stack.status == 'start_creation')){
+                        this.showOutput = true;
+                    }
+                },
+                updateTerm: function(show) {
+                    if (show) {
+                        this.attachTerm();
+                    } else {
+                      var xterm = this.querySelector("xterm-dialog");
+                      if (xterm)
+                          xterm.remove();
+                    }
+                },
+                attachTerm: function() {
+                    var xterm = this.querySelector("xterm-dialog");
+                    if (xterm)
+                        xterm.remove();
+                    xterm = document.createElement("xterm-dialog");
+                    xterm.target = {job_id: this.stack.job_id};
+                    xterm.height = 500;
+                    xterm.controls = false;
+                    var parent = this.querySelector("div#cfyshell");
+                    parent.insertBefore(xterm, parent.firstChild);
+                    console.warn('xterm open', xterm);
                 },
                 jobFinished: function(finished_at){
                     //clear interval
                     if (this.job && this.job.finished_at > 0 && this.intervalID){
                         window.clearInterval(this.intervalID);
                         this.intervalID = null;
+                        // update job logs one last time
+                        this.async(function(){this.$.getJobLog.generateRequest()}, 1000);
                     }
                 },
                 test: function() {
@@ -811,7 +925,7 @@
                     if (this.job && stack && stack.status == 'error'){
                         this.$.getJobLog.generateRequest();
                     }
-                    return stack.status == 'error';
+                    return stack && stack.status == 'error';
                 },
                 is_workflow_started: function(stack) {
                     if (stack)
@@ -825,9 +939,9 @@
                     if (stack)
                         return stack.status == 'ok' || stack.status == 'error';
                 },
-                _hideWorkflows: function(stack) {
-                    if (stack)
-                        return !stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
+                _hideWorkflows: function(status) {
+                    if (this.stack)
+                        return !this.stack.deploy || this.stack.status == 'workflow_started' || this.stack.status == 'start_creation';
                 },
                 _hideDeployNow: function(stack) {
                     if (stack)
@@ -872,15 +986,16 @@
 
                     return sum > 0 ? true : false;
                 },
-                _computeTemplate: function(stack, templates) {
-                    if (stack)
-                        return this.model.templates[stack.template];
+                _computeTemplate: function(stacktemplate, templates) {
+                    if (this.stack)
+                        if (this.model.templates[this.stack.template])
+                            return this.model.templates[this.stack.template];
                 },
                 _computeJobID: function(stack) {
                     return stack.job_id ? stack.job_id : false;
                 },
                 _machines: function(stack) {
-                    return stack.machines;
+                    return stack && stack.machines;
                 },
                 _listMachines: function(nis) {
                     var machines = [];
@@ -949,8 +1064,9 @@
                     }
                     return keys;
                 },
-                _computeWorkflows: function(workflows, templates) {
-                    var workflows = workflows.base.filter(function(wf){
+                _computeWorkflows: function(template) {
+                    console.log('_computeWorkflows');
+                    var workflows = this.template.workflows.filter(function(wf){
                         return wf.name != 'scale' &&  wf.name != 'execute_operation';
                     });
                     workflows.forEach(function(wf){
@@ -1005,7 +1121,7 @@
                     return workflows;
                 },
                 _computeReadableDate: function(date) {
-                    return moment(date).fromNow();
+                    return moment.utc(date).fromNow();
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element'),
@@ -1104,34 +1220,38 @@
                     this.$.stackOutputs.innerHTML = this._makeString(outputs);
                 },
                 _makeString: function(info){
-                    console.log(YAML.dump(info));
-                    console.log(anchorme.js(YAML.dump(info)));
+                    // console.log(YAML.dump(info));
+                    // console.log(anchorme.js(YAML.dump(info)));
                     return anchorme.js(YAML.dump(info).replace(/\'/g, ""));
                 },
                 _updateLogs: function(that){
                     if (that.stack && (that.stack.status == 'workflow_started' || that.stack.status == 'start_creation')){
                         console.log('_updateLogs');
                         that.$.getJobLog.generateRequest();
+                        this.showOutput = true;
+                        this.showLogs = true;
                     }
                 },
-                computeLogIcon: function(log, index){
+                computeLogIcon: function(log, index, status){
                     if (log.error) {
                         return 'icons:error-outline'
                     }
-                    else if (index == this.job.logs.length -1 && this.job.finished_at == 0){
+                    else if (index == this.job.logs.length -1 && this.job.finished_at == 0 && status != 'ok'){
                         return '';
                     }
                     else {
                         return 'icons:done';
                     }
                 },
-                _updateFields: function(){
-
-                },
                 newStackPage: function(id){
                     console.log('un setting interval for', this.intervalID);
                     window.clearInterval(this.intervalID);
                     this.intervalID = null;
+                    var xterm = this.querySelector("xterm-dialog");
+                    if (xterm)
+                        xterm.remove();
+                    this.showOutput = false;
+                    this.showLogs = false;
                 },
                 _computeIsloading: function(stack) {
                     return !this.stack ? true : false;
