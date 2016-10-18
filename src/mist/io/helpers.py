@@ -232,7 +232,7 @@ def amqp_owner_listening(owner):
 
 def trigger_session_update(owner, sections=['clouds', 'keys', 'monitoring',
                                             'scripts', 'templates', 'stacks',
-                                            'user', 'org']):
+                                            'cronjobs', 'user', 'org']):
     amqp_publish_user(owner, routing_key='update', data=sections)
 
 

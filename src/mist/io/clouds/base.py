@@ -655,47 +655,17 @@ class BaseController(object):
                   if img.name and img.id[:3] not in ('aki', 'ari')
                   and 'windows' not in img.name.lower()]
 
-        # Sort images in following groups, then alphabetically:
-        # 0: default and starred
-        # 1: not default and starred
-        # 2: default
-        # 3: default and unstarred
-        # 4: not default
-        # 5: not default and unstarred
-        sortvals = {}
-        for image in images:
-            if self.image_is_default(image.id):
-                if image.id in self.cloud.starred:
-                    if self.cloud.starred[image.id]:
-                        # default and starred
-                        sortvals[image.id] = 0
-                    else:
-                        # default and unstarred
-                        sortvals[image.id] = 3
-                else:
-                    # default
-                    sortvals[image.id] = 2
-            else:
-                if image.id in self.cloud.starred:
-                    if self.cloud.starred[image.id]:
-                        # not default and starred
-                        sortvals[image.id] = 1
-                    else:
-                        # not default and unstarred
-                        sortvals[image.id] = 5
-                else:
-                    # not default
-                    sortvals[image.id] = 4
-        images.sort(key=lambda image: (sortvals[image.id], image.name.lower()))
+        # Turn images to dict to return and star them.
+        images = [{'id': img.id,
+                   'name': img.name,
+                   'extra': img.extra,
+                   'star': self.image_is_starred(img.id)}
+                  for img in images]
 
-        # Images with sortvals 0, 1, 2 will be labeled as actually starred.
-        # These correspond to images that are either starred in the cloud
-        # or considered default.
-        return [{'id': image.id,
-                 'name': image.name,
-                 'extra': image.extra,
-                 'star': sortvals[image.id] < 3}
-                for image in images]
+        # Sort images: Starred first, then alphabetically.
+        images.sort(key=lambda image: (not image['star'], image['name']))
+
+        return images
 
     def _list_images__fetch_images(self, search=None):
         """Fetch image listing in a libcloud compatible format
@@ -710,8 +680,13 @@ class BaseController(object):
         """
         return self.connection.list_images()
 
+    def image_is_starred(self, image_id):
+        starred = image_id in self.cloud.starred
+        unstarred = image_id in self.cloud.unstarred
+        default = self.image_is_default(image_id)
+        return starred or (default and not unstarred)
+
     def image_is_default(self, image_id):
-        # FIXME
         return True
 
     def list_sizes(self):
