@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <dom-module id="rules-item">
     <template>
@@ -89,6 +90,7 @@
                 </span>then <span class="strong">[[rule.action]]</span>
             	<paper-icon-button icon="icons:create" toggles active={{editMode}}>edit</paper-icon-button>
             </div>
+            <paper-spinner active$="{{sendingData}}"></paper-spinner>
             <iron-icon icon="close" data-attr="[[rule.id]]" on-tap="deleteRule"></iron-icon>
         </div>
         <div class="rule-edit" hidden$="{{!editMode}}">
@@ -141,15 +143,16 @@
 	            </paper-dropdown-menu>
             </div>
             <div class="rule-actions layout horizontal">
+            	<paper-spinner active$="{{sendingData}}"></paper-spinner>
             	<paper-button toggles active={{!editMode}}>cancel</paper-button>
             	<paper-button on-tap="updateRule" class="blue" disabled$="{{!diff}}">update rule</paper-button>
             </div>
         </div>
-        <iron-ajax id="deleteRuleRequest" contentType="application/json" handle-as="json" method="DELETE" on-request="_handleDeleteRequest" on-response="_handleDeleteResponse" on-error="_handleDeleteError"></iron-ajax>
+        <iron-ajax id="deleteRuleRequest" contentType="application/json" handle-as="json" method="DELETE" on-request="_handleDeleteRequest" on-response="_handleDeleteResponse" on-error="_handleDeleteError" loading="{{sendingData}}"></iron-ajax>
 
         <iron-ajax id="addRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="json" method="POST" on-request="_handleAddRequest" on-response="_handleAddResponse" on-error="_handleAddError"></iron-ajax>
 
-        <iron-ajax id="updateRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="json" method="POST" on-request="_handleUpdateRequest" on-response="_handleUpdateResponse" on-error="_handleUpdateError"></iron-ajax>
+        <iron-ajax id="updateRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="json" method="POST" on-request="_handleUpdateRequest" on-response="_handleUpdateResponse" on-error="_handleUpdateError" loading="{{sendingData}}"></iron-ajax>
 
         <!-- get metrics: http://localhost/api/v1/clouds/[[cloud.id]]/machines/[[machine.id]]/metrics -->
     </template>
@@ -187,7 +190,11 @@
                 editMode: {
                 	type: Boolean,
                 	value: false	
-                }
+                },
+                sendingData: {
+                	type: Boolean,
+                	value: false	
+                },
             },
             listeners: {
             	'iron-select':'ruleUpdates',
@@ -256,6 +263,9 @@
                 this.$.updateRuleRequest.params = payload;
                 this.$.updateRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.updateRuleRequest.generateRequest();
+            },
+            _handleUpdateRequest: function(e){
+
             },
             _handleUpdateResponse: function(e){
             	this.set('diff', {});
