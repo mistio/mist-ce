@@ -80,6 +80,12 @@
             	top: 16px;
             	left: 24px;
             }
+            .errormsg-container {
+                color: var(--red-color);
+            }
+            .errormsg-container iron-icon {
+                color: inherit;
+            }
         </style>
 
 		<div class="rule-item layout horizontal"  hidden$="{{editMode}}">
@@ -149,6 +155,7 @@
 	            </paper-dropdown-menu>
             </div>
             <div class="rule-actions layout horizontal">
+            	<p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
             	<paper-spinner active$="{{sendingData}}"></paper-spinner>
             	<paper-button toggles active={{!editMode}}>cancel</paper-button>
             	<paper-button on-tap="updateRule" class="blue" disabled$="{{!noChanges}}">update rule</paper-button>
@@ -156,7 +163,7 @@
         </div>
         <iron-ajax id="deleteRuleRequest" contentType="application/json" handle-as="json" method="DELETE" on-request="_handleDeleteRequest" on-response="_handleDeleteResponse" on-error="_handleDeleteError" loading="{{sendingData}}"></iron-ajax>
 
-        <iron-ajax id="updateRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="json" method="POST" on-request="_handleUpdateRequest" on-response="_handleUpdateResponse" on-error="_handleUpdateError" loading="{{sendingData}}"></iron-ajax>
+        <iron-ajax id="updateRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="xml" method="POST" on-request="_handleUpdateRequest" on-response="_handleUpdateResponse" on-error="_handleUpdateError" loading="{{sendingData}}"></iron-ajax>
 
         <!-- get metrics: http://localhost/api/v1/clouds/[[cloud.id]]/machines/[[machine.id]]/metrics -->
     </template>
@@ -200,8 +207,12 @@
                 },
                 sendingData: {
                 	type: Boolean,
-                	value: false	
+                	value: false
                 },
+                formError: {
+                	type: Boolean,
+                	value: false
+                }
             },
             listeners: {
             	'iron-select':'ruleUpdates',
@@ -270,13 +281,19 @@
                 this.$.updateRuleRequest.params = payload;
                 this.$.updateRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.updateRuleRequest.generateRequest();
+                this.set('formError', false);
             },
             _handleUpdateRequest: function(e){
-
+            	this.set('formError', false);
             },
             _handleUpdateResponse: function(e){
             	this.set('diff', {});
             	this.set('editMode', false);
+            },
+            _handleUpdateError: function(e){
+            	console.log(e.detail.request.xhr.responseText);
+            	this.$.errormsg.textContent = e.detail.request.xhr.responseText;
+            	this.set('formError', true);
             },
             ruleUpdates: function(e){
             	var changes = {};
@@ -289,6 +306,7 @@
             	}
             	this.set('diff', changes);
             	this.set('noChanges', count);
+            	this.set('formError', false);
             }
         });
 DEFAULT_METRICS = {
