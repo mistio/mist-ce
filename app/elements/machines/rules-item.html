@@ -6,6 +6,12 @@
 
 <dom-module id="rules-item">
     <template>
+    	<style is="custom-style">
+    		paper-button[disabled] {
+    			background-color: rgba(0,0,0,.13) !important;
+    			color: rgba(0,0,0,0.32) !important;
+    		}
+    	</style>
         <style is="custom-style" include="shared-styles"></style>
         <style is="custom-style" include="forms"></style>
         <style is="custom-style">
@@ -145,7 +151,7 @@
             <div class="rule-actions layout horizontal">
             	<paper-spinner active$="{{sendingData}}"></paper-spinner>
             	<paper-button toggles active={{!editMode}}>cancel</paper-button>
-            	<paper-button on-tap="updateRule" class="blue" disabled$="{{!diff}}">update rule</paper-button>
+            	<paper-button on-tap="updateRule" class="blue" disabled$="{{!noChanges}}">update rule</paper-button>
             </div>
         </div>
         <iron-ajax id="deleteRuleRequest" contentType="application/json" handle-as="json" method="DELETE" on-request="_handleDeleteRequest" on-response="_handleDeleteResponse" on-error="_handleDeleteError" loading="{{sendingData}}"></iron-ajax>
@@ -184,8 +190,11 @@
                 },
                 diff:  {
                 	type: Object,
-                	notify: true,
-                	value: false
+                	notify: true
+                },
+                noChanges: {
+                	type: Boolean,
+                	value: true
                 },
                 editMode: {
                 	type: Boolean,
@@ -273,12 +282,15 @@
             },
             ruleUpdates: function(e){
             	var changes = {};
+            	var count = 0;
             	for (var p in this.newRule){
             		if (this.rule[p] != this.newRule[p]){
+            			count ++;
             			changes[p] = this.newRule[p];
             		}
             	}
             	this.set('diff', changes);
+            	this.set('noChanges', count);
             }
         });
 DEFAULT_METRICS = {
