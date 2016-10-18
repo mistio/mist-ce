@@ -156,8 +156,6 @@
         </div>
         <iron-ajax id="deleteRuleRequest" contentType="application/json" handle-as="json" method="DELETE" on-request="_handleDeleteRequest" on-response="_handleDeleteResponse" on-error="_handleDeleteError" loading="{{sendingData}}"></iron-ajax>
 
-        <iron-ajax id="addRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="json" method="POST" on-request="_handleAddRequest" on-response="_handleAddResponse" on-error="_handleAddError"></iron-ajax>
-
         <iron-ajax id="updateRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="json" method="POST" on-request="_handleUpdateRequest" on-response="_handleUpdateResponse" on-error="_handleUpdateError" loading="{{sendingData}}"></iron-ajax>
 
         <!-- get metrics: http://localhost/api/v1/clouds/[[cloud.id]]/machines/[[machine.id]]/metrics -->
@@ -188,7 +186,7 @@
                 	computed: "_computeNewRule(rule)",
                 	notify: true
                 },
-                diff:  {
+                diff: {
                 	type: Object,
                 	notify: true
                 },
@@ -198,7 +196,7 @@
                 },
                 editMode: {
                 	type: Boolean,
-                	value: false	
+                	value: false
                 },
                 sendingData: {
                 	type: Boolean,
