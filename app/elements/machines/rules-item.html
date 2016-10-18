@@ -291,7 +291,6 @@
             	this.set('editMode', false);
             },
             _handleUpdateError: function(e){
-            	console.log(e.detail.request.xhr.responseText);
             	this.$.errormsg.textContent = e.detail.request.xhr.responseText;
             	this.set('formError', true);
             },
