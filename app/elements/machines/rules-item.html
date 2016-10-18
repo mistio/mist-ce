@@ -94,7 +94,7 @@
             <div id="[[rule.id]]" class="rule">
 	            If 
 	            <paper-dropdown-menu class="dropdown-block metricName">
-	                <paper-menu id="metricName" attr-for-selected="value" selected="{{rule.metric}}" class="dropdown-content">
+	                <paper-menu id="metricName" attr-for-selected="value" selected="{{newRule.metric}}" class="dropdown-content">
 	                    <template is="dom-repeat" items="[[availableMterics]]" as="option">
 	                        <paper-item value="[[option.id]]">[[option.name]]</paper-item>
 	                    </template>
@@ -102,20 +102,20 @@
 	            </paper-dropdown-menu>
 
 	            <paper-dropdown-menu class="dropdown-block metricOp">
-	                <paper-menu id="metricOp" attr-for-selected="value" selected="{{rule.operator}}" class="dropdown-content">
+	                <paper-menu id="metricOp" attr-for-selected="value" selected="{{newRule.operator}}" class="dropdown-content">
 	                    <paper-item value="gt"> > </paper-item>
 	                    <paper-item value="lt"> < </paper-item>
 	                </paper-menu>
 	            </paper-dropdown-menu>
 
-	            <paper-input id="metricValue" placeholder="5" value="{{rule.value}}" auto-validate></paper-input>
+	            <paper-input id="metricValue" placeholder="5" value="{{newRule.value}}" auto-validate></paper-input>
 
-	            {{computeUnits(newMetric)}}
+	            {{computeUnits(newRule.metric)}}
 
 	            for 
 
 	            <paper-dropdown-menu class="dropdown-block metricAggr">
-	                <paper-menu id="metricAggr" attr-for-selected="value" selected="{{rule.aggregate}}" class="dropdown-content">
+	                <paper-menu id="metricAggr" attr-for-selected="value" selected="{{newRule.aggregate}}" class="dropdown-content">
 	                    <paper-item value="all"> every </paper-item>
 	                    <paper-item value="any"> any </paper-item>
 	                    <paper-item value="avg"> average </paper-item>
@@ -124,12 +124,12 @@
 
 	            value within 
 
-	            <paper-input id="metricOffset" placeholder="1" value="{{rule.reminder_offset}}" auto-validate></paper-input>min,
+	            <paper-input id="metricOffset" placeholder="1" value="{{newRule.reminder_offset}}" auto-validate></paper-input>min,
 
 	            then
 
 	            <paper-dropdown-menu class="dropdown-block metricAction">
-	                <paper-menu id="metricAction" attr-for-selected="value" selected="{{rule.action}}" class="dropdown-content">
+	                <paper-menu id="metricAction" attr-for-selected="value" selected="{{newRule.action}}" class="dropdown-content">
 	                    <paper-item value="alert"> alert </paper-item>
 	                    <paper-item value="reboot"> reboot </paper-item>
 	                    <paper-item value="destroy"> destroy </paper-item>
@@ -170,12 +170,24 @@
                     type: Array,
                     computed: "_computeMetrics(resource)"
                 },
+                newRule: {
+                	type: Object,
+                	computed: "_computeNewRule(rule)"
+                }                
             },
             listeners: {
             },
             observers: [
             ],
             ready: function() {
+            },
+            _computeNewRule: function(rule){
+            	var newRule = {};
+            	for (var p in rule) {
+            		if (typeof(rule[p]) == 'string')
+            			newRule[p] = rule[p].slice(0);
+            	}
+            	return newRule;
             },
             computeUnits: function(metric) {
                 return DEFAULT_METRICS[metric] ? DEFAULT_METRICS[metric].unit : 'unit';
