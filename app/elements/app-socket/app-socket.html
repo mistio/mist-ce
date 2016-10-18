@@ -635,7 +635,6 @@
         _machineRules: function(machineID, cloudID){
             // if something has not initiaised
             if (!machineID || !cloudID || !this.model || !this.model.monitoring || !this.model.monitoring.rules || !this.model.clouds || !this.model.clouds[cloudID] || !this.model.clouds[cloudID].machines || !this.model.clouds[cloudID].machines[machineID]){
-                console.log('not');
                 return [];
             }
             else {
