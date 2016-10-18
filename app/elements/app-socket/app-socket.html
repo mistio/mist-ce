@@ -575,7 +575,7 @@
         _updateIncidents: function(data) {
             this.set('onboarding.isLoadingIncidents', false);
             if (data) {
-                console.log(data);
+                // console.log(data);
                 for(var i=0;i<data.length;i++){
                     var inc = data[i];
                     inc.id = inc.incident_id
@@ -633,21 +633,27 @@
             }
         },
         _machineRules: function(machineID, cloudID){
-            // console.log('Update _machineKeys',cloudID,machineID);
-            if (machineID && cloudID){
-                if (this.model && this.model.monitoring)
-                    var rules = [];
-                    for (var rule in this.model.monitoring.rules) {
-                        if (rule.machine == machineID && rule.cloud == cloudID){
-                            var ruleExists;
-                            if(this.model.clouds[cloudID].machines[machineID].rules) 
-                                var ruleExists = this.model.clouds[cloudID].machines[machineID].rules.find(function(r){
-                                    return r.id == rule.id
-                                });
-                            if (!ruleExists)
-                                rules.push(rule);
+            // if something has not initiaised
+            if (!machineID || !cloudID || !this.model || !this.model.monitoring || !this.model.monitoring.rules || !this.model.clouds || !this.model.clouds[cloudID] || !this.model.clouds[cloudID].machines || !this.model.clouds[cloudID].machines[machineID]){
+                console.log('not');
+                return [];
+            }
+            else {
+                var rules = [];
+                for (var rule in this.model.monitoring.rules) {
+                    if (this.model.monitoring.rules[rule].machine == machineID && this.model.monitoring.rules[rule].cloud == cloudID){
+                        //add rule only if it's not already added in the machine
+                        var ruleExists = false;
+                        if(this.model.clouds[cloudID].machines[machineID].rules) {
+                            var ruleExists = this.model.clouds[cloudID].machines[machineID].rules.find(function(r){
+                                return r.id == this.model.monitoring.rules[rule].id
+                            }, this);
+                        }
+                        if (!ruleExists) {
+                            rules.push(this.model.monitoring.rules[rule]);
                         }
                     }
+                }
                 return rules;
             }
         }
