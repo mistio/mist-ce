@@ -219,6 +219,7 @@ class MainConnection(MistConnection):
         self.list_tags()
         self.list_keys()
         self.list_scripts()
+        self.list_cronjobs()
         self.list_templates()
         self.list_stacks()
         self.list_tunnels()
@@ -248,6 +249,10 @@ class MainConnection(MistConnection):
     def list_scripts(self):
         self.send('list_scripts',
                   core_methods.filter_list_scripts(self.auth_context))
+
+    def list_cronjobs(self):
+        self.send('list_cronjobs',
+                  core_methods.filter_list_cronjobs(self.auth_context))
 
     def list_templates(self):
         self.send('list_templates',
@@ -299,28 +304,27 @@ class MainConnection(MistConnection):
 
     def on_stats(self, cloud_id, machine_id, start, stop, step, request_id,
                  metrics):
-        error = False
+
+        def callback(data, error=False):
+            ret = {
+                'cloud_id': cloud_id,
+                'machine_id': machine_id,
+                'start': start,
+                'stop': stop,
+                'request_id': request_id,
+                'metrics': data,
+            }
+            if error:
+                ret['error'] = error
+            self.send('stats', ret)
+
         try:
-            data = get_stats(self.owner, cloud_id, machine_id,
-                             start, stop, step, metrics=metrics)
+            get_stats(self.owner, cloud_id, machine_id, start, stop, step,
+                      metrics=metrics, callback=callback, tornado_async=True)
         except BadRequestError as exc:
-            error = str(exc)
-            data = []
+            callback([], str(exc))
         except Exception as exc:
             log.error("Exception in get_stats: %r", exc)
-            return
-
-        ret = {
-            'cloud_id': cloud_id,
-            'machine_id': machine_id,
-            'start': start,
-            'stop': stop,
-            'request_id': request_id,
-            'metrics': data,
-        }
-        if error:
-            ret['error'] = error
-        self.send('stats', ret)
 
     def process_update(self, ch, method, properties, body):
         routing_key = method.routing_key
@@ -405,6 +409,8 @@ class MainConnection(MistConnection):
                 self.list_keys()
             if 'scripts' in sections:
                 self.list_scripts()
+            if 'cronjobs' in sections:
+                self.list_cronjobs()
             if 'templates' in sections:
                 self.list_templates()
             if 'stacks' in sections:

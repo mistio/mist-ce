@@ -401,13 +401,13 @@
                     var key = data[i];
                     if (this.model.clouds && key.machines)
                     key.machines.forEach(function(m, index){
-                        var cloud = m[0],
-                            machine = m[1];
-                        if (this.model.clouds[cloud] && this.model.clouds[cloud].machines[machine])
-                        // check if machine has this key, if not add
-                        var keyexists = this.model.clouds[cloud].machines[machine].keys.find(function(k){
-                            return k.name == key.name;
-                        })
+                        var cloud = m[0], machine = m[1];
+                        if (this.model.clouds && this.model.clouds[cloud] && this.model.clouds[cloud].machines && this.model.clouds[cloud].machines[machine]) {
+                            // check if machine has this key, if not add
+                            var keyexists = this.model.clouds[cloud].machines[machine].keys.find(function(k){
+                                return k.name == key.name;
+                            });
+                        }
                         if (!keyexists) {
                             if (!this.get('model.clouds.'+cloud+'.machines.'+machine+'.keys'))
                                 this.set('model.clouds.'+cloud+'.machines.'+machine+'.keys', [key])
