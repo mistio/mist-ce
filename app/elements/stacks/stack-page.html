@@ -550,7 +550,7 @@
                                 <template is="dom-if" if=[[workflow.params.length]]>
                                     <paper-material class="app-form-title">[[workflow.name]]</paper-material>
                                     <paper-material>
-                                        <mist-form model=[[model]] fields="{{workflow.params}}" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[stack.id]]" on-request="handleWorkflowRequest" on-response="handleWorkflowResponse" on-error="handleWorkflowError" btncontent="[[workflow.name]]">[[workflow.name]]</mist-form>
+                                        <mist-form model=[[model]] fields="[[workflow.params]]" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[stack.id]]" on-request="handleWorkflowRequest" on-response="handleWorkflowResponse" on-error="handleWorkflowError" btncontent="[[workflow.name]]">[[workflow.name]]</mist-form>
                                     </paper-material>
                                 </template>
 
@@ -695,7 +695,7 @@
                     },
                     template: {
                         type: Object,
-                        computed: '_computeTemplate(stack, model.templates)'
+                        computed: '_computeTemplate(stack.template, model.templates)'
                     },
                     machines: {
                         type: Array,
@@ -718,7 +718,7 @@
                     },
                     workflows: {
                         type: Array,
-                        computed: '_computeWorkflows(template.workflows.*, model.templates)'
+                        computed: '_computeWorkflows(template)'
                     },
                     timestamp: {
                         type: String,
@@ -940,12 +940,10 @@
 
                     return sum > 0 ? true : false;
                 },
-                _computeTemplate: function(stack, templates) {
-                    if (stack)
-                        if (this.model.templates[stack.template])
-                            return this.model.templates[stack.template];
-                        else
-                            return {};
+                _computeTemplate: function(stacktemplate, templates) {
+                    if (this.stack)
+                        if (this.model.templates[this.stack.template])
+                            return this.model.templates[this.stack.template];
                 },
                 _computeJobID: function(stack) {
                     return stack.job_id ? stack.job_id : false;
@@ -1020,8 +1018,9 @@
                     }
                     return keys;
                 },
-                _computeWorkflows: function(workflows, templates) {
-                    var workflows = workflows.base.filter(function(wf){
+                _computeWorkflows: function(template) {
+                    console.log('_computeWorkflows');
+                    var workflows = this.template.workflows.filter(function(wf){
                         return wf.name != 'scale' &&  wf.name != 'execute_operation';
                     });
                     workflows.forEach(function(wf){
@@ -1175,8 +1174,8 @@
                     this.$.stackOutputs.innerHTML = this._makeString(outputs);
                 },
                 _makeString: function(info){
-                    console.log(YAML.dump(info));
-                    console.log(anchorme.js(YAML.dump(info)));
+                    // console.log(YAML.dump(info));
+                    // console.log(anchorme.js(YAML.dump(info)));
                     return anchorme.js(YAML.dump(info).replace(/\'/g, ""));
                 },
                 _updateLogs: function(that){
