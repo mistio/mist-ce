@@ -279,10 +279,10 @@
                      <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                 </div>
             </paper-material>-->
-            <paper-material class="info-card" hidden$="[[!isMonitored]]">
+            <!-- <paper-material class="info-card" hidden$="[[!isMonitored]]">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Rules</h2>
-                <app-rules incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" machine="[[machine]]"></app-rules>
-            </paper-material>
+            </paper-material> -->
+            <app-rules incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isMonitored]]">></app-rules>
             <paper-material class="info-card">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
                 <div class="card-content">
