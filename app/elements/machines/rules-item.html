@@ -184,6 +184,10 @@
                 	notify: true,
                 	value: false
                 },
+                editMode: {
+                	type: Boolean,
+                	value: false	
+                }
             },
             listeners: {
             	'iron-select':'ruleUpdates',
@@ -246,10 +250,16 @@
             	var payload = {};
                 	payload = this.diff;
                 	payload["id"] = this.rule.id;
+                if (payload["reminder_offset"])
+                	payload["reminder_offset"] = payload["reminder_offset"]*60;
                 console.log(payload);
                 this.$.updateRuleRequest.params = payload;
                 this.$.updateRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.updateRuleRequest.generateRequest();
+            },
+            _handleUpdateResponse: function(e){
+            	this.set('diff', {});
+            	this.set('editMode', false);
             },
             ruleUpdates: function(e){
             	var changes = {};
