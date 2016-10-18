@@ -22,11 +22,22 @@
 
 <dom-module id="stack-page">
     <template>
+        <style is="custom-style">
+            paper-button#minimal:not([disabled]) {
+                background-color: #eee;
+                text-transform: none;
+                font-weight: 400;
+                color: inherit;
+            }
+            paper-button#minimal::content iron-icon {
+                opacity: 0.32;
+            }
+        </style>
         <style is="custom-style" include="lists"></style>
         <style is="custom-style" include="forms"></style>
         <style is="custom-style" include="tags-and-labels"></style>
         <style is="custom-style" include="single-page"></style>
-        <style include="shared-styles">
+        <style is="custom-style" include="shared-styles">
             :host {
                 display: block;
             }
@@ -420,6 +431,30 @@
         .output paper-button {
             float: right;
             margin: 8px !important;
+        }.
+        paper-icon-button.logs-show::content iron-icon {
+            transition: transform 300ms ease-in;
+            transform: rotate3d(0, 0, 1, 0);
+        }
+        paper-icon-button.logs-show[active]::content iron-icon {
+            transform: rotate3d(0, 0, 1, 180deg);
+        }
+        #logscollapse > .log:last-of-type{
+            margin-bottom: 24px;
+        }
+        #logscollapse[collapsed] {
+            height: 100px;
+            overflow: hidden;
+        }
+        .logscontrol {
+            margin-top: 16px;
+            padding: 0 8px;
+            
+        }
+
+        .log.more {
+            font-size: 0.9em;
+            color: rgba(0,0,0,0.54);
         }
         </style>
         <div id="content">
@@ -570,16 +605,25 @@
 
             <!-- <template is="dom-if" if="[[ok]]"> -->
             <div id="logs" class="page">
-                <h3 class="smallcaps">Job Logs <span class="small">job_id: [[stack.job_id]]</span></h3>
                 <paper-material>
-                    <template is="dom-repeat" items="[[job.logs]]" as="log">
-                        <div class$="log error-[[log.error]]">
-                            <iron-icon icon$="[[computeLogIcon(log, index, stack.status)]]"></iron-icon>
-                            <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
-                            [[log.action]]
-                            <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
-                        </div>
-                    </template>
+                    <h3 class="smallcaps">Job Logs <span class="small">job_id: [[stack.job_id]]</span></h3>
+                    <div id="logscollapse" collapsed$="[[!showLogs]]">
+                        <template is="dom-repeat" items="[[job.logs]]" as="log">
+                            <div class$="log error-[[log.error]]">
+                                <iron-icon icon$="[[computeLogIcon(log, index, stack.status)]]"></iron-icon>
+                                <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
+                                [[log.action]]
+                                <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="log false more" hidden$="[[showLogs]]">
+                        ... and more. [[job.logs.length]] total log entries
+                    </div>
+                    <paper-button id="minimal" class="logscontrol" toggles active={{showLogs}} hidden$="[[!job.finished_at]]">
+                        <span hidden$="{{showLogs}}">expand logs <iron-icon icon="icons:unfold-more"></iron-icon> </span>
+                        <span hidden$="{{!showLogs}}">collapse logs <iron-icon icon="icons:unfold-less"></iron-icon> </span>
+                    </paper-button>
                 </paper-material>
                 <paper-material class="no-pad">
                     <div class="output">
@@ -684,6 +728,10 @@
                         type: Boolean,
                         value: false,
                     },
+                    showLogs: {
+                        type: Boolean,
+                        value: true,
+                    },
                     section: {
                         type: Object
                     },
@@ -781,8 +829,6 @@
                     'updateTerm(showOutput)'
                 ],
                 listeners: {
-                    // 'change' : '_updateFields',
-                    // 'iron-select' : '_updateFields',
                     'iron-activate': '_handleInterval'
                 },
                 ready: function(){
@@ -1183,6 +1229,7 @@
                         console.log('_updateLogs');
                         that.$.getJobLog.generateRequest();
                         this.showOutput = true;
+                        this.showLogs = true;
                     }
                 },
                 computeLogIcon: function(log, index, status){
@@ -1196,9 +1243,6 @@
                         return 'icons:done';
                     }
                 },
-                _updateFields: function(){
-
-                },
                 newStackPage: function(id){
                     console.log('un setting interval for', this.intervalID);
                     window.clearInterval(this.intervalID);
@@ -1207,6 +1251,7 @@
                     if (xterm)
                         xterm.remove();
                     this.showOutput = false;
+                    this.showLogs = false;
                 },
                 _computeIsloading: function(stack) {
                     return !this.stack ? true : false;
