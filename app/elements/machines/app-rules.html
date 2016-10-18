@@ -66,7 +66,14 @@
             }
             paper-button iron-icon {
                 opacity: 0.32;
-                padding: 8px;
+                padding: 4px;
+            }
+            .errormsg-container {
+                color: var(--red-color);
+                align-self: flex-start;
+            }
+            .errormsg-container iron-icon {
+                color: inherit;
             }
         </style>
         <paper-material>
@@ -129,6 +136,7 @@
 
                 </div>
                 <div class="rule-actions layout horizontal">
+                    <p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
                     <paper-spinner active$="{{sendingData}}"></paper-spinner>
                     <paper-button toggles active="{{editNew}}" class="link">cancel</paper-button>
                     <paper-button on-tap="addRule" class="blue">save rule</paper-button>
@@ -137,7 +145,7 @@
 
         </paper-material>
 
-        <iron-ajax id="addRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="json" method="POST" on-request="_handleAddRequest" on-response="_handleAddResponse" on-error="_handleAddError" loading="{{sendingData}}"></iron-ajax>
+        <iron-ajax id="addRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="xml" method="POST" on-request="_handleAddRequest" on-response="_handleAddResponse" on-error="_handleAddError" loading="{{sendingData}}"></iron-ajax>
 
         <!-- get metrics: http://localhost/api/v1/clouds/[[cloud.id]]/machines/[[machine.id]]/metrics -->
     </template>
@@ -166,10 +174,15 @@
                 editNew: {
                     type: Boolean,
                     value: false
+                },
+                formError: {
+                    type: Boolean,
+                    value: false
                 }
             },
             listeners: {
-                
+                'iron-select':'userChanges',
+                'input':'userChanges',
             },
             observers: [
                 'updateNewrule(resource.id)'
@@ -241,6 +254,15 @@
             },
             _handleAddResponse: function(){
                 this.set('editNew', false);
+                this.set('formError', false);
+            },
+            _handleAddError: function(e){
+                console.log(e.detail.request.xhr.responseText);
+                this.$.errormsg.textContent = e.detail.request.xhr.responseText;
+                this.set('formError', true);
+            },
+            userChanges: function(){
+                this.set('formError', false);
             }
         });
 DEFAULT_METRICS = {
