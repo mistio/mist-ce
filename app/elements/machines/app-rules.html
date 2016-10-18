@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <dom-module id="app-rules">
     <template>
@@ -13,12 +14,32 @@
             .rule {
                 padding: 8px 0;
             }
+            .strong {
+                font-weight: 500;
+            }
+            .rule-item iron-icon {
+                cursor: pointer;
+            }
         </style>
         <template is="dom-repeat" items="{{items}}" as="rule">
-            <div id="[[rule.id]]" class="rule">
-                if [[computeName(rule.metric)]] [[rule.operator]] [[rule.value]] [[computeUnits(rule.metric)]] for [[rule.aggregate]] value within [[computeTime(rule.reminder_offset)]] min then [[rule.action]]
+            <div class="rule-item layout horizontal">
+                <div id="[[rule.id]]" class="rule flex">
+                    If <span class="strong">[[computeName(rule.metric)]] [[computeOperator(rule.operator)]] [[rule.value]][[computeUnits(rule.metric)]] </span>
+                    for [[computeAggregate(rule.aggregate)]] value 
+                    <span hidden$="[[showOffset(rule.aggregate)]]">
+                        within [[computeTime(rule.reminder_offset)]]min
+                    </span>, then <span class="strong">[[rule.action]]</span>
+                </div>
+                <iron-icon icon="close" data-attr="[[rule.id]]" on-tap="deleteRule"></iron-icon>
             </div>
         </template>
+        
+        <paper-button on-tap="addRule">add test rule</paper-button>
+
+        <iron-ajax id="deleteRuleRequest" contentType="application/json" handle-as="json" method="DELETE" on-request="_handleDeleteRequest" on-response="_handleDeleteResponse" on-error="_handleDeleteError"></iron-ajax>
+
+        <iron-ajax id="addRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="json" method="POST" on-request="_handleAddRequest" on-response="_handleAddResponse" on-error="_handleAddError"></iron-ajax>
+
         <!-- get metrics: http://localhost/api/v1/clouds/[[cloud.id]]/machines/[[machine.id]]/metrics -->
     </template>
 
@@ -52,13 +73,47 @@
                 return rulesArray;
             },
             computeUnits: function(metric) {
-                return DEFAULT_METRICS[metric].unit;
+                return DEFAULT_METRICS[metric] ? DEFAULT_METRICS[metric].unit : 'unit';
             },
             computeName: function(metric) {
-                return DEFAULT_METRICS[metric].name;
+                return DEFAULT_METRICS[metric]? DEFAULT_METRICS[metric].name : 'name';
             },
             computeTime: function(time){
-                return time/60;
+                return time/60 + 1;
+            },
+            computeOperator: function(op){
+                if (op == "gt")
+                    return ">";
+                if (op == "lt")
+                    return "<";
+            },
+            computeAggregate: function(aggr){
+                if (aggr == "all")
+                    return "every";
+                else
+                    return aggr;
+            },
+            showOffset: function(aggregate){
+                console.log(aggregate, aggregate != 'all');
+                return aggregate != 'all';
+            },
+            deleteRule: function(e){
+                var ruleid = e.target.dataAttr;
+                this.$.deleteRuleRequest.url = '/api/v1/rules/'+ruleid;
+                this.$.deleteRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.deleteRuleRequest.generateRequest();
+            },
+            addRule: function(e){
+                this.$.addRuleRequest.params = {
+                        cloudId: this.machine.cloud.id,
+                        machineId: this.machine.id,
+                        metric:"load.shortterm",
+                        operator:"gt",
+                        value:5,
+                        action:"alert"
+                    };                    
+                this.$.addRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.addRuleRequest.generateRequest();
             }
         });
 DEFAULT_METRICS = {
@@ -106,6 +161,15 @@ DEFAULT_METRICS = {
         "id": "memory.used_percent",
         "unit": "%",
         "name": "RAM used"
+    },
+    "memory.nonfree_percent": {
+        "_target": "asPercent(sumSeries(exclude(%(head)s.memory.*,'free')),sumSeries( % (head) s.memory.*))",
+        "max_value": 100,
+        "min_value": 0,
+        "priority": -50,
+        "id": "memory.nonfree_percent",
+        "unit": "%",
+        "name": "RAM"
     },
 }
     </script>
