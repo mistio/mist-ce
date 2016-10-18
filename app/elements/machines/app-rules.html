@@ -183,6 +183,7 @@
             listeners: {
                 'iron-select':'userChanges',
                 'input':'userChanges',
+                'edit-request': 'editRequest'
             },
             observers: [
                 'updateNewrule(resource.id)'
@@ -263,6 +264,16 @@
             },
             userChanges: function(){
                 this.set('formError', false);
+            },
+            editRequest: function(e){
+                // handling of edit area
+                var id = e.detail.rule;
+                var els = this.querySelectorAll('rules-item');
+                [].forEach.call(els, function(el, index) {
+                    if (el.rule.id != id) {
+                        el.set('editMode', false);
+                    }
+                });
             }
         });
 DEFAULT_METRICS = {
