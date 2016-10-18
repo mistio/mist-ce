@@ -6,6 +6,7 @@
 <dom-module id="app-rules">
     <template>
         <style is="custom-style" include="shared-styles"></style>
+        <style is="custom-style" include="forms"></style>
         <style is="custom-style">
             :host {
                 display: block;
@@ -17,24 +18,106 @@
             .strong {
                 font-weight: 500;
             }
-            .rule-item iron-icon {
+            .rule-item iron-icon[icon='close'] {
                 cursor: pointer;
+            }
+            .rule-item iron-icon[icon='icons:warning'] {
+                cursor: inherit;
+                color: var(--red-color);
+            }
+            .metric {
+
+            }
+            .metricName {
+            }
+            .metricOp  {
+                width: 50px;
+            }
+            .metricAggr,
+            .metricAction {
+                width: 100px;
+            }
+            paper-input#metricValue, 
+            paper-input#metricOffset {
+                width: 40px;
+                display: inline-block;
+            }
+            paper-input#metricAggr {
+                width: 120px;
+                display: inline-block;
+            }
+            .rule.incident-true {
+                color: var(--red-color);
             }
         </style>
         <template is="dom-repeat" items="{{items}}" as="rule">
             <div class="rule-item layout horizontal">
-                <div id="[[rule.id]]" class="rule flex">
+                <div id="[[rule.id]]" class$="rule flex incident-{{ruleCreatesIncident(rule,incidents)}}">
+                    <iron-icon icon="icons:warning" hidden$="{{!ruleCreatesIncident(rule,incidents)}}"></iron-icon>
                     If <span class="strong">[[computeName(rule.metric)]] [[computeOperator(rule.operator)]] [[rule.value]][[computeUnits(rule.metric)]] </span>
                     for [[computeAggregate(rule.aggregate)]] value 
-                    <span hidden$="[[showOffset(rule.aggregate)]]">
-                        within [[computeTime(rule.reminder_offset)]]min
-                    </span>, then <span class="strong">[[rule.action]]</span>
+                    <span hidden$="[[!rule.aggregate]]">
+                        within [[computeTime(rule.reminder_offset)]]min, 
+                    </span>then <span class="strong">[[rule.action]]</span>
                 </div>
                 <iron-icon icon="close" data-attr="[[rule.id]]" on-tap="deleteRule"></iron-icon>
             </div>
         </template>
         
-        <paper-button on-tap="addRule">add test rule</paper-button>
+        <div class="rule-item layout horizontal">
+            <div id="newrule" class="rule flex">
+
+                If 
+
+                <paper-dropdown-menu class="dropdown-block metricName">
+                    <paper-menu id="metricName" attr-for-selected="value" selected="{{newRule.metric}}" class="dropdown-content">
+                        <template is="dom-repeat" items="[[availableMterics]]" as="option">
+                            <paper-item value="[[option.id]]">[[option.name]]</paper-item>
+                        </template>
+                    </paper-menu>
+                </paper-dropdown-menu>
+
+                <paper-dropdown-menu class="dropdown-block metricOp">
+                    <paper-menu id="metricOp" attr-for-selected="value" selected="{{newRule.operator}}" class="dropdown-content">
+                        <paper-item value="gt"> > </paper-item>
+                        <paper-item value="lt"> < </paper-item>
+                    </paper-menu>
+                </paper-dropdown-menu>
+
+                <paper-input id="metricValue" placeholder="5" value="{{newRule.value}}" auto-validate></paper-input>
+
+                {{computeUnits(newMetric)}}
+
+                for 
+
+                <paper-dropdown-menu class="dropdown-block metricAggr">
+                    <paper-menu id="metricAggr" attr-for-selected="value" selected="{{newRule.aggregate}}" class="dropdown-content">
+                        <paper-item value="all"> every </paper-item>
+                        <paper-item value="any"> any </paper-item>
+                        <paper-item value="avg"> average </paper-item>
+                    </paper-menu>
+                </paper-dropdown-menu>
+
+                value within 
+
+                <paper-input id="metricOffset" placeholder="1" value="{{newRule.reminder_offset}}" auto-validate></paper-input>min,
+
+                then
+
+                <paper-dropdown-menu class="dropdown-block metricAction">
+                    <paper-menu id="metricAction" attr-for-selected="value" selected="{{newRule.action}}" class="dropdown-content">
+                        <paper-item value="alert"> alert </paper-item>
+                        <paper-item value="reboot"> reboot </paper-item>
+                        <paper-item value="destroy"> destroy </paper-item>
+                        <paper-item value="command"> command </paper-item>
+                        <paper-item value="launch" disabled> launch </paper-item>
+                    </paper-menu>
+                </paper-dropdown-menu>
+
+            </div>
+        </div>
+
+        <paper-button on-tap="addRule" class="blue">save rule</paper-button>
 
         <iron-ajax id="deleteRuleRequest" contentType="application/json" handle-as="json" method="DELETE" on-request="_handleDeleteRequest" on-response="_handleDeleteResponse" on-error="_handleDeleteError"></iron-ajax>
 
@@ -48,20 +131,42 @@
             is: 'app-rules',
 
             properties: {
-                model: Object,
+                incidents: {
+                    type: Array,
+                    notify: true
+                },
                 resource: Object,  // machine, cloud or other later
                 rules: Object,
                 items: {
                     type: Array,
                     computed: "_computeRules(rules)",
                     notify: true
-                }
+                },
+                availableMterics: {
+                    type: Array,
+                    computed: "_computeMetrics(machine)"
+                },
+                newRule: Object
             },
             listeners: {
                 
             },
+            observers: [
+                'updateNewrule(machine.id)'
+            ],
             ready: function() {
-
+                var new_rule = {
+                        cloudId: '',
+                        machineId: '',
+                        metric:"load.shortterm",
+                        operator:"gt",
+                        value:5
+                    }
+                this.set('newRule', new_rule);
+            },
+            updateNewrule: function(id){
+                this.set('newRule.cloudId', this.machine.cloud.id);
+                this.set('newRule.machineId', this.machine.id);
             },
             _computeRules: function (rules) {
                 var rulesArray = []
@@ -93,9 +198,19 @@
                 else
                     return aggr;
             },
-            showOffset: function(aggregate){
-                console.log(aggregate, aggregate != 'all');
-                return aggregate != 'all';
+            ruleCreatesIncident: function(rule, incidents){
+                var find = false;
+                    find = this.incidents.find(function(i){
+                    return !i.finished_at && i.rule_id == rule.id;
+                });
+                return !find ? false : true;
+            },
+            _computeMetrics: function(machine){
+                var metrics = [];
+                for (var p in DEFAULT_METRICS){
+                    metrics.push(DEFAULT_METRICS[p])
+                }
+                return metrics;
             },
             deleteRule: function(e){
                 var ruleid = e.target.dataAttr;
@@ -104,14 +219,7 @@
                 this.$.deleteRuleRequest.generateRequest();
             },
             addRule: function(e){
-                this.$.addRuleRequest.params = {
-                        cloudId: this.machine.cloud.id,
-                        machineId: this.machine.id,
-                        metric:"load.shortterm",
-                        operator:"gt",
-                        value:5,
-                        action:"alert"
-                    };                    
+                this.$.addRuleRequest.params = this.newRule;
                 this.$.addRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.addRuleRequest.generateRequest();
             }
