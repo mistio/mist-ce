@@ -26,9 +26,9 @@
             .rule-item iron-icon[icon='close'] {
                 cursor: pointer;
             }
-            .rule-item iron-icon[icon='icons:warning'] {
+            iron-icon#alert {
                 cursor: inherit;
-                color: var(--red-color);
+                color: inherit !important;
             }
             paper-icon-button::content iron-icon {
             	opacity: 0.32;
@@ -37,6 +37,7 @@
             	position: relative;
             	background-color: #eee;
             	padding: 0 24px 16px 24px;
+            	border-bottom: 1px solid #ccc;
             }
             .metricOp  {
                 width: 50px;
@@ -61,6 +62,7 @@
             	align-self: flex-end;
             	justify-content: flex-end;
     			font-size: 0.9em;
+    			margin-top: 16px;
             }
             .rule-id {
             	color: rgba(0,0,0,0.32);
@@ -76,7 +78,7 @@
 		<div class="rule-item layout horizontal"  hidden$="{{editMode}}">
             <div id="[[rule.id]]" class$="rule flex incident-[[ruleCreatesIncident(rule,incidents)]]">
                 <span class="rule-id">[[rule.id]]</span>
-                <iron-icon icon="icons:warning" hidden$="{{!ruleCreatesIncident(rule,incidents)}}"></iron-icon>
+                <iron-icon id="alert" icon="icons:warning" hidden$="{{!ruleCreatesIncident(rule,incidents)}}"></iron-icon>
                 If 
                 <span class="strong">
                 	[[computeName(rule.metric)]] [[computeOperator(rule.operator)]] [[rule.value]][[computeUnits(rule.metric)]] 
@@ -140,12 +142,14 @@
             </div>
             <div class="rule-actions layout horizontal">
             	<paper-button toggles active={{!editMode}}>cancel</paper-button>
-            	<paper-button on-tap="updateRule" class="blue">upadate rule</paper-button>
+            	<paper-button on-tap="updateRule" class="blue" disabled$="{{!diff}}">update rule</paper-button>
             </div>
         </div>
         <iron-ajax id="deleteRuleRequest" contentType="application/json" handle-as="json" method="DELETE" on-request="_handleDeleteRequest" on-response="_handleDeleteResponse" on-error="_handleDeleteError"></iron-ajax>
 
         <iron-ajax id="addRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="json" method="POST" on-request="_handleAddRequest" on-response="_handleAddResponse" on-error="_handleAddError"></iron-ajax>
+
+        <iron-ajax id="updateRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="json" method="POST" on-request="_handleUpdateRequest" on-response="_handleUpdateResponse" on-error="_handleUpdateError"></iron-ajax>
 
         <!-- get metrics: http://localhost/api/v1/clouds/[[cloud.id]]/machines/[[machine.id]]/metrics -->
     </template>
@@ -172,10 +176,18 @@
                 },
                 newRule: {
                 	type: Object,
-                	computed: "_computeNewRule(rule)"
-                }                
+                	computed: "_computeNewRule(rule)",
+                	notify: true
+                },
+                diff:  {
+                	type: Object,
+                	notify: true,
+                	value: false
+                },
             },
             listeners: {
+            	'iron-select':'ruleUpdates',
+            	'input':'ruleUpdates',
             },
             observers: [
             ],
@@ -230,7 +242,24 @@
                 this.$.deleteRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.deleteRuleRequest.generateRequest();
             },
-            
+            updateRule: function(e){
+            	var payload = {};
+                	payload = this.diff;
+                	payload["id"] = this.rule.id;
+                console.log(payload);
+                this.$.updateRuleRequest.params = payload;
+                this.$.updateRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.updateRuleRequest.generateRequest();
+            },
+            ruleUpdates: function(e){
+            	var changes = {};
+            	for (var p in this.newRule){
+            		if (this.rule[p] != this.newRule[p]){
+            			changes[p] = this.newRule[p];
+            		}
+            	}
+            	this.set('diff', changes);
+            }
         });
 DEFAULT_METRICS = {
     "cpu.total.nonidle": {
