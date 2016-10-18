@@ -674,7 +674,7 @@
                     },
                     hideWorkflows: {
                         type: Boolean,
-                        computed: '_hideWorkflows(stack)'
+                        computed: '_hideWorkflows(stack.status)'
                     },
                     hideDeployNow: {
                         type: Boolean,
@@ -893,9 +893,9 @@
                     if (stack)
                         return stack.status == 'ok' || stack.status == 'error';
                 },
-                _hideWorkflows: function(stack) {
-                    if (stack)
-                        return !stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
+                _hideWorkflows: function(status) {
+                    if (this.stack)
+                        return !this.stack.deploy || this.stack.status == 'workflow_started' || this.stack.status == 'start_creation';
                 },
                 _hideDeployNow: function(stack) {
                     if (stack)
@@ -1207,7 +1207,6 @@
                     if (xterm)
                         xterm.remove();
                     this.showOutput = false;
-
                 },
                 _computeIsloading: function(stack) {
                     return !this.stack ? true : false;
