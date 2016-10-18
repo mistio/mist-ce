@@ -132,7 +132,12 @@ class AmazonController(BaseController):
         default_images = config.EC2_IMAGES[self.cloud.region]
         image_ids = default_images.keys() + self.cloud.starred
         if not search:
-            images = self.connection.list_images(None, image_ids)
+            try:
+                # this might break if image_ids contains starred images
+                # that are not valid anymore for AWS
+                images = self.connection.list_images(None, image_ids)
+            except:
+                images = self.connection.list_images(None, default_images.keys())
             for image in images:
                 if image.id in default_images:
                     image.name = default_images[image.id]
