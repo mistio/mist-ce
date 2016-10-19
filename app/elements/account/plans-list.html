@@ -74,7 +74,10 @@
                 <div class="plans xs12">
                     <template is="dom-repeat" items=[[plans]] as="plan">
                         <plan-item class="xs6 l3" user="[[user]]" plan="[[plan]]" index="[[index]]" iscurrent="[[computeIsCurrent(plan, user)]]" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
-                    </template>
+                    </template>                    
+                </div>
+                <div class="xs12 center">
+                    <p>Don't see a plan that meets your requirements? <a href="mailto:sales@mist.io">Contact sales.</a></p>
                 </div>
             </div>
         </paper-material>
@@ -111,8 +114,7 @@
                 }, this);
             },
             _computeReadableDate: function(date) {
-                console.log('date', date, moment(date))
-                return moment(date * 1000).format("MMMM Do YYYY");
+                return date ? moment(date * 1000).format("MMMM Do YYYY") : '...';
             }
         });
     })();
