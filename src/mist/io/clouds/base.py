@@ -262,7 +262,6 @@ class BaseController(object):
         override `self._add__preparse_kwargs`.
 
         """
-
         # Transform params with extra underscores for compatibility.
         rename_kwargs(kwargs, 'api_key', 'apikey')
         rename_kwargs(kwargs, 'api_secret', 'apisecret')
@@ -299,19 +298,12 @@ class BaseController(object):
                 'msg': "Invalid parameters %s." % errors.keys(),
                 'errors': errors,
             })
-
-        # Set fields to cloud model and attempt to save.
-        for key, value in kwargs.iteritems():
-            setattr(self.cloud, key, value)
+        # TODO try except change msg
         try:
-            self.cloud.save()
-        except me.ValidationError as exc:
-            log.error("Error adding %s: %s", self.cloud, exc.to_dict())
-            raise BadRequestError({'msg': exc.message,
-                                   'errors': exc.to_dict()})
-        except me.NotUniqueError as exc:
-            log.error("Cloud %s not unique error: %s", self.cloud, exc)
-            raise CloudExistsError()
+            self.update_validate(fail_on_error=False, **kwargs)
+        except me.ValidationError as e:
+            log.error("Error adding %s: %s", self.cloud, e.to_dict())
+            raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
 
         # Try to connect to cloud.
         if remove_on_error:
@@ -331,6 +323,47 @@ class BaseController(object):
                           self.cloud)
                 self.cloud.delete()
                 raise
+
+    def update_validate(self, fail_on_error=True, **kwargs):
+        # TODO docstring
+        # Set fields to cloud model and attempt to save.
+        if 'title' in kwargs.keys():
+            self.cloud.title = kwargs.pop('title')
+        for key, value in kwargs.iteritems():
+            if key not in self.cloud._cloud_specific_fields:
+                log.error("Error editing %s", self.cloud)
+                raise BadRequestError("Invalid parameter %s=%r."
+                                      % (key, value))
+            setattr(self.cloud, key, value)
+
+        # Try to connect to cloud.
+        if fail_on_error:
+            try:
+                try:
+                    self.check_connection()
+                except (
+                CloudUnavailableError, CloudUnauthorizedError) as exc:
+                    log.error("Failed to edit cloud %s because "
+                              "we couldn't connect: %r", self.cloud, exc)
+                    raise
+                except Exception as exc:
+                    log.exception("Failed to edit cloud %s because "
+                                  "we couldn't connect.", self.cloud)
+                    raise CloudUnavailableError(exc=exc)
+            except:
+                log.error("Failed to connect to cloud %s, will not edit it.",
+                          self.cloud)
+                raise
+
+        try:
+            self.cloud.save()
+        except me.ValidationError as exc:
+            log.error("Error editing %s: %s", self.cloud, exc.to_dict())
+            raise BadRequestError({'msg': exc.message,
+                                   'errors': exc.to_dict()})
+        except me.NotUniqueError as exc:
+            log.error("Cloud %s not unique error: %s", self.cloud, exc)
+            raise CloudExistsError()
 
     def _add__preparse_kwargs(self, kwargs):
         """Preparse keyword arguments to `self.add`
