@@ -26,16 +26,28 @@
         is: 'plan-overusage',
 
         properties: {
-            model: Object,
-            org: Object,
-            user:  Object,
+            machines: {
+                type: Array,
+                notify: true
+            },
+            org: {
+                type: Object,
+                notify: true,
+            },
+            user:  {
+                type: Object,
+                notify: true,
+            },
             isOverUsing: {
                 type: Boolean,
-                computed: "_computeIsOverUsing(model.machinesArray.length, model.user.current_plan.*)"
+                computed: "_computeIsOverUsing(machines.*, machines.length, user.*)",
+                notify: true,
+                value: false
             }
         },
-        _computeIsOverUsing: function(machines, current_plan){
-            return !this.model.user.current_plan.title && machines > 5;
+        _computeIsOverUsing: function(machines, length, user){
+            console.log('_computeIsOverUsing')
+            return !this.user.current_plan.title && this.machines.length > 5;
         },
         _toggleUI: function() {
             window.location.href = '/toggle-ui/legacy';
