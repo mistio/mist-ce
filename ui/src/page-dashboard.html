@@ -524,6 +524,8 @@ Polymer({
             mIds = Object.keys(this.get('model.monitoring.monitored_machines') || {});
         for (var i=0; i<mIds.length; i++) {
             var mref = this.model.monitoring.monitored_machines[mIds[i]],
+                m;
+            if (this.model.clouds && this.model.clouds[mref.cloud_id] && this.model.clouds[mref.cloud_id].machines && this.model.clouds[mref.cloud_id].machines[mref.machine_id])
                 m = mref && this.model.clouds[mref.cloud_id].machines[mref.machine_id];
             ret[mIds[i]] = m ? m.name : 'unknown';
         }
