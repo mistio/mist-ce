@@ -392,7 +392,7 @@ Polymer({
         },
         incidents: {
             type: Array,
-            computed: "_computeIncidents(model.incidents.*)"
+            computed: "_computeIncidents(model.incidentsArray.*)"
         }
     },
 
@@ -492,12 +492,14 @@ Polymer({
     _computeIncidents: function(incidents){
          // update incidents
         var machinesWithIncidents = [];
-        machinesWithIncidents = this.model.incidents.filter(function(inc){
-                return !inc.finished_at || inc.finished_at == 0;
-            }).map(function(inc){
-                if (this.model.clouds[inc.cloud_id] && this.model.clouds[inc.cloud_id].machines && this.model.clouds[inc.cloud_id].machines[inc.machine_id]) 
-                    return this.model.clouds[inc.cloud_id].machines[inc.machine_id].id;
-        }, this);
+        if (this.model && this.model.incidentsArray) {
+            machinesWithIncidents = this.model.incidentsArray.filter(function(inc){
+                    return !inc.finished_at || inc.finished_at == 0;
+                }).map(function(inc){
+                    if (this.model.clouds[inc.cloud_id] && this.model.clouds[inc.cloud_id].machines && this.model.clouds[inc.cloud_id].machines[inc.machine_id]) 
+                        return this.model.clouds[inc.cloud_id].machines[inc.machine_id].id;
+            }, this);
+        }
         return machinesWithIncidents;
     },
     selectedItemsChanged: function (changeRecord) {
@@ -709,12 +711,14 @@ Polymer({
 
     _itemLink: function(item) {
         var p, s = this.section.id;
-        if (s == "machines")
+        if (s == "machines" && item.uuid)
             p = item.uuid
         else if (s == "networks")
             p = item.id
-        else if (s == "incidents")
-            p = item.machine_id
+        else if (s == "incidents") {
+            if (this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id])
+                p = item.machine_id
+        }
         else
             p = item.id
 
@@ -722,7 +726,7 @@ Polymer({
         if (s != "incidents")
             return "/" + this.section.id + "/" + p;
         else
-            return "/machines/" + p;
+            return p ? "/machines/" + p : "/machines";
     },
 
     _getHeaderStyle: function(color, selectedItemsLength) {

@@ -210,10 +210,11 @@
                         }
                     },
                     open_incidents: function(data) {
-                        that.set('onboarding.isLoadingIncidents', false);
                         if (DEBUG_SOCKET)
                             console.debug('got incidents', data);
-                        that.set('model.incidents', data);
+                        that.debounce(that._updateIncidents(data), function() {
+                            console.debug('Loaded incidents data');
+                        }, 250);
                     },
                     open_jobs: function(data) {
                         if (DEBUG_SOCKET)
@@ -393,15 +394,18 @@
                     var key = data[i];
                     if (this.model.clouds && key.machines)
                     key.machines.forEach(function(m, index){
-                        var cloud = m[0],
-                            machine = m[1];
-                        if (this.model.clouds[cloud] && this.model.clouds[cloud].machines[machine])
-                        // check if machine has this key, if not add
-                        var keyexists = this.model.clouds[cloud].machines[machine].keys.find(function(k){
-                            return k.name == key.name;
-                        })
+                        var cloud = m[0], machine = m[1];
+                        if (this.model.clouds && this.model.clouds[cloud] && this.model.clouds[cloud].machines && this.model.clouds[cloud].machines[machine]) {
+                            // check if machine has this key, if not add
+                            var keyexists = this.model.clouds[cloud].machines[machine].keys.find(function(k){
+                                return k.name == key.name;
+                            });
+                        }
                         if (!keyexists) {
-                            this.push('model.clouds.'+cloud+'.machines.'+machine+'.keys',key)
+                            if (!this.get('model.clouds.'+cloud+'.machines.'+machine+'.keys'))
+                                this.set('model.clouds.'+cloud+'.machines.'+machine+'.keys', [key])
+                            else
+                                this.push('model.clouds.'+cloud+'.machines.'+machine+'.keys',key)
                         }
                     }, this)
                 }
@@ -552,6 +556,19 @@
         _updateTunnels: function(data) {
             this.set('onboarding.isLoadingTunnels', false);
             return this._updateModel('tunnels', data);
+        },
+
+        _updateIncidents: function(data) {
+            this.set('onboarding.isLoadingIncidents', false);
+            if (data) {
+                console.log(data);
+                for(var i=0;i<data.length;i++){
+                    var inc = data[i];
+                    inc.id = inc.incident_id
+                }
+            }
+            console.log(data);
+            return this._updateModel('incidents', data);
         },
 
         _updateProjects: function(data) {

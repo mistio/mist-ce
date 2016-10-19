@@ -317,8 +317,9 @@ function itemUid(item, section) {
     var item_type = item && item.type ? item.type : (section &&
                                              section.id.slice(0,-1));
     var cloudId = item && item.cloud ? item.cloud.id : '';
-    var itemId = item &&item.id ? item.id : '';
-
+    var itemId = item && item.id ? item.id : '';
+    if (item_type == 'incident')
+        itemId = item.incident_id
     return item_type + ':' + cloudId + ':' + itemId;
 }
 
@@ -516,7 +517,7 @@ Polymer({
             if (item.can_reboot)
                 ret.push('reboot');
             if (item.can_resume)
-                ret.push('resume');            
+                ret.push('resume');
             if (item.can_rename)
                 ret.push('rename');
             if (item.can_destroy)
@@ -552,6 +553,8 @@ Polymer({
         } else if (item.type == 'stack') {
             ret.push('delete');
         } else if (item.type == 'team') {
+            ret.push('delete');
+        } else if (item.type == 'incident') {
             ret.push('delete');
         }
         return ret;
@@ -659,7 +662,13 @@ Polymer({
                 console.warn('opening shell');
                 // load page import on demand.
                 //el.importHref(el.resolveUrl('/elements/helpers/xterm-dialog.html'), null, null, true);
-                var xterm = el.querySelector("xterm-dialog");
+
+                // remove existing terminals from DOM
+                var xterm = document.querySelector("xterm-dialog");
+                if (xterm)
+                    xterm.remove();
+
+                xterm = el.querySelector("xterm-dialog");
                 if (!xterm) {
                     xterm = document.createElement("xterm-dialog");
                     xterm.target = item;
@@ -706,6 +715,10 @@ Polymer({
             //tunnels
             } else if (action.name == 'delete' && item.type == 'tunnel') {
                 uri = '/api/v1/tunnels/' + item.id;
+                method = 'DELETE';
+            //incidents
+            } else if (action.name == 'delete' && item.type == 'incident') {
+                uri = '/api/v1/stories/' + item.incident_id;
                 method = 'DELETE';
             } else {
                 console.error('unknown action', action, 'on item', item );

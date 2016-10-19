@@ -12,6 +12,7 @@ be performed inside the corresponding method functions.
 import re
 import requests
 import json
+import uuid
 import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError
 
@@ -1004,6 +1005,7 @@ def create_machine(request):
     # servers, while False means the server has montly pricing
     softlayer_backend_vlan_id = params.get('softlayer_backend_vlan_id', None)
     hourly = params.get('billing', True)
+    job_id = params.get('job_id', uuid.uuid4().hex)
 
     # only for mist.core, parameters for cronjob
     if not params.get('cronjob_type'):
@@ -1034,8 +1036,6 @@ def create_machine(request):
     if key_id:
         auth_context.check_perm("key", "read", key_id)
 
-    import uuid
-    job_id = uuid.uuid4().hex
     from mist.io import tasks
     args = (cloud_id, key_id, machine_name,
             location_id, image_id, size_id,

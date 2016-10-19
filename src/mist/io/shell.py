@@ -25,6 +25,8 @@ from mist.io.exceptions import ServiceUnavailableError
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import sanitize_host
 
+from mist.core.helpers import get_story
+
 try:
     from mist.core.user.models import User
     from mist.io.clouds.models import Cloud
@@ -338,59 +340,16 @@ class ParamikoShell(object):
         self.disconnect()
 
 
-class DockerShell(object):
+class DockerWebSocket(object):
     """
-    Docker Shell achieved through the docker hosts API, by opening a websocket
+    Base WebSocket class inherited by DockerShell
     """
-    def __init__(self, host):
-        self.host = host
+    def __init__(self):
         self.ws = websocket.WebSocket()
         self.protocol = "ws"
         self.uri = ""
         self.sslopt = {}
         self.buffer = ""
-
-    def autoconfigure(self, user, cloud_id, machine_id, **kwargs):
-        log.info("autoconfiguring DockerShell for machine %s:%s",
-                 cloud_id, machine_id)
-        cloud = Cloud.objects.get(owner=user, id=cloud_id)
-        docker_port = cloud.port
-
-        self.host, docker_port = dnat(user, self.host, docker_port)
-
-        # For basic auth
-        if cloud.username and cloud.password:
-            self.uri = "://%s:%s@%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
-                       (cloud.username, cloud.password, self.host, docker_port, machine_id)
-        else:
-            self.uri = "://%s:%s/containers/%s/attach/ws?logs=0&stream=1&stdin=1&stdout=1&stderr=1" % \
-                       (self.host, docker_port, machine_id)
-
-        # For tls
-        if cloud.key_file and cloud.cert_file:
-            self.protocol = "wss"
-            tempkey = tempfile.NamedTemporaryFile(delete=False)
-            with open(tempkey.name, "w") as f:
-                f.write(cloud.key_file)
-            tempcert = tempfile.NamedTemporaryFile(delete=False)
-            with open(tempcert.name, "w") as f:
-                f.write(cloud.cert_file)
-
-            self.sslopt = {
-                'cert_reqs': ssl.CERT_NONE,
-                'keyfile': tempkey.name,
-                'certfile': tempcert.name
-            }
-            self.ws = websocket.WebSocket(sslopt=self.sslopt)
-
-        self.uri = self.protocol + self.uri
-
-        log.info(self.uri)
-
-        self.connect()
-
-        # This need in order to be consistent with the ParamikoShell
-        return None, None
 
     def connect(self):
         try:
@@ -443,14 +402,101 @@ class DockerShell(object):
             sleep(1)
         thread.start_new_thread(run, ())
 
-
     def __del__(self):
         self.disconnect()
 
 
+class DockerShell(DockerWebSocket):
+    """
+    DockerShell achieved through the Docker host's API by opening a WebSocket
+    """
+    def __init__(self, host):
+        self.host = host
+        super(DockerShell, self).__init__()
+
+    def autoconfigure(self, user, cloud_id, machine_id, **kwargs):
+        shell_type = 'logging' if kwargs.get('job_id', '') else 'interactive'
+        config_method = '%s_shell' % shell_type
+
+        getattr(self, config_method)(user,
+                                     cloud_id=cloud_id, machine_id=machine_id,
+                                     job_id=kwargs.get('job_id', ''))
+        self.connect()
+        # This is for compatibility purposes with the ParamikoShell
+        return None, None
+
+    def interactive_shell(self, user, **kwargs):
+        docker_port, cloud = \
+            self.get_docker_endpoint(user, cloud_id=kwargs['cloud_id'])
+        log.info("Autoconfiguring DockerShell for machine %s:%s",
+                 cloud.id, kwargs['machine_id'])
+
+        ssl_enabled = cloud.key_file and cloud.cert_file
+        self.uri = self.build_uri(kwargs['machine_id'], docker_port, cloud=cloud,
+                                  ssl_enabled=ssl_enabled)
+
+    def logging_shell(self, user, log_type='CFY', **kwargs):
+        docker_port, container_id = \
+            self.get_docker_endpoint(user, cloud_id=None, job_id=kwargs['job_id'])
+        log.info('Autoconfiguring DockerShell to stream %s logs from ' \
+                 'container %s (User: %s)', log_type, container_id, user.id)
+
+        # TODO: SSL for CFY container
+        self.uri = self.build_uri(container_id, docker_port, allow_logs=1,
+                                                             allow_stdin=0)
+
+    def get_docker_endpoint(self, user, cloud_id, job_id=None):
+        if job_id:
+            event = get_story(job_id)
+            assert user.id == event['owner_id'], 'Owner ID mismatch!'
+            self.host, docker_port = config.DOCKER_IP, config.DOCKER_PORT
+            return docker_port, event['logs'][0]['container_id']
+
+        cloud = Cloud.objects.get(owner=user, id=cloud_id)
+        self.host, docker_port = dnat(user, self.host, cloud.port)
+        return docker_port, cloud
+
+    def build_uri(self, container_id, docker_port, cloud=None, ssl_enabled=False,
+                  allow_logs=0, allow_stdin=1):
+        if ssl_enabled:
+            self.protocol = 'wss'
+            ssl_key, ssl_cert = self.ssl_credentials(cloud)
+            self.sslopt = {
+                'cert_reqs': ssl.CERT_NONE,
+                'keyfile': ssl_key,
+                'certfile': ssl_cert
+            }
+            self.ws = websocket.WebSocket(sslopt=self.sslopt)
+
+        if cloud and cloud.username and cloud.password:
+            uri = '%s://%s:%s@%s:%s/containers/%s/attach/ws?logs=%s&stream=1&stdin=%s&stdout=1&stderr=1' % \
+                   (self.protocol, cloud.username, cloud.password, self.host,
+                    docker_port, container_id, allow_logs, allow_stdin)
+        else:
+            uri = '%s://%s:%s/containers/%s/attach/ws?logs=%s&stream=1&stdin=%s&stdout=1&stderr=1' % \
+                  (self.protocol, self.host, docker_port, container_id,
+                   allow_logs, allow_stdin)
+
+        return uri
+
+    @staticmethod
+    def ssl_credentials(cloud=None):
+        if cloud:
+            _key, _cert = cloud.key_file, cloud.cert_file
+
+            tempkey = tempfile.NamedTemporaryFile(delete=False)
+            with open(tempkey.name, 'w') as f:
+                f.write(_key)
+            tempcert = tempfile.NamedTemporaryFile(delete=False)
+            with open(tempcert.name, 'w') as f:
+                f.write(_cert)
+
+            return tempkey.name, tempcert.name
+
+
 class Shell(object):
     """
-    Proxy Shell Class to distinguish weather we are talking about Docker or Paramiko Shell
+    Proxy Shell Class to distinguish whether we are talking about Docker or Paramiko Shell
     """
     def __init__(self, host, provider=None, username=None, key=None,
                  password=None, cert_file=None, port=22, enforce_paramiko=False):
@@ -476,14 +522,14 @@ class Shell(object):
             self.ssh = self._shell.ssh
 
     def autoconfigure(self, user, cloud_id, machine_id, key_id=None,
-                      username=None, password=None, port=22):
+                      username=None, password=None, port=22, **kwargs):
         if isinstance(self._shell, ParamikoShell):
             return self._shell.autoconfigure(
                 user, cloud_id, machine_id, key_id=key_id,
                 username=username, password=password, port=port
             )
         elif isinstance(self._shell, DockerShell):
-            return self._shell.autoconfigure(user, cloud_id, machine_id)
+            return self._shell.autoconfigure(user, cloud_id, machine_id, **kwargs)
 
     def connect(self, username, key=None, password=None, cert_file=None, port=22):
         if isinstance(self._shell, ParamikoShell):
@@ -505,7 +551,7 @@ class Shell(object):
             return self._shell.ws.recv()
 
     def disconnect(self):
-            self._shell.disconnect()
+        self._shell.disconnect()
 
     def command(self, cmd, pty=True):
         if isinstance(self._shell, ParamikoShell):
