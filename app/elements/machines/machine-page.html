@@ -293,33 +293,32 @@
                 </template>
             </table>
         </div>
-        <<<<<<< HEAD </paper-material>
-            <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">More Info</h2>
-                <div class="card-content">
-                    <element-for-in content="[[machine.extra]]"></element-for-in>
-                </div>
-            </paper-material>
-            </div>
-            <dialog-element id="machinedialog"></dialog-element>
-            <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
-            <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
-            <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-            <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
-            <machine-edit machine="[[machine]]"></machine-edit>
-            <tags-list model="[[model]]"></tags-list>
-            <paper-toast></paper-toast>
-            =======
-            <dialog-element id="machinedialog"></dialog-element>
-            <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
-            <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
-            <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-            <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
-            <!-- <machine-edit machine="[[machine]]"></machine-edit> -->
-            <tags-list model="[[model]]"></tags-list>
-            <paper-toast></paper-toast>
-            >>>>>>> 54763ed93c19d92e0220a647748d0f089c0e2c87
-            </template>
+    </paper-material>
+    <paper-material class="info-card">
+        <h2 style$="[[_getHeaderStyle(section.color)]]">More Info</h2>
+        <div class="card-content">
+            <element-for-in content="[[machine.extra]]"></element-for-in>
+        </div>
+    </paper-material>
+    </div>
+    <dialog-element id="machinedialog"></dialog-element>
+    <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
+    <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
+    <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+    <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
+    <machine-edit machine="[[machine]]"></machine-edit>
+    <tags-list model="[[model]]"></tags-list>
+    <paper-toast></paper-toast>
+    =======
+    <dialog-element id="machinedialog"></dialog-element>
+    <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
+    <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
+    <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+    <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
+    <!-- <machine-edit machine="[[machine]]"></machine-edit> -->
+    <tags-list model="[[model]]"></tags-list>
+    <paper-toast></paper-toast>
+    </template>
 </dom-module>
 <script>
     MACHINEACTIONS = {
@@ -554,51 +553,57 @@
             return actions;
         },
         _computeMachine: function(params, machines) {
-            this.dashboard = {
-                "id": 1,
-                // "refresh": "",
-                "rows": [{
-                    "height": "500px",
-                    "panels": [{
-                        "aliasColors": {},
-                        "datasource": "mistphite",
-                        "id": 2,
-                        "span": 12,
-                        "stack": false,
-                        "targets": [{
-                            "refId": "A",
-                            "target": 'load.*'
-                        }, ],
-                        "timeFrom": null,
-                        "timeShift": null,
-                        "title": "Load",
-                        "type": "graph",
-                        "urlPrefix": "",
-                        "x-axis": true,
-                        "y-axis": true
+            if (!this.dashboard) {
+                this.dashboard = {
+                    "id": 1,
+                    // "refresh": "",
+                    "rows": [{
+                        "height": "500px",
+                        "panels": [{
+                            "aliasColors": {},
+                            "datasource": "mistphite",
+                            "id": 2,
+                            "span": 12,
+                            "stack": false,
+                            "targets": [{
+                                "refId": "A",
+                                "target": "load.longterm"
+                            }, {
+                                "refId": "B",
+                                "target": "load.shortterm"
+                            }],
+                            "timeFrom": null,
+                            "timeShift": null,
+                            "title": "Load",
+                            "type": "graph",
+                            "machineIds": [],
+                            "cloudIds": [],
+                            "x-axis": true,
+                            "y-axis": true
+                        }],
                     }],
-                }],
-                "time": {
-                    "from": "now-10m",
-                    "to": "now"
-                },
-                "timepicker": {
-                    "now": true,
-                    "refresh_intervals": [],
-                    "time_options": [
-                        "5m",
-                        "15m",
-                        "1h",
-                        "6h",
-                        "12h",
-                        "24h",
-                        "2d",
-                        "7d",
-                        "30d"
-                    ]
-                },
-                "timezone": "browser"
-            };
+                    "time": {
+                        "from": "now-10m",
+                        "to": "now"
+                    },
+                    "timepicker": {
+                        "now": true,
+                        "refresh_intervals": [],
+                        "time_options": [
+                            "5m",
+                            "15m",
+                            "1h",
+                            "6h",
+                            "12h",
+                            "24h",
+                            "2d",
+                            "7d",
+                            "30d"
+                        ]
+                    },
+                    "timezone": "browser"
+                };
+            }
 
             if (this.machine && this.machine.uuid && params.uuid != this.machine.uuid) {
                 this.set('isPendingKeyRequest', false);
@@ -610,8 +615,9 @@
         _computeItemInArray: function() {
             for (var i = 0; i < this.dashboard.rows.length; i++) {
                 for (var j = 0; j < this.dashboard.rows[i].panels.length; j++) {
-                    if (this.dashboard.rows[i].panels[j].datasource == "mistphite") {
-                        this.dashboard.rows[i].panels[j].urlPrefix = '/api/v1/clouds/' + this.machine.cloud.id + '/machines/' + this.machine.id + '/stats';
+                    if (this.dashboard.rows[i].panels[j].datasource == "mistphite" && this.dashboard.rows[i].panels[j].machineIds.length == 0) {
+                        this.dashboard.rows[i].panels[j].machineIds.push(this.machine.id);
+                        this.dashboard.rows[i].panels[j].cloudIds.push(this.machine.cloud.id);
                     }
                 }
             }
