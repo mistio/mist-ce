@@ -371,7 +371,13 @@ MACHINEACTIONS = {
     'icon': 'delete',
     'confirm': true,
     'multi': true
-  }
+  },
+  'probe': {
+    'name': 'probe',
+    'icon': 'icons:compare-arrows',
+    'confirm': false,
+    'multi': true
+  },
 }
     Polymer({
         is: 'machine-page',
@@ -505,6 +511,7 @@ MACHINEACTIONS = {
               // if not monitoring then enable monitoring
               ret.push('shell');
               ret.push('associate-key');
+              ret.push('probe');
               if(this.hideAssociatedKeys)
                 ret.push('run-script');
             }
