@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="plan-overusage">
+    <template>
+        <style is="custom-style" include="shared-styles">
+            :host {
+                display: block;
+            }
+            .notice {
+                background-color: #ffff8d;
+                padding: 2px 16px;
+                margin: 4px 16px;
+                z-index: 9;
+                position: relative;
+            }
+        </style>
+        <div class="notice" hidden$="{{!isOverUsing}}">
+            <p><strong>Attention:</strong> You have exceed the limits of the free plan, which includes unlimited clouds and up to 5 machines with monitoring for one of them. To continue using Mist.io <a href="/account">upgrade your plan.</a> 
+            <!-- <a href="javascript:void(0)" on-tap="_toggleUI">upgrade your plan.</a> -->
+            </p>
+        </div>
+    </template>
+    <script>
+    Polymer({
+        is: 'plan-overusage',
+
+        properties: {
+            model: Object,
+            org: Object,
+            user:  Object,
+            isOverUsing: {
+                type: Boolean,
+                computed: "_computeIsOverUsing(model.machinesArray.length, model.user.current_plan.*)"
+            }
+        },
+        _computeIsOverUsing: function(machines, current_plan){
+            return !this.model.user.current_plan.title && machines > 5;
+        },
+        _toggleUI: function() {
+            window.location.href = '/toggle-ui/legacy';
+        },
+    });
+    </script>
+</dom-module>
