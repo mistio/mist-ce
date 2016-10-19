@@ -44,6 +44,61 @@
             white-space: nowrap;
             overflow: hidden;
         }
+        .field.state {
+            position: relative;
+        }
+        .field.state.hasprobe {
+            overflow: visible;
+        }
+        .field.state.hasprobe:after {
+            content: " ";
+            position: absolute;
+            height: 4px;
+            width: 8px;
+            top: 25px;
+            right: 24px;
+        }
+        /* midterm */
+        .field.state.midlow:after {
+            background: #42A5F5; /*cyan*/
+        }
+        .field.state.midmedium:after {
+            background: #FFCA28; /*orange*/
+        }
+        .field.state.midhigh:after {
+            background: #EF5350; /*red*/
+        }
+        /* shortlow + long */
+        .field.state.shortlow.longlow:after {
+            box-shadow: 0 1px 0 #fff, 0 4px 0 #42A5F5, 0 -1px 0 #fff, 0 -4px 0 #42A5F5; /*cyan cyan*/
+        }
+        .field.state.shortlow.longmedium:after {
+            box-shadow: 0 1px 0 #fff, 0 4px 0 #42A5F5, 0 -1px 0 #fff, 0 -4px 0 #FFCA28; /*cyan orange*/
+        }
+        .field.state.shortlow.longhigh:after {
+            box-shadow: 0 1px 0 #fff, 0 4px 0 #42A5F5, 0 -1px 0 #fff, 0 -4px 0 #EF5350; /*cyan red*/
+        }
+        /* shortmedium + long */
+        .field.state.shortmedium.longlow:after {
+            box-shadow: 0 1px 0 #fff, 0 4px 0 #FFCA28, 0 -1px 0 #fff, 0 -4px 0 #42A5F5; /*orange cyan*/
+        }
+        .field.state.shortmedium.longmedium:after {
+            box-shadow: 0 1px 0 #fff, 0 4px 0 #FFCA28, 0 -1px 0 #fff, 0 -4px 0 #FFCA28; /*orange orange*/
+        }
+        .field.state.shortmedium.longhigh:after {
+            box-shadow: 0 1px 0 #fff, 0 4px 0 #FFCA28, 0 -1px 0 #fff, 0 -4px 0 #EF5350; /*orange red*/
+        }
+        /* shorthigh + long */
+        .field.state.shorthigh.longlow:after {
+            box-shadow: 0 1px 0 #fff, 0 4px 0 #EF5350, 0 -1px 0 #fff, 0 -4px 0 #42A5F5; /*red cyan*/
+        }
+        .field.state.shorthigh.longmedium:after {
+            box-shadow: 0 1px 0 #fff, 0 4px 0 #EF5350, 0 -1px 0 #fff, 0 -4px 0 #FFCA28; /*red orange*/
+        }
+        .field.state.shorthigh.longhigh:after {
+            box-shadow: 0 1px 0 #fff, 0 4px 0 #EF5350, 0 -1px 0 #fff, 0 -4px 0 #EF5350; /*red red*/
+        }
+
         .field.state,
         /*.field.create_date,*/
         .field.cloud,
@@ -89,7 +144,7 @@
         <content></content>
         <template is="dom-repeat" items="{{fields}}" as="field">
           <a href="[[uri]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false">
-            <div class$="[[field]] field field[[index]] {{itemField(item, field)}}">{{itemField(item, field)}}</div>
+            <div class$="[[field]] field field[[index]] {{itemField(item, field)}} {{itemProbeClasses(item, field)}}">{{itemField(item, field)}}</div>
           </a>
         </template>
         <div class="field tags" hidden$="[[!item.tags.length]]">
@@ -337,6 +392,53 @@ Polymer({
 
     _firstItem: function (index) {
         return !index;
+    },
+
+    itemProbeClasses: function(item, field) {
+        if (field != 'state') {
+            return false;
+        }
+        else {
+            var model = document.querySelector('mist-app').model;
+
+            if (!model || !model.probes || !model.probes[item.uuid] || !model.probes[item.uuid].loadavg) {
+                return "";
+            }
+
+            else {
+                var probe = model.probes[item.uuid].loadavg;
+                var classes = "";
+
+                //short
+                if (parseInt(probe[0]*100) < 30)
+                    classes += "shortlow ";
+                else if (parseInt(probe[0]*100) > 30 && parseInt(probe[0]*100) < 60)
+                    classes += "shortmedium ";
+                else
+                    classes += "shorthigh ";
+                //mid
+                if (parseInt(probe[1]*100) < 30)
+                    classes += "midlow ";
+                else if (parseInt(probe[1]*100) > 30 && parseInt(probe[1]*100) < 60)
+                    classes += "midmedium ";
+                else
+                    classes += "midhigh ";
+                //long
+                if (parseInt(probe[2]*100) < 30)
+                    classes += "longlow ";
+                else if (parseInt(probe[2]*100) > 30 && parseInt(probe[2]*100) < 60)
+                    classes += "longmedium ";
+                else
+                    classes += "longhigh ";
+
+                //has probe data
+                if (classes != "")
+                    classes += "hasprobe "
+
+                return classes;
+            }
+        }
+
     }
 });
 </script>
