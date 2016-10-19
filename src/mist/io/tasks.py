@@ -269,7 +269,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             # only for mist.core, set cronjob entry as a post deploy step
             if cronjob:
                 try:
-                    from mist.core.methods import add_cronjob_entry
+                    from mist.core.cronjobs.methods import add_cronjob_entry
                     tmp_log('Add cronjob entry %s', cronjob["name"])
                     cronjob["machines_per_cloud"] = [[cloud_id, machine_id]]
                     cronjob_info = add_cronjob_entry(owner, cronjob)
