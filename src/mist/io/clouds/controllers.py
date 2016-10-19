@@ -919,6 +919,20 @@ class LibvirtController(BaseController):
                           self.cloud.host,  # hypervisor id is the hostname
                           username=self.cloud.username, port=self.cloud.port)
 
+    def update_validate(self, fail_on_error=False, **kwargs):
+        # if edit_key
+        key = kwargs.get('key')
+        super(LibvirtController, self).update_validate(
+            fail_on_error=fail_on_error, **kwargs
+        )
+
+        if self.cloud.key is not None and self.cloud.key == key:
+            # FIXME
+            from mist.io.methods import associate_key
+            associate_key(self.cloud.owner, self.cloud.key.id, self.cloud.id,
+                          self.cloud.host,  # hypervisor id is the hostname
+                          username=self.cloud.username, port=self.cloud.port)
+
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(LibvirtController, self)._list_machines__machine_actions(
                machine, machine_libcloud)
