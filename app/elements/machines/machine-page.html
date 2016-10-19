@@ -27,11 +27,17 @@
             .columns paper-material > * {
                 word-break: break-all;
             }
+            .left {
+                line-height: 1.6em;
+            }
             .left, .right {
                 @apply(--layout-vertical);
                 align-items: flex-start;
                 flex-direction: column;
                 flex: 1 100%;
+            }
+            .left h3, .right h3 {
+                margin-bottom: 0;
             }
             .flex-horizontal-with-ratios {
                 @apply(--layout-horizontal);
@@ -197,6 +203,58 @@
                 vertical-align: auto;
                 padding: 0;
             }
+            .probe-data {
+                position: relative;
+            }
+            .probe-data.hasprobe {
+                overflow: visible;
+            }
+            .probe-data.hasprobe {
+                height: 8px;
+                width: 4px;
+                display: inline-block;
+                margin: 2px 8px;
+            }
+            /* midterm */
+            .midlow {
+                background: #42A5F5; /*cyan*/
+            }
+            .midmedium {
+                background: #FFCA28; /*orange*/
+            }
+            .midhigh {
+                background: #EF5350; /*red*/
+            }
+            /* shortlow + long */
+            .shortlow.longlow {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*cyan cyan*/
+            }
+            .shortlow.longmedium {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #FFCA28; /*cyan orange*/
+            }
+            .shortlow.longhigh {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #EF5350; /*cyan red*/
+            }
+            /* shortmedium + long */
+            .shortmedium.longlow {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*orange cyan*/
+            }
+            .shortmedium.longmedium {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #FFCA28; /*orange orange*/
+            }
+            .shortmedium.longhigh {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #EF5350; /*orange red*/
+            }
+            /* shorthigh + long */
+            .shorthigh.longlow {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*red cyan*/
+            }
+            .shorthigh.longmedium {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #FFCA28; /*red orange*/
+            }
+            .shorthigh.longhigh {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #EF5350; /*red red*/
+            }
         </style>
 
         <div id="content">
@@ -223,6 +281,10 @@
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
                     <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
+                    <div hidden$="{{!probeData}}"> Probe Data: 
+                        <span class$="probe-data {{itemProbeClasses(machine, model.probes)}}"> </span>
+                        <span hidden$="{{!probeData}}"> {{probeData}} </span>
+                    </div>
                 </paper-material>
                 <paper-material id="rightcolumn" class="right" hidden$="[[hideAssociatedKeys]]">
                     <h3 class="smallcaps">Associated Keys:</h3>
@@ -460,6 +522,11 @@ MACHINEACTIONS = {
             actions: {
                 type: Array,
                 computed: '_computeActions(machine)'
+            },
+            probeData: {
+                type: String,
+                computed: '_computeProbeData(machine, model.probes.*)',
+                value: false
             }
         },
         observers: [
@@ -732,16 +799,67 @@ MACHINEACTIONS = {
             }
         },
         _feedbackOnRename: function(e){
-        console.log("_feedbackOnRename")
-        if (e.detail.request) {
-            this._showToast('Rename request sent. Waiting for machine to respond');
+            console.log("_feedbackOnRename")
+            if (e.detail.request) {
+                this._showToast('Rename request sent. Waiting for machine to respond');
+            }
+            if (e.detail.response) {
+                this._showToast('Renaming was successful.');
+            }
+            if (e.detail.error) {
+                this._showToast(e.detail.errormsg);
+            }
+        },
+        _computeProbeData: function(machine, probes){
+            if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid].loadavg.length)
+                return this.model.probes[machine.uuid].loadavg[0]+", "+this.model.probes[machine.uuid].loadavg[1]+", "+this.model.probes[machine.uuid].loadavg[2]+" - "+this.model.probes[machine.uuid].cores+" cores. Last probe: "+moment(this.model.probes[machine.uuid].timestamp*1000).fromNow();
+        },
+        itemProbeClasses: function(item, probes) {
+            if (!probes) {
+                console.log('1')
+                return false;
+            }
+            else {
+
+                if (!this.model || !this.model.probes || !this.model.probes[item.uuid] || !this.model.probes[item.uuid].loadavg) {
+                    return false;
+                    console.log('2')
+                }
+
+                else {
+                    var probe = this.model.probes[item.uuid].loadavg;
+                    var classes = "";
+
+                    //short
+                    if (parseInt(probe[0]*100) < 30)
+                        classes += "shortlow ";
+                    else if (parseInt(probe[0]*100) > 30 && parseInt(probe[0]*100) < 60)
+                        classes += "shortmedium ";
+                    else
+                        classes += "shorthigh ";
+                    //mid
+                    if (parseInt(probe[1]*100) < 30)
+                        classes += "midlow ";
+                    else if (parseInt(probe[1]*100) > 30 && parseInt(probe[1]*100) < 60)
+                        classes += "midmedium ";
+                    else
+                        classes += "midhigh ";
+                    //long
+                    if (parseInt(probe[2]*100) < 30)
+                        classes += "longlow ";
+                    else if (parseInt(probe[2]*100) > 30 && parseInt(probe[2]*100) < 60)
+                        classes += "longmedium ";
+                    else
+                        classes += "longhigh ";
+
+                    //has probe data
+                    if (classes != "")
+                        classes += "hasprobe "
+
+                    return classes;
+                }
+            }
+
         }
-        if (e.detail.response) {
-            this._showToast('Renaming was successful.');
-        }
-        if (e.detail.error) {
-            this._showToast(e.detail.errormsg);
-        }
-    },
     });
 </script>
