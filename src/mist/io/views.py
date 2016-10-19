@@ -363,6 +363,46 @@ def rename_cloud(request):
     return OK
 
 
+@view_config(route_name='api_v1_edit_cloud', request_method='PUT')
+@view_config(route_name='edit_cloud', request_method='PUT')
+def edit_cloud(request):
+    """
+    Edit cloud with given cloud_id.
+    EDIT permission required on cloud.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    kwargs:
+      type:
+    """
+    auth_context = auth_context_from_request(request)
+    cloud_id = request.matchdict['cloud']
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
+    params = params_from_request(request)
+    creds = params.get('creds')
+    if not creds:
+        raise BadRequestError("You must provide your new credentials")
+
+    auth_context.check_perm('cloud', 'edit', cloud_id)
+
+    log.info("Editing cloud: %s", cloud_id)
+
+    fail_on_error = params.pop('fail_on_error', True)
+
+    # Edit the cloud
+    cloud.ctl.update_validate(fail_on_error=fail_on_error, **creds)
+
+    log.info("Cloud with id '%s' edited successfully.", cloud.id)
+    trigger_session_update(auth_context.owner, ['clouds'])
+    return OK
+
+
 @view_config(route_name='api_v1_cloud_action', request_method='POST')
 @view_config(route_name='cloud_action', request_method='POST')
 def toggle_cloud(request):
