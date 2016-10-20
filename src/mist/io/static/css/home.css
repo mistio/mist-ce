@@ -4,6 +4,8 @@
     background-color: #ffff8d;
     padding: 13px 8px;
     font-size: 14px;
+    letter-spacing: initial;
+    opacity: 0.9;
 }
 #home-page .notice a {
     cursor: pointer;
