@@ -1309,11 +1309,11 @@
                     // return YAML.dump(log);
                 },
                 getScriptlink: function(id) {
-                    if (this.model.scripts[id])
+                    if (id && this.model.scripts[id])
                         return "/scripts/"+this.model.scripts[id];
                 },
                 getScriptName: function(id) {
-                    if (this.model.scripts[id])
+                    if (id && this.model.scripts[id])
                         return this.model.scripts[id].name;
                 },
             });
