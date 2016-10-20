@@ -448,13 +448,12 @@
             margin-bottom: 24px;
         }
         #logscollapse[collapsed] {
-            height: 100px;
+            height: 30px;
             overflow: hidden;
         }
         .logscontrol {
             margin-top: 16px;
             padding: 0 8px;
-            
         }
 
         .log.more {
@@ -620,15 +619,16 @@
                         <template is="dom-repeat" items="[[job.logs]]" as="log">
                             <div class$="log error-[[log.error]]">
                                 <iron-icon icon$="[[computeLogIcon(log, index, stack.status)]]"></iron-icon>
-                                [[log.action]] :
-                                <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
-                                <span hidden$="[[!log.name]]">[[log.name]] </span>
-                                <span hidden$="[[!log.machine_name]]">[[log.machine_name]] </span>
-                                <span hidden$="[[!log.machine_names]]">[[log.machine_names]] </span>
-                                <span hidden$="[[!log.script_id]]">[[log.script_id]] </span>
-                                <span hidden$="[[!log.script_name]]">[[log.script_name]] </span>
-                                <span hidden$="[[!log.request_params.name]]">[[log.request_params.name]] </span>
-                                <span hidden$="[[!log.request_params.workflow]]">[[log.request_params.workflow]] </span> <br/>
+                                [[log.action]]
+                                <span hidden$="[[!log.workflow]]">: [[log.workflow]] </span>
+                                <span hidden$="[[!log.name]]">: [[log.name]] </span>
+                                <span hidden$="[[!log.machine_name]]">: [[log.machine_name]] </span>
+                                <span hidden$="[[!log.machine_names]]">: [[log.machine_names]] </span>
+                                <span hidden$="[[!log.script_id]]">: [[log.script_id]] </span>
+                                <span hidden$="[[!log.script_name]]">: [[log.script_name]] </span>
+                                <span hidden$="[[!log.request_params.name]]">: [[log.request_params.name]] </span>
+                                <span hidden$="[[!log.request_params.workflow]]">: [[log.request_params.workflow]] </span>
+                                <span hidden$="[[!log.result.loadavg]]">: [[log.result.loadavg]] </span> <br/>
                                 <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
                                 <!-- <div class="log-info" hidden$="[[!showLogs]]">
                                     <pre><code>
@@ -641,7 +641,7 @@
                     <div class="log false more" hidden$="[[showLogs]]">
                         ... and more. [[job.logs.length]] total log entries
                     </div>
-                    <paper-button id="minimal" class="logscontrol" toggles active={{showLogs}} hidden$="[[!job.finished_at]]">
+                    <paper-button id="minimal" class="logscontrol" toggles active={{showLogs}}>
                         <span hidden$="{{showLogs}}">expand logs <iron-icon icon="icons:unfold-more"></iron-icon> </span>
                         <span hidden$="{{!showLogs}}">collapse logs <iron-icon icon="icons:unfold-less"></iron-icon> </span>
                     </paper-button>
@@ -751,7 +751,7 @@
                     },
                     showLogs: {
                         type: Boolean,
-                        value: true,
+                        value: false,
                     },
                     section: {
                         type: Object
@@ -1249,7 +1249,7 @@
                         console.log('_updateLogs');
                         that.$.getJobLog.generateRequest();
                         this.showOutput = true;
-                        this.showLogs = true;
+                        // this.showLogs = true;
                     }
                 },
                 computeLogIcon: function(log, index, status){
@@ -1271,7 +1271,7 @@
                     if (xterm)
                         xterm.remove();
                     this.showOutput = false;
-                    this.showLogs = false;
+                    // this.showLogs = false;
                 },
                 _computeIsloading: function(stack) {
                     return !this.stack ? true : false;
