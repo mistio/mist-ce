@@ -68,6 +68,12 @@
             selected: {
                 value: 0
             }
+        },
+        attached: function(){
+            console.log(document.querySelector("app-location").queryParams);
+            if (document.querySelector("app-location").queryParams["plans"] == "true") {
+                this.set("selected",2);
+            }
         }
     });
 </script>
