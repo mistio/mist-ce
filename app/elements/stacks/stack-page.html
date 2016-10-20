@@ -624,7 +624,7 @@
                                 <span hidden$="[[!log.name]]">: [[log.name]] </span>
                                 <span hidden$="[[!log.machine_name]]">: [[log.machine_name]] </span>
                                 <span hidden$="[[!log.machine_names]]">: [[log.machine_names]] </span>
-                                <span hidden$="[[!log.script_id]]">: [[log.script_id]] </span>
+                                <span hidden$="[[!log.script_id]]">: [[log.script_id]] <a href$="[[getScriptlink(log.script_id)]]">[[getScriptName(log.script_id)]] </span>
                                 <span hidden$="[[!log.script_name]]">: [[log.script_name]] </span>
                                 <span hidden$="[[!log.request_params.name]]">: [[log.request_params.name]] </span>
                                 <span hidden$="[[!log.request_params.workflow]]">: [[log.request_params.workflow]] </span>
@@ -1307,7 +1307,15 @@
 
                     return info;
                     // return YAML.dump(log);
-                }
+                },
+                getScriptlink: function(id) {
+                    if (this.model.scripts[id])
+                        return "/scripts/"+this.model.scripts[id];
+                },
+                getScriptName: function(id) {
+                    if (this.model.scripts[id])
+                        return this.model.scripts[id].name;
+                },
             });
         })();
     </script>
