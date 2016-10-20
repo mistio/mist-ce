@@ -359,6 +359,10 @@
         .log:not(.error-false) iron-icon, .log:not(.error-false) {
             color: var(--red-color);
         }
+        .log span.error {
+            padding-left: 28px;
+            display: block;
+        }
         .parsing-loader paper-progress {
             width: 100%;
             margin-bottom: 32px;
@@ -616,14 +620,21 @@
                         <template is="dom-repeat" items="[[job.logs]]" as="log">
                             <div class$="log error-[[log.error]]">
                                 <iron-icon icon$="[[computeLogIcon(log, index, stack.status)]]"></iron-icon>
+                                [[log.action]] :
                                 <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
-                                [[log.action]]
+                                <span hidden$="[[!log.name]]">[[log.name]] </span>
+                                <span hidden$="[[!log.machine_name]]">[[log.machine_name]] </span>
+                                <span hidden$="[[!log.machine_names]]">[[log.machine_names]] </span>
+                                <span hidden$="[[!log.script_id]]">[[log.script_id]] </span>
+                                <span hidden$="[[!log.script_name]]">[[log.script_name]] </span>
+                                <span hidden$="[[!log.request_params.name]]">[[log.request_params.name]] </span>
+                                <span hidden$="[[!log.request_params.workflow]]">[[log.request_params.workflow]] </span> <br/>
                                 <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
-                                <div class="log-info" hidden$="[[!showLogs]]">
-<pre><code>
-[[logInfo(log)]]
-</code></pre>
-                                </div>
+                                <!-- <div class="log-info" hidden$="[[!showLogs]]">
+                                    <pre><code>
+                                    [[logInfo(log)]]
+                                    </code></pre>
+                                </div> -->
                             </div>
                         </template>
                     </div>
@@ -1266,7 +1277,36 @@
                     return !this.stack ? true : false;
                 },
                 logInfo: function(log) {
-                    return YAML.dump(log);
+                    var info = "";
+
+                    if (log.action)
+                        info += "action: " + YAML.dump(log.action) +"\n";
+
+                    if (log.inputs && log.inputs.machine_name)
+                        info += "inputs: machine_name: " + YAML.dump(log.inputs.machine_name) +"\n"; 
+                    
+                    if (log.machine_name)
+                        info += "machine_name: " + YAML.dump(log.machine_name) +"\n";
+                    
+                    if (log.script_id)
+                        info += "script_id: " +YAML.dump(log.script_id) +"\n";
+                    
+                    if (log.request_params && log.request_params.name)
+                        info += "name: "+ YAML.dump(log.request_params.name) +"\n";
+
+                    if (log.request_params && log.request_params.workflow)
+                        info += "workflow: "+ YAML.dump(log.request_params.workflow) +"\n";
+                    
+                    if (log.machine_names)
+                        info += "machine_names: " +"\n"+ YAML.dump(log.machine_names) +"\n";
+                    
+                    info += "error: "+ log.error +"\n " ;
+
+
+                    action
+
+                    return info;
+                    // return YAML.dump(log);
                 }
             });
         })();
