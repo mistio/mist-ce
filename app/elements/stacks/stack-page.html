@@ -457,6 +457,10 @@
             font-size: 0.9em;
             color: rgba(0,0,0,0.54);
         }
+        .log-info {
+            background-color: #eee;
+            padding-left: 16px;
+        }
         </style>
         <div id="content">
             <div class="is-loading" hidden$="[[!isLoading]]">
@@ -615,6 +619,11 @@
                                 <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
                                 [[log.action]]
                                 <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
+                                <div class="log-info" hidden$="[[!showLogs]]">
+<pre><code>
+[[logInfo(log)]]
+</code></pre>
+                                </div>
                             </div>
                         </template>
                     </div>
@@ -1255,6 +1264,9 @@
                 },
                 _computeIsloading: function(stack) {
                     return !this.stack ? true : false;
+                },
+                logInfo: function(log) {
+                    return YAML.dump(log);
                 }
             });
         })();
