@@ -253,6 +253,12 @@ ACTIONS = {
     'confirm': true,
     'multi': true
   },
+  'probe': {
+    'name': 'probe',
+    'icon': 'icons:compare-arrows',
+    'confirm': false,
+    'multi': true
+  },
   'star': {
     'name': 'star',
     'icon': 'star',
@@ -501,6 +507,7 @@ Polymer({
               // if not monitoring then enable monitoring
               ret.push('associate-key');
               ret.push('shell');
+              ret.push('probe');
               if (item.keys.length) {
                   ret.push('run-script');
               }
@@ -681,6 +688,9 @@ Polymer({
                 uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id;
                 payload = {'action': action.name};
                 console.log(action.name);
+            } else if (action.name == 'probe') {
+                uri = '/api/v1/clouds/' + item.cloud.id + '/machines/' + item.id+ '/probe';
+                payload = {'host': item.public_ips[0], 'key': item.keys[0]};
             //templates
             } else if (action.name == 'delete' && item.type == 'template') {
                 uri = '/api/v1/templates/' + item.id;
