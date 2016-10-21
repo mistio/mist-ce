@@ -296,7 +296,7 @@
                 </a>
             </div>
             <paper-material class="graphs">
-                <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+                <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
             </paper-material>
         </div>
         <div class="left">
@@ -413,13 +413,14 @@
                     "panels": [{
                         "aliasColors": {},
                         "datasource": "mistphite",
-                        "id": 2,
+                        "id": 4,
                         "span": 12,
                         "stack": false,
                         "targets": [{
                             "refId": "A",
                             "target": 'load.shortterm'
                         }, ],
+                        "machineArray": [],
                         "timeFrom": null,
                         "timeShift": null,
                         "title": "Load_on_all_monitored_machines",
@@ -449,7 +450,13 @@
                 },
                 "timezone": "browser"
             };
-
+            var machinearray = [];
+            console.log(this.model.monitoring);
+            this.model.monitoring.machines.forEach(function(entry) {
+                machinearray.push(entry);
+            });
+            console.log(machinearray);
+            this.dashboard.rows[0].panels[0].machineArray = machinearray;
             // var that = this;
             // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
             //     if (that.querySelector('dashboard-panel'))

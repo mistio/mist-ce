@@ -194,6 +194,16 @@
                             console.warn('cannot find open request', data.request_id)
                         else {
                             that.openRequests[data.request_id](data);
+                            that.openRequests[data.request_id] = null;
+                            var found = false;
+                            that.openRequests.forEach(function(entry) {
+                                if (entry != null) {
+                                    found = true;
+                                }
+                            });
+                            if (!found) {
+                                that.openRequests = [];
+                            }
                         }
                     }
                 },
@@ -254,7 +264,7 @@
         },
 
         getStats: function(data, callback) {
-            var reqId = Math.floor(1 + Math.random());
+            var reqId = Math.floor(100 * Math.random());
             data[5] = reqId;
             this.send('msg', 'main', 'stats', data);
             this.openRequests[reqId] = callback;
