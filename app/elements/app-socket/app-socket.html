@@ -26,6 +26,7 @@
                 type: Object,
                 value: {
                     isLoadingClouds: true,
+                    isLoadingMachines: true,
                     isLoadingImages: true,
                     isLoadingKeys: true,
                     isLoadingNetworks: true,
@@ -382,12 +383,32 @@
         },
 
         _updateClouds: function(data) {
-            if (data.length && (this.get('onboarding.hasCloud') != true))
+            console.log('_updateClouds');
+            if (data.length && this.get('onboarding.hasCloud') != true)
                 this.set('onboarding.hasCloud', true);
-            if (!data.length)
+            if (!data.length) {
                 this.set('onboarding.hasCloud', false);
+                this.set('onboarding.isLoadingMachines', false);
+                this.set('onboarding.isLoadingImages', false);
+                this.set('onboarding.isLoadingNetworks', false);
+            }
             var ret = this._updateModel('clouds', data);
             this.set('onboarding.isLoadingClouds', false);
+
+            // the case when clouds have loaded but handlers list_machines/list_images/list_networks
+            // have never been triggered (ex. all clouds are disabled, list_machines never gets data)
+            var cloudsResources = !(!this.model.machines && !this.model.networks && !this.model.images);
+            if (data.length && !cloudsResources && ret)
+                cloudsResources = data.map(function(d){
+                    return d.machines || d.images || d.networks ? true : false ;
+                }).reduce(function(b1, b2){
+                    return b1 || b2 ;
+                });
+            if (!cloudsResources){
+                this.set('onboarding.isLoadingMachines', false);
+                this.set('onboarding.isLoadingImages', false);
+                this.set('onboarding.isLoadingNetworks', false);
+            }
             return ret;
         },
 
@@ -465,6 +486,7 @@
         },
 
         _updateImages: function(data) {
+            console.log('_updateImages');
             this.set('onboarding.isLoadingImages', false);
             var changed = this._updateModel('clouds.' + data.cloud_id + '.images', data.images);
             if (!changed)

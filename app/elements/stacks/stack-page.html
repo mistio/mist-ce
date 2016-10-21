@@ -359,6 +359,10 @@
         .log:not(.error-false) iron-icon, .log:not(.error-false) {
             color: var(--red-color);
         }
+        .log span.error {
+            padding-left: 28px;
+            display: block;
+        }
         .parsing-loader paper-progress {
             width: 100%;
             margin-bottom: 32px;
@@ -444,18 +448,21 @@
             margin-bottom: 24px;
         }
         #logscollapse[collapsed] {
-            height: 100px;
+            height: 30px;
             overflow: hidden;
         }
         .logscontrol {
             margin-top: 16px;
             padding: 0 8px;
-            
         }
 
         .log.more {
             font-size: 0.9em;
             color: rgba(0,0,0,0.54);
+        }
+        .log-info {
+            background-color: #eee;
+            padding-left: 16px;
         }
         </style>
         <div id="content">
@@ -612,16 +619,29 @@
                         <template is="dom-repeat" items="[[job.logs]]" as="log">
                             <div class$="log error-[[log.error]]">
                                 <iron-icon icon$="[[computeLogIcon(log, index, stack.status)]]"></iron-icon>
-                                <span hidden$="[[!log.workflow]]">[[log.workflow]] </span>
                                 [[log.action]]
+                                <span hidden$="[[!log.workflow]]">: [[log.workflow]] </span>
+                                <span hidden$="[[!log.name]]">: [[log.name]] </span>
+                                <span hidden$="[[!log.machine_name]]">: [[log.machine_name]] </span>
+                                <span hidden$="[[!log.machine_names]]">: [[log.machine_names]] </span>
+                                <span hidden$="[[!log.script_id]]">: <a class="regular blue-link" href$="[[getScriptlink(log.script_id)]]">[[getScriptName(log.script_id)]] </a></span>
+                                <span hidden$="[[!log.script_name]]">: [[log.script_name]] </span>
+                                <span hidden$="[[!log.request_params.name]]">: [[log.request_params.name]] </span>
+                                <span hidden$="[[!log.request_params.workflow]]">: [[log.request_params.workflow]] </span>
+                                <span hidden$="[[!log.result.loadavg]]">: [[log.result.loadavg]] </span> <br/>
                                 <span class="error" hidden$="[[!log.error]]">error: [[log.error]]</span>
+                                <!-- <div class="log-info" hidden$="[[!showLogs]]">
+                                    <pre><code>
+                                    [[logInfo(log)]]
+                                    </code></pre>
+                                </div> -->
                             </div>
                         </template>
                     </div>
                     <div class="log false more" hidden$="[[showLogs]]">
                         ... and more. [[job.logs.length]] total log entries
                     </div>
-                    <paper-button id="minimal" class="logscontrol" toggles active={{showLogs}} hidden$="[[!job.finished_at]]">
+                    <paper-button id="minimal" class="logscontrol" toggles active={{showLogs}}>
                         <span hidden$="{{showLogs}}">expand logs <iron-icon icon="icons:unfold-more"></iron-icon> </span>
                         <span hidden$="{{!showLogs}}">collapse logs <iron-icon icon="icons:unfold-less"></iron-icon> </span>
                     </paper-button>
@@ -731,7 +751,7 @@
                     },
                     showLogs: {
                         type: Boolean,
-                        value: true,
+                        value: false,
                     },
                     section: {
                         type: Object
@@ -1229,7 +1249,7 @@
                         console.log('_updateLogs');
                         that.$.getJobLog.generateRequest();
                         this.showOutput = true;
-                        this.showLogs = true;
+                        // this.showLogs = true;
                     }
                 },
                 computeLogIcon: function(log, index, status){
@@ -1251,11 +1271,51 @@
                     if (xterm)
                         xterm.remove();
                     this.showOutput = false;
-                    this.showLogs = false;
+                    // this.showLogs = false;
                 },
                 _computeIsloading: function(stack) {
                     return !this.stack ? true : false;
-                }
+                },
+                logInfo: function(log) {
+                    var info = "";
+
+                    if (log.action)
+                        info += "action: " + YAML.dump(log.action) +"\n";
+
+                    if (log.inputs && log.inputs.machine_name)
+                        info += "inputs: machine_name: " + YAML.dump(log.inputs.machine_name) +"\n"; 
+                    
+                    if (log.machine_name)
+                        info += "machine_name: " + YAML.dump(log.machine_name) +"\n";
+                    
+                    if (log.script_id)
+                        info += "script_id: " +YAML.dump(log.script_id) +"\n";
+                    
+                    if (log.request_params && log.request_params.name)
+                        info += "name: "+ YAML.dump(log.request_params.name) +"\n";
+
+                    if (log.request_params && log.request_params.workflow)
+                        info += "workflow: "+ YAML.dump(log.request_params.workflow) +"\n";
+                    
+                    if (log.machine_names)
+                        info += "machine_names: " +"\n"+ YAML.dump(log.machine_names) +"\n";
+                    
+                    info += "error: "+ log.error +"\n " ;
+
+
+                    action
+
+                    return info;
+                    // return YAML.dump(log);
+                },
+                getScriptlink: function(id) {
+                    if (id && this.model.scripts[id])
+                        return "/scripts/"+this.model.scripts[id].id;
+                },
+                getScriptName: function(id) {
+                    if (id && this.model.scripts[id])
+                        return this.model.scripts[id].name;
+                },
             });
         })();
     </script>
