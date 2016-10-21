@@ -1049,6 +1049,24 @@ class OtherController(BaseController):
                     self.cloud.delete()
                 raise
 
+    def update_validate(self, fail_on_error=True, **kwargs):
+        # TODO add docstring, user can only edit title
+        if 'title' in kwargs.keys():
+            self.cloud.title = kwargs.pop('title')
+        if kwargs:
+            log.error("Error editing %s", self.cloud)
+            raise BadRequestError("Invalid parameters %s." % kwargs)
+
+        try:
+            self.cloud.save()
+        except me.ValidationError as exc:
+            log.error("Error editing %s: %s", self.cloud, exc.to_dict())
+            raise BadRequestError({'msg': exc.message,
+                                   'errors': exc.to_dict()})
+        except me.NotUniqueError as exc:
+            log.error("Cloud %s not unique error: %s", self.cloud, exc)
+            raise CloudExistsError()
+
     def add_machine_wrapper(self, name, remove_on_error=True,
                             fail_on_invalid_params=True, **kwargs):
         """Wrapper around add_machine for kwargs backwards compatibity
