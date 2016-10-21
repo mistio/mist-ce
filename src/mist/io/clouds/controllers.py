@@ -137,12 +137,13 @@ class AmazonController(BaseController):
                 # that are not valid anymore for AWS
                 images = self.connection.list_images(None, image_ids)
             except Exception as e:
-                bad_ids = re.findall('ami-\w*',e.message, re.DOTALL)
+                bad_ids = re.findall(r'ami-\w*', e.message, re.DOTALL)
                 for bad_id in bad_ids:
                     self.cloud.starred.remove(bad_id)
                 self.cloud.save()
                 images = self.connection.list_images(None,
-                         default_images.keys() + self.cloud.starred)
+                                                     default_images.keys() +
+                                                     self.cloud.starred)
             for image in images:
                 if image.id in default_images:
                     image.name = default_images[image.id]
