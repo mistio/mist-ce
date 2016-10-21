@@ -56,6 +56,7 @@ def load_clouds_from_config():
 
 CLOUDS = load_clouds_from_config()
 CLOUD_NAMES = [cdict['name'] for cdict in CLOUDS]
+CREDS = {cdict['name']:cdict['creds'] for cdict in CLOUDS}
 
 
 @pytest.fixture(scope='module')
