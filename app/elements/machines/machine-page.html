@@ -24,11 +24,20 @@
                 flex: 1 100%;
                 margin-bottom: 16px;
             }
+            .columns paper-material > * {
+                word-break: break-all;
+            }
+            .left {
+                line-height: 1.6em;
+            }
             .left, .right {
                 @apply(--layout-vertical);
                 align-items: flex-start;
                 flex-direction: column;
                 flex: 1 100%;
+            }
+            .left h3, .right h3 {
+                margin-bottom: 0;
             }
             .flex-horizontal-with-ratios {
                 @apply(--layout-horizontal);
@@ -194,13 +203,65 @@
                 vertical-align: auto;
                 padding: 0;
             }
+            .probe-data {
+                position: relative;
+            }
+            .probe-data.hasprobe {
+                overflow: visible;
+            }
+            .probe-data.hasprobe {
+                height: 8px;
+                width: 4px;
+                display: inline-block;
+                margin: 2px 8px;
+            }
+            /* midterm */
+            .midlow {
+                background: #42A5F5; /*cyan*/
+            }
+            .midmedium {
+                background: #FFCA28; /*orange*/
+            }
+            .midhigh {
+                background: #EF5350; /*red*/
+            }
+            /* shortlow + long */
+            .shortlow.longlow {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*cyan cyan*/
+            }
+            .shortlow.longmedium {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #FFCA28; /*cyan orange*/
+            }
+            .shortlow.longhigh {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #EF5350; /*cyan red*/
+            }
+            /* shortmedium + long */
+            .shortmedium.longlow {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*orange cyan*/
+            }
+            .shortmedium.longmedium {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #FFCA28; /*orange orange*/
+            }
+            .shortmedium.longhigh {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #EF5350; /*orange red*/
+            }
+            /* shorthigh + long */
+            .shorthigh.longlow {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*red cyan*/
+            }
+            .shorthigh.longmedium {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #FFCA28; /*red orange*/
+            }
+            .shorthigh.longhigh {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #EF5350; /*red red*/
+            }
         </style>
 
         <div id="content">
             <div class="is-loading" hidden$="[[!isLoading]]">
                 <paper-spinner active hidden$="[[!isLoading]]"></paper-spinner>
             </div>
-            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+            <paper-material class="single-head layout horizontal" style$="color:#fff;background-color: [[section.color]];">
                 <span class="icon"><iron-icon class$=" machine-state-icon [[machine.state]]" icon="[[section.icon]]"></iron-icon></span>
                 <div class="title flex">
                     <h2>
@@ -211,33 +272,7 @@
                     </div>
                 </div>
                 <div class="machine-actions">
-                    <!-- can_destroy:true
-                    can_start:false
-                    can_stop:true
-                    can_suspend:false
-                    can_reboot:true
-                    can_rename:true
-                    can_resume:false
-                    can_tag:true
-                    can_undefine:false -->
-
-                    <!-- 
-                        rename
-                        run script on machine
-                        monitor
-                     -->
-
                     <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" actions="[[actions]]" org="[[model.org]]" model="[[model]]"></item-actions>
-
-                    <!-- 
-                    <paper-menu-button id="moreMachineActions" horizontal-align="right">
-                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
-                        <paper-menu id="machine_actions" class="dropdown-content">
-                            <paper-button on-tap="associateKey" class="simple">Associate a key</paper-button>
-                            <paper-button on-tap="_runScript" class="simple">Run a Script</paper-button>
-                        </paper-menu>
-                    </paper-menu-button>
-                    <paper-button on-tap="monitor" class="simple white right-icon" style$="color: [[section.color]]" hidden$="[[isMonitored]]" disabled>monitor <iron-icon style$="color: [[section.color]]" icon="icons:visibility"></iron-icon></paper-button> -->
                 </div>
             </paper-material>
             <div class="columns">
@@ -246,6 +281,10 @@
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
                     <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
+                    <div hidden$="{{!probeData}}"> Probe Data: 
+                        <span class$="probe-data {{itemProbeClasses(machine, model.probes)}}"> </span>
+                        <span hidden$="{{!probeData}}"> {{probeData}} </span>
+                    </div>
                 </paper-material>
                 <paper-material id="rightcolumn" class="right" hidden$="[[hideAssociatedKeys]]">
                     <h3 class="smallcaps">Associated Keys:</h3>
@@ -269,14 +308,14 @@
                 </paper-material>
             </div>
             <!--<paper-material class="info-card" hidden$="{{!isMonitored}}">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
+                <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
                 <div>
                     <paper-material>graph data</paper-material>
                      <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                 </div>
             </paper-material>-->
             <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
+                <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
                 <div class="card-content">
                     <table class="info-table">
                         <template is="dom-if" if="[[machine.public_ips]]">
@@ -305,7 +344,7 @@
                 </div>
             </paper-material>
             <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">More Info</h2>
+                <h2 style$="color:#fff;background-color: [[section.color]];">More Info</h2>
                 <div class="card-content">
                     <element-for-in content="[[machine.extra]]"></element-for-in>
                 </div>
@@ -394,7 +433,13 @@ MACHINEACTIONS = {
     'icon': 'delete',
     'confirm': true,
     'multi': true
-  }
+  },
+  'probe': {
+    'name': 'probe',
+    'icon': 'icons:compare-arrows',
+    'confirm': false,
+    'multi': true
+  },
 }
     Polymer({
         is: 'machine-page',
@@ -477,6 +522,11 @@ MACHINEACTIONS = {
             actions: {
                 type: Array,
                 computed: '_computeActions(machine)'
+            },
+            probeData: {
+                type: String,
+                computed: '_computeProbeData(machine, model.probes.*)',
+                value: false
             }
         },
         observers: [
@@ -528,6 +578,7 @@ MACHINEACTIONS = {
               // if not monitoring then enable monitoring
               ret.push('shell');
               ret.push('associate-key');
+              ret.push('probe');
               if(this.hideAssociatedKeys)
                 ret.push('run-script');
             }
@@ -648,25 +699,6 @@ MACHINEACTIONS = {
                 this.isMonitored = false;
             }
         },
-        _getColor: function() {
-            return this.section && this.section.color ? this.section.color : '';
-        },
-        addKey: function(_, params) {
-            console.log("clicked addKey");
-        },
-        rename: function(_, params) {
-            console.log("clicked rename");
-        },
-
-        _getHeaderStyle: function(color) {
-            return 'background-color: ' + color + '; color: #fff;';
-        },
-        toggle: function() {
-            this.$.collapse.toggle();
-        },
-        togglefull: function() {
-            this.$.collapsefull.toggle();
-        },
         _machineImage: function(id) {
             var image = this.model.imagesArray.find(function(image) {
                 return image.id == id;
@@ -675,17 +707,6 @@ MACHINEACTIONS = {
                 return image.name;
             else
                 return "";
-        },
-        _editTags: function() {
-            var el = this.querySelector('tags-list'),
-            items = [];
-            items.push(itemUid(this.machine, this.sections['machines']));
-            el.items = items;
-            el._openDialog();
-        },
-        _editMachine: function(e) {
-            var el = this.querySelector('machine-edit');
-            el._openEditMachineModal();
         },    
         _computeReplaceTargets: function(machine) {
             var ret = {'bucky.': ''};
@@ -778,16 +799,67 @@ MACHINEACTIONS = {
             }
         },
         _feedbackOnRename: function(e){
-        console.log("_feedbackOnRename")
-        if (e.detail.request) {
-            this._showToast('Rename request sent. Waiting for machine to respond');
+            console.log("_feedbackOnRename")
+            if (e.detail.request) {
+                this._showToast('Rename request sent. Waiting for machine to respond');
+            }
+            if (e.detail.response) {
+                this._showToast('Renaming was successful.');
+            }
+            if (e.detail.error) {
+                this._showToast(e.detail.errormsg);
+            }
+        },
+        _computeProbeData: function(machine, probes){
+            if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid].loadavg.length)
+                return this.model.probes[machine.uuid].loadavg[0]+", "+this.model.probes[machine.uuid].loadavg[1]+", "+this.model.probes[machine.uuid].loadavg[2]+" - "+this.model.probes[machine.uuid].cores+" cores. Last probe: "+moment(this.model.probes[machine.uuid].timestamp*1000).fromNow();
+        },
+        itemProbeClasses: function(item, probes) {
+            if (!probes) {
+                console.log('1')
+                return false;
+            }
+            else {
+
+                if (!this.model || !this.model.probes || !this.model.probes[item.uuid] || !this.model.probes[item.uuid].loadavg) {
+                    return false;
+                    console.log('2')
+                }
+
+                else {
+                    var probe = this.model.probes[item.uuid].loadavg;
+                    var classes = "";
+
+                    //short
+                    if (parseInt(probe[0]*100) < 30)
+                        classes += "shortlow ";
+                    else if (parseInt(probe[0]*100) > 30 && parseInt(probe[0]*100) < 60)
+                        classes += "shortmedium ";
+                    else
+                        classes += "shorthigh ";
+                    //mid
+                    if (parseInt(probe[1]*100) < 30)
+                        classes += "midlow ";
+                    else if (parseInt(probe[1]*100) > 30 && parseInt(probe[1]*100) < 60)
+                        classes += "midmedium ";
+                    else
+                        classes += "midhigh ";
+                    //long
+                    if (parseInt(probe[2]*100) < 30)
+                        classes += "longlow ";
+                    else if (parseInt(probe[2]*100) > 30 && parseInt(probe[2]*100) < 60)
+                        classes += "longmedium ";
+                    else
+                        classes += "longhigh ";
+
+                    //has probe data
+                    if (classes != "")
+                        classes += "hasprobe "
+
+                    return classes;
+                }
+            }
+
         }
-        if (e.detail.response) {
-            this._showToast('Renaming was successful.');
-        }
-        if (e.detail.error) {
-            this._showToast(e.detail.errormsg);
-        }
-    },
     });
 </script>
