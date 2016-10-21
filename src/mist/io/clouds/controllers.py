@@ -427,7 +427,7 @@ class AzureController(BaseController):
                                      ex_cloud_service_name=cloud_service)
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
-        super(AzureArmController, self)._list_machines__machine_actions(
+        super(AzureController, self)._list_machines__machine_actions(
               machine, machine_libcloud)
         if machine_libcloud.state is NodeState.PAUSED:
             machine.actions.start = True
