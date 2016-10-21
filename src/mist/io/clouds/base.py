@@ -325,7 +325,16 @@ class BaseController(object):
                 raise
 
     def update_validate(self, fail_on_error=True, **kwargs):
-        # TODO docstring
+        """Edit a pre-exist Cloud from the database
+
+        Params:
+        fail_on_error: If True, then a connection to the cloud will be
+            established and if it fails, a `CloudUnavailableError` or
+            `CloudUnauthorizedError` will be raised and the edit cloud will
+            failed.
+
+        Subclasses SHOULD NOT override or extend this method.
+        """
         # Set fields to cloud model and attempt to save.
         if 'title' in kwargs.keys():
             self.cloud.title = kwargs.pop('title')
