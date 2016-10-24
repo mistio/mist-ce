@@ -157,14 +157,7 @@
         <content></content>
         <template is="dom-repeat" items="{{fields}}" as="field">
           <a href="[[uri]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false">
-            <template is="dom-if" if="{{!itemMonitoredClass(item, field)}}">
-                <div class$="[[field]] field field[[index]] {{itemField(item, field)}} {{itemProbeClasses(item, field)}}">{{itemField(item, field)}}</div>    
-            </template>
-            <template is="dom-if" if="{{itemMonitoredClass(item, field)}}">
-                <div class$="[[field]] field field[[index]] {{itemField(item, field)}} {{itemProbeClasses(item, field)}} {{itemMonitoredClass(item, field)}}"> 
-                <iron-icon icon="icons:visibility"></iron-icon> 
-                {{itemField(item, field)}}</div>    
-            </template>
+            <div class$="[[field]] field field[[index]] {{itemField(item, field)}} {{itemProbeClasses(item, field)}}">{{itemField(item, field)}}</div>
           </a>
         </template>
         <div class="field tags" hidden$="[[!item.tags.length]]">
@@ -412,26 +405,6 @@ Polymer({
 
     _firstItem: function (index) {
         return !index;
-    },
-
-    itemMonitoredClass: function(item, field){
-        if (field != 'state') {
-            console.log('itemMonitoredClass', field)
-            return false;
-        }
-        else {
-            var model = document.querySelector('mist-app').model;
-            console.log('itemMonitoredClass', model);
-
-            if (!model || !model.monitoring || !model.monitoring.monitored_machines || !model.monitoring.monitored_machines[item.uuid]) {
-                console.log('itemMonitoredClass FALSE', model.monitoring.monitored_machines, item.uuid, model.monitoring.monitored_machines[item.uuid] )
-                return false;
-            }
-            else {
-                console.log('itemMonitoredClass MONITORED', model.monitoring.monitored_machines[item.uuid])
-                return "monitored";
-            }
-        }
     },
 
     itemProbeClasses: function(item, field) {

@@ -228,12 +228,21 @@
         .field.desc #sortarrow {
             transform: rotate3d(0, 0, 1, 180deg);
         }
-        .has-incidents:after {
+        .monitoring:after {
             position: absolute;
             height: 200px;
             content: " ";
             left: 0;
             width: 8px;
+            background: var(--green-color);
+        }
+        .pending:after {            
+            background: #bbb;
+        }
+        .failed:after {            
+            background: var(--orange-color);
+        }
+        .has-incidents:after {            
             background: var(--red-color);
         }
         </style>
@@ -289,9 +298,7 @@
                 <div class="row" data-index$="[[index]]">
                     <list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]" uri$="[[_itemLink(item)]]">
                         <template is="dom-if" if="[[ismachines]]">
-                            <template is="dom-if" if="[[itemHasIncidents(item, incidents)]]">
-                                <span class="has-incidents"></span>
-                            </template>
+                            <span class$="[[itemMonitoringStatus(item, incidents, model.monitoring)]]"></span>
                         </template>
                         <template is="dom-if" if="[[!isimages]]">
                             <app-check id="check" allselected="{{allselected}}" selected$="{{isSelected(item, selectedItems.splices)}}" item="[[item]]" on-tap="_selectItem">
@@ -420,13 +427,49 @@ Polymer({
 
         this.vpHeight = 'height:65px;';
     },
-    itemHasIncidents: function(item, incidents){
-        if (this.incidents.length > 0 && this.incidents.indexOf(item.id) > -1) {
-            return true;
+    itemMonitoringStatus: function(item, incidents, monitoring){
+        var classes = "";
+        //nstallation_status
+//case
+        // manual:true
+        // started_at:1477334865
+        // state:"installing"
+
+//case
+        // error_msg :""
+        // finished_at:1477335451
+        // manual:false
+        // started_at:1477335136
+        // state:"succeeded"
+        // stdout:
+
+        // check if machine is monitored
+        if (!this.model.monitoring) {
+            return " ";
+        }
+        else if (this.model.monitoring && this.model.monitoring.monitored_machines && this.model.monitoring.monitored_machines[item.uuid]) {
+            console.log('itemMonitoringStatus',this.model.monitoring.monitored_machines[item.uuid])
+            classes += "monitoring ";
         }
         else {
-            return false;
+            return " ";
         }
+
+        //check state of monitoring 
+        if (this.model.monitoring.monitored_machines[item.uuid].installation_status == "installing" || !this.model.monitoring.monitored_machines[item.uuid].installation_status.activated_at) {
+            classes += "pending "
+        }
+
+        if (this.model.monitoring.monitored_machines[item.uuid].installation_status == "failed"){
+            classes += "failed "
+        }
+
+
+        if (this.incidents.length > 0 && this.incidents.indexOf(item.id) > -1) {            
+            classes += "has-incidents "
+        }
+
+        return classes;
     },
     attached: function() {
         // Re-render iron-list a few times in case the items don't change
@@ -469,7 +512,7 @@ Polymer({
 
         this.debounce('itemsChanged', function () {
             // If some selectedItems are no longer in the items list, unselect them
-            console.debug('itemsChanged');
+            // console.debug('itemsChanged');
             if (!that.selectedItems) {
                 // console.log('returning');
                 return;
