@@ -241,7 +241,7 @@ class BaseController(object):
             self._conn.disconnect()
             self._conn = None
 
-    def add(self, remove_on_error=True, fail_on_invalid_params=True, **kwargs):
+    def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
         """Add new Cloud to the database
 
         This is only expected to be called by `Cloud.add` classmethod to create
@@ -249,7 +249,7 @@ class BaseController(object):
         `self.cloud`. The `self.cloud` model is not yet saved.
 
         Params:
-        remove_on_error: If True, then a connection to the cloud will be
+        fail_on_error: If True, then a connection to the cloud will be
             established and if it fails, a `CloudUnavailableError` or
             `CloudUnauthorizedError` will be raised and the cloud will be
             deleted.
@@ -277,102 +277,13 @@ class BaseController(object):
                           self.cloud)
             raise InternalServerError(exc=exc)
 
-        # Basic param check.
-        errors = {}
-        # Check for invalid `kwargs` keys.
-        for key in kwargs.keys():
-            if key not in self.cloud._cloud_specific_fields:
-                error = "Invalid parameter %s=%r." % (key, kwargs[key])
-                if fail_on_invalid_params:
-                    errors[key] = error
-                else:
-                    log.warning(error)
-                    kwargs.pop(key)
-        # Check for missing required `kwargs` keys.
-        for key in self.cloud._cloud_specific_fields:
-            if self.cloud._fields[key].required and key not in kwargs:
-                errors[key] = "Required parameter missing '%s'." % key
-        if errors:
-            log.error("Error adding %s: %s", self.cloud, errors)
-            raise BadRequestError({
-                'msg': "Invalid parameters %s." % errors.keys(),
-                'errors': errors,
-            })
-        # TODO try except change msg
         try:
-            self.update_validate(fail_on_error=False, **kwargs)
-        except me.ValidationError as e:
-            log.error("Error adding %s: %s", self.cloud, e.to_dict())
-            raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
-
-        # Try to connect to cloud.
-        if remove_on_error:
-            try:
-                try:
-                    self.check_connection()
-                except (CloudUnavailableError, CloudUnauthorizedError) as exc:
-                    log.error("Removing cloud %s because "
-                              "we couldn't connect: %r", self.cloud, exc)
-                    raise
-                except Exception as exc:
-                    log.exception("Removing cloud %s because "
-                                  "we couldn't connect.", self.cloud)
-                    raise CloudUnavailableError(exc=exc)
-            except:
-                log.error("Failed to connect to cloud %s, will delete.",
-                          self.cloud)
-                self.cloud.delete()
-                raise
-
-    def update_validate(self, fail_on_error=True, **kwargs):
-        """Edit a pre-exist Cloud from the database
-
-        Params:
-        fail_on_error: If True, then a connection to the cloud will be
-            established and if it fails, a `CloudUnavailableError` or
-            `CloudUnauthorizedError` will be raised and the edit cloud will
-            failed.
-
-        Subclasses SHOULD NOT override or extend this method.
-        """
-        # Set fields to cloud model and attempt to save.
-        if 'title' in kwargs.keys():
-            self.cloud.title = kwargs.pop('title')
-        for key, value in kwargs.iteritems():
-            if key not in self.cloud._cloud_specific_fields:
-                log.error("Error editing %s", self.cloud)
-                raise BadRequestError("Invalid parameter %s=%r."
-                                      % (key, value))
-            setattr(self.cloud, key, value)
-
-        # Try to connect to cloud.
-        if fail_on_error:
-            try:
-                try:
-                    self.check_connection()
-                except (
-                CloudUnavailableError, CloudUnauthorizedError) as exc:
-                    log.error("Failed to edit cloud %s because "
-                              "we couldn't connect: %r", self.cloud, exc)
-                    raise
-                except Exception as exc:
-                    log.exception("Failed to edit cloud %s because "
-                                  "we couldn't connect.", self.cloud)
-                    raise CloudUnavailableError(exc=exc)
-            except:
-                log.error("Failed to connect to cloud %s, will not edit it.",
-                          self.cloud)
-                raise
-
-        try:
-            self.cloud.save()
-        except me.ValidationError as exc:
-            log.error("Error editing %s: %s", self.cloud, exc.to_dict())
-            raise BadRequestError({'msg': exc.message,
-                                   'errors': exc.to_dict()})
-        except me.NotUniqueError as exc:
-            log.error("Cloud %s not unique error: %s", self.cloud, exc)
-            raise CloudExistsError()
+            self.update(fail_on_error=fail_on_error,
+                        fail_on_invalid_params=fail_on_invalid_params,
+                        **kwargs)
+        except (CloudUnavailableError, CloudUnauthorizedError) as exc:
+            # TODO: remove any machines created from check conn list machines?
+            raise
 
     def _add__preparse_kwargs(self, kwargs):
         """Preparse keyword arguments to `self.add`
@@ -391,6 +302,120 @@ class BaseController(object):
 
         """
         return
+
+    def update(self, fail_on_error=True, fail_on_invalid_params=True,
+               **kwargs):
+        """Edit an existing Cloud
+
+        Params:
+        fail_on_error: If True, then a connection to the cloud will be
+            established and if it fails, a `CloudUnavailableError` or
+            `CloudUnauthorizedError` will be raised and the cloud changes will
+            not be saved.
+        fail_on_invalid_params: If True, then invalid keys in `kwargs` will
+            raise an Error.
+
+        Subclasses SHOULD NOT override or extend this method.
+
+        If a subclass has to perform special parsing of `kwargs`, it can
+        override `self._update__preparse_kwargs`.
+
+        """
+        # Transform params with extra underscores for compatibility.
+        rename_kwargs(kwargs, 'api_key', 'apikey')
+        rename_kwargs(kwargs, 'api_secret', 'apisecret')
+
+        # Cloud specific kwargs preparsing.
+        try:
+            self._update__preparse_kwargs(kwargs)
+        except MistError as exc:
+            log.error("Error while updating cloud %s: %r", self.cloud, exc)
+            raise
+        except Exception as exc:
+            log.exception("Error while preparsing kwargs on update %s",
+                          self.cloud)
+            raise InternalServerError(exc=exc)
+
+        # Check for invalid `kwargs` keys.
+        errors = {}
+        for key in kwargs.keys():
+            if key not in self.cloud._cloud_specific_fields:
+                error = "Invalid parameter %s=%r." % (key, kwargs[key])
+                if fail_on_invalid_params:
+                    errors[key] = error
+                else:
+                    log.warning(error)
+                    kwargs.pop(key)
+        if errors:
+            log.error("Error adding %s: %s", self.cloud, errors)
+            raise BadRequestError({
+                'msg': "Invalid parameters %s." % errors.keys(),
+                'errors': errors,
+            })
+
+        # Set fields to cloud model and perform early validation.
+        for key, value in kwargs.iteritems():
+            setattr(self.cloud, key, value)
+        try:
+            self.cloud.clean()  # FIXME: validate? clean_all?
+        except me.ValidationError as exc:
+            log.error("Error updating %s: %s", self.cloud, exc.to_dict())
+            raise BadRequestError({'msg': exc.message,
+                                   'errors': exc.to_dict()})
+
+        # Try to connect to cloud.
+        if fail_on_error:
+            try:
+                self.check_connection()
+            except (CloudUnavailableError, CloudUnauthorizedError) as exc:
+                log.error("Will not update cloud %s because "
+                          "we couldn't connect: %r", self.cloud, exc)
+                raise
+            except Exception as exc:
+                log.exception("Will not update cloud %s because "
+                              "we couldn't connect.", self.cloud)
+                raise CloudUnavailableError(exc=exc)
+
+        # Attempt to save.
+        try:
+            self.cloud.save()
+        except me.ValidationError as exc:
+            log.error("Error updating %s: %s", self.cloud, exc.to_dict())
+            raise BadRequestError({'msg': exc.message,
+                                   'errors': exc.to_dict()})
+        except me.NotUniqueError as exc:
+            log.error("Cloud %s not unique error: %s", self.cloud, exc)
+            raise CloudExistsError()
+
+    def _update__preparse_kwargs(self, kwargs):
+        """Preparse keyword arguments to `self.update`
+
+        This is called by `self.update` when updating a cloud and it is also
+        indirectly called during `self.add`, in order to apply preprocessing to
+        the given params. Any subclass that requires any special preprocessing
+        of the params passed to `self.update`, SHOULD override this method.
+
+        Params:
+        kwargs: A dict of the keyword arguments that will be set as attributes
+            to the `Cloud` model instance stored in `self.cloud`. This method
+            is expected to modify `kwargs` in place.
+
+        Subclasses MAY override this method.
+
+        """
+        return
+
+    def rename(self, title):
+        self.cloud.title = title
+        self.cloud.save()
+
+    def enable(self):
+        self.cloud.enabled = True
+        self.cloud.save()
+
+    def disable(self):
+        self.cloud.enabled = False
+        self.cloud.save()
 
     def list_machines(self):
         """Return list of machines for cloud

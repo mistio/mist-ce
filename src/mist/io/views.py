@@ -396,7 +396,7 @@ def edit_cloud(request):
     fail_on_error = params.pop('fail_on_error', True)
 
     # Edit the cloud
-    cloud.ctl.update_validate(fail_on_error=fail_on_error, **creds)
+    cloud.ctl.update(fail_on_error=fail_on_error, **creds)
 
     log.info("Cloud with id '%s' edited successfully.", cloud.id)
     trigger_session_update(auth_context.owner, ['clouds'])
@@ -428,18 +428,17 @@ def toggle_cloud(request):
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
-    params = params_from_request(request)
-    new_state = params.get('new_state', '')
-    if not new_state:
-        raise RequiredParameterMissingError('new_state')
-
-    if new_state != "1" and new_state != "0":
-        raise BadRequestError('Invalid cloud state')
-
     auth_context.check_perm('cloud', 'edit', cloud_id)
 
-    cloud.enabled=bool(int(new_state))
-    cloud.save()
+    new_state = params_from_request(request).get('new_state')
+    if new_state == '1':
+        cloud.ctl.enable()
+    elif new_state == '0':
+        cloud.ctl.disable()
+    elif new_state:
+        raise BadRequestError('Invalid cloud state')
+    else:
+        raise RequiredParameterMissingError('new_state')
     trigger_session_update(auth_context.owner, ['clouds'])
     return OK
 
