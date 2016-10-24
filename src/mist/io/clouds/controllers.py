@@ -107,6 +107,12 @@ class AmazonController(BaseController):
         machine.os_type = machine_libcloud.extra.get('platform', 'linux')
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
+        # TODO: stopped instances still charge for the EBS device
+        # https://aws.amazon.com/ebs/pricing/
+        # Need to add this cost for all instances
+        if machine_libcloud.state == NodeState.STOPPED:
+            return 0, 0
+
         image_id = machine_libcloud.extra.get('image_id')
         try:
             # FIXME: This is here to avoid circular imports.
