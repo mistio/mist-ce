@@ -40,6 +40,10 @@
             }
         },
 
+        observers: [
+            "_updateIsOverusing(model.user, model.machinesArray)"
+        ],
+
         ready: function() {
             // Create the socket if it does not exist
             console.warn('ready');
@@ -600,6 +604,12 @@
 
         _updateTags: function(data) {
             console.warn('_updateTags not implemented. Got data', data);
+        },
+
+        _updateIsOverusing: function(user, machines){
+            console.log('_updateIsOverusing', user, machines);
+            if (user && machines)
+                this.set('model.isOverUsing', !user.current_plan.title && machines.length > 5);
         },
 
         _probe: function(data) {

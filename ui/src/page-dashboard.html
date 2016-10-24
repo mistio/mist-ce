@@ -256,7 +256,7 @@
                 <a href="javascript:void(0)" on-tap="_toggleUI" class="flex">Return to old UI</a>
                 </p>
             </div>
-            <plan-overusage machines="[[model.machinesArray]]" org="[[model.org]]" user=[[model.user]]></plan-overusage>
+            <plan-overusage is-over-using="[[model.isOverUsing]]"></plan-overusage>
             <template is="dom-if" if="[[showDashboard]]">
                 <div class="clouds top flexchild-wide-top">
                     <div id="cloudslist" class="flex">
@@ -380,7 +380,8 @@ Polymer({
         },
         matrix: {
             type: Array
-        }
+        },
+        isOverUsing: Boolean
     },
     observers: [
         'cloudLayoutMatrix(model.clouds.*, sidebarIsOpen)'

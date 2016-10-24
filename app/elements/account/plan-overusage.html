@@ -15,9 +15,8 @@
                 position: relative;
             }
         </style>
-        <div class="notice" hidden$="{{!isOverUsing}}">
+        <div class="notice" hidden$="[[!isOverUsing]]">
             <p><strong>Attention:</strong> You have exceed the limits of the free plan! The free plan includes unlimited clouds and up to 5 machines with monitoring for one of them. To continue using Mist.io <a href="/my-account/?plans=true">upgrade your plan.</a> 
-            <!-- <a href="javascript:void(0)" on-tap="_toggleUI">upgrade your plan.</a> -->
             </p>
         </div>
     </template>
@@ -26,27 +25,9 @@
         is: 'plan-overusage',
 
         properties: {
-            machines: {
-                type: Array,
-                notify: true
-            },
-            org: {
-                type: Object,
-                notify: true,
-            },
-            user:  {
-                type: Object,
-                notify: true,
-            },
             isOverUsing: {
-                type: Boolean,
-                computed: "_computeIsOverUsing(machines.*, machines.length, user.*)",
-                notify: true,
-                value: false
+                type: Boolean
             }
-        },
-        _computeIsOverUsing: function(machines, length, user){
-            return !this.user.current_plan.title && this.machines.length > 5;
         },
         _toggleUI: function() {
             window.location.href = '/toggle-ui/legacy';
