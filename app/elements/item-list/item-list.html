@@ -237,7 +237,13 @@
             background: var(--green-color);
         }
         .pending:after {            
-            background: #bbb;
+            background:  repeating-linear-gradient(
+              -45deg,
+              #ddd,
+              #ddd 2px,
+              #eee 2px,
+              #eee 4px
+            );
         }
         .failed:after {            
             background: var(--orange-color);
