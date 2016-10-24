@@ -33,10 +33,16 @@
             }
         </style>
         <div class="plan">
-            <h2>[[plan.title]]</h2>
+            <h2>[[plan.title]]
+                <span hidden$="[[plan.title]]">Free</span>
+            </h2>
             <hr>
-            <p>[[priceText]]</p>
-            <p>[[descriptionText]]</p>
+            <p>[[priceText]]
+                <span hidden$="[[plan.title]]">$0 forever</span>
+            </p>
+            <p>[[descriptionText]]
+            <span hidden$="[[descriptionText]]">Up to 5 machines. <br/> Monitoring for one of them.</span>
+            </p>
             <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
             <p hidden$="[[!plan.expiration]]">expires on [[_computeReadableDate(plan.expiration)]]</p>
             <template is="dom-if" if="[[!iscurrent]]">
@@ -77,13 +83,13 @@
                     discountedPriceText: {
                         type: String,
                         computed: '_computeDiscountedPriceText(plan.promo)'
-                    },
+                    }
                 },
                 _computePriceText: function(price) {
                     return price != null ? '$' + price + '/month' : '';
                 },
                 _computeDescriptionText: function(description, machineLimit) {
-                    return description ? description : machineLimit + ' monitored servers';
+                    return description != null && description ? description : machineLimit + ' monitored servers';
                 },
                 _computeDiscountedPriceText: function(promo) {
                     if (promo) {
@@ -93,10 +99,7 @@
                     return '';
                 },
                 _computeReadableDate: function(date) {
-                    if (date) {
-                        return moment(date * 1000).format("MMMM Do YYYY");
-                    }
-                    return '';
+                    return date ? moment(date * 1000).format("MMMM Do YYYY") : date;
                 },
                 _selectPlan: function(e) {
                     console.log(this.plan);
