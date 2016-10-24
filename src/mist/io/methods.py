@@ -1336,7 +1336,6 @@ def destroy_machine(user, cloud_id, machine_id):
     After destroying a machine it also deletes all key associations. However,
     it doesn't undeploy the keypair. There is no need to do it because the
     machine will be destroyed.
-
     """
 
     log.info('Destroying machine %s in cloud %s' % (machine_id, cloud_id))
@@ -1363,18 +1362,20 @@ def destroy_machine(user, cloud_id, machine_id):
             log.warning("Didn't manage to disable monitoring, maybe the "
                         "machine never had monitoring enabled. Error: %r", exc)
 
-    # delete cronjobs for this machine or remove it from cron.machines_per_cloud
+    machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+    # delete cronjobs for this machine or
+    # remove it from cron.machines and cron.args
     crons = UserPeriodicTask.objects(owner=user)
     for cron in crons:
-        if [cloud_id, machine_id] in cron.machines_per_cloud:
-            if len(cron.machines_per_cloud) > 1:
-                cron.machines_per_cloud.remove([cloud_id, machine_id])
+        if machine in cron.machines:
+            if len(cron.machines) > 1:
+                cron.machines.remove(machine)
+                if [cloud_id, machine_id] in cron.args[3]:
+                    cron.args[3].remove([cloud_id, machine_id])
                 cron.save()
             else:
                 cron.delete()
 
-    # we don't have to disassociate keys because
-    machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
     machine.ctl.destroy()
 
 
@@ -2302,9 +2303,16 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
     body = message + '\n' if message else ''
     if 'cloud_id' in kwargs:
         cloud_id = kwargs['cloud_id']
-        cloud = Cloud.objects.get(owner=user, id=cloud_id)
-        body += "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title,
-                                                      cloud_id)
+        body += "Cloud:\n"
+        try:
+            cloud = Cloud.objects.get(owner=user, id=cloud_id)
+            cloud_title = cloud.title
+        except DoesNotExist:
+            cloud_title = ''
+            cloud = ''
+        if cloud_title:
+            body += "  Name: %s\n" % cloud_title
+        body += "  Id: %s\n" % cloud_id
         if 'machine_id' in kwargs:
             machine_id = kwargs['machine_id']
             body += "Machine:\n"
@@ -2313,8 +2321,9 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
             else:
                 try:
                     name = Machine.objects.get(cloud=cloud,
-                                               machine_id=machine_id).name
-                except MachineNotFoundError:
+                                               machine_id=machine_id,
+                                               state__ne='terminated').name
+                except DoesNotExist:
                     name = ''
             if name:
                 body += "  Name: %s\n" % name
