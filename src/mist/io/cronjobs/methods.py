@@ -57,7 +57,9 @@ def add_cronjob_entry(auth_context, params):
         # SEC require permission RUN on script
         auth_context.check_perm('script', 'run', script_id)
 
-    machines = params.get('machines')
+    machines = params.get('machines', '')
+    if not machines:
+        raise BadRequestError("You must provide a list of machine ids")
     cloud_machines_pairs = []
     sched_machines_obj = []
     for machine_uuid in machines:
