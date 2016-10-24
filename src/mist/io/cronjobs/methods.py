@@ -2,6 +2,7 @@ import json
 import datetime
 import mongoengine as me
 from celery.schedules import crontab_parser
+from mist.io.helpers import trigger_session_update
 
 from mist.core.cloud.models import Machine
 from mist.core.script.models import Script
@@ -56,20 +57,19 @@ def add_cronjob_entry(auth_context, params):
         # SEC require permission RUN on script
         auth_context.check_perm('script', 'run', script_id)
 
-    machines_per_cloud = params.get('machines_per_cloud')
-    for pair in machines_per_cloud:
-        cloud_id = pair[0]
-        machine_id = pair[1]
+    machines = params.get('machines')
+    cloud_machines_pairs = []
+    sched_machines_obj = []
+    for machine_uuid in machines:
+        try:
+            machine = Machine.objects.get(id=machine_uuid,
+                                          state__ne='terminated')
+        except me.DoesNotExist:
+            raise NotFoundError('Machine with that machine id does not exist')
 
+        cloud_id = machine.cloud.id
         # SEC require permission READ on cloud
         auth_context.check_perm("cloud", "read", cloud_id)
-        try:
-            machine = Machine.objects.get(
-                      cloud=cloud_id, machine_id=machine_id
-            )
-            machine_uuid = machine.id
-        except me.DoesNotExist:
-            raise NotFoundError('Machine with that machine_id does not exist')
 
         if action:
             # SEC require permission ACTION on machine
@@ -77,6 +77,9 @@ def add_cronjob_entry(auth_context, params):
         else:
             # SEC require permission RUN_SCRIPT on machine
             auth_context.check_perm("machine", "run_script", machine_uuid)
+        pair = (cloud_id, machine.machine_id)
+        cloud_machines_pairs.append(pair)
+        sched_machines_obj.append(machine)
 
     pt_args = {k: v for k, v in params.items()
                if k in UserPeriodicTask.api_fields}
@@ -84,19 +87,20 @@ def add_cronjob_entry(auth_context, params):
         'owner': owner,
         'kwargs': {},
     })
+    pt_args['machines'] = sched_machines_obj
 
     if params.get('action'):
         pt_args.update({
             'task': 'mist.core.tasks.group_machines_actions',
             'args': [owner.id, params.get('action'),
                      params.get('name'),
-                     params.get('machines_per_cloud')],
+                     cloud_machines_pairs],
         })
     else:
         pt_args.update({
             'task': 'mist.core.tasks.group_run_script',
             'args': [owner.id, script_id, params.get('name'),
-                     params.get('machines_per_cloud')],
+                     cloud_machines_pairs],
         })
 
     cronjob_type = params.get('cronjob_type')
@@ -105,9 +109,12 @@ def add_cronjob_entry(auth_context, params):
                               '(crontab, interval, one_off)]')
 
     if cronjob_type == 'crontab' or cronjob_type == 'interval':
-        future_date = params.get('expires')
+        future_date = params.get('expires', '')
     elif cronjob_type == 'one_off':
-        future_date = params.get('cronjob_entry')
+        future_date = params.get('cronjob_entry', '')
+        if not future_date:
+            raise BadRequestError('one_off cronjob requires date '
+                                  'given in cronjob_entry')
 
     if future_date:
         try:
@@ -153,7 +160,9 @@ def add_cronjob_entry(auth_context, params):
         raise CronjobNameExistsError()
     except me.OperationError:
         raise CronjobOperationError()
-    return ptask
+
+    trigger_session_update(owner, ['cronjobs'])
+    return ptask.id
 
 
 def edit_cronjob_entry(auth_context, cronjob_id, params):
@@ -168,7 +177,7 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
     script_id = params.get('script_id', '')
     action = params.get('action', '')
 
-    if action not in ['', 'reboot', 'destroy', 'start', 'shutdown']:
+    if action not in ['', 'reboot', 'destroy', 'start', 'stop']:
         raise BadRequestError("Action is not correct")
 
     if script_id:
@@ -180,20 +189,18 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
         # SEC require permission RUN on script
         auth_context.check_perm('script', 'run', script_id)
 
-    machines_per_cloud = params.get('machines_per_cloud')
-    for pair in machines_per_cloud:
-        cloud_id = pair[0]
-        machine_id = pair[1]
+    machines = params.get('machines')
+    cloud_machines_pairs = []
+    sched_machines_obj = []
+    for machine_uuid in machines:
+        try:
+            machine = Machine.objects.get(id=machine_uuid)
+        except me.DoesNotExist:
+            raise NotFoundError('Machine with that machine id does not exist')
 
+        cloud_id = machine.cloud.id
         # SEC require permission READ on cloud
         auth_context.check_perm("cloud", "read", cloud_id)
-        try:
-            machine = Machine.objects.get(
-                cloud=cloud_id, machine_id=machine_id
-            )
-            machine_uuid = machine.id
-        except me.DoesNotExist:
-            raise NotFoundError('Machine with that machine_id does not exist')
 
         if action:
             # SEC require permission ACTION on machine
@@ -201,6 +208,9 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
         else:
             # SEC require permission RUN_SCRIPT on machine
             auth_context.check_perm("machine", "run_script", machine_uuid)
+        pair = (cloud_id, machine.machine_id)
+        cloud_machines_pairs.append(pair)
+        sched_machines_obj.append(machine)
 
     # check what the user previous has, script or action
     if ptask.script_id and params.get('action'):
@@ -210,6 +220,9 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
 
     pt_args = {k: v for k, v in params.items()
                if k in UserPeriodicTask.api_fields}
+
+    if machines:
+        pt_args['machines'] = sched_machines_obj
 
     name = params.get('name')
     if name is not None and name != '':
@@ -235,6 +248,9 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
         future_date = params.get('expires')
     elif cronjob_type == 'one_off':
         future_date = params.get('cronjob_entry')
+        if not future_date:
+            raise BadRequestError('one_off cronjob requires date '
+                                  'given in cronjob_entry')
 
     if future_date:
         try:
@@ -248,18 +264,16 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
                                   ' contact Marty McFly')
 
     name = params.get('name') or ptask.name
-    if params.get('action') and params.get('machines_per_cloud'):
+    if params.get('action') and params.get('machines'):
         pt_args.update({'args': [owner.id, params.get('action', ptask.action),
                                  name,
-                                 params.get('machines_per_cloud',
-                                            ptask.machines_per_cloud)]})
+                                 cloud_machines_pairs]})
 
-    if params.get('script_id') and params.get('machines_per_cloud'):
+    if params.get('script_id') and params.get('machines'):
         pt_args.update({'args': [owner.id,
                                  params.get('script_id', ptask.script_id),
                                  name,
-                                 params.get('machines_per_cloud',
-                                            ptask.machines_per_cloud)]}
+                                 cloud_machines_pairs]}
                        )
 
     if cronjob_type == 'crontab':
@@ -292,4 +306,5 @@ def edit_cronjob_entry(auth_context, cronjob_id, params):
     except me.ValidationError as e:
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
 
-    return ptask
+    trigger_session_update(owner, ['cronjobs'])
+    return ptask.id
