@@ -5,6 +5,7 @@ import mongoengine as me
 import mist.core.tag.models
 from mist.core.user.models import Owner
 from celerybeatmongo.models import PeriodicTask
+from mist.core.cloud.models import Machine
 
 
 class UserPeriodicTask(PeriodicTask):
@@ -24,12 +25,13 @@ class UserPeriodicTask(PeriodicTask):
 
     """
 
-    # TODO change the __unicode__ return what user give for data input
-
+    # These exist here for return response class to the user
+    # so he can see his cronjob,
+    # ex. interval {'period': 'bla', every: 'bla'}
     class UserInterval(PeriodicTask.Interval):
         def __unicode__(self):
             return str(dict((k, getattr(self, k)) for k, v
-                            in self._fields.iteritems()))
+                            in self._fields.iteritems() if k is not '_cls'))
 
     class UserCrontab(PeriodicTask.Crontab):
         def __unicode__(self):
@@ -38,10 +40,8 @@ class UserPeriodicTask(PeriodicTask):
 
     interval = me.EmbeddedDocumentField(UserInterval)
     crontab = me.EmbeddedDocumentField(UserCrontab)
-    # use cloud_id as key
-    machines_per_cloud = me.ListField(me.ListField(me.StringField(
-                         required=True), required=True), required=True
-    )
+
+    machines = me.ListField(me.ReferenceField(Machine, required=True))
 
     id = me.StringField(primary_key=True,
                         default=lambda: uuid4().hex)
@@ -61,21 +61,9 @@ class UserPeriodicTask(PeriodicTask):
     last_run_at = me.DateTimeField()
     total_run_count = me.IntField(min_value=0)
 
-    excluded_fields = ['task', 'args', 'kwargs', '_cls', 'queue', 'exchange',
-                       'routing_key', 'date_changed', 'total_run_count',
-                       'last_run_at']
-    api_fields = ['name', 'script_id', 'action', 'machines_per_cloud',
+    # i use these in cronjobs.methods
+    api_fields = ['name', 'script_id', 'action', 'machines',
                   'enabled', 'expires', 'description', 'run_immediately']
-
-    def __json__(self, request):
-        """this is a search for pyramid
-           Returns only the fields that refer to our api"""
-        return dict((k, getattr(self, k)) for k in self._fields.keys() if
-                    k not in self.excluded_fields)
-
-    def clean(self):
-        """Validation to ensure that user gives future date"""
-        super(UserPeriodicTask, self).clean()
 
     def update_validate(self, value_dict):
         for key in value_dict:
@@ -89,13 +77,14 @@ class UserPeriodicTask(PeriodicTask):
 
     def as_dict(self):
         # Return a dict as it will be returned to the API
+        machines = [machine.id for machine in self.machines]
         return {
             'id': self.id,
             'cron_name': self.name,
             'description': self.description or '',
-            'interval': self.interval,
-            'crontab': self.crontab,
-            'cloud_machine_pairs': self.machines_per_cloud,
+            'interval': self.interval.__unicode__() if self.interval else '',
+            'crontab': self.crontab.__unicode__() if self.crontab else '',
+            'machines': machines,
             'script_id': self.script_id or '',
             'action': self.action or '',
             'expires': str(self.expires or ''),
