@@ -528,7 +528,7 @@ EC2_IMAGES = {
         'ami-0f510a6c': 'SUSE Linux Enterprise Server 12 SP 1 (HVM), SSD Volume Type',
         'ami-8ea3fbed': 'SUSE Linux Enterprise Server 11 SP4 (PV), SSD Volume Type',
         'ami-ba3e14d9': 'Ubuntu Server 14.04 LTS (HVM), SSD Volume Type',
-        'ami-ba3e14d9': 'Ubuntu Server 16.04 LTS (HVM), SSD Volume Type - ami-623c0d01',
+        'ami-623c0d01': 'Ubuntu Server 16.04 LTS (HVM), SSD Volume Type',
         'ami-e8e4ce8b': 'CoreOS stable 1068.8.0 (HVM)',
         'ami-ede4ce8e': 'CoreOS stable 1068.8.0 (PV)',
     },
