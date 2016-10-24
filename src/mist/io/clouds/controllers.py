@@ -919,19 +919,12 @@ class LibvirtController(BaseController):
                           self.cloud.host,  # hypervisor id is the hostname
                           username=self.cloud.username, port=self.cloud.port)
 
-    def update(self, fail_on_error=False, **kwargs):
-        # if edit_key
-        key = kwargs.get('key')
-        super(LibvirtController, self).update(
-            fail_on_error=fail_on_error, **kwargs
-        )
-
-        if self.cloud.key is not None and self.cloud.key == key:
-            # FIXME
-            from mist.io.methods import associate_key
-            associate_key(self.cloud.owner, self.cloud.key.id, self.cloud.id,
-                          self.cloud.host,  # hypervisor id is the hostname
-                          username=self.cloud.username, port=self.cloud.port)
+    def update(self, fail_on_error=True, fail_on_invalid_params=True,
+               **kwargs):
+        # FIXME: Add update support, need to clean up kvm 'host' from libcloud,
+        # and especially stop using cloud.host as the machine id ffs.
+        raise BadRequestError("Update action is not currently support for "
+                              "Libvirt/KVM clouds.")
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(LibvirtController, self)._list_machines__machine_actions(
@@ -1049,23 +1042,12 @@ class OtherController(BaseController):
                     self.cloud.delete()
                 raise
 
-    def update(self, fail_on_error=True, **kwargs):
-        # TODO add docstring, user can only edit title
-        if 'title' in kwargs.keys():
-            self.cloud.title = kwargs.pop('title')
-        if kwargs:
-            log.error("Error editing %s", self.cloud)
-            raise BadRequestError("Invalid parameters %s." % kwargs)
-
-        try:
-            self.cloud.save()
-        except me.ValidationError as exc:
-            log.error("Error editing %s: %s", self.cloud, exc.to_dict())
-            raise BadRequestError({'msg': exc.message,
-                                   'errors': exc.to_dict()})
-        except me.NotUniqueError as exc:
-            log.error("Cloud %s not unique error: %s", self.cloud, exc)
-            raise CloudExistsError()
+    def update(self, fail_on_error=True, fail_on_invalid_params=True,
+               **kwargs):
+        raise BadRequestError("OtherServer clouds don't support `update`. "
+                              "Only title can be changed, using `rename`. "
+                              "To change machine details, one must edit the "
+                              "machines themselves, not the cloud.")
 
     def add_machine_wrapper(self, name, fail_on_error=True,
                             fail_on_invalid_params=True, **kwargs):

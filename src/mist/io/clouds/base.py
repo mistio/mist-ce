@@ -282,7 +282,14 @@ class BaseController(object):
                         fail_on_invalid_params=fail_on_invalid_params,
                         **kwargs)
         except (CloudUnavailableError, CloudUnauthorizedError) as exc:
-            # TODO: remove any machines created from check conn list machines?
+            # FIXME: Move this to top of the file once Machine model is
+            # migrated.  The import statement is currently here to avoid
+            # circular import issues.
+            from mist.core.cloud.models import Machine
+            # Remove any machines created from check_connection performing a
+            # list_machines.
+            Machine.objects(cloud=self.cloud, owner=self.cloud.owner).delete()
+            # Propagate original error.
             raise
 
     def _add__preparse_kwargs(self, kwargs):
@@ -357,7 +364,7 @@ class BaseController(object):
         for key, value in kwargs.iteritems():
             setattr(self.cloud, key, value)
         try:
-            self.cloud.clean()  # FIXME: validate? clean_all?
+            self.cloud.validate(clean=True)
         except me.ValidationError as exc:
             log.error("Error updating %s: %s", self.cloud, exc.to_dict())
             raise BadRequestError({'msg': exc.message,
