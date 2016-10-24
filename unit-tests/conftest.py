@@ -56,7 +56,7 @@ def load_clouds_from_config():
 
 CLOUDS = load_clouds_from_config()
 CLOUD_NAMES = [cdict['name'] for cdict in CLOUDS]
-CREDS = {cdict['name']:cdict['creds'] for cdict in CLOUDS}
+CREDS = {cdict['name']:cdict.get('creds') for cdict in CLOUDS}
 
 
 @pytest.fixture(scope='module')
@@ -112,7 +112,7 @@ def cloud(request, org):
     """Fixture to create clouds from config file with proper cleanup"""
 
     cdict = request.param
-    name = cdict.pop('name')
+    name = cdict['name']
     cls = models.CLOUDS[cdict['provider']]
     print "Creating cloud '%s'." % name
     cloud = cls.add(org, name, **cdict['fields'])
