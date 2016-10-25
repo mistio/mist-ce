@@ -12,6 +12,7 @@ from mist.io.exceptions import CloudUnavailableError
 
 def test_update_cloud(cloud):
     pre_updated_cloud = cloud
+    print '=' * 80
     print "update credentials"
 
     # choose the creds of relevant cloud provider
@@ -49,12 +50,12 @@ def test_update_cloud(cloud):
             cloud.ctl.update(fail_on_error=True,
                              fail_on_invalid_params=True, **kwargs)
 
-    # FIXME this doesn't work, it fails
-    # if cloud.title in ['ec2', 'linode']:
-    #     print '- expected to raise CloudUnavailableError'
-    #     with pytest.raises(CloudUnauthorizedError):
-    #         cloud.ctl.update(fail_on_error=True,
-    #                          fail_on_invalid_params=True, **kwargs)
+    if cloud.title in ['ec2', 'linode']:
+        print '- expected to raise CloudUnauthorizedError'
+        with pytest.raises(CloudUnauthorizedError):
+            print kwargs
+            cloud.ctl.update(fail_on_error=True,
+                             fail_on_invalid_params=True, **kwargs)
 
 
 def test_rename_cloud(cloud):
@@ -67,8 +68,3 @@ def test_rename_cloud(cloud):
     cloud.ctl.rename(new_title)
     assert new_title == cloud.title
     print 'rename cloud succeeded'
-
-
-
-
-
