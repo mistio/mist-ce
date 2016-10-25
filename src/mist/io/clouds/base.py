@@ -238,7 +238,12 @@ class BaseController(object):
         """
         if self._conn is not None:
             log.debug("Closing libcloud-like connection for %s.", self.cloud)
-            self._conn.disconnect()
+            try:
+                self._conn.disconnect()
+            except AttributeError:
+                pass
+            except Exception as exc:
+                log.error("Error disconnecting cloud '%s': %r", self, exc)
             self._conn = None
 
     def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
@@ -328,6 +333,10 @@ class BaseController(object):
         override `self._update__preparse_kwargs`.
 
         """
+
+        # Close previous connection.
+        self.disconnect()
+
         # Transform params with extra underscores for compatibility.
         rename_kwargs(kwargs, 'api_key', 'apikey')
         rename_kwargs(kwargs, 'api_secret', 'apisecret')
@@ -354,7 +363,7 @@ class BaseController(object):
                     log.warning(error)
                     kwargs.pop(key)
         if errors:
-            log.error("Error adding %s: %s", self.cloud, errors)
+            log.error("Error updating %s: %s", self.cloud, errors)
             raise BadRequestError({
                 'msg': "Invalid parameters %s." % errors.keys(),
                 'errors': errors,
