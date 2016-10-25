@@ -78,7 +78,7 @@
         </style>
         <paper-material>
             <template is="dom-repeat" items="{{items}}">
-                <rules-item rule="[[item]]" incidents="[[incidents]]" resource="[[resource]]"></rules-item>
+                <rules-item builtin-metrics="[[builtinMetrics]]" rule="[[item]]" incidents="[[incidents]]" resource="[[resource]]"></rules-item>
             </template>
             
             <paper-button toggles active="{{editNew}}" hidden$="{{editNew}}"><iron-icon icon="icons:add-circle"></iron-icon> add new rule</paper-button>
@@ -91,7 +91,7 @@
 
                     <paper-dropdown-menu class="dropdown-block metricName">
                         <paper-menu id="metricName" attr-for-selected="value" selected="{{newRule.metric}}" class="dropdown-content">
-                            <template is="dom-repeat" items="[[availableMterics]]" as="option">
+                            <template is="dom-repeat" items="[[availableMetrics]]" as="option">
                                 <paper-item value="[[option.id]]">[[option.name]]</paper-item>
                             </template>
                         </paper-menu>
@@ -106,7 +106,7 @@
 
                     <paper-input id="metricValue" placeholder="5" value="{{newRule.value}}" auto-validate></paper-input>
 
-                    {{computeUnits(newMetric)}}
+                    {{computeUnits(newMetric, builtinMetrics)}}
 
                     for 
 
@@ -156,19 +156,22 @@
 
             properties: {
                 incidents: {
-                    type: Array,
-                    notify: true
+                    type: Array
                 },
                 resource: Object,  // machine, cloud or other later
                 rules: Object,
                 items: {
                     type: Array,
-                    computed: "_computeRules(rules)",
-                    notify: true
+                    computed: "_computeRules(rules)"
                 },
-                availableMterics: {
+                builtinMetrics:{
+                    type: Object,
+                    notify: true,
+                    value: {}
+                },
+                availableMetrics: {
                     type: Array,
-                    computed: "_computeMetrics(resource)"
+                    computed: "_computeMetrics(builtinMetrics)"
                 },
                 newRule: Object,
                 editNew: {
@@ -214,10 +217,12 @@
                 return rulesArray;
             },
             computeUnits: function(metric) {
-                return DEFAULT_METRICS[metric] ? DEFAULT_METRICS[metric].unit : 'unit';
+                console.log(metric, builtinMetrics);
+                return this.builtinMetrics[metric] ? this.builtinMetrics[metric].unit : 'unit';
             },
             computeName: function(metric) {
-                return DEFAULT_METRICS[metric]? DEFAULT_METRICS[metric].name : 'name';
+                console.log(metric, builtinMetrics);
+                return this.builtinMetrics[metric]? this.builtinMetrics[metric].name : 'name';
             },
             computeTime: function(time){
                 return time/60 + 1;
@@ -243,8 +248,8 @@
             },
             _computeMetrics: function(machine){
                 var metrics = [];
-                for (var p in DEFAULT_METRICS){
-                    metrics.push(DEFAULT_METRICS[p])
+                for (var p in this.builtinMetrics){
+                    metrics.push(this.builtinMetrics[p])
                 }
                 return metrics;
             },
@@ -276,61 +281,5 @@
                 });
             }
         });
-DEFAULT_METRICS = {
-    "cpu.total.nonidle": {
-        "_target": "asPercent(sumSeries(exclude(%(head)s.cpu.*.*,'idle')),sumSeries( % (head) s.cpu.*.*))",
-        "max_value": 100,
-        "min_value": 0,
-        "priority": -50,
-        "id": "cpu.total.nonidle",
-        "unit": "%",
-        "name": "CPU"
-    },
-    "load.longterm": {
-        "_target": "%(head)s.load.longterm",
-        "max_value": null,
-        "min_value": 0,
-        "priority": 0,
-        "id": "load.longterm",
-        "unit": "",
-        "name": "Load (15 mins)"
-    },
-    "load.midterm": {
-        "_target": "%(head)s.load.midterm",
-        "max_value": null,
-        "min_value": 0,
-        "priority": 0,
-        "id": "load.midterm",
-        "unit": "",
-        "name": "Load (5 mins)"
-    },
-    "load.shortterm": {
-        "_target": "%(head)s.load.shortterm",
-        "max_value": null,
-        "min_value": 0,
-        "priority": -50,
-        "id": "load.shortterm",
-        "unit": "",
-        "name": "Load"
-    },
-    "memory.used_percent": {
-        "_target": "asPercent(%(head)s.memory.used,sumSeries( % (head) s.memory.*))",
-        "max_value": 100,
-        "min_value": 0,
-        "priority": 0,
-        "id": "memory.used_percent",
-        "unit": "%",
-        "name": "RAM used"
-    },
-    "memory.nonfree_percent": {
-        "_target": "asPercent(sumSeries(exclude(%(head)s.memory.*,'free')),sumSeries( % (head) s.memory.*))",
-        "max_value": 100,
-        "min_value": 0,
-        "priority": -50,
-        "id": "memory.nonfree_percent",
-        "unit": "%",
-        "name": "RAM"
-    },
-}
     </script>
 </dom-module>
