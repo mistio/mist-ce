@@ -90,7 +90,8 @@ def add_cloud_v_2(owner, title, provider, params):
     """Add cloud to owner"""
 
     # FIXME: Some of these should be explicit arguments, others shouldn't exist
-    remove_on_error = params.pop('remove_on_error', True)
+    fail_on_error = params.pop('fail_on_error',
+                               params.pop('remove_on_error', True))
     monitoring = params.pop('monitoring', False)
     params.pop('title', None)
     params.pop('provider', None)
@@ -103,7 +104,7 @@ def add_cloud_v_2(owner, title, provider, params):
     cloud_cls = cloud_models.CLOUDS[provider]  # Class of Cloud model.
 
     # Add the cloud.
-    cloud = cloud_cls.add(owner, title, remove_on_error=remove_on_error,
+    cloud = cloud_cls.add(owner, title, fail_on_error=fail_on_error,
                           fail_on_invalid_params=False, **params)
     ret = {'cloud_id': cloud.id}
     if provider == 'bare_metal' and monitoring:
@@ -128,11 +129,7 @@ def rename_cloud(owner, cloud_id, new_name):
 
     log.info("Renaming cloud: %s", cloud_id)
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
-    cloud.title = new_name
-    try:
-        cloud.save()
-    except NotUniqueError:
-        raise BadRequestError('Cloud with name %s already exists' % new_name)
+    cloud.ctl.rename(new_name)
     log.info("Succesfully renamed cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
 

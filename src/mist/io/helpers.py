@@ -5,6 +5,7 @@ import re
 import sys
 import time
 import json
+import string
 import random
 import socket
 import logging
@@ -451,3 +452,15 @@ def get_datetime(timestamp):
             pass
     # Fuck this shit.
     raise ValueError("Couldn't extract date object from %r" % timestamp)
+
+
+def random_string(length=5, punc=False):
+    """
+    Generate a random string. Default length is set to 5 characters.
+    When punc=True, the string will also contain punctuation apart
+    from letters and digits
+    """
+    _chars = string.letters + string.digits
+    _chars += string.punctuation if punc else ''
+    return ''.join(random.choice(_chars) for _ in range(length))
+

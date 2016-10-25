@@ -43,7 +43,7 @@
             <iron-pages selected="{{selected}}">
                 <details-page org="[[org]]" user="[[user]]" data-route="0"></details-page>
                 <password-page user="[[user]]" data-route="1"></password-page>
-                <plans-list org="[[org]]" user="[[user]]" data-route="2"></plans-list>
+                <plans-list is-over-using="[[isOverUsing]]" org="[[org]]" user="[[user]]" data-route="2"></plans-list>
                 <div data-route="3"></div>
                 <div data-route="4"></div>
                 <subscriptions-list user="[[user]]" data-route="5"></subscriptions-list>
@@ -58,6 +58,7 @@
     Polymer({
         is: 'page-my-account',
         properties: {
+            isOverUsing: Boolean,
             user: {
                 type: Object
             },
@@ -66,6 +67,12 @@
             },
             selected: {
                 value: 0
+            }
+        },
+        attached: function(){
+            console.log(document.querySelector("app-location").queryParams);
+            if (document.querySelector("app-location").queryParams["plans"] == "true") {
+                this.set("selected",2);
             }
         }
     });

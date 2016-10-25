@@ -117,10 +117,10 @@
                         <!-- Only red incidents sould count and show. keep it temp/ly due to lacj of data -->
                         <!-- [[incidentColor(item)]] -->
                         <div class="list layout horizontal wrap">
-                            <a class="list-item red flexchild layout horizontal" href$="[[machineUri(item,model)]]">
+                            <a class="list-item red flexchild layout horizontal" href$="[[machineUri(item,model.clouds)]]">
                                 <div class="flexchild expression">
                                     <iron-icon icon="[[sections.machines.icon]]"></iron-icon>
-                                    <span class="machine flexchild">[[machineName(item)]]</span>: <span class="rule-condition">[[ruleCondition(item)]]</span>
+                                    <span class="machine flexchild">[[machineName(item, model.clouds)]]</span>: <span class="rule-condition">[[ruleCondition(item)]]</span>
                                 </div>
                                 <span class="time">
                                     <template is="dom-if" if="[[!item.finished_at]]">
@@ -197,12 +197,12 @@ Polymer({
             return 'icons:report-problem';
         return 'icons:check';
     },
-    machineName: function(item) {
+    machineName: function(item, clouds) {
         if (item.logs.length)
             return this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id] ? item.logs[0].machine_name : item.logs[0].machine_name +': Machine is missing';
         return this.model.clouds[item.cloud_id].machines[item.machine_id].name;
     },
-    machineUri: function(item, model) {
+    machineUri: function(item, clouds) {
         // give machine url only if machine axists
         if (this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id]){
             return '/machines/'  + this.model.clouds[item.cloud_id].machines[item.machine_id].uuid;
