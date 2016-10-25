@@ -451,11 +451,9 @@
                 "timezone": "browser"
             };
             var machinearray = [];
-            console.log(this.model.monitoring);
             this.model.monitoring.machines.forEach(function(entry) {
                 machinearray.push(entry);
             });
-            console.log(machinearray);
             this.dashboard.rows[0].panels[0].machineArray = machinearray;
             // var that = this;
             // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page

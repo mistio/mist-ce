@@ -131,6 +131,8 @@ def add_routes(configurator):
     configurator.add_route('key_association',
                            '/clouds/{cloud}/machines/{machine}/keys/{key}')
 
+    configurator.add_route('api_v1_machine_dashboard', '/api/v1/clouds/{cloud}/machines/{machine}/dashboard')
+
     configurator.add_route('api_v1_rules', '/api/v1/rules')
     configurator.add_route('rules', '/rules')
     configurator.add_route('api_v1_rule', '/api/v1/rules/{rule}')

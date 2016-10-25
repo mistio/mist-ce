@@ -262,7 +262,8 @@
     </div>
     <paper-material class="info-card" hidden$="[[!isMonitored]]">
         <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
-        <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+        <paper-button>Add Graph</paper-button>
+        <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" dashboard-path="mist"></polyana-dashboard>
     </paper-material>
     <paper-material class="info-card">
         <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
@@ -314,6 +315,13 @@
     <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
     <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
     <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
+    <iron-ajax id="metrics"
+      url = "[[_computeMetricsUri(machine)]]"
+      handle-as="json"
+      method="GET"
+      contentType="application/json"
+      on-response="_handleMetricResponse">
+    </iron-ajax>
     <!-- <machine-edit machine="[[machine]]"></machine-edit> -->
     <tags-list model="[[model]]"></tags-list>
     <paper-toast></paper-toast>
@@ -513,7 +521,13 @@
             //     //     that.querySelector('dashboard-panel').resize();
             //
             // }, 5000);
-
+        },
+        _computeMetricsUri:function (machine){
+          console.log("/api/v1/clouds/"+machine.cloud.id+"/machines/"+machine.id+"/metrics");
+          return "/api/v1/clouds/"+machine.cloud.id+"/machines/"+machine.id+"/metrics";
+        },
+        _HandleMetricResponse:function (data){
+            console.log("prrrrrrrrrrrrrrrrr",data);
         },
         _computeActions: function(item) {
             var ret = [];
@@ -566,6 +580,7 @@
                 "rows": [{
                     "height": "500px",
                     "panels": [{
+                        "lines": true,
                         "aliasColors": {},
                         "datasource": "mistphite",
                         "id": 2,
@@ -586,6 +601,7 @@
                         "x-axis": true,
                         "y-axis": true
                     }, {
+                        "lines": true,
                         "aliasColors": {},
                         "datasource": "mistphite",
                         "id": 3,
@@ -625,6 +641,7 @@
                 },
                 "timezone": "browser"
             };
+            //because this function is called repeteadly we need to only change dashboards if they have actually changed
             var changeit = false;
             for (var i = 0; i < tempdash.rows.length; i++) {
                 for (var j = 0; j < tempdash.rows[i].panels.length; j++) {

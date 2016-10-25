@@ -2274,7 +2274,7 @@
                     var socket = document.querySelector('app-socket');
 
                     this.term.on('data', function (data, ev) {
-                        socket.send('msg', 'shell', 'shell_data', data);
+                        socket.send('msg', 'shell', 'shell_data', [data]);
                     });
 
                     socket.send('sub', 'shell');
@@ -2299,7 +2299,7 @@
                         this.set("style.position", "fixed")
                     }
 
-                    socket.send('msg', 'shell', 'shell_open', payload);
+                    socket.send('msg', 'shell', 'shell_open', [payload]);
 
                     socket.set('term', this.term);
 
@@ -2348,8 +2348,7 @@
                             .send('msg',
                                   'shell',
                                   'shell_resize',
-                                  newCols,
-                                  newRows);
+                                  [newCols, newRows]);
                       that.term.resize(newCols, newRows);
                 },
                 detached: function() {

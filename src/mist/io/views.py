@@ -2143,3 +2143,76 @@ def list_supported_providers(request):
         return {'supported_providers': config.SUPPORTED_PROVIDERS_V_2}
     else:
         return {'supported_providers': config.SUPPORTED_PROVIDERS}
+
+@view_config(route_name='api_v1_machine_dashboard', request_method='GET', renderer='json')
+def get_machine_dashboard(request):
+    """return dashboard"""
+    dashboard_id = request.matchdict['dashboard']
+    if dashboard_id == 'home':
+        ret = {
+            "id": 1,
+            // "refresh": "",
+            "rows": [{
+                "height": "500px",
+                "panels": [{
+                    "lines":true,
+                    "aliasColors": {},
+                    "datasource": "mistphite",
+                    "id": 2,
+                    "span": 12,
+                    "stack": false,
+                    "targets": [{
+                        "refId": "A",
+                        "target": "load.longterm"
+                    }, {
+                        "refId": "B",
+                        "target": "load.shortterm"
+                    }],
+                    "timeFrom": null,
+                    "timeShift": null,
+                    "title": "Load",
+                    "type": "graph",
+                    "machineArray": [],
+                    "x-axis": true,
+                    "y-axis": true
+                }, {
+                    "lines":true,
+                    "aliasColors": {},
+                    "datasource": "mistphite",
+                    "id": 3,
+                    "span": 12,
+                    "stack": false,
+                    "targets": [{
+                        "refId": "A",
+                        "target": "cpu"
+                    }],
+                    "timeFrom": null,
+                    "timeShift": null,
+                    "title": "CPU",
+                    "type": "graph",
+                    "machineArray": [],
+                    "x-axis": true,
+                    "y-axis": true
+                }],
+            }],
+            "time": {
+                "from": "now-10m",
+                "to": "now"
+            },
+            "timepicker": {
+                "now": true,
+                "refresh_intervals": [],
+                "time_options": [
+                    "5m",
+                    "15m",
+                    "1h",
+                    "6h",
+                    "12h",
+                    "24h",
+                    "2d",
+                    "7d",
+                    "30d"
+                ]
+            },
+            "timezone": "browser"
+            };
