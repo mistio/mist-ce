@@ -134,6 +134,8 @@
                         </paper-menu>
                     </paper-dropdown-menu>
 
+                    <paper-
+
                 </div>
                 <div class="rule-actions layout horizontal">
                     <p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
@@ -215,7 +217,7 @@
                         rulesArray.push(rules[rule]);
                     }
                 }
-                return rulesArray;
+                return rulesArray.reverse();
             },
             computeUnits: function(metric) {
                 console.log(metric, builtinMetrics);
