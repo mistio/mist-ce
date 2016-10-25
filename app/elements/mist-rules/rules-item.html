@@ -3,6 +3,9 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-textarea/paper-textarea.html">
 
 <dom-module id="rules-item">
     <template>
@@ -74,6 +77,8 @@
             .rule-id {
             	color: rgba(0,0,0,0.32);
             	font-size: 0.8em;
+                display: inline-block;
+                width: 40px;
             }
             .rule-edit .rule-id {
             	position: absolute;
@@ -153,6 +158,7 @@
 	                    <paper-item value="launch" disabled> launch </paper-item>
 	                </paper-menu>
 	            </paper-dropdown-menu>
+
             </div>
             <div class="rule-actions layout horizontal">
             	<p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
