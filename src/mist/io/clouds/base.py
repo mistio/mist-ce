@@ -288,7 +288,7 @@ class BaseController(object):
             from mist.core.cloud.models import Machine
             # Remove any machines created from check_connection performing a
             # list_machines.
-            Machine.objects(cloud=self.cloud, owner=self.cloud.owner).delete()
+            Machine.objects(cloud=self.cloud).delete()
             # Propagate original error.
             raise
 
