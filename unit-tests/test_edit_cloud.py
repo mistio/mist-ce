@@ -41,8 +41,8 @@ def test_update_cloud(cloud):
     if cloud.title in ['packet']:
         print '- expected to raise CloudUnauthorizedError'
         with pytest.raises(CloudUnauthorizedError):
-            cloud.ctl.update(fail_on_error=True, fail_on_invalid_params=True,
-                             **kwargs)
+            cloud.ctl.update(fail_on_error=True,
+                             fail_on_invalid_params=True, **kwargs)
 
     if cloud.title in ['gce']:
         print '- expected to raise CloudUnavailableError'
@@ -53,7 +53,6 @@ def test_update_cloud(cloud):
     if cloud.title in ['ec2', 'linode']:
         print '- expected to raise CloudUnauthorizedError'
         with pytest.raises(CloudUnauthorizedError):
-            print kwargs
             cloud.ctl.update(fail_on_error=True,
                              fail_on_invalid_params=True, **kwargs)
 
