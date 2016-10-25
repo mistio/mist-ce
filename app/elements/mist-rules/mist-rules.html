@@ -61,6 +61,7 @@
                 font-size: 0.8em;
                 top: 16px;
                 left: 24px;
+
             }
             .rule-actions {
                 justify-content: flex-end;
@@ -137,7 +138,9 @@
                         </paper-menu>
                     </paper-dropdown-menu>
 
-                    <paper-
+                    <template is="dom-if" if="{{showCommandTextarea}}">
+                        <paper-textarea id="command" value="{{newRule.command}}"></paper-textarea>
+                    </template>
 
                 </div>
                 <div class="rule-actions layout horizontal">
@@ -186,6 +189,10 @@
                 formError: {
                     type: Boolean,
                     value: false
+                },
+                showCommandTextarea: {
+                    type: Boolean,                    
+                    value: false
                 }
             },
             listeners: {
@@ -194,7 +201,8 @@
                 'edit-request': 'editRequest'
             },
             observers: [
-                'updateNewrule(resource.id)'
+                'updateNewrule(resource.id)',
+                "_computeShowCommandTextarea(newRule.action)",
             ],
             ready: function() {
                 var new_rule = {
@@ -290,6 +298,9 @@
                         el.set('editMode', false);
                     }
                 });
+            },
+            _computeShowCommandTextarea: function(action){
+                this.set('showCommandTextarea',action == "command") ;
             }
         });
     </script>

@@ -91,6 +91,19 @@
             .errormsg-container iron-icon {
                 color: inherit;
             }
+            .command {
+                max-width: 160px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                font-size: 0.8em;
+                vertical-align: middle;
+                background-color: #ddd;
+                color: #666;
+                padding: 2px 4px;
+                display: inline-block;
+                border-radius: 2px;
+            }
         </style>
 
 		<div class="rule-item layout horizontal"  hidden$="{{editMode}}">
@@ -105,6 +118,7 @@
                 <span hidden$="[[!rule.aggregate]]">
                     within [[computeTime(rule.reminder_offset)]]min, 
                 </span>then <span class="strong">[[rule.action]]</span>
+                <span class="command" hidden$="[[!rule.command]]"><code>[[rule.command]]</code></span>
             	<paper-icon-button icon="icons:create" toggles active={{editMode}}>edit</paper-icon-button>
             </div>
             <paper-spinner active$="{{sendingData}}"></paper-spinner>
@@ -159,6 +173,9 @@
 	                </paper-menu>
 	            </paper-dropdown-menu>
 
+                <template is="dom-if" if="{{showCommandTextarea}}">
+                    <paper-textarea id="command" value="{{newRule.command}}"></paper-textarea>
+                </template>
             </div>
             <div class="rule-actions layout horizontal">
             	<p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
@@ -217,14 +234,19 @@
                 formError: {
                 	type: Boolean,
                 	value: false
+                },
+                showCommandTextarea: {
+                    type: Boolean,                    
+                    value: false
                 }
             },
             listeners: {
             	'iron-select':'ruleUpdates',
-            	'input':'ruleUpdates',
+            	'input':'ruleUpdates'            
             },
             observers: [
-            	'editModeChanged(editMode)'
+            	'editModeChanged(editMode)',
+                "_computeShowCommandTextarea(newRule.action)",
             ],
             ready: function() {
             },
@@ -324,6 +346,9 @@
             	if (editMode == true) {
             		this.fire('edit-request', {rule: this.rule.id})
             	}
+            },
+            _computeShowCommandTextarea: function(action){
+                this.set('showCommandTextarea',action == "command") ;
             }
         });
     </script>
