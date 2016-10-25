@@ -221,32 +221,32 @@
                     computed: "_computeMetrics(builtinMetrics.*, resource)"
                 },
                 newRule: {
-                	type: Object,
-                	computed: "_computeNewRule(rule)",
-                	notify: true
+                    type: Object,
+                    computed: "_computeNewRule(rule)",
+                    notify: true
                 },
                 diff: {
-                	type: Object,
-                	notify: true
+                    type: Object,
+                    notify: true
                 },
                 noChanges: {
-                	type: Boolean,
-                	value: true
+                    type: Boolean,
+                    value: true
                 },
                 editMode: {
-                	type: Boolean,
-                	value: false
+                    type: Boolean,
+                    value: false
                 },
                 sendingData: {
-                	type: Boolean,
-                	value: false
+                    type: Boolean,
+                    value: false
                 },
                 formError: {
-                	type: Boolean,
-                	value: false
+                    type: Boolean,
+                    value: false
                 },
                 showCommandTextarea: {
-                    type: Boolean,                    
+                    type: Boolean,
                     value: false
                 }
             },
@@ -256,15 +256,14 @@
             },
             observers: [
             	'editModeChanged(editMode)',
-                "_computeShowCommandTextarea(newRule.action)",
+                '_computeShowCommandTextarea(newRule.action)',
             ],
             ready: function() {
-                // this.set("emails","");
             },
             _computeNewRule: function(rule){
-            	var newRule = {};
-            	for (var p in rule) {
-            		if (typeof(rule[p]) == 'string')
+                var newRule = {};
+                for (var p in rule) {
+                    if (typeof(rule[p]) == 'string')
             			newRule[p] = rule[p].slice(0);
                     if (typeof(rule[p]) == 'number')
                         newRule[p] = rule[p].toString().slice(0);
