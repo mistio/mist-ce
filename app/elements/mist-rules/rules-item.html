@@ -124,7 +124,7 @@
 	                </paper-menu>
 	            </paper-dropdown-menu>
 
-	            <paper-input id="metricValue" placeholder="5" value="{{newRule.value}}" auto-validate></paper-input>
+	            <paper-input id="metricValue" value="{{newRule.value}}" auto-validate></paper-input>
 
 	            {{computeUnits(newRule.metric)}}
 
@@ -140,7 +140,7 @@
 
 	            value within 
 
-	            <paper-input id="metricOffset" placeholder="1" value="{{newRule.reminder_offset}}" auto-validate></paper-input>min,
+	            <paper-input id="metricOffset" value="{{newRule.reminder_offset}}" auto-validate></paper-input>min,
 
 	            then
 
@@ -227,7 +227,12 @@
             	for (var p in rule) {
             		if (typeof(rule[p]) == 'string')
             			newRule[p] = rule[p].slice(0);
+                    if (typeof(rule[p]) == 'number')
+                        newRule[p] = rule[p].toString().slice(0);
+                    if (typeof(rule[p]) == 'number' && p == 'reminder_offset')
+                        newRule[p] = (rule[p]/60+1).toString().slice(0);
             	}
+                console.log("_computeNewRule",newRule.reminder_offset, rule.reminder_offset);
             	return newRule;
             },
             computeUnits: function(metric, builtinMetrics) {
@@ -276,7 +281,7 @@
                 	payload = this.diff;
                 	payload["id"] = this.rule.id;
                 if (payload["reminder_offset"])
-                	payload["reminder_offset"] = payload["reminder_offset"]*60;
+                	payload["reminder_offset"] = (payload["reminder_offset"]-1 )*60;
                 console.log(payload);
                 this.$.updateRuleRequest.params = payload;
                 this.$.updateRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
