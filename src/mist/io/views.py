@@ -375,8 +375,6 @@ def update_cloud(request):
       in: path
       required: true
       type: string
-    creds:
-      type:dict
     """
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
@@ -389,7 +387,7 @@ def update_cloud(request):
     creds = params
 
     if not creds:
-        raise BadRequestError("You should provide your new credentials")
+        raise BadRequestError("You should provide your new cloud settings")
 
     auth_context.check_perm('cloud', 'edit', cloud_id)
 
