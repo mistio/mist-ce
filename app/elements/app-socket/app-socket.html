@@ -360,7 +360,7 @@
         },
 
         _updateClouds: function(data) {
-            console.log('_updateClouds');
+            // console.log('_updateClouds');
             if (data.length && this.get('onboarding.hasCloud') != true)
                 this.set('onboarding.hasCloud', true);
             if (!data.length) {
@@ -402,7 +402,7 @@
                     if (this.model.clouds[rule.cloud] && this.model.clouds[rule.cloud].machines[rule.machine]){
                         if (!this.get('model.clouds.'+rule.cloud+'.machines.'+rule.machine+'.rules')){
                             this.set('model.clouds.'+rule.cloud+'.machines.'+rule.machine+'.rules', [rule])
-                            console.log('// inform machines that have rules ', rule.cloud, rule.machine, this.model.clouds[rule.cloud].machines[rule.machine].rules);
+                            // console.log('// inform machines that have rules ', rule.cloud, rule.machine, this.model.clouds[rule.cloud].machines[rule.machine].rules);
                         }
                         else
                             this.push('model.clouds.'+rule.cloud+'.machines.'+rule.machine+'.rules',rule)
@@ -475,7 +475,7 @@
         },
 
         _updateImages: function(data) {
-            console.log('_updateImages');
+            // console.log('_updateImages');
             this.set('onboarding.isLoadingImages', false);
             var changed = this._updateModel('clouds.' + data.cloud_id + '.images', data.images);
             if (!changed)
@@ -607,7 +607,7 @@
                     inc.id = inc.incident_id
                 }
             }
-            console.log(data);
+            // console.log(data);
             return this._updateModel('incidents', data);
         },
 
@@ -621,7 +621,7 @@
         },
 
         _updateIsOverusing: function(user, machines){
-            console.log('_updateIsOverusing', user, machines);
+            // console.log('_updateIsOverusing', user, machines);
             if (user && machines)
                 this.set('model.isOverUsing', !user.current_plan.title && machines.length > 5);
         },
