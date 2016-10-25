@@ -318,12 +318,14 @@
                 </div>
             </paper-material>-->
             <paper-material class="info-card">
-                <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
+                <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring
+                    <span hidden$="[[!isMonitored]]"> enabled</span>
+                </h2>
                 <div class="monitoringArea" hidden$="[[isMonitored]]">
-                    enable Monitoring
+                    <paper-button class="blue" on-tap="toggleMonitoring">enable Monitoring</paper-button>
                 </div>
                 <div class="monitoringArea" hidden$="[[!isMonitored]]">
-                    is Monitored
+                    <paper-button class="blue" on-tap="toggleMonitoring">disable Monitoring</paper-button>
                 </div>
             </paper-material>
             <paper-material class="info-card">
@@ -367,6 +369,7 @@
         <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
+        <iron-ajax id="monitoringRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/monitoring" method="POST" on-response="_monitoringResponse" on-error="_monitoringError" on-request="_monitoringRequest"></iron-ajax>
         <!-- <machine-edit machine="[[machine]]"></machine-edit> -->
         <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
@@ -871,7 +874,21 @@ MACHINEACTIONS = {
                     return classes;
                 }
             }
-
-        }
+        },
+        toggleMonitoring: function(e){
+            var payload = {}
+                payload.action = this.isMonitored ? "disable" : "enable";
+                payload.no_ssh = this.machine.keys && this.machine.keys.length ? "false" : "true";
+                payload.public_ips = this.machine.public_ips;
+                payload.name = this.machine.name;
+                payload.dns_name = "n/a";
+            console.log("toggleMonitoring",payload);
+            this.$.monitoringRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+            this.$.monitoringRequest.params = payload;
+            this.$.monitoringRequest.generateRequest();
+        },
+        _monitoringRequest: function(){},
+        _monitoringResponse: function(){},
+        _monitoringError: function(){}
     });
 </script>
