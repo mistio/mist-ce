@@ -118,7 +118,7 @@
                 <span hidden$="[[!rule.aggregate]]">
                     within [[computeTime(rule.reminder_offset)]]min, 
                 </span>then <span class="strong">[[rule.action]]</span>
-                <span class="command" hidden$="[[!rule.command]]"><code>[[rule.command]]</code></span>
+                <span class="command" hidden$="[[!showCommandTextarea]]"><code>[[rule.command]]</code></span>
             	<paper-icon-button icon="icons:create" toggles active={{editMode}}>edit</paper-icon-button>
             </div>
             <paper-spinner active$="{{sendingData}}"></paper-spinner>
@@ -308,6 +308,10 @@
             	var payload = {};
                 	payload = this.diff;
                 	payload["id"] = this.rule.id;
+                    // clean up command
+                    if(payload.action != "command" && payload.command) {
+                        delete payload.command;
+                    }
                     //patch. backend misses the value if updates dont include it
                     payload["value"] = this.newRule.value;
                 if (payload["reminder_offset"])
@@ -348,6 +352,9 @@
             	}
             },
             _computeShowCommandTextarea: function(action){
+                if(action != "command" && this.newRule.command) {
+                    delete this.newRule.command;
+                }
                 this.set('showCommandTextarea',action == "command") ;
             }
         });

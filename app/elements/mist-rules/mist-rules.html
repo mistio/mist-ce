@@ -273,6 +273,10 @@
                 if (payload["reminder_offset"])
                     payload["reminder_offset"] = (payload["reminder_offset"]-1 )*60;
 
+                // clean up command
+                if(payload.action != "command") {
+                    delete payload.command;
+                }
                 this.$.addRuleRequest.params = payload;
                 this.$.addRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.addRuleRequest.generateRequest();
@@ -300,6 +304,9 @@
                 });
             },
             _computeShowCommandTextarea: function(action){
+                if(action != "command" && this.newRule.command) {
+                    delete this.newRule.command;
+                }
                 this.set('showCommandTextarea',action == "command") ;
             }
         });
