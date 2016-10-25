@@ -242,11 +242,9 @@
                 return rulesArray.reverse();
             },
             computeUnits: function(metric) {
-                console.log(metric, builtinMetrics);
                 return this.builtinMetrics[metric] ? this.builtinMetrics[metric].unit : 'unit';
             },
             computeName: function(metric) {
-                console.log(metric, builtinMetrics);
                 return this.builtinMetrics[metric]? this.builtinMetrics[metric].name : 'name';
             },
             computeTime: function(time){
