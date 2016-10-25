@@ -5,6 +5,8 @@ import signal
 import tornado.web
 import tornado.ioloop
 
+from tornado_profile import TornadoProfiler
+
 import mist.io.sock
 
 
@@ -80,6 +82,6 @@ if __name__ == '__main__':
 
     app = tornado.web.Application([
         (r"/", MainHandler),
-    ] + make_router().urls)
+    ] + make_router().urls + TornadoProfiler().get_routes())
     app.listen(port)
     tornado.ioloop.IOLoop.instance().start()
