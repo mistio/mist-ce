@@ -5,7 +5,6 @@ import string
 import pytest
 
 from conftest import CREDS
-
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudUnauthorizedError
 from mist.io.exceptions import CloudUnavailableError
@@ -38,19 +37,24 @@ def test_update_cloud(cloud):
     print '* test invalid credentials values'
     kwargs = dict((k,'aa'+v) for k,v in valid_kwargs.items())
 
-    if cloud.title == 'packet':
-        print '- expected to raise CloudUnauthorized'
+    if cloud.title in ['packet']:
+        print '- expected to raise CloudUnauthorizedError'
         with pytest.raises(CloudUnauthorizedError):
+            cloud.ctl.update(fail_on_error=True, fail_on_invalid_params=True,
+                             **kwargs)
+
+    if cloud.title in ['gce']:
+        print '- expected to raise CloudUnavailableError'
+        with pytest.raises(CloudUnavailableError):
             cloud.ctl.update(fail_on_error=True,
                              fail_on_invalid_params=True, **kwargs)
 
-    # # FIXME this don't catch the exception!
-    # if cloud.title in ['ec2', 'gce', 'linode']:
-    #     print '- expected to raise CloudUnavailable'
-    #     with pytest.raises((CloudUnauthorizedError, CloudUnavailableError,
-    #                         Exception)):
+    # FIXME this doesn't work, it fails
+    # if cloud.title in ['ec2', 'linode']:
+    #     print '- expected to raise CloudUnavailableError'
+    #     with pytest.raises(CloudUnauthorizedError):
     #         cloud.ctl.update(fail_on_error=True,
-    #                          fail_on_invalid_params=True,**kwargs)
+    #                          fail_on_invalid_params=True, **kwargs)
 
 
 def test_rename_cloud(cloud):
