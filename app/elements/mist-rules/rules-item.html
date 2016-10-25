@@ -104,6 +104,10 @@
                 display: inline-block;
                 border-radius: 2px;
             }
+            paper-input#emails {
+                max-width: 240px;
+                display: inline-block;
+            }
         </style>
 
 		<div class="rule-item layout horizontal"  hidden$="{{editMode}}">
@@ -119,6 +123,7 @@
                     within [[computeTime(rule.reminder_offset)]]min, 
                 </span>then <span class="strong">[[rule.action]]</span>
                 <span class="command" hidden$="[[!showCommandTextarea]]"><code>[[rule.command]]</code></span>
+                <span hidden$="[[!rule.emails.length]]">and email <span class="command"><code>[[joinEmails(rule.emails)]]</code></span></span>
             	<paper-icon-button icon="icons:create" toggles active={{editMode}}>edit</paper-icon-button>
             </div>
             <paper-spinner active$="{{sendingData}}"></paper-spinner>
@@ -176,6 +181,11 @@
                 <template is="dom-if" if="{{showCommandTextarea}}">
                     <paper-textarea id="command" value="{{newRule.command}}"></paper-textarea>
                 </template>
+
+                and email
+
+                <paper-input id="emails" value="{{joinEmails(newRule.emails)}}" auto-validate></paper-input>
+
             </div>
             <div class="rule-actions layout horizontal">
             	<p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
@@ -249,6 +259,7 @@
                 "_computeShowCommandTextarea(newRule.action)",
             ],
             ready: function() {
+                // this.set("emails","");
             },
             _computeNewRule: function(rule){
             	var newRule = {};
@@ -259,6 +270,12 @@
                         newRule[p] = rule[p].toString().slice(0);
                     if (typeof(rule[p]) == 'number' && p == 'reminder_offset')
                         newRule[p] = (rule[p]/60+1).toString().slice(0);
+                    if (typeof(rule[p]) == 'object'){
+                        newRule[p] = rule[p];
+                    }
+                    if (typeof(rule[p]) == 'array'){
+                        newRule[p] = rule[p];
+                    }
             	}
                 console.log("_computeNewRule",newRule.reminder_offset, rule.reminder_offset);
             	return newRule;
@@ -306,16 +323,26 @@
             },
             updateRule: function(e){
             	var payload = {};
-                	payload = this.diff;
+                	payload = this.newRule;
                 	payload["id"] = this.rule.id;
+
+                    delete payload._id;
                     // clean up command
                     if(payload.action != "command" && payload.command) {
                         delete payload.command;
+                    }
+                    //parse string to array
+                    if (this.querySelector("#emails").value && this.querySelector("#emails").value != "") {
+                        payload["emails"] = this.querySelector("#emails").value;
+                    }
+                    else {
+                        payload.emails = ' ';
                     }
                     //patch. backend misses the value if updates dont include it
                     payload["value"] = this.newRule.value;
                 if (payload["reminder_offset"])
                 	payload["reminder_offset"] = (payload["reminder_offset"]-1 )*60;
+
                 console.log(payload);
                 this.$.updateRuleRequest.params = payload;
                 this.$.updateRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
@@ -356,6 +383,10 @@
                     delete this.newRule.command;
                 }
                 this.set('showCommandTextarea',action == "command") ;
+            },            
+            joinEmails: function(emails){
+                if (emails)
+                    return emails.join(', ');
             }
         });
     </script>

@@ -79,6 +79,10 @@
             .errormsg-container iron-icon {
                 color: inherit;
             }
+            paper-input#emails {
+                max-width: 240px;
+                display: inline-block;
+            }
         </style>
         <paper-material>
             <template is="dom-repeat" items="{{items}}">
@@ -141,6 +145,11 @@
                     <template is="dom-if" if="{{showCommandTextarea}}">
                         <paper-textarea id="command" value="{{newRule.command}}"></paper-textarea>
                     </template>
+
+                    and email
+
+                    <paper-input id="emails" placeholder="[[userEmail()]]" value="{{newRule.emails}}" auto-validate></paper-input>
+
 
                 </div>
                 <div class="rule-actions layout horizontal">
@@ -205,6 +214,7 @@
                 "_computeShowCommandTextarea(newRule.action)",
             ],
             ready: function() {
+                this.set("emails","");
                 var new_rule = {
                         cloudId: '',
                         machineId: '',
@@ -212,7 +222,8 @@
                         operator:"gt",
                         value:5,
                         action: 'alert',
-                        reminder_offset: '1'
+                        reminder_offset: '1',
+                        emails: ''
                     }
                 this.set('newRule', new_rule);
             },
@@ -272,11 +283,15 @@
                     payload = this.newRule;
                 if (payload["reminder_offset"])
                     payload["reminder_offset"] = (payload["reminder_offset"]-1 )*60;
-
                 // clean up command
                 if(payload.action != "command") {
                     delete payload.command;
                 }
+                //error on empty string
+                if (payload["emails"] == "") {
+                    delete payload.emails;
+                }
+
                 this.$.addRuleRequest.params = payload;
                 this.$.addRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.addRuleRequest.generateRequest();
@@ -302,6 +317,9 @@
                         el.set('editMode', false);
                     }
                 });
+            },
+            userEmail: function(){
+                return document.querySelector("mist-app").model.user.email;
             },
             _computeShowCommandTextarea: function(action){
                 if(action != "command" && this.newRule.command) {
