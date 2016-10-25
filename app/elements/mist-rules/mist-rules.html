@@ -255,7 +255,12 @@
                 return metrics;
             },
             addRule: function(e){
-                this.$.addRuleRequest.params = this.newRule;
+                var payload = {};
+                    payload = this.newRule;
+                if (payload["reminder_offset"])
+                    payload["reminder_offset"] = (payload["reminder_offset"]-1 )*60;
+
+                this.$.addRuleRequest.params = payload;
                 this.$.addRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                 this.$.addRuleRequest.generateRequest();
             },
