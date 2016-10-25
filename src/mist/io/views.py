@@ -363,19 +363,20 @@ def rename_cloud(request):
     return OK
 
 
-@view_config(route_name='api_v1_edit_cloud', request_method='PUT')
-@view_config(route_name='edit_cloud', request_method='PUT')
-def edit_cloud(request):
+@view_config(route_name='api_v1_cloud_action', request_method='PATCH')
+@view_config(route_name='cloud_action', request_method='PATCH')
+def update_cloud(request):
     """
-    Edit cloud with given cloud_id.
+    UPDATE cloud with given cloud_id.
     EDIT permission required on cloud.
+    Not all fields need to be specified, only the ones being modified
     ---
     cloud:
       in: path
       required: true
       type: string
-    kwargs:
-      type:
+    creds:
+      type:dict
     """
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
@@ -385,20 +386,23 @@ def edit_cloud(request):
         raise NotFoundError('Cloud does not exist')
 
     params = params_from_request(request)
-    creds = params.get('creds')
+    creds = params
+
     if not creds:
-        raise BadRequestError("You must provide your new credentials")
+        raise BadRequestError("You should provide your new credentials")
 
     auth_context.check_perm('cloud', 'edit', cloud_id)
 
-    log.info("Editing cloud: %s", cloud_id)
+    log.info("Updating cloud: %s", cloud_id)
 
     fail_on_error = params.pop('fail_on_error', True)
+    fail_on_invalid_params = params.pop('fail_on_invalid_params', True)
 
     # Edit the cloud
-    cloud.ctl.update(fail_on_error=fail_on_error, **creds)
+    cloud.ctl.update(fail_on_error=fail_on_error,
+                     fail_on_invalid_params=fail_on_invalid_params, **creds)
 
-    log.info("Cloud with id '%s' edited successfully.", cloud.id)
+    log.info("Cloud with id '%s' updated successfully.", cloud.id)
     trigger_session_update(auth_context.owner, ['clouds'])
     return OK
 
