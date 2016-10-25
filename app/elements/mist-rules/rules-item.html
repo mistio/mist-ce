@@ -280,6 +280,8 @@
             	var payload = {};
                 	payload = this.diff;
                 	payload["id"] = this.rule.id;
+                    //patch. backend misses the value if updates dont include it
+                    payload["value"] = this.newRule.value;
                 if (payload["reminder_offset"])
                 	payload["reminder_offset"] = (payload["reminder_offset"]-1 )*60;
                 console.log(payload);
