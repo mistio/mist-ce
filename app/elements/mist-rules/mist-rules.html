@@ -104,7 +104,7 @@
                         </paper-menu>
                     </paper-dropdown-menu>
 
-                    <paper-input id="metricValue" placeholder="5" value="{{newRule.value}}" auto-validate></paper-input>
+                    <paper-input id="metricValue" value="{{newRule.value}}" auto-validate></paper-input>
 
                     {{computeUnits(newMetric, builtinMetrics)}}
 
@@ -120,7 +120,7 @@
 
                     value within 
 
-                    <paper-input id="metricOffset" placeholder="1" value="{{newRule.reminder_offset}}" auto-validate></paper-input>min,
+                    <paper-input id="metricOffset" value="{{newRule.reminder_offset}}" auto-validate></paper-input>min,
 
                     then
 
@@ -198,7 +198,8 @@
                         metric:"load.shortterm",
                         operator:"gt",
                         value:5,
-                        action: 'alert'
+                        action: 'alert',
+                        reminder_offset: '1'
                     }
                 this.set('newRule', new_rule);
             },
