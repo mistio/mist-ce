@@ -67,15 +67,12 @@ def add_routes(configurator):
     configurator.add_route('images', '/images')
     configurator.add_route('image', '/images/{image}')
 
-
     configurator.add_route('api_v1_providers', '/api/v1/providers')
     configurator.add_route('providers', '/providers')
     configurator.add_route('api_v1_clouds', '/api/v1/clouds')
     configurator.add_route('clouds', '/clouds')
     configurator.add_route('api_v1_cloud_action', '/api/v1/clouds/{cloud}')
     configurator.add_route('cloud_action', '/clouds/{cloud}')
-    configurator.add_route('api_v1_edit_cloud', '/api/v1/edit_clouds/{cloud}')
-    configurator.add_route('edit_cloud', '/edit_clouds/{cloud}')
 
     configurator.add_route('api_v1_machines', '/api/v1/clouds/{cloud}/machines')
     configurator.add_route('api_v1_machine',
