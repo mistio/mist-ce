@@ -255,6 +255,9 @@
             .shorthigh.longhigh {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #EF5350; /*red red*/
             }
+            .monitoringArea {
+                padding: 24px;
+            }
         </style>
 
         <div id="content">
@@ -314,6 +317,15 @@
                      <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
                 </div>
             </paper-material>-->
+            <paper-material class="info-card">
+                <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
+                <div class="monitoringArea" hidden$="[[isMonitored]]">
+                    enable Monitoring
+                </div>
+                <div class="monitoringArea" hidden$="[[!isMonitored]]">
+                    is Monitored
+                </div>
+            </paper-material>
             <paper-material class="info-card">
                 <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
                 <div class="card-content">
