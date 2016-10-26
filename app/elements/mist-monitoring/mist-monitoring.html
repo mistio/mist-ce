@@ -1,0 +1,240 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
+
+<script src="../../bower_components/yaml.js/dist/yaml.min.js"></script>
+
+<dom-module id="mist-monitoring">
+    <template>
+        <style include="shared-styles">
+        	.monitoringArea, .scriptArea {
+                padding: 24px;
+            }
+            .monitoringArea paper-button {
+                margin-top: 24px;
+            }
+            .scriptArea .console {
+                background-color: #444;
+                color: #fff;
+                padding: 8px;
+            }
+            .errormsg-container {
+                padding: 24px 24px  0 24px;
+                color: var(--red-color);
+            }
+            .errormsg-container iron-icon {
+                color: inherit;
+            }
+            paper-button.red {
+                background-color: #d96557 !important;
+            }
+        </style>
+        <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring
+            [[monitoringState(resourec, model.monitoring)]]
+        </h2>
+        <div class="monitoringArea" hidden$="[[!isRunning]]">
+        	<p hidden$="[[resource.keys.length]]">
+            	To enable Monitoring you should either have a key associated to the machine or run the agent installation command manually. If there is an associated key, Mist.io will automatically install the monitoring agent
+            </p>
+            <p hidden$="[[!resource.keys.length]]">
+            	Once you enable monitoring Mist.io will automatically install the collectd monitoring agent and start receiving data.
+            </p>
+        </div>
+        <div class="monitoringArea" hidden$="[[!waitingData]]">
+            Waiting data
+        </div>
+        <div id="errormsgArea">
+            <p class="errormsg-container" hidden$="[[!monitoringError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
+        </div>
+        <div class="scriptArea" hidden$="[[!showScript]]">
+            <p hidden$="[[resource.keys.length]]">
+                You do not have associated keys with this machine. Either associate one, or manually install the monitoring agent running the following script.
+            </p>
+            <div class="console">
+				<code id="monitoringscript">
+					[[script]]
+				</code>
+        	</div>
+        </div>
+        <!-- the machine is running -->
+        <div hidden$="[[!isRunning]]">
+
+        	<!-- we can request monitoring -->
+            <div class="monitoringArea" hidden$="[[isMonitored]]">            	
+                <paper-button class="blue" on-tap="toggleMonitoring">enable Monitoring</paper-button>
+            </div>
+
+            <!-- the machine is considered monitored -->
+            <div class="monitoringArea" hidden$="[[!isMonitored]]">
+	            <paper-button class="red" on-tap="toggleMonitoring">disable Monitoring</paper-button>
+	        </div>
+
+        </div>
+
+        <!-- the machine cannot be monitored, it is not running -->
+        <div hidden$="[[isRunning]]">
+            <div class="monitoringArea">
+                The machine is [[resource.state]]. It must be running to enable monitoring.<br/>
+                <paper-button class="blue" on-tap="toggleMonitoring" disabled>enable Monitoring</paper-button>
+            </div>
+        </div>
+
+        <iron-ajax id="monitoringRequest" url="/api/v1/clouds/[[resource.cloud.id]]/machines/[[resource.id]]/monitoring" method="POST" on-response="_monitoringResponse" on-error="_monitoringError" on-request="_monitoringRequest" handle-as="xml"></iron-ajax>
+
+     </template>
+</dom-module>
+<script>
+	Polymer({
+        is: 'mist-monitoring',
+
+        properties: {
+        	resource: Object, //currently machines only, later other resources too
+        	monitoring: Object,
+        	section: Object,
+        	isRunning: {
+        		type: Boolean,
+        		computed: '_computeIsRunning(resource)'
+        	},
+        	isMonitored: {
+        		type: Boolean,
+        		computed: '_computeIsMonitored(resource, monitoring)'
+        	},
+        	isManualInstallation: {
+        		type: Boolean,
+        		computed: '_computeIsManualInstallation(resource)'
+        	},
+        	waitingData: {
+        		type: Boolean,
+        		value: false
+        	},
+        	installationError: {
+        		type: Boolean,
+        		value: false
+        	},
+        	isActivated: {
+        		type: Boolean,
+        		computed: '_computeIsActivated(resource, monitoring)',
+        		value: false
+        	},
+        	script: {
+        		type: String,
+        		computed: '_computeScript(resource, monitoring)',
+        	},
+        	monitoringError: {
+                type: Boolean,
+                value: false
+            },
+            showScript: {
+                type: Boolean,
+                value: false
+            },
+        },
+        
+        observers: [
+        	// '_isMonitored(resource, monitoring.machines.*)'
+        ],
+        ready: function(){
+
+        },
+        attached: function(){
+
+        },
+        // _isMonitored: function(machine, machines){
+        //     if (machines){
+        //         var mach =  machines.base.find(function(m){
+        //             return m[1] == machine.id ;
+        //         }, this);
+        //     }
+        //     if (mach && machine.state == "running"){
+        //         this.isMonitored = true;
+        //     }
+        //     else{
+        //         this.isMonitored = false;
+        //     }
+        // },
+        _computeIsMonitored: function(resource, monitoring){
+        	if (monitoring && monitoring.monitored_machines[resource.uuid])
+        		return true;
+        	else {
+        		return false;
+        	}
+        },
+        _computeIsRunning: function(resource) {
+            return this.resource.state == "running";
+        },
+        _computeWaitingData: function(resource, monitoring){
+            if (!this.resource || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[machine.uuid] || !this.monitoring.monitored_machines[resource.uuid].installation_status){
+                return false;
+            }
+            else if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == 'succeded' && !this.model.monitoring.monitored_machines[resource.uuid].installation_status.activated_at){
+                return true;
+            }
+            else 
+                return false;
+        },
+        monitoringState: function(resource, monitoring){
+            if (!this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid]){
+                return "";
+            }
+            else if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == "succeeded"){
+                return "enabled";
+            }
+            else {
+                return this.monitoring.monitored_machines[resource.uuid].installation_status.state;
+            }
+        },
+        toggleMonitoring: function(e){
+            var payload = {}
+                payload.action = this.isMonitored ? "disable" : "enable";
+                payload.no_ssh = this.resource.keys && this.resource.keys.length ? "false" : "true";
+                payload.public_ips = this.resource.public_ips;
+                payload.name = this.resource.name;
+                payload.dns_name = this.resource.extra.dns_name ? this.resource.extra.dns_name : "n/a";
+            console.log("toggleMonitoring",payload);
+            this.$.monitoringRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+            this.$.monitoringRequest.params = payload;
+            this.$.monitoringRequest.generateRequest();
+        },
+        _monitoringRequest: function(e){},
+        _monitoringResponse: function(e){
+            var script = YAML.parse(e.detail.xhr.response);
+            if (this.resource.extra.os_type)
+                script = script[this.resource.extra[os_type]+"_command"];
+            else
+                script = script.command; //["command"];
+            this.$.monitoringscript.textContent = YAML.dump(script);
+
+            if (script != null)
+                this.set("showScript", true);
+            else 
+                this.set("showScript", false);
+
+            // this.script = script;
+        },
+        _monitoringError: function(e){
+            console.log("_monitoringError",e.detail.request.xhr.responseText);
+            this.$.errormsg.textContent = e.detail.request.xhr.responseText;
+            this.set("monitoringError", true);
+        },
+        _reset: function(resource){
+            this.set("monitoringError", false);
+            this.set("showScript", false);
+        },
+        _computeScript: function(resource, monitoring){
+        	if (!this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid]){
+                return "";
+            }
+            else if (this.monitoring.monitored_machines[resource.uuid].script){
+                return this.monitoring.monitored_machines[resource.uuid].script;
+            }
+            else {
+            	return "";	
+            }
+        }
+    });
+</script>

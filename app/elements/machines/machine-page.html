@@ -7,6 +7,7 @@
 <link rel="import" href="../tags/tags-list.html">
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
+<link rel="import" href="../mist-monitoring/mist-monitoring.html">
 
 <link rel="import" href="machine-edit.html">
 
@@ -254,10 +255,7 @@
             }
             .shorthigh.longhigh {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #EF5350; /*red red*/
-            }
-            .monitoringArea {
-                padding: 24px;
-            }
+            }            
         </style>
 
         <div id="content">
@@ -318,15 +316,7 @@
                 </div>
             </paper-material>-->
             <paper-material class="info-card">
-                <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring
-                    <span hidden$="[[!isMonitored]]"> enabled</span>
-                </h2>
-                <div class="monitoringArea" hidden$="[[isMonitored]]">
-                    <paper-button class="blue" on-tap="toggleMonitoring">enable Monitoring</paper-button>
-                </div>
-                <div class="monitoringArea" hidden$="[[!isMonitored]]">
-                    <paper-button class="blue" on-tap="toggleMonitoring">disable Monitoring</paper-button>
-                </div>
+                <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]"></mist-monitoring>
             </paper-material>
             <paper-material class="info-card">
                 <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
@@ -368,8 +358,7 @@
         <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
         <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-        <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
-        <iron-ajax id="monitoringRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/monitoring" method="POST" on-response="_monitoringResponse" on-error="_monitoringError" on-request="_monitoringRequest"></iron-ajax>
+        <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>    
         <!-- <machine-edit machine="[[machine]]"></machine-edit> -->
         <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
@@ -545,6 +534,7 @@ MACHINEACTIONS = {
             }
         },
         observers: [
+            '_reset(machine.id)',
             '_isMonitored(machine, model.monitoring.machines.*)',
             '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)'
         ],
@@ -584,7 +574,8 @@ MACHINEACTIONS = {
                     that.querySelector('dashboard-panel').resize();
 
             }, 5000);
-
+            this.set("monitoringError", false);
+            this.set("showScript", false);
         },
         _computeActions: function(item){
             var ret = [];
@@ -707,7 +698,7 @@ MACHINEACTIONS = {
                     return m[1] == machine.id ;
                 }, this);
             }
-            if (mach){
+            if (mach && machine.state == "running"){
                 this.isMonitored = true;
             }
             else{
@@ -874,21 +865,6 @@ MACHINEACTIONS = {
                     return classes;
                 }
             }
-        },
-        toggleMonitoring: function(e){
-            var payload = {}
-                payload.action = this.isMonitored ? "disable" : "enable";
-                payload.no_ssh = this.machine.keys && this.machine.keys.length ? "false" : "true";
-                payload.public_ips = this.machine.public_ips;
-                payload.name = this.machine.name;
-                payload.dns_name = "n/a";
-            console.log("toggleMonitoring",payload);
-            this.$.monitoringRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-            this.$.monitoringRequest.params = payload;
-            this.$.monitoringRequest.generateRequest();
-        },
-        _monitoringRequest: function(){},
-        _monitoringResponse: function(){},
-        _monitoringError: function(){}
+        }
     });
 </script>
