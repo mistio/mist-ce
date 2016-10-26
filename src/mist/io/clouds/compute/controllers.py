@@ -3,7 +3,6 @@
 """
 
 import re
-import json
 import logging
 
 from xml.sax.saxutils import escape

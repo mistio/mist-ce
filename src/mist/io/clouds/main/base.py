@@ -20,8 +20,6 @@ from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
-from mist.io.clouds.compute.base import ComputeController
-
 # from mist.core.cloud.models import Machine
 
 
@@ -130,8 +128,6 @@ class BaseController(object):
         extend this method instead.
 
         """
-        self.compute = ComputeController(self)
-
         self.cloud = cloud
         self._conn = None
 
