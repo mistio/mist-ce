@@ -28,6 +28,8 @@ from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.io.helpers import get_datetime
 
+from mist.io.clouds.main.base import BaseController
+
 from mist.core.tag.models import Tag
 
 # from mist.core.cloud.models import Machine
@@ -40,10 +42,18 @@ class ComputeController(object):
     """
 
     """
-    def __init__(self, main_controller):
+    def __init__(self, main_controller=None):
         """
 
         """
+        if not main_controller or not isinstance(main_controller,
+                                                 BaseController):
+            raise TypeError(
+                "Can't initialize %s. "
+                "All subcontrollers should inherit a main controller "
+                "pointing to a subclass of `BaseController`." % self
+            )
+
         self.ctl = main_controller
 
     def list_machines(self):
