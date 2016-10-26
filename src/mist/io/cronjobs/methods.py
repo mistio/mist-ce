@@ -67,7 +67,7 @@ def add_cronjob_entry(auth_context, params):
             machine = Machine.objects.get(id=machine_uuid,
                                           state__ne='terminated')
         except me.DoesNotExist:
-            raise NotFoundError('Machine with that machine id does not exist')
+            raise NotFoundError('Machine state is terminated')
 
         cloud_id = machine.cloud.id
         # SEC require permission READ on cloud
@@ -88,8 +88,8 @@ def add_cronjob_entry(auth_context, params):
     pt_args.update({
         'owner': owner,
         'kwargs': {},
+        'machines': sched_machines_obj,
     })
-    pt_args['machines'] = sched_machines_obj
 
     if params.get('action'):
         pt_args.update({
