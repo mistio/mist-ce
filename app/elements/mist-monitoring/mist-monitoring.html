@@ -12,73 +12,102 @@
 <dom-module id="mist-monitoring">
     <template>
         <style include="shared-styles">
-        	.monitoringArea, .scriptArea {
+        	.monitoringArea {
                 padding: 24px;
             }
-            .monitoringArea paper-button {
-                margin-top: 24px;
-            }
-            .scriptArea .console {
+            .console {
                 background-color: #444;
                 color: #fff;
                 padding: 8px;
+                margin-top: 24px;
+                margin-bottom: 24px;
+            }
+            #errormsgArea p {
+                margin-top: 0;
             }
             .errormsg-container {
-                padding: 24px 24px  0 24px;
                 color: var(--red-color);
             }
             .errormsg-container iron-icon {
                 color: inherit;
             }
+            paper-button {
+                margin: 24px 0 0 0;
+            }
             paper-button.red {
                 background-color: #d96557 !important;
             }
+            .head {
+                margin-top: 0;
+            }
+            .tip {
+                opacity: 0.54;
+                font-size: 0.9em;
+            }
         </style>
-        <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring
-            [[monitoringState(resourec, model.monitoring)]]
-        </h2>
-        <div class="monitoringArea" hidden$="[[!isRunning]]">
-        	<p hidden$="[[resource.keys.length]]">
-            	To enable Monitoring you should either have a key associated to the machine or run the agent installation command manually. If there is an associated key, Mist.io will automatically install the monitoring agent
-            </p>
-            <p hidden$="[[!resource.keys.length]]">
-            	Once you enable monitoring Mist.io will automatically install the collectd monitoring agent and start receiving data.
-            </p>
-        </div>
-        <div class="monitoringArea" hidden$="[[!waitingData]]">
-            Waiting data
-        </div>
-        <div id="errormsgArea">
-            <p class="errormsg-container" hidden$="[[!monitoringError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
-        </div>
-        <div class="scriptArea" hidden$="[[!showScript]]">
-            <p hidden$="[[resource.keys.length]]">
-                You do not have associated keys with this machine. Either associate one, or manually install the monitoring agent running the following script.
-            </p>
-            <div class="console">
-				<code id="monitoringscript">
-					[[script]]
-				</code>
-        	</div>
-        </div>
-        <!-- the machine is running -->
-        <div hidden$="[[!isRunning]]">
+        <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
+        <div class="monitoringArea">        
+            <!-- the machine is running -->
+            <div hidden$="[[!isRunning]]">
 
-        	<!-- we can request monitoring -->
-            <div class="monitoringArea" hidden$="[[isMonitored]]">            	
-                <paper-button class="blue" on-tap="toggleMonitoring">enable Monitoring</paper-button>
+                <!-- the machine is not yet monitored -->
+                <div hidden$="[[!isMonitored]]">
+
+                    <div hidden$="[[isActivated]]">
+                        <div hidden$="[[resourceMonitoringInfo.installation_status.activated_at]]">
+                            <h4 class="head"><strong>Monitoring is not yet activated</strong></h4>
+                        </div>
+                        <p hidden$="[[resource.keys.length]]">
+                            To enable Monitoring you should either have a key associated to the machine or run the agent installation command manually. If there is an associated key, Mist.io will automatically install the monitoring agent.
+                        </p>
+                        <p hidden$="[[!resource.keys.length]]">
+                            When you enable monitoring Mist.io automatically installs the collectd monitoring agent and starts receiving data.
+                        </p>
+                    </div>
+                    <p hidden$="[[resource.keys.length]]">
+                        You do not have associated keys with this machine. Either associate one and retry, or manually install the monitoring agent running the following script.
+                    </p>                    
+                    <div hidden$="[[isActivated]]">
+                        <p hidden$="[[resourceMonitoringInfo.installation_status.manual]]">
+                            Agent installation status: [[monitoringState(resource, monitoring)]]
+                        </p>
+                        <div hidden$="[[!resourceMonitoringInfo.installation_status.manual]]">
+                            Run the following command with ssh to manually install the monitoring agent.
+                            <div class="console">
+                                <code id="monitoringscript">
+                                    [[script]]
+                                </code>
+                            </div>
+                            <h4 class="tip"><strong>Tip:</strong> Alternatively you can disable monitoring, associate a key, and enable monitoring again, so Mist.io will automativally connect and install the monitoring agent.</h4>
+                        </div>
+                    </div>
+                    <p hidden$="[[!isActivated]]">
+                        Graphs
+                    </p>                    
+                </div>
+                
+                <div id="errormsgArea">
+                    <p class="errormsg-container" hidden$="[[!monitoringError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
+                </div>
+
+            	<!-- we can request monitoring button -->
+                <div hidden$="[[isMonitored]]">
+                    <paper-button class="blue" on-tap="toggleMonitoring">enable Monitoring</paper-button>
+                </div>
+
+
+                <!-- the machine is considered monitored -->
+                <div hidden$="[[!isMonitored]]">                    
+                    <div hidden$="[[!waitingData]]">
+                        <p>Waiting for data</p>
+                    </div>
+    	            <paper-button class="red" on-tap="toggleMonitoring">disable Monitoring</paper-button>
+    	        </div>
+
             </div>
 
-            <!-- the machine is considered monitored -->
-            <div class="monitoringArea" hidden$="[[!isMonitored]]">
-	            <paper-button class="red" on-tap="toggleMonitoring">disable Monitoring</paper-button>
-	        </div>
-
-        </div>
-
-        <!-- the machine cannot be monitored, it is not running -->
-        <div hidden$="[[isRunning]]">
-            <div class="monitoringArea">
+            <!-- the machine cannot be monitored, it is not running -->
+            <div hidden$="[[isRunning]]">
                 The machine is [[resource.state]]. It must be running to enable monitoring.<br/>
                 <paper-button class="blue" on-tap="toggleMonitoring" disabled>enable Monitoring</paper-button>
             </div>
@@ -100,9 +129,13 @@
         		type: Boolean,
         		computed: '_computeIsRunning(resource)'
         	},
+            resourceMonitoringInfo: {
+                type: Object,
+                computed: '_computeResourceMonitoringInfo(resource, monitoring)'
+            },
         	isMonitored: {
         		type: Boolean,
-        		computed: '_computeIsMonitored(resource, monitoring)'
+        		computed: '_computeIsMonitored(resource, monitoring.machines.*)'
         	},
         	isManualInstallation: {
         		type: Boolean,
@@ -118,8 +151,7 @@
         	},
         	isActivated: {
         		type: Boolean,
-        		computed: '_computeIsActivated(resource, monitoring)',
-        		value: false
+        		computed: '_computeIsActivated(resource, monitoring)'
         	},
         	script: {
         		type: String,
@@ -136,7 +168,8 @@
         },
         
         observers: [
-        	// '_isMonitored(resource, monitoring.machines.*)'
+        	// '_isMonitored(resource, monitoring.machines.*),'
+            '_reset(resource.id)'
         ],
         ready: function(){
 
@@ -158,7 +191,7 @@
         //     }
         // },
         _computeIsMonitored: function(resource, monitoring){
-        	if (monitoring && monitoring.monitored_machines[resource.uuid])
+        	if (this.resource && this.monitoring && this.monitoring.monitored_machines[resource.uuid])
         		return true;
         	else {
         		return false;
@@ -168,10 +201,10 @@
             return this.resource.state == "running";
         },
         _computeWaitingData: function(resource, monitoring){
-            if (!this.resource || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[machine.uuid] || !this.monitoring.monitored_machines[resource.uuid].installation_status){
+            if (!this.resource || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || !this.monitoring.monitored_machines[resource.uuid].installation_status){
                 return false;
             }
-            else if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == 'succeded' && !this.model.monitoring.monitored_machines[resource.uuid].installation_status.activated_at){
+            else if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == 'succeeded' && !this.model.monitoring.monitored_machines[resource.uuid].installation_status.activated_at){
                 return true;
             }
             else 
@@ -180,9 +213,6 @@
         monitoringState: function(resource, monitoring){
             if (!this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid]){
                 return "";
-            }
-            else if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == "succeeded"){
-                return "enabled";
             }
             else {
                 return this.monitoring.monitored_machines[resource.uuid].installation_status.state;
@@ -207,7 +237,7 @@
                 script = script[this.resource.extra[os_type]+"_command"];
             else
                 script = script.command; //["command"];
-            this.$.monitoringscript.textContent = YAML.dump(script);
+            // this.$.monitoringscript.textContent = YAML.dump(script);
 
             if (script != null)
                 this.set("showScript", true);
@@ -229,12 +259,24 @@
         	if (!this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid]){
                 return "";
             }
-            else if (this.monitoring.monitored_machines[resource.uuid].script){
-                return this.monitoring.monitored_machines[resource.uuid].script;
+            else if (this.monitoring.monitored_machines[resource.uuid].commands){
+                return this.monitoring.monitored_machines[resource.uuid].commands[this.resource.os_type] || this.monitoring.monitored_machines[resource.uuid].commands["unix"];
             }
             else {
             	return "";	
             }
+        },
+        _computeIsActivated(resource, monitoring){
+            if (!this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || !this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at)
+                return false;
+            else
+                return true;
+        },
+        _computeResourceMonitoringInfo: function(resource, monitoring){
+            if (!this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid])
+                return false;
+            else
+                return this.monitoring.monitored_machines[resource.uuid];
         }
     });
 </script>

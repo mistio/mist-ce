@@ -322,10 +322,10 @@
             <!-- <paper-material class="info-card" hidden$="[[!isMonitored]]">
                 <h2 style$="[[_getHeaderStyle(section.color)]]">Rules</h2>
             </paper-material> -->
-            <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isMonitored]]"></mist-rules>
             <paper-material class="info-card">
                 <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]"></mist-monitoring>
             </paper-material>
+            <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isMonitored]]"></mist-rules>
             <paper-material class="info-card">
                 <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
                 <div class="card-content">
@@ -541,8 +541,7 @@ MACHINEACTIONS = {
                 value: false
             }
         },
-        observers: [
-            '_reset(machine.id)',
+        observers: [            
             '_isMonitored(machine, model.monitoring.machines.*)',
             '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)'
         ],
