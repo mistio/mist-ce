@@ -363,6 +363,48 @@ def rename_cloud(request):
     return OK
 
 
+@view_config(route_name='api_v1_cloud_action', request_method='PATCH')
+@view_config(route_name='cloud_action', request_method='PATCH')
+def update_cloud(request):
+    """
+    UPDATE cloud with given cloud_id.
+    EDIT permission required on cloud.
+    Not all fields need to be specified, only the ones being modified
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    """
+    auth_context = auth_context_from_request(request)
+    cloud_id = request.matchdict['cloud']
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
+    params = params_from_request(request)
+    creds = params
+
+    if not creds:
+        raise BadRequestError("You should provide your new cloud settings")
+
+    auth_context.check_perm('cloud', 'edit', cloud_id)
+
+    log.info("Updating cloud: %s", cloud_id)
+
+    fail_on_error = params.pop('fail_on_error', True)
+    fail_on_invalid_params = params.pop('fail_on_invalid_params', True)
+
+    # Edit the cloud
+    cloud.ctl.update(fail_on_error=fail_on_error,
+                     fail_on_invalid_params=fail_on_invalid_params, **creds)
+
+    log.info("Cloud with id '%s' updated successfully.", cloud.id)
+    trigger_session_update(auth_context.owner, ['clouds'])
+    return OK
+
+
 @view_config(route_name='api_v1_cloud_action', request_method='POST')
 @view_config(route_name='cloud_action', request_method='POST')
 def toggle_cloud(request):
@@ -388,18 +430,17 @@ def toggle_cloud(request):
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
-    params = params_from_request(request)
-    new_state = params.get('new_state', '')
-    if not new_state:
-        raise RequiredParameterMissingError('new_state')
-
-    if new_state != "1" and new_state != "0":
-        raise BadRequestError('Invalid cloud state')
-
     auth_context.check_perm('cloud', 'edit', cloud_id)
 
-    cloud.enabled=bool(int(new_state))
-    cloud.save()
+    new_state = params_from_request(request).get('new_state')
+    if new_state == '1':
+        cloud.ctl.enable()
+    elif new_state == '0':
+        cloud.ctl.disable()
+    elif new_state:
+        raise BadRequestError('Invalid cloud state')
+    else:
+        raise RequiredParameterMissingError('new_state')
     trigger_session_update(auth_context.owner, ['clouds'])
     return OK
 
