@@ -548,7 +548,7 @@ Polymer({
             machinesWithIncidents = this.model.incidentsArray.filter(function(inc){
                     return !inc.finished_at || inc.finished_at == 0;
                 }).map(function(inc){
-                    if (this.model.clouds[inc.cloud_id] && this.model.clouds[inc.cloud_id].machines && this.model.clouds[inc.cloud_id].machines[inc.machine_id]) 
+                    if (this.model.clouds && this.model.clouds[inc.cloud_id] && this.model.clouds[inc.cloud_id].machines && this.model.clouds[inc.cloud_id].machines[inc.machine_id]) 
                         return this.model.clouds[inc.cloud_id].machines[inc.machine_id].id;
             }, this);
         }
