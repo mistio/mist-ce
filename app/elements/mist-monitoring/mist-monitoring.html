@@ -63,11 +63,14 @@
                         <p hidden$="[[!resource.keys.length]]">
                             When you enable monitoring Mist.io automatically installs the collectd monitoring agent and starts receiving data.
                         </p>
-                    </div>
-                    <p hidden$="[[resource.keys.length]]">
-                        You do not have associated keys with this machine. Either associate one and retry, or manually install the monitoring agent running the following script.
-                    </p>                    
-                    <div hidden$="[[isActivated]]">
+                        <p hidden$="[[!resource.keys]]">
+                            You do not have associated keys with this machine. Either associate one and retry, or manually install the monitoring agent running the following script.
+                            <div class="console">
+                                <code id="monitoringscript">
+                                    [[script]]
+                                </code>
+                            </div>
+                        </p>
                         <p hidden$="[[!resource.keys.length]]">
                             Agent installation status: [[monitoringState(resource, monitoring)]]
                         </p>
@@ -83,7 +86,7 @@
                     </div>
                     <p hidden$="[[!isActivated]]">
                         Graphs
-                    </p>                    
+                    </p>
                 </div>
                 
                 <div id="errormsgArea">
