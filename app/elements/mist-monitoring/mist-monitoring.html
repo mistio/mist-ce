@@ -68,10 +68,10 @@
                         You do not have associated keys with this machine. Either associate one and retry, or manually install the monitoring agent running the following script.
                     </p>                    
                     <div hidden$="[[isActivated]]">
-                        <p hidden$="[[resourceMonitoringInfo.installation_status.manual]]">
+                        <p hidden$="[[!resource.keys.length]]">
                             Agent installation status: [[monitoringState(resource, monitoring)]]
                         </p>
-                        <div hidden$="[[!resourceMonitoringInfo.installation_status.manual]]">
+                        <div hidden$="[[resource.keys.length]]">
                             Run the following command with ssh to manually install the monitoring agent.
                             <div class="console">
                                 <code id="monitoringscript">
