@@ -33,6 +33,8 @@ from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.io.helpers import get_datetime
 
+from mist.io.clouds.networks import NetworkSubcontroller
+
 from mist.core.tag.models import Tag
 
 # from mist.core.cloud.models import Machine
@@ -146,6 +148,7 @@ class BaseController(object):
 
         self.cloud = cloud
         self._conn = None
+        self.network = NetworkSubcontroller(self)
 
     @property
     def connection(self):

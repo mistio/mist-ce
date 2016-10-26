@@ -15,6 +15,7 @@ from mist.io.exceptions import CloudExistsError
 from mist.io.exceptions import RequiredParameterMissingError
 
 
+
 # This is a map from provider name to provider class, eg:
 # 'linode': LinodeCloud
 # It is autofilled by _populate_clouds which is run on the end of this file.
@@ -368,3 +369,31 @@ class OtherCloud(Cloud):
 
 
 _populate_clouds()
+
+
+class Network(me.Document):
+
+    id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
+    title = me.StringField(required=True)
+    cloud = me.ReferenceField(Cloud, required=True)
+
+    subnets = me.ListField(me.ReferenceField('Subnet'))
+    machines = me.ListField(me.ReferenceField('Machine'))
+
+    @property
+    def owner(self):
+        return self.cloud.owner
+
+
+class Subnet(me.Document):
+
+    id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
+    title = me.StringField(required=True)
+    cloud = me.ReferenceField(Cloud, required=True)
+
+    base_network = me.ReferenceField(Network)
+    machines = me.ListField(me.ReferenceField('Machine'))
+
+    @property
+    def owner(self):
+        return self.cloud.owner
