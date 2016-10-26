@@ -57,24 +57,14 @@
                         <div hidden$="[[resourceMonitoringInfo.installation_status.activated_at]]">
                             <h4 class="head"><strong>Monitoring is not yet activated</strong></h4>
                         </div>
-                        <p hidden$="[[resource.keys.length]]">
-                            To enable Monitoring you should either have a key associated to the machine or run the agent installation command manually. If there is an associated key, Mist.io will automatically install the monitoring agent.
-                        </p>
-                        <p hidden$="[[!resource.keys.length]]">
+                         <p hidden$="[[!hasKeys]]">
                             When you enable monitoring Mist.io automatically installs the collectd monitoring agent and starts receiving data.
                         </p>
-                        <p hidden$="[[!resource.keys]]">
-                            You do not have associated keys with this machine. Either associate one and retry, or manually install the monitoring agent running the following script.
-                            <div class="console">
-                                <code id="monitoringscript">
-                                    [[script]]
-                                </code>
-                            </div>
-                        </p>
-                        <p hidden$="[[!resource.keys.length]]">
+                        <p hidden$="[[!hasKeys]]">
                             Agent installation status: [[monitoringState(resource, monitoring)]]
                         </p>
-                        <div hidden$="[[resource.keys.length]]">
+                        <div hidden$="[[hasKeys]]">
+                            Mist.io can not install the monitoring agent automatically, beacause there are no associated keys with this machine. <br/><br/>
                             Run the following command with ssh to manually install the monitoring agent.
                             <div class="console">
                                 <code id="monitoringscript">
@@ -167,6 +157,11 @@
             showScript: {
                 type: Boolean,
                 value: false
+            },
+            hasKeys: {
+                type: Boolean,
+                computed: '_computeHasKeys(resource.keys.*)',
+                value: true
             },
         },
         
@@ -280,6 +275,12 @@
                 return false;
             else
                 return this.monitoring.monitored_machines[resource.uuid];
+        },
+        _computeHasKeys: function(keys){
+            if (this.resource.keys)
+                return this.resource.keys.length > 0;
+            else
+                return false;
         }
     });
 </script>
