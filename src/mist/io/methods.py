@@ -2318,8 +2318,7 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
             else:
                 try:
                     name = Machine.objects.get(cloud=cloud,
-                                               machine_id=machine_id,
-                                               state__ne='terminated').name
+                                               machine_id=machine_id).name
                 except DoesNotExist:
                     name = ''
             if name:
