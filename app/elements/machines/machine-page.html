@@ -291,63 +291,24 @@
                                 <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
                             </div>
                         </template>
-        <div class="machine-key" id="pendingKeyRequest">
-            <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
-        </div>
-        </div>
-        </paper-material>
-        <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
-            <h3 class="smallcaps">TAGS:</h3>
-            <template is="dom-repeat" items="[[machine.tags]]">
-                            <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
-                        </template>
-        </paper-material>
-        </div>
-        <paper-material class="info-card" hidden$="[[!isMonitored]]">
-            <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
-            <add-panel uri="[[_computeMetricsUri(machine)]]"></add-panel>
-            <polyana-dashboard dashboard="{{dashboard}}" datasources="[[datasources]]" dashboard-path="mist"></polyana-dashboard>
-        </paper-material>
-        <paper-material class="info-card">
-            <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
-            <div class="card-content">
-                <table class="info-table">
-                    <template is="dom-if" if="[[machine.public_ips]]">
-                                <tr>
-                                    <td>Machine ID</td>
-                                    <td>[[machine.id]]</td>
-                                </tr>
-                                <tr>
-                                    <td>UUID</td>
-                                    <td>[[machine.uuid]]</td>
-                                </tr>
-                                <tr><td>Public IPs</td>
-                                    <td><template is="dom-repeat" items="[[machine.public_ips]]">
-                                            [[item]]
-                                        </template>
-                    </td>
-                    </tr>
-                    <tr>
-                        <td>Private IPs</td>
-                        <td><template is="dom-repeat" items="[[machine.private_ips]]">
-                                            [[item]]
-                                        </template>
-                        </td>
-                    </tr>
+                        <div class="machine-key" id="pendingKeyRequest">
+                            <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
+                        </div>
+                    </div>
+                </paper-material>
+                <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
+                    <h3 class="smallcaps">TAGS:</h3>
+                    <template is="dom-repeat" items="[[machine.tags]]">
+                        <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
                     </template>
-                </table>
+                </paper-material>
             </div>
-            <!--<paper-material class="info-card" hidden$="{{!isMonitored}}">
+            <paper-material class="info-card">
                 <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
-                <div>
-                    <paper-material>graph data</paper-material>
-                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
-                </div>
-            </paper-material>-->
-            <!-- <paper-material class="info-card" hidden$="[[!isMonitored]]">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">Rules</h2>
-            </paper-material> -->
-            <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isMonitored]]"></mist-rules>
+                <add-panel uri="[[_computeMetricsUri(machine)]]"></add-panel>
+                <polyana-dashboard dashboard="{{dashboard}}" datasources="[[datasources]]" dashboard-path="mist"></polyana-dashboard>
+                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isMonitored]]"></mist-rules>
+            </paper-material>
             <paper-material class="info-card">
                 <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
                 <div class="card-content">
