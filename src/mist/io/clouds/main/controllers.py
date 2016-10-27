@@ -54,6 +54,7 @@ from mist.io.bare_metal import BareMetalDriver
 from mist.io.clouds.main.base import BaseController, rename_kwargs
 
 import mist.io.clouds.compute.controllers as compute_controllers
+import mist.io.clouds.network.controllers as network_controllers
 
 log = logging.getLogger(__name__)
 
@@ -65,6 +66,7 @@ class AmazonController(BaseController):
     def __init__(self, cloud):
         super(AmazonController, self).__init__(cloud)
         self.compute = compute_controllers.AmazonComputeController(self)
+        self.network = network_controllers.AmazonNetworkController(self)
 
     def _connect(self):
         return get_driver(Provider.EC2)(self.cloud.apikey,
@@ -210,6 +212,7 @@ class GoogleController(BaseController):
     def __init__(self, cloud):
         super(GoogleController, self).__init__(cloud)
         self.compute = compute_controllers.GoogleComputeController(self)
+        self.network = network_controllers.GoogleNetworkController(self)
 
     def _connect(self):
         return get_driver(Provider.GCE)(self.cloud.email,
@@ -354,6 +357,7 @@ class OpenStackController(BaseController):
     def __init__(self, cloud):
         super(OpenStackController, self).__init__(cloud)
         self.compute = compute_controllers.OpenStackComputeController(self)
+        self.network = network_controllers.OpenStackNetworkController(self)
 
     def _connect(self):
         url = dnat(self.cloud.owner, self.cloud.url)

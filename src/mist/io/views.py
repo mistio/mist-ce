@@ -1446,7 +1446,6 @@ def list_locations(request):
 def list_networks(request):
     """
     List networks of a cloud
-    List networks from each cloud.
     Currently supports the EC2, GCE and Openstack clouds.
     For other providers this returns an empty list.
     READ permission required on cloud.
@@ -1456,10 +1455,13 @@ def list_networks(request):
       required: true
       type: string
     """
+
     cloud_id = request.matchdict['cloud']
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
-    return methods.list_networks(auth_context.owner, cloud_id)
+    networks = methods.list_networks(auth_context.owner, cloud_id)
+
+    return networks
 
 
 @view_config(route_name='api_v1_networks', request_method='POST', renderer='json')
@@ -1516,6 +1518,7 @@ def delete_network(request):
       required: true
       type: string
     """
+    log.info(request)
     cloud_id = request.matchdict['cloud']
     network_id = request.matchdict['network']
 

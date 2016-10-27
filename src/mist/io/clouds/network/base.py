@@ -25,9 +25,7 @@ class NetworkController(object):
         """List Networks
         Should be extended by Cloud vendor-specific subclasses"""
 
-
         libcloud_networks = self.ctl.connection.ex_list_networks()
-        log.info(libcloud_networks)
         return self._parse_network_listing(libcloud_networks, return_format)
 
     def _parse_network_listing(self, network_listing, return_format):

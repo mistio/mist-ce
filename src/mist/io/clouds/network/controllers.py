@@ -1,36 +1,87 @@
 import logging
-from mist.io.clouds.models import Network, Subnet
+# from mist.io.clouds.network.models import Network, Subnet
 from mist.io.clouds.network.base import NetworkController
-
 
 log = logging.getLogger(__name__)
 
 
 class AmazonNetworkController(NetworkController):
-
     def _create_network(self, network_listing):
         pass
 
-    def _parse_network_listing(self, network_listing):
-        pass
+    @staticmethod
+    def _ec2_network_to_dict(network):
+        net = {'name': network.name,
+               'id': network.id,
+               'is_default': network.extra.get('is_default', False),
+               'state': network.extra.get('state'),
+               'instance_tenancy': network.extra.get('instance_tenancy'),
+               'dhcp_options_id': network.extra.get('dhcp_options_id'),
+               'tags': network.extra.get('tags', []),
+               'subnets': [{'name': network.cidr_block}]}
+        return net
+
+    def _parse_network_listing(self, network_listing, return_format):
+        for network in network_listing:
+            return_format['public'].append(self._ec2_network_to_dict(network))
+        return return_format
 
 
 class GoogleNetworkController(NetworkController):
-
     def _create_network(self, network_listing):
         pass
 
-    def _parse_network_listing(self, network_listing):
-        pass
+    def _parse_network_listing(self, network_listing, return_format):
+
+        all_subnets = self.ctl.connection.ex_list_subnets()
+        subnets = []
+        for region in all_subnets:
+            subnets += all_subnets[region]['subnetworks']
+        for network in network_listing:
+            return_format['public'].append(self._gce_network_to_dict(network, subnets=[s for s in subnets if
+                                                                                       s['network'].endswith(
+                                                                                           network.name)]))
+        return return_format
+
+    @staticmethod
+    def _gce_network_to_dict(network, subnets=None):
+        if subnets is None:
+            subnets = []
+        net = {'name': network.name,
+               'id': network.id,
+               'extra': network.extra,
+               'subnets': [GoogleNetworkController._gce_subnet_to_dict(s) for s in subnets]}
+        return net
+
+    @staticmethod
+    def _gce_subnet_to_dict(subnet):
+        # In case network is empty
+        if not subnet:
+            return {}
+        # Network and region come in URL form, so we have to split it
+        # and use the last element of the splited list
+        network = subnet['network'].split("/")[-1]
+        region = subnet['region'].split("/")[-1]
+
+        ret = {
+            'id': subnet['id'],
+            'name': subnet['name'],
+            'network': network,
+            'region': region,
+            'cidr': subnet['ipCidrRange'],
+            'gateway_ip': subnet['gatewayAddress'],
+            'creation_timestamp': subnet['creationTimestamp']
+        }
+        return ret
 
 
 class OpenStackNetworkController(NetworkController):
-
     def _create_network(self, network_listing):
         pass
 
     @staticmethod
     def _openstack_network_to_dict(network, subnets=None, floating_ips=None, nodes=None):
+
         if nodes is None:
             nodes = []
         if floating_ips is None:
@@ -54,6 +105,7 @@ class OpenStackNetworkController(NetworkController):
 
     @staticmethod
     def _openstack_floating_ip_to_dict(floating_ip, nodes=None):
+
         if nodes is None:
             nodes = []
 
@@ -105,7 +157,8 @@ class OpenStackNetworkController(NetworkController):
         subnets = conn.ex_list_subnets()
         routers = conn.ex_list_routers()
         floating_ips = conn.ex_list_floating_ips()
-        if conn.tenant_id:
+
+        if conn.connection.tenant_id:
             floating_ips = [floating_ip for floating_ip in floating_ips if
                             floating_ip.extra.get('tenant_id') == conn.connection.tenant_id]
         nodes = conn.list_nodes() if floating_ips else []
@@ -123,4 +176,3 @@ class OpenStackNetworkController(NetworkController):
             return_format['routers'].append(self._openstack_router_to_dict(router))
 
         return return_format
-
