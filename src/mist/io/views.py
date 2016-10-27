@@ -102,6 +102,7 @@ def exception_handler_mist(exc, request):
 @view_config(route_name='image', request_method='GET')
 @view_config(route_name='keys', request_method='GET')
 @view_config(route_name='key', request_method='GET')
+@view_config(route_name='networks', request_method='GET')
 @view_config(route_name='network', request_method='GET')
 
 def home(request):
@@ -1442,7 +1443,6 @@ def list_locations(request):
 
 
 @view_config(route_name='api_v1_networks', request_method='GET', renderer='json')
-@view_config(route_name='networks', request_method='GET', renderer='json')
 def list_networks(request):
     """
     List networks of a cloud
@@ -1501,7 +1501,6 @@ def create_network(request):
 
 
 @view_config(route_name='api_v1_network', request_method='DELETE')
-@view_config(route_name='networks', request_method='DELETE', renderer='json')
 def delete_network(request):
     """
     Delete a network

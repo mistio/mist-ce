@@ -12,32 +12,34 @@ class MachineController(object):
         self.machine = machine
 
     def start(self):
-        return self.machine.cloud.ctl.start_machine(self.machine)
+        return self.machine.cloud.ctl.compute.start_machine(self.machine)
 
     def stop(self):
-        return self.machine.cloud.ctl.stop_machine(self.machine)
+        return self.machine.cloud.ctl.compute.stop_machine(self.machine)
 
     def suspend(self):
         """Suspends machine - used in KVM libvirt to pause machine"""
-        return self.machine.cloud.ctl.suspend_machine(self.machine)
+        return self.machine.cloud.ctl.compute.suspend_machine(self.machine)
 
     def resume(self):
         """Resumes machine - used in KVM libvirt to resume suspended machine"""
-        return self.machine.cloud.ctl.resume_machine(self.machine)
+        return self.machine.cloud.ctl.compute.resume_machine(self.machine)
 
     def reboot(self):
-        return self.machine.cloud.ctl.reboot_machine(self.machine)
+        return self.machine.cloud.ctl.compute.reboot_machine(self.machine)
 
     def destroy(self):
-        return self.machine.cloud.ctl.destroy_machine(self.machine)
+        return self.machine.cloud.ctl.compute.destroy_machine(self.machine)
 
     def resize(self, plan_id):
         """Resize a machine on an other plan."""
-        return self.machine.cloud.ctl.resize_machine(self.machine, plan_id)
+        return self.machine.cloud.ctl.compute.resize_machine(self.machine,
+                                                             plan_id)
 
     def rename(self, name):
         """Renames a machine on a certain cloud."""
-        return self.machine.cloud.ctl.rename_machine(self.machine, name)
+        return self.machine.cloud.ctl.compute.rename_machine(self.machine,
+                                                             name)
 
     # TODO we want this also ?
     # def tag(self):
@@ -46,4 +48,4 @@ class MachineController(object):
     def undefine(self):
         """Undefines machine - used in KVM libvirt
         to destroy machine and delete XML conf"""
-        return self.machine.cloud.ctl.undefine_machine(self.machine)
+        return self.machine.cloud.ctl.compute.undefine_machine(self.machine)

@@ -436,7 +436,8 @@ def connect_provider(cloud):
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
-    machines = Cloud.objects.get(owner=user, id=cloud_id).ctl.list_machines()
+    machines = Cloud.objects.get(
+        owner=user, id=cloud_id).ctl.compute.list_machines()
     return [machine.as_dict_old() for machine in machines]
 
 
@@ -1397,14 +1398,15 @@ def ssh_command(user, cloud_id, machine_id, host, command,
 
 def list_images(user, cloud_id, term=None):
     """List images from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_images(term)
+    return Cloud.objects.get(
+        owner=user, id=cloud_id).ctl.compute.list_images(term)
 
 
 def star_image(user, cloud_id, image_id):
     """Toggle image star (star/unstar)"""
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
 
-    star = cloud.ctl.image_is_starred(image_id)
+    star = cloud.ctl.compute.image_is_starred(image_id)
     if star:
         if image_id in cloud.starred:
             cloud.starred.remove(image_id)
@@ -1456,12 +1458,13 @@ def list_keys(user):
 
 def list_sizes(user, cloud_id):
     """List sizes (aka flavors) from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_sizes()
+    return Cloud.objects.get(owner=user, id=cloud_id).ctl.compute.list_sizes()
 
 
 def list_locations(user, cloud_id):
     """List locations from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_locations()
+    return Cloud.objects.get(
+        owner=user, id=cloud_id).ctl.compute.list_locations()
 
 
 def list_networks(user, cloud_id):
@@ -1477,70 +1480,75 @@ def list_networks(user, cloud_id):
     }
 
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
-    controller_networks = cloud.ctl.network.list_networks()
+    if cloud.provider not in ['ec2', 'gce', 'openstack']:
+        return list_networks_legacy(connect_provider(cloud), ret)
+    controller_networks = cloud.ctl.network.list_networks(ret)
     ret.update(controller_networks)
     return ret
 
+
+def list_networks_legacy(conn, ret):
+
     # Get the actual networks
-    # if conn.type in [Provider.NEPHOSCALE]:
-    #     networks = conn.ex_list_networks()
-    #     for network in networks:
-    #         ret['public'].append(nephoscale_network_to_dict(network))
-    # elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-    #     networks = conn.ex_list_networks()
-    #
-    #     for network in networks:
-    #         ret['public'].append({
-    #             'id': network.id,
-    #             'name': network.name,
-    #             'extra': network.extra,
-    #         })
-    # elif conn.type in (Provider.OPENSTACK,):
-    #     networks = conn.ex_list_networks()
-    #     subnets = conn.ex_list_subnets()
-    #     routers = conn.ex_list_routers()
-    #     floating_ips = conn.ex_list_floating_ips()
-    #     if conn.connection.tenant_id:
-    #         floating_ips = [floating_ip for floating_ip in floating_ips if floating_ip.extra.get('tenant_id') == conn.connection.tenant_id]
-    #     if floating_ips:
-    #         nodes = conn.list_nodes()
-    #     else:
-    #         nodes = []
-    #
-    #     public_networks = []
-    #     for net in networks:
-    #         if net.router_external:
-    #             net_index = networks.index(net)
-    #             public_networks.append(networks.pop(net_index))
-    #
-    #     for pub_net in public_networks:
-    #         ret['public'].append(openstack_network_to_dict(pub_net, subnets, floating_ips, nodes))
-    #     for network in networks:
-    #         ret['private'].append(openstack_network_to_dict(network, subnets))
-    #     for router in routers:
-    #         ret['routers'].append(openstack_router_to_dict(router))
-    # elif conn.type in [Provider.GCE]:
-    #     networks = conn.ex_list_networks()
-    #     all_subnets = conn.ex_list_subnets()
-    #     subnets = []
-    #     for region in all_subnets:
-    #         subnets += all_subnets[region]['subnetworks']
-    #     for network in networks:
-    #         ret['public'].append(gce_network_to_dict(network,
-    #                              subnets=[s for s in subnets if s['network'].endswith(network.name)]))
-    # elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST, Provider.EC2_AP_NORTHEAST1, Provider.EC2_AP_NORTHEAST2,
-    #                    Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2,
-    #                    Provider.EC2_EU, Provider.EC2_EU_WEST,
-    #                    Provider.EC2_SA_EAST, Provider.EC2_US_EAST,
-    #                    Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON]:
-    #     networks = conn.ex_list_networks()
-    #     for network in networks:
-    #         ret['public'].append(ec2_network_to_dict(network))
-    #
-    # if conn.type == 'libvirt':
-    #     # close connection with libvirt
-    #     conn.disconnect()
-    return ret
+    if conn.type in [Provider.NEPHOSCALE]:
+        networks = conn.ex_list_networks()
+        for network in networks:
+            ret['public'].append(nephoscale_network_to_dict(network))
+    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
+        networks = conn.ex_list_networks()
+
+        for network in networks:
+            ret['public'].append({
+                'id': network.id,
+                'name': network.name,
+                'extra': network.extra,
+            })
+    elif conn.type in (Provider.OPENSTACK,):
+        networks = conn.ex_list_networks()
+        subnets = conn.ex_list_subnets()
+        routers = conn.ex_list_routers()
+        floating_ips = conn.ex_list_floating_ips()
+        if conn.connection.tenant_id:
+            floating_ips = [floating_ip for floating_ip in floating_ips if floating_ip.extra.get('tenant_id') == conn.connection.tenant_id]
+        if floating_ips:
+            nodes = conn.list_nodes()
+        else:
+            nodes = []
+
+        public_networks = []
+        for net in networks:
+            if net.router_external:
+                net_index = networks.index(net)
+                public_networks.append(networks.pop(net_index))
+
+        for pub_net in public_networks:
+            ret['public'].append(openstack_network_to_dict(pub_net, subnets, floating_ips, nodes))
+        for network in networks:
+            ret['private'].append(openstack_network_to_dict(network, subnets))
+        for router in routers:
+            ret['routers'].append(openstack_router_to_dict(router))
+    elif conn.type in [Provider.GCE]:
+        networks = conn.ex_list_networks()
+        all_subnets = conn.ex_list_subnets()
+        subnets = []
+        for region in all_subnets:
+            subnets += all_subnets[region]['subnetworks']
+        for network in networks:
+            ret['public'].append(gce_network_to_dict(network,
+                                 subnets=[s for s in subnets if s['network'].endswith(network.name)]))
+    elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST, Provider.EC2_AP_NORTHEAST1, Provider.EC2_AP_NORTHEAST2,
+                       Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2,
+                       Provider.EC2_EU, Provider.EC2_EU_WEST,
+                       Provider.EC2_SA_EAST, Provider.EC2_US_EAST,
+                       Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON]:
+        networks = conn.ex_list_networks()
+        for network in networks:
+            ret['public'].append(ec2_network_to_dict(network))
+
+        if conn.type == 'libvirt':
+            # close connection with libvirt
+            conn.disconnect()
+        return ret
 
 
 def list_projects(user, cloud_id):
@@ -1703,6 +1711,7 @@ def create_network(owner, cloud_id, network, subnet, router):
     it will use the new network's id to create a subnet
 
     """
+    log.info('create mathod called')
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     conn = connect_provider(cloud)
     if conn.type not in (Provider.OPENSTACK,):

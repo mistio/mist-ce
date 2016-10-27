@@ -8,7 +8,7 @@ from mist.core.tag.models import Tag
 from mist.core.keypair.models import Keypair
 from mist.core.user.models import Organization
 
-import mist.io.clouds.controllers as controllers
+import mist.io.clouds.main.controllers as controllers
 
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudExistsError
@@ -67,7 +67,7 @@ class Cloud(me.Document):
     clouds controller. This way it is possible to do things like:
 
         cloud = Cloud.objects.get(id=cloud_id)
-        print cloud.ctl.list_machines()
+        print cloud.ctl.compute.list_machines()
 
     """
 
@@ -377,6 +377,7 @@ class Network(me.Document):
     title = me.StringField(required=True)
     cloud = me.ReferenceField(Cloud, required=True)
 
+    cidr_range = me.StringField()
     subnets = me.ListField(me.ReferenceField('Subnet'))
     machines = me.ListField(me.ReferenceField('Machine'))
 
@@ -391,6 +392,7 @@ class Subnet(me.Document):
     title = me.StringField(required=True)
     cloud = me.ReferenceField(Cloud, required=True)
 
+    cidr_range = me.StringField()
     base_network = me.ReferenceField(Network)
     machines = me.ListField(me.ReferenceField('Machine'))
 
