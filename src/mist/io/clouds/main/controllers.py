@@ -5,7 +5,9 @@ specific cloud by subclassing and extending the `BaseController`.
 
 A cloud controller also extends the `BaseController` by initialising
 sub-controllers, which are utilizing libcloud in order to perform API calls to
-the various cloud providers.
+the various cloud providers. Initially, all cloud controllers MUST implement a
+sub-controller of class `ComputeController` in order to perform basic API calls
+to cloud providers via libcloud's compute API.
 
 For each different cloud type, there is a corresponding cloud controller
 defined here. All the different classes inherit `BaseController` and share a
@@ -58,6 +60,7 @@ from mist.core.vpn.methods import to_tunnel
 from mist.io.bare_metal import BareMetalDriver
 
 from mist.io.clouds.main.base import BaseController, rename_kwargs
+from mist.io.clouds.compute.base import ComputeController
 
 import mist.io.clouds.compute.controllers as compute_controllers
 
@@ -246,7 +249,7 @@ class HostVirtualController(BaseController):
 
     def __init__(self, cloud):
         super(HostVirtualController, self).__init__(cloud)
-        self.compute = compute_controllers.HostVirtualComputeController(self)
+        self.compute = ComputeController(self)
 
     def _connect(self):
         return get_driver(Provider.HOSTVIRTUAL)(self.cloud.apikey)
@@ -283,7 +286,7 @@ class VSphereController(BaseController):
 
     def __init__(self, cloud):
         super(VSphereController, self).__init__(cloud)
-        self.compute = compute_controllers.VSphereComputeController(self)
+        self.compute = ComputeController(self)
 
     def _connect(self):
         host = dnat(self.cloud.owner, self.cloud.host)
@@ -343,8 +346,7 @@ class IndonesianVCloudController(VCloudController):
 
     def __init__(self, cloud):
         super(IndonesianVCloudController, self).__init__(cloud)
-        self.compute = compute_controllers.IndonesianVCloudComputeController(
-                                                                        self)
+        self.compute = ComputeController(self)
 
     def _update__preparse_kwargs(self, kwargs):
         host = kwargs.get('host', self.cloud.host) or 'my.idcloudonline.com'

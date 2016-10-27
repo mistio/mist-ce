@@ -198,7 +198,7 @@ class BaseController(object):
 
         """
         self.connect()
-        self.compute.list_machines()  # TODO self.compute
+        self.compute.list_machines()
 
     def disconnect(self):
         """Close libcloud-like connection to cloud

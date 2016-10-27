@@ -3,10 +3,12 @@
 A cloud's compute sub-controller handles all calls to libcloud's compute API by
 subclassing and extending the `ComputeController`.
 
-For each different cloud type, there is a corresponding compute controller
-defined here. All the different classes inherit `ComputeController` and share a
-commmon interface, with the exception that some controllers may not have
-implemented all methods.
+Most often for each different cloud type, there is a corresponding compute
+controller defined here. All the different classes inherit `ComputeController`
+and share a commmon interface, with the exception that some controllers may
+not have implemented all methods. It is also possible that certain cloud types
+do not possess their own compute controller, but rather utilize the base
+`ComputeController`.
 
 A compute controller is initialized given a cloud's main controller, which is
 derived from `BaseController`. That way, all sub-controllers of a given cloud
@@ -500,9 +502,6 @@ class GoogleComputeController(ComputeController):
         return sizes
 
 
-HostVirtualComputeController = ComputeController
-
-
 class PacketComputeController(ComputeController):
 
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
@@ -524,9 +523,6 @@ class VultrComputeController(ComputeController):
         return machine_libcloud.extra.get('cost_per_month', 0)
 
 
-VSphereComputeController = ComputeController
-
-
 class VCloudComputeController(ComputeController):
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
@@ -535,9 +531,6 @@ class VCloudComputeController(ComputeController):
         if machine_libcloud.state is NodeState.PENDING:
             machine.actions.start = True
             machine.actions.stop = True
-
-
-IndonesianVCloudComputeController = ComputeController
 
 
 class OpenStackComputeController(ComputeController):
