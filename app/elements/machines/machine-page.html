@@ -7,6 +7,8 @@
 <link rel="import" href="../tags/tags-list.html">
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
+<link rel="import" href="../mist-rules/mist-rules.html">
+
 <link rel="import" href="machine-edit.html">
 <link rel="import" href="add-panel.html">
 
@@ -194,6 +196,9 @@
                 vertical-align: auto;
                 padding: 0;
             }
+            item-actions ::content .item-actions {
+                margin-left: 0 !important;
+            }
             .probe-data {
                 position: relative;
             }
@@ -332,21 +337,52 @@
                     </template>
                 </table>
             </div>
-        </paper-material>
-        <paper-material class="info-card">
-            <h2 style$="color:#fff;background-color: [[section.color]];">More Info</h2>
-            <div class="card-content">
-                <element-for-in content="[[machine.extra]]"></element-for-in>
-            </div>
-        </paper-material>
-        </div>
-        </paper-material>
-        <paper-material class="info-card">
-            <h2 style$="[[_getHeaderStyle(section.color)]]">More Info</h2>
-            <div class="card-content">
-                <element-for-in content="[[machine.extra]]"></element-for-in>
-            </div>
-        </paper-material>
+            <!--<paper-material class="info-card" hidden$="{{!isMonitored}}">
+                <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
+                <div>
+                    <paper-material>graph data</paper-material>
+                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+                </div>
+            </paper-material>-->
+            <!-- <paper-material class="info-card" hidden$="[[!isMonitored]]">
+                <h2 style$="[[_getHeaderStyle(section.color)]]">Rules</h2>
+            </paper-material> -->
+            <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isMonitored]]"></mist-rules>
+            <paper-material class="info-card">
+                <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
+                <div class="card-content">
+                    <table class="info-table">
+                        <template is="dom-if" if="[[machine.public_ips]]">
+                            <tr>
+                                <td>Machine ID</td>
+                                <td>[[machine.id]]</td>
+                            </tr>
+                            <tr>
+                                <td>UUID</td>
+                                <td>[[machine.uuid]]</td>
+                            </tr>
+                            <tr><td>Public IPs</td>
+                                <td><template is="dom-repeat" items="[[machine.public_ips]]">
+                                        [[item]]
+                                    </template>
+                                </td>
+                            </tr>
+                            <tr><td>Private IPs</td>
+                                <td><template is="dom-repeat" items="[[machine.private_ips]]">
+                                        [[item]]
+                                    </template>
+                                </td>
+                            </tr>
+                        </template>
+                    </table>
+                </div>
+            </paper-material>
+            <paper-material class="info-card">
+                <h2 style$="color:#fff;background-color: [[section.color]];">More Info</h2>
+                <div class="card-content">
+                    <element-for-in content="[[machine.extra]]"></element-for-in>
+                </div>
+            </paper-material>
         </div>
         <dialog-element id="machinedialog"></dialog-element>
         <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->

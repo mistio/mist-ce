@@ -329,6 +329,7 @@ PROVIDERS.push({
         show: true,
         required: true,
         // SUPPORTED_PROVIDERS[3].regions.map(function(i){return {val:i.id, title: i.location}})
+        //ec2_ap_northeast should be ap-northeast
         options: [{"val":"ec2_ap_northeast","title":"Tokyo"},{"val":"ec2_ap_northeast_2","title":"Seoul"},{"val":"ec2_ap_southeast","title":"Singapore"},{"val":"ec2_ap_southeast_2","title":"Sydney"},{"val":"ec2_eu_central","title":"Frankfurt"},{"val":"ec2_eu_west","title":"Ireland"},{"val":"ec2_sa_east","title":"Sao Paulo"},{"val":"ec2_us_east","title":"N. Virginia"},{"val":"ec2_us_west","title":"N. California"},{"val":"ec2_us_west_oregon","title":"Oregon"}]
     }, {
         name: "title",

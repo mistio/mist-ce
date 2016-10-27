@@ -47,7 +47,7 @@ def test_list_machines(cloud, load_staging_l_machines):
     print len(response)
 
     if response:
-        machine = response[0]
+        machine = response[0].as_dict_old()
         ref = load_staging_l_machines.get(cloud.ctl.provider)
         for t in machine, ref:
             # Remove keys from extra.

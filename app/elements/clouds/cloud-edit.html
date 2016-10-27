@@ -1,0 +1,139 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
+
+<link rel="import" href="../app-form/app-form.html">
+
+<dom-module id="cloud-edit">
+    <template>
+    <style is="custom-style" include="forms">
+    :root {
+                --primary-color: #fff;
+                --primary-text-color: rgba(255,255,255,0.87);
+                --secondary-text-color: rgba(255,255,255,0.54);
+                --primary-background-color: #424242;
+                --secondary-background-color: #424242;
+                --paper-input-container-input-color: rgba(255,255,255,0.87);
+                --paper-input-container-focus-color: rgba(255,255,255,0.54);
+            }
+            :host {
+                box-sizing: border-box;
+                width: 100%;
+                height: auto;
+                margin-top: 7px;
+                transition: 200ms all ease-in;
+                position: relative;
+            }
+            :host[opened='true'],
+            :host[opened] {
+                display: block;
+            }
+            :host[opened="false"] .cloud-block,
+            :host:not([opened]) .cloud-block {
+                display: none;
+            }
+            :host .cloud-block {
+                box-sizing: border-box;
+                background-color: #424242;
+                color: #fff !important;
+                @apply(--layout-horizontal);
+            }
+            :host >::content paper-input-container {
+                padding: 0 0 8px 0;
+            }
+            :host >::content .input-content.label-is-floating.paper-input-container label {
+                color: rgba(255,255,255,0.54) !important;
+            }
+            :host paper-icon-button ::content iron-icon {
+                color: #fff !important;
+            }
+            .cloud-overview-item {
+                @apply(--layout-horizontal);
+                padding: 16px 0;
+            }
+            .cloud-overview-item.last {
+                padding: 12px 0 16px 0;
+            }
+            .cloud-overview {
+                padding: 4px 24px 24px 24px;
+                border-right: 1px solid rgba(255,255,255,0.15);
+                max-width: 33%;
+            }
+            .cloud-credentials {
+                padding: 24px;
+            }
+            #close-btn {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+            }
+            .button {
+                align-self: center;
+            }
+            paper-input {
+                padding-right: 16px;
+            }
+            paper-button {
+                padding: 0.57em 0.57em;
+            }
+            paper-button[disabled] {
+                background: rgba(255,255,255,0.15);
+                color: #424242;
+            }
+            paper-toggle-button {
+                margin-left: 36px;
+                cursor: pointer;
+            }
+            :host paper-toggle-button >::content .toggle-button {
+                background-color: #d96557 !important;
+            }
+            :host paper-toggle-button[checked]:not([disabled]) >::content .toggle-button {
+                background-color: #69b46c !important;
+            }
+            ::selection,
+            :host >::content ::selection {
+                background-color: yellow;
+                color: black;
+            }
+            paper-toast {
+                z-index: 999;
+            }
+
+            :host >::content .input-content.label-is-floating.paper-input-container label {
+                color: rgba(255, 255, 255, 0.54) !important;
+            }
+    </style>
+
+    <h3>Edit Credentials</h3>
+    <app-form fields="{{fields}}" url="/api/v1/edit_clouds/[[cloud.id]]" method="PUT" on-request="_editCloudRequest" on-response="_editCloudsResponse" btncontent="Edit Cloud"></app-form>
+
+    </template>
+    <script>
+    Polymer({
+        is: 'cloud-edit',
+        properties: {
+            cloud: {
+                type: Object,
+                notify: true
+            },
+            fields: {
+                    type: Array,
+                    computed: "_computeFields(cloud.provider)",
+                    notify: true
+            },
+            providers: {
+                type: Array,
+                value: PROVIDERS
+            }
+        },
+        _computeFields: function(cloudprovider){
+            var providerFields = this.providers.filter(function(fields) {
+                return fields.val == this.cloud.provider;
+            }, this);
+            return providerFields[0].options;
+        },
+        _editCloudRequest: function(){},
+        _editCloudsResponse: function(){},
+    });
+    </script>
+</dom-module>

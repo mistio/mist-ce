@@ -1,0 +1,330 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
+
+<link rel="import" href="rules-item.html">
+
+<dom-module id="mist-rules">
+    <template>
+        <style is="custom-style">
+            paper-button {
+                padding: 0.8em 1.57em 0.7em 1.57em;
+                font-weight: 500;
+            }
+            paper-button[disabled] {
+                background-color: rgba(0,0,0,.13) !important;
+                color: rgba(0,0,0,0.32) !important;
+            }
+        </style>
+        <!-- <style is="custom-style" include="shared-styles"></style>
+        <style is="custom-style" include="forms"></style> -->
+        <style is="custom-style">
+            :host {
+                display: block;
+            }
+            .metricOp  {
+                width: 50px;
+            }
+            .metricAggr,
+            .metricAction {
+                width: 100px;
+            }
+            paper-input#metricValue, 
+            paper-input#metricOffset {
+                width: 40px;
+                display: inline-block;
+            }
+            paper-input#metricAggr {
+                width: 120px;
+                display: inline-block;
+            }
+            .rule.incident-true {
+                color: var(--red-color);
+            }
+            .rule {
+                padding: 8px 0;
+            }
+            .rule-edit {
+                position: relative;
+                background-color: #eee;
+                padding: 0 24px 16px 24px;
+                border-bottom: 1px solid #ccc;
+            }
+            .rule-id {
+                position: absolute;
+                color: rgba(0,0,0,0.32);
+                font-size: 0.8em;
+                top: 16px;
+                left: 24px;
+
+            }
+            .rule-actions {
+                justify-content: flex-end;
+                font-size: 0.9em;
+                margin-top: 16px;
+            }
+            paper-button iron-icon {
+                opacity: 0.32;
+                padding: 4px;
+            }
+            .errormsg-container {
+                color: var(--red-color);
+                align-self: flex-start;
+            }
+            .errormsg-container iron-icon {
+                color: inherit;
+            }
+            paper-input#emails {
+                max-width: 240px;
+                display: inline-block;
+            }
+        </style>
+        <paper-material>
+            <template is="dom-repeat" items="{{items}}">
+                <rules-item builtin-metrics="[[builtinMetrics]]" rule="[[item]]" incidents="[[incidents]]" resource="[[resource]]"></rules-item>
+            </template>
+            
+            <paper-button toggles active="{{editNew}}" hidden$="{{editNew}}"><iron-icon icon="icons:add-circle"></iron-icon> add new rule</paper-button>
+
+            <div class="rule-edit" hidden$="{{!editNew}}">
+                <span class="rule-id">new rule</span>
+                <div id="newrule" class="rule">
+
+                    If 
+
+                    <paper-dropdown-menu class="dropdown-block metricName">
+                        <paper-menu id="metricName" attr-for-selected="value" selected="{{newRule.metric}}" class="dropdown-content">
+                            <template is="dom-repeat" items="[[availableMetrics]]" as="option">
+                                <paper-item value="[[option.id]]">[[option.name]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+
+                    <paper-dropdown-menu class="dropdown-block metricOp">
+                        <paper-menu id="metricOp" attr-for-selected="value" selected="{{newRule.operator}}" class="dropdown-content">
+                            <paper-item value="gt"> > </paper-item>
+                            <paper-item value="lt"> < </paper-item>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+
+                    <paper-input id="metricValue" value="{{newRule.value}}" auto-validate></paper-input>
+
+                    {{computeUnits(newMetric, builtinMetrics)}}
+
+                    for 
+
+                    <paper-dropdown-menu class="dropdown-block metricAggr">
+                        <paper-menu id="metricAggr" attr-for-selected="value" selected="{{newRule.aggregate}}" class="dropdown-content">
+                            <paper-item value="all"> every </paper-item>
+                            <paper-item value="any"> any </paper-item>
+                            <paper-item value="avg"> average </paper-item>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+
+                    value within 
+
+                    <paper-input id="metricOffset" value="{{newRule.reminder_offset}}" auto-validate></paper-input>min,
+
+                    then
+
+                    <paper-dropdown-menu class="dropdown-block metricAction">
+                        <paper-menu id="metricAction" attr-for-selected="value" selected="{{newRule.action}}" class="dropdown-content">
+                            <paper-item value="alert"> alert </paper-item>
+                            <paper-item value="reboot"> reboot </paper-item>
+                            <paper-item value="destroy"> destroy </paper-item>
+                            <paper-item value="command"> command </paper-item>
+                            <paper-item value="launch" disabled> launch </paper-item>
+                        </paper-menu>
+                    </paper-dropdown-menu>
+
+                    <template is="dom-if" if="{{showCommandTextarea}}">
+                        <paper-textarea id="command" value="{{newRule.command}}"></paper-textarea>
+                    </template>
+
+                    and email
+
+                    <paper-input id="emails" placeholder="[[userEmail()]]" value="{{newRule.emails}}" auto-validate></paper-input>
+
+
+                </div>
+                <div class="rule-actions layout horizontal">
+                    <p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
+                    <paper-spinner active$="{{sendingData}}"></paper-spinner>
+                    <paper-button toggles active="{{editNew}}" class="link">cancel</paper-button>
+                    <paper-button on-tap="addRule" class="blue">save rule</paper-button>
+                </div>
+            </div>
+
+        </paper-material>
+
+        <iron-ajax id="addRuleRequest" url="/api/v1/rules" contentType="application/json" handle-as="xml" method="POST" on-request="_handleAddRequest" on-response="_handleAddResponse" on-error="_handleAddError" loading="{{sendingData}}"></iron-ajax>
+
+        <!-- get metrics: http://localhost/api/v1/clouds/[[cloud.id]]/machines/[[machine.id]]/metrics -->
+    </template>
+
+    <script>
+        Polymer({
+            is: 'mist-rules',
+
+            properties: {
+                incidents: {
+                    type: Array
+                },
+                resource: Object,  // machine, cloud or other later
+                rules: Object,
+                items: {
+                    type: Array,
+                    computed: "_computeRules(rules)"
+                },
+                builtinMetrics:{
+                    type: Object,
+                    notify: true,
+                    value: {}
+                },
+                availableMetrics: {
+                    type: Array,
+                    computed: "_computeMetrics(builtinMetrics)"
+                },
+                newRule: Object,
+                editNew: {
+                    type: Boolean,
+                    value: false
+                },
+                formError: {
+                    type: Boolean,
+                    value: false
+                },
+                showCommandTextarea: {
+                    type: Boolean,                    
+                    value: false
+                }
+            },
+            listeners: {
+                'iron-select':'userChanges',
+                'input':'userChanges',
+                'edit-request': 'editRequest'
+            },
+            observers: [
+                'updateNewrule(resource.id)',
+                "_computeShowCommandTextarea(newRule.action)",
+            ],
+            ready: function() {
+                this.set("emails","");
+                var new_rule = {
+                        cloudId: '',
+                        machineId: '',
+                        metric:"load.shortterm",
+                        operator:"gt",
+                        value:5,
+                        action: 'alert',
+                        reminder_offset: '1',
+                        emails: ''
+                    }
+                this.set('newRule', new_rule);
+            },
+            updateNewrule: function(id){
+                // for machines only for now
+                this.set('newRule.cloudId', this.resource.cloud.id);
+                this.set('newRule.machineId', this.resource.id);
+            },
+            _computeRules: function (rules) {
+                var rulesArray = []
+                if (rules) {
+                    for (var rule in rules) {
+                        rulesArray.push(rules[rule]);
+                    }
+                }
+                return rulesArray.reverse();
+            },
+            computeUnits: function(metric) {
+                return this.builtinMetrics[metric] ? this.builtinMetrics[metric].unit : 'unit';
+            },
+            computeName: function(metric) {
+                return this.builtinMetrics[metric]? this.builtinMetrics[metric].name : 'name';
+            },
+            computeTime: function(time){
+                return time/60 + 1;
+            },
+            computeOperator: function(op){
+                if (op == "gt")
+                    return ">";
+                if (op == "lt")
+                    return "<";
+            },
+            computeAggregate: function(aggr){
+                if (aggr == "all")
+                    return "every";
+                else
+                    return aggr;
+            },
+            ruleCreatesIncident: function(rule, incidents){
+                var find = false;
+                    find = this.incidents.find(function(i){
+                    return !i.finished_at && i.rule_id == rule.id;
+                });
+                return !find ? false : true;
+            },
+            _computeMetrics: function(machine){
+                var metrics = [];
+                for (var p in this.builtinMetrics){
+                    metrics.push(this.builtinMetrics[p])
+                }
+                return metrics;
+            },
+            addRule: function(e){
+                var payload = {};
+                    payload = this.newRule;
+                if (payload["reminder_offset"])
+                    payload["reminder_offset"] = (payload["reminder_offset"]-1 )*60;
+                // clean up command
+                if(payload.action != "command") {
+                    delete payload.command;
+                }
+                //error on empty string
+                if (payload["emails"] == "") {
+                    delete payload.emails;
+                }
+
+                this.$.addRuleRequest.params = payload;
+                this.$.addRuleRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.addRuleRequest.generateRequest();
+            },
+            _handleAddResponse: function(){
+                this.set('editNew', false);
+                this.set('formError', false);
+            },
+            _handleAddError: function(e){
+                console.log(e.detail.request.xhr.responseText);
+                this.$.errormsg.textContent = e.detail.request.xhr.responseText;
+                this.set('formError', true);
+            },
+            userChanges: function(){
+                this.set('formError', false);
+            },
+            editRequest: function(e){
+                // handling of edit area
+                var id = e.detail.rule;
+                var els = this.querySelectorAll('rules-item');
+                [].forEach.call(els, function(el, index) {
+                    if (el.rule.id != id) {
+                        el.set('editMode', false);
+                    }
+                });
+            },
+            userEmail: function(){
+                return document.querySelector("mist-app").model.user.email;
+            },
+            _computeShowCommandTextarea: function(action){
+                if(action != "command" && this.newRule.command) {
+                    delete this.newRule.command;
+                }
+                this.set('showCommandTextarea',action == "command") ;
+            }
+        });
+    </script>
+</dom-module>

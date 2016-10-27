@@ -4,6 +4,8 @@
 <link rel="import" href="../../bower_components/neon-animation/animations/slide-up-animation.html">
 <link rel="import" href="../../bower_components/iron-label/iron-label.html">
 
+<link rel="import" href="cloud-edit.html">
+
 <dom-module id="cloud-info">
     <template>
         <style is="custom-style" include="dialogs"></style>
@@ -134,7 +136,7 @@
                 </div>
             </div>
             <div class="cloud-credentials flex">
-                credentials
+                <cloud-edit cloud="[[cloud]]"></cloud-edit>
             </div>
         </div>
 
