@@ -1,6 +1,25 @@
-"""
+"""Cloud Compute Sub-Controllers
+
+A cloud's compute sub-controller handles all calls to libcloud's compute API by
+subclassing and extending the `ComputeController`.
+
+For each different cloud type, there is a corresponding compute controller
+defined here. All the different classes inherit `ComputeController` and share a
+commmon interface, with the exception that some controllers may not have
+implemented all methods.
+
+A compute controller is initialized given a cloud's main controller, which is
+derived from `BaseController`. That way, all sub-controllers of a given cloud
+will be interconnected at the main controller's level.
+
+Most of the time a sub-controller will be accessed through a cloud's main
+controller, using the `ctl` abbreviation, like this:
+
+    cloud = mist.io.clouds.models.Cloud.objects.get(id=cloud_id)
+    print cloud.ctl.compute.enable()
 
 """
+
 
 import re
 import logging

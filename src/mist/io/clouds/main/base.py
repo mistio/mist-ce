@@ -1,10 +1,11 @@
-"""Definition of base classes for Clouds
+"""Definition of the base class for Clouds
 
-This currently contains only BaseController. It includes basic functionality
-for a given cloud (including libcloud calls, fetching and storing information
-to db etc. Cloud specific controllers are in `mist.io.clouds.controllers`.
+The `BaseController` contains the basic functionality for a given cloud,
+such as adding, deleting, or editing. Cloud-specific controllers are in
+`mist.io.clouds.main.controllers`.
 
 """
+
 
 import ssl
 import logging
@@ -68,8 +69,8 @@ def rename_kwargs(kwargs, old_key, new_key):
 class BaseController(object):
     """Abstract base class for every cloud/provider controller
 
-    This base controller factors out all the steps common to all or most
-    clouds into a base class, and defines an interface for provider or
+    This base controller factors out all the basic steps common to all or
+    most clouds into a base class, and defines an interface for provider or
     technology specific cloud controllers.
 
     Subclasses are meant to extend or override methods of this base class to
@@ -100,9 +101,8 @@ class BaseController(object):
     always start with an underscore, such as `self._connect`. When an internal
     method is only ever used in the process of one public method, it is
     prefixed as such to make identification and purpose more obvious. For
-    example, method `self._list_machines__postparse_machine` is called in the
-    process of `self.list_machines` to postparse a machine and inject or
-    modify its attributes.
+    example, method `self._add__prepare_kwargs` is called in order to apply
+    any special preprocessing of the params passed to `self.add`.
 
     This `BaseController` defines a strict interface to controlling clouds.
     For each different cloud type, a subclass needs to be defined. The subclass
@@ -120,7 +120,7 @@ class BaseController(object):
         cloud, like this:
 
             cloud = mist.io.clouds.models.Cloud.objects.get(id=cloud_id)
-            print cloud.ctl.list_machines()
+            print cloud.ctl.disable()
 
         Subclasses SHOULD NOT override this method.
 
@@ -198,7 +198,7 @@ class BaseController(object):
 
         """
         self.connect()
-        self.compute.list_machines()
+        self.compute.list_machines()  # TODO self.compute
 
     def disconnect(self):
         """Close libcloud-like connection to cloud
@@ -206,7 +206,7 @@ class BaseController(object):
         If a connection object has been initialized, this method will attempt
         to call its disconnect method.
 
-        This method is called automatically called by the class's destructor.
+        This method is automatically called by the class's destructor.
         This may however be unreliable, so users should call `disconnect`
         manually to be on the safe side.
 
