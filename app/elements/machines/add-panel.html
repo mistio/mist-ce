@@ -1,0 +1,214 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<dom-module id="add-panel">
+    <template>
+  <style is="custom-style">
+    :host {
+      display: inline-block;
+    }
+    #alignedDialog {
+      margin: 0;
+    }
+    paper-header-panel {
+      background-color: #03a9f4;
+    }
+  </style>
+  <paper-button raised on-tap="openDialog">Add Graph</paper-button>
+  <paper-dialog id="alignedDialog" no-overlap horizontal-align="left" vertical-align="top" style="height: 150px; width:500px">
+    <iron-ajax
+      id="metrics"
+      url="[[uri]]"
+      handle-as="json" method="GET"
+      contentType="application/json"
+      on-response="_handleMetricResponse">
+    </iron-ajax>
+    <paper-dialog-scrollable>
+      <paper-header-panel>
+        <div class="paper-header">Seleect target for graph</div>
+      </paper-header-panel>
+      <div>
+        <paper-dropdown-menu id="combo0" on-select="_nextOption" style="width: 180px;">
+            <paper-menu class="dropdown-content" attr-for-selected="name" selected="{{selectedValue}}">
+                  <template is="dom-repeat" items="[[combo0]]">
+                      <paper-item name="[[item]]">[[item]]</paper-item>
+                  </template>
+            </paper-menu>
+        </paper-dropdown-menu>
+      </div>
+      <template is="dom-repeat" items="{{optionsNum}}">
+        <iron-label>
+          <paper-button id="[[item.name]]" hidden="true" iron-label-target on-tap="_handleTap"></paper-button>
+        </iron-label>
+      </template>
+    </paper-dialog-scrollable>
+    </paper-dialog>
+    </template>
+    <script>
+        Polymer({
+            is: "add-panel",
+            properties: {
+                panel: {
+                    type: Object,
+                },
+                data: {
+                    type: Object
+                },
+                uri: {
+                    type: String
+                },
+                responseMetrics: {
+                    type: Array,
+                },
+                target: {
+                    type: String
+                },
+            },
+            openDialog: function() {
+                var dialog = this.querySelector('paper-dialog');
+                dialog.positionTarget = this;
+                dialog.open();
+                this.validInput = "";
+                this.stepType = "";
+                this.querySelector("#metrics").generateRequest();
+                this.querySelector('#combo0').setAttribute("disabled", "true");
+            },
+            _handleMetricResponse: function(data) {
+                var metricsArray = [];
+                var item;
+                var metrics = [];
+                var options = 0;
+                for (var metric in data.detail.response) {
+                    item = metric.split(".");
+                    metricsArray.push(item);
+                    if (item.length > options) {
+                        options = item.length;
+                    }
+                }
+                var optionsArray = [];
+                var itemsArray = [];
+                for (var i = 1; i < options; i++) {
+                    itemsArray.push({
+                        'name': "combo" + i
+                    });
+                }
+                console.log("itemsArray", itemsArray);
+                this.optionsNum = itemsArray;
+                this.responseMetrics = metricsArray;
+                this.querySelector('#combo0').removeAttribute("disabled");
+                this.combo0 = this._getMetrics(0);
+            },
+            _handleTap: function(e) {
+                console.log(e);
+                var targetCut = -1;
+                if (e.target.id == "combo0") {
+                    targetCut = 0;
+                    this.querySelector("#combo0").hidden = true;
+                    for (var i = 0; i < this.optionsNum.length; i++) {
+                        this.querySelector("#" + this.optionsNum[v].name).hidden = true;
+                    }
+                }
+                for (var i = 0; i < this.optionsNum.length; i++) {
+                    if (e.target.id == this.optionsNum[i].name) {
+                        targetCut = i;
+                        for (var v = i; v < this.optionsNum.length; v++) {
+                            this.querySelector("#" + this.optionsNum[v].name).hidden = true;
+                        }
+                    }
+                }
+                if (this.target != null) {
+                    if (targetCut == 0) {
+                        this.target = null;
+                    } else if (targetCut > 0) {
+                        var tempTarget = this.target.split(".");
+                        tempTarget.splice(targetCut, tempTarget.length - 1);
+                        this.target = "";
+                        for (var y = 0; y < tempTarget.length; y++) {
+                            if (y < tempTarget.length - 1)
+                                this.target += tempTarget[y] + "."
+                            else {
+                                this.target += tempTarget[y];
+                            }
+                        }
+                    }
+                }
+                console.log(targetCut);
+                this._getMetrics(targetCut);
+            },
+            _nextOption: function(e) {
+                if (e.target.value != "") {
+                    if (this.target == null || this.target.length <= 1) {
+                        this.target = e.target.value;
+                    } else {
+                        this.target += "." + e.target.value;
+                    }
+                    for (var i = 0; i <= this.optionsNum.length; i++) {
+                        if (this.querySelector('#combo' + i).hidden) {
+                            var tempCombo = this._getMetrics(i);
+                            console.log(tempCombo, i == this.optionsNum.length);
+                            if (tempCombo[0] != null) {
+                                this.querySelector('#combo' + i).hidden = false;
+                                this.querySelector('#combo' + i).innerHTML = e.target.value;
+                                this.selectedValue = "";
+                            } else {
+                                this.fire('panelAdded', this.target);
+                                this._exit();
+                            }
+                            break;
+                        }
+                        if (!this.querySelector('#combo' + this.optionsNum.length).hidden) {
+                            this._exit();
+                            break;
+                        }
+                    }
+                }
+            },
+            _getMetrics: function(index) {
+                var targetArray = [];
+                if (this.target != null) {
+                    targetArray = this.target.split(".");
+                }
+                console.log(targetArray, index);
+                var metrics = [];
+                for (var j = 1; j < this.responseMetrics.length; j++) {
+                    if (index == 0) {
+                        if (metrics.length == 0) {
+                            metrics.push(this.responseMetrics[j][index]);
+                        } else if (metrics.indexOf(this.responseMetrics[j][index]) < 0) {
+                            metrics.push(this.responseMetrics[j][index]);
+                        }
+                    } else {
+                        if (targetArray.length > 0) {
+                            var match = true;
+                            for (var i = 0; i < targetArray.length; i++) {
+                                if (targetArray[i] != this.responseMetrics[j][i]) {
+                                    match = false;
+                                    break;
+                                }
+                            }
+                            if (match) {
+                                if (metrics.indexOf(this.responseMetrics[j][index]) < 0)
+                                    metrics.push(this.responseMetrics[j][index]);
+                            }
+                        }
+                    }
+                }
+                this.set("combo0", metrics);
+                return metrics;
+            },
+            _exit: function() {
+                this.target = null;
+                for (var i = 0; i < this.optionsNum; i++) {
+                    this.querySelector('#' + this.optionsNum[i].name).hidden = true;
+                }
+                this.optionsNum = [];
+                var dialog = this.querySelector('paper-dialog');
+                dialog.close();
+            }
+        });
+    </script>
+</dom-module>
