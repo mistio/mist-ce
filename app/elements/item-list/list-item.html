@@ -420,29 +420,14 @@ Polymer({
 
             else {
                 var probe = model.probes[item.uuid].loadavg;
-                var classes = "";
+                var cores =  parseInt(model.probes[item.uuid].cores);
+                var classes = '';
+                var prefix = '';
+                
+                classes += this.loadToColor(parseInt(probe[0]/cores), "short");
+                classes += this.loadToColor(parseInt(probe[1]/cores), "mid");
+                classes += this.loadToColor(parseInt(probe[2]/cores), "long");
 
-                //short
-                if (parseInt(probe[0]*100) < 30)
-                    classes += "shortlow ";
-                else if (parseInt(probe[0]*100) > 30 && parseInt(probe[0]*100) < 60)
-                    classes += "shortmedium ";
-                else
-                    classes += "shorthigh ";
-                //mid
-                if (parseInt(probe[1]*100) < 30)
-                    classes += "midlow ";
-                else if (parseInt(probe[1]*100) > 30 && parseInt(probe[1]*100) < 60)
-                    classes += "midmedium ";
-                else
-                    classes += "midhigh ";
-                //long
-                if (parseInt(probe[2]*100) < 30)
-                    classes += "longlow ";
-                else if (parseInt(probe[2]*100) > 30 && parseInt(probe[2]*100) < 60)
-                    classes += "longmedium ";
-                else
-                    classes += "longhigh ";
 
                 //has probe data
                 if (classes != "")
@@ -451,7 +436,16 @@ Polymer({
                 return classes;
             }
         }
-
+    },
+    loadToColor: function(load, prefix){
+        if (load > 1.2)
+            return prefix+"high ";
+        else if (load > 0.8)
+            return prefix+"medium ";
+        else if (load > 0.4)
+            return prefix+"low ";
+        else
+            return prefix+"low ";
     }
 });
 </script>

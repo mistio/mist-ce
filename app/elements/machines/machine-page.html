@@ -824,41 +824,24 @@ MACHINEACTIONS = {
         },
         itemProbeClasses: function(item, probes) {
             if (!probes) {
-                console.log('1')
                 return false;
             }
             else {
 
                 if (!this.model || !this.model.probes || !this.model.probes[item.uuid] || !this.model.probes[item.uuid].loadavg) {
                     return false;
-                    console.log('2')
                 }
 
                 else {
                     var probe = this.model.probes[item.uuid].loadavg;
-                    var classes = "";
+                    var cores =  parseInt(this.model.probes[item.uuid].cores);
+                    var classes = '';
+                    var prefix = '';
+                    
+                    classes += this.loadToColor(parseInt(probe[0]/cores), "short");
+                    classes += this.loadToColor(parseInt(probe[1]/cores), "mid");
+                    classes += this.loadToColor(parseInt(probe[2]/cores), "long");
 
-                    //short
-                    if (parseInt(probe[0]*100) < 30)
-                        classes += "shortlow ";
-                    else if (parseInt(probe[0]*100) > 30 && parseInt(probe[0]*100) < 60)
-                        classes += "shortmedium ";
-                    else
-                        classes += "shorthigh ";
-                    //mid
-                    if (parseInt(probe[1]*100) < 30)
-                        classes += "midlow ";
-                    else if (parseInt(probe[1]*100) > 30 && parseInt(probe[1]*100) < 60)
-                        classes += "midmedium ";
-                    else
-                        classes += "midhigh ";
-                    //long
-                    if (parseInt(probe[2]*100) < 30)
-                        classes += "longlow ";
-                    else if (parseInt(probe[2]*100) > 30 && parseInt(probe[2]*100) < 60)
-                        classes += "longmedium ";
-                    else
-                        classes += "longhigh ";
 
                     //has probe data
                     if (classes != "")
@@ -867,7 +850,16 @@ MACHINEACTIONS = {
                     return classes;
                 }
             }
-
+        },
+        loadToColor: function(load, prefix){
+            if (load > 1.2)
+                return prefix+"high ";
+            else if (load > 0.8)
+                return prefix+"medium ";
+            else if (load > 0.4)
+                return prefix+"low ";
+            else
+                return prefix+"low ";
         }
     });
 </script>
