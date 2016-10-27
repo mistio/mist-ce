@@ -202,7 +202,7 @@
             if (!this.resource || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || !this.monitoring.monitored_machines[resource.uuid].installation_status){
                 return false;
             }
-            else if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == 'succeeded' && !this.model.monitoring.monitored_machines[resource.uuid].installation_status.activated_at){
+            else if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == 'succeeded' && !this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at){
                 return true;
             }
             else 
