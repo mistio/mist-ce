@@ -324,8 +324,8 @@
             </paper-material> -->
             <paper-material class="info-card">
                 <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]"></mist-monitoring>
+                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isMonitored]]"></mist-rules>
             </paper-material>
-            <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isMonitored]]"></mist-rules>
             <paper-material class="info-card">
                 <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
                 <div class="card-content">
