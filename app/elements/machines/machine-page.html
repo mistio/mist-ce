@@ -324,7 +324,7 @@
             </paper-material> -->
             <paper-material class="info-card">
                 <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]"></mist-monitoring>
-                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isMonitored]]"></mist-rules>
+                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isActivated]]"></mist-rules>
             </paper-material>
             <paper-material class="info-card">
                 <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
@@ -483,9 +483,13 @@ MACHINEACTIONS = {
             },
             isMonitored: {
                 type: Boolean,
-                value: true,
-                notify: true
+                value: true
             },
+            isActivated: {
+                type: Boolean,
+                value: false,
+                computed: '_computeIsActivated(machine, monitoring)'
+            }
             machineImage: {
                 type: String,
                 computed: "_machineImage(machine.imageId)"
@@ -711,6 +715,12 @@ MACHINEACTIONS = {
             else{
                 this.isMonitored = false;
             }
+        },
+        _computeIsActivated: function(machine, monitoring){
+            if (!this.machine.isMonitored || !this.model.monitoring || !this.model.monitoring.monitored_machines || !this.model.monitoring.monitored_machines[machine.uuid] || !this.model.monitoring.monitored_machines[machine.uuid].installation_status.activated_at)
+                return false;
+            else
+                return true;
         },
         _machineImage: function(id) {
             var image = this.model.imagesArray.find(function(image) {

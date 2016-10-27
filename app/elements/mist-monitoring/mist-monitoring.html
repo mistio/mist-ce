@@ -166,7 +166,6 @@
         },
         
         observers: [
-        	// '_isMonitored(resource, monitoring.machines.*),'
             '_reset(resource.id)'
         ],
         ready: function(){
@@ -175,19 +174,6 @@
         attached: function(){
 
         },
-        // _isMonitored: function(machine, machines){
-        //     if (machines){
-        //         var mach =  machines.base.find(function(m){
-        //             return m[1] == machine.id ;
-        //         }, this);
-        //     }
-        //     if (mach && machine.state == "running"){
-        //         this.isMonitored = true;
-        //     }
-        //     else{
-        //         this.isMonitored = false;
-        //     }
-        // },
         _computeIsMonitored: function(resource, monitoring){
         	if (this.resource && this.monitoring && this.monitoring.monitored_machines[resource.uuid])
         		return true;
