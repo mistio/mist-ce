@@ -324,7 +324,7 @@
             </paper-material> -->
             <paper-material class="info-card">
                 <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]"></mist-monitoring>
-                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isActivated]]"></mist-rules>
+                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
             <paper-material class="info-card">
                 <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
@@ -488,7 +488,7 @@ MACHINEACTIONS = {
             isActivated: {
                 type: Boolean,
                 value: false,
-                computed: '_computeIsActivated(machine, monitoring)'
+                computed: '_computeIsActivated(machine, model.monitoring.monitored_machines.*)'
             },
             machineImage: {
                 type: String,
@@ -717,10 +717,11 @@ MACHINEACTIONS = {
             }
         },
         _computeIsActivated: function(machine, monitoring){
-            if (!this.machine.isMonitored || !this.model.monitoring || !this.model.monitoring.monitored_machines || !this.model.monitoring.monitored_machines[machine.uuid] || !this.model.monitoring.monitored_machines[machine.uuid].installation_status.activated_at)
-                return false;
-            else
-                return true;
+            // if (!this.machine || this.model.monitoring || !this.model.monitoring.monitored_machines || !this.model.monitoring.monitored_machines[machine.uuid] || !this.model.monitoring.monitored_machines[machine.uuid].installation_status.activated_at)
+            //     return false;
+            // else
+            if (this.model.monitoring.monitored_machines[machine.uuid])
+                return this.model.monitoring.monitored_machines[machine.uuid].installation_status.activated_at;
         },
         _machineImage: function(id) {
             var image = this.model.imagesArray.find(function(image) {
