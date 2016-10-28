@@ -68,7 +68,7 @@ import mist.io.tasks
 import mist.io.inventory
 
 from mist.io.clouds.models import Cloud
-from mist.io.cronjobs.models import UserPeriodicTask
+from mist.io.schedules.models import Schedule
 from mist.core.cloud.models import Machine
 
 from mist.core.vpn.methods import destination_nat as dnat
@@ -1360,18 +1360,17 @@ def destroy_machine(user, cloud_id, machine_id):
                         "machine never had monitoring enabled. Error: %r", exc)
 
     machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-    # delete cronjobs for this machine or
-    # remove it from cron.machines and cron.args
-    crons = UserPeriodicTask.objects(owner=user)
-    for cron in crons:
-        if machine in cron.machines:
-            if len(cron.machines) > 1:
-                cron.machines.remove(machine)
-                if [cloud_id, machine_id] in cron.args[3]:
-                    cron.args[3].remove([cloud_id, machine_id])
-                cron.save()
+    # delete schedules for this machine or
+    # remove it from schedule.machines_match.machines
+    # TODO use reverse delete
+    schedules = Schedule.objects(owner=user)
+    for sched in schedules:
+        if machine in sched.machines_match.machines:
+            if len(sched.machines) > 1:
+                sched.machines_match.remove(machine)
+                sched.save()
             else:
-                cron.delete()
+                sched.delete()
 
     machine.ctl.destroy()
 
