@@ -357,7 +357,9 @@
                 that.set('sortedItems', items.base.sort(that._computeSort(this.sortBy, this.sortOrder)));
                 if (that.sortedItems.length != that.items.length)
                     that.set('sortedItems', that.items);
+                var scrollY = that.querySelector('iron-list').scrollTop;
                 that.set('filteredItems', that.filterItems());
+                that.querySelector('iron-list').scroll(0, scrollY);
             }, 300);
         },
 
