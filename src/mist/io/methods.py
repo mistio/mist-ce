@@ -2838,6 +2838,54 @@ def machine_name_validator(provider, name):
                 "and be at least 3 characters long")
     return name
 
+def list_all_dns_records(owner):
+    """
+    Will pick all user clouds, check each for all available zones,
+    and for each zone, get all available records.
+
+    """
+
+    # Create a list to store all customer zones
+    zones_list = []
+    # iterate over all clouds that can also be used as DNS providers
+    providers = {}
+    clouds = Cloud.objects(owner=owner)
+    log.critical("User:" + str(owner))
+    log.critical("Clouds:" + str(clouds))
+    for cloud in clouds:
+        if isinstance(cloud, cloud_models.AmazonCloud):
+            provider = DnsProvider.ROUTE53
+            creds = cloud.apikey, cloud.apisecret
+        #TODO: add support for more providers
+        #elif cloud.provider == Provider.LINODE:
+        #    pass
+        #elif cloud.provider == Provider.RACKSPACE:
+        #    pass
+        else:
+            # no DNS support for this provider, skip
+            continue
+        if (provider, creds) in providers:
+            # we have already checked this provider with these creds, skip
+            continue
+
+        try:
+            # from ipdb import set_trace; set_trace()
+            conn = get_dns_driver(provider)(*creds)
+            zones = conn.list_zones()
+        except InvalidCredsError:
+            log.error("Invalid creds for DNS provider %s.", provider)
+            continue
+        except Exception as exc:
+            log.error("Error listing zones for DNS provider %s: %r",
+                      provider, exc)
+            continue
+
+        # for each possible domain, starting with the longest match
+        for zone in zones:
+            zones_list.append(zone)
+
+    records = {"zones": zones_list}
+    return records
 
 def create_dns_a_record(user, domain_name, ip_addr):
     """Will try to create DNS A record for specified domain name and IP addr.

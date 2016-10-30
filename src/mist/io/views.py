@@ -33,6 +33,7 @@ import mist.core.methods
 #     from mist.io.helpers import user_from_request
 #     from pyramid.view import view_config
 
+
 from mist.io import methods
 
 import mist.io.exceptions as exceptions
@@ -816,6 +817,17 @@ def disassociate_key(request):
 
     return assoc_machines
 
+@view_config(route_name='api_v1_dns', request_method='GET', renderer='json')
+def list_dns(request):
+    """
+    List all DNS records.
+    Retrieves a list of all DNS records based on the user Clouds.
+    For each cloud that supports DNS functionality, we get all available zones
+    and for each zone we get all available records.
+    ---
+    """
+    auth_context = auth_context_from_request(request)
+    return methods.list_all_dns_records(auth_context.owner)
 
 @view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
 def list_machines(request):

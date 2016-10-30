@@ -138,3 +138,5 @@ def add_routes(configurator):
     configurator.add_route('api_v1_check_auth', '/api/v1/auth')
     configurator.add_route('check_auth', '/auth')
     configurator.add_route('account', '/account')
+
+    configurator.add_route('api_v1_dns', '/api/v1/dns')
