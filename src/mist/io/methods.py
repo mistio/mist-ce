@@ -1474,9 +1474,6 @@ def list_networks(user, cloud_id):
 
     """
 
-    from celery.utils.log import get_task_logger
-    logger = get_task_logger(__name__)
-
     ret = {
         'public': [],
         'private': [],
@@ -1488,7 +1485,6 @@ def list_networks(user, cloud_id):
         return list_networks_legacy(connect_provider(cloud), ret)
     controller_networks = cloud.ctl.network.list_networks(ret)
     ret.update(controller_networks)
-    logger.error(ret)
     return ret
 
 
@@ -1675,18 +1671,16 @@ def create_network(owner, cloud_id, network, subnet, router):
     it will use the new network's id to create a subnet
 
     """
-    log.info('create mathod called')
+    log.info("Owner: %s, Cloud ID:%s Network:%s Subnet %s Router:%s", owner, cloud_id, network, subnet, router)
+
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
-    conn = connect_provider(cloud)
-    if conn.type not in (Provider.OPENSTACK,):
-        raise NetworkActionNotSupported()
+    ret = cloud.ctl.network.create_network(network, subnet, router)
 
-    if conn.type is Provider.OPENSTACK:
-        ret = _create_network_openstack(conn, network, subnet, router)
-
+    # Schedule a UI update
     task = mist.io.tasks.ListNetworks()
     task.clear_cache(owner.id, cloud_id)
     trigger_session_update(owner, ['clouds'])
+
     return ret
 
 

@@ -1446,7 +1446,7 @@ def list_locations(request):
 def list_networks(request):
     """
     List networks of a cloud
-    Currently supports the EC2, GCE and Openstack clouds.
+    Currently supports the EC2, GCE and OpenStack clouds.
     For other providers this returns an empty list.
     READ permission required on cloud.
     ---
@@ -1487,10 +1487,9 @@ def create_network(request):
       type: string
     """
     cloud_id = request.matchdict['cloud']
-    log.info(request)
 
     try:
-        network = request.json_body.get('network')
+        network = request.json_body.get('network').get('name')
     except Exception as e:
         raise RequiredParameterMissingError(e)
 
