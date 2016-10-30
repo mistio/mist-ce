@@ -2846,21 +2846,18 @@ def list_all_dns_records(owner):
     """
 
     # Create a list to store all customer zones
-    zones_list = []
+    records = {}
     # iterate over all clouds that can also be used as DNS providers
     providers = {}
     clouds = Cloud.objects(owner=owner)
-    log.critical("User:" + str(owner))
-    log.critical("Clouds:" + str(clouds))
     for cloud in clouds:
         if isinstance(cloud, cloud_models.AmazonCloud):
             provider = DnsProvider.ROUTE53
             creds = cloud.apikey, cloud.apisecret
+        elif isinstance(cloud, cloud_models.GoogleCloud):
+            provider = DnsProvider.GOOGLE
+            creds = cloud.email, cloud.private_key, cloud.project_id
         #TODO: add support for more providers
-        #elif cloud.provider == Provider.LINODE:
-        #    pass
-        #elif cloud.provider == Provider.RACKSPACE:
-        #    pass
         else:
             # no DNS support for this provider, skip
             continue
@@ -2869,8 +2866,9 @@ def list_all_dns_records(owner):
             continue
 
         try:
-            # from ipdb import set_trace; set_trace()
+            #from ipdb import set_trace; set_trace()
             conn = get_dns_driver(provider)(*creds)
+            records[provider] = {}
             zones = conn.list_zones()
         except InvalidCredsError:
             log.error("Invalid creds for DNS provider %s.", provider)
@@ -2880,11 +2878,12 @@ def list_all_dns_records(owner):
                       provider, exc)
             continue
 
-        # for each possible domain, starting with the longest match
+        records[provider]['zones'] = []
         for zone in zones:
-            zones_list.append(zone)
+            records[provider]['zones'].append(zone)
+            records[provider][zone.domain] = []
+            records[provider][zone.domain] = conn.list_records(zone)
 
-    records = {"zones": zones_list}
     return records
 
 def create_dns_a_record(user, domain_name, ip_addr):
