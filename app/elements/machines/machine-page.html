@@ -305,7 +305,7 @@
                 </div>
                 <paper-material class="info-card" hidden$="[[!isMonitored]]">
                     <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
-                    <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+                    <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
                 </paper-material>
                 <paper-material class="info-card">
                     <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
@@ -493,7 +493,6 @@ MACHINEACTIONS = {
             },
             replaceTargets: {
                 type: Object,
-                computed: '_computeReplaceTargets(machine)'
             },
             isLoading: {
                 type: Boolean,
@@ -555,19 +554,9 @@ MACHINEACTIONS = {
             this.datasources = [{
                 "id": 1,
                 "orgId": 1,
-                "name": "mistphite",
+                "name": "mist.monitor",
                 "type": "mist.monitor",
-                "access": "proxy",
-                "uri": "/graphite/",
-                "password": "",
-                "user": "",
-                "database": "",
-                "basicAuth": false,
-                "basicAuthUser": "",
-                "basicAuthPassword": "",
-                "withCredentials": false,
-                "isDefault": false,
-                "jsonData": null
+                "uri": "/api/v1/stats"
             }];
             // var that = this;
             // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
@@ -630,7 +619,7 @@ MACHINEACTIONS = {
                     "height": "500px",
                     "panels": [{
                         "aliasColors": {},
-                        "datasource": "mistphite",
+                        "datasource": "mist.monitor",
                         "id": 2,
                         "span": 12,
                         "stack": false,
@@ -650,7 +639,7 @@ MACHINEACTIONS = {
                         "y-axis": true
                     }, {
                         "aliasColors": {},
-                        "datasource": "mistphite",
+                        "datasource": "mist.monitor",
                         "id": 3,
                         "span": 12,
                         "stack": false,
@@ -691,7 +680,7 @@ MACHINEACTIONS = {
             var changeit = false;
             for (var i = 0; i < tempdash.rows.length; i++) {
                 for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
-                    if (tempdash.rows[i].panels[j].datasource == "mistphite") {
+                    if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
                         if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
                             tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
                             changeit = true;
@@ -755,16 +744,6 @@ MACHINEACTIONS = {
                 return image.name;
             else
                 return "";
-        },
-        _computeReplaceTargets: function(machine) {
-            // var ret = {'bucky.': ''};
-            // var m = this.machine;
-            // var mId = this.machine.id;
-            // var m = this.machine.name;
-            // ret[mId] = m ? m.name : 'unknown';
-            // // Object {bucky.: "", 3e3a36a5a2694f859a2dc2ccbc192619: "unknown", a203e912f9e744df8ac10179403b8248: "monitor-docker"}
-            // this.dashboard.rows[0].panels[0].targets[0].target = 'bucky.'+this.machine.id+'.load.shortterm';
-            // return ret;
         },
         confirmAction: function(action) {
             this._showDialog({
