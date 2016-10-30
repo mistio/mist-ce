@@ -38,9 +38,7 @@
 
         {{#if Mist.authenticated}}
             <li><a class="ui-btn ui-btn-icon-left ui-mini icon-user" href={{view.accountUrl}} target={{view.isNotCore}}>Account</a></li>
-            {{#if BETA_FEATURES}}
-                <li><a class="ui-btn ui-btn-icon-left ui-mini icon-machine" {{action "toggleUIClicked" target=view}}>BETA UI</a></li>
-            {{/if}}
+            <li><a class="ui-btn ui-btn-icon-left ui-mini icon-machine" {{action "toggleUIClicked" target=view}}>BETA UI</a></li>
             {{#if Mist.isCore}}
                 <li><a class="ui-btn ui-btn-icon-left ui-mini icon-x" {{action "logoutClicked" target=view}}>Logout</a></li>
             {{/if}}

@@ -44,6 +44,10 @@
             }
         },
 
+        observers: [
+            "_updateIsOverusing(model.user, model.machinesArray)"
+        ],
+
         ready: function() {
             // Create the socket if it does not exist
             console.warn('ready');
@@ -383,7 +387,7 @@
         },
 
         _updateClouds: function(data) {
-            console.log('_updateClouds');
+            // console.log('_updateClouds');
             if (data.length && this.get('onboarding.hasCloud') != true)
                 this.set('onboarding.hasCloud', true);
             if (!data.length) {
@@ -416,9 +420,22 @@
             console.warn('got monitoring', data);
             if (data.length && this.get('onboarding.hasMonitoring') != true)
                 this.set('onboarding.hasMonitoring', true);
-            if (!data.length)
+            if (!data) //data is an Object
                 this.set('onboarding.hasMonitoring', false);
             this.set('model.pending.monitoring', false);
+            // inform machines that have rules
+            if (data.rules) {
+                for (var rule in data.rules) {
+                    if (this.model.clouds[rule.cloud] && this.model.clouds[rule.cloud].machines[rule.machine]){
+                        if (!this.get('model.clouds.'+rule.cloud+'.machines.'+rule.machine+'.rules')){
+                            this.set('model.clouds.'+rule.cloud+'.machines.'+rule.machine+'.rules', [rule])
+                            // console.log('// inform machines that have rules ', rule.cloud, rule.machine, this.model.clouds[rule.cloud].machines[rule.machine].rules);
+                        }
+                        else
+                            this.push('model.clouds.'+rule.cloud+'.machines.'+rule.machine+'.rules',rule)
+                    }
+                }
+            }
             return this.set('model.monitoring', data);
         },
 
@@ -486,7 +503,7 @@
         },
 
         _updateImages: function(data) {
-            console.log('_updateImages');
+            // console.log('_updateImages');
             this.set('onboarding.isLoadingImages', false);
             var changed = this._updateModel('clouds.' + data.cloud_id + '.images', data.images);
             if (!changed)
@@ -533,6 +550,7 @@
                                     'provider': cloud.provider
                                 };
                                 machine.keys = this._machineKeys(machine.id, machine.cloud.id) || [];
+                                machine.rules = this._machineRules(machine.id, machine.cloud.id);
                             }, this);
 
                             return allMachines = allMachines.concat(cloud.machinesArray != undefined ? cloud.machinesArray : [])
@@ -627,6 +645,12 @@
             console.warn('_updateTags not implemented. Got data', data);
         },
 
+        _updateIsOverusing: function(user, machines){
+            // console.log('_updateIsOverusing', user, machines);
+            if (user && machines)
+                this.set('model.isOverUsing', !user.current_plan.title && machines.length > 5);
+        },
+
         _probe: function(data) {
             if (!this.model.probes)
                 this.set('model.probes', {})
@@ -663,6 +687,30 @@
                     })
                 });
                 return keys || [];
+            }
+        },
+        _machineRules: function(machineID, cloudID){
+            // if something has not initiaised
+            if (!machineID || !cloudID || !this.model || !this.model.monitoring || !this.model.monitoring.rules || !this.model.clouds || !this.model.clouds[cloudID] || !this.model.clouds[cloudID].machines || !this.model.clouds[cloudID].machines[machineID]){
+                return [];
+            }
+            else {
+                var rules = [];
+                for (var rule in this.model.monitoring.rules) {
+                    if (this.model.monitoring.rules[rule].machine == machineID && this.model.monitoring.rules[rule].cloud == cloudID){
+                        //add rule only if it's not already added in the machine
+                        var ruleExists = false;
+                        if(this.model.clouds[cloudID].machines[machineID].rules) {
+                            var ruleExists = this.model.clouds[cloudID].machines[machineID].rules.find(function(r){
+                                return r.id == this.model.monitoring.rules[rule].id
+                            }, this);
+                        }
+                        if (!ruleExists) {
+                            rules.push(this.model.monitoring.rules[rule]);
+                        }
+                    }
+                }
+                return rules;
             }
         }
     });

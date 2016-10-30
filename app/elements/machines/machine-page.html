@@ -8,6 +8,7 @@
 <link rel="import" href="../tags/tags-list.html">
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
+<link rel="import" href="../mist-rules/mist-rules.html">
 
 <link rel="import" href="machine-edit.html">
 
@@ -195,6 +196,9 @@
                 vertical-align: auto;
                 padding: 0;
             }
+            item-actions ::content .item-actions {
+                margin-left: 0 !important;
+            }
             .probe-data {
                 position: relative;
             }
@@ -273,7 +277,7 @@
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
                     <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
-                    <div hidden$="{{!probeData}}"> Probe Data: 
+                    <div hidden$="{{!probeData}}"> Probe Data:
                         <span class$="probe-data {{itemProbeClasses(machine, model.probes)}}"> </span>
                         <span hidden$="{{!probeData}}"> {{probeData}} </span>
                     </div>
@@ -287,27 +291,27 @@
                                 <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
                             </div>
                         </template>
-    <div class="machine-key" id="pendingKeyRequest">
-        <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
-    </div>
-    </div>
-    </paper-material>
-    <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
-        <h3 class="smallcaps">TAGS:</h3>
-        <template is="dom-repeat" items="[[machine.tags]]">
+                        <div class="machine-key" id="pendingKeyRequest">
+                            <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
+                        </div>
+                    </div>
+                </paper-material>
+                <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
+                    <h3 class="smallcaps">TAGS:</h3>
+                    <template is="dom-repeat" items="[[machine.tags]]">
                         <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
                     </template>
-    </paper-material>
-    </div>
-    <paper-material class="info-card" hidden$="[[!isMonitored]]">
-        <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
-        <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
-    </paper-material>
-    <paper-material class="info-card">
-        <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
-        <div class="card-content">
-            <table class="info-table">
-                <template is="dom-if" if="[[machine.public_ips]]">
+                </paper-material>
+                </div>
+                <paper-material class="info-card" hidden$="[[!isMonitored]]">
+                    <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
+                    <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+                </paper-material>
+                <paper-material class="info-card">
+                    <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
+                    <div class="card-content">
+                        <table class="info-table">
+                            <template is="dom-if" if="[[machine.public_ips]]">
                             <tr>
                                 <td>Machine ID</td>
                                 <td>[[machine.id]]</td>
@@ -751,7 +755,7 @@ MACHINEACTIONS = {
                 return image.name;
             else
                 return "";
-        },    
+        },
         _computeReplaceTargets: function(machine) {
             // var ret = {'bucky.': ''};
             // var m = this.machine;
