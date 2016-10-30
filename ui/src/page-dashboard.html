@@ -29,6 +29,8 @@
 <link rel="import" href="../elements/clouds/cloud-info.html">
 <link rel="import" href="../elements/clouds/cloud-chip.html">
 
+<link rel="import" href="../elements/account/plan-overusage.html">
+
 <dom-module id="page-dashboard">
     <template>
         <style is="custom-style" include="headings"></style>
@@ -250,10 +252,11 @@
         </style>
         <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
             <div class="notice">
-                <p><strong>Note:</strong> Hello! We are providing an early preview of the new Mist.io UI. Much of the functionality is under heavy development and, as a result, not functional. We would appreciate your feedback! Send suggestions to <a href="mailto:info@mist.io">info@mist.io</a>.
+                <p><strong>Note:</strong> Hello! We are providing an early preview of the new Mist.io UI. A part of the functionality is under heavy development and, as a result, not yet fully functional. We would appreciate your feedback! Send suggestions to <a href="mailto:info@mist.io">info@mist.io</a>.
                 <a href="javascript:void(0)" on-tap="_toggleUI" class="flex">Return to old UI</a>
                 </p>
             </div>
+            <plan-overusage is-over-using="[[model.isOverUsing]]"></plan-overusage>
             <template is="dom-if" if="[[showDashboard]]">
                 <div class="clouds top flexchild-wide-top">
                     <div id="cloudslist" class="flex">
@@ -377,7 +380,8 @@ Polymer({
         },
         matrix: {
             type: Array
-        }
+        },
+        isOverUsing: Boolean
     },
     observers: [
         'cloudLayoutMatrix(model.clouds.*, sidebarIsOpen)'

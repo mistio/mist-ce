@@ -43,11 +43,11 @@ def compare_fields(res):
 
 def test_list_machines(cloud, load_staging_l_machines):
 
-    response = cloud.ctl.list_machines()
+    response = cloud.ctl.compute.list_machines()
     print len(response)
 
     if response:
-        machine = response[0]
+        machine = response[0].as_dict_old()
         ref = load_staging_l_machines.get(cloud.ctl.provider)
         for t in machine, ref:
             # Remove keys from extra.
@@ -69,7 +69,7 @@ def test_list_machines(cloud, load_staging_l_machines):
 
 def test_list_locations(cloud, load_staging_l_locations):
 
-    response = cloud.ctl.list_locations()
+    response = cloud.ctl.compute.list_locations()
     print len(response)
 
     if response:
@@ -80,7 +80,7 @@ def test_list_locations(cloud, load_staging_l_locations):
 
 def test_list_images(cloud, load_staging_l_images):
 
-    response = cloud.ctl.list_images()
+    response = cloud.ctl.compute.list_images()
     print len(response)
 
     if response:
@@ -91,7 +91,7 @@ def test_list_images(cloud, load_staging_l_images):
 
 def test_list_sizes(cloud, load_staging_l_sizes):
 
-    response = cloud.ctl.list_sizes()
+    response = cloud.ctl.compute.list_sizes()
     print len(response)
 
     if response:

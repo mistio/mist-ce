@@ -90,7 +90,8 @@ def add_cloud_v_2(owner, title, provider, params):
     """Add cloud to owner"""
 
     # FIXME: Some of these should be explicit arguments, others shouldn't exist
-    remove_on_error = params.pop('remove_on_error', True)
+    fail_on_error = params.pop('fail_on_error',
+                               params.pop('remove_on_error', True))
     monitoring = params.pop('monitoring', False)
     params.pop('title', None)
     params.pop('provider', None)
@@ -103,7 +104,7 @@ def add_cloud_v_2(owner, title, provider, params):
     cloud_cls = cloud_models.CLOUDS[provider]  # Class of Cloud model.
 
     # Add the cloud.
-    cloud = cloud_cls.add(owner, title, remove_on_error=remove_on_error,
+    cloud = cloud_cls.add(owner, title, fail_on_error=fail_on_error,
                           fail_on_invalid_params=False, **params)
     ret = {'cloud_id': cloud.id}
     if provider == 'bare_metal' and monitoring:
@@ -128,11 +129,7 @@ def rename_cloud(owner, cloud_id, new_name):
 
     log.info("Renaming cloud: %s", cloud_id)
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
-    cloud.title = new_name
-    try:
-        cloud.save()
-    except NotUniqueError:
-        raise BadRequestError('Cloud with name %s already exists' % new_name)
+    cloud.ctl.rename(new_name)
     log.info("Succesfully renamed cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
 
@@ -439,7 +436,8 @@ def connect_provider(cloud):
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
-    machines = Cloud.objects.get(owner=user, id=cloud_id).ctl.list_machines()
+    machines = Cloud.objects.get(
+        owner=user, id=cloud_id).ctl.compute.list_machines()
     return [machine.as_dict_old() for machine in machines]
 
 
@@ -1400,14 +1398,15 @@ def ssh_command(user, cloud_id, machine_id, host, command,
 
 def list_images(user, cloud_id, term=None):
     """List images from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_images(term)
+    return Cloud.objects.get(
+        owner=user, id=cloud_id).ctl.compute.list_images(term)
 
 
 def star_image(user, cloud_id, image_id):
     """Toggle image star (star/unstar)"""
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
 
-    star = cloud.ctl.image_is_starred(image_id)
+    star = cloud.ctl.compute.image_is_starred(image_id)
     if star:
         if image_id in cloud.starred:
             cloud.starred.remove(image_id)
@@ -1459,12 +1458,13 @@ def list_keys(user):
 
 def list_sizes(user, cloud_id):
     """List sizes (aka flavors) from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_sizes()
+    return Cloud.objects.get(owner=user, id=cloud_id).ctl.compute.list_sizes()
 
 
 def list_locations(user, cloud_id):
     """List locations from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_locations()
+    return Cloud.objects.get(
+        owner=user, id=cloud_id).ctl.compute.list_locations()
 
 
 def list_networks(user, cloud_id):

@@ -8,7 +8,11 @@ from mist.core.tag.models import Tag
 from mist.core.keypair.models import Keypair
 from mist.core.user.models import Organization
 
-import mist.io.clouds.controllers as controllers
+import mist.io.clouds.main.controllers as controllers
+
+from mist.io.exceptions import BadRequestError
+from mist.io.exceptions import CloudExistsError
+from mist.io.exceptions import RequiredParameterMissingError
 
 
 # This is a map from provider name to provider class, eg:
@@ -62,7 +66,7 @@ class Cloud(me.Document):
     clouds controller. This way it is possible to do things like:
 
         cloud = Cloud.objects.get(id=cloud_id)
-        print cloud.ctl.list_machines()
+        print cloud.ctl.compute.list_machines()
 
     """
 
@@ -138,6 +142,12 @@ class Cloud(me.Document):
           should match the extra fields of the particular cloud type.
 
         """
+        if not title:
+            raise RequiredParameterMissingError('title')
+        if not owner or not isinstance(owner, Organization):
+            raise BadRequestError('owner')
+        if Cloud.objects(owner=owner, title=title):
+            raise CloudExistsError()
         cloud = cls(owner=owner, title=title)
         if id:
             cloud.id = id
