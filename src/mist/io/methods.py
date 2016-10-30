@@ -2838,7 +2838,7 @@ def machine_name_validator(provider, name):
                 "and be at least 3 characters long")
     return name
 
-def list_all_dns_records(owner):
+def list_dns_zones(owner):
     """
     Will pick all user clouds, check each for all available zones,
     and for each zone, get all available records.
@@ -2846,7 +2846,7 @@ def list_all_dns_records(owner):
     """
 
     # Create a list to store all customer zones
-    records = {}
+    all_zones = {}
     # iterate over all clouds that can also be used as DNS providers
     providers = {}
     clouds = Cloud.objects(owner=owner)
@@ -2868,7 +2868,7 @@ def list_all_dns_records(owner):
         try:
             #from ipdb import set_trace; set_trace()
             conn = get_dns_driver(provider)(*creds)
-            records[provider] = {}
+            all_zones[provider] = {}
             zones = conn.list_zones()
         except InvalidCredsError:
             log.error("Invalid creds for DNS provider %s.", provider)
@@ -2878,13 +2878,16 @@ def list_all_dns_records(owner):
                       provider, exc)
             continue
 
-        records[provider]['zones'] = []
+        #all_zones[provider]['zones'] = []
         for zone in zones:
-            records[provider]['zones'].append(zone)
-            records[provider][zone.domain] = []
-            records[provider][zone.domain] = conn.list_records(zone)
+            #records[provider]['zones'].append(zone.id)
+            all_zones[provider][zone.id] = {}
+            all_zones[provider][zone.id]["domain"] = zone.domain
+            all_zones[provider][zone.id]["type"] = zone.type
+            all_zones[provider][zone.id]["ttl"] = zone.ttl
+            all_zones[provider][zone.id]["extra"] = zone.extra
 
-    return records
+    return all_zones
 
 def create_dns_a_record(user, domain_name, ip_addr):
     """Will try to create DNS A record for specified domain name and IP addr.

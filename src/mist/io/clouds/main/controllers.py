@@ -63,6 +63,7 @@ from mist.io.clouds.main.base import BaseController, rename_kwargs
 from mist.io.clouds.compute.base import ComputeController
 
 import mist.io.clouds.compute.controllers as compute_controllers
+import mist.io.clouds.dns.controllers as dns_controllers
 
 
 log = logging.getLogger(__name__)

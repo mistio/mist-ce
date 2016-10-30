@@ -858,17 +858,28 @@ def disassociate_key(request):
 
     return assoc_machines
 
-@view_config(route_name='api_v1_dns', request_method='GET', renderer='json')
-def list_dns(request):
+@view_config(route_name='api_v1_zones', request_method='GET', renderer='json')
+def list_dns_zones(request):
     """
-    List all DNS records.
-    Retrieves a list of all DNS records based on the user Clouds.
-    For each cloud that supports DNS functionality, we get all available zones
-    and for each zone we get all available records.
+    List all DNS zones.
+    Retrieves a list of all DNS zones based on the user Clouds.
+    For each cloud that supports DNS functionality, we get all available zones.
     ---
     """
     auth_context = auth_context_from_request(request)
-    return methods.list_all_dns_records(auth_context.owner)
+    return methods.list_dns_zones(auth_context.owner)
+
+
+@view_config(route_name='api_v1_zone_action', request_method='GET', renderer='json')
+def list_dns_zone_records(request):
+    """
+    List all DNS records under a specific zone.
+    Retrieves a list of all DNS records based on the provided zone_id.
+    ---
+    """
+    auth_context = auth_context_from_request(request)
+    return {"status":"API endpoint not implemented yet"}
+
 
 @view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
 def list_machines(request):
