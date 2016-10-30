@@ -130,6 +130,7 @@ class BaseController(object):
         """
         self.cloud = cloud
         self._conn = None
+        self._dns_conn = None
 
     @property
     def connection(self):
@@ -229,6 +230,107 @@ class BaseController(object):
             except Exception as exc:
                 log.error("Error disconnecting cloud '%s': %r", self, exc)
             self._conn = None
+
+    @property
+    def dns_connection(self):
+        """Cached libcloud connection, accessible as attribute
+
+        Subclasses SHOULD NOT have to override or extend this method.
+
+        """
+        if self._dns_conn is None:
+            self._dns_conn = self.dns_connect()
+        return self._dns_conn
+
+    def dns_connect(self):
+        """Return libcloud-like connection to cloud DNS provider
+
+        This is a wrapper, an error handler, around cloud specific `_dns_connect`
+        methods.
+
+        Subclasses SHOULD NOT override or extend this method.
+
+        Instead, subclasses MUST override `_dns_connect` method.
+
+        """
+        try:
+            return self._dns_connect()
+        except (CloudUnavailableError, CloudUnauthorizedError) as exc:
+            log.error("Error adding DNS cloud %s: %r", self.cloud, exc)
+            raise
+        except InvalidCredsError as exc:
+            log.warning("Invalid creds while connecting to DNS %s: %s",
+                        self.cloud, exc)
+            raise CloudUnauthorizedError("Invalid creds.")
+        except ssl.SSLError as exc:
+            log.error("SSLError on connecting to DNS %s: %s", self.cloud, exc)
+            raise CloudUnavailableError(exc=exc)
+        except Exception as exc:
+            log.exception("Error while connecting to DNS %s", self.cloud)
+            raise CloudUnavailableError(exc=exc)
+
+    def _dns_connect(self):
+        """Return libcloud-like connection to cloud DNS provider
+
+        This is called solely by `dns_connect` which adds error handling.
+
+        All subclasses MUST implement this method.
+
+        """
+        raise NotImplementedError()
+
+    def check_dns_connection(self):
+        """Raise exception if we can't connect to cloud provider
+
+        In case of error, an instance of `CloudUnavailableError` or
+        `CloudUnauthorizedError` should be raised.
+
+        For most cloud providers, who use an HTTP API, calling `connect`
+        doesn't really establish a connection, so we also have to attempt to
+        make an actual call such as `list_machines` to verify that the
+        connection actually works.
+
+        If a subclass's `connect` not raising errors is enough to make sure
+        that establishing a connection works, then these subclasses should
+        override this method and only call `connect`.
+
+        In most cases, subclasses SHOULD NOT override or extend this method.
+
+        """
+        self.dns_connect()
+        # self.dns.list_zones()
+
+    def dns_disconnect(self):
+        """Close libcloud-like connection to cloud
+
+        If a connection object has been initialized, this method will attempt
+        to call its disconnect method.
+
+        This method is automatically called by the class's destructor.
+        This may however be unreliable, so users should call `disconnect`
+        manually to be on the safe side.
+
+        For cloud providers whose connection object is dummy in the sense that
+        it doesn't represent an actual underlying connection, this method
+        doesn't really do anything.
+
+        Subclasses SHOULD NOT override this method.
+
+        If a subclass has to perform some special clean up, like deleting
+        temporary files, it SHOULD *extend* this method instead.
+
+        """
+        if self._dns_conn is not None:
+            log.debug("Closing libcloud-like connection for DNS %s.",
+                self.cloud)
+            try:
+                self._dns_conn.disconnect()
+            except AttributeError:
+                pass
+            except Exception as exc:
+                log.error("Error disconnecting DNS cloud '%s': %r", self, exc)
+            self._dns_conn = None
+
 
     def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
         """Add new Cloud to the database

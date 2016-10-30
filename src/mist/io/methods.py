@@ -2846,46 +2846,14 @@ def list_dns_zones(owner):
     """
 
     # Create a list to store all customer zones
-    all_zones = {}
+    all_zones = []
     # iterate over all clouds that can also be used as DNS providers
-    providers = {}
     clouds = Cloud.objects(owner=owner)
     for cloud in clouds:
-        if isinstance(cloud, cloud_models.AmazonCloud):
-            provider = DnsProvider.ROUTE53
-            creds = cloud.apikey, cloud.apisecret
-        elif isinstance(cloud, cloud_models.GoogleCloud):
-            provider = DnsProvider.GOOGLE
-            creds = cloud.email, cloud.private_key, cloud.project_id
-        #TODO: add support for more providers
-        else:
-            # no DNS support for this provider, skip
-            continue
-        if (provider, creds) in providers:
-            # we have already checked this provider with these creds, skip
-            continue
-
         try:
-            #from ipdb import set_trace; set_trace()
-            conn = get_dns_driver(provider)(*creds)
-            all_zones[provider] = {}
-            zones = conn.list_zones()
-        except InvalidCredsError:
-            log.error("Invalid creds for DNS provider %s.", provider)
-            continue
+            all_zones.append(cloud.ctl.dns.list_zones())
         except Exception as exc:
-            log.error("Error listing zones for DNS provider %s: %r",
-                      provider, exc)
-            continue
-
-        #all_zones[provider]['zones'] = []
-        for zone in zones:
-            #records[provider]['zones'].append(zone.id)
-            all_zones[provider][zone.id] = {}
-            all_zones[provider][zone.id]["domain"] = zone.domain
-            all_zones[provider][zone.id]["type"] = zone.type
-            all_zones[provider][zone.id]["ttl"] = zone.ttl
-            all_zones[provider][zone.id]["extra"] = zone.extra
+            log.error("%s", exc)
 
     return all_zones
 

@@ -40,6 +40,9 @@ from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from libcloud.utils.networking import is_private_subnet
 
+from libcloud.dns.providers import get_driver as get_dns_driver
+from libcloud.dns.types import Provider as DnsProvider
+
 from mist.io import config
 
 from mist.io.exceptions import MistError
@@ -72,15 +75,21 @@ log = logging.getLogger(__name__)
 class AmazonController(BaseController):
 
     provider = 'ec2'
+    dns_provider = 'route53'
 
     def __init__(self, cloud):
         super(AmazonController, self).__init__(cloud)
         self.compute = compute_controllers.AmazonComputeController(self)
+        self.dns = dns_controllers.AmazonDNSController(self)
 
     def _connect(self):
         return get_driver(Provider.EC2)(self.cloud.apikey,
                                         self.cloud.apisecret,
                                         region=self.cloud.region)
+
+    def _dns_connect(self):
+        return get_dns_driver(DnsProvider.ROUTE53)(self.cloud.apikey,
+                                        self.cloud.apisecret)
 
     def _add__preparse_kwargs(self, kwargs):
 
@@ -217,13 +226,20 @@ class AzureArmController(BaseController):
 class GoogleController(BaseController):
 
     provider = 'gce'
+    dns_provider = 'google'
 
     def __init__(self, cloud):
         super(GoogleController, self).__init__(cloud)
         self.compute = compute_controllers.GoogleComputeController(self)
+        self.dns = dns_controllers.GoogleDNSController(self)
 
     def _connect(self):
         return get_driver(Provider.GCE)(self.cloud.email,
+                                        self.cloud.private_key,
+                                        project=self.cloud.project_id)
+
+    def _dns_connect(self):
+        return get_dns_driver(DnsProvider.GOOGLE)(self.cloud.email,
                                         self.cloud.private_key,
                                         project=self.cloud.project_id)
 

@@ -139,4 +139,4 @@ def add_routes(configurator):
     configurator.add_route('account', '/account')
 
     configurator.add_route('api_v1_zones', '/api/v1/zones')
-    configurator.add_route('api_v1_zone_action', '/api/v1/zones/{zone_id}')
+    configurator.add_route('api_v1_zone_action', '/api/v1/zones/{zone}')

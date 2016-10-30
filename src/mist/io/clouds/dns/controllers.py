@@ -24,17 +24,45 @@ controller, using the `ctl` abbreviation, like this:
 
 from mist.io.clouds.dns.base import DNSController
 
+from libcloud.dns.types import Provider as DnsProvider
+from libcloud.dns.types import RecordType
 
-class AmazonComputeController(DNSController):
-    """
-    For now we don't need to extend/override any methods.
+class AmazonDNSController(DNSController):
 
-    This should change as we add/implement more of libcloud DNS functionality.
-    """
+    def list_zones(self):
+        """
 
-class GoogleComputeController(DNSController):
-    """
-    For now we don't need to extend/override any methods.
+        """
+        provider = DnsProvider.GOOGLE
+        all_zones = {}
+        all_zones[provider] = {}
+        zones = self.ctl.dns_connection.list_zones()
+        for zone in zones:
+            #records[provider]['zones'].append(zone.id)
+            all_zones[provider][zone.id] = {}
+            all_zones[provider][zone.id]["domain"] = zone.domain
+            all_zones[provider][zone.id]["type"] = zone.type
+            all_zones[provider][zone.id]["ttl"] = zone.ttl
+            all_zones[provider][zone.id]["extra"] = zone.extra
+        return all_zones
 
-    This should change as we add/implement more of libcloud DNS functionality.
-    """
+
+class GoogleDNSController(DNSController):
+
+    def list_zones(self):
+        """
+
+        """
+        provider = DnsProvider.GOOGLE
+        all_zones = {}
+        all_zones[provider] = {}
+        zones = self.ctl.dns_connection.list_zones()
+        for zone in zones:
+            #records[provider]['zones'].append(zone.id)
+            all_zones[provider][zone.id] = {}
+            all_zones[provider][zone.id]["domain"] = zone.domain
+            all_zones[provider][zone.id]["type"] = zone.type
+            all_zones[provider][zone.id]["ttl"] = zone.ttl
+            all_zones[provider][zone.id]["extra"] = zone.extra
+        return all_zones
+

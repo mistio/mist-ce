@@ -20,7 +20,7 @@ from mist.io.exceptions import CloudUnauthorizedError
 from mist.io.clouds.main.base import BaseController
 
 
-log = logging.getLogger(__name__)
+#log = logging.getLogger(__name__)
 
 
 class DNSController(object):
@@ -98,9 +98,7 @@ class DNSController(object):
         """
         Returns a list of available DNS zones for the cloud.
 
-        This functionality is implemented via libcloud for almost all DNS
-        providers besides (NFSN DNS) so we're keeping it on the Base level.
-
-        Subclasses SHOULD NOT have to override or extend this method.
+        All subclasses MUST implement this method.
         """
-        pass
+        raise NotImplementedError()
+
