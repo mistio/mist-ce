@@ -2271,7 +2271,7 @@
                     if (ips[0])
                         this.term.write('Connecting to ' + ips[0] + '...\r\n');
 
-                    var socket = document.querySelector('app-socket');
+                    var socket = document.querySelector('mist-socket');
 
                     this.term.on('data', function (data, ev) {
                         socket.send('msg', 'shell', 'shell_data', data);
@@ -2344,7 +2344,7 @@
                       newCols = Math.floor(terminalContainer.offsetWidth/10);
 
                       console.log('resize term', newCols, newRows);
-                      document.querySelector('app-socket')
+                      document.querySelector('mist-socket')
                             .send('msg',
                                   'shell',
                                   'shell_resize',
@@ -2354,7 +2354,7 @@
                 },
                 detached: function() {
                     console.debug('xterm detached');
-                    var socket = document.querySelector('app-socket');
+                    var socket = document.querySelector('mist-socket');
                     socket.send('uns', 'shell');
                 },
                 _closeDialog: function(e) {

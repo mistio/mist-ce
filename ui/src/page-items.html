@@ -1,13 +1,13 @@
-<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
-<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
-<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
-<link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/pushstate-anchor/pushstate-anchor.html">
 
-<link rel="import" href="../app-sidebar/app-sidebar.html">
-<link rel="import" href="../teams/team-add.html">
-<link rel="import" href="../item-list/item-list.html">
-<link rel="import" href="../empty-pages/empty-pages.html">
+<link rel="import" href="app-sidebar/app-sidebar.html">
+<link rel="import" href="teams/team-add.html">
+<link rel="import" href="item-list/item-list.html">
+<link rel="import" href="empty-pages/empty-pages.html">
 
 <dom-module id="page-items">
     <template>
@@ -357,7 +357,9 @@
                 that.set('sortedItems', items.base.sort(that._computeSort(this.sortBy, this.sortOrder)));
                 if (that.sortedItems.length != that.items.length)
                     that.set('sortedItems', that.items);
+                var scrollY = that.querySelector('iron-list').scrollTop;
                 that.set('filteredItems', that.filterItems());
+                that.querySelector('iron-list').scroll(0, scrollY);
             }, 300);
         },
 
