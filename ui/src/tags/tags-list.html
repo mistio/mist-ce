@@ -154,13 +154,13 @@
                 },
                 _computeTags: function(lengths) {
                     var tags = this._computeCommonTags(this.items);
+                    // console.log('_computeTags',tags.length);
                     if (!tags.length) {
                         tags = [{
                             key: '',
                             value: ''
                         }];
                     }
-
                     this.set('tags', tags);
                 },
                 _computeCommonTags: function(items) {
@@ -232,7 +232,7 @@
 
                     tag.op = "-";
                     this.push('tagsToDelete', tag);
-                    console.log(this.tagsToDelete);
+                    // console.log('tagsToDelete',this.tagsToDelete, this.tagsToDelete.length);
                 },
                 _tagUpdate: function(e){
                     // this._tagDeleteHandler(e);
@@ -245,6 +245,7 @@
                     if (oldTag.key != newTag.key){
                         oldTag.op = "-";
                         this.push('tagsToDelete', oldTag);
+                        // console.log('tagsToDelete',this.tagsToDelete, this.tagsToDelete.length);
                     }
                 },
                 _saveTags: function() {
@@ -276,7 +277,9 @@
                         newItem.tags = newTags;
 
                         if (this.tagsToDelete.length > 0) {
-                            this.tagsToDelete.forEach(function(tag){
+                            this.tagsToDelete.filter(function(tag){
+                                return tag.key != "";
+                            }).forEach(function(tag){
                                 newItem.tags.push(tag);
                             })
                         }
