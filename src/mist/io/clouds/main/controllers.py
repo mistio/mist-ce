@@ -1,13 +1,16 @@
 """Cloud Controllers
 
-A cloud controller handles all operations that can be performed on a cloud,
-commonly using libcloud under the hood.
+A cloud controller handles all main operations that can be performed on a
+specific cloud by subclassing and extending the `BaseController`.
 
-It also performs several steps and combines the information stored in the
-database with that returned from API calls to providers.
+A cloud controller also extends the `BaseController` by initialising
+sub-controllers, which are utilizing libcloud in order to perform API calls to
+the various cloud providers. Initially, all cloud controllers MUST implement a
+sub-controller of class `ComputeController` in order to perform basic API calls
+to cloud providers via libcloud's compute API.
 
 For each different cloud type, there is a corresponding cloud controller
-defined here. All the different classes inherit BaseController and share a
+defined here. All the different classes inherit `BaseController` and share a
 commmon interface, with the exception that some controllers may not have
 implemented all methods.
 
@@ -15,7 +18,12 @@ A cloud controller is initialized given a cloud. Most of the time it will be
 accessed through a cloud model, using the `ctl` abbreviation, like this:
 
     cloud = mist.io.clouds.models.Cloud.objects.get(id=cloud_id)
-    print cloud.ctl.list_machines()
+    cloud.ctl.enable()
+
+In order to perform libcloud operations the corresponding sub-controller must
+be invoked, as such:
+
+    cloud.ctl.compute.list_machines()
 
 """
 
@@ -52,9 +60,11 @@ from mist.core.vpn.methods import to_tunnel
 from mist.io.bare_metal import BareMetalDriver
 
 from mist.io.clouds.main.base import BaseController, rename_kwargs
+from mist.io.clouds.compute.base import ComputeController
 
 import mist.io.clouds.compute.controllers as compute_controllers
 import mist.io.clouds.network.controllers as network_controllers
+
 
 log = logging.getLogger(__name__)
 
@@ -196,7 +206,7 @@ class AzureArmController(BaseController):
 
     def __init__(self, cloud):
         super(AzureArmController, self).__init__(cloud)
-        self.compute = compute_controllers.AzureArmController(self)
+        self.compute = compute_controllers.AzureArmComputeController(self)
 
     def _connect(self):
         return get_driver(Provider.AZURE_ARM)(self.cloud.tenant_id,
@@ -242,7 +252,7 @@ class HostVirtualController(BaseController):
 
     def __init__(self, cloud):
         super(HostVirtualController, self).__init__(cloud)
-        self.compute = compute_controllers.HostVirtualComputeController(self)
+        self.compute = ComputeController(self)
 
     def _connect(self):
         return get_driver(Provider.HOSTVIRTUAL)(self.cloud.apikey)
@@ -279,7 +289,7 @@ class VSphereController(BaseController):
 
     def __init__(self, cloud):
         super(VSphereController, self).__init__(cloud)
-        self.compute = compute_controllers.VSphereComputeController(self)
+        self.compute = ComputeController(self)
 
     def _connect(self):
         host = dnat(self.cloud.owner, self.cloud.host)
@@ -339,8 +349,7 @@ class IndonesianVCloudController(VCloudController):
 
     def __init__(self, cloud):
         super(IndonesianVCloudController, self).__init__(cloud)
-        self.compute = compute_controllers.IndonesianVCloudComputeController(
-                                                                        self)
+        self.compute = ComputeController(self)
 
     def _update__preparse_kwargs(self, kwargs):
         host = kwargs.get('host', self.cloud.host) or 'my.idcloudonline.com'
@@ -410,7 +419,7 @@ class DockerController(BaseController):
                 ca_cert_temp_file.close()
                 ca_cert = ca_cert_temp_file.name
             # FIXME: The docker_host logic should come out of libcloud into
-            # DockerController.list_machines
+            # DockerController.compute.list_machines
             return get_driver(Provider.DOCKER)(host=host,
                                                port=port,
                                                docker_host=self.cloud.host,
