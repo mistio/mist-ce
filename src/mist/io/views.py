@@ -2192,7 +2192,6 @@ def get_machine_dashboard(request):
     if dashboard_id == 'home':
         ret = {
             "id": 1,
-            // "refresh": "",
             "rows": [{
                 "height": "500px",
                 "panels": [{
