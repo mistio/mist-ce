@@ -7,10 +7,10 @@
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/pushstate-anchor/pushstate-anchor.html">
 
-<link rel="import" href="../elements/section-tile/section-tile.html">
-<link rel="import" href="../elements/app-incidents/app-incidents.html">
-<link rel="import" href="../elements/app-costs/app-costs.html">
-<link rel="import" href="../elements/app-costs/app-costs-per-tag.html">
+<link rel="import" href="section-tile/section-tile.html">
+<link rel="import" href="app-incidents/app-incidents.html">
+<link rel="import" href="app-costs/app-costs.html">
+<link rel="import" href="app-costs/app-costs-per-tag.html">
 
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
@@ -24,12 +24,12 @@
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <!--link rel="import" href="../bower_components/iron-form/iron-form.html"-->
 
-<link rel="import" href="../elements/logs/log-list.html">
-<link rel="import" href="../elements/onb-element/onb-element.html">
-<link rel="import" href="../elements/clouds/cloud-info.html">
-<link rel="import" href="../elements/clouds/cloud-chip.html">
+<link rel="import" href="logs/log-list.html">
+<link rel="import" href="onb-element/onb-element.html">
+<link rel="import" href="clouds/cloud-info.html">
+<link rel="import" href="clouds/cloud-chip.html">
 
-<link rel="import" href="../elements/account/plan-overusage.html">
+<link rel="import" href="account/plan-overusage.html">
 
 <dom-module id="page-dashboard">
     <template>
@@ -473,13 +473,6 @@ Polymer({
                 that.querySelector('dashboard-panel').resize();
 
         }, 5000, this);
-
-        /*this.async(function() {
-            this.importHref(this.resolveUrl('/elements/logs/log-list.html'),
-                            null,
-                            null,
-                            true)},
-            500);*/
     },
     isOnline: function(cloud) {
         return cloud.state == 'online' && 'online';

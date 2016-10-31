@@ -236,7 +236,7 @@
             width: 8px;
             background: var(--green-color);
         }
-        .pending:after {            
+        .pending:after {
             background:  repeating-linear-gradient(
               -45deg,
               #ddd,
@@ -245,10 +245,10 @@
               #eee 4px
             );
         }
-        .failed:after {            
+        .failed:after {
             background: var(--orange-color);
         }
-        .has-incidents:after {            
+        .has-incidents:after {
             background: var(--red-color);
         }
         </style>
@@ -461,7 +461,7 @@ Polymer({
             return " ";
         }
 
-        //check state of monitoring 
+        //check state of monitoring
         if (this.model.monitoring.monitored_machines[item.uuid].installation_status == "installing" || !this.model.monitoring.monitored_machines[item.uuid].installation_status.activated_at) {
             classes += "pending "
         }
@@ -471,7 +471,7 @@ Polymer({
         }
 
 
-        if (this.incidents.length > 0 && this.incidents.indexOf(item.id) > -1) {            
+        if (this.incidents.length > 0 && this.incidents.indexOf(item.id) > -1) {
             classes += "has-incidents "
         }
 
@@ -500,6 +500,7 @@ Polymer({
         }
     },
     itemsChanged: function (changeRecord) {
+        console.warn('scrollTop', this.querySelector('iron-list').scrollTop);
         var that = this;
         // update height of list depending on number of items
         var topOfset = 168;
@@ -548,7 +549,7 @@ Polymer({
             machinesWithIncidents = this.model.incidentsArray.filter(function(inc){
                     return !inc.finished_at || inc.finished_at == 0;
                 }).map(function(inc){
-                    if (this.model.clouds && this.model.clouds[inc.cloud_id] && this.model.clouds[inc.cloud_id].machines && this.model.clouds[inc.cloud_id].machines[inc.machine_id]) 
+                    if (this.model.clouds && this.model.clouds[inc.cloud_id] && this.model.clouds[inc.cloud_id].machines && this.model.clouds[inc.cloud_id].machines[inc.machine_id])
                         return this.model.clouds[inc.cloud_id].machines[inc.machine_id].id;
             }, this);
         }

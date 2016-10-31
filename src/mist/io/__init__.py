@@ -32,6 +32,7 @@ def main(global_config, **settings):
     configurator.add_renderer('json', json_renderer)
     configurator.add_static_view('resources', 'mist.io:static')
     configurator.add_static_view('src', path='../../../ui/src')
+    configurator.add_static_view('assets', path='../../../ui/assets')
 
     configurator.add_static_view('docs', path='../../../docs/build')
 
