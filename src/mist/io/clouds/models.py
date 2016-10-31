@@ -8,7 +8,7 @@ from mist.core.tag.models import Tag
 from mist.core.keypair.models import Keypair
 from mist.core.user.models import Organization
 
-import mist.io.clouds.controllers as controllers
+from mist.io.clouds.main import controllers
 
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudExistsError
@@ -66,7 +66,7 @@ class Cloud(me.Document):
     clouds controller. This way it is possible to do things like:
 
         cloud = Cloud.objects.get(id=cloud_id)
-        print cloud.ctl.list_machines()
+        print cloud.ctl.compute.list_machines()
 
     """
 
