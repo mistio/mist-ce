@@ -353,8 +353,8 @@
         <!-- <machine-edit machine="[[machine]]"></machine-edit> -->
         <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
-        </template>
-    </dom-module>
+    </template>
+</dom-module>
     <script>
     MACHINEACTIONS = {
         'shell': {
@@ -632,15 +632,11 @@
             // }, 5000);
         },
         _updateDashboard:function(id){
-          var dashboard=this.dashboard;
-          this.dashboard.rows[0].panels[0].id;
-          for(var i=0; i<dashboard.rows[0].panels.length; i++){
-            if(dashboard.rows[0].panels[i].machineArray[0]==null){
-              dashboard.rows[0].panels[i].machineArray[0]=[this.machine.cloud.id, this.machine.id];
+          for(var i=0; i<this.dashboard.rows[0].panels.length; i++){
+            if(this.dashboard.rows[0].panels[i].machineArray.length==0){
+              this.push("dashboard.rows.0.panels."+i+".machineArray",[this.machine.cloud.id, this.machine.id]);
             }
           }
-          this.set("dashboard",dashboard);
-          console.log("in");
         },
         _panelAdded:function (e){
             console.log("i got",e.detail);
