@@ -1,3 +1,12 @@
 [submodule "tests"]
 	path = tests
 	url = ../../mistio/mist.tests.git
+[submodule "ui/bower_components/polyana-dashboard"]
+	path = ui/bower_components/polyana-dashboard
+	url = git@gitlab.ops.mist.io:mistio/polyana-dashboard.git
+[submodule "ui/bower_components/c3-chart"]
+	path = ui/bower_components/c3-chart
+	url = git@gitlab.ops.mist.io:mistio/c3-chart.git
+[submodule "ui/bower_components/timerange-picker"]
+	path = ui/bower_components/timerange-picker
+	url = git@gitlab.ops.mist.io:mistio/timerange-picker.git
