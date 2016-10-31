@@ -63,8 +63,7 @@ class AmazonNetworkController(NetworkController):
                 'state': network.extra.get('state'),
                 'instance_tenancy': network.extra.get('instance_tenancy'),
                 'dhcp_options_id': network.extra.get('dhcp_options_id'),
-                'tags': network.extra.get('tags', []),
-                'subnets': [{'name': network.cidr_block}]}
+                'tags': network.extra.get('tags', [])}
 
     @staticmethod
     def _ec2_subnet_to_dict(subnet):
