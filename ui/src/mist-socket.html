@@ -3,7 +3,7 @@
     CSRF_TOKEN = '';
     DEBUG_SOCKET = false;
     Polymer({
-        is: 'app-socket',
+        is: 'mist-socket',
         url: '/socket',
         properties: {
             socket: {
@@ -423,7 +423,7 @@
             if (!data) //data is an Object
                 this.set('onboarding.hasMonitoring', false);
             this.set('model.pending.monitoring', false);
-            // inform machines that have rules 
+            // inform machines that have rules
             if (data.rules) {
                 for (var rule in data.rules) {
                     if (this.model.clouds[rule.cloud] && this.model.clouds[rule.cloud].machines[rule.machine]){
