@@ -435,10 +435,11 @@ Polymer({
                 var cores =  parseInt(model.probes[item.uuid].cores);
                 var classes = '';
                 var prefix = '';
+                console.log(parseInt(probe[0]),probe[0]);
 
-                classes += this.loadToColor(probe[0]*100/cores, "short");
-                classes += this.loadToColor(probe[1]*100/cores, "mid");
-                classes += this.loadToColor(probe[2]*100/cores, "long");
+                classes += this.loadToColor(parseFloat(probe[0]/cores), "short");
+                classes += this.loadToColor(parseFloat(probe[1]/cores), "mid");
+                classes += this.loadToColor(parseFloat(probe[2]/cores), "long");
 
 
                 //has probe data
@@ -451,14 +452,13 @@ Polymer({
     },
     loadToColor: function(load, prefix){
         console.log(prefix,load);
-        var mload = parseInt(load);
-        if (mload > 120)
+        if (load > 1.2)
             return prefix+"high ";
-        else if (mload > 80)
+        else if (load > 0.8)
             return prefix+"medium ";
-        else if (mload > 60)
+        else if (load > 0.6)
             return prefix+"eco ";
-        else if (mload > 20)
+        else if (load > 0.2)
             return prefix+"low ";
         else
             return prefix+"low ";
