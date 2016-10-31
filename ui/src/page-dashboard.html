@@ -7,10 +7,10 @@
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/pushstate-anchor/pushstate-anchor.html">
 
-<link rel="import" href="../elements/section-tile/section-tile.html">
-<link rel="import" href="../elements/app-incidents/app-incidents.html">
-<link rel="import" href="../elements/app-costs/app-costs.html">
-<link rel="import" href="../elements/app-costs/app-costs-per-tag.html">
+<link rel="import" href="section-tile/section-tile.html">
+<link rel="import" href="app-incidents/app-incidents.html">
+<link rel="import" href="app-costs/app-costs.html">
+<link rel="import" href="app-costs/app-costs-per-tag.html">
 
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
@@ -24,12 +24,12 @@
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <!--link rel="import" href="../bower_components/iron-form/iron-form.html"-->
 
-<link rel="import" href="../elements/logs/log-list.html">
-<link rel="import" href="../elements/onb-element/onb-element.html">
-<link rel="import" href="../elements/clouds/cloud-info.html">
-<link rel="import" href="../elements/clouds/cloud-chip.html">
+<link rel="import" href="logs/log-list.html">
+<link rel="import" href="onb-element/onb-element.html">
+<link rel="import" href="clouds/cloud-info.html">
+<link rel="import" href="clouds/cloud-chip.html">
 
-<link rel="import" href="../elements/account/plan-overusage.html">
+<link rel="import" href="account/plan-overusage.html">
 
 <dom-module id="page-dashboard">
     <template>
@@ -258,76 +258,75 @@
                                 <h1 class="cloud-title">[[item.title]]</h1>
                             </cloud-chip>
                         </template>
-    </div>
-    <div class="ovhid">
-        <cloud-info></cloud-info>
-    </div>
-    </div>
-    <div class="columns">
-        <div id="leftcolumn" class="left">
-            <template is="dom-if" if="[[hasIncidents]]">
+                    </div>
+                    <div class="ovhid">
+                        <cloud-info></cloud-info>
+                    </div>
+                </div>
+                <div class="columns">
+                    <div id="leftcolumn" class="left">
+                        <template is="dom-if" if="[[hasIncidents]]">
                             <div class="incidents">
                                 <app-incidents model="[[model]]" sections="[[sections]]">
                                 </app-incidents>
                             </div>
                         </template>
-            <div class="sections layout horizontal wrap">
-                <a href="/machines" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
-                    </section-tile>
-                </a>
-                <a href="/images" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="[[model.imagesArray.length]]"></section-tile>
-                </a>
-                <a href="/keys" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="[[model.keysArray.length]]"></section-tile>
-                </a>
-                <a href="/networks" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="[[model.networksArray.length]]"></section-tile>
-                </a>
-                <a href="/scripts" class="main-section flex" is=" pushstate-anchor">
-                    <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="[[model.scriptsArray.length]]"></section-tile>
-                </a>
-                <a href="/templates" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="templates" color="[[sections.templates.color]]" icon="[[sections.templates.icon]]" count="[[model.templatesArray.length]]"></section-tile>
-                </a>
-                <a href="/stacks" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="stacks" color="[[sections.stacks.color]]" icon="[[sections.stacks.icon]]" count="[[model.stacksArray.length]]"></section-tile>
-                </a>
-                <a href="/teams" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
-                </a>
-            </div>
-            <paper-material class="graphs">
-                <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
-            </paper-material>
-        </div>
-        <div class="left">
-            <div class="costs">
-                <app-costs model="[[model]]" sections="[[sections]]">
-                </app-costs>
-                <app-costs-per-tag model="[[model]]" sections="[[sections]]">
-                </app-costs-per-tag>
-            </div>
-            <paper-material id="rightcolumn" class="logs">
-                <log-list></log-list>
-            </paper-material>
-        </div>
-    </div>
-    </template>
-    <template is="dom-if" if="[[!showDashboard]]">
+                        <div class="sections layout horizontal wrap">
+                            <a href="/machines" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
+                                </section-tile>
+                            </a>
+                            <a href="/images" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="[[model.imagesArray.length]]"></section-tile>
+                            </a>
+                            <a href="/keys" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="[[model.keysArray.length]]"></section-tile>
+                            </a>
+                            <a href="/networks" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="[[model.networksArray.length]]"></section-tile>
+                            </a>
+                            <a href="/scripts" class="main-section flex" is=" pushstate-anchor">
+                                <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="[[model.scriptsArray.length]]"></section-tile>
+                            </a>
+                            <a href="/templates" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="templates" color="[[sections.templates.color]]" icon="[[sections.templates.icon]]" count="[[model.templatesArray.length]]"></section-tile>
+                            </a>
+                            <a href="/stacks" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="stacks" color="[[sections.stacks.color]]" icon="[[sections.stacks.icon]]" count="[[model.stacksArray.length]]"></section-tile>
+                            </a>
+                            <a href="/teams" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
+                            </a>
+                        </div>
+                        <paper-material class="graphs">
+                            <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
+                        </paper-material>
+                    </div>
+                    <div class="left">
+                        <div class="costs">
+                            <app-costs model="[[model]]" sections="[[sections]]">
+                            </app-costs>
+                            <app-costs-per-tag model="[[model]]" sections="[[sections]]">
+                            </app-costs-per-tag>
+                        </div>
+                        <paper-material id="rightcolumn" class="logs">
+                            <log-list></log-list>
+                        </paper-material>
+                    </div>
+                </div>
+            </template>
+            <template is="dom-if" if="[[!showDashboard]]">
                 <onb-element model="[[model]]"></onb-element>
             </template>
-    <div class="absolute-bottom-right">
-        <a href="/clouds/+add">
-            <paper-fab id="addBtn" icon="cloud"></paper-fab>
-        </a>
-    </div>
-
-    <div class="is-loading" hidden$="[[!onboarding.isLoadingClouds]]">
-        <paper-spinner active></paper-spinner>
-    </div>
-    </div>
+            <div class="absolute-bottom-right">
+                <a href="/clouds/+add">
+                    <paper-fab id="addBtn" icon="cloud"></paper-fab>
+                </a>
+            </div>
+            <div class="is-loading" hidden$="[[!onboarding.isLoadingClouds]]">
+                <paper-spinner active></paper-spinner>
+            </div>
+        </div>
     </template>
 </dom-module>
 <script>
@@ -519,6 +518,8 @@
                 mIds = Object.keys(this.get('model.monitoring.monitored_machines') || {});
             for (var i = 0; i < mIds.length; i++) {
                 var mref = this.model.monitoring.monitored_machines[mIds[i]],
+                    m;
+                if (this.model.clouds && this.model.clouds[mref.cloud_id] && this.model.clouds[mref.cloud_id].machines && this.model.clouds[mref.cloud_id].machines[mref.machine_id])
                     m = mref && this.model.clouds[mref.cloud_id].machines[mref.machine_id];
                 ret[mIds[i]] = m ? m.name : 'unknown';
             }

@@ -75,7 +75,7 @@ Polymer({
     },
 
     ready: function() {
-        var socket = document.querySelector('app-socket'), that = this, requestPending = false;
+        var socket = document.querySelector('mist-socket'), that = this, requestPending = false;
         if (!socket || !socket.get('initialized')) {
             setTimeout(function() {
               that.ready();
