@@ -1,21 +1,21 @@
-"""Cloud Controllers
+"""Cloud Main Controllers
 
-A cloud controller handles all operations that can be performed on a cloud,
-commonly using libcloud under the hood.
-
-It also performs several steps and combines the information stored in the
-database with that returned from API calls to providers.
-
-For each different cloud type, there is a corresponding cloud controller
-defined here. All the different classes inherit BaseController and share a
-commmon interface, with the exception that some controllers may not have
-implemented all methods.
+Main controllers implement common cloud operations, such as add, update,
+disable, that mainly affect mist, instead of interacting with the remote cloud
+itself. These operations are mostly the same for all different clouds.
 
 A cloud controller is initialized given a cloud. Most of the time it will be
 accessed through a cloud model, using the `ctl` abbreviation, like this:
 
     cloud = mist.io.clouds.models.Cloud.objects.get(id=cloud_id)
+    cloud.ctl.enable()
+
+The main controller also acts as a gateway to specific controllers. For
+example, one may do
+
     print cloud.ctl.compute.list_machines()
+
+See `mist.io.clouds.controllers.main.base` for more information.
 
 """
 
@@ -43,18 +43,18 @@ from mist.io.helpers import sanitize_host, check_host
 from mist.core.keypair.models import Keypair
 from mist.core.vpn.methods import to_tunnel
 
-from mist.io.clouds.main.base import BaseController
 from mist.io.clouds.utils import rename_kwargs
-from mist.io.clouds.compute import controllers as compute_controllers
+from mist.io.clouds.controllers.main.base import BaseMainController
+from mist.io.clouds.controllers.compute import controllers as compute_ctls
 
 
 log = logging.getLogger(__name__)
 
 
-class AmazonController(BaseController):
+class AmazonMainController(BaseMainController):
 
     provider = 'ec2'
-    ComputeController = compute_controllers.AmazonComputeController
+    ComputeController = compute_ctls.AmazonComputeController
 
     def _add__preparse_kwargs(self, kwargs):
         # Autofill apisecret from other Amazon Cloud.
@@ -79,22 +79,22 @@ class AmazonController(BaseController):
             kwargs['region'] = '-'.join(parts)
 
 
-class DigitalOceanController(BaseController):
+class DigitalOceanMainController(BaseMainController):
 
     provider = 'digitalocean'
-    ComputeController = compute_controllers.DigitalOceanComputeController
+    ComputeController = compute_ctls.DigitalOceanComputeController
 
 
-class LinodeController(BaseController):
+class LinodeMainController(BaseMainController):
 
     provider = 'linode'
-    ComputeController = compute_controllers.LinodeComputeController
+    ComputeController = compute_ctls.LinodeComputeController
 
 
-class RackSpaceController(BaseController):
+class RackSpaceMainController(BaseMainController):
 
     provider = 'rackspace'
-    ComputeController = compute_controllers.RackSpaceComputeController
+    ComputeController = compute_ctls.RackSpaceComputeController
 
     def _add__preparse_kwargs(self, kwargs):
         username = kwargs.get('username')
@@ -106,34 +106,34 @@ class RackSpaceController(BaseController):
                 kwargs['apikey'] = cloud.apikey
 
 
-class SoftLayerController(BaseController):
+class SoftLayerMainController(BaseMainController):
 
     provider = 'softlayer'
-    ComputeController = compute_controllers.SoftLayerComputeController
+    ComputeController = compute_ctls.SoftLayerComputeController
 
 
-class NephoScaleController(BaseController):
+class NephoScaleMainController(BaseMainController):
 
     provider = 'nephoscale'
-    ComputeController = compute_controllers.NephoScaleComputeController
+    ComputeController = compute_ctls.NephoScaleComputeController
 
 
-class AzureController(BaseController):
+class AzureMainController(BaseMainController):
 
     provider = 'azure'
-    ComputeController = compute_controllers.AzureComputeController
+    ComputeController = compute_ctls.AzureComputeController
 
 
-class AzureArmController(BaseController):
+class AzureArmMainController(BaseMainController):
 
     provider = 'azure_arm'
-    ComputeController = compute_controllers.AzureArmComputeController
+    ComputeController = compute_ctls.AzureArmComputeController
 
 
-class GoogleController(BaseController):
+class GoogleMainController(BaseMainController):
 
     provider = 'gce'
-    ComputeController = compute_controllers.GoogleComputeController
+    ComputeController = compute_ctls.GoogleComputeController
 
     def _update__preparse_kwargs(self, kwargs):
         private_key = kwargs.get('private_key', self.cloud.private_key)
@@ -152,28 +152,28 @@ class GoogleController(BaseController):
                                 "params, or 'private_key' as a json file.")
 
 
-class HostVirtualController(BaseController):
+class HostVirtualMainController(BaseMainController):
 
     provider = 'hostvirtual'
-    ComputeController = compute_controllers.HostVirtualComputeController
+    ComputeController = compute_ctls.HostVirtualComputeController
 
 
-class PacketController(BaseController):
+class PacketMainController(BaseMainController):
 
     provider = 'packet'
-    ComputeController = compute_controllers.PacketComputeController
+    ComputeController = compute_ctls.PacketComputeController
 
 
-class VultrController(BaseController):
+class VultrMainController(BaseMainController):
 
     provider = 'vultr'
-    ComputeController = compute_controllers.VultrComputeController
+    ComputeController = compute_ctls.VultrComputeController
 
 
-class VSphereController(BaseController):
+class VSphereMainController(BaseMainController):
 
     provider = 'vsphere'
-    ComputeController = compute_controllers.VSphereComputeController
+    ComputeController = compute_ctls.VSphereComputeController
 
     def _update__preparse_kwargs(self, kwargs):
         host = kwargs.get('host', self.cloud.host)
@@ -182,10 +182,10 @@ class VSphereController(BaseController):
             check_host(kwargs['host'])
 
 
-class VCloudController(BaseController):
+class VCloudMainController(BaseMainController):
 
     provider = 'vcloud'
-    ComputeController = compute_controllers.VCloudComputeController
+    ComputeController = compute_ctls.VCloudComputeController
 
     def _update__preparse_kwargs(self, kwargs):
         username = kwargs.get('username', self.cloud.username) or ''
@@ -203,23 +203,23 @@ class VCloudController(BaseController):
             check_host(kwargs['host'])
 
 
-class IndonesianVCloudController(VCloudController):
+class IndonesianVCloudMainController(VCloudMainController):
 
     provider = 'indonesian_vcloud'
-    ComputeController = compute_controllers.VCloudComputeController
+    ComputeController = compute_ctls.VCloudComputeController
 
     def _update__preparse_kwargs(self, kwargs):
         host = kwargs.get('host', self.cloud.host) or 'my.idcloudonline.com'
         if host not in ('my.idcloudonline.com', 'compute.idcloudonline.com'):
             raise me.ValidationError("Invalid host '%s'." % host)
-        super(IndonesianVCloudController,
+        super(IndonesianVCloudMainController,
               self)._update__preparse_kwargs(kwargs)
 
 
-class OpenStackController(BaseController):
+class OpenStackMainController(BaseMainController):
 
     provider = 'openstack'
-    ComputeController = compute_controllers.OpenStackComputeController
+    ComputeController = compute_ctls.OpenStackComputeController
 
     def _update__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'auth_url', 'url')
@@ -234,10 +234,10 @@ class OpenStackController(BaseController):
             check_host(sanitize_host(kwargs['url']))
 
 
-class DockerController(BaseController):
+class DockerMainController(BaseMainController):
 
     provider = 'docker'
-    ComputeController = compute_controllers.DockerComputeController
+    ComputeController = compute_ctls.DockerComputeController
 
     def _update__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'docker_port', 'port')
@@ -250,10 +250,10 @@ class DockerController(BaseController):
             check_host(kwargs['host'])
 
 
-class LibvirtController(BaseController):
+class LibvirtMainController(BaseMainController):
 
     provider = 'libvirt'
-    ComputeController = compute_controllers.LibvirtComputeController
+    ComputeController = compute_ctls.LibvirtComputeController
 
     def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'machine_hostname', 'host')
@@ -272,7 +272,7 @@ class LibvirtController(BaseController):
 
     def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
         """This is a hack to associate a key with the VM hosting this cloud"""
-        super(LibvirtController, self).add(
+        super(LibvirtMainController, self).add(
             fail_on_error=fail_on_error,
             fail_on_invalid_params=fail_on_invalid_params,
             **kwargs
@@ -292,16 +292,16 @@ class LibvirtController(BaseController):
                               "Libvirt/KVM clouds.")
 
 
-class OtherController(BaseController):
+class OtherMainController(BaseMainController):
 
     provider = 'bare_metal'
-    ComputeController = compute_controllers.OtherComputeController
+    ComputeController = compute_ctls.OtherComputeController
 
     def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
         """Add new Cloud to the database
 
         This is the only cloud controller subclass that overrides the `add`
-        method of `BaseController`.
+        method of `BaseMainController`.
 
         This is only expected to be called by `Cloud.add` classmethod to create
         a cloud. Fields `owner` and `title` are already populated in

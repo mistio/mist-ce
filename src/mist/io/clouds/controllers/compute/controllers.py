@@ -7,8 +7,8 @@ It also performs several steps and combines the information stored in the
 database with that returned from API calls to providers.
 
 For each different cloud type, there is a corresponding cloud controller
-defined here. All the different classes inherit BaseComputeController and share a
-commmon interface, with the exception that some controllers may not have
+defined here. All the different classes inherit BaseComputeController and share
+a commmon interface, with the exception that some controllers may not have
 implemented all methods.
 
 A cloud controller is initialized given a cloud. Most of the time it will be
@@ -43,7 +43,7 @@ from mist.core.vpn.methods import destination_nat as dnat
 
 from mist.io.bare_metal import BareMetalDriver
 
-from mist.io.clouds.main.base import BaseComputeController
+from mist.io.clouds.controllers.main.base import BaseComputeController
 
 
 log = logging.getLogger(__name__)

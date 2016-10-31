@@ -1,8 +1,16 @@
-"""Definition of base classes for Clouds
+"""Definition of base main controllers for clouds
 
-This currently contains only BaseController. It includes basic functionality
-for a given cloud (including libcloud calls, fetching and storing information
-to db etc. Cloud specific controllers are in `mist.io.clouds.controllers`.
+This currently contains only BaseMainController. It includes basic
+functionality common to all clouds, such as add, update, rename, disable etc.
+
+The main controller also acts as a gateway to specific controllers. For
+example, one may do
+
+    cloud.ctl.enable()
+    cloud.ctl.compute.list_machines()
+
+Cloud specific main controllers are in
+`mist.io.clouds.controllers.main.controllers`.
 
 """
 
@@ -17,7 +25,7 @@ from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
-from mist.io.clouds.compute.base import BaseComputeController
+from mist.io.clouds.controllers.compute.base import BaseComputeController
 from mist.io.clouds.utils import rename_kwargs
 
 # from mist.core.cloud.models import Machine
@@ -26,12 +34,26 @@ from mist.io.clouds.utils import rename_kwargs
 log = logging.getLogger(__name__)
 
 
-class BaseController(object):
-    """Abstract base class for every cloud/provider controller
+class BaseMainController(object):
+    """Base main controller class for all cloud types
 
-    This base controller factors out all the steps common to all or most
-    clouds into a base class, and defines an interface for provider or
-    technology specific cloud controllers.
+    BaseMainController defines common cloud operations, such as add, update,
+    disable, that mainly affect mist, instead of interacting with the remote
+    cloud itself. These operations are mostly the same for all different
+    clouds.
+
+    Main controllers act as a gateway to specific controllers. For example, one
+    may do
+
+        cloud.ctl.enable()
+        cloud.ctl.compute.list_machines()
+
+    For this to work, subclasses must define the appropriate subcontroller
+    class, by defining for example a `ComputeController` attribute with a
+    subclass of mist.io.clouds.controllers.compute.base.BaseComputeController.
+
+    For specific clouds, main controllers are defined in
+    `mist.io.clouds.controllers.main.controllers`.
 
     Subclasses are meant to extend or override methods of this base class to
     account for differencies between different cloud types.
@@ -41,36 +63,15 @@ class BaseController(object):
     feasible. That is to say, don't add a new method to a subclass unless
     there is a very good reason to do so.
 
-    The following convention is followed:
-
     Any methods and attributes that don't start with an underscore are the
     controller's public API.
 
-    In the `BaseController`, these public methods will in most cases contain
-    a basic implementation that works for most clouds, along with the proper
-    logging and error handling. In almost all cases, subclasses SHOULD NOT
-    override or extend the public methods of `BaseController`. To account for
-    cloud/subclass specific behaviour, one is expected to override the
-    internal/private methods of `BaseController`.
-
-    Any methods and attributes that start with an underscore are the
-    controller's internal/private API.
-
-    To account for cloud/subclass specific behaviour, the public methods of
-    `BaseController` call a number of private methods. These methods will
-    always start with an underscore, such as `self._connect`. When an internal
-    method is only ever used in the process of one public method, it is
-    prefixed as such to make identification and purpose more obvious. For
-    example, method `self._list_machines__postparse_machine` is called in the
-    process of `self.list_machines` to postparse a machine and inject or
-    modify its attributes.
-
-    This `BaseController` defines a strict interface to controlling clouds.
-    For each different cloud type, a subclass needs to be defined. The subclass
-    must at least define a proper `self._connect` method. For simple clouds,
-    this may be enough. To provide cloud specific processing, hook the code on
-    the appropriate private method. Each method defined here documents its
-    intended purpose and use.
+    In the `BaseMainController`, these public methods will in most cases
+    contain a basic implementation that works for most clouds, along with the
+    proper logging and error handling. In almost all cases, subclasses SHOULD
+    NOT override or extend the public methods of `BaseMainController`. To
+    account for cloud/subclass specific behaviour, one is expected to override
+    the internal/private methods of `BaseMainController`.
 
     """
 
@@ -79,17 +80,17 @@ class BaseController(object):
     # NetworkController = None
 
     def __init__(self, cloud):
-        """Initialize cloud controller given a cloud
+        """Initialize main cloud controller given a cloud
 
         Most times one is expected to access a controller from inside the
         cloud, like this:
 
             cloud = mist.io.clouds.models.Cloud.objects.get(id=cloud_id)
-            print cloud.ctl.compute.list_machines()
+            print cloud.ctl.disable()
 
         Subclasses SHOULD NOT override this method.
 
-        If a subclass has to initialize a certain instance attribute, it SHOULD
+        If a subclass has to initialize a certain instance attribute, it MAY
         extend this method instead.
 
         """
@@ -97,13 +98,16 @@ class BaseController(object):
         self.cloud = cloud
         self._conn = None
 
+        # Initialize compute controller.
         assert issubclass(self.ComputeController, BaseComputeController)
         self.compute = self.ComputeController(self)
 
+        # TODO: Initialize dns controller.
         # if self.DnsController is not None:
         #     assert issubclass(self.DnsController, DnsController)
         #     self.dns = self.DnsController(self)
 
+        # TODO: Initialize network controller.
         # if self.NetworkController is not None:
         #     assert issubclass(self.NetworkController, NetworkController)
         #     self.network = self.NetworkController(self)
