@@ -289,6 +289,9 @@
                         <span class$="probe-data {{itemProbeClasses(machine, model.probes)}}"> </span>
                         <span hidden$="{{!probeData}}"> {{probeData}} </span>
                     </div>
+                    <div hidden$="{{!dirtyCow}}"> 
+                        {{dirtyCow}} 
+                    </div>
                 </paper-material>
                 <paper-material id="rightcolumn" class="right" hidden$="[[hideAssociatedKeys]]">
                     <h3 class="smallcaps">Associated Keys:</h3>
@@ -534,6 +537,11 @@ MACHINEACTIONS = {
             probeData: {
                 type: String,
                 computed: '_computeProbeData(machine, model.probes.*)',
+                value: false
+            },
+            dirtyCow: {
+                type: String,
+                computed: '_computeDirtyCow(machine, model.probes.*)',
                 value: false
             }
         },
@@ -821,6 +829,20 @@ MACHINEACTIONS = {
         _computeProbeData: function(machine, probes){
             if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid].loadavg.length)
                 return this.model.probes[machine.uuid].loadavg[0]+", "+this.model.probes[machine.uuid].loadavg[1]+", "+this.model.probes[machine.uuid].loadavg[2]+" - "+this.model.probes[machine.uuid].cores+" cores. Last probe: "+moment(this.model.probes[machine.uuid].timestamp*1000).fromNow();
+        },
+        _computeDirtyCow: function(machine, probes){
+            var info = "";
+            if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid].loadavg.length){
+                if (this.model.probes[machine.uuid].kernel_version)
+                    info += "Kernel version: "+this.model.probes[machine.uuid].kernel_version;
+                if (this.model.probes[machine.uuid].os)
+                    info += "OS: "+this.model.probes[machine.uuid].os;
+                if (this.model.probes[machine.uuid].os_version)
+                    info += this.model.probes[machine.uuid].os_version;
+                if (this.model.probes[machine.uuid].dirty_cow)
+                    info += "Dirty COW vulnerability: "+this.model.probes[machine.uuid].dirty_cow;
+            }
+            return info.length ? info : false;
         },
         itemProbeClasses: function(item, probes) {
             if (!probes) {
