@@ -294,6 +294,7 @@
             // if the received data array has different length than the respective
             // model array, then things must have changed since last update
             if (data.length != this.get('model.' + section + 'Array.length')) {
+                // console.debug('0. length', data.length, this.get('model.' + section + 'Array.length'));
                 changed = true;
             }
 
@@ -307,8 +308,12 @@
                     data[i].id = data[i]._id
                 }
                 // Check if item exists in respective model
-                var item = this.get('model.' + section + '.' + data[i].id);
+                // var item = this.get('model.' + section + '.' + data[i].id);
+                // patch for when data[i].id is of type '127.0.0.1'
+                var path = this.get('model.' + section);
+                var item = path[data[i].id];
                 if (!item) { // If does not exist then model needs to be updated
+                    // console.debug('1. data[i].id', data[i], this.get('model.' + section + '.' + data[i].id));
                     changed = true;
                     break;
                 }
@@ -323,12 +328,14 @@
                     }
                     if (modelKeys.indexOf(dataKeys[k]) == -1) {
                         // If something is missing the model needs to be updated
+                        console.debug('2. model', modelKeys.indexOf(dataKeys[k]), dataKeys[k]);
                         changed = true;
                         break;
                     }
                     // If some field changed the model needs to be updated
                     if (JSON.stringify(data[i][dataKeys[k]])
                         .localeCompare(JSON.stringify(item[dataKeys[k]]))) {
+                        // console.debug('localeCompare',JSON.stringify(data[i][dataKeys[k]]).localeCompare(JSON.stringify(item[dataKeys[k]])));
                         console.debug('property ', dataKeys[k], ' changed in ', item);
                         var oldVal = JSON.stringify(item[dataKeys[k]]),
                             newVal = JSON.stringify(data[i][dataKeys[k]]);
