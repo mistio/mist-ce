@@ -527,7 +527,8 @@
         },
         observers: [
             '_isMonitored(machine, model.monitoring.machines.*)',
-            '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)'
+            '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)',
+            '_updateDashboard(machine.uuid)'
         ],
         listeners: {
             'confirmation': '_machineActionConfirmation',
@@ -630,6 +631,17 @@
             //
             // }, 5000);
         },
+        _updateDashboard:function(id){
+          var dashboard=this.dashboard;
+          this.dashboard.rows[0].panels[0].id;
+          for(var i=0; i<dashboard.rows[0].panels.length; i++){
+            if(dashboard.rows[0].panels[i].machineArray[0]==null){
+              dashboard.rows[0].panels[i].machineArray[0]=[this.machine.cloud.id, this.machine.id];
+            }
+          }
+          this.set("dashboard",dashboard);
+          console.log("in");
+        },
         _panelAdded:function (e){
             console.log("i got",e.detail);
 
@@ -707,10 +719,6 @@
             }, this);
         },
         _computeItemInArray: function() {
-          for(var i=0; i<this.dashboard.rows[0].panels.length; i++){
-            if(this.dashboard.rows[0].panels[i].machineArray[0]==null)
-            this.dashboard.rows[0].panels[i].machineArray[0]=[this.machine.cloud.id, this.machine.id];
-          }
             var arr = [];
             arr.push(this.machine);
             return arr;
