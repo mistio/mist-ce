@@ -135,11 +135,22 @@ class ListOfMachines(BaseMachines):
 
 
 class TaggedMachines(BaseMachines):
-    tags = me.ListField(me.ReferenceField(Tag, required=True))
+
+    tags = me.ListField()
+    owner = me.ReferenceField(Owner, required=True)
 
     def get_machines(self):
         # all machines currently matching the tags
-        raise NotImplementedError()
+        cloud_machines_pairs = []
+        for tag in self.tags:
+            machines_from_tags = Tag.objects(owner=self.owner,
+                                             resource_type='machines', key=tag)
+            for m in machines_from_tags:
+                machine_id = m.resource.machine_id
+                cloud_id = m.resource.cloud.id
+                cloud_machines_pairs.append((cloud_id, machine_id))
+
+        return cloud_machines_pairs
 
 
 class Schedule(me.Document):
@@ -179,7 +190,7 @@ class Schedule(me.Document):
     total_run_count = me.IntField(min_value=0)
 
     # These are used in schedules.methods
-    api_fields = ['name', 'task_type', 'machines', 'schedule_type',
+    api_fields = ['name', 'task_type', 'machines_match', 'schedule_type',
                   'enabled', 'expires', 'description', 'run_immediately']
 
     no_changes = False
@@ -232,13 +243,12 @@ class Schedule(me.Document):
 
     def as_dict(self):
         # Return a dict as it will be returned to the API
-        machines = [machine.id for machine in self.machines_match.machines]
         return {
             'id': self.id,
             'schedule_name': self.name,
             'description': self.description or '',
             'schedule_type': unicode(self.schedule_type),
-            'machines_match': machines,
+            'machines_match': self.machines_match.get_machines(),
             'task_type': str(self.task_type),
             'expires': str(self.expires or ''),
             'enabled': self.enabled,

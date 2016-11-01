@@ -89,7 +89,17 @@ def add_schedule_entry(auth_context, params):
 
             machines_obj.append(machine)
 
-    # todo TaggedMachines and also check permissions
+    # check permissions for machines' tags
+    if machines_tags:
+        for machine_tag in machines_tags:
+            if action:
+                # SEC require permission ACTION on machine
+                auth_context.check_perm("machine", action, None)
+                auth_context.check_perm("machine", action, machine_tag)
+            else:
+                # SEC require permission RUN_SCRIPT on machine
+                auth_context.check_perm("machine", "run_script", None)
+                auth_context.check_perm("machine", "run_script", machine_tag)
 
     # create a dict for Scheduler
     sched_args = {k: v for k, v in params.items()
@@ -104,7 +114,11 @@ def add_schedule_entry(auth_context, params):
         sched_args['machines_match'] = schedules.ListOfMachines(
                                      **{'machines': machines_obj}
         )
-    # todo for TaggedMachines and also check permissions
+    else:
+        sched_args['machines_match'] = schedules.TaggedMachines(
+                                     **{'tags': machines_tags,
+                                        'owner': auth_context.owner}
+        )
 
     if action:
         sched_args['task_type'] = schedules.ActionTask(**{'action': action})
@@ -158,11 +172,11 @@ def add_schedule_entry(auth_context, params):
                           'expires': future_date.strftime('%Y-%m-%d %H:%M:%S')}
                           )
 
-    ptask = schedules.Schedule(**sched_args)
+    stask = schedules.Schedule(**sched_args)
 
     # Check if the action succeeded and saved
     try:
-        ptask.save()
+        stask.save()
     except me.ValidationError as e:
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
     except me.NotUniqueError:
@@ -171,7 +185,7 @@ def add_schedule_entry(auth_context, params):
         raise ScheduleOperationError()
 
     trigger_session_update(owner, ['schedules'])
-    return ptask.id
+    return stask.id
 
 
 def edit_schedule_entry(auth_context, schedule_id, params):
@@ -179,7 +193,7 @@ def edit_schedule_entry(auth_context, schedule_id, params):
     owner = auth_context.owner
     # Check if entry exists
     try:
-        ptask = schedules.Schedule.objects.get(id=schedule_id, owner=owner)
+        stask = schedules.Schedule.objects.get(id=schedule_id, owner=owner)
     except schedules.Schedule.DoesNotExist:
         raise PeriodicTaskNotFound()
 
@@ -198,7 +212,7 @@ def edit_schedule_entry(auth_context, schedule_id, params):
         # SEC require permission RUN on script
         auth_context.check_perm('script', 'run', script_id)
 
-    machines_uuids = params.get('machines_uuids')
+    machines_uuids = params.get('machines_uuids', '')
     if machines_uuids:
         machines_obj = []
         for machine_uuid in machines_uuids:
@@ -222,19 +236,38 @@ def edit_schedule_entry(auth_context, schedule_id, params):
             # cloud_machines_pairs.append(pair)
             machines_obj.append(machine)
 
+    machines_tags = params.get('machine_tags', '')
+    if machines_tags:
+        for machine_tag in machines_tags:
+            if action:
+                # SEC require permission ACTION on machine
+                auth_context.check_perm("machine", action, None)
+                auth_context.check_perm("machine", action, machine_tag)
+            else:
+                # SEC require permission RUN_SCRIPT on machine
+                auth_context.check_perm("machine", "run_script", None)
+                auth_context.check_perm("machine", "run_script", machine_tag)
+
     # check what the user previous has, script or action
-    if ptask.script_id and params.get('action'):
+    if stask.task_type._cls == 'ScriptTask' and params.get('action'):
         raise BadRequestError("You cannot change from script to action")
-    if ptask.action and script_id:
+    if stask.task_type._cls == 'ActionTask' and script_id:
         raise BadRequestError("You cannot change from action to script")
 
     sched_args = {k: v for k, v in params.items()
                   if k in schedules.Schedule.api_fields}
 
     if machines_uuids:
-        sched_args['machines_match'] = machines_obj
+        sched_args['machines_match'] = schedules.ListOfMachines(
+                                     **{'machines': machines_obj}
+        )
+    elif machines_tags:
+        sched_args['machines_match'] = schedules.TaggedMachines(
+                                     **{'tags': machines_tags,
+                                        'owner': auth_context.owner}
+        )
 
-    name = params.get('name') or ptask.name
+    name = params.get('name') or stask.name
     if name is not None and name != '':
         sched_args.update({'name': name})
 
@@ -250,33 +283,33 @@ def edit_schedule_entry(auth_context, schedule_id, params):
     schedule_type = params.get('schedule_type', '')
 
     # schedule_type not empty string
-    if schedule_type not in ['crontab', 'interval', 'one_off']:
-        raise BadRequestError('schedule type must be one off these '
-                              '(crontab, interval, one_off)]')
+    if schedule_type:
+        if schedule_type not in ['crontab', 'interval', 'one_off']:
+            raise BadRequestError('schedule type must be one off these '
+                                  '(crontab, interval, one_off)]')
 
-    if schedule_type == 'crontab' or schedule_type == 'interval':
-        future_date = params.get('expires')
-    elif schedule_type == 'one_off':
-        future_date = params.get('schedule_entry')
-        if not future_date:
-            raise BadRequestError('one_off schedule requires date '
-                                  'given in schedule_entry')
+        if schedule_type == 'crontab' or schedule_type == 'interval':
+            future_date = params.get('expires')
+        elif schedule_type == 'one_off':
+            future_date = params.get('schedule_entry')
+            if not future_date:
+                raise BadRequestError('one_off schedule requires date '
+                                      'given in schedule_entry')
 
-    if future_date:
-        try:
-            future_date = datetime.datetime.strptime(future_date,
-                                                     '%Y-%m-%d %H:%M:%S')
-        except ValueError:
-            raise BadRequestError('Expiration date value was not valid')
-        now = datetime.datetime.now()
-        if future_date < now:
-            raise BadRequestError('Date of future task is in the past. Please'
-                                  ' contact Marty McFly')
+        if future_date:
+            try:
+                future_date = datetime.datetime.strptime(future_date,
+                                                         '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                raise BadRequestError('Expiration date value was not valid')
+            now = datetime.datetime.now()
+            if future_date < now:
+                raise BadRequestError('Date of future task is in the past. Please'
+                                      ' contact Marty McFly')
 
-    # TODO check these with test
     if action:
         sched_args['task_type'] = schedules.ActionTask(**{'action': action})
-    else:
+    elif script_id:
         sched_args['task_type'] = schedules.ScriptTask(
                                **{'script_id': script_id})
 
@@ -305,9 +338,9 @@ def edit_schedule_entry(auth_context, schedule_id, params):
                                                            )})
 
     try:
-        ptask.update_validate(sched_args)
+        stask.update_validate(sched_args)
     except me.ValidationError as e:
         raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
 
     trigger_session_update(owner, ['schedules'])
-    return ptask.id
+    return stask.id

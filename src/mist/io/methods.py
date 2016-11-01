@@ -1362,12 +1362,11 @@ def destroy_machine(user, cloud_id, machine_id):
     machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
     # delete schedules for this machine or
     # remove it from schedule.machines_match.machines
-    # TODO use reverse delete
     schedules = Schedule.objects(owner=user)
     for sched in schedules:
         if machine in sched.machines_match.machines:
-            if len(sched.machines) > 1:
-                sched.machines_match.remove(machine)
+            if len(sched.machines_match) > 1:
+                sched.machines_match.machines.remove(machine)
                 sched.save()
             else:
                 sched.delete()
