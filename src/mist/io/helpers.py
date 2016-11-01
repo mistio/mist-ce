@@ -145,7 +145,6 @@ def parse_ping(stdout):
     return {}
 
 
-
 def parse_os_release(os_release):
     """
     Extract os name and version from the output of `cat /etc/*release`

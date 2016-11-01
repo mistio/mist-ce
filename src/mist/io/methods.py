@@ -2249,7 +2249,7 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
     pub_ips = find_public_ips(ips)
     priv_ips = [ip for ip in ips if ip not in pub_ips]
 
-    kernel_version = cmd_output[6]
+    kernel_version = cmd_output[6].replace("\n", "")
     os_release = cmd_output[7]
     os, os_version = parse_os_release(os_release)
 
