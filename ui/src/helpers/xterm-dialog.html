@@ -2299,14 +2299,14 @@
                         this.set("style.position", "fixed")
                     }
 
-                    socket.send('msg', 'shell', 'shell_open', payload);
+                    socket.send('msg', 'shell', 'shell_open', [payload]);
 
                     socket.set('term', this.term);
 
                     // Add event handler for window resize
                     var that = this;
                     window.addEventListener("resize", function() {
-                      that.windowResize(that);
+                        that.windowResize(that);
                     });
                 },
 

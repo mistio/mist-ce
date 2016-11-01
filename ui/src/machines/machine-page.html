@@ -9,6 +9,8 @@
 <link rel="import" href="../element-for-in/element-for-in.html">
 <link rel="import" href="../mist-rules/mist-rules.html">
 
+<link rel="import" href="../mist-monitoring.html">
+
 <link rel="import" href="machine-edit.html">
 
 <dom-module id="machine-page">
@@ -21,7 +23,7 @@
                 display: block;
             }
             .columns {
-                @apply(--layout-horizontal);  
+                @apply(--layout-horizontal);
                 flex: 1 100%;
                 margin-bottom: 16px;
             }
@@ -137,22 +139,13 @@
             polyana-dashboard ::content h3 {
                 text-transform: uppercase;
                 font-size: 16px;
-                font-weight: 400;
+                font-weight: 500;
                 line-height: 36px;
-                margin: 0 24px 0 0;
             }
-            polyana-dashboard ::content timerange-picker {
-                position: absolute;
-                right: 0;
-                top: 12px;
-            }
-            polyana-dashboard ::content paper-button {
-                margin: 0;
-                min-width: 1px;
-            }
-            polyana-dashboard ::content paper-spinner {
-                display: block;
-                margin: 0 auto;
+            polyana-dashboard {
+              display: block;
+                height: auto;
+                overflow: hidden;
             }
             paper-button[disabled] {
                 opacity: 0.54
@@ -196,7 +189,7 @@
             }
             item-actions {
                 display: flex;
-                font-size: 1em;                
+                font-size: 1em;
             }
             item-actions ::content .actions {
                 height: auto;
@@ -229,6 +222,9 @@
             .midhigh {
                 background: #EF5350; /*red*/
             }
+            .mideco {
+                background: #69b46c; /*green*/
+            }
             /* shortlow + long */
             .shortlow.longlow {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*cyan cyan*/
@@ -238,6 +234,9 @@
             }
             .shortlow.longhigh {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #EF5350; /*cyan red*/
+            }
+            .shortlow.longeco {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #69b46c; /*cyan green*/
             }
             /* shortmedium + long */
             .shortmedium.longlow {
@@ -249,6 +248,9 @@
             .shortmedium.longhigh {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #EF5350; /*orange red*/
             }
+            .shortmedium.longeco {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #69b46c; /*cyan green*/
+            }
             /* shorthigh + long */
             .shorthigh.longlow {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*red cyan*/
@@ -258,6 +260,22 @@
             }
             .shorthigh.longhigh {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #EF5350; /*red red*/
+            }
+            .shorthigh.longeco {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #69b46c; /*red green*/
+            }
+            /* shorteco + long */
+            .shorteco.longlow {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*green cyan*/
+            }
+            .shorteco.longmedium {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #FFCA28; /*green orange*/
+            }
+            .shorteco.longhigh {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #EF5350; /*green red*/
+            }
+            .shorteco.longeco {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #69b46c; /*green green*/
             }
         </style>
 
@@ -285,7 +303,7 @@
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
                     <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
-                    <div hidden$="{{!probeData}}"> Probe Data: 
+                    <div hidden$="{{!probeData}}"> Probe Data:
                         <span class$="probe-data {{itemProbeClasses(machine, model.probes)}}"> </span>
                         <span hidden$="{{!probeData}}"> {{probeData}} </span>
                     </div>
@@ -314,19 +332,12 @@
                     </template>
                 </paper-material>
             </div>
-            <!--<paper-material class="info-card" hidden$="{{!isMonitored}}">
-                <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
-                <div>
-                    <paper-material>graph data</paper-material>
-                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
-                </div>
-            </paper-material>-->
-            <!-- <paper-material class="info-card" hidden$="[[!isMonitored]]">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">Rules</h2>
-            </paper-material> -->
-            <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isMonitored]]"></mist-rules>
             <paper-material class="info-card">
-                <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
+                <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" dashboard="[[dashboard]]" datasources="[[datasources]]"></mist-monitoring>
+                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="{{!isActivated}}"></mist-rules>
+            </paper-material>
+            <paper-material class="info-card">
+                <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
                 <div class="card-content">
                     <table class="info-table">
                         <template is="dom-if" if="[[machine.public_ips]]">
@@ -344,7 +355,8 @@
                                     </template>
                                 </td>
                             </tr>
-                            <tr><td>Private IPs</td>
+                            <tr>
+                                <td>Private IPs</td>
                                 <td><template is="dom-repeat" items="[[machine.private_ips]]">
                                         [[item]]
                                     </template>
@@ -366,7 +378,7 @@
         <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
-        <!-- <machine-edit machine="[[machine]]"></machine-edit> -->
+        <machine-edit machine="[[machine]]"></machine-edit>
         <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
     </template>
@@ -482,8 +494,13 @@ MACHINEACTIONS = {
             },
             isMonitored: {
                 type: Boolean,
-                value: true,
+                value: false,
                 notify: true
+            },
+            isActivated: {
+                type: Boolean,
+                value: false,
+                computed: '_computeIsActivated(machine, model.monitoring.monitored_machines.*)'
             },
             machineImage: {
                 type: String,
@@ -494,7 +511,6 @@ MACHINEACTIONS = {
             },
             replaceTargets: {
                 type: Object,
-                computed: '_computeReplaceTargets(machine)'
             },
             isLoading: {
                 type: Boolean,
@@ -503,7 +519,7 @@ MACHINEACTIONS = {
             },
             associatedKeys: {
                 type: Array,
-                computed:'_computeAssociatedKeys(machine, model.keysArray)'
+                computed: '_computeAssociatedKeys(machine, model.keysArray)'
             },
             newKeyId: {
                 type: String,
@@ -552,42 +568,27 @@ MACHINEACTIONS = {
         listeners: {
             'confirmation': '_machineActionConfirmation',
             'pending-key-request': '_updateKeyLoader',
-            'run-script-request':'_feedbackOnScript',
-            'rename-request':'_feedbackOnRename'
         },
-        ready: function(){
+        ready: function() {
             this.set('hideAssociatedKeys', true);
             this.set('isPendingKeyRequest', false);
         },
-        attached: function(){
-            this.datasources = [
-              {
-              "id": 1,
-              "orgId": 1,
-              "name": "mistphite",
-              "type": "graphite",
-              "access": "proxy",
-              "uri": "/graphite/",
-              "password": "",
-              "user": "",
-              "database": "",
-              "basicAuth": false,
-              "basicAuthUser": "",
-              "basicAuthPassword": "",
-              "withCredentials": false,
-              "isDefault": false,
-              "jsonData": null
-              }
-            ];
-            var that = this;
-            setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-                if (that.querySelector('dashboard-panel'))
-                    that.querySelector('dashboard-panel').resize();
-
-            }, 5000);
-
+        attached: function() {
+            this.datasources = [{
+                "id": 1,
+                "orgId": 1,
+                "name": "mist.monitor",
+                "type": "mist.monitor",
+                "uri": "/api/v1/stats"
+            }];
+            // var that = this;
+            // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
+            //     // if (that.querySelector('dashboard-panel'))
+            //     //     that.querySelector('dashboard-panel').resize();
+            //
+            // }, 5000);
         },
-        _computeActions: function(item){
+        _computeActions: function(item) {
             var ret = [];
             if (item.state == 'running') {
               // if key then add shell / run script
@@ -618,59 +619,13 @@ MACHINEACTIONS = {
                 ret.push('undefine');
 
             var actions = [];
-            for (var i=0; i<ret.length; i++) {
+            for (var i = 0; i < ret.length; i++) {
                 actions.push(MACHINEACTIONS[ret[i]]);
             }
 
             return actions;
         },
         _computeMachine: function(params, machines) {
-            this.dashboard = {
-              "id": 1,
-              "refresh": "10s",
-              "rows": [{
-                "panels": [{
-                  "aliasColors": {},
-                  "datasource": "mistphite",
-                  "id": 2,
-                  "span": 12,
-                  "stack": false,
-                  "targets": [
-                    {
-                    "refId": "A",
-                    "target": "bucky."+params.uuid+".load.shortterm"
-                    },
-                  ],
-                  "timeFrom": null,
-                  "timeShift": null,
-                  "title": "Load",
-                  "type": "graph",
-                  "x-axis": true,
-                  "y-axis": true
-                }],
-              }],
-              "time": {
-                "from": "now-10m",
-                "to": "now"
-              },
-              "timepicker": {
-                "now": true,
-                "refresh_intervals": [],
-                "time_options": [
-                  "5m",
-                  "15m",
-                  "1h",
-                  "6h",
-                  "12h",
-                  "24h",
-                  "2d",
-                  "7d",
-                  "30d"
-                ]
-              },
-              "timezone": "browser"
-            };
-
             if (this.machine && this.machine.uuid && params.uuid != this.machine.uuid) {
                 this.set('isPendingKeyRequest', false);
             }
@@ -678,42 +633,137 @@ MACHINEACTIONS = {
                 return machine.uuid == params.uuid;
             }, this);
         },
-        _computeItemInArray: function(){
+        _computeItemInArray: function() {
+            var tempdash = {
+                "id": 1,
+                // "refresh": "",
+                "rows": [{
+                    "height": "500px",
+                    "panels": [{
+                        "aliasColors": {},
+                        "datasource": "mist.monitor",
+                        "id": 2,
+                        "span": 12,
+                        "stack": false,
+                        "targets": [{
+                            "refId": "A",
+                            "target": "load.longterm"
+                        }, {
+                            "refId": "B",
+                            "target": "load.shortterm"
+                        }],
+                        "timeFrom": null,
+                        "timeShift": null,
+                        "title": "Load",
+                        "type": "graph",
+                        "machineArray": [],
+                        "x-axis": true,
+                        "y-axis": true
+                    }, {
+                        "aliasColors": {},
+                        "datasource": "mist.monitor",
+                        "id": 3,
+                        "span": 12,
+                        "stack": false,
+                        "targets": [{
+                            "refId": "A",
+                            "target": "cpu"
+                        }],
+                        "timeFrom": null,
+                        "timeShift": null,
+                        "title": "CPU",
+                        "type": "graph",
+                        "machineArray": [],
+                        "x-axis": true,
+                        "y-axis": true
+                    }],
+                }],
+                "time": {
+                    "from": "now-10m",
+                    "to": "now"
+                },
+                "timepicker": {
+                    "now": true,
+                    "refresh_intervals": [],
+                    "time_options": [
+                        "5m",
+                        "15m",
+                        "1h",
+                        "6h",
+                        "12h",
+                        "24h",
+                        "2d",
+                        "7d",
+                        "30d"
+                    ]
+                },
+                "timezone": "browser"
+            };
+            var changeit = false;
+            for (var i = 0; i < tempdash.rows.length; i++) {
+                for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
+                    if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
+                        if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
+                            tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
+                            changeit = true;
+                        }
+                    }
+                }
+            }
+            if (changeit)
+                this.dashboard = tempdash;
+
             var arr = [];
             arr.push(this.machine);
             return arr;
         },
-        _computeThisItemUid: function(machine){
+        _computeThisItemUid: function(machine) {
             var itemUidInArray = [];
             itemUidInArray.push(itemUid(this.machine, this.sections['machines']));
             return itemUidInArray;
         },
-        _computeAssociatedKeys: function(machine, keys){
+
+        _computeAssociatedKeys: function(machine, keys) {
+            var machineId = this.machine.id;
+            var associatedKeys = [];
+            associatedKeys = this.model.keysArray.filter(function(key) {
+                return key.machines.filter(function(machine) {
+                    return machine[1] == machineId;
+                }).length;
+            }, this);
+            return associatedKeys || [];
+        },
+        _computeAssociatedKeys: function(machine, keys) {
             return machine.keys || [];
         },
-        computeMachineIp: function(machineips){
-            if (this.machine.public_ips){
+        computeMachineIp: function(machineips) {
+            if (this.machine.public_ips) {
                 return this.machine.public_ips[0]
-            }
-            else {
+            } else {
                 return ''
             }
         },
         _isEqual: function(a, b) {
             return a === b;
         },
-        _isMonitored: function(machine, machines){
-            if (machines){
-                var mach =  machines.base.find(function(m){
-                    return m[1] == machine.id ;
+        _isMonitored: function(machine, monitoredMachines) {
+            if (monitoredMachines) {
+                var mach = monitoredMachines.base.find(function(m) {
+                    return m[1] == machine.id && m[0] == machine.cloud.id;
                 }, this);
             }
-            if (mach){
-                this.isMonitored = true;
+            if (monitoredMachines && mach) {
+                this.set('isMonitored', true);
+            } else {
+                this.set('isMonitored', false);
             }
-            else{
-                this.isMonitored = false;
-            }
+        },
+        _computeIsActivated: function(machine, monitoring){
+            // if (!this.machine || this.model.monitoring || !this.model.monitoring.monitored_machines || !this.model.monitoring.monitored_machines[machine.uuid] || !this.model.monitoring.monitored_machines[machine.uuid].installation_status.activated_at)
+            //     return false;
+            // else
+            if (this.model.monitoring.monitored_machines[machine.uuid])
+                return this.model.monitoring.monitored_machines[machine.uuid].installation_status.activated_at;
         },
         _machineImage: function(id) {
             var image = this.model.imagesArray.find(function(image) {
@@ -723,23 +773,13 @@ MACHINEACTIONS = {
                 return image.name;
             else
                 return "";
-        },    
-        _computeReplaceTargets: function(machine) {
-            var ret = {'bucky.': ''};
-            var m = this.machine;
-            var mId = this.machine.id;
-            var m = this.machine.name;
-            ret[mId] = m ? m.name : 'unknown';
-            // Object {bucky.: "", 3e3a36a5a2694f859a2dc2ccbc192619: "unknown", a203e912f9e744df8ac10179403b8248: "monitor-docker"}
-            this.dashboard.rows[0].panels[0].targets[0].target = 'bucky.'+this.machine.id+'.load.shortterm';
-            return ret;
         },
-        confirmAction: function(action){
+        confirmAction: function(action) {
             this._showDialog({
-                title: action+' Machine?',
-                body: "You are about to "+ action +" machine '" + this.machine.name + "'.",
+                title: action + ' Machine?',
+                body: "You are about to " + action + " machine '" + this.machine.name + "'.",
                 danger: false,
-                reason: "machine."+action,
+                reason: "machine." + action,
                 action: action
             });
         },
@@ -755,21 +795,21 @@ MACHINEACTIONS = {
             toast.text = msg;
             toast.show();
         },
-        isState: function(machine){
-            return machine.state == machine.extra.status ;
+        isState: function(machine) {
+            return machine.state == machine.extra.status;
         },
         _computeIsloading: function(machine) {
             return !this.machine ? true : false;
         },
-        disassociateKey: function(e){
+        disassociateKey: function(e) {
             var keyId = e.target['dataKeyid'];
             var keyName = e.target['dataKeyname'];
 
-            console.log('disassociateKey',keyId, keyName);
+            // console.log('disassociateKey',keyId, keyName);
 
             this.set('disassociateKeyId', keyId);
-            
-            console.log(this.disassociateKeyId);
+
+            // console.log(this.disassociateKeyId);
 
             this._showDialog({
                 title: 'Disassociate key',
@@ -780,35 +820,48 @@ MACHINEACTIONS = {
                 key: keyId
             });
         },
-        _disassociateKeyRequest: function(e){
+        _disassociateKeyRequest: function(e) {
             this.set('isPendingKeyRequest', true);
         },
-        _disassociateKeyResponse: function(e){
+        _disassociateKeyResponse: function(e) {
             this.set('isPendingKeyRequest', false);
         },
-        _disassociateKeyError: function(e){
+        _disassociateKeyError: function(e) {
             this.set('isPendingKeyRequest', false);
         },
-        _updateKeyLoader: function(e){
+        _updateKeyLoader: function(e) {
             //console.log(e.detail);
             if (e.detail.request) {
                 this.set('isPendingKeyRequest', true);
-            }
-            else if (e.detail.response) {
+            } else if (e.detail.response) {
                 this.set('isPendingKeyRequest', false);
-            }
-            else if (e.detail.error) {
+            } else if (e.detail.error) {
                 this.set('isPendingKeyRequest', false);
                 this._showToast(e.detail.errormsg);
             }
         },
-        _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest){
-            var hide =  !(this.machine.keys.length > 0 || isPendingKeyRequest);
+        _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest) {
+            var hide = !(associatedKeys.base.length > 0 || isPendingKeyRequest);
+        },
+        _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest) {
+            var hide = !(this.machine.keys.length > 0 || isPendingKeyRequest);
             this.set('hideAssociatedKeys', hide);
         },
-        _feedbackOnScript: function(e){
+        _feedbackOnScript: function(e) {
             if (e.detail.response) {
-                this._showToast('Script run request succeded. Script '+this.model.scripts[e.detail.scriptId].name+' has been queued for execution');
+                this._showToast('Script run request succeded. Script ' + this.model.scripts[e.detail.scriptId].name + ' has been queued for execution');
+            }
+            if (e.detail.error) {
+                this._showToast(e.detail.errormsg);
+            }
+        },
+        _feedbackOnRename: function(e) {
+            console.log("_feedbackOnRename")
+            if (e.detail.request) {
+                this._showToast('Rename request sent. Waiting for machine to respond');
+            }
+            if (e.detail.response) {
+                this._showToast('Renaming was successful.');
             }
             if (e.detail.error) {
                 this._showToast(e.detail.errormsg);
@@ -846,41 +899,24 @@ MACHINEACTIONS = {
         },
         itemProbeClasses: function(item, probes) {
             if (!probes) {
-                console.log('1')
                 return false;
             }
             else {
 
                 if (!this.model || !this.model.probes || !this.model.probes[item.uuid] || !this.model.probes[item.uuid].loadavg) {
                     return false;
-                    console.log('2')
                 }
 
                 else {
                     var probe = this.model.probes[item.uuid].loadavg;
-                    var classes = "";
+                    var cores =  parseInt(this.model.probes[item.uuid].cores);
+                    var classes = '';
+                    var prefix = '';
 
-                    //short
-                    if (parseInt(probe[0]*100) < 30)
-                        classes += "shortlow ";
-                    else if (parseInt(probe[0]*100) > 30 && parseInt(probe[0]*100) < 60)
-                        classes += "shortmedium ";
-                    else
-                        classes += "shorthigh ";
-                    //mid
-                    if (parseInt(probe[1]*100) < 30)
-                        classes += "midlow ";
-                    else if (parseInt(probe[1]*100) > 30 && parseInt(probe[1]*100) < 60)
-                        classes += "midmedium ";
-                    else
-                        classes += "midhigh ";
-                    //long
-                    if (parseInt(probe[2]*100) < 30)
-                        classes += "longlow ";
-                    else if (parseInt(probe[2]*100) > 30 && parseInt(probe[2]*100) < 60)
-                        classes += "longmedium ";
-                    else
-                        classes += "longhigh ";
+
+                    classes += this.loadToColor(parseFloat(probe[0]/cores), "short");
+                    classes += this.loadToColor(parseFloat(probe[1]/cores), "mid");
+                    classes += this.loadToColor(parseFloat(probe[2]/cores), "long");
 
                     //has probe data
                     if (classes != "")
@@ -889,7 +925,18 @@ MACHINEACTIONS = {
                     return classes;
                 }
             }
-
+        },
+        loadToColor: function(load, prefix){
+            if (load > 1.2)
+                return prefix+"high ";
+            else if (load > 0.8)
+                return prefix+"medium ";
+            else if (load > 0.6)
+                return prefix+"eco ";
+            else if (load > 0.2)
+                return prefix+"low ";
+            else
+                return prefix+"low ";
         }
     });
 </script>

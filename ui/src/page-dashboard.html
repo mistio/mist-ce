@@ -1,4 +1,4 @@
-<!--link rel="import" href="../bower_components/polyana-dashboard/polyana-dashboard.html"-->
+<link rel="import" href="../bower_components/polyana-dashboard/polyana-dashboard.html">
 <link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-menu/paper-menu.html">
@@ -173,32 +173,23 @@
                 flex: 1 100%;
             }
         }
-        polyana-dashboard {
-            position: relative;
-        }
-        log-list ::content h3,
-        polyana-dashboard ::content h3 {
+        log-list ::content h3 {
             text-transform: uppercase;
             font-size: 16px;
             font-weight: 400;
             line-height: 36px;
             margin: 0 24px 0 0;
         }
-        polyana-dashboard ::content timerange-picker {
-            position: absolute;
-            right: 0;
-            top: 12px;
+        polyana-dashboard ::content h3 {
+            text-transform: uppercase;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 36px;
         }
-        timerange-picker {
-            display: flex;
-        }
-        polyana-dashboard ::content paper-button {
-            margin: 0;
-            min-width: 1px;
-        }
-        polyana-dashboard ::content paper-spinner {
+        polyana-dashboard {
             display: block;
-            margin: 0 auto;
+            height: auto;
+            overflow: hidden;
         }
         #content.onb-true {
             background: url('/assets/onboarding/mount.svg') center bottom transparent no-repeat;
@@ -307,9 +298,9 @@
                                 <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
                             </a>
                         </div>
-                        <!-- <paper-material class="graphs">
-                            <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
-                        </paper-material> -->
+                        <paper-material class="graphs">
+                            <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
+                        </paper-material>
                     </div>
                     <div class="left">
                         <div class="costs">
@@ -332,7 +323,6 @@
                     <paper-fab id="addBtn" icon="cloud"></paper-fab>
                 </a>
             </div>
-
             <div class="is-loading" hidden$="[[!onboarding.isLoadingClouds]]">
                 <paper-spinner active></paper-spinner>
             </div>
@@ -340,277 +330,282 @@
     </template>
 </dom-module>
 <script>
+    Polymer({
+        is: 'page-dashboard',
+        enableCustomStyleProperties: true,
+        properties: {
+            sections: {
+                type: Object
+            },
+            model: {
+                type: Object
+            },
+            q: {
+                type: String,
+                notify: true
+            },
+            dashboard: {
+                type: Object
+            },
+            replaceTargets: {
+                type: Object,
+                computed: '_computeReplaceTargets(model.monitoring)'
+            },
+            openedCloud: String,
+            showDashboard: {
+                type: Boolean,
+                // value: true,
+                computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds)',
+                notify: true
+            },
+            hasIncidents: {
+                type: Boolean,
+                computed: '_computeHasIncidents(model.incidentsArray.*)',
+                value: false
+            },
+            sidebarIsOpen: {
+                type: Boolean,
+                value: true
+            },
+            matrix: {
+                type: Array
+            }
+        },
+        observers: [
+            'cloudLayoutMatrix(model.clouds.*, sidebarIsOpen)'
+        ],
+        listeners: {
+            'close-cloud-info': '_closeCloudChips'
+        },
+        ready: function() {
 
-Polymer({
-    is: 'page-dashboard',
-    enableCustomStyleProperties: true,
-    properties: {
-        sections: {
-            type: Object
         },
-        model: {
-            type: Object
-        },
-        q: {
-            type: String,
-            notify: true
-        },
-        dashboard: {
-            type: Object
-        },
-        replaceTargets: {
-            type: Object,
-            computed: '_computeReplaceTargets(model.monitoring)'
-        },
-        openedCloud: String,
-        showDashboard: {
-            type: Boolean,
-            // value: true,
-            computed: '_computeshowDashboard(model.cloudsArray.length, onboarding.isLoadingClouds)',
-            notify: true
-        },
-        hasIncidents: {
-             type: Boolean,
-             computed: '_computeHasIncidents(model.incidentsArray.*)',
-             value: false
-        },
-        sidebarIsOpen: {
-            type: Boolean,
-            value: true
-        },
-        matrix: {
-            type: Array
-        },
-        isOverUsing: Boolean
-    },
-    observers: [
-        'cloudLayoutMatrix(model.clouds.*, sidebarIsOpen)'
-    ],
-    listeners: {
-        'close-cloud-info': '_closeCloudChips'
-    },
-    ready: function() {
-    },
-    attached: function() {
-        // initialise chips position matrix
-        var that = this;
-        this.async(function(){
-            that.cloudLayoutMatrix(that.model.clouds, that.sidebarIsOpen);
-        }, 50);
+        attached: function() {
+            // initialise chips position matrix
+            var that = this;
+            this.async(function() {
+                that.cloudLayoutMatrix(that.model.clouds, that.sidebarIsOpen);
+            }, 50);
 
-        // reset page title since this is the default page
-        this.fire('page-meta', {
-            title: null
-        });
-        this.datasources = [
-          {
-          "id": 1,
-          "orgId": 1,
-          "name": "mistphite",
-          "type": "graphite",
-          "access": "proxy",
-          "uri": "/graphite/",
-          "password": "",
-          "user": "",
-          "database": "",
-          "basicAuth": false,
-          "basicAuthUser": "",
-          "basicAuthPassword": "",
-          "withCredentials": false,
-          "isDefault": false,
-          "jsonData": null
-          }
-        ];
-        this.dashboard = {
-          "id": 1,
-          "refresh": "10s",
-          "rows": [{
-            "panels": [{
-              "aliasColors": {},
-              "datasource": "mistphite",
-              "id": 2,
-              "span": 12,
-              "stack": false,
-              "targets": [
-                {
-                "refId": "A",
-                "target": "bucky.*.load.shortterm"
+            // reset page title since this is the default page
+            this.fire('page-meta', {
+                title: null
+            });
+            this.datasources = [{
+                "id": 1,
+                "orgId": 1,
+                "name": "mistphite",
+                "type": "mist.monitor",
+                "access": "proxy",
+                "uri": "/graphite/",
+                "password": "",
+                "user": "",
+                "database": "",
+                "basicAuth": false,
+                "basicAuthUser": "",
+                "basicAuthPassword": "",
+                "withCredentials": false,
+                "isDefault": false,
+                "jsonData": null
+            }];
+            this.dashboard = {
+                "id": 1,
+                "refresh": "0",
+                "rows": [{
+                    "panels": [{
+                        "aliasColors": {},
+                        "datasource": "mistphite",
+                        "id": 4,
+                        "span": 12,
+                        "stack": false,
+                        "targets": [{
+                            "refId": "A",
+                            "target": 'load.shortterm'
+                        }, ],
+                        "machineArray": [],
+                        "timeFrom": null,
+                        "timeShift": null,
+                        "title": "Load_on_all_monitored_machines",
+                        "type": "graph",
+                        "x-axis": true,
+                        "y-axis": true
+                    }],
+                }],
+                "time": {
+                    "from": "now-10m",
+                    "to": "now"
                 },
-              ],
-              "timeFrom": null,
-              "timeShift": null,
-              "title": "Load on all monitored machines",
-              "type": "graph",
-              "x-axis": true,
-              "y-axis": true
-            }],
-          }],
-          "time": {
-            "from": "now-10m",
-            "to": "now"
-          },
-          "timepicker": {
-            "now": true,
-            "refresh_intervals": [],
-            "time_options": [
-              "5m",
-              "15m",
-              "1h",
-              "6h",
-              "12h",
-              "24h",
-              "2d",
-              "7d",
-              "30d"
-            ]
-          },
-          "timezone": "browser"
-        };
-
-        var that = this;
-        setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-            if (that.querySelector('dashboard-panel'))
-                that.querySelector('dashboard-panel').resize();
-
-        }, 5000, this);
-    },
-    isOnline: function(cloud) {
-        return cloud.state == 'online' && 'online';
-    },
-    isOffline: function(cloud) {
-        return cloud.state == 'offline' && 'offline';
-    },
-    _computeHasIncidents: function(incidents){
-        // incidents must be unresolved to count
-         if (incidents.base){
-             return incidents.base.filter(function(inc){
+                "timepicker": {
+                    "now": true,
+                    "refresh_intervals": [],
+                    "time_options": [
+                        "5m",
+                        "15m",
+                        "1h",
+                        "6h",
+                        "12h",
+                        "24h",
+                        "2d",
+                        "7d",
+                        "30d"
+                    ]
+                },
+                "timezone": "browser"
+            };
+            var machinearray = [];
+            console.log(this.model.monitoring);
+            this.model.monitoring.machines.forEach(function(entry) {
+                machinearray.push(entry);
+            });
+            console.log(machinearray);
+            this.dashboard.rows[0].panels[0].machineArray = machinearray;
+            // var that = this;
+            // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
+            //     if (that.querySelector('dashboard-panel'))
+            //         that.querySelector('dashboard-panel').resize();
+            // }, 5000, this);
+            /*this.async(function() {
+                this.importHref(this.resolveUrl('/elements/logs/log-list.html'),
+                                null,
+                                null,
+                                true)},
+                500);*/
+        },
+        isOnline: function(cloud) {
+            return cloud.state == 'online' && 'online';
+        },
+        isOffline: function(cloud) {
+            return cloud.state == 'offline' && 'offline';
+        },
+        _computeHasIncidents: function(incidents) {
+            // incidents must be unresolved to count
+            if (incidents.base) {
+                return incidents.base.filter(function(inc) {
                     return !inc.finished_at || inc.finished_at == 0;
                 }).length > 0 ? true : false;
-         }
-         else {
-             return false;
-         }
-     },
-    _computeshowDashboard: function(cloudslength, isLoadingClouds) {
-        var show;
-        if (cloudslength > 0 && isLoadingClouds == false) {
-            show =  true;
-        }
-        else {
-            show = false;
-            // TODO: does not work. hides no matter
-            // this.hideSidebar();
-        }
-        return show;
-    },
-    hideSidebar: function(){
-        // if we are on boarding, close sidebar for focus
-        window.setTimeout(function(){
-            var sidebar = document.querySelector('app-sidebar'),
-                content = document.querySelector('iron-pages');
-            sidebar.classList.add('close');
-            content.classList.add('center');
-        }, 2400);
-        this.set('sidebarIsOpen', false);
-    },
-    _computeProviderLogo: function(className) {
-        return '../assets/providers/provider-' + className.split('_')[0] + '.png';
-    },
-    _computeReplaceTargets: function(monitoring) {
-        var ret = {'bucky.': ''},
-            mIds = Object.keys(this.get('model.monitoring.monitored_machines') || {});
-        for (var i=0; i<mIds.length; i++) {
-            var mref = this.model.monitoring.monitored_machines[mIds[i]],
-                m;
-            if (this.model.clouds && this.model.clouds[mref.cloud_id] && this.model.clouds[mref.cloud_id].machines && this.model.clouds[mref.cloud_id].machines[mref.machine_id])
-                m = mref && this.model.clouds[mref.cloud_id].machines[mref.machine_id];
-            ret[mIds[i]] = m ? m.name : 'unknown';
-        }
-        return ret;
-    },
-    _showCloudInfoDialog: function(e) {
-        var cloudId = e.currentTarget.getAttribute('id');
-        var dialog = this.querySelector('cloud-info');
-        var parent = this.querySelector('#cloudslist');
-        var target = e.currentTarget;
-        var lastInd = this.indexOfLast(parseInt(target.attributes.index.value))
-
-        // find the cloud chip node with index=lastInd
-        var last = [].find.call(parent.children, function(c, index){
-            if (c.attributes.index) {
-                return c.attributes.index.value == lastInd;
+            } else {
+                return false;
             }
-            return false;
-        });
-        //insert cloud-info before last node
-        Polymer.dom(parent).insertBefore(dialog, last);
+        },
+        _computeshowDashboard: function(cloudslength, isLoadingClouds) {
+            var show;
+            if (cloudslength > 0 && isLoadingClouds == false) {
+                show = true;
+            } else {
+                show = false;
+                // TODO: does not work. hides no matter
+                // this.hideSidebar();
+            }
+            return show;
+        },
+        hideSidebar: function() {
+            // if we are on boarding, close sidebar for focus
+            window.setTimeout(function() {
+                var sidebar = document.querySelector('app-sidebar'),
+                    content = document.querySelector('iron-pages');
+                sidebar.classList.add('close');
+                content.classList.add('center');
+            }, 2400);
+            this.set('sidebarIsOpen', false);
+        },
+        _computeProviderLogo: function(className) {
+            return '../assets/providers/provider-' + className.split('_')[0] + '.png';
+        },
+        _computeReplaceTargets: function(monitoring) {
+            var ret = {
+                    'bucky.': ''
+                },
+                mIds = Object.keys(this.get('model.monitoring.monitored_machines') || {});
+            for (var i = 0; i < mIds.length; i++) {
+                var mref = this.model.monitoring.monitored_machines[mIds[i]],
+                    m;
+                if (this.model.clouds && this.model.clouds[mref.cloud_id] && this.model.clouds[mref.cloud_id].machines && this.model.clouds[mref.cloud_id].machines[mref.machine_id])
+                    m = mref && this.model.clouds[mref.cloud_id].machines[mref.machine_id];
+                ret[mIds[i]] = m ? m.name : 'unknown';
+            }
+            return ret;
+        },
+        _showCloudInfoDialog: function(e) {
+            var cloudId = e.currentTarget.getAttribute('id');
+            var dialog = this.querySelector('cloud-info');
+            var parent = this.querySelector('#cloudslist');
+            var target = e.currentTarget;
+            var lastInd = this.indexOfLast(parseInt(target.attributes.index.value))
 
-        if (this.openedCloud && this.openedCloud == cloudId) {
-            dialog.removeAttribute('opened');
-            this._closeCloudChips();
-        }
-        else {
-            var cloudChips = this.querySelectorAll('cloud-chip'),
-                cloud = this.model.cloudsArray.find(function(cloud) {
-                    return cloud.id == cloudId;
+            // find the cloud chip node with index=lastInd
+            var last = [].find.call(parent.children, function(c, index) {
+                if (c.attributes.index) {
+                    return c.attributes.index.value == lastInd;
+                }
+                return false;
+            });
+            //insert cloud-info before last node
+            Polymer.dom(parent).insertBefore(dialog, last);
+
+            if (this.openedCloud && this.openedCloud == cloudId) {
+                dialog.removeAttribute('opened');
+                this._closeCloudChips();
+            } else {
+                var cloudChips = this.querySelectorAll('cloud-chip'),
+                    cloud = this.model.cloudsArray.find(function(cloud) {
+                        return cloud.id == cloudId;
+                    });
+                [].forEach.call(cloudChips, function(el, index) {
+                    if (el == e.currentTarget) {
+                        el.setAttribute('opened', true)
+                    } else {
+                        el.removeAttribute('opened');
+                    }
                 });
+                this.set('openedCloud', cloudId);
+                dialog.cloud = cloud;
+                dialog.setAttribute('opened', true);
+            }
+        },
+        _closeCloudChips: function() {
+            var cloudChips = this.querySelectorAll('cloud-chip');
             [].forEach.call(cloudChips, function(el, index) {
-                if (el == e.currentTarget){
-                    el.setAttribute('opened', true)
-                }
-                else {
-                    el.removeAttribute('opened');
-                }
+                el.removeAttribute('opened');
             });
-            this.set('openedCloud', cloudId);
-            dialog.cloud = cloud;
-            dialog.setAttribute('opened', true);
-        }
-    },
-    _closeCloudChips: function(){
-        var cloudChips = this.querySelectorAll('cloud-chip');
-        [].forEach.call(cloudChips, function(el, index) {
-            el.removeAttribute('opened');
-        });
-        this.set('openedCloud', '');
-    },
-    showSidebar: function(){
-        //show sidebar for navigation
-        window.setTimeout(function(){
-            var sidebar = document.querySelector('app-sidebar'),
-                content = document.querySelector('iron-pages');
-            sidebar.classList.remove('close');
-            content.classList.remove('center');
-        }, 200);
-        this.set('sidebarIsOpen', true);
-    },
-    cloudLayoutMatrix: function(clouds, sidebarOpen){
-        //construct a reference matrix of the chips offsetTops
-        var chips = document.querySelectorAll('cloud-chip');
-        var matrix = [];
-        if(chips) {
-            [].forEach.call(chips, function(c){
-                matrix.push(c.offsetTop);
-            });
-            this.set('matrix', matrix);
-        }
-    },
-    indexOfLast: function(index){
-        //calculate the index of the first chip of the next row
-        var ref = this.matrix[index];
-        var targetIndex;
-        var nextInd = this.matrix.find(function(n, index){
-            targetIndex = index;
-            return n > ref;
-        }, this);
-        // or if the first chip of the next row does not exist, set index to the last chip
-        if (!nextInd){
-            targetIndex = this.matrix.length
-        }
-        return targetIndex;
-    },
-    _toggleUI: function() {
-        window.location.href = '/toggle-ui/legacy';
-    },
-});
+            this.set('openedCloud', '');
+        },
+        showSidebar: function() {
+            //show sidebar for navigation
+            window.setTimeout(function() {
+                var sidebar = document.querySelector('app-sidebar'),
+                    content = document.querySelector('iron-pages');
+                sidebar.classList.remove('close');
+                content.classList.remove('center');
+            }, 200);
+            this.set('sidebarIsOpen', true);
+        },
+        cloudLayoutMatrix: function(clouds, sidebarOpen) {
+            //construct a reference matrix of the chips offsetTops
+            var chips = document.querySelectorAll('cloud-chip');
+            var matrix = [];
+            if (chips) {
+                [].forEach.call(chips, function(c) {
+                    matrix.push(c.offsetTop);
+                });
+                this.set('matrix', matrix);
+            }
+        },
+        indexOfLast: function(index) {
+            //calculate the index of the first chip of the next row
+            var ref = this.matrix[index];
+            var targetIndex;
+            var nextInd = this.matrix.find(function(n, index) {
+                targetIndex = index;
+                return n > ref;
+            }, this);
+            // or if the first chip of the next row does not exist, set index to the last chip
+            if (!nextInd) {
+                targetIndex = this.matrix.length
+            }
+            return targetIndex;
+        },
+        _toggleUI: function() {
+            window.location.href = '/toggle-ui/legacy';
+        },
+    });
 </script>
