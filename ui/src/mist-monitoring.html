@@ -1,13 +1,14 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/paper-styles/typography.html">
-<link rel="import" href="../../bower_components/paper-material/paper-material.html">
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
-<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/polyana-dashboard/polyana-dashboard.html">
 
-<link rel="import" href="../helpers/dialog-element.html">
+<link rel="import" href="helpers/dialog-element.html">
 
-<script src="../../bower_components/yaml.js/dist/yaml.min.js"></script>
+<script src="../bower_components/yaml.js/dist/yaml.min.js"></script>
 
 <dom-module id="mist-monitoring">
     <template>
@@ -46,7 +47,7 @@
             }
         </style>
         <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
-        <div class="monitoringArea">        
+        <div class="monitoringArea">
             <!-- the machine is running -->
             <div hidden$="[[!isRunning]]">
 
@@ -90,10 +91,10 @@
                     </div>
                     <!-- monitoring is activated. we expect to have data -->
                     <p hidden$="[[!isActivated]]">
-                        Graphs
+                        <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
                     </p>
                 </div>
-                
+
                 <div id="errormsgArea">
                     <p class="errormsg-container" hidden$="[[!monitoringError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
                 </div>
@@ -186,7 +187,7 @@
                 value: false
             },
         },
-        
+
         observers: [
             '_reset(resource.id)'
         ],
@@ -213,7 +214,7 @@
             else if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == 'succeeded' && !this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at){
                 return true;
             }
-            else 
+            else
                 return false;
         },
         monitoringState: function(resource, monitoring){
@@ -221,7 +222,7 @@
                 return "";
             }
             else {
-                if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == "failed") 
+                if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == "failed")
                     this.set("failed", true);
                 return this.monitoring.monitored_machines[resource.uuid].installation_status.state;
             }
@@ -253,7 +254,7 @@
 
             if (script != null)
                 this.set("showScript", true);
-            else 
+            else
                 this.set("showScript", false);
 
             // this.script = script;
@@ -276,7 +277,7 @@
                 return this.monitoring.monitored_machines[resource.uuid].commands[this.resource.os_type] || this.monitoring.monitored_machines[resource.uuid].commands["unix"];
             }
             else {
-            	return "";	
+            	return "";
             }
         },
         _computeIsActivated(resource, monitoring){
