@@ -152,7 +152,6 @@
                 selectedItemsChanged: function(items, length){
                     // console.log('selectedItemsChanged',this.$.tagsModal.opened);
                     // freeze updating of selectedItems when dialog is open
-                    // TODO: selected items tags upddates should pass in
                     if (!this.$.tagsModal.opened)
                         this._computeTags(this.items);
                 },
