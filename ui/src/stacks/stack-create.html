@@ -394,7 +394,8 @@
 
             },
 
-            _updateFields: function(e) {
+            _updateFields: function(event) {
+                var e = Polymer.dom(event);
                 var changeInYaml = e.path.indexOf(document.querySelector("paper-textarea#stackinputs")) > -1
                 if (changeInYaml) {
                     var yaml = document.querySelector("paper-textarea#stackinputs").value;

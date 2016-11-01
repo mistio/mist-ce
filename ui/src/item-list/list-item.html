@@ -71,6 +71,9 @@
         .field.state.midhigh:after {
             background: #EF5350; /*red*/
         }
+        .field.state.mideco:after {
+            background: #69b46c; /*green*/
+        }
         /* shortlow + long */
         .field.state.shortlow.longlow:after {
             box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*cyan cyan*/
@@ -80,6 +83,9 @@
         }
         .field.state.shortlow.longhigh:after {
             box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #EF5350; /*cyan red*/
+        }
+        .field.state.shortlow.longeco:after {
+            box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #69b46c; /*cyan green*/
         }
         /* shortmedium + long */
         .field.state.shortmedium.longlow:after {
@@ -91,6 +97,9 @@
         .field.state.shortmedium.longhigh:after {
             box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #EF5350; /*orange red*/
         }
+        .field.state.shortmedium.longeco:after {
+            box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #69b46c; /*orange green*/
+        }
         /* shorthigh + long */
         .field.state.shorthigh.longlow:after {
             box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*red cyan*/
@@ -100,6 +109,9 @@
         }
         .field.state.shorthigh.longhigh:after {
             box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #EF5350; /*red red*/
+        }
+        .field.state.shorthigh.longeco:after {
+            box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #69b46c; /*red green*/
         }
 
         .field.state.monitored {
@@ -420,29 +432,15 @@ Polymer({
 
             else {
                 var probe = model.probes[item.uuid].loadavg;
-                var classes = "";
+                var cores =  parseInt(model.probes[item.uuid].cores);
+                var classes = '';
+                var prefix = '';
+                console.log(parseInt(probe[0]),probe[0]);
 
-                //short
-                if (parseInt(probe[0]*100) < 30)
-                    classes += "shortlow ";
-                else if (parseInt(probe[0]*100) > 30 && parseInt(probe[0]*100) < 60)
-                    classes += "shortmedium ";
-                else
-                    classes += "shorthigh ";
-                //mid
-                if (parseInt(probe[1]*100) < 30)
-                    classes += "midlow ";
-                else if (parseInt(probe[1]*100) > 30 && parseInt(probe[1]*100) < 60)
-                    classes += "midmedium ";
-                else
-                    classes += "midhigh ";
-                //long
-                if (parseInt(probe[2]*100) < 30)
-                    classes += "longlow ";
-                else if (parseInt(probe[2]*100) > 30 && parseInt(probe[2]*100) < 60)
-                    classes += "longmedium ";
-                else
-                    classes += "longhigh ";
+                classes += this.loadToColor(parseFloat(probe[0]/cores), "short");
+                classes += this.loadToColor(parseFloat(probe[1]/cores), "mid");
+                classes += this.loadToColor(parseFloat(probe[2]/cores), "long");
+
 
                 //has probe data
                 if (classes != "")
@@ -451,7 +449,18 @@ Polymer({
                 return classes;
             }
         }
-
+    },
+    loadToColor: function(load, prefix){
+        if (load > 1.2)
+            return prefix+"high ";
+        else if (load > 0.8)
+            return prefix+"medium ";
+        else if (load > 0.6)
+            return prefix+"eco ";
+        else if (load > 0.2)
+            return prefix+"low ";
+        else
+            return prefix+"low ";
     }
 });
 </script>
