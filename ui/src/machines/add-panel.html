@@ -101,6 +101,7 @@
                 this.responseMetrics = metricsArray;
                 this.querySelector('#combo0').removeAttribute("disabled");
                 this.combo0 = this._getMetrics(0);
+                this.selectedValue=this.combo0[0];
             },
             _handleTap: function(e) {
                 console.log(e);
@@ -121,12 +122,14 @@
                     }
                 }
                 if (this.target != null) {
+                  var selection;
                     if (targetCut == 0) {
-                        this.selectedValue=this.target;
+                        selection=this.target.split(".")[0];
+                        console.log(this.selectedValue);
                         this.target = null;
                     } else if (targetCut > 0) {
                         var tempTarget = this.target.split(".");
-                        this.selectedValue=tempTarget[tempTarget.length-1];
+                        selection=tempTarget[tempTarget.length-1];
                         tempTarget.splice(targetCut, tempTarget.length - 1);
                         this.target = "";
                         for (var y = 0; y < tempTarget.length; y++) {
@@ -139,6 +142,8 @@
                     }
                 }
                 this._getMetrics(targetCut);
+                this.selectedValue=selection;
+                console.log(this.selectedValue);
             },
             _nextOption: function(e) {
                 if (e.target.value != "") {
@@ -154,7 +159,7 @@
                             if (tempCombo[0] != null) {
                                 this.querySelector('#combo' + i).hidden = false;
                                 this.querySelector('#combo' + i).innerHTML = e.target.value;
-                                this.selectedValue = "";
+                                this.selectedValue = tempCombo[0];
                                 this.querySelector('#combo0').setAttribute("label","Select next value");
                             } else {
                                 this.fire('panelAdded', this.target);

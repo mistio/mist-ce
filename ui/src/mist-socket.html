@@ -354,7 +354,7 @@
                         break;
                     }
                     // If some field changed the model needs to be updated
-                    if (JSON.stringify(data[i][dataKeys[k]])
+                    if (data[i][dataKeys[k]] && JSON.stringify(data[i][dataKeys[k]])
                         .localeCompare(JSON.stringify(item[dataKeys[k]]))) {
                         console.debug('property ', dataKeys[k], ' changed in ', item);
                         var oldVal = JSON.stringify(item[dataKeys[k]]),
@@ -628,13 +628,11 @@
         _updateIncidents: function(data) {
             this.set('onboarding.isLoadingIncidents', false);
             if (data) {
-                // console.log(data);
-                for(var i=0;i<data.length;i++){
+                for (var i = 0; i < data.length; i++) {
                     var inc = data[i];
                     inc.id = inc.incident_id
                 }
             }
-            // console.log(data);
             return this._updateModel('incidents', data);
         },
 

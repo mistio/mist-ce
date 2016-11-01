@@ -258,76 +258,75 @@
                                 <h1 class="cloud-title">[[item.title]]</h1>
                             </cloud-chip>
                         </template>
-    </div>
-    <div class="ovhid">
-        <cloud-info></cloud-info>
-    </div>
-    </div>
-    <div class="columns">
-        <div id="leftcolumn" class="left">
-            <template is="dom-if" if="[[hasIncidents]]">
+                    </div>
+                    <div class="ovhid">
+                        <cloud-info></cloud-info>
+                    </div>
+                </div>
+                <div class="columns">
+                    <div id="leftcolumn" class="left">
+                        <template is="dom-if" if="[[hasIncidents]]">
                             <div class="incidents">
                                 <app-incidents model="[[model]]" sections="[[sections]]">
                                 </app-incidents>
                             </div>
                         </template>
-            <div class="sections layout horizontal wrap">
-                <a href="/machines" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
-                    </section-tile>
-                </a>
-                <a href="/images" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="[[model.imagesArray.length]]"></section-tile>
-                </a>
-                <a href="/keys" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="[[model.keysArray.length]]"></section-tile>
-                </a>
-                <a href="/networks" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="[[model.networksArray.length]]"></section-tile>
-                </a>
-                <a href="/scripts" class="main-section flex" is=" pushstate-anchor">
-                    <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="[[model.scriptsArray.length]]"></section-tile>
-                </a>
-                <a href="/templates" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="templates" color="[[sections.templates.color]]" icon="[[sections.templates.icon]]" count="[[model.templatesArray.length]]"></section-tile>
-                </a>
-                <a href="/stacks" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="stacks" color="[[sections.stacks.color]]" icon="[[sections.stacks.icon]]" count="[[model.stacksArray.length]]"></section-tile>
-                </a>
-                <a href="/teams" class="main-section flex" is="pushstate-anchor">
-                    <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
-                </a>
-            </div>
-            <paper-material class="graphs">
-                <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
-            </paper-material>
-        </div>
-        <div class="left">
-            <div class="costs">
-                <app-costs model="[[model]]" sections="[[sections]]">
-                </app-costs>
-                <app-costs-per-tag model="[[model]]" sections="[[sections]]">
-                </app-costs-per-tag>
-            </div>
-            <paper-material id="rightcolumn" class="logs">
-                <log-list></log-list>
-            </paper-material>
-        </div>
-    </div>
-    </template>
-    <template is="dom-if" if="[[!showDashboard]]">
+                        <div class="sections layout horizontal wrap">
+                            <a href="/machines" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="machines" color="[[sections.machines.color]]" icon="[[sections.machines.icon]]" count="[[model.machinesArray.length]]">
+                                </section-tile>
+                            </a>
+                            <a href="/images" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="images" color="[[sections.images.color]]" icon="[[sections.images.icon]]" count="[[model.imagesArray.length]]"></section-tile>
+                            </a>
+                            <a href="/keys" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="keys" color="[[sections.keys.color]]" icon="[[sections.keys.icon]]" count="[[model.keysArray.length]]"></section-tile>
+                            </a>
+                            <a href="/networks" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="networks" color="[[sections.networks.color]]" icon="[[sections.networks.icon]]" count="[[model.networksArray.length]]"></section-tile>
+                            </a>
+                            <a href="/scripts" class="main-section flex" is=" pushstate-anchor">
+                                <section-tile name="scripts" color="[[sections.scripts.color]]" icon="[[sections.scripts.icon]]" count="[[model.scriptsArray.length]]"></section-tile>
+                            </a>
+                            <a href="/templates" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="templates" color="[[sections.templates.color]]" icon="[[sections.templates.icon]]" count="[[model.templatesArray.length]]"></section-tile>
+                            </a>
+                            <a href="/stacks" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="stacks" color="[[sections.stacks.color]]" icon="[[sections.stacks.icon]]" count="[[model.stacksArray.length]]"></section-tile>
+                            </a>
+                            <a href="/teams" class="main-section flex" is="pushstate-anchor">
+                                <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
+                            </a>
+                        </div>
+                        <paper-material class="graphs">
+                            <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
+                        </paper-material>
+                    </div>
+                    <div class="left">
+                        <div class="costs">
+                            <app-costs model="[[model]]" sections="[[sections]]">
+                            </app-costs>
+                            <app-costs-per-tag model="[[model]]" sections="[[sections]]">
+                            </app-costs-per-tag>
+                        </div>
+                        <paper-material id="rightcolumn" class="logs">
+                            <log-list></log-list>
+                        </paper-material>
+                    </div>
+                </div>
+            </template>
+            <template is="dom-if" if="[[!showDashboard]]">
                 <onb-element model="[[model]]"></onb-element>
             </template>
-    <div class="absolute-bottom-right">
-        <a href="/clouds/+add">
-            <paper-fab id="addBtn" icon="cloud"></paper-fab>
-        </a>
-    </div>
-
-    <div class="is-loading" hidden$="[[!onboarding.isLoadingClouds]]">
-        <paper-spinner active></paper-spinner>
-    </div>
-    </div>
+            <div class="absolute-bottom-right">
+                <a href="/clouds/+add">
+                    <paper-fab id="addBtn" icon="cloud"></paper-fab>
+                </a>
+            </div>
+            <div class="is-loading" hidden$="[[!onboarding.isLoadingClouds]]">
+                <paper-spinner active></paper-spinner>
+            </div>
+        </div>
     </template>
 </dom-module>
 <script>
@@ -378,7 +377,6 @@
         listeners: {
             'close-cloud-info': '_closeCloudChips'
         },
-
         ready: function() {
 
         },
@@ -455,9 +453,11 @@
                 "timezone": "browser"
             };
             var machinearray = [];
+            console.log(this.model.monitoring);
             this.model.monitoring.machines.forEach(function(entry) {
                 machinearray.push(entry);
             });
+            console.log(machinearray);
             this.dashboard.rows[0].panels[0].machineArray = machinearray;
             // var that = this;
             // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
@@ -511,144 +511,101 @@
         _computeProviderLogo: function(className) {
             return '../assets/providers/provider-' + className.split('_')[0] + '.png';
         },
-    ready: function() {
-    },
+        _computeReplaceTargets: function(monitoring) {
+            var ret = {
+                    'bucky.': ''
+                },
+                mIds = Object.keys(this.get('model.monitoring.monitored_machines') || {});
+            for (var i = 0; i < mIds.length; i++) {
+                var mref = this.model.monitoring.monitored_machines[mIds[i]],
+                    m;
+                if (this.model.clouds && this.model.clouds[mref.cloud_id] && this.model.clouds[mref.cloud_id].machines && this.model.clouds[mref.cloud_id].machines[mref.machine_id])
+                    m = mref && this.model.clouds[mref.cloud_id].machines[mref.machine_id];
+                ret[mIds[i]] = m ? m.name : 'unknown';
+            }
+            return ret;
+        },
+        _showCloudInfoDialog: function(e) {
+            var cloudId = e.currentTarget.getAttribute('id');
+            var dialog = this.querySelector('cloud-info');
+            var parent = this.querySelector('#cloudslist');
+            var target = e.currentTarget;
+            var lastInd = this.indexOfLast(parseInt(target.attributes.index.value))
 
-    isOnline: function(cloud) {
-        return cloud.state == 'online' && 'online';
-    },
-    isOffline: function(cloud) {
-        return cloud.state == 'offline' && 'offline';
-    },
-    _computeHasIncidents: function(incidents){
-        // incidents must be unresolved to count
-         if (incidents.base){
-             return incidents.base.filter(function(inc){
-                    return !inc.finished_at || inc.finished_at == 0;
-                }).length > 0 ? true : false;
-         }
-         else {
-             return false;
-         }
-     },
-    _computeshowDashboard: function(cloudslength, isLoadingClouds) {
-        var show;
-        if (cloudslength > 0 && isLoadingClouds == false) {
-            show =  true;
-        }
-        else {
-            show = false;
-            // TODO: does not work. hides no matter
-            // this.hideSidebar();
-        }
-        return show;
-    },
-    hideSidebar: function(){
-        // if we are on boarding, close sidebar for focus
-        window.setTimeout(function(){
-            var sidebar = document.querySelector('app-sidebar'),
-                content = document.querySelector('iron-pages');
-            sidebar.classList.add('close');
-            content.classList.add('center');
-        }, 2400);
-        this.set('sidebarIsOpen', false);
-    },
-    _computeProviderLogo: function(className) {
-        return '../assets/providers/provider-' + className.split('_')[0] + '.png';
-    },
-    _computeReplaceTargets: function(monitoring) {
-        var ret = {'bucky.': ''},
-            mIds = Object.keys(this.get('model.monitoring.monitored_machines') || {});
-        for (var i=0; i<mIds.length; i++) {
-            var mref = this.model.monitoring.monitored_machines[mIds[i]],
-                m;
-            if (this.model.clouds && this.model.clouds[mref.cloud_id] && this.model.clouds[mref.cloud_id].machines && this.model.clouds[mref.cloud_id].machines[mref.machine_id])
-                m = mref && this.model.clouds[mref.cloud_id].machines[mref.machine_id];
-            ret[mIds[i]] = m ? m.name : 'unknown';
-        }
-        return ret;
-    },
-      _showCloudInfoDialog: function(e) {
-          var cloudId = e.currentTarget.getAttribute('id');
-          var dialog = this.querySelector('cloud-info');
-          var parent = this.querySelector('#cloudslist');
-          var target = e.currentTarget;
-          var lastInd = this.indexOfLast(parseInt(target.attributes.index.value))
+            // find the cloud chip node with index=lastInd
+            var last = [].find.call(parent.children, function(c, index) {
+                if (c.attributes.index) {
+                    return c.attributes.index.value == lastInd;
+                }
+                return false;
+            });
+            //insert cloud-info before last node
+            Polymer.dom(parent).insertBefore(dialog, last);
 
-          // find the cloud chip node with index=lastInd
-          var last = [].find.call(parent.children, function(c, index) {
-              if (c.attributes.index) {
-                  return c.attributes.index.value == lastInd;
-              }
-              return false;
-          });
-          //insert cloud-info before last node
-          Polymer.dom(parent).insertBefore(dialog, last);
-
-          if (this.openedCloud && this.openedCloud == cloudId) {
-              dialog.removeAttribute('opened');
-              this._closeCloudChips();
-          } else {
-              var cloudChips = this.querySelectorAll('cloud-chip'),
-                  cloud = this.model.cloudsArray.find(function(cloud) {
-                      return cloud.id == cloudId;
-                  });
-              [].forEach.call(cloudChips, function(el, index) {
-                  if (el == e.currentTarget) {
-                      el.setAttribute('opened', true)
-                  } else {
-                      el.removeAttribute('opened');
-                  }
-              });
-              this.set('openedCloud', cloudId);
-              dialog.cloud = cloud;
-              dialog.setAttribute('opened', true);
-          }
-      },
-      _closeCloudChips: function() {
-          var cloudChips = this.querySelectorAll('cloud-chip');
-          [].forEach.call(cloudChips, function(el, index) {
-              el.removeAttribute('opened');
-          });
-          this.set('openedCloud', '');
-      },
-      showSidebar: function() {
-          //show sidebar for navigation
-          window.setTimeout(function() {
-              var sidebar = document.querySelector('app-sidebar'),
-                  content = document.querySelector('iron-pages');
-              sidebar.classList.remove('close');
-              content.classList.remove('center');
-          }, 200);
-          this.set('sidebarIsOpen', true);
-      },
-      cloudLayoutMatrix: function(clouds, sidebarOpen) {
-          //construct a reference matrix of the chips offsetTops
-          var chips = document.querySelectorAll('cloud-chip');
-          var matrix = [];
-          if (chips) {
-              [].forEach.call(chips, function(c) {
-                  matrix.push(c.offsetTop);
-              });
-              this.set('matrix', matrix);
-          }
-      },
-      indexOfLast: function(index) {
-          //calculate the index of the first chip of the next row
-          var ref = this.matrix[index];
-          var targetIndex;
-          var nextInd = this.matrix.find(function(n, index) {
-              targetIndex = index;
-              return n > ref;
-          }, this);
-          // or if the first chip of the next row does not exist, set index to the last chip
-          if (!nextInd) {
-              targetIndex = this.matrix.length
-          }
-          return targetIndex;
-      },
-      _toggleUI: function() {
-          window.location.href = '/toggle-ui/legacy';
-      },
-  });
+            if (this.openedCloud && this.openedCloud == cloudId) {
+                dialog.removeAttribute('opened');
+                this._closeCloudChips();
+            } else {
+                var cloudChips = this.querySelectorAll('cloud-chip'),
+                    cloud = this.model.cloudsArray.find(function(cloud) {
+                        return cloud.id == cloudId;
+                    });
+                [].forEach.call(cloudChips, function(el, index) {
+                    if (el == e.currentTarget) {
+                        el.setAttribute('opened', true)
+                    } else {
+                        el.removeAttribute('opened');
+                    }
+                });
+                this.set('openedCloud', cloudId);
+                dialog.cloud = cloud;
+                dialog.setAttribute('opened', true);
+            }
+        },
+        _closeCloudChips: function() {
+            var cloudChips = this.querySelectorAll('cloud-chip');
+            [].forEach.call(cloudChips, function(el, index) {
+                el.removeAttribute('opened');
+            });
+            this.set('openedCloud', '');
+        },
+        showSidebar: function() {
+            //show sidebar for navigation
+            window.setTimeout(function() {
+                var sidebar = document.querySelector('app-sidebar'),
+                    content = document.querySelector('iron-pages');
+                sidebar.classList.remove('close');
+                content.classList.remove('center');
+            }, 200);
+            this.set('sidebarIsOpen', true);
+        },
+        cloudLayoutMatrix: function(clouds, sidebarOpen) {
+            //construct a reference matrix of the chips offsetTops
+            var chips = document.querySelectorAll('cloud-chip');
+            var matrix = [];
+            if (chips) {
+                [].forEach.call(chips, function(c) {
+                    matrix.push(c.offsetTop);
+                });
+                this.set('matrix', matrix);
+            }
+        },
+        indexOfLast: function(index) {
+            //calculate the index of the first chip of the next row
+            var ref = this.matrix[index];
+            var targetIndex;
+            var nextInd = this.matrix.find(function(n, index) {
+                targetIndex = index;
+                return n > ref;
+            }, this);
+            // or if the first chip of the next row does not exist, set index to the last chip
+            if (!nextInd) {
+                targetIndex = this.matrix.length
+            }
+            return targetIndex;
+        },
+        _toggleUI: function() {
+            window.location.href = '/toggle-ui/legacy';
+        },
+    });
 </script>

@@ -3,14 +3,15 @@
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
+
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 <link rel="import" href="../mist-rules/mist-rules.html">
 
-<link rel="import" href="machine-edit.html">
 <link rel="import" href="add-panel.html">
+<link rel="import" href="machine-edit.html">
 
 <dom-module id="machine-page">
     <template>
@@ -302,18 +303,17 @@
                         <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
                     </template>
                 </paper-material>
-            </div>
-            <paper-material class="info-card">
-                <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
-                <add-panel uri="[[_computeMetricsUri(machine)]]"></add-panel>
-                <polyana-dashboard dashboard="{{dashboard}}" datasources="[[datasources]]" dashboard-path="mist"></polyana-dashboard>
-                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="[[!isMonitored]]"></mist-rules>
-            </paper-material>
-            <paper-material class="info-card">
-                <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
-                <div class="card-content">
-                    <table class="info-table">
-                        <template is="dom-if" if="[[machine.public_ips]]">
+                </div>
+                  <add-panel uri="[[_computeMetricsUri(machine)]]"></add-panel>
+                <paper-material class="info-card" hidden$="[[!isMonitored]]">
+                    <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
+                    <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
+                </paper-material>
+                <paper-material class="info-card">
+                    <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
+                    <div class="card-content">
+                        <table class="info-table">
+                            <template is="dom-if" if="[[machine.public_ips]]">
                             <tr>
                                 <td>Machine ID</td>
                                 <td>[[machine.id]]</td>
@@ -326,10 +326,11 @@
                                 <td><template is="dom-repeat" items="[[machine.public_ips]]">
                                         [[item]]
                                     </template>
-                                </td>
-                            </tr>
-                            <tr><td>Private IPs</td>
-                                <td><template is="dom-repeat" items="[[machine.private_ips]]">
+                </td>
+                </tr>
+                <tr>
+                    <td>Private IPs</td>
+                    <td><template is="dom-repeat" items="[[machine.private_ips]]">
                                         [[item]]
                                     </template>
                                 </td>
@@ -345,97 +346,113 @@
                 </div>
             </paper-material>
         </div>
-        <dialog-element id="machinedialog"></dialog-element>
-        <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
-        <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
-        <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-        <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
-        <!-- <machine-edit machine="[[machine]]"></machine-edit> -->
-        <tags-list model="[[model]]"></tags-list>
-        <paper-toast></paper-toast>
+    </paper-material>
+    <paper-material class="info-card">
+        <h2 style$="[[_getHeaderStyle(section.color)]]">More Info</h2>
+        <div class="card-content">
+            <element-for-in content="[[machine.extra]]"></element-for-in>
+        </div>
+    </paper-material>
+    </div>
+    <dialog-element id="machinedialog"></dialog-element>
+    <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
+    <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
+    <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+    <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
+    <machine-edit machine="[[machine]]"></machine-edit>
+    <tags-list model="[[model]]"></tags-list>
+    <paper-toast></paper-toast>
+    <dialog-element id="machinedialog"></dialog-element>
+    <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
+    <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
+    <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+    <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
+    <!-- <machine-edit machine="[[machine]]"></machine-edit> -->
+    <tags-list model="[[model]]"></tags-list>
+    <paper-toast></paper-toast>
     </template>
 </dom-module>
-    <script>
-    MACHINEACTIONS = {
-        'shell': {
-            'name': 'shell',
-            'icon': 'vaadin-icons:terminal',
-            'confirm': false,
-            'multi': true
-        },
-        'tag': {
-            'name': 'tag',
-            'icon': 'label',
-            'confirm': true,
-            'multi': true
-        },
-        'run-script': {
-            'name': 'run script',
-            'icon': 'image:movie-creation',
-            'confirm': true,
-            'multi': false
-        },
-        'associate-key': {
-            'name': 'associate key',
-            'icon': 'communication:vpn-key',
-            'confirm': true,
-            'multi': true
-        },
-        'reboot': {
-            'name': 'reboot',
-            'icon': 'av:replay',
-            'confirm': true,
-            'multi': true
-        },
-        'start': {
-            'name': 'start',
-            'icon': 'av:replay',
-            'confirm': true,
-            'multi': true
-        },
-        'stop': {
-            'name': 'stop',
-            'icon': 'av:stop',
-            'confirm': true,
-            'multi': true
-        },
-        'suspend': {
-            'name': 'suspend',
-            'icon': 'av:stop',
-            'confirm': true,
-            'multi': true
-        },
-        'rename': {
-            'name': 'rename',
-            'icon': 'editor:mode-edit',
-            'confirm': true,
-            'multi': false
-        },
-        'resume': {
-            'name': 'resume',
-            'icon': 'av:replay',
-            'confirm': true,
-            'multi': true
-        },
-        'undefine': {
-            'name': 'undefine',
-            'icon': 'image:panorama-fish-eye',
-            'confirm': true,
-            'multi': true
-        },
-        'destroy': {
-            'name': 'destroy',
-            'icon': 'delete',
-            'confirm': true,
-            'multi': true
-        },
-        'probe': {
-            'name': 'probe',
-            'icon': 'icons:compare-arrows',
-            'confirm': false,
-            'multi': true
-        },
-    }
+<script>
+MACHINEACTIONS = {
+  'shell': {
+    'name': 'shell',
+    'icon': 'vaadin-icons:terminal',
+    'confirm': false,
+    'multi': true
+  },
+  'tag': {
+    'name': 'tag',
+    'icon': 'label',
+    'confirm': true,
+    'multi': true
+  },
+  'run-script': {
+    'name': 'run script',
+    'icon': 'image:movie-creation',
+    'confirm': true,
+    'multi': false
+  },
+  'associate-key': {
+    'name': 'associate key',
+    'icon': 'communication:vpn-key',
+    'confirm': true,
+    'multi': true
+  },
+  'reboot': {
+    'name': 'reboot',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'start': {
+    'name': 'start',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'stop': {
+    'name': 'stop',
+    'icon': 'av:stop',
+    'confirm': true,
+    'multi': true
+  },
+  'suspend': {
+    'name': 'suspend',
+    'icon': 'av:stop',
+    'confirm': true,
+    'multi': true
+  },
+  'rename': {
+    'name': 'rename',
+    'icon': 'editor:mode-edit',
+    'confirm': true,
+    'multi': false
+  },
+  'resume': {
+    'name': 'resume',
+    'icon': 'av:replay',
+    'confirm': true,
+    'multi': true
+  },
+  'undefine': {
+    'name': 'undefine',
+    'icon': 'image:panorama-fish-eye',
+    'confirm': true,
+    'multi': true
+  },
+  'destroy': {
+    'name': 'destroy',
+    'icon': 'delete',
+    'confirm': true,
+    'multi': true
+  },
+  'probe': {
+    'name': 'probe',
+    'icon': 'icons:compare-arrows',
+    'confirm': false,
+    'multi': true
+  },
+}
     Polymer({
         is: 'machine-page',
 
@@ -474,12 +491,10 @@
                 computed: "_machineImage(machine.imageId)"
             },
             dashboard: {
-                type: Object,
-                notify:true
+                type: Object
             },
             replaceTargets: {
                 type: Object,
-                computed: '_computeReplaceTargets(machine)'
             },
             isLoading: {
                 type: Boolean,
@@ -527,8 +542,7 @@
         },
         observers: [
             '_isMonitored(machine, model.monitoring.machines.*)',
-            '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)',
-            '_updateDashboard(machine.uuid)'
+            '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)'
         ],
         listeners: {
             'confirmation': '_machineActionConfirmation',
@@ -543,30 +557,101 @@
             this.datasources = [{
                 "id": 1,
                 "orgId": 1,
-                "name": "mistphite",
+                "name": "mist.monitor",
                 "type": "mist.monitor",
-                "access": "proxy",
-                "uri": "/graphite/",
-                "password": "",
-                "user": "",
-                "database": "",
-                "basicAuth": false,
-                "basicAuthUser": "",
-                "basicAuthPassword": "",
-                "withCredentials": false,
-                "isDefault": false,
-                "jsonData": null
+                "uri": "/api/v1/stats"
             }];
-            this.dashboard = {
+            // var that = this;
+            // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
+            //     // if (that.querySelector('dashboard-panel'))
+            //     //     that.querySelector('dashboard-panel').resize();
+            //
+            // }, 5000);
+
+        },
+        _computeActions: function(item) {
+            var ret = [];
+            if (item.state == 'running') {
+              // if key then add shell / run script
+              // if not monitoring then enable monitoring
+              ret.push('shell');
+              ret.push('associate-key');
+              ret.push('probe');
+              if(this.hideAssociatedKeys)
+                ret.push('run-script');
+            }
+            if (item.can_tag)
+                ret.push('tag');
+            if (item.can_start)
+                ret.push('start');
+            if (item.can_stop)
+                ret.push('stop');
+            if (item.can_suspend)
+                ret.push('suspend');
+            if (item.can_reboot)
+                ret.push('reboot');
+            if (item.can_resume)
+                ret.push('resume');
+            if (item.can_rename)
+                ret.push('rename');
+            if (item.can_destroy)
+                ret.push('destroy');
+            if (item.can_undefine)
+                ret.push('undefine');
+
+            var actions = [];
+            for (var i = 0; i < ret.length; i++) {
+                actions.push(MACHINEACTIONS[ret[i]]);
+            }
+
+            return actions;
+        },
+        _computeMachine: function(params, machines) {
+            if (this.machine && this.machine.uuid && params.uuid != this.machine.uuid) {
+                this.set('isPendingKeyRequest', false);
+            }
+            return machines.base.find(function(machine) {
+                return machine.uuid == params.uuid;
+            }, this);
+        },
+        _computeMetricsUri: function(machine) {
+            return "/api/v1/clouds/" + machine.cloud.id + "/machines/" + machine.id + "/metrics";
+        },
+        _panelAdded:function (e){
+            console.log("i got",e.detail);
+
+            var panel ={
+                "lines": true,
+                "aliasColors": {},
+                "datasource": "mist.monitor",
+                "id": this.dashboard.rows[0].panels.length,
+                "span": 12,
+                "stack": false,
+                "targets": [{
+                    "refId": "A",
+                    "target": e.detail
+                }],
+                "timeFrom": null,
+                "timeShift": null,
+                "title": e.detail.split(".")[0],
+                "type": "graph",
+                "machineArray": [[this.machine.cloud.id, this.machine.id]],
+                "x-axis": true,
+                "y-axis": true
+            }
+            this.push("dashboard.rows.0.panels",panel);
+            console.log(this.dashboard);
+        },
+        _computeItemInArray: function() {
+            var tempdash = {
                 "id": 1,
                 "refresh": "",
                 "rows": [{
                     "height": "500px",
                     "panels": [{
-                        "lines": true,
                         "aliasColors": {},
-                        "datasource": "mistphite",
-                        "id": 1,
+                        "datasource": "mist.monitor",
+                        "id": 2,
                         "span": 12,
                         "stack": false,
                         "targets": [{
@@ -584,10 +669,9 @@
                         "x-axis": true,
                         "y-axis": true
                     }, {
-                        "lines": true,
                         "aliasColors": {},
-                        "datasource": "mistphite",
-                        "id": 2,
+                        "datasource": "mist.monitor",
+                        "id": 3,
                         "span": 12,
                         "stack": false,
                         "targets": [{
@@ -624,97 +708,20 @@
                 },
                 "timezone": "browser"
             };
-            // var that = this;
-            // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-            //     // if (that.querySelector('dashboard-panel'))
-            //     //     that.querySelector('dashboard-panel').resize();
-            //
-            // }, 5000);
-        },
-        _updateDashboard:function(id){
-          for(var i=0; i<this.dashboard.rows[0].panels.length; i++){
-            if(this.dashboard.rows[0].panels[i].machineArray.length==0){
-              this.push("dashboard.rows.0.panels."+i+".machineArray",[this.machine.cloud.id, this.machine.id]);
+            var changeit = false;
+            for (var i = 0; i < tempdash.rows.length; i++) {
+                for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
+                    if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
+                        if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
+                            tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
+                            changeit = true;
+                        }
+                    }
+                }
             }
-          }
-        },
-        _panelAdded:function (e){
-            console.log("i got",e.detail);
+            if (changeit)
+                this.dashboard = tempdash;
 
-            var panel ={
-                "lines": true,
-                "aliasColors": {},
-                "datasource": "mistphite",
-                "id": this.dashboard.rows[0].panels.length,
-                "span": 12,
-                "stack": false,
-                "targets": [{
-                    "refId": "A",
-                    "target": e.detail
-                }],
-                "timeFrom": null,
-                "timeShift": null,
-                "title": e.detail.split(".")[0],
-                "type": "graph",
-                "machineArray": [[this.machine.cloud.id, this.machine.id]],
-                "x-axis": true,
-                "y-axis": true
-            }
-            this.push("dashboard.rows.0.panels",panel);
-            console.log(this.dashboard);
-        },
-        _getMetrics: function() {
-            this.querySelector("#metrics").generateRequest();
-        },
-        _computeMetricsUri: function(machine) {
-            return "/api/v1/clouds/" + machine.cloud.id + "/machines/" + machine.id + "/metrics";
-        },
-        _computeActions: function(item) {
-            var ret = [];
-            if (item.state == 'running') {
-                // if key then add shell / run script
-                // if not monitoring then enable monitoring
-                ret.push('shell');
-                ret.push('associate-key');
-                ret.push('probe');
-                if (this.hideAssociatedKeys)
-                    ret.push('run-script');
-            }
-            if (item.can_tag)
-                ret.push('tag');
-            if (item.can_start)
-                ret.push('start');
-            if (item.can_stop)
-                ret.push('stop');
-            if (item.can_suspend)
-                ret.push('suspend');
-            if (item.can_reboot)
-                ret.push('reboot');
-            if (item.can_resume)
-                ret.push('resume');
-            if (item.can_rename)
-                ret.push('rename');
-            if (item.can_destroy)
-                ret.push('destroy');
-            if (item.can_undefine)
-                ret.push('undefine');
-
-            var actions = [];
-            for (var i = 0; i < ret.length; i++) {
-                actions.push(MACHINEACTIONS[ret[i]]);
-            }
-
-            return actions;
-        },
-        _computeMachine: function(params, machines) {
-            if (this.machine && this.machine.uuid && params.uuid != this.machine.uuid) {
-                this.set('isPendingKeyRequest', false);
-            }
-            return machines.base.find(function(machine) {
-                return machine.uuid == params.uuid;
-            }, this);
-        },
-        _computeItemInArray: function() {
             var arr = [];
             arr.push(this.machine);
             return arr;
@@ -768,16 +775,6 @@
                 return image.name;
             else
                 return "";
-        },
-        _computeReplaceTargets: function(machine) {
-            // var ret = {'bucky.': ''};
-            // var m = this.machine;
-            // var mId = this.machine.id;
-            // var m = this.machine.name;
-            // ret[mId] = m ? m.name : 'unknown';
-            // // Object {bucky.: "", 3e3a36a5a2694f859a2dc2ccbc192619: "unknown", a203e912f9e744df8ac10179403b8248: "monitor-docker"}
-            // this.dashboard.rows[0].panels[0].targets[0].target = 'bucky.'+this.machine.id+'.load.shortterm';
-            // return ret;
         },
         confirmAction: function(action) {
             this._showDialog({
@@ -872,7 +869,7 @@
                 this._showToast(e.detail.errormsg);
             }
         },
-        _feedbackOnRename: function(e) {
+        _feedbackOnRename: function(e){
             console.log("_feedbackOnRename")
             if (e.detail.request) {
                 this._showToast('Rename request sent. Waiting for machine to respond');
@@ -884,42 +881,44 @@
                 this._showToast(e.detail.errormsg);
             }
         },
-        _computeProbeData: function(machine, probes) {
+        _computeProbeData: function(machine, probes){
             if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid].loadavg.length)
-                return this.model.probes[machine.uuid].loadavg[0] + ", " + this.model.probes[machine.uuid].loadavg[1] + ", " + this.model.probes[machine.uuid].loadavg[2] + " - " + this.model.probes[machine.uuid].cores +
-                    " cores. Last probe: " + moment(this.model.probes[machine.uuid].timestamp * 1000).fromNow();
+                return this.model.probes[machine.uuid].loadavg[0]+", "+this.model.probes[machine.uuid].loadavg[1]+", "+this.model.probes[machine.uuid].loadavg[2]+" - "+this.model.probes[machine.uuid].cores+" cores. Last probe: "+moment(this.model.probes[machine.uuid].timestamp*1000).fromNow();
         },
         itemProbeClasses: function(item, probes) {
             if (!probes) {
                 console.log('1')
                 return false;
-            } else {
+            }
+            else {
 
                 if (!this.model || !this.model.probes || !this.model.probes[item.uuid] || !this.model.probes[item.uuid].loadavg) {
                     return false;
                     console.log('2')
-                } else {
+                }
+
+                else {
                     var probe = this.model.probes[item.uuid].loadavg;
                     var classes = "";
 
                     //short
-                    if (parseInt(probe[0] * 100) < 30)
+                    if (parseInt(probe[0]*100) < 30)
                         classes += "shortlow ";
-                    else if (parseInt(probe[0] * 100) > 30 && parseInt(probe[0] * 100) < 60)
+                    else if (parseInt(probe[0]*100) > 30 && parseInt(probe[0]*100) < 60)
                         classes += "shortmedium ";
                     else
                         classes += "shorthigh ";
                     //mid
-                    if (parseInt(probe[1] * 100) < 30)
+                    if (parseInt(probe[1]*100) < 30)
                         classes += "midlow ";
-                    else if (parseInt(probe[1] * 100) > 30 && parseInt(probe[1] * 100) < 60)
+                    else if (parseInt(probe[1]*100) > 30 && parseInt(probe[1]*100) < 60)
                         classes += "midmedium ";
                     else
                         classes += "midhigh ";
                     //long
-                    if (parseInt(probe[2] * 100) < 30)
+                    if (parseInt(probe[2]*100) < 30)
                         classes += "longlow ";
-                    else if (parseInt(probe[2] * 100) > 30 && parseInt(probe[2] * 100) < 60)
+                    else if (parseInt(probe[2]*100) > 30 && parseInt(probe[2]*100) < 60)
                         classes += "longmedium ";
                     else
                         classes += "longhigh ";
