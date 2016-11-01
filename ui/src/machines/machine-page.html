@@ -315,7 +315,8 @@
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
                     <div hidden$="[[!probeData]]"> Probe Data:
                         <span class$="probe-data [[itemProbeClasses(machine, model.probes)]]"> </span>
-                        <span hidden$="[[!probeData]]"> [[probeData]] </span>
+                        <span hidden$="[[!probeData]]"> [[probeData]] </span> <br/>
+                        <span hidden$="[[!lastProbe]]"> [[lastProbe]] </span>
                     </div>
                     <div hidden$="[[!kernelInfo]]"> 
                         [[kernelInfo]]
@@ -324,6 +325,7 @@
                         <span class$="dc-[[probeObj.dirty_cow]]">
                             <iron-icon hidden$="[[!probeObj.dirty_cow]]" icon="icons:report-problem"></iron-icon> [[dirtyCowAlert]]
                         </span>
+                        <!-- <a href="/link-to-blog" target="new" class="regular" hidden$="[[!probeObj.dirty_cow]]">read more...</a> -->
                     </div>
                 </paper-material>
                 <paper-material id="rightcolumn" class="right" hidden$="[[hideAssociatedKeys]]">
@@ -584,6 +586,11 @@ MACHINEACTIONS = {
             probeData: {
                 type: String,
                 computed: '_computeProbeData(machine, model.probes.*)',
+                value: false
+            },
+            lastProbe: {
+                type: String,
+                computed: '_computeLastProbe(machine, model.probes.*)',
                 value: false
             },
             kernelInfo: {
@@ -922,7 +929,11 @@ MACHINEACTIONS = {
         },
         _computeProbeData: function(machine, probes){
             if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid].loadavg.length)
-                return this.model.probes[machine.uuid].loadavg[0]+", "+this.model.probes[machine.uuid].loadavg[1]+", "+this.model.probes[machine.uuid].loadavg[2]+" - "+this.model.probes[machine.uuid].cores+" cores. Last probe: "+moment(this.model.probes[machine.uuid].timestamp*1000).fromNow();
+                return this.model.probes[machine.uuid].loadavg[0]+", "+this.model.probes[machine.uuid].loadavg[1]+", "+this.model.probes[machine.uuid].loadavg[2]+" - "+this.model.probes[machine.uuid].cores+" cores."
+        },
+        _computeLastProbe: function(machine, probes){
+            if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid].timestamp)
+                return "Last probe: "+moment(this.model.probes[machine.uuid].timestamp*1000).fromNow();
         },
         _computeKernelInfo: function(machine, probes){
             var info = "";
