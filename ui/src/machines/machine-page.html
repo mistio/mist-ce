@@ -370,6 +370,10 @@
                                 <td>Users</td>
                                 <td>[[probeObj.users]]</td>
                             </tr>
+                            <tr hidden$="[[!probeObj]]">
+                                <td>Uptime</td>
+                                <td>[[probeObj.uptime]]</td>
+                            </tr>
                             <tr hidden$="[[!probeData]]">
                                 <td>Filesystem Info</td>
                                 <td>
@@ -962,6 +966,15 @@ MACHINEACTIONS = {
                 return prefix+"low ";
             else
                 return prefix+"low ";
+        },
+        readableUptime: function(str){
+            if (str) {
+                var a = str.split(" ")[0],
+                    b = str.split(" ")[1];
+                return "Up "+a+". Idle:"+b;
+            }
+            else 
+                return "";
         }
     });
 </script>
