@@ -27,7 +27,7 @@
                 flex: 1 100%;
                 margin-bottom: 16px;
             }
-            .columns paper-material > * {
+            .columns paper-material > .break {
                 word-break: break-all;
             }
             .left {
@@ -200,6 +200,10 @@
             item-actions ::content .item-actions {
                 margin-left: 0 !important;
             }
+            .probe-df {
+                height: 240px;
+                overflow-y: scroll;
+            }
             .probe-data {
                 position: relative;
             }
@@ -301,7 +305,7 @@
                 <paper-material id="leftcolumn" class="left">
                     <h3 class="smallcaps">Info:</h3>
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
-                    <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
+                    <span hidden$="[[!machine.extra.image]]" class="break">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
                     <div hidden$="{{!probeData}}"> Probe Data:
                         <span class$="probe-data {{itemProbeClasses(machine, model.probes)}}"> </span>
@@ -337,7 +341,7 @@
                 <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
             <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
+                <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
                 <div class="card-content">
                     <table class="info-table">
                         <template is="dom-if" if="[[machine.public_ips]]">
@@ -360,6 +364,18 @@
                                 <td><template is="dom-repeat" items="[[machine.private_ips]]">
                                         [[item]]
                                     </template>
+                                </td>
+                            </tr>
+                            <tr hidden$="[[!probeObj]]">
+                                <td>Users</td>
+                                <td>[[probeObj.users]]</td>
+                            </tr>
+                            <tr hidden$="[[!probeData]]">
+                                <td>Filesystem Info</td>
+                                <td>
+                                    <div class="probe-df">
+<pre><code>[[probeObj.df]]</code></pre>
+                                    </div>
                                 </td>
                             </tr>
                         </template>
@@ -558,6 +574,11 @@ MACHINEACTIONS = {
             dirtyCow: {
                 type: String,
                 computed: '_computeDirtyCow(machine, model.probes.*)',
+                value: false
+            },
+            probeObj: {
+                type: Object,
+                computed: '_computeProbeObj(machine, model.probes.*)',
                 value: false
             }
         },
@@ -896,6 +917,10 @@ MACHINEACTIONS = {
                     info += "DIRTY COW vulnerability: "+this.model.probes[machine.uuid].dirty_cow;
             }
             return info.length ? info : false;
+        },
+        _computeProbeObj: function (machine, probes){
+            if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid])
+                return this.model.probes[machine.uuid];
         },
         itemProbeClasses: function(item, probes) {
             if (!probes) {
