@@ -150,6 +150,10 @@
             min-width: 250px;
         }
 
+        .field.recommendations {
+            min-width: 250px;      
+        }
+
         .field {
             min-width: 150px;
             margin-right: 17px;
@@ -628,7 +632,7 @@ Polymer({
     displayedFields: function (section) {
         if (this.isMachines(this.section)){
             if (this.get('xxwideViewport'))
-                return ['name', 'state', 'cloud', 'cost', 'created', 'size', 'image', 'id'];
+                return ['name', 'state', 'recommendations','cloud', 'cost', 'created', 'size', 'image', 'id'];
             if (this.get('xwideViewport'))
                 return ['name', 'state', 'cloud', 'cost', 'size', 'image']
             if (this.get('wideViewport'))

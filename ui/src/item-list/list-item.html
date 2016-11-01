@@ -267,6 +267,9 @@ Polymer({
 
     itemField: function(item, field) {
 
+        if (field == 'recommendations')
+            return 'test';
+
         if (field == 'cost') {
             if (item.extra.cost_per_month) {
                 return '$'+Math.round(item.extra.cost_per_month);
