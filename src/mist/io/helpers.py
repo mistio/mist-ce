@@ -200,13 +200,10 @@ def dirty_cow(os, os_version, kernel_version):
         "rhel":
         {
             "6": "3.10.58-rt62.60.el6rt",
-            "7": "3.10.0-327.36.1.rt56.237.el7"
+            "6.8": "3.10.58-rt62.60.el6rt",
+            "7": "3.10.0-327.36.1.rt56.237.el7",
+            "7.2": "3.10.0-327.36.1.rt56.237.el7"
         },
-        "redhat":
-        {
-            "6": "3.10.58-rt62.60.el6rt",
-            "7": "3.10.0-327.36.1.rt56.237.el7"
-        }
     }
 
     # If version is lower that min_patched_version it is most probably vulnerable
