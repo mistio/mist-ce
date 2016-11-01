@@ -3,12 +3,16 @@
     CSRF_TOKEN = '';
     DEBUG_SOCKET = false;
     Polymer({
-        is: 'app-socket',
+        is: 'mist-socket',
         url: '/socket',
         properties: {
             socket: {
                 type: Object,
                 value: false
+            },
+            openRequests: {
+                type: Array,
+                value: []
             },
             model: {
                 type: Object,
@@ -120,7 +124,7 @@
                     },
                     list_machines: function(data) {
                         that.debounce(that._updateMachines(data), function() {
-                            // console.debug('list_machines', data);
+                            //console.debug('list_machines', data);
                         }, 250);
                     },
                     list_images: function(data) {
@@ -187,8 +191,25 @@
                             console.debug('Loaded org data');
                         }, 250);
                     },
-                    logout: function(data){
+                    logout: function(data) {
                         document.location.pathname = '/';
+                    },
+                    stats: function(data) {
+                        if (!that.openRequests[data.request_id])
+                            console.warn('cannot find open request', data.request_id)
+                        else {
+                            that.openRequests[data.request_id](data);
+                            that.openRequests[data.request_id] = null;
+                            var found = false;
+                            that.openRequests.forEach(function(entry) {
+                                if (entry != null) {
+                                    found = true;
+                                }
+                            });
+                            if (!found) {
+                                that.openRequests = [];
+                            }
+                        }
                     }
                 },
                 shell: {
@@ -239,13 +260,22 @@
                 }
             };
         },
-
+        // _handleStats:function(data){
+        //   console.log("hey",data);
+        // },
         heartbeat: function() {
             console.debug('got heartbeat');
             this.send('h'); // reply with empty frame
         },
 
-        send: function(type, namespace, body, params, moreparams) {
+        getStats: function(data, callback) {
+            var reqId = Math.floor(100 * Math.random());
+            data[5] = reqId;
+            this.send('msg', 'main', 'stats', data);
+            this.openRequests[reqId] = callback;
+        },
+        send: function(type, namespace, body, params) {
+
             if (namespace == undefined)
                 namespace = 'main';
 
@@ -255,10 +285,7 @@
                 payload += ',' + body;
 
             if (params !== undefined)
-                if (moreparams !== undefined)
-                    payload += ',' + JSON.stringify([params, moreparams]);
-                else
-                    payload += ',' + JSON.stringify([params]);
+                payload += ',' + JSON.stringify(params);
 
             this.socket.send(payload);
             if (DEBUG_SOCKET)
@@ -327,7 +354,7 @@
                         break;
                     }
                     // If some field changed the model needs to be updated
-                    if (JSON.stringify(data[i][dataKeys[k]])
+                    if (data[i][dataKeys[k]] && JSON.stringify(data[i][dataKeys[k]])
                         .localeCompare(JSON.stringify(item[dataKeys[k]]))) {
                         console.debug('property ', dataKeys[k], ' changed in ', item);
                         var oldVal = JSON.stringify(item[dataKeys[k]]),
@@ -396,7 +423,7 @@
             if (!data) //data is an Object
                 this.set('onboarding.hasMonitoring', false);
             this.set('model.pending.monitoring', false);
-            // inform machines that have rules 
+            // inform machines that have rules
             if (data.rules) {
                 for (var rule in data.rules) {
                     if (this.model.clouds[rule.cloud] && this.model.clouds[rule.cloud].machines[rule.machine]){
@@ -427,25 +454,26 @@
 
         _updateKeys: function(data) {
             this.set('onboarding.isLoadingKeys', false);
-            if(data){
-                for (var i=0;i<data.length;i++) {
+            if (data) {
+                for (var i = 0; i < data.length; i++) {
                     var key = data[i];
                     if (this.model.clouds && key.machines)
-                    key.machines.forEach(function(m, index){
-                        var cloud = m[0], machine = m[1];
-                        if (this.model.clouds && this.model.clouds[cloud] && this.model.clouds[cloud].machines && this.model.clouds[cloud].machines[machine]) {
-                            // check if machine has this key, if not add
-                            var keyexists = this.model.clouds[cloud].machines[machine].keys.find(function(k){
-                                return k.name == key.name;
-                            });
-                        }
-                        if (!keyexists) {
-                            if (!this.get('model.clouds.'+cloud+'.machines.'+machine+'.keys'))
-                                this.set('model.clouds.'+cloud+'.machines.'+machine+'.keys', [key])
-                            else
-                                this.push('model.clouds.'+cloud+'.machines.'+machine+'.keys',key)
-                        }
-                    }, this)
+                        key.machines.forEach(function(m, index) {
+                            var cloud = m[0],
+                                machine = m[1];
+                            if (this.model.clouds && this.model.clouds[cloud] && this.model.clouds[cloud].machines && this.model.clouds[cloud].machines[machine]) {
+                                // check if machine has this key, if not add
+                                var keyexists = this.model.clouds[cloud].machines[machine].keys.find(function(k) {
+                                    return k.name == key.name;
+                                });
+                            }
+                            if (!keyexists) {
+                                if (!this.get('model.clouds.' + cloud + '.machines.' + machine + '.keys'))
+                                    this.set('model.clouds.' + cloud + '.machines.' + machine + '.keys', [key])
+                                else
+                                    this.push('model.clouds.' + cloud + '.machines.' + machine + '.keys', key)
+                            }
+                        }, this)
                 }
             }
             return this._updateModel('keys', data);
@@ -543,16 +571,16 @@
 
             //update cloud's networks
             var cloudNetworks = [];
-            data.networks.private.forEach(function(net){
-                if (net.id){
+            data.networks.private.forEach(function(net) {
+                if (net.id) {
                     net["network_type"] = "private";
                     net["provider"] = this.model.clouds[data.cloud_id].provider;
                     net["cloud_id"] = data.cloud_id;
                     cloudNetworks.push(net);
                 }
             }, this);
-            data.networks.public.forEach(function(net){
-                if (net.id){
+            data.networks.public.forEach(function(net) {
+                if (net.id) {
                     net["network_type"] = "public";
                     net["provider"] = this.model.clouds[data.cloud_id].provider;
                     net["cloud_id"] = data.cloud_id;
@@ -582,13 +610,12 @@
             var allNetworks = [];
             if (this.model != undefined) {
                 this.model.cloudsArray.forEach(function(cloud) {
-                        if (cloud.networksArray != undefined && cloud.enabled) {
-                            cloud.networksArray.forEach(function(net){
-                                allNetworks.push(net);
-                            })
-                        }
+                    if (cloud.networksArray != undefined && cloud.enabled) {
+                        cloud.networksArray.forEach(function(net) {
+                            allNetworks.push(net);
+                        })
                     }
-                );
+                });
             }
             this.set('model.networksArray', allNetworks);
             this.set('model.networks', _generateMap(allNetworks));
@@ -601,13 +628,11 @@
         _updateIncidents: function(data) {
             this.set('onboarding.isLoadingIncidents', false);
             if (data) {
-                // console.log(data);
-                for(var i=0;i<data.length;i++){
+                for (var i = 0; i < data.length; i++) {
                     var inc = data[i];
                     inc.id = inc.incident_id
                 }
             }
-            // console.log(data);
             return this._updateModel('incidents', data);
         },
 
@@ -632,7 +657,7 @@
 
             try {
                 var uuid = this.model.clouds[data.cloud_id].machines[data.machine_id].uuid;
-                this.set('model.probes.'  + uuid, data.result);
+                this.set('model.probes.' + uuid, data.result);
             } catch (e) {
                 console.warn('cannot find uuid for machine with cloud_id ', data.cloud_id, ' and machine_id', data.machine_id);
             }
@@ -653,11 +678,11 @@
             return keywords;
         },
 
-        _machineKeys: function(machineID, cloudID){
+        _machineKeys: function(machineID, cloudID) {
             // console.log('Update _machineKeys',cloudID,machineID);
-            if (machineID && cloudID){
-                var keys = this.model.keysArray.filter(function(k){
-                    return k.machines.find(function(m){
+            if (machineID && cloudID) {
+                var keys = this.model.keysArray.filter(function(k) {
+                    return k.machines.find(function(m) {
                         return m[1] == machineID && m[0] == cloudID;
                     })
                 });
