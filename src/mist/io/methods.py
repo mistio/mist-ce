@@ -64,6 +64,8 @@ from mist.io.helpers import trigger_session_update
 from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import StdStreamCapture
 
+from mist.io.helpers import dirty_cow, parse_os_release
+
 import mist.io.tasks
 import mist.io.inventory
 
@@ -2210,6 +2212,10 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
        "/sbin/ifconfig;"
        "echo -------- &&"
        "/bin/df -Pah;"
+       "echo -------- &&"
+       "uname -r ;"
+       "echo -------- &&"
+       "cat /etc/*release;"
        "echo --------"
        "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
     )
@@ -2243,6 +2249,10 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
     pub_ips = find_public_ips(ips)
     priv_ips = [ip for ip in ips if ip not in pub_ips]
 
+    kernel_version = cmd_output[6]
+    os_release = cmd_output[7]
+    os, os_version = parse_os_release(os_release)
+
     return {
         'uptime': uptime,
         'loadavg': loadavg,
@@ -2253,6 +2263,10 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
         'macs': macs,
         'df': cmd_output[5],
         'timestamp': time(),
+        'kernel': kernel_version,
+        'os': os,
+        'os_version': os_version,
+        'dirty_cow': dirty_cow(os, os_version, kernel_version)
     }
 
 
