@@ -200,6 +200,12 @@
             item-actions ::content .item-actions {
                 margin-left: 0 !important;
             }
+            .dc-true {
+                color: var(--red-color);
+            }
+            .dc-true iron-icon {
+                color: inherit;
+            }
             .probe-df {
                 height: 240px;
                 overflow-y: scroll;
@@ -307,12 +313,17 @@
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
                     <span hidden$="[[!machine.extra.image]]" class="break">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
-                    <div hidden$="{{!probeData}}"> Probe Data:
-                        <span class$="probe-data {{itemProbeClasses(machine, model.probes)}}"> </span>
-                        <span hidden$="{{!probeData}}"> {{probeData}} </span>
+                    <div hidden$="[[!probeData]]"> Probe Data:
+                        <span class$="probe-data [[itemProbeClasses(machine, model.probes)]]"> </span>
+                        <span hidden$="[[!probeData]]"> [[probeData]] </span>
                     </div>
-                    <div hidden$="{{!dirtyCow}}"> 
-                        {{dirtyCow}} 
+                    <div hidden$="[[!kernelInfo]]"> 
+                        [[kernelInfo]]
+                    </div>
+                    <div hidden$="[[!probeObj]]"> 
+                        <span class$="dc-[[probeObj.dirty_cow]]">
+                            <iron-icon hidden$="[[!probeObj.dirty_cow]]" icon="icons:report-problem"></iron-icon> [[dirtyCowAlert]]
+                        </span>
                     </div>
                 </paper-material>
                 <paper-material id="rightcolumn" class="right" hidden$="[[hideAssociatedKeys]]">
@@ -575,11 +586,16 @@ MACHINEACTIONS = {
                 computed: '_computeProbeData(machine, model.probes.*)',
                 value: false
             },
-            dirtyCow: {
+            kernelInfo: {
                 type: String,
-                computed: '_computeDirtyCow(machine, model.probes.*)',
+                computed: '_computeKernelInfo(machine, model.probes.*)',
                 value: false
             },
+            dirtyCowAlert: {
+                type: String,
+                computed: '_computeDirtyCowAlert(machine, model.probes.*)',
+                value: false
+            },            
             probeObj: {
                 type: Object,
                 computed: '_computeProbeObj(machine, model.probes.*)',
@@ -908,7 +924,7 @@ MACHINEACTIONS = {
             if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid].loadavg.length)
                 return this.model.probes[machine.uuid].loadavg[0]+", "+this.model.probes[machine.uuid].loadavg[1]+", "+this.model.probes[machine.uuid].loadavg[2]+" - "+this.model.probes[machine.uuid].cores+" cores. Last probe: "+moment(this.model.probes[machine.uuid].timestamp*1000).fromNow();
         },
-        _computeDirtyCow: function(machine, probes){
+        _computeKernelInfo: function(machine, probes){
             var info = "";
             if (this.model && this.model.probes && this.model.probes[machine.uuid]){
                 if (this.model.probes[machine.uuid].kernel)
@@ -917,8 +933,14 @@ MACHINEACTIONS = {
                     info += "OS: "+this.model.probes[machine.uuid].os+" ";
                 if (this.model.probes[machine.uuid].os_version)
                     info += " "+this.model.probes[machine.uuid].os_version+". ";
+            }
+            return info.length ? info : false;
+        },
+        _computeDirtyCowAlert: function(machine, probes){
+            var info = "";
+            if (this.model && this.model.probes && this.model.probes[machine.uuid]){
                 if (this.model.probes[machine.uuid].dirty_cow != undefined)
-                    info += "DIRTY COW vulnerability: "+this.model.probes[machine.uuid].dirty_cow;
+                    info += "Dirty COW vulnerability: "+this.model.probes[machine.uuid].dirty_cow;
             }
             return info.length ? info : false;
         },
