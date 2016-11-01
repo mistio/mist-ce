@@ -885,15 +885,15 @@ MACHINEACTIONS = {
         },
         _computeDirtyCow: function(machine, probes){
             var info = "";
-            if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid].loadavg.length){
-                if (this.model.probes[machine.uuid].kernel_version)
-                    info += "Kernel version: "+this.model.probes[machine.uuid].kernel_version;
+            if (this.model && this.model.probes && this.model.probes[machine.uuid]){
+                if (this.model.probes[machine.uuid].kernel)
+                    info += "Kernel version: "+this.model.probes[machine.uuid].kernel+". ";
                 if (this.model.probes[machine.uuid].os)
-                    info += "OS: "+this.model.probes[machine.uuid].os;
+                    info += "OS: "+this.model.probes[machine.uuid].os+" ";
                 if (this.model.probes[machine.uuid].os_version)
-                    info += this.model.probes[machine.uuid].os_version;
-                if (this.model.probes[machine.uuid].dirty_cow)
-                    info += "Dirty COW vulnerability: "+this.model.probes[machine.uuid].dirty_cow;
+                    info += " "+this.model.probes[machine.uuid].os_version+". ";
+                if (this.model.probes[machine.uuid].dirty_cow != undefined)
+                    info += "DIRTY COW vulnerability: "+this.model.probes[machine.uuid].dirty_cow;
             }
             return info.length ? info : false;
         },
