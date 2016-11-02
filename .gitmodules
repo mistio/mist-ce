@@ -1,12 +1,12 @@
 [submodule "tests"]
-	path = tests
-	url = ../../mistio/mist.tests.git
-[submodule "ui/bower_components/polyana-dashboard"]
-	path = ui/bower_components/polyana-dashboard
-	url = ../../mistio/polyana-dashboard.git
-[submodule "ui/bower_components/c3-chart"]
-	path = ui/bower_components/c3-chart
-	url = ../../mistio/c3-chart.git
-[submodule "ui/bower_components/timerange-picker"]
-	path = ui/bower_components/timerange-picker
-	url = ../../mistio/timerange-picker.git
+        path = tests
+        url = ../../mistio/mist.tests.git
+[submodule "ui/polyana-dashboard"]
+	path = ui/polyana-dashboard
+	url = ../polyana-dashboard.git
+[submodule "ui/c3-chart"]
+	path = ui/c3-chart
+	url = ../c3-chart.git
+[submodule "ui/timerange-picker"]
+	path = ui/timerange-picker
+	url = ../timerange-picker.git
