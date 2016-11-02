@@ -1,14 +1,14 @@
 import json
 import datetime
 import mongoengine as me
-from celery.schedules import crontab_parser
+from celery.schedules import crontab_parser, ParseException
 from mist.core.cloud.models import Machine
 from mist.core.script.models import Script
 import mist.io.schedules.models as schedules
 from mist.io.helpers import trigger_session_update
 
 from mist.io.exceptions import NotFoundError
-from mist.core.exceptions import InvalidCron
+from mist.core.exceptions import InvalidSchedule
 from mist.core.exceptions import BadRequestError
 from mist.core.exceptions import ScriptNotFoundError
 from mist.core.exceptions import PeriodicTaskNotFound
@@ -18,6 +18,16 @@ from mist.core.exceptions import RequiredParameterMissingError
 
 
 def validate_cronjob_entry(cronj_entry):
+    """
+    Validate cron entry. Use crontab_parser for crontab expressions.
+    The parser is a general purpose one, useful for parsing hours,
+    minutes and day_of_week expressions.
+
+    example for minutes:
+        minutes = crontab_parser(60).parse('*/15')
+        [0, 15, 30, 45]
+
+    """
     try:
         for k, v in cronj_entry.items():
             if k == 'minute':
@@ -30,8 +40,12 @@ def validate_cronjob_entry(cronj_entry):
                 crontab_parser(31, 1).parse(v)
             elif k == 'month_of_year':
                 crontab_parser(12, 1).parse(v)
-    except Exception:
-        raise InvalidCron()
+            else:
+                raise BadRequestError('You should provide valid period of time')
+    except ParseException:
+        raise InvalidSchedule('Your crontab entry is not valid')
+    except BadRequestError as exc:
+        raise InvalidSchedule({'msg': exc.message})
 
 
 def add_schedule_entry(auth_context, params):
@@ -41,11 +55,14 @@ def add_schedule_entry(auth_context, params):
 
     # TODO
     # validate params, if sth is extra pop it
-    if name is None or name == '':
+    if not name:
         raise RequiredParameterMissingError('name')
 
     script_id = params.get('script_id', '')
     action = params.get('action', '')
+
+    if not (script_id or action):
+        raise BadRequestError("You must provide script_id or machine's action")
 
     if action not in ['', 'reboot', 'destroy', 'start', 'stop']:
         raise BadRequestError("Action is not correct")
@@ -91,40 +108,32 @@ def add_schedule_entry(auth_context, params):
 
     # check permissions for machines' tags
     if machines_tags:
-        for machine_tag in machines_tags:
-            if action:
-                # SEC require permission ACTION on machine
-                auth_context.check_perm("machine", action, None)
-                auth_context.check_perm("machine", action, machine_tag)
-            else:
-                # SEC require permission RUN_SCRIPT on machine
-                auth_context.check_perm("machine", "run_script", None)
-                auth_context.check_perm("machine", "run_script", machine_tag)
+        if action:
+            # SEC require permission ACTION on machine
+            auth_context.check_perm("machine", action, None)
+        else:
+            # SEC require permission RUN_SCRIPT on machine
+            auth_context.check_perm("machine", "run_script", None)
 
-    # create a dict for Scheduler
-    sched_args = {k: v for k, v in params.items()
-                  if k in schedules.Schedule.api_fields}
-
-    sched_args.update({
-        'owner': owner,
-        'kwargs': {},
-    })
+    stask = schedules.Schedule()
+    stask.owner = owner
+    stask.name = name
+    stask.description = params.get('description', '')
+    stask.enabled = params.get('enabled')
+    stask.run_immediately = params.get('run_immediately')
 
     if machines_uuids:
-        sched_args['machines_match'] = schedules.ListOfMachines(
-                                     **{'machines': machines_obj}
-        )
+        stask.machines_match = schedules.ListOfMachines(machines=machines_obj)
     else:
-        sched_args['machines_match'] = schedules.TaggedMachines(
-                                     **{'tags': machines_tags,
-                                        'owner': auth_context.owner}
+        stask.machines_match = schedules.TaggedMachines(
+            tags = machines_tags,
+            owner = auth_context.owner
         )
 
     if action:
-        sched_args['task_type'] = schedules.ActionTask(**{'action': action})
+        stask.task_type = schedules.ActionTask(action = action)
     else:
-        sched_args['task_type'] = schedules.ScriptTask(
-                                  **{'script_id': script_id})
+        stask.task_type = schedules.ScriptTask(script_id=script_id)
 
     schedule_type = params.get('schedule_type')
     if schedule_type not in ['crontab', 'interval', 'one_off']:
@@ -153,26 +162,19 @@ def add_schedule_entry(auth_context, params):
     if schedule_type == 'crontab':
         schedule_entry = json.loads(params.get('schedule_entry', '[]'))
         validate_cronjob_entry(schedule_entry)
-        sched_args.update(
-            {'schedule_type': schedules.Crontab(**schedule_entry)}
-            )
+        stask.schedule_type = schedules.Crontab(**schedule_entry)
 
     elif schedule_type == 'interval':
         schedule_entry = json.loads(params.get('schedule_entry', '[]'))
-        sched_args.update(
-            {'schedule_type': schedules.Interval(**schedule_entry)}
-            )
+        stask.schedule_type = schedules.Interval(**schedule_entry)
 
     elif schedule_type == 'one_off':
         delta = future_date - now
         future_date += datetime.timedelta(minutes=1)
-        interval = schedules.Interval(**{'period': 'seconds',
-                                         'every': delta.seconds})
-        sched_args.update({'schedule_type': interval,
-                          'expires': future_date.strftime('%Y-%m-%d %H:%M:%S')}
-                          )
-
-    stask = schedules.Schedule(**sched_args)
+        interval = schedules.Interval(period='seconds',
+                                      every=delta.seconds)
+        stask.schedule_type = interval
+        stask.expires = future_date.strftime('%Y-%m-%d %H:%M:%S')
 
     # Check if the action succeeded and saved
     try:
@@ -238,20 +240,17 @@ def edit_schedule_entry(auth_context, schedule_id, params):
 
     machines_tags = params.get('machine_tags', '')
     if machines_tags:
-        for machine_tag in machines_tags:
-            if action:
-                # SEC require permission ACTION on machine
-                auth_context.check_perm("machine", action, None)
-                auth_context.check_perm("machine", action, machine_tag)
-            else:
-                # SEC require permission RUN_SCRIPT on machine
-                auth_context.check_perm("machine", "run_script", None)
-                auth_context.check_perm("machine", "run_script", machine_tag)
+        if action:
+            # SEC require permission ACTION on machine
+            auth_context.check_perm("machine", action, None)
+        else:
+            # SEC require permission RUN_SCRIPT on machine
+            auth_context.check_perm("machine", "run_script", None)
 
     # check what the user previous has, script or action
-    if stask.task_type._cls == 'ScriptTask' and params.get('action'):
+    if isinstance(stask.task_type, schedules.ScriptTask) and action:
         raise BadRequestError("You cannot change from script to action")
-    if stask.task_type._cls == 'ActionTask' and script_id:
+    if isinstance(stask.task_type, schedules.ActionTask) and script_id:
         raise BadRequestError("You cannot change from action to script")
 
     sched_args = {k: v for k, v in params.items()
