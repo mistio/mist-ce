@@ -52,7 +52,6 @@
             return fields;
         },
         _fillInCreds: function(cloud, provider, fields){
-            console.log("_fillInCreds", provider);
             if (provider){
                 // if there is an apikey we can fill in
                 var apikey = this.cloud.apikey;
@@ -61,7 +60,6 @@
                     this.set('fields.'+index+'.value', apikey);
                     // if there is apikey and an apisecret we can 'getsecretfromdb'
                     var indexp = this._fieldIndexByName('apisecret');
-                    console.log('apisecret',indexp);
                     if (indexp) {
                         this.set('fields.'+indexp+'.value', 'getsecretfromdb');
                     }
