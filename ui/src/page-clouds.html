@@ -17,6 +17,7 @@
 
     <page-items name="clouds" class="clouds" model="[[model]]" items="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.clouds]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
     <cloud-add providers="[[providers]]" keys="[[model.keysArray]]" section="[[sections.clouds]]" clouds="[[model.cloudsArray]]" hidden$=[[!_isAddPageActive(route.path)]]></cloud-add>
+    <cloud-page model="[[model]]" params="[[_getCloud(data.clouds, model.clouds)]]" sections="[[sections]]" section="[[sections.clouds]]" hidden$=[[!_isDetailsPageActive(route.path)]]></cloud-page>
 
   </template>
 
@@ -46,7 +47,16 @@
 
       _isListActive: function(path) {
           return !path;
+      },
+
+      _isListActive: function(path) {
+          return !path;
+      },
+      _getCloud: function(id) {
+          if (this.model.clouds)
+              return this.model.clouds[id];
       }
+
 
     });
   </script>
