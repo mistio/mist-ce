@@ -127,9 +127,10 @@
                     this.fire('close-cloud-info');
                 },
                 _computeNewCloud: function(cloud) {
-                    return {
-                        title: cloud.title
-                    }
+                    if (cloud)
+                        return {
+                            title: this.cloud.title
+                        }
                 },
                 _computeIsEnabled: function(enabled) {
                     return enabled;

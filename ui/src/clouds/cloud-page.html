@@ -216,7 +216,7 @@
                 <paper-material>
                     <h4 class="id">cloud ID:</h4><span class="id">[[cloud.id]]</span>
                     <h4 class="id tags" hidden$="[[!cloud.region]]">Region:</h4><span class="id">[[cloud.region]]</span>
-                    <h4 class="id tags" hidden$="[[!cloud.enabled]]">State:</h4><span class="id">[[cloud.state]]</span>
+                    <h4 class="id tags" hidden$="[[!cloud.enabled]]">State:</h4><span class="id" hidden$="[[!cloud.enabled]]">[[cloud.state]]</span>
                     <h4 class="id tags" hidden$="[[!cloud.tags.length]]">Tags
                         <span class="id">([[cloud.tags.length]])</span>
                     </h4>
@@ -303,8 +303,10 @@
                     return !this.cloud ? true : false;
                 },
                 _computeItemImage: function (item) {
-                    var provider = item.provider.split('_')[0];
-                    return '../assets/providers/provider-' + provider + '.png';
+                    if (item && item.provider) {
+                        var provider = item.provider.split('_')[0];
+                        return '../assets/providers/provider-' + provider + '.png';
+                    }
                 },
                  _deleteCloud: function(e){
                     this.$.cloudDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -312,10 +314,10 @@
                     this.$.cloudDeleteAjaxRequest.generateRequest();
                 },
                 _handleCloudDeletionAjaxResponse: function(e){
+                    document.querySelector('paper-header-panel').scroller.scrollTop = 0;
+                    document.querySelector('app-location').set('path', '/');
                     var msg = 'Cloud ' + this.cloud.title + ' was deleted';
                     this._showToast(msg);
-                    this.set('opened', false);
-                    this.fire('close-cloud-info');
                 },
                 _handleCloudDeletionAjaxError: function(e){
                     var msg = 'There was an error deleting ' + this.cloud.title + '.';
@@ -330,7 +332,7 @@
                     this.$.cloudStateAjaxRequest.generateRequest();
                 },
                 _handleCloudStateAjaxResponse: function(e) {
-                    var msg = this.cloud.enabled ? 'Cloud ' + this.cloud.title + ' was enabled!' :
+                    var msg = !this.cloud.enabled ? 'Cloud ' + this.cloud.title + ' was enabled!' :
                     'Cloud ' + this.cloud.title + ' was disabled!';
                     this._showToast(msg);
                 },
