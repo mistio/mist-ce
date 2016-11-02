@@ -169,9 +169,6 @@ class Schedule(me.Document):
     owner = me.ReferenceField(Owner, required=True)
 
     # celery periodic task specific fields
-    task = me.StringField(required=True)
-    args = me.ListField()
-    kwargs = me.DictField()
     queue = me.StringField()
     exchange = me.StringField()
     routing_key = me.StringField()
@@ -189,10 +186,6 @@ class Schedule(me.Document):
     last_run_at = me.DateTimeField()
     total_run_count = me.IntField(min_value=0)
 
-    # These are used in schedules.methods
-    api_fields = ['name', 'task_type', 'machines_match', 'schedule_type',
-                  'enabled', 'expires', 'description', 'run_immediately']
-
     no_changes = False
 
     @property
@@ -201,6 +194,10 @@ class Schedule(me.Document):
             return self.schedule_type.schedule
         else:
             raise Exception("must define interval or crontab schedule")
+
+    @property
+    def kwargs(self):
+        return {}
 
     @property
     def args(self):
@@ -213,23 +210,13 @@ class Schedule(me.Document):
     def task(self):
         return self.task_type.task
 
-    # def __unicode__(self):
-    #     fmt = '{0.name}: {{no schedule}}'
-    #     if self.interval:
-    #         fmt = '{0.name}: {0.interval}'
-    #     elif self.crontab:
-    #         fmt = '{0.name}: {0.crontab}'
-    #     else:
-    #         raise Exception("must define interval or crontab schedule")
-    #     return fmt.format(self)
-
-    def clean(self):
-        if not self.schedule_type:
-            msg = 'Must defined either interval or crontab schedule.'
-            raise me.ValidationError(msg)
-        # FIXME action - script_id
-        # FIXME machines ids or machines_tags
-        # maybe to use clean or validate attrs from add_cronjob_entry
+    def __unicode__(self):
+        fmt = '{0.name}: {{no schedule}}'
+        if self.schedule_type:
+            fmt = 'name: {0.name} type: {0.schedule_type._cls}'
+        else:
+            raise Exception("must define interval or crontab schedule")
+        return fmt.format(self)
 
     def update_validate(self, value_dict):
         for key in value_dict:
@@ -258,5 +245,5 @@ class Schedule(me.Document):
         }
 
 
-class MyScheduler(MongoScheduler):
+class UserScheduler(MongoScheduler):
     Model = Schedule
