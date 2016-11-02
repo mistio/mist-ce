@@ -85,8 +85,7 @@
             </div>
         </div>
 
-        <iron-ajax id="cloudEditAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="PUT" on-response="_handleCloudEditAjaxResponse" on-error="_handleCloudEditAjaxError"></iron-ajax>
-        <iron-ajax id="cloudStateAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="POST" on-response="_handleCloudStateAjaxResponse" on-error="_handleCloudStateAjaxError"></iron-ajax>
+        <iron-ajax id="cloudEditAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="PUT" on-response="_handleCloudEditAjaxResponse" on-error="_handleCloudEditAjaxError"></iron-ajax>        
         <iron-ajax id="cloudDeleteAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="DELETE" on-response="_handleCloudDeletionAjaxResponse" on-error="_handleCloudDeletionAjaxError"></iron-ajax>
         <paper-toast></paper-toast>
     </template>

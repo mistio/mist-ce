@@ -249,6 +249,7 @@
         </div>
         <iron-ajax id="cloudStarAjaxRequest" url="/api/v1/clouds/{{cloud.cloud.id}}/clouds/{{cloud.id}}" method="POST" on-response="_handlecloudStarAjaxResponse" on-error="_handlecloudStarAjaxError"></iron-ajax>
         <iron-ajax id="cloudDeleteAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="DELETE" on-response="_handleCloudDeletionAjaxResponse" on-error="_handleCloudDeletionAjaxError"></iron-ajax>
+        <iron-ajax id="cloudStateAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="POST" on-response="_handleCloudStateAjaxResponse" on-error="_handleCloudStateAjaxError"></iron-ajax>
         <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
     </template>
@@ -321,7 +322,7 @@
                     this.$.cloudStateAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.cloudStateAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.cloudStateAjaxRequest.body = {
-                        new_state: this.cloud.enabled== true ? '0' : '1'
+                        new_state: this.cloud.enabled==true ? '0' : '1'
                     };
                     this.$.cloudStateAjaxRequest.generateRequest();
 
