@@ -22,6 +22,7 @@
                 padding: 20px;
             }
             paper-material.separator {
+                padding-bottom: 40px;
                 border-top: 4px solid #ddd;
             }
 
@@ -154,6 +155,28 @@
             paper-material > p {
                 padding: 0;
             }
+            .head-toggle {
+                padding: 0.7em 0.57em;
+                display: inline-block;
+            }
+            .head-toggle, .head-toggle > *  {
+                font-weight: 500;
+                vertical-align: middle;
+                color: #fff !important;
+                line-height: 20px;
+            }
+            .head-toggle > *  {
+                display: flex;
+            }
+            :host paper-toggle-button >::content .toggle-button {
+                background-color: #d96557 !important;
+            }
+            :host paper-toggle-button[checked]:not([disabled]) >::content .toggle-button {
+                background-color: #69b46c !important;
+            }
+            :host paper-toggle-button >::content .toggle-label {
+                color: #fff !important;
+            }
         </style>
         <div id="content">
             <div class="is-loading" hidden$="[[!isLoading]]">
@@ -167,17 +190,27 @@
                     <h2>
                         [[cloud.title]]
                     </h2>
+                    <div class="subtitle">
+                        [[cloud.state]]<span hidden$="[[!cloud.enabled]]">, enabled.</span><span hidden$="[[cloud.enabled]]">, disabled.</span>
+                    </div>
                 </div>
                 <div class="item-actions">
+                    <div class="head-toggle">
+                        <paper-toggle-button checked$="[[cloud.enabled]]" on-tap="_changeState">
+                            <span hidden$="[[!cloud.enabled]]">ENABLED</span>
+                            <span hidden$="[[cloud.enabled]]">DISABLED</span>
+                        </paper-toggle-button>
+                    </div>
                     <paper-button on-tap="_editTags" class="simple">tags</paper-button>
-                    <paper-button on-tap="_starcloud" class="simple">                        
-                    </paper-button>
+                    <!-- <paper-button on-tap="_starcloud" class="simple">                        
+                    </paper-button> -->
                 </div>
             </paper-material>
             <template is="dom-if" if="[[cloud]]">
                 <paper-material>
                     <h4 class="id">cloud ID:</h4><span class="id">[[cloud.id]]</span>
                     <h4 class="id tags" hidden$="[[!cloud.region]]">Region:</h4><span class="id">[[cloud.region]]</span>
+                    <h4 class="id tags" hidden$="[[!cloud.state]]">State:</h4><span class="id">[[cloud.state]]</span>
                     <h4 class="id tags" hidden$="[[!cloud.tags.length]]">Tags
                         <span class="id">([[cloud.tags.length]])</span>
                     </h4>
@@ -194,14 +227,17 @@
                         </div>
                     </div>
                 </paper-material>
-                <cloud-info cloud="[[cloud]]" opened></cloud-info>
             </template>
-            <paper-material>
+            <paper-material class="separator">
+                <h3>Rename Cloud</h3>
+                <cloud-info cloud="[[cloud]]" opened></cloud-info>
+            </paper-material>
+            <paper-material class="separator">
                 <cloud-edit cloud="[[cloud]]" clouds="[[model.clouds]]"></cloud-edit>
             </paper-material>
             <paper-material class="separator">
-                <h3>Delete Cloud [[cloud.title]]</h3>
-                <p>Deleting clouds can not be undone. You can temporarily disable the cloud from feeding mist by using the option on the top.</p>
+                <h3>Delete Cloud: [[cloud.title]]</h3>
+                <p>Deleting clouds can not be undone. Alternatively you can disable the cloud temporarily by using the option on the top.</p>
                 <div class="button">
                     <paper-button on-tap="_deleteCloud" class="red">Delete Cloud</paper-button>
                 </div>
@@ -279,6 +315,24 @@
                 },
                 _handleCloudDeletionAjaxError: function(e){
                     var msg = 'There was an error deleting ' + this.cloud.title + '.';
+                    this._showToast(msg);
+                },
+                _changeState: function(e) {
+                    this.$.cloudStateAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.cloudStateAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.cloudStateAjaxRequest.body = {
+                        new_state: this.cloud.enabled== true ? '0' : '1'
+                    };
+                    this.$.cloudStateAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _handleCloudStateAjaxResponse: function(e) {
+                    this.set('cloud.enabled', !this.cloud.enabled);
+                    this.set('sendingData', false);
+                    console.log(this.cloud);
+                    var msg = this.cloud.enabled ? 'Cloud ' + this.cloud.title + ' was enabled!' :
+                    'Cloud ' + this.cloud.title + ' was disabled!';
                     this._showToast(msg);
                 },
             });
