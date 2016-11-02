@@ -168,6 +168,9 @@
             .head-toggle > *  {
                 display: flex;
             }
+            paper-toggle-button {
+                cursor: pointer;
+            }
             :host paper-toggle-button >::content .toggle-button {
                 background-color: #d96557 !important;
             }
@@ -176,6 +179,9 @@
             }
             :host paper-toggle-button >::content .toggle-label {
                 color: #fff !important;
+            }
+            .capitalize {
+                text-transform: capitalize;
             }
         </style>
         <div id="content">
@@ -191,7 +197,7 @@
                         [[cloud.title]]
                     </h2>
                     <div class="subtitle">
-                        [[cloud.state]]<span hidden$="[[!cloud.enabled]]">, enabled.</span><span hidden$="[[cloud.enabled]]">, disabled.</span>
+                        <span class="capitalize" hidden$="[[!cloud.enabled]]">[[cloud.state]]</span><span hidden$="[[!cloud.enabled]]">, enabled.</span><span class="capitalize" hidden$="[[cloud.enabled]]">disabled</span>
                     </div>
                 </div>
                 <div class="item-actions">
@@ -210,7 +216,7 @@
                 <paper-material>
                     <h4 class="id">cloud ID:</h4><span class="id">[[cloud.id]]</span>
                     <h4 class="id tags" hidden$="[[!cloud.region]]">Region:</h4><span class="id">[[cloud.region]]</span>
-                    <h4 class="id tags" hidden$="[[!cloud.state]]">State:</h4><span class="id">[[cloud.state]]</span>
+                    <h4 class="id tags" hidden$="[[!cloud.enabled]]">State:</h4><span class="id">[[cloud.state]]</span>
                     <h4 class="id tags" hidden$="[[!cloud.tags.length]]">Tags
                         <span class="id">([[cloud.tags.length]])</span>
                     </h4>
