@@ -44,6 +44,12 @@
             white-space: nowrap;
             overflow: hidden;
         }
+        .field.recommendations {
+            min-width: 250px;      
+        }
+        .recommendations.Dirty.COW.Update {
+            color: #F57F17;
+        }
         .field.state {
             position: relative;
         }
@@ -267,8 +273,20 @@ Polymer({
 
     itemField: function(item, field) {
 
-        if (field == 'recommendations')
-            return 'test';
+        if (field == 'recommendations'){
+            // temp for machines only
+            if (this.section.id == "machines" && document.querySelector('mist-app').model.probes && document.querySelector('mist-app').model.probes[item.uuid]){
+                if (document.querySelector('mist-app').model.probes[item.uuid].dirty_cow == true) {
+                    return "Dirty COW alert! Update kernel.";
+                }
+                else {
+                    return '';
+                }
+            }
+            else {
+                return '';
+            }
+        }
 
         if (field == 'cost') {
             if (item.extra.cost_per_month) {
