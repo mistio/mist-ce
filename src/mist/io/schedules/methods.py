@@ -41,7 +41,8 @@ def validate_cronjob_entry(cronj_entry):
             elif k == 'month_of_year':
                 crontab_parser(12, 1).parse(v)
             else:
-                raise BadRequestError('You should provide valid period of time')
+                raise BadRequestError(
+                    'You should provide valid period of time')
     except ParseException:
         raise InvalidSchedule('Your crontab entry is not valid')
     except BadRequestError as exc:
@@ -125,13 +126,12 @@ def add_schedule_entry(auth_context, params):
     if machines_uuids:
         stask.machines_match = schedules.ListOfMachines(machines=machines_obj)
     else:
-        stask.machines_match = schedules.TaggedMachines(
-            tags = machines_tags,
-            owner = auth_context.owner
+        stask.machines_match = schedules.TaggedMachines(tags = machines_tags,
+            owner=auth_context.owner
         )
 
     if action:
-        stask.task_type = schedules.ActionTask(action = action)
+        stask.task_type = schedules.ActionTask(action=action)
     else:
         stask.task_type = schedules.ScriptTask(script_id=script_id)
 
@@ -303,8 +303,8 @@ def edit_schedule_entry(auth_context, schedule_id, params):
                 raise BadRequestError('Expiration date value was not valid')
             now = datetime.datetime.now()
             if future_date < now:
-                raise BadRequestError('Date of future task is in the past. Please'
-                                      ' contact Marty McFly')
+                raise BadRequestError('Date of future task is in the past. '
+                    'Please contact Marty McFly')
 
     if action:
         sched_args['task_type'] = schedules.ActionTask(**{'action': action})
