@@ -281,9 +281,6 @@
                 },
                 ready: function() {
                 },
-                _computeIsStarred: function(star) {
-                    return star;
-                },
                 _editTags: function() {
                     var el = this.querySelector('tags-list'),
                     items = [];
@@ -322,16 +319,11 @@
                     this.$.cloudStateAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.cloudStateAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.cloudStateAjaxRequest.body = {
-                        new_state: this.cloud.enabled==true ? '0' : '1'
+                        new_state: this.cloud.enabled? '0' : '1'
                     };
                     this.$.cloudStateAjaxRequest.generateRequest();
-
-                    this.set('sendingData', true);
                 },
                 _handleCloudStateAjaxResponse: function(e) {
-                    this.set('cloud.enabled', !this.cloud.enabled);
-                    this.set('sendingData', false);
-                    console.log(this.cloud);
                     var msg = this.cloud.enabled ? 'Cloud ' + this.cloud.title + ' was enabled!' :
                     'Cloud ' + this.cloud.title + ' was disabled!';
                     this._showToast(msg);
