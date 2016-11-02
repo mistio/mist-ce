@@ -1,3 +1,6 @@
+[submodule "tests"]
+        path = tests
+        url = ../../mistio/mist.tests.git
 [submodule "ui/polyana-dashboard"]
 	path = ui/polyana-dashboard
 	url = ../polyana-dashboard.git
