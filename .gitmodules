@@ -1,0 +1,9 @@
+[submodule "ui/polyana-dashboard"]
+	path = ui/polyana-dashboard
+	url = ../polyana-dashboard.git
+[submodule "ui/c3-chart"]
+	path = ui/c3-chart
+	url = ../c3-chart.git
+[submodule "ui/timerange-picker"]
+	path = ui/timerange-picker
+	url = ../timerange-picker.git
