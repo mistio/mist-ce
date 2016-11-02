@@ -6,6 +6,8 @@
 <link rel="import" href="../tags/tags-list.html">
 <link rel="import" href="../item-list/item-actions.html">
 
+<link rel="import" href="cloud-info.html">
+
 <dom-module id="cloud-page">
     <template>
         <style is="custom-style" include="single-page"></style>
@@ -145,41 +147,32 @@
                 <paper-spinner active hidden$="[[!isLoading]]"></paper-spinner>
             </div>
             <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
-                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <span class="icon">
+                    <iron-icon src="[[_computeItemImage(cloud)]]">M</iron-icon>
+                </span>
                 <div class="title flex">
                     <h2>
-                        [[cloud.name]]
-                        <iron-icon icon="star" hidden$="{{!isStarred}}"></iron-icon>
+                        [[cloud.title]]
                     </h2>
-                    <div class="subtitle">
-                        on [[cloud.cloud.title]]
-                    </div>
                 </div>
                 <div class="item-actions">
                     <paper-button on-tap="_editTags" class="simple">tags</paper-button>
-                    <paper-button on-tap="_starcloud" class="simple">
-                        <span hidden$="{{!isStarred}}"> unstar </span>
-                        <span hidden$="{{isStarred}}"> star <iron-icon icon="star"></iron-icon> </span>
+                    <paper-button on-tap="_starcloud" class="simple">                        
                     </paper-button>
                 </div>
             </paper-material>
             <template is="dom-if" if="[[cloud]]">
                 <paper-material>
                     <h4 class="id">cloud ID:</h4><span class="id">[[cloud.id]]</span>
-                    <h4 class="id tags">Tags
-                        <template is="dom-if" if="[[cloud.tags]]">
-                            <span class="id">([[cloud.tags.length]])</span>
-                        </template>
-                        <template is="dom-if" if="[[!cloud.tags]]">
-                            <span class="id">(0)</span>
-                        </template>
-                        :
+                    <h4 class="id tags">Region:</h4><span class="id">[[cloud.region]]</span>
+                    <h4 class="id tags" hidden$="[[!cloud.tags.length]]">Tags
+                        <span class="id">([[cloud.tags.length]])</span>
                     </h4>
-                    <template is="dom-if" if="[[cloud.tags]]">
+                    <div hidden$="[[!cloud.tags]]">
                         <template is="dom-repeat" items="[[cloud.tags]]">
                             <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
                         </template>
-                    </template>
+                    </div>
                 </paper-material>
                 <paper-material class="no-pad">
                     <div class="info-table">
@@ -188,11 +181,12 @@
                         </div>
                     </div>
                 </paper-material>
+                <cloud-info cloud="[[cloud]]" opened></cloud-info>
             </template>
-            <div class="absolute-bottom-right">
+<!--             <div class="absolute-bottom-right">
                 <paper-fab icon="star-border" on-tap="_starcloud" id="starcloudFab" hidden$={{!isStarred}}></paper-fab>
                 <paper-fab icon="star" on-tap="_starcloud" id="starcloudFab" hidden$={{isStarred}}></paper-fab>
-            </div>
+            </div> -->
         </div>
         <iron-ajax id="cloudStarAjaxRequest" url="/api/v1/clouds/{{cloud.cloud.id}}/clouds/{{cloud.id}}" method="POST" on-response="_handlecloudStarAjaxResponse" on-error="_handlecloudStarAjaxError"></iron-ajax>
         <tags-list model="[[model]]"></tags-list>
@@ -211,10 +205,6 @@
                     },
                     section: {
                         type: Object
-                    },
-                    color: {
-                        type: String,
-                        computed: '_getHeaderStyle(section)'
                     },
                     params: {
                         type: Object
@@ -238,9 +228,6 @@
                     }
                 },
                 ready: function() {
-                },
-                _getHeaderStyle: function(section) {
-                    return 'background-color: ' + section.color + '; color: #fff;';
                 },
                 _computecloud: function(params, clouds) {
                     return params;
@@ -283,7 +270,11 @@
                 },
                 _computeIsloading: function(cloud) {
                     return !this.cloud ? true : false;
-                }
+                },
+                _computeItemImage: function (item) {
+                    var provider = item.provider.split('_')[0];
+                    return '../assets/providers/provider-' + provider + '.png';
+                },
             });
         })();
     </script>
