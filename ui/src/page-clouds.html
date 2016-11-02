@@ -50,8 +50,8 @@
           return !path;
       },
 
-      _isListActive: function(path) {
-          return !path;
+      _isDetailsPageActive: function(path) {
+          return path && path != '/+add';
       },
       _getCloud: function(id) {
           if (this.model.clouds)
