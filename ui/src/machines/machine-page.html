@@ -953,7 +953,7 @@ MACHINEACTIONS = {
                 if (this.model.probes[machine.uuid].dirty_cow != undefined)
                     info += "Dirty COW vulnerability: "+this.model.probes[machine.uuid].dirty_cow;
             }
-            return info.length ? info : false;
+            return info.length ? info : '';
         },
         _computeProbeObj: function (machine, probes){
             if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid])
