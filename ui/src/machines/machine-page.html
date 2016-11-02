@@ -2,18 +2,14 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
-
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 <link rel="import" href="../mist-rules/mist-rules.html">
-
-<link rel="import" href="add-panel.html">
-<link rel="import" href="../mist-monitoring.html">
-
+<link rel="import" href="mist-monitoring.html">
 <link rel="import" href="machine-edit.html">
-
+<link rel="import" href="add-panel.html">
 <dom-module id="machine-page">
     <template>
         <style is="custom-style" include="tags-and-labels"></style>
@@ -48,19 +44,15 @@
                 align-content: stretch;
                 flex: 100%;
             }
-
             .flexchild {
                 @apply(--layout-flex);
             }
-
             .paper-header h2 {
                 @apply(--layout-flex-none);
             }
-
             .machine-ip {
                 margin: 0;
             }
-
             paper-material {
                 padding: 24px;
                 box-sizing: border-box;
@@ -74,7 +66,6 @@
                 margin-bottom: 0;
                 cursor: pointer;
             }
-
             .subhead {
                 box-sizing: border-box;
                 position: absolute;
@@ -86,23 +77,18 @@
                 z-index: 9;
                 color: rgba(0, 0, 0, 0.87);
             }
-
             paper-header-panel::content #dropShadow {
                 top: 56px;
             }
-
             paper-toolbar::content #bottomBar .right-actions {
                 transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
             }
-
             paper-toolbar:not(.tall)::content #bottomBar .right-actions {
                 margin-right: 70px;
             }
-
             .label {
                 padding: 2px !important;
             }
-
             #machine_actions paper-button {
                 text-align: left !important;
             }
@@ -112,23 +98,18 @@
             .machine-state-icon.running {
                 color: var(--green-color) !important;
             }
-
             .machine-state-icon.terminated {
                 color: var(--mist-dark-color) !important;
             }
-
             .machine-state-icon.stopped {
                 color: var(--orange-color) !important;
             }
-
             .machine-state-icon.error {
                 color: var(--red-color) !important;
             }
-
             .machine-state-icon.unknown, .machine-state-icon.pending {
                 color: #ccc !important;
             }
-
             paper-material > .smallcaps {
                 margin-top: 0;
             }
@@ -279,7 +260,6 @@
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #69b46c; /*green green*/
             }
         </style>
-
         <div id="content">
             <div class="is-loading" hidden$="[[!isLoading]]">
                 <paper-spinner active hidden$="[[!isLoading]]"></paper-spinner>
@@ -329,19 +309,9 @@
                         <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
                     </template>
                 </paper-material>
-                </div>
-                  <add-panel uri="[[_computeMetricsUri(machine)]]"></add-panel>
-                <paper-material class="info-card" hidden$="[[!isMonitored]]">
-                    <h2 style$="[[_getHeaderStyle(section.color)]]">Monitoring</h2>
-                    <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
-                </paper-material>
-                <paper-material class="info-card">
-                    <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
-                    <div class="card-content">
-                        <table class="info-table">
-                            <template is="dom-if" if="[[machine.public_ips]]">
             </div>
             <paper-material class="info-card">
+                <add-panel uri="[[_computeMetricsUri(machine)]]"></add-panel>
                 <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" dashboard="[[dashboard]]" datasources="[[datasources]]"></mist-monitoring>
                 <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
@@ -475,7 +445,6 @@ MACHINEACTIONS = {
 }
     Polymer({
         is: 'machine-page',
-
         properties: {
             model: {
                 type: Object,
@@ -567,7 +536,8 @@ MACHINEACTIONS = {
         },
         observers: [
             '_isMonitored(machine, model.monitoring.machines.*)',
-            '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)'
+            '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)',
+            '_updateDashboard(machine.uuid)'
         ],
         listeners: {
             'confirmation': '_machineActionConfirmation',
@@ -592,6 +562,34 @@ MACHINEACTIONS = {
             //     //     that.querySelector('dashboard-panel').resize();
             //
             // }, 5000);
+        },
+        _panelAdded:function (e){
+            console.log("i got",e.detail);
+
+            var panel ={
+                "lines": true,
+                "aliasColors": {},
+                "datasource": "mist.monitor",
+                "id": this.dashboard.rows[0].panels.length,
+                "span": 12,
+                "stack": false,
+                "targets": [{
+                    "refId": "A",
+                    "target": e.detail
+                }],
+                "timeFrom": null,
+                "timeShift": null,
+                "title": e.detail.split(".")[0],
+                "type": "graph",
+                "machineArray": [[this.machine.cloud.id, this.machine.id]],
+                "x-axis": true,
+                "y-axis": true
+            }
+            this.push("dashboard.rows.0.panels",panel);
+            console.log(this.dashboard);
+        },
+        _computeMetricsUri: function(machine) {
+            return "/api/v1/clouds/" + machine.cloud.id + "/machines/" + machine.id + "/metrics";
         },
         _computeActions: function(item) {
             var ret = [];
@@ -622,12 +620,10 @@ MACHINEACTIONS = {
                 ret.push('destroy');
             if (item.can_undefine)
                 ret.push('undefine');
-
             var actions = [];
             for (var i = 0; i < ret.length; i++) {
                 actions.push(MACHINEACTIONS[ret[i]]);
             }
-
             return actions;
         },
         _computeMachine: function(params, machines) {
@@ -638,38 +634,10 @@ MACHINEACTIONS = {
                 return machine.uuid == params.uuid;
             }, this);
         },
-        _computeMetricsUri: function(machine) {
-            return "/api/v1/clouds/" + machine.cloud.id + "/machines/" + machine.id + "/metrics";
-        },
-        _panelAdded:function (e){
-            console.log("i got",e.detail);
-
-            var panel ={
-                "lines": true,
-                "aliasColors": {},
-                "datasource": "mist.monitor",
-                "id": this.dashboard.rows[0].panels.length,
-                "span": 12,
-                "stack": false,
-                "targets": [{
-                    "refId": "A",
-                    "target": e.detail
-                }],
-                "timeFrom": null,
-                "timeShift": null,
-                "title": e.detail.split(".")[0],
-                "type": "graph",
-                "machineArray": [[this.machine.cloud.id, this.machine.id]],
-                "x-axis": true,
-                "y-axis": true
-            }
-            this.push("dashboard.rows.0.panels",panel);
-            console.log(this.dashboard);
-        },
         _computeItemInArray: function() {
             var tempdash = {
                 "id": 1,
-                "refresh": "",
+                // "refresh": "",
                 "rows": [{
                     "height": "500px",
                     "panels": [{
@@ -745,7 +713,6 @@ MACHINEACTIONS = {
             }
             if (changeit)
                 this.dashboard = tempdash;
-
             var arr = [];
             arr.push(this.machine);
             return arr;
@@ -755,7 +722,6 @@ MACHINEACTIONS = {
             itemUidInArray.push(itemUid(this.machine, this.sections['machines']));
             return itemUidInArray;
         },
-
         _computeAssociatedKeys: function(machine, keys) {
             var machineId = this.machine.id;
             var associatedKeys = [];
@@ -837,13 +803,9 @@ MACHINEACTIONS = {
         disassociateKey: function(e) {
             var keyId = e.target['dataKeyid'];
             var keyName = e.target['dataKeyname'];
-
             // console.log('disassociateKey',keyId, keyName);
-
             this.set('disassociateKeyId', keyId);
-
             // console.log(this.disassociateKeyId);
-
             this._showDialog({
                 title: 'Disassociate key',
                 body: "You are about to disassociate key '" + keyName + "' from machine.",
@@ -921,26 +883,20 @@ MACHINEACTIONS = {
                 return false;
             }
             else {
-
                 if (!this.model || !this.model.probes || !this.model.probes[item.uuid] || !this.model.probes[item.uuid].loadavg) {
                     return false;
                 }
-
                 else {
                     var probe = this.model.probes[item.uuid].loadavg;
                     var cores =  parseInt(this.model.probes[item.uuid].cores);
                     var classes = '';
                     var prefix = '';
-
-
                     classes += this.loadToColor(parseFloat(probe[0]/cores), "short");
                     classes += this.loadToColor(parseFloat(probe[1]/cores), "mid");
                     classes += this.loadToColor(parseFloat(probe[2]/cores), "long");
-
                     //has probe data
                     if (classes != "")
                         classes += "hasprobe "
-
                     return classes;
                 }
             }
