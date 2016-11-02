@@ -2,7 +2,6 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
-<link rel="import" href="../../bower_components/polyana-dashboard/polyana-dashboard.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 <link rel="import" href="../tags/tags-list.html">
@@ -11,6 +10,8 @@
 <link rel="import" href="../mist-rules/mist-rules.html">
 
 <link rel="import" href="add-panel.html">
+<link rel="import" href="../mist-monitoring.html">
+
 <link rel="import" href="machine-edit.html">
 
 <dom-module id="machine-page">
@@ -222,6 +223,9 @@
             .midhigh {
                 background: #EF5350; /*red*/
             }
+            .mideco {
+                background: #69b46c; /*green*/
+            }
             /* shortlow + long */
             .shortlow.longlow {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*cyan cyan*/
@@ -231,6 +235,9 @@
             }
             .shortlow.longhigh {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #EF5350; /*cyan red*/
+            }
+            .shortlow.longeco {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #42A5F5, -1px 0 0 #fff, -4px 0 0 #69b46c; /*cyan green*/
             }
             /* shortmedium + long */
             .shortmedium.longlow {
@@ -242,6 +249,9 @@
             .shortmedium.longhigh {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #EF5350; /*orange red*/
             }
+            .shortmedium.longeco {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #FFCA28, -1px 0 0 #fff, -4px 0 0 #69b46c; /*cyan green*/
+            }
             /* shorthigh + long */
             .shorthigh.longlow {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*red cyan*/
@@ -251,6 +261,22 @@
             }
             .shorthigh.longhigh {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #EF5350; /*red red*/
+            }
+            .shorthigh.longeco {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #69b46c; /*red green*/
+            }
+            /* shorteco + long */
+            .shorteco.longlow {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*green cyan*/
+            }
+            .shorteco.longmedium {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #FFCA28; /*green orange*/
+            }
+            .shorteco.longhigh {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #EF5350; /*green red*/
+            }
+            .shorteco.longeco {
+                box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #69b46c; /*green green*/
             }
         </style>
 
@@ -314,6 +340,16 @@
                     <div class="card-content">
                         <table class="info-table">
                             <template is="dom-if" if="[[machine.public_ips]]">
+            </div>
+            <paper-material class="info-card">
+                <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" dashboard="[[dashboard]]" datasources="[[datasources]]"></mist-monitoring>
+                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="{{!isActivated}}"></mist-rules>
+            </paper-material>
+            <paper-material class="info-card">
+                <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
+                <div class="card-content">
+                    <table class="info-table">
+                        <template is="dom-if" if="[[machine.public_ips]]">
                             <tr>
                                 <td>Machine ID</td>
                                 <td>[[machine.id]]</td>
@@ -326,11 +362,11 @@
                                 <td><template is="dom-repeat" items="[[machine.public_ips]]">
                                         [[item]]
                                     </template>
-                </td>
-                </tr>
-                <tr>
-                    <td>Private IPs</td>
-                    <td><template is="dom-repeat" items="[[machine.private_ips]]">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Private IPs</td>
+                                <td><template is="dom-repeat" items="[[machine.private_ips]]">
                                         [[item]]
                                     </template>
                                 </td>
@@ -346,30 +382,14 @@
                 </div>
             </paper-material>
         </div>
-    </paper-material>
-    <paper-material class="info-card">
-        <h2 style$="[[_getHeaderStyle(section.color)]]">More Info</h2>
-        <div class="card-content">
-            <element-for-in content="[[machine.extra]]"></element-for-in>
-        </div>
-    </paper-material>
-    </div>
-    <dialog-element id="machinedialog"></dialog-element>
-    <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
-    <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
-    <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-    <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
-    <machine-edit machine="[[machine]]"></machine-edit>
-    <tags-list model="[[model]]"></tags-list>
-    <paper-toast></paper-toast>
-    <dialog-element id="machinedialog"></dialog-element>
-    <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
-    <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
-    <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-    <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
-    <!-- <machine-edit machine="[[machine]]"></machine-edit> -->
-    <tags-list model="[[model]]"></tags-list>
-    <paper-toast></paper-toast>
+        <dialog-element id="machinedialog"></dialog-element>
+        <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
+        <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
+        <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+        <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
+        <machine-edit machine="[[machine]]"></machine-edit>
+        <tags-list model="[[model]]"></tags-list>
+        <paper-toast></paper-toast>
     </template>
 </dom-module>
 <script>
@@ -486,6 +506,11 @@ MACHINEACTIONS = {
                 value: false,
                 notify: true
             },
+            isActivated: {
+                type: Boolean,
+                value: false,
+                computed: '_computeIsActivated(machine, model.monitoring.monitored_machines.*)'
+            },
             machineImage: {
                 type: String,
                 computed: "_machineImage(machine.imageId)"
@@ -567,7 +592,6 @@ MACHINEACTIONS = {
             //     //     that.querySelector('dashboard-panel').resize();
             //
             // }, 5000);
-
         },
         _computeActions: function(item) {
             var ret = [];
@@ -767,6 +791,13 @@ MACHINEACTIONS = {
                 this.set('isMonitored', false);
             }
         },
+        _computeIsActivated: function(machine, monitoring){
+            // if (!this.machine || this.model.monitoring || !this.model.monitoring.monitored_machines || !this.model.monitoring.monitored_machines[machine.uuid] || !this.model.monitoring.monitored_machines[machine.uuid].installation_status.activated_at)
+            //     return false;
+            // else
+            if (this.model.monitoring.monitored_machines[machine.uuid])
+                return this.model.monitoring.monitored_machines[machine.uuid].installation_status.activated_at;
+        },
         _machineImage: function(id) {
             var image = this.model.imagesArray.find(function(image) {
                 return image.id == id;
@@ -887,41 +918,24 @@ MACHINEACTIONS = {
         },
         itemProbeClasses: function(item, probes) {
             if (!probes) {
-                console.log('1')
                 return false;
             }
             else {
 
                 if (!this.model || !this.model.probes || !this.model.probes[item.uuid] || !this.model.probes[item.uuid].loadavg) {
                     return false;
-                    console.log('2')
                 }
 
                 else {
                     var probe = this.model.probes[item.uuid].loadavg;
-                    var classes = "";
+                    var cores =  parseInt(this.model.probes[item.uuid].cores);
+                    var classes = '';
+                    var prefix = '';
 
-                    //short
-                    if (parseInt(probe[0]*100) < 30)
-                        classes += "shortlow ";
-                    else if (parseInt(probe[0]*100) > 30 && parseInt(probe[0]*100) < 60)
-                        classes += "shortmedium ";
-                    else
-                        classes += "shorthigh ";
-                    //mid
-                    if (parseInt(probe[1]*100) < 30)
-                        classes += "midlow ";
-                    else if (parseInt(probe[1]*100) > 30 && parseInt(probe[1]*100) < 60)
-                        classes += "midmedium ";
-                    else
-                        classes += "midhigh ";
-                    //long
-                    if (parseInt(probe[2]*100) < 30)
-                        classes += "longlow ";
-                    else if (parseInt(probe[2]*100) > 30 && parseInt(probe[2]*100) < 60)
-                        classes += "longmedium ";
-                    else
-                        classes += "longhigh ";
+
+                    classes += this.loadToColor(parseFloat(probe[0]/cores), "short");
+                    classes += this.loadToColor(parseFloat(probe[1]/cores), "mid");
+                    classes += this.loadToColor(parseFloat(probe[2]/cores), "long");
 
                     //has probe data
                     if (classes != "")
@@ -930,7 +944,18 @@ MACHINEACTIONS = {
                     return classes;
                 }
             }
-
+        },
+        loadToColor: function(load, prefix){
+            if (load > 1.2)
+                return prefix+"high ";
+            else if (load > 0.8)
+                return prefix+"medium ";
+            else if (load > 0.6)
+                return prefix+"eco ";
+            else if (load > 0.2)
+                return prefix+"low ";
+            else
+                return prefix+"low ";
         }
     });
 </script>
