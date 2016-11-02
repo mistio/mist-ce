@@ -59,8 +59,7 @@
             }
             .cloud-overview {
                 padding: 4px 24px 24px 24px;
-                border-right: 1px solid rgba(255,255,255,0.15);
-                max-width: 33%;
+                max-width: 90%;
             }
             .cloud-credentials {
                 padding: 24px;
@@ -109,7 +108,7 @@
         </style>
 
         <div class="cloud-block">
-            <paper-icon-button id="close-btn" icon="close" on-tap="close"></paper-icon-button>
+            <!-- <paper-icon-button id="close-btn" icon="close" on-tap="close"></paper-icon-button> -->
             <div class="cloud-overview flex">
                 <div class="cloud-overview-item">
                     <paper-input class="flex" label="Title" value="{{newCloud.title}}"></paper-input>
@@ -134,9 +133,6 @@
                         <paper-button on-tap="_deleteCloud" class="red">Delete Cloud</paper-button>
                     </div>
                 </div>
-            </div>
-            <div class="cloud-credentials flex">
-                <cloud-edit cloud="[[cloud]]"></cloud-edit>
             </div>
         </div>
 
