@@ -61,7 +61,10 @@ class Crontab(BaseScheduleType):
                                         month_of_year=self.month_of_year)
 
     def __unicode__(self):
-        rfield = lambda f: f and str(f).replace(' ', '') or '*'
+
+        def rfield(x):
+            return str(x).replace(' ', '') or '*'
+
         return '{0} {1} {2} {3} {4} (m/h/d/dM/MY)'.format(
             rfield(self.minute), rfield(self.hour),
             rfield(self.day_of_week),
