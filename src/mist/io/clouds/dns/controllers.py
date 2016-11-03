@@ -34,16 +34,15 @@ class AmazonDNSController(DNSController):
 
         """
         provider = DnsProvider.GOOGLE
-        all_zones = {}
-        all_zones[provider] = {}
+        all_zones = []
         zones = self.ctl.dns_connection.list_zones()
         for zone in zones:
-            #records[provider]['zones'].append(zone.id)
-            all_zones[provider][zone.id] = {}
-            all_zones[provider][zone.id]["domain"] = zone.domain
-            all_zones[provider][zone.id]["type"] = zone.type
-            all_zones[provider][zone.id]["ttl"] = zone.ttl
-            all_zones[provider][zone.id]["extra"] = zone.extra
+            zone_details = {}
+            for attr, value in zone.__dict__.iteritems():
+                if attr != "driver":
+                    zone_details[attr] = value
+            zone_details["provider"] = provider
+            all_zones.append(zone_details)
         return all_zones
 
 
@@ -54,15 +53,14 @@ class GoogleDNSController(DNSController):
 
         """
         provider = DnsProvider.GOOGLE
-        all_zones = {}
-        all_zones[provider] = {}
+        all_zones = []
         zones = self.ctl.dns_connection.list_zones()
         for zone in zones:
-            #records[provider]['zones'].append(zone.id)
-            all_zones[provider][zone.id] = {}
-            all_zones[provider][zone.id]["domain"] = zone.domain
-            all_zones[provider][zone.id]["type"] = zone.type
-            all_zones[provider][zone.id]["ttl"] = zone.ttl
-            all_zones[provider][zone.id]["extra"] = zone.extra
+            zone_details = {}
+            for attr, value in zone.__dict__.iteritems():
+                if attr != "driver":
+                    zone_details[attr] = value
+            zone_details["provider"] = provider
+            all_zones.append(zone_details)
         return all_zones
 

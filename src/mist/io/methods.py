@@ -2851,7 +2851,7 @@ def list_dns_zones(owner):
     clouds = Cloud.objects(owner=owner)
     for cloud in clouds:
         try:
-            all_zones.append(cloud.ctl.dns.list_zones())
+            all_zones += cloud.ctl.dns.list_zones()
         except Exception as exc:
             log.error("%s", exc)
 
