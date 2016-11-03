@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 
+<link rel="import" href="plan-purchase.html">
 <link rel="import" href="plan-overusage.html">
 
 <dom-module id="plans-list">
@@ -17,17 +18,14 @@
         }
 
         .plans {
+            padding-left: 8px;
+            padding-right: 8px;
             @apply(--layout-horizontal);
         }
 
         .plan {
             @apply(--layout-flex);
             @apply(--shadow-elevation-2dp);
-        }
-
-        .plans {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
         }
 
         plan-item {
@@ -89,6 +87,7 @@
                 </div>
             </div>
         </paper-material>
+        <plan-purchase id="purcahseplan"></plan-purchase>
     </template>
     <script>
     (function() {
@@ -110,6 +109,9 @@
                     computed: 'computePlans(user,org)'
                 }
             },
+            listeners: {
+                'plan-selected': 'purcahsePlan'
+            },
             computeIsCurrent: function(plan, user) {
                 if (this.user.current_plan) {
                     return plan.title == this.user.current_plan.title ? true : false;
@@ -124,6 +126,10 @@
             },
             _computeReadableDate: function(date) {
                 return date ? moment(date * 1000).format("MMMM Do YYYY") : '...';
+            },
+            purcahsePlan: function(e){
+                this.$.purcahseplan.plan = e.detail.plan;
+                this.$.purcahseplan.open();
             }
         });
     })();

@@ -1,0 +1,230 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+<dom-module id="plan-purchase">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style include="shared-styles">
+            :host {
+                width: 320px;
+            }
+            #form {
+                font-size: inherit;
+            }
+            .logo {
+                position: absolute;
+                top: -64px;
+                left: calc(50% - 64px);
+            }
+            .head {
+                padding-top: 32px;
+                text-align: center;
+            }
+            .form-inputs {
+                border-radius: 2px;
+                border: 1px solid wheat;
+                background-color: seashell;
+                padding: 8px;
+                width: 100%;
+                margin-bottom: 16px;
+                box-sizing: border-box;
+            }
+            .form-row {
+                padding: 4px 0;
+                font-size: inherit;
+            }
+            input {
+                padding: 4px;
+                font-size: inherit;
+            }
+            .buttons {
+                padding: 8px 24px 16px 24px;
+            }
+            paper-progress#progresserror ::content #primaryProgress {
+                background-color: var(--red-color);
+            }
+            .errormsg-container {
+                color: var(--red-color);
+            }
+            .errormsg-container iron-icon {
+                color: inherit;
+            }            
+            paper-progress {
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
+        </style>
+
+        <!-- 4242 4242 4242 4242 -->
+
+        <paper-dialog id="form" with-backdrop>
+            <img class="logo" src="/assets/logos/logo-vertical-v2.svg" width="80" alt="Mist.io Logo" tabindex="0" on-tap="_goToDashboard"></a>
+            <div class="head">
+                <p>[[plan.title]] plan</p>
+            </div>
+            <paper-dialog-scrollable>                
+                <div class="form-inputs">
+                    <div class="form-row">
+                        <label>
+                        <span>Card Number</span>
+                        <input type="text" size="20" data-stripe="number" value="{{payload.number::input}}">
+                        </label>
+                    </div>
+
+                    <div class="form-row">
+                        <label>
+                          <span>Expiration (MM/YY)</span>
+                          <input type="text" size="4" data-stripe="exp_month" value="{{payload.exp_month::input}}">
+                        </label>
+                        <span> / </span>
+                        <input type="text" size="4" data-stripe="exp_year" value="{{payload.exp_year::input}}">
+                    </div>
+
+                    <div class="form-row">
+                        <label>
+                          <span>CVC</span>
+                          <input type="text" size="4" data-stripe="cvc" value="{{payload.cvc::input}}">
+                        </label>
+                    </div>
+                </div>
+            </paper-dialog-scrollable>
+            <div class="progress">
+                <paper-progress id="progress" indeterminate hidden$="[[!sendingData]]"></paper-progress>
+                <paper-progress id="progresserror" value="100" hidden$="[[!formError]]"></paper-progress>
+                <hr class="appform"/>
+                <p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button autofocus on-tap="submit" class="blue" disabled="[[!formReady]]">Submit Payment</paper-button>
+            </div>
+        <paper-dialog>
+
+        <iron-ajax id="purchasePlanRequest" method="POST" url="/purchase" on-request="purchaseRequest" on-response="purchaseResponse" on-error="purchaseError"></iron-ajax>
+
+    </template>
+    <script>
+    Stripe.setPublishableKey('pk_test_cCB2mLEoMDLnGXI7XPYE77Hw');
+    Polymer({
+        is: 'plan-purchase',
+
+        properties: {
+            isOverUsing: Boolean,
+            user: Object,
+            org: Object,
+            plan: Object,
+            payload: {
+                type: Object,
+                value: function(){
+                    return {
+                        number: "",
+                        exp_month: "",
+                        exp_year: "",
+                        cvc: ""
+                    }
+                },
+                notify: true
+            },
+            sendingData: {
+                type: Boolean,
+                value: false
+            },
+            formError: {
+                type: Boolean,
+                value: false
+            },
+            formReady: {
+                type: Boolean,
+                value: false
+            }
+        },
+        listeners: {
+            'input': 'validateForm'
+        },
+        open: function(e){
+            this.querySelector("#form").open();
+        },
+        submit: function(){
+            Stripe.card.createToken(this.payload, stripeResponseHandler);
+            this.set('sendingData', true);
+            var that = this;
+            function stripeResponseHandler(status, response){
+                console.log('stripeResponseHandler', status, response);
+                if (response.error) {
+                    console.log('stripeResponseHandler failed', response.error.message);
+                    that.showError(response.error.message);
+                }
+                else {
+                    that.sumbmitPayment(status, response);
+                }
+            }
+        },
+        sumbmitPayment: function(status, response){
+            console.log('sumbmitPayment');
+            console.log('stripeResponseHandler failed');
+            var mistPayload = {
+                token: response.id,
+                plan: this.plan.title,
+                promo_code: ''
+            };
+            this.$.purchasePlanRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+            this.$.purchasePlanRequest.params = mistPayload;
+            this.$.purchasePlanRequest.generateRequest();
+        },
+        showError: function(error){
+            this.set('sendingData', false);
+            this.set('formError', true);
+            this.$.errormsg.textContent = error;
+        },
+        validateForm: function(error){
+            this.set('formError', false);
+            this.$.errormsg.textContent = '';
+
+            if (this.valideNumber(this.payload.number,0) && this.valideNumber(this.payload.exp_month,2) && this.valideNumber(this.payload.exp_year,2) && this.valideNumber(this.payload.cvc,3))
+                this.set('formReady', true);
+
+            else 
+                this.set('formReady', false);
+        },
+        valideNumber: function(input, length){
+            if (!input || !input.length){
+                //no input
+                console.log('1');
+                return false;
+            }
+            if (length !=0 && input.length > length){
+                //input longer than constrain
+                console.log('2');
+                return false;
+            }
+            if (!(/^[0-9 ]*$/.test(input))){
+                //input is not number
+                console.log('3');
+                return false;
+            }
+            return true;
+        },
+        purchaseRequest: function(e){
+            console.log('purchaseRequest',e);
+            this.set('sendingData', true);
+        },
+        purchaseResponse: function(e){
+            console.log('purchaseResponse',e);
+            this.set('sendingData', false);
+            this.set('formError', false);
+        },
+        purchaseError: function(e){
+            console.log('purchaseError',e);
+            this.set('sendingData', false);
+            this.set('formError', true);
+            this.$.errormsg.textContent = error;
+        },
+    });
+    </script>
+</dom-module>

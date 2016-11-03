@@ -8,7 +8,7 @@
         <style include="shared-styles">
             :host {
                 display: block;
-                margin: 16px;
+                margin: 8px;
                 box-sizing: border-box;
             }
 
@@ -48,7 +48,7 @@
             <template is="dom-if" if="[[!iscurrent]]">
                 <paper-button id="select" class="btn-block submit-btn" raised on-tap="_selectPlan">Select</paper-button>
             </template>
-        </div>
+        </div>        
 
     </template>
     <script src="../../bower_components/moment/moment.js"></script>
@@ -102,7 +102,7 @@
                     return date ? moment(date * 1000).format("MMMM Do YYYY") : date;
                 },
                 _selectPlan: function(e) {
-                    console.log(this.plan);
+                    this.fire('plan-selected', {plan: this.plan});
                 },
                 _triggerInfo: function() {
                     console.log('info popup');
