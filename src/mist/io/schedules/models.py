@@ -4,9 +4,12 @@ from uuid import uuid4
 import celery.schedules
 import mongoengine as me
 from mist.core.tag.models import Tag
-from mist.core.user.models import Owner
 from mist.core.cloud.models import Machine
+from mist.io.exceptions import BadRequestError
+from mist.core.user.models import Owner, Organization
 from celerybeatmongo.schedulers import MongoScheduler
+from mist.core.exceptions import ScheduleNameExistsError
+from mist.io.exceptions import RequiredParameterMissingError
 
 
 #: Authorized values for Interval.period
@@ -15,6 +18,8 @@ PERIODS = ('days', 'hours', 'minutes', 'seconds', 'microseconds')
 
 # scheduler type
 class BaseScheduleType(me.EmbeddedDocument):
+    """Abstract Base class used as a common interface
+    for Interval/Crontab specific Schedule types """
     meta = {'allow_inheritance': True}
 
     @property
@@ -71,9 +76,20 @@ class Crontab(BaseScheduleType):
             rfield(self.day_of_month), rfield(self.month_of_year),
         )
 
+    def as_dict(self):
+        return {
+            'minute': self.minute,
+            'hour': self.hour,
+            'day_of_week': self.day_of_week,
+            'day_of_month': self.day_of_month,
+            'month_of_year': self.month_of_year
+        }
+
 
 # scheduler task
 class BaseTaskType(me.EmbeddedDocument):
+    """Abstract Base class used as a common interface
+       for Action/Script specific task types """
     meta = {'allow_inheritance': True}
 
     @property
@@ -117,6 +133,8 @@ class ScriptTask(BaseTaskType):
 
 # scheduler machines
 class BaseMachines(me.EmbeddedDocument):
+    """Abstract Base class used as a common interface
+        for ListOfMachines/ TaggedMachines"""
     meta = {'allow_inheritance': True}
 
     def get_machines(self):
@@ -191,6 +209,36 @@ class Schedule(me.Document):
 
     no_changes = False
 
+    def __init__(self, *args, **kwargs):
+        # FIXME
+        from mist.io.schedules.controllers import ScheduleController
+        super(Schedule, self).__init__(*args, **kwargs)
+        self.ctl = ScheduleController(self)
+
+    @classmethod
+    def add(cls, auth_context, name, **kwargs):
+        """Add schedule
+
+        This is a class method, meaning that it is meant to be called on the
+        class itself and not on an instance of the class.
+
+        You're not meant to be calling this directly, but on a schedule class
+        instead like this:
+
+            schedule = Schedule.add(owner=owner, **kwargs)
+        """
+        owner = auth_context.owner
+        if not name:
+            raise RequiredParameterMissingError('name')
+        if not owner or not isinstance(owner, Organization):
+            raise BadRequestError('owner')
+        if Schedule.objects(owner=owner, name=name):
+            raise ScheduleNameExistsError()
+        schedule = cls(owner=owner, name=name)
+        schedule.ctl.add(auth_context, **kwargs)
+
+        return schedule
+
     @property
     def schedule(self):
         if self.schedule_type:
@@ -221,11 +269,42 @@ class Schedule(me.Document):
             raise Exception("must define interval or crontab schedule")
         return fmt.format(self)
 
-    def update_validate(self, value_dict):
-        for key in value_dict:
-            if key in self._fields.keys():
-                setattr(self, key, value_dict[key])
-        self.save()
+    def validate(self, clean=True):
+
+        """
+        Override mongoengine validate. We should validate crontab entry.
+            Use crontab_parser for crontab expressions.
+            The parser is a general purpose one, useful for parsing hours,
+            minutes and day_of_week expressions.
+
+            example for minutes:
+                minutes = crontab_parser(60).parse('*/15')
+                [0, 15, 30, 45]
+
+        """
+        if isinstance(self.schedule_type, Crontab):
+            cronj_entry = self.schedule_type.as_dict()
+            try:
+                for k, v in cronj_entry.items():
+                    if k == 'minute':
+                        celery.schedules.crontab_parser(60).parse(v)
+                    elif k == 'hour':
+                        celery.schedules.crontab_parser(24).parse(v)
+                    elif k == 'day_of_week':
+                        celery.schedules.crontab_parser(7).parse(v)
+                    elif k == 'day_of_month':
+                        celery.schedules.crontab_parser(31, 1).parse(v)
+                    elif k == 'month_of_year':
+                        celery.schedules.crontab_parser(12, 1).parse(v)
+                    else:
+                        raise me.ValidationError(
+                            'You should provide valid period of time')
+            except celery.schedules.ParseException:
+                raise me.ValidationError('Crontab entry is not valid')
+            except Exception as exc:
+                raise me.ValidationError('Crontab entry is not valid:%s'
+                                         % exc.message)
+        super(Schedule, self).validate(clean=True)
 
     def delete(self):
         super(Schedule, self).delete()
