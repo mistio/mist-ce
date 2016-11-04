@@ -8,7 +8,6 @@
 <link rel="import" href="../item-list/item-actions.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 <link rel="import" href="../mist-rules/mist-rules.html">
-
 <link rel="import" href="../mist-monitoring.html">
 
 <link rel="import" href="machine-edit.html">
@@ -334,7 +333,7 @@
                 <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
             <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
+                <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
                 <div class="card-content">
                     <table class="info-table">
                         <template is="dom-if" if="[[machine.public_ips]]">

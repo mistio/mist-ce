@@ -42,6 +42,8 @@ class MistInventory(object):
                     # on the name since this is how ssh will include it as
                     # an identify file
                     self.keys['%s-cert.pub' % key_id] = keypair.certificate
+                    # pub key also needed for openssh 7.2
+                    self.keys['%s.pub' % key_id] = keypair.public
             if name in self.hosts:
                 num = 2
                 while ('%s-%d' % (name, num)) in self.hosts:
