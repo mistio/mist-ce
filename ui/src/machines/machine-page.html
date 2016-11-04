@@ -315,7 +315,7 @@
                 <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
             <paper-material class="info-card">
-                <h2 style$="[[_getHeaderStyle(section.color)]]">Basic Info</h2>
+                <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
                 <div class="card-content">
                     <table class="info-table">
                         <template is="dom-if" if="[[machine.public_ips]]">
