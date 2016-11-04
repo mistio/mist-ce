@@ -36,7 +36,9 @@
     "anchorme": "anchorme.js#^0.6.0",
     "Sortable": "^1.4.2",
     "iron-label": "^1.0.2",
-    "polymer-sortablejs": "^0.1.3"
+    "polymer-sortablejs": "^0.1.3",
+    "c3": "^0.4.11",
+    "iron-component-page": "^1.1.7"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
@@ -46,6 +48,8 @@
     "paper-styles": "^1.1.4",
     "paper-item": "^1.1.4",
     "iron-list": "^1.3.3",
-    "paper-icon-button": "~1.1.1"
+    "paper-icon-button": "~1.1.1",
+    "timerange-picker": "*",
+    "c3-chart": "*"
   }
 }
