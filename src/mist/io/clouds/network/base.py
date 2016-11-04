@@ -1,5 +1,6 @@
 import logging
 
+from mist.io.clouds.network.models import Network, Subnet
 
 log = logging.getLogger(__name__)
 
@@ -12,8 +13,15 @@ class NetworkController(object):
 
     def create_network(self, network, subnet, router):
         """Create a new network"""
+        network_info = self._create_network(network, subnet, router)
 
-        return self._create_network(network, subnet, router)
+        # Persist a new Network object to the DB
+        network_entry = Network(title=network_info['network']['name'],
+                                libcloud_id=network_info['network']['id'],
+                                cloud=self.ctl.cloud)
+        network_entry.save()
+
+        return network_info
 
     def _create_network(self, network, subnet, router):
         """Handles cloud-specific network creation calls.
@@ -21,10 +29,23 @@ class NetworkController(object):
 
         raise NotImplementedError()
 
-    def create_subnet(self, subnet, parent_network):
+    def create_subnet(self, subnet, parent_network_id):
         """Create a new subnet"""
 
-        return self._create_subnet(subnet, parent_network)
+        parent_network_entry = Network.objects.get(id=parent_network_id)
+
+        subnet_info = self._create_subnet(subnet, parent_network_id)
+
+        # Persist a new Subnet object to the DB
+        subnet_entry = Subnet(title=subnet_info['name'],
+                              libcloud_id=subnet_info['id'],
+                              cloud=self.ctl.cloud,
+                              base_network=parent_network_entry)
+        subnet_entry.save()
+
+        parent_network_entry.subnets.append(subnet_entry)
+        parent_network_entry.save()
+        return subnet_info
 
     def _create_subnet(self, subnet, parent_network):
         """Handles cloud-specific subnet creation calls.
@@ -36,7 +57,8 @@ class NetworkController(object):
         """List Networks"""
 
         libcloud_networks = self.ctl.connection.ex_list_networks()
-        return self._parse_network_listing(libcloud_networks, return_format)
+        network_info = self._parse_network_listing(libcloud_networks, return_format)
+        return network_info
 
     def _parse_network_listing(self, network_listing, return_format):
         """Parses the result of the libcloud ex_list_networks call to conform the API call return format.
@@ -44,13 +66,14 @@ class NetworkController(object):
 
         raise NotImplementedError()
 
-    def delete_network(self, libcloud_network):
+    def delete_network(self, network_id):
         """Delete Network"""
 
-        return self._delete_network(libcloud_network)
+        delete_result = self._delete_network(network_id)
+        return delete_result
 
-    def _delete_network(self, libcloud_network):
+    def _delete_network(self, network_id):
         """Handles cloud-specific network deletion calls.
          Should be overridden by all subclasses that can support it"""
 
-        return self.ctl.connection.ex_delete_network(libcloud_network)
+        return self.ctl.connection.ex_delete_network(network_id)
