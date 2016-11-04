@@ -439,22 +439,31 @@ Polymer({
         this.vpHeight = 'height:65px;';
     },
     showRecommendations: function(fields, probes){
-        if (probes && this.section.id == "machines" && this.fields){
-            var show = false;
-            for (var p in probes) {
-                if (probes[p] && probes[p].dirty_cow){
+        var show = false;
+        if (!this.model.probes || !this.fields) {
+            console.log('no probes or fields')
+            show = false;
+        }
+        else {
+            for (var p in this.model.probes) {
+                console.log('in probe loop')
+                if (this.model.probes[p].dirty_cow == true){
+                    console.log('checking true', p)
                     show = true;
-                    break;
                 }
             }
-            console.log('show', show, this.fields.indexOf('recommendations'), this.fields);
-
-            if (show && this.fields.indexOf('recommendations') == -1) 
-                this.splice('fields', 2 , 0 ,'recommendations');
-            
-            else if (!show && this.fields.indexOf('recommendations') != -1) 
-                this.splice('fields', 2 , this.fields.indexOf('recommendations'));
         }
+
+        console.log('show', show, this.fields.indexOf('recommendations'));
+        if (!show && this.fields.indexOf('recommendations') >-1){
+            this.splice('fields', this.fields.indexOf('recommendations'), 1);
+            console.log('remove');
+        }
+        else if (show && this.fields.indexOf('recommendations') ==-1){
+            this.splice('fields', 2, 0 , 'recommendations');
+            console.log('add');
+        }
+
     },
     itemMonitoringStatus: function(item, incidents, monitoring){
         var classes = "";
@@ -477,7 +486,7 @@ Polymer({
             return " ";
         }
         else if (this.model.monitoring && this.model.monitoring.monitored_machines && this.model.monitoring.monitored_machines[item.uuid]) {
-            console.log('itemMonitoringStatus',this.model.monitoring.monitored_machines[item.uuid])
+            // console.log('itemMonitoringStatus',this.model.monitoring.monitored_machines[item.uuid])
             classes += "monitoring ";
         }
         else {
@@ -651,11 +660,11 @@ Polymer({
     displayedFields: function (section) {
         if (this.isMachines(this.section)){
             if (this.get('xxwideViewport'))
-                return ['name', 'state','cloud', 'cost', 'created', 'size', 'image', 'id'];
+                return ['name', 'state','recommendations', 'cloud', 'cost', 'created', 'size', 'image', 'id'];
             if (this.get('xwideViewport'))
-                return ['name', 'state', 'cloud', 'cost', 'size', 'image']
+                return ['name', 'state','recommendations', 'cloud','cost', 'size', 'image']
             if (this.get('wideViewport'))
-                return ['name', 'state', 'cloud', 'size']
+                return ['name', 'state', 'recommendations', 'cloud', 'size']
             if (!this.get('mediumViewport') && !this.get('narrowViewport'))
                 return ['name', 'state', 'cloud']
             else
