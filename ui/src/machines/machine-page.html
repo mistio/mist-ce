@@ -9,7 +9,7 @@
 <link rel="import" href="../mist-rules/mist-rules.html">
 <link rel="import" href="mist-monitoring.html">
 <link rel="import" href="machine-edit.html">
-<link rel="import" href="add-panel.html">
+
 <dom-module id="machine-page">
     <template>
         <style is="custom-style" include="tags-and-labels"></style>
@@ -311,7 +311,6 @@
                 </paper-material>
             </div>
             <paper-material class="info-card">
-                <add-panel uri="[[_computeMetricsUri(machine)]]"></add-panel>
                 <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" dashboard="[[dashboard]]" datasources="[[datasources]]"></mist-monitoring>
                 <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
@@ -564,33 +563,15 @@ MACHINEACTIONS = {
             // }, 5000);
 
         },
-        _panelAdded:function (e){
-            console.log("i got",e.detail);
-
-            var panel ={
-                "lines": true,
-                "aliasColors": {},
-                "datasource": "mist.monitor",
-                "id": this.dashboard.rows[0].panels.length,
-                "span": 12,
-                "stack": false,
-                "targets": [{
-                    "refId": "A",
-                    "target": e.detail
-                }],
-                "timeFrom": null,
-                "timeShift": null,
-                "title": e.detail.split(".")[0],
-                "type": "graph",
-                "machineArray": [[this.machine.cloud.id, this.machine.id]],
-                "x-axis": true,
-                "y-axis": true
+        _updateDashboard:function(id){
+          var dashboard=this.dashboard;
+          this.dashboard.rows[0].panels[0].id;
+          for(var i=0; i<dashboard.rows[0].panels.length; i++){
+            if(dashboard.rows[0].panels[i].machineArray[0]==null){
+              dashboard.rows[0].panels[i].machineArray[0]=[this.machine.cloud.id, this.machine.id];
             }
-            this.push("dashboard.rows.0.panels",panel);
-            console.log(this.dashboard);
-        },
-        _computeMetricsUri: function(machine) {
-            return "/api/v1/clouds/" + machine.cloud.id + "/machines/" + machine.id + "/metrics";
+          }
+          this.set("dashboard",dashboard);
         },
         _computeActions: function(item) {
             var ret = [];
@@ -708,6 +689,7 @@ MACHINEACTIONS = {
                         if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
                             tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
                             changeit = true;
+                            break;
                         }
                     }
                 }

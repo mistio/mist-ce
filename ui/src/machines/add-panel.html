@@ -5,8 +5,9 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../bower_components/juicy-ace-editor/juicy-ace-editor.html">
 <dom-module id="add-panel">
-  <template>
+    <template>
     <style is="custom-style">
       :host {
         display: inline-block;
@@ -19,34 +20,52 @@
       }
     </style>
     <paper-button raised on-tap="openDialog">Add Graph</paper-button>
-      <paper-dialog id="alignedDialog" no-overlap horizontal-align="left" vertical-align="top" style="height: 150px; width:500px">
+      <paper-dialog id="alignedDialog" no-overlap horizontal-align="left" vertical-align="top" style="height: 200px; width:550px">
         <iron-ajax
           id="metrics"
-          url="[[uri]]"
+          url="[[_computeMetricsUri(cloudId,machineId)]]"
           handle-as="json" method="GET"
           contentType="application/json"
           on-response="_handleMetricResponse">
         </iron-ajax>
         <paper-dialog-scrollable>
-          <paper-header-panel>
-            <div class="paper-header">Seleect target for graph</div>
-          </paper-header-panel>
+          <h2>Select target for graph</h2>
           <div>
             <paper-dropdown-menu id="combo0" label="Select value" on-select="_nextOption" style="width: 180px;">
                 <paper-menu class="dropdown-content" attr-for-selected="name" selected="{{selectedValue}}">
                       <template is="dom-repeat" items="[[combo0]]">
                           <paper-item name="[[item]]">[[item]]</paper-item>
                       </template>
-                </paper-menu>
-            </paper-dropdown-menu>
-          </div>
-          <template is="dom-repeat" items="{{optionsNum}}">
+    </paper-menu>
+    </paper-dropdown-menu>
+    </div>
+    <template is="dom-repeat" items="{{optionsNum}}">
             <iron-label>
               <paper-button id="[[item.name]]" hidden="true" iron-label-target on-tap="_handleTap"></paper-button>
             </iron-label>
           </template>
-        </paper-dialog-scrollable>
-      </paper-dialog>
+    <div id="addcustom" hidden="{{hide}}">
+        <iron-ajax id="postCustomgraph" url="[[_computeUrl(cloudId,machineId,metric)]]" handle-as="json" method="POST" contentType="application/json" on-response="_handleMetricResponse">
+        </iron-ajax>
+        <div>
+            <paper-input id="name" value=[[metric.name]] label="Enter name"></paper-input>
+            <paper-input id="unit" value=[[metric.unit]] label="Enter unit"></paper-input>
+        </div>
+        <div>
+            <h3>Python script</h3>
+            <juicy-ace-editor id="script" style="height: 100px; width:500px">
+            <juicy-ace-editor>
+        </div>
+        <h3>Advance settings</h3>
+        <div>
+            <paper-checkbox id="derivative">Calculate derivative</paper-checkbox>
+        </div>
+        <div>
+            <paper-button id="submit" align="center" style="display:block;"> Add custom graph</paper-button>
+        </div>
+    </div>
+    </paper-dialog-scrollable>
+    </paper-dialog>
     </template>
     <script>
         Polymer({
@@ -58,15 +77,47 @@
                 data: {
                     type: Object
                 },
-                uri: {
-                    type: String
-                },
+                machineId: String,
+                cloudId: String,
                 responseMetrics: {
                     type: Array,
                 },
                 target: {
                     type: String
                 },
+                hide: {
+                    type: Boolean,
+                    value: true // init the value to true so it will be hidden on page load
+                },
+                metric: {
+                    name: null,
+                    unit: null,
+                    type: null,
+                    script: null,
+                    pluginId: {
+                        computed: '_computepluginId()'
+                    }
+                }
+            },
+            _computeplugidId: function() {
+                if (!this.metric.name) return;
+                var newPluginId = this.metric.name
+                    .toLowerCase() // Remove upper case letters
+                    .replace(/[^\w]/g, '_') // keep only alphanumeric and _ chars
+                    .replace(/__*/g, '_') // don't allow double underscores
+                    .replace(/^_/, '') // trim heading underscore
+                    .replace(/_$/, ''); // trim trailing underscore
+                this.metric.set('pluginId', newPluginId);
+                console.log(this.metric.pluginId);
+            },
+            _computeMetricsUri: function(cloudId, machineId, metric) {
+                return "/api/v1/clouds/" + cloudId + "/machines/" + machineId + "/metrics";
+            },
+            _computeUrl: function() {
+
+                return '/api/v1/clouds/' + cloudId +
+                    '/machines/' + machineId +
+                    '/plugins/' + metric.pluginId;
             },
             openDialog: function() {
                 var dialog = this.querySelector('paper-dialog');
@@ -76,6 +127,7 @@
                 this.stepType = "";
                 this.querySelector("#metrics").generateRequest();
                 this.querySelector('#combo0').setAttribute("disabled", "true");
+                this.querySelector('#script').value="import random \n \n def read(): \n    # return random value \n    return random.random() \n";
             },
             _handleMetricResponse: function(data) {
                 var metricsArray = [];
@@ -101,7 +153,7 @@
                 this.responseMetrics = metricsArray;
                 this.querySelector('#combo0').removeAttribute("disabled");
                 this.combo0 = this._getMetrics(0);
-                this.selectedValue=this.combo0[0];
+                this.selectedValue = this.combo0[0];
             },
             _handleTap: function(e) {
                 console.log(e);
@@ -122,14 +174,14 @@
                     }
                 }
                 if (this.target != null) {
-                  var selection;
+                    var selection;
                     if (targetCut == 0) {
-                        selection=this.target.split(".")[0];
+                        selection = this.target.split(".")[0];
                         console.log(this.selectedValue);
                         this.target = null;
                     } else if (targetCut > 0) {
                         var tempTarget = this.target.split(".");
-                        selection=tempTarget[tempTarget.length-1];
+                        selection = tempTarget[tempTarget.length - 1];
                         tempTarget.splice(targetCut, tempTarget.length - 1);
                         this.target = "";
                         for (var y = 0; y < tempTarget.length; y++) {
@@ -142,11 +194,12 @@
                     }
                 }
                 this._getMetrics(targetCut);
-                this.selectedValue=selection;
+                this.selectedValue = selection;
                 console.log(this.selectedValue);
             },
             _nextOption: function(e) {
-                if (e.target.value != "") {
+                if (e.target.value != "" && e.target.value != "Custom") {
+                    this.hide = true;
                     if (this.target == null || this.target.length <= 1) {
                         this.target = e.target.value;
                     } else {
@@ -160,18 +213,21 @@
                                 this.querySelector('#combo' + i).hidden = false;
                                 this.querySelector('#combo' + i).innerHTML = e.target.value;
                                 this.selectedValue = tempCombo[0];
-                                this.querySelector('#combo0').setAttribute("label","Select next value");
+                                this.querySelector('#combo0').setAttribute("label", "Select next value");
                             } else {
                                 this.fire('panelAdded', this.target);
                                 this._exit();
                             }
                             break;
                         }
-                        if (!this.querySelector('#combo' + this.optionsNum.length).hidden) {
+                        if (!this.querySelector('#combo' + this.optionsNum.length).hidden && this.selectedValue != "Custom") {
                             this._exit();
                             break;
                         }
                     }
+                } else {
+                    this.querySelector('#alignedDialog').style.height = '600px';
+                    this.hide = false;
                 }
             },
             _getMetrics: function(index) {
@@ -203,6 +259,9 @@
                             }
                         }
                     }
+                }
+                if (index == 0) {
+                    metrics.push("Custom");
                 }
                 this.set("combo0", metrics);
                 return metrics;
