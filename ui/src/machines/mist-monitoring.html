@@ -192,7 +192,8 @@
             'panelAdded':'_panelAdded'
         },
         observers: [
-            '_reset(resource.id)'
+            '_reset(resource.id)',
+            'obs(resource)'
         ],
         ready: function(){
 

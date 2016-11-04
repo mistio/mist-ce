@@ -45,7 +45,7 @@
             </iron-label>
           </template>
     <div id="addcustom" hidden="{{hide}}">
-        <iron-ajax id="postCustomgraph" url="[[_computeUrl(cloudId,machineId,metric)]]" handle-as="json" method="POST" contentType="application/json" on-response="_handleMetricResponse">
+        <iron-ajax id="postCustomgraph" url="[[uri]]"  handle-as="json" method="POST" contentType="application/json" on-response="_customgraphResponse">
         </iron-ajax>
         <div>
             <paper-input id="name" value={{metric.name}} label="Enter name"></paper-input>
@@ -61,7 +61,7 @@
             <paper-checkbox id="derivative">Calculate derivative</paper-checkbox>
         </div>
         <div>
-            <paper-button id="submit" align="center" style="display:block;"> Add custom graph</paper-button>
+            <paper-button id="submit" align="center" style="display:block;" on-tap="_generateCustomgraphrequest"> Add custom graph</paper-button>
         </div>
     </div>
     </paper-dialog-scrollable>
@@ -89,20 +89,26 @@
                     type: Boolean,
                     value: true // init the value to true so it will be hidden on page load
                 },
+                uri:String,
                 metric: {
                   type:Object,
                   value:function(){
                     return{
                       name: null,
                       unit: null,
-                      type: null,
-                      script: null,
+                      type: "gauge",
+                      script: "import random \n \ndef read(): \n    # return random value \n    return random.random() \n",
                       pluginId: null
                     }
                   }
                 }
             },
-            observers:['_computeplugidId(metric.name)'],
+            observers:[
+              '_computeplugidId(metric.name)',
+            ],
+            _customgraphResponse: function (data){
+              console.log(data);
+            },
             _computeplugidId: function(name) {
                 if (!this.metric.name) return;
                 var newPluginId = this.metric.name
@@ -112,16 +118,14 @@
                     .replace(/^_/, '') // trim heading underscore
                     .replace(/_$/, ''); // trim trailing underscore
                 this.set('metric.pluginId', newPluginId);
-                console.log(name);
             },
             _computeMetricsUri: function(cloudId, machineId) {
                 return "/api/v1/clouds/" + cloudId + "/machines/" + machineId + "/metrics";
             },
-            _computeUrl: function(cloudId,machineId,metric) {
-
-                return '/api/v1/clouds/' + cloudId +
+            _computeUrl: function(cloudId,machineId,pluginId) {
+                this.uri= '/api/v1/clouds/' + cloudId +
                     '/machines/' + machineId +
-                    '/plugins/' + metric.pluginId;
+                    '/plugins/' + pluginId;
             },
             openDialog: function() {
                 var dialog = this.querySelector('paper-dialog');
@@ -131,7 +135,6 @@
                 this.stepType = "";
                 this.querySelector("#metrics").generateRequest();
                 this.querySelector('#combo0').setAttribute("disabled", "true");
-                this.querySelector('#script').value="import random \n \n def read(): \n    # return random value \n    return random.random() \n";
             },
             _handleMetricResponse: function(data) {
                 var metricsArray = [];
@@ -231,6 +234,7 @@
                     }
                 } else {
                     this.querySelector('#alignedDialog').style.height = '600px';
+                    this.querySelector('#script').value=this.metric.script;
                     this.hide = false;
                 }
             },
@@ -278,6 +282,28 @@
                 this.optionsNum = [];
                 var dialog = this.querySelector('paper-dialog');
                 dialog.close();
+            },
+            _generateCustomgraphrequest(){
+              console.log(this.cloudId,this.machineId,this.metric.pluginId);
+              this._computeUrl(this.cloudId,this.machineId,this.metric.pluginId);
+              if(this.querySelector('#derivative').checked){
+                this.metric.type="derive";
+              }
+              else{
+                this.metric.type="gauge"
+              }
+              var payload=  {
+                   "plugin_type"   : "python",
+                   "name"          : this.metric.name,
+                   "unit"          : this.metric.unit,
+                   "value_type"    : this.metric.type,
+                   "read_function" : this.metric.script,
+                   "host"          : "172.17.0.1"
+               };
+              this.querySelector('#postCustomgraph').contentType="application/json"
+              this.querySelector('#postCustomgraph').headers["Csrf-Token"] = CSRF_TOKEN;
+              this.querySelector('#postCustomgraph').body =payload;
+              this.querySelector('#postCustomgraph').generateRequest();
             }
         });
     </script>
