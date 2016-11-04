@@ -574,6 +574,19 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
         node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
     elif conn.type is Provider.LINODE and private_key:
+        # FIXME: The orchestration UI does not provide all the necessary
+        # parameters, thus we need to fetch the proper size and image objects.
+        # This should be properly fixed when migrated to the controllers.
+        if not disk:
+            for size in conn.list_sizes():
+                if int(size.id) == int(size_id):
+                    size = size
+                    break
+        if not image_extra:  # Missing: {'64bit': 1, 'pvops': 1}
+            for image in conn.list_images():
+                if int(image.id) == int(image_id):
+                    image = image
+                    break
         node = _create_machine_linode(conn, key_id, private_key, public_key,
                                       machine_name, image, size,
                                       location)
