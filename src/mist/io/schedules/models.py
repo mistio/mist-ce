@@ -16,10 +16,11 @@ from mist.io.exceptions import RequiredParameterMissingError
 PERIODS = ('days', 'hours', 'minutes', 'seconds', 'microseconds')
 
 
-# scheduler type
 class BaseScheduleType(me.EmbeddedDocument):
     """Abstract Base class used as a common interface
-    for Interval/Crontab specific Schedule types """
+    for scheduler types. There are two different types
+    for now: Interval and Crontab
+    """
     meta = {'allow_inheritance': True}
 
     @property
@@ -86,10 +87,10 @@ class Crontab(BaseScheduleType):
         }
 
 
-# scheduler task
 class BaseTaskType(me.EmbeddedDocument):
     """Abstract Base class used as a common interface
-       for Action/Script specific task types """
+    for scheduler's tasks types. Action and Script"""
+
     meta = {'allow_inheritance': True}
 
     @property
@@ -131,10 +132,12 @@ class ScriptTask(BaseTaskType):
         return 'Run script: %s' % self.script_id
 
 
-# scheduler machines
 class BaseMachines(me.EmbeddedDocument):
-    """Abstract Base class used as a common interface
-        for ListOfMachines/ TaggedMachines"""
+    """Abstract Base class used as a common interface for given resources.
+
+    For ListOfMachines: give a list of machines' uuids
+    For TaggedMachines: give a list of machines' tags
+    """
     meta = {'allow_inheritance': True}
 
     def get_machines(self):
