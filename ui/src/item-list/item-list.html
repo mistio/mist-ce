@@ -24,13 +24,16 @@
             border-radius: 3px;
             opacity: 1;
             transition: opacity 0.4s;
+            transition: max-width 500ms ease-in;
         }
 
         :host(.hidden) {
             transition: none;
             opacity: 0;
         }
-
+        :host[with-recommendations] {
+            max-width: 1750px !important;
+        }
         iron-list {
             border-right: 1px solid #d0d0d0;
             border-left: 1px solid #d0d0d0;
@@ -413,6 +416,11 @@ Polymer({
         incidents: {
             type: Array,
             computed: "_computeIncidents(model.incidentsArray.*)"
+        },
+        withRecommendations: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true
         }
     },
 
@@ -441,27 +449,23 @@ Polymer({
     showRecommendations: function(fields, probes){
         var show = false;
         if (!this.model.probes || !this.fields) {
-            console.log('no probes or fields')
             show = false;
         }
         else {
             for (var p in this.model.probes) {
-                console.log('in probe loop')
                 if (this.model.probes[p].dirty_cow == true){
-                    console.log('checking true', p)
                     show = true;
                 }
             }
         }
 
-        console.log('show', show, this.fields.indexOf('recommendations'));
         if (!show && this.fields.indexOf('recommendations') >-1){
             this.splice('fields', this.fields.indexOf('recommendations'), 1);
-            console.log('remove');
+            this.set('withRecommendations', false)
         }
         else if (show && this.fields.indexOf('recommendations') ==-1){
             this.splice('fields', 2, 0 , 'recommendations');
-            console.log('add');
+            this.set('withRecommendations', true)
         }
 
     },
