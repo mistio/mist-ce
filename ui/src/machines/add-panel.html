@@ -48,8 +48,8 @@
         <iron-ajax id="postCustomgraph" url="[[_computeUrl(cloudId,machineId,metric)]]" handle-as="json" method="POST" contentType="application/json" on-response="_handleMetricResponse">
         </iron-ajax>
         <div>
-            <paper-input id="name" value=[[metric.name]] label="Enter name"></paper-input>
-            <paper-input id="unit" value=[[metric.unit]] label="Enter unit"></paper-input>
+            <paper-input id="name" value={{metric.name}} label="Enter name"></paper-input>
+            <paper-input id="unit" value={{metric.unit}} label="Enter unit"></paper-input>
         </div>
         <div>
             <h3>Python script</h3>
@@ -90,16 +90,20 @@
                     value: true // init the value to true so it will be hidden on page load
                 },
                 metric: {
-                    name: null,
-                    unit: null,
-                    type: null,
-                    script: null,
-                    pluginId: {
-                        computed: '_computepluginId()'
+                  type:Object,
+                  value:function(){
+                    return{
+                      name: null,
+                      unit: null,
+                      type: null,
+                      script: null,
+                      pluginId: null
                     }
+                  }
                 }
             },
-            _computeplugidId: function() {
+            observers:['_computeplugidId(metric.name)'],
+            _computeplugidId: function(name) {
                 if (!this.metric.name) return;
                 var newPluginId = this.metric.name
                     .toLowerCase() // Remove upper case letters
@@ -107,13 +111,13 @@
                     .replace(/__*/g, '_') // don't allow double underscores
                     .replace(/^_/, '') // trim heading underscore
                     .replace(/_$/, ''); // trim trailing underscore
-                this.metric.set('pluginId', newPluginId);
-                console.log(this.metric.pluginId);
+                this.set('metric.pluginId', newPluginId);
+                console.log(name);
             },
-            _computeMetricsUri: function(cloudId, machineId, metric) {
+            _computeMetricsUri: function(cloudId, machineId) {
                 return "/api/v1/clouds/" + cloudId + "/machines/" + machineId + "/metrics";
             },
-            _computeUrl: function() {
+            _computeUrl: function(cloudId,machineId,metric) {
 
                 return '/api/v1/clouds/' + cloudId +
                     '/machines/' + machineId +
