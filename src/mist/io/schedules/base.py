@@ -1,3 +1,4 @@
+#  FIXME add docstring abstract bla bla
 import json
 import logging
 import datetime
@@ -14,7 +15,7 @@ from mist.core.exceptions import ScheduleNameExistsError
 log = logging.getLogger(__name__)
 
 
-class ScheduleController(object):
+class BaseController(object):
     def __init__(self, schedule):
         """Initialize schedule controller given a schedule
 
