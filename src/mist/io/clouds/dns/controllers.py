@@ -22,10 +22,15 @@ controller, using the `ctl` abbreviation, like this:
 
 """
 
+import logging
+
 from mist.io.clouds.dns.base import DNSController
 
 from libcloud.dns.types import Provider as DnsProvider
 from libcloud.dns.types import RecordType
+from libcloud.dns.types import ZoneDoesNotExistError
+
+log = logging.getLogger(__name__)
 
 class AmazonDNSController(DNSController):
 
@@ -53,11 +58,35 @@ class AmazonDNSController(DNSController):
             all_zones.append(zone_details)
         return all_zones
 
-    def list_records(self, zone):
+    def list_records(self, zone_id):
         """
 
         """
-        pass
+        all_records = []
+
+        # We cannot call list_records() with the zone_id, we need to provide
+        # a zone object. We will get that by calling the get_zone() method.
+        try:
+            zone = self.ctl.dns_connection.get_zone(zone_id)
+        except ZoneDoesNotExistError:
+            log.warning("No zone found with id: " + zone_id +
+                " under the " + self.provider + " DNS provider")
+        else:
+            # TODO: This should be wrapped in try .. except
+            # Need to check which exceptions can be raised by list_zones()
+            records = self.ctl.dns_connection.list_records(zone)
+            for record in records:
+                record_details = {}
+                for attr, value in record.__dict__.iteritems():
+                    if attr != "driver":
+                        record_details[attr] = value
+                record_details["provider"] = self.provider
+                all_records.append(record_details)
+
+        return all_records
+
+
+
 
 
 class GoogleDNSController(DNSController):
@@ -87,9 +116,29 @@ class GoogleDNSController(DNSController):
             all_zones.append(zone_details)
         return all_zones
 
-    def list_records(self, zone):
+    def list_records(self, zone_id):
         """
 
         """
-        pass
+        all_records = []
 
+        # We cannot call list_records() with the zone_id, we need to provide
+        # a zone object. We will get that by calling the get_zone() method.
+        try:
+            zone = self.ctl.dns_connection.get_zone(zone_id)
+        except ZoneDoesNotExistError:
+            log.warning("No zone found with id: " + zone_id +
+                " under the " + self.provider + " DNS provider")
+        else:
+            # TODO: This should be wrapped in try .. except
+            # Need to check which exceptions can be raised by list_zones()
+            records = self.ctl.dns_connection.list_records(zone)
+            for record in records:
+                record_details = {}
+                for attr, value in record.__dict__.iteritems():
+                    if attr != "driver":
+                        record_details[attr] = value
+                record_details["provider"] = self.provider
+                all_records.append(record_details)
+
+        return all_records

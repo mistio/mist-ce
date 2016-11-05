@@ -102,7 +102,7 @@ class DNSController(object):
         """
         raise NotImplementedError()
 
-    def list_records(self, zone):
+    def list_records(self, zone_id):
         """
         Returns a list of available DNS records for a particular DNS zone.
 

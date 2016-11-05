@@ -873,18 +873,17 @@ def list_dns_zones(request):
 @view_config(route_name='api_v1_zone_action', request_method='GET', renderer='json')
 def list_dns_zone_records(request):
     """
-    List all DNS zone details for a particular zone.
+    List all DNS zone records for a particular zone.
     ---
     """
     auth_context = auth_context_from_request(request)
     zone_id = request.matchdict['zone']
-    return {"status":"API endpoint not implemented yet"}
-    # return methods.list_dns_zone_details(zone_id)
+    return methods.list_dns_zone_records(auth_context.owner,zone_id)
 
 @view_config(route_name='api_v1_zone_action', request_method='POST', renderer='json')
-def list_dns_zone_records(request):
+def create_dns_zone_record(request):
     """
-    List all DNS zone details for a particular zone.
+    Create a new record under a specific zone
     ---
     """
     auth_context = auth_context_from_request(request)
@@ -893,9 +892,9 @@ def list_dns_zone_records(request):
     # return methods.create_dns_record(zone_id)
 
 @view_config(route_name='api_v1_zone_action', request_method='DELETE', renderer='json')
-def list_dns_zone_records(request):
+def delete_dns_zone_record(request):
     """
-    List all DNS zone details for a particular zone.
+    Delete a specific DNS record under a zone.
     ---
     """
     auth_context = auth_context_from_request(request)
