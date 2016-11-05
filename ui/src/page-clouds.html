@@ -1,7 +1,8 @@
 <link rel="import" href="../bower_components/app-route/app-route.html">
 
-<link rel="import" href="../elements/pages/page-items.html">
-<link rel="import" href="../elements/clouds/cloud-add.html">
+<link rel="import" href="page-items.html">
+<link rel="import" href="clouds/cloud-add.html">
+<link rel="import" href="clouds/cloud-page.html">
 
 <dom-module id="page-clouds">
   <template>
@@ -12,11 +13,12 @@
     </style>
 
     <app-route route="{{route}}"
-                pattern="/:key"
+                pattern="/:cloud"
                 data="{{data}}"></app-route>
 
     <page-items name="clouds" class="clouds" model="[[model]]" items="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.clouds]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
     <cloud-add providers="[[providers]]" keys="[[model.keysArray]]" section="[[sections.clouds]]" clouds="[[model.cloudsArray]]" hidden$=[[!_isAddPageActive(route.path)]]></cloud-add>
+    <cloud-page model="[[model]]" cloud="[[_getCloud(data.cloud, model.clouds)]]" sections="[[sections]]" section="[[sections.clouds]]" hidden$=[[!_isDetailsPageActive(route.path)]]></cloud-page>
 
   </template>
 
@@ -46,6 +48,14 @@
 
       _isListActive: function(path) {
           return !path;
+      },
+
+      _isDetailsPageActive: function(path) {
+          return path && path != '/+add';
+      },
+      _getCloud: function(id) {
+          if (this.model.clouds)
+              return this.model.clouds[id];
       }
 
     });

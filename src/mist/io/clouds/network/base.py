@@ -72,8 +72,6 @@ class NetworkController(object):
         libcloud_networks = self.ctl.connection.ex_list_networks()
         network_info = self._parse_network_listing(libcloud_networks, return_format)
 
-
-
         # TODO: Fetch all existing Network and subnet objects for this cloud, compare and sync
 
         return network_info
