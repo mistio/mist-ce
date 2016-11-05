@@ -29,31 +29,54 @@ from libcloud.dns.types import RecordType
 
 class AmazonDNSController(DNSController):
 
+    def __init__(self, main_controller):
+        """
+
+        """
+        super(AmazonDNSController, self).__init__(main_controller)
+        self.provider = DnsProvider.ROUTE53
+
     def list_zones(self):
         """
 
         """
-        provider = DnsProvider.GOOGLE
         all_zones = []
+        # TODO: I think this should be wrapped in try .. except
+        # Need to check which exceptions can be raised by list_zones()
         zones = self.ctl.dns_connection.list_zones()
         for zone in zones:
             zone_details = {}
             for attr, value in zone.__dict__.iteritems():
                 if attr != "driver":
                     zone_details[attr] = value
-            zone_details["provider"] = provider
+            zone_details["provider"] = self.provider
             all_zones.append(zone_details)
         return all_zones
+
+    def list_records(self, zone):
+        """
+
+        """
+        pass
 
 
 class GoogleDNSController(DNSController):
 
+    def __init__(self, main_controller):
+        """
+
+        """
+        super(GoogleDNSController, self).__init__(main_controller)
+        self.provider = DnsProvider.GOOGLE
+
     def list_zones(self):
         """
 
         """
         provider = DnsProvider.GOOGLE
         all_zones = []
+        # TODO: I think this should be wrapped in try .. except
+        # Need to check which exceptions can be raised by list_zones()
         zones = self.ctl.dns_connection.list_zones()
         for zone in zones:
             zone_details = {}
@@ -63,4 +86,10 @@ class GoogleDNSController(DNSController):
             zone_details["provider"] = provider
             all_zones.append(zone_details)
         return all_zones
+
+    def list_records(self, zone):
+        """
+
+        """
+        pass
 

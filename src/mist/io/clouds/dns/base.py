@@ -102,3 +102,12 @@ class DNSController(object):
         """
         raise NotImplementedError()
 
+    def list_records(self, zone):
+        """
+        Returns a list of available DNS records for a particular DNS zone.
+
+        All subclasses MUST implement this method.
+        """
+        raise NotImplementedError()
+
+
