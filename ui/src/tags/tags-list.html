@@ -150,17 +150,20 @@
                     this.$.errormsg.textContent = '';
                 },
                 selectedItemsChanged: function(items, length){
-                    this._computeTags(this.items);
+                    // console.log('selectedItemsChanged',this.$.tagsModal.opened);
+                    // freeze updating of selectedItems when dialog is open
+                    if (!this.$.tagsModal.opened)
+                        this._computeTags(this.items);
                 },
                 _computeTags: function(lengths) {
                     var tags = this._computeCommonTags(this.items);
+                    // console.log('_computeTags',tags.length);
                     if (!tags.length) {
                         tags = [{
                             key: '',
                             value: ''
                         }];
                     }
-
                     this.set('tags', tags);
                 },
                 _computeCommonTags: function(items) {
@@ -228,11 +231,11 @@
                 _tagDeleteHandler: function(e) {
                     var tag = e.detail.tag,
                         index = this.tags.indexOf(tag);
-                    this.splice('tags', index, 1);
-
-                    tag.op = "-";
-                    this.push('tagsToDelete', tag);
-                    console.log(this.tagsToDelete);
+                        this.splice('tags', index, 1);
+                    if (tag.key && !this._inArray(tag, this.tagsToDelete)) {
+                        tag.op = "-";
+                        this.push('tagsToDelete', tag);
+                    }
                 },
                 _tagUpdate: function(e){
                     // this._tagDeleteHandler(e);
@@ -242,17 +245,31 @@
                     var newTag = e.detail.newTag;
 
                     //move old tag to tags to delete
-                    if (oldTag.key != newTag.key){
+                    if (oldTag.key && oldTag.key != newTag.key && !this._inArray(oldTag, this.tagsToDelete)){
                         oldTag.op = "-";
                         this.push('tagsToDelete', oldTag);
                     }
+                },
+                _inArray: function(tag, tagstodelete){
+                    var tin = this.tagsToDelete.find(function(t){
+                        return t.key == tag.key;
+                    })
+                    console.log('tin', tin);
+                    return tin ? true : false;
                 },
                 _saveTags: function() {
                     // console.log('_saveTags', this.items);
                     var newTags = this.tags.filter(function(tag) {
                             return tag.key;
                         }),
-                        payload = [];
+                        payload = [],
+                        deltags = [];
+                    
+                    if (this.tagsToDelete.length > 0) {
+                        deltags = this.tagsToDelete.filter(function(tag){
+                            return tag.key != "";
+                        });
+                    }
 
                     payload = this.items.map(function(item) {
                         var itemType = item.split(":")[0],
@@ -273,13 +290,7 @@
                             item_id: itemId,
                             cloud_id: ['machine', 'image', 'network'].indexOf(itemType) != -1 ? itemCloudId : ''
                         };
-                        newItem.tags = newTags;
-
-                        if (this.tagsToDelete.length > 0) {
-                            this.tagsToDelete.forEach(function(tag){
-                                newItem.tags.push(tag);
-                            })
-                        }
+                        newItem.tags = newTags.concat(deltags);
                         return newItem;
                     }, this);
                     console.log('payload',payload);
