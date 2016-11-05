@@ -252,16 +252,18 @@
                 <div class="clouds top flexchild-wide-top">
                     <div id="cloudslist" class="flex">
                         <template is="dom-repeat" items="[[model.cloudsArray]]">
-                            <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" index$=[[index]] on-tap="_showCloudInfoDialog" id$="[[item.id]]">
-                                <div class="icon"></div>
-                                <!-- src="[[_computeProviderLogo(item.provider)]]" -->
-                                <h1 class="cloud-title">[[item.title]]</h1>
-                            </cloud-chip>
+                            <a class="cloud-chip" href="/clouds/[[item.id]]">
+                                <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" index$=[[index]] id$="[[item.id]]">
+                                    <div class="icon"></div>
+                                    <!-- src="[[_computeProviderLogo(item.provider)]]" -->
+                                    <h1 class="cloud-title">[[item.title]]</h1>
+                                </cloud-chip>
+                            </a>
                         </template>
                     </div>
-                    <div class="ovhid">
+                    <!-- <div class="ovhid">
                         <cloud-info></cloud-info>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="columns">
                     <div id="leftcolumn" class="left">
