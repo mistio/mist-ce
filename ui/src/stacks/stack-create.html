@@ -1,0 +1,528 @@
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../app-form/app-form.html">
+<dom-module id="stack-create">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+        :host {
+            display: block;
+        }
+
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
+
+        #content {
+            max-width: 900px;
+        }
+
+        paper-progress {
+            position: absolute;
+            bottom: 87px;
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        :host >::content paper-input-container {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+
+        paper-item.lead {
+            font-size: 2em;
+        }
+
+        paper-toggle-button[disabled]::content {
+            color: rgba(0, 0, 0, 0.32);
+        }
+
+        paper-toggle-button::content paper-input-container input {
+            color: color: rgba(0, 0, 0, 0.54);
+        }
+
+        .spacer {
+            display: block;
+            height: 24px;
+            width: 100%;
+        }
+
+        .bottom-actions {
+            padding-left: 20px;
+        }
+
+        *:not(paper-button)[disabled] {
+            display: none;
+        }
+
+        paper-radio-group {
+            padding: 16px 8px;
+        }
+
+        @media (max-width: 800px) {
+            .desc {
+                display: none;
+            }
+        }
+
+        .desc {
+            width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        </style>
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Create Stack
+                    </h2>
+                    <div class="subtitle">
+                        from [[template.name]]
+                        <a href$="/templates/[[template.id]]">
+                            <iron-icon icon="icons:link"></iron-icon>
+                        </a>
+                        <span class="desc" hidden$="[[!template.description]]">([[template.description]])</span>
+                    </div>
+                </div>
+            </paper-material>
+            <paper-material>
+                <app-form fields="{{fields}}" templateid="{{template.id}}" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
+            </paper-material>
+        </div>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'stack-create',
+
+            properties: {
+                model: {
+                    type: Object
+                },
+                section: {
+                    type: Object
+                },
+                color: {
+                    type: String,
+                    computed: '_getHeaderStyle(section)'
+                },
+                stack: {
+                    type: Object
+                },
+                form: {
+                    type: Object,
+                    value: {}
+                },
+                params: {
+                    type: Object
+                },
+                template: {
+                    type: Object,
+                    computed: '_fromTemplate(params, model.templates.*)'
+                },
+                fields: {
+                    type: Array,
+                    value: [],
+                    notify: true
+                },
+                keys: {
+                    type: Array,
+                    computed: "_keys(model)"
+                },
+                clouds: {
+                    type: Array,
+                    computed: "_clouds(model)"
+                },
+                images: {
+                    type: Array,
+                    computed: "_images(model)"
+                },
+                uri: {
+                    type: String,
+                    computed: "_uri(model)"
+                },
+                yaml_inputs: {
+                    type: String,
+                    notify: true
+                }
+            },
+
+            observers: [
+                '_computeFields(template, template.inputs, template.inputs.*, model.templatesArray.*, model.cloudsArray.*, model.keysArray.*, params)'
+            ],
+
+            listeners: {
+                'change': '_updateFields',
+                'iron-select': '_updateFields',
+            },
+            ready: function() {},
+            _fromTemplate: function(params, templates) {
+                if (params.template && this.model.templates) {
+                    var yaml_inputs = '';
+                    this.model.templates[params.template].inputs.forEach(function(inp) {
+                        yaml_inputs += inp.name + ': ';
+                        var val = inp.value = !undefined ? inp.value : inp.defaultValue || inp.default;
+                        yaml_inputs += val + '\n';
+                    }, this);
+                    this.set('yaml_inputs', yaml_inputs);
+                    // pass values into form's stackinputs default value
+                    var ind;
+                    var stackinputsField = this.fields.find(function(f, index) {
+                        ind = index;
+                        return f.name == "stackinputs";
+                    });
+                    this.set('fields.' + ind + '.defaultValue', this.yaml_inputs);
+                    console.log('template is redefined');
+
+
+                    var yaml_or_form = 'form';
+                    var template = this.model.templates[params.template];
+                    console.log('Computing Fields started');
+
+                    if (this.fields) {
+                        var yf = this.fields.find(function(f) {
+                            return f.name == 'yaml_or_form'
+                        });
+                        if (yf && yf.value)
+                            yaml_or_form = yf.value;
+                        else
+                            yaml_or_form = 'form';
+                    }
+
+                    var ret = [{
+                        name: "name",
+                        label: "Stack Name",
+                        type: "text",
+                        value: "",
+                        isLead: true,
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please enter a name for the stack",
+                        show: true,
+                        required: true
+                    }, {
+                        name: "description",
+                        label: "Stack Description",
+                        type: "textarea",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        helptext: "Choose a usefull description for your stack",
+                        errorMessage: "Please enter stacks's description",
+                        show: true,
+                        required: false
+                    }, {
+                        name: "yaml_or_form",
+                        label: "YAML or form",
+                        type: "radio",
+                        value: yaml_or_form,
+                        defaultValue: "form",
+                        helptext: "Choose the way you want to insert inputs",
+                        errorMessage: "Choose an input format",
+                        show: true,
+                        required: true,
+                        options: [{
+                            title: "Form",
+                            val: "form"
+                        }, {
+                            title: "YAML",
+                            val: "yaml"
+                        }]
+                    }, {
+                        name: "stackinputs",
+                        label: "Stack Inputs YAML",
+                        type: "textarea",
+                        value: this.yaml_inputs,
+                        defaultValue: this.yaml_inputs,
+                        placeholder: '',
+                        helptext: "Enter the stack inputs in yaml format",
+                        errorMessage: "Please enter stacks's inputs",
+                        show: true,
+                        required: true,
+                        showIf: {
+                            fieldName: "yaml_or_form",
+                            fieldValues: ["yaml"]
+                        }
+                    }];
+
+                    if (template && template.inputs) {
+                        template.inputs.forEach(function(inp) {
+                            inp['showIf'] = {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                            inp['label'] = inp.name.replace(/_/g, ' ');
+                            inp['defaultValue'] = inp.default;
+                            inp['value'] = inp['value'] || inp.default;
+
+                            // Temp, before Tosca uses 'required' key
+                            inp.required = false;
+
+                            // Uncomment when TOSCA uses 'required' key
+                            // if (!inp.required){
+                            //     inp.required = false;
+                            // }
+
+                            // make key dropdown
+                            if (inp.name.startsWith('mist_key')) {
+                                inp.type = 'ssh_key';
+                                // inp.type = 'dropdown';
+                                inp.helptext = 'Select key';
+                                inp.options = []; //this.model.keysArray;
+                            }
+
+                            // make cloud dropdown
+                            if (inp.name.startsWith('mist_cloud')) {
+                                inp.label = 'cloud';
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Select cloud';
+                                inp.options = []; //this.model.cloudsArray;
+
+                                inp.options.forEach(function(o) {
+                                    o.disabled = !o.enabled;
+                                });
+                            }
+
+                            // make image dropdown & dependent on cloud
+                            if (inp.name.startsWith("mist_image")) {
+                                var xid = inp.name.split("mist_image")[1];
+                                inp.show = false;
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Select image';
+                                inp.showIf = {
+                                    fieldName: "mist_cloud" + xid,
+                                    fieldExists: true
+                                }
+                            }
+
+                            // make image location & dependent on cloud
+                            if (inp.name.startsWith("mist_location")) {
+                                var xid = inp.name.split("mist_location")[1];
+                                inp.show = false;
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Select location';
+                                inp.showIf = {
+                                    fieldName: "mist_cloud" + xid,
+                                    fieldExists: true
+                                }
+                            }
+
+                            // make image location & dependent on cloud
+                            if (inp.name.startsWith("mist_size")) {
+                                var xid = inp.name.split("mist_size")[1];
+                                inp.show = false;
+                                inp.type = 'mist_dropdown';
+                                inp.helptext = 'Choose the size of your cloud';
+                                inp.showIf = {
+                                    fieldName: "mist_cloud" + xid,
+                                    fieldExists: true
+                                }
+                            }
+
+                            // hide mist api credential inputs
+                            if (inp.name == "mist_token" || inp.name == "mist_uri" || inp.name == "mist_username" || inp.name == "mist_password") {
+                                inp.hidden = true;
+                                inp.required = false;
+                            }
+
+                            ret.push(inp);
+                        }, this);
+                    }
+
+                    ret.push({
+                        name: "deploy",
+                        label: "Deploy Now",
+                        type: "toggle",
+                        value: true,
+                        defaultValue: true,
+                        placeholder: true,
+                        helptext: "Enable this option to deploy your stack now",
+                        errorMessage: "",
+                        show: true,
+                        required: false
+                    });
+                    this.set('fields', ret);
+
+
+                    return this.model.templates[params.template];
+                } else {
+                    return {
+                        name: "Template is missing"
+                    }
+                    console.log('template is missing');
+                }
+            },
+
+            _computeFields: function(template, templateInps, templateInputs, modelTemplates, clouds, keys, params) {
+                this.fields.filter(function(inp, index) {
+                    if (inp.name.startsWith('mist_key')){
+                        this.set('fields.' + index + '.options', this.model.keysArray);
+                    }
+
+                }, this);
+
+                this.fields.filter(function(inp, index) {
+                    if (inp.name.startsWith('mist_cloud')){
+                        this.set('fields.' + index + '.options', this.model.cloudsArray);
+                        this.fields[index].options.forEach(function(o){
+                            o.disabled = !o.enabled;
+                        })
+                    }
+                }, this);
+
+                this.fields.forEach(function(f, index){
+                    if (f.options && f.options.length == 1){
+                        if (f.type == "dropdown")
+                           this.set('fields.'+index+'.value', f.options[0].val);
+                        else
+                           this.set('fields.'+index+'.value', f.options[0].id);
+                    }
+                }, this);
+
+            },
+
+            _updateFields: function(event) {
+                var e = Polymer.dom(event);
+                var changeInYaml = e.path.indexOf(document.querySelector("paper-textarea#stackinputs")) > -1
+                if (changeInYaml) {
+                    var yaml = document.querySelector("paper-textarea#stackinputs").value;
+                    var yaml_array = yaml.split('\n');
+                    var inputs = [];
+                    yaml_array.forEach(function(line) {
+                        var name = line.split(':')[0].trim();
+                        var value = line.split(':')[1];
+                        if (value)
+                            value = value.trim();
+                        inputs[name] = value;
+                    });
+
+                    this.fields.forEach(function(f, index) {
+                        if (inputs[f.name])
+                            this.set('fields.' + index + '.value', inputs[f.name])
+                    }, this)
+                } else {
+                    var cloud = this.fields.find(function(f) {
+                        return f.name.startsWith("mist_cloud");
+                    });
+                    var yaml_inputs = '';
+                    this.fields.forEach(function(inp) {
+                        var fieldCloud;
+
+                        if (['name', 'description', 'yaml_or_form', 'stackinputs', 'deploy'].indexOf(inp.name) == -1) {
+                            yaml_inputs += inp.name + ': ';
+                            var val = inp.value || inp.defaultValue;
+                            yaml_inputs += val + '\n';
+                        }
+                        if (cloud && cloud.value) {
+                            if (inp.name.startsWith("mist_location")) {
+                                var xid = inp.name.split("mist_location")[0];
+                                fieldCloud = this.fields.find(function(f) {
+                                    return f.name.startsWith("mist_cloud" + xid);
+                                }) || cloud;
+                                var cloudId = fieldCloud.value;
+                                if (cloudId)
+                                    inp.options = this.model.clouds[cloudId].locationsArray;
+                            }
+                            if (inp.name.startsWith("mist_image")) {
+                                var xid = inp.name.split("mist_image")[0];
+                                fieldCloud = this.fields.find(function(f) {
+                                    return f.name.startsWith("mist_cloud" + xid);
+                                }) || cloud;
+                                var cloudId = fieldCloud.value;
+                                if (this.model && cloudId)
+                                    inp.options = this.model.clouds[cloudId].imagesArray;
+                            }
+                            if (inp.name.startsWith("mist_size")) {
+                                console.warn('mist_size');
+                                var xid = inp.name.split("mist_size")[0];
+                                fieldCloud = this.fields.find(function(f) {
+                                    return f.name.startsWith("mist_cloud" + xid);
+                                }) || cloud;
+                                var cloudId = fieldCloud.value;
+                                console.warn('xid', xid, 'cloud', fieldCloud);
+                                if (cloudId)
+                                    inp.options = this.model.clouds[cloudId].sizesArray;
+                            }
+
+                            this.fields.forEach(function(f, index){
+                                if (f.options && f.options.length == 1){
+                                    if (f.type == "dropdown")
+                                       this.set('fields.'+index+'.value', f.options[0].val);
+                                    else
+                                       this.set('fields.'+index+'.value', f.options[0].id);
+                                }
+                            }, this);
+                        }
+                    }, this);
+
+                    this.set('yaml_inputs', yaml_inputs);
+
+                    // pass values into form's stackinputs value
+                    var ind;
+                    var stackinputsField = this.fields.find(function(f, index) {
+                        ind = index;
+                        return f.name == "stackinputs";
+                    });
+
+                    this.set('fields.' + ind + '.value', this.yaml_inputs);
+                }
+            },
+
+            _handleRequest: function(e) {
+
+            },
+
+            _handleResponse: function(e) {
+                // console.log('create stack ', e);
+                var response = YAML.parse(e.detail.xhr.response);
+                var sid = response.stack.id;
+                document.querySelector('app-location').set('path', '/stacks/' + sid);
+
+                this.debounce('resetForm', function() {
+                    this._resetForm();
+                }, 500);
+            },
+
+            _handleError: function(e) {
+
+            },
+
+            _resetForm: function(e) {
+                // Reset form
+                for (var attr in this.form) {
+                    this.set('form.' + attr, '');
+                }
+                // Reset Form Fields
+                this.fields.forEach(function(el, index) {
+                    if (el.showIf) {
+                        this.set('fields.' + index + '.show', false);
+                    }
+                    // Reset Form Fields Validation
+                    this._resetField(el, index);
+                }, this);
+            },
+            _resetField: function(el, index) {
+                // this.set('fields.' + index + '.value', el.defaultValue);
+                // var input = this.querySelector('#' + el.name);
+                // if (input) {
+                //     input.invalid = false;
+                // }
+            },
+
+        });
+    })();
+    </script>
+</dom-module>

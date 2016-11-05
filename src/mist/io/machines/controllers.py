@@ -6,7 +6,7 @@ class MachineController(object):
         machine, like this:
 
           machine = mist.io.machines.models.Machine.objects.get(id=machine_id)
-          machine.cloud.ctl.reboot()
+          machine.cloud.ctl.compute.reboot()
         """
 
         self.machine = machine
@@ -43,8 +43,8 @@ class MachineController(object):
 
     # TODO we want this also ?
     # def tag(self):
-    #     return self.machine.cloud.ctl.tag(self.machine)
-    #
+    #     return self.machine.cloud.ctl.compute.tag(self.machine)
+
     def undefine(self):
         """Undefines machine - used in KVM libvirt
         to destroy machine and delete XML conf"""

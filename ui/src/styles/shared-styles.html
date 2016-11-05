@@ -1,0 +1,1109 @@
+<!-- shared styles for all elements and index.html -->
+<dom-module id="shared-styles">
+    <template>
+        <style>
+        :root {
+            --primary-text-color: var(--light-theme-text-color);
+            --primary-background-color: var(--light-theme-background-color);
+            --secondary-text-color: var(--light-theme-secondary-color);
+            --disabled-text-color: var(--light-theme-disabled-color);
+            --divider-color: var(--light-theme-divider-color);
+            --error-color: var(--paper-deep-orange-a700);
+            /* color definitions */
+            --paper-grey-50: #fafafa;
+            --paper-grey-100: #f5f5f5;
+            --paper-grey-200: #eeeeee;
+            --paper-grey-300: #e0e0e0;
+            --paper-grey-400: #bdbdbd;
+            --paper-grey-500: #9e9e9e;
+            --paper-grey-600: #757575;
+            --paper-grey-700: #616161;
+            --paper-grey-800: #424242;
+            --paper-grey-900: #212121;
+            --paper-blue-grey-50: #eceff1;
+            /* aka --mist-lighter-color */
+            --paper-blue-grey-100: #cfd8dc;
+            --paper-blue-grey-200: #b0bec5;
+            /* aka --mist-light-color */
+            --paper-blue-grey-300: #90a4ae;
+            --paper-blue-grey-400: #78909c;
+            --paper-blue-grey-500: #607d8b;
+            --paper-blue-grey-600: #546e7a;
+            --paper-blue-grey-700: #455a64;
+            --paper-blue-grey-800: #37474f;
+            --paper-blue-grey-900: #263238;
+            /* aka --mist-dark-color */
+            /* opacity for dark text on a light background */
+            --dark-divider-opacity: 0.12;
+            --dark-disabled-opacity: 0.38;
+            /* or hint text or icon */
+            --dark-secondary-opacity: 0.54;
+            --dark-primary-opacity: 0.87;
+            /* opacity for light text on a dark background */
+            --light-divider-opacity: 0.12;
+            --light-disabled-opacity: 0.3;
+            /* or hint text or icon */
+            --light-secondary-opacity: 0.7;
+            --light-primary-opacity: 1.0;
+            /*
+             * Primary and accent colors. Also see color.html for more colors.
+             */
+            --primary-color: #3f51b5;
+            /* --paper-indigo-500 */
+            --light-primary-color: #c5cae9;
+            /* --paper-indigo-100 */
+            --dark-primary-color: #303f9f;
+            /* --paper-indigo-700 */
+            --accent-color: #039BE5;
+            /* --paper-pink-a200 */
+            --light-accent-color: #ff80ab;
+            /* --paper-pink-a100 */
+            --dark-accent-color: #f50057;
+            /* --paper-pink-a400 */
+            /* overriding defaults */
+            --primary-color: #263238;
+            --light-primary-color: #B0BEC5;
+            --dark-primary-color: #eceff1;
+            --accent-color: #2196F3;
+            --light-accent-color: #ff80ab;
+            --dark-accent-color: #f50057;
+            /*
+             * Material Design Light background theme
+             */
+            --light-theme-background-color: #ffffff;
+            --light-theme-base-color: #000000;
+            --light-theme-text-color: #212121;
+            --light-theme-secondary-color: #737373;
+            /* for secondary text and icons */
+            --light-theme-disabled-color: #9b9b9b;
+            /* disabled/hint text */
+            --light-theme-divider-color: #dbdbdb;
+            /*
+             * Material Design Dark background theme
+             */
+            --dark-theme-background-color: #212121;
+            --dark-theme-base-color: #ffffff;
+            --dark-theme-text-color: #ffffff;
+            --dark-theme-secondary-color: #bcbcbc;
+            /* for secondary text and icons */
+            --dark-theme-disabled-color: #646464;
+            /* disabled/hint text */
+            --dark-theme-divider-color: #3c3c3c;
+            /* informational colors */
+            --green-color: #69b46c;
+            --red-color: #d96557;
+            --orange-color: #e9a644;
+            --blue-color: #47b3e3;
+            --gray-dark-color: #cfd8dc;
+            --gray-light-color: #eceff1;
+            /* three primary colors */
+            --mist-dark-color: #263238;
+            --mist-light-color: #B0BEC5;
+            --mist-lighter-color: #eceff1;
+            /*accent color*/
+            /*--mist-blue: #039BE5;*/
+            --mist-blue: #2196F3;
+        }
+
+        .green {
+            background-color: var(--green-color);
+            color: #fff;
+        }
+
+        .red {
+            background-color: var(--red-color);
+            color: #fff;
+        }
+
+        .orange {
+            background-color: var(--orange-color);
+            color: #444;
+        }
+
+        .blue {
+            background-color: var(--mist-blue);
+            color: #fff;
+        }
+
+        .blue[disabled] {
+            background-color: #eaeaea;
+            color: #a8a8a8;
+        }
+
+        .on-dark.blue[disabled] {
+            background-color: rgba(255,255,255,0.15);
+        }
+
+        .mist-dark {
+            background-color: var(--mist-dark-color);
+            color: #fff;
+        }
+
+        .mist-light {
+            background-color: var(--mist-light-color);
+            color: #444;
+        }
+
+        .mist-lighter {
+            background-color: var(--mist-lighter-color);
+            color: #444;
+        }
+
+        .mist-blue {
+            background-color: var(--mist-blue);
+            color: #fff;
+        }
+
+        .gray-dark {
+            background-color: var(--gray-dark-color);
+            color: #444;
+        }
+
+        .gray-light {
+            background-color: var(--gray-light-color);
+            color: #444;
+        }
+
+        .page-title {
+            @apply(--paper-font-display2);
+        }
+
+        paper-menu a > *,
+        paper-menu paper-item > *,
+        paper-menu paper-icon-item > * {
+            pointer-events: none;
+        }
+
+        paper-dialog paper-button {
+            margin-top: 0;
+        }
+
+        paper-card {
+            display: block;
+        }
+
+        paper-material,
+        paper-card {
+            padding-bottom: 8px;
+        }
+
+        paper-material > h2,
+        paper-material > p,
+        paper-card > h2,
+        paper-card > p {
+            padding: 16px;
+            font-weight: 400;
+        }
+
+        paper-material.form {
+            max-width: 940px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        paper-material.form > h2 {
+            padding: 0 0 16px 0;
+        }
+
+        .top-actions {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+
+        .bottom-actions {
+            padding-bottom: 2px;
+            margin-top: 16px;
+        }
+
+        paper-dialog {
+            padding: 0;
+        }
+
+        paper-card paper-button:not([disabled]),
+        paper-material paper-button:not([disabled]),
+        paper-button.blue:not([disabled]) {
+            background-color: var(--mist-blue);
+            font-weight: 500;
+            color: #fff;
+            margin: 0;
+            @apply(--layout-flex);
+        }
+        paper-button.blue:not([disabled]) {
+            background-color: var(--mist-blue);
+            font-weight: 500;
+            color: #fff;
+            margin: 0;
+            @apply(--layout-flex-none);
+        }
+        paper-button.blue-link {
+            background-color: transparent;
+            font-weight: 400;
+            color: rgba(0,0,0,87);
+            margin: 0;
+        }
+
+        paper-material paper-button.simple {
+            color: inherit;
+            background-color: transparent;
+        }
+        paper-material paper-button.simple.white {
+            color: inherit;
+            background-color: #fff;
+            padding-left: 24px;
+            padding-right: 24px;
+            margin-left: 8px;
+        }
+        .notifications > * {
+            color: #fff;
+            padding: 8px;
+            margin: 16px 0;
+        }
+
+        :host >::content .focused-line.paper-input-container {
+            background-color: var(--mist-blue);
+        }
+
+        :host >::content .input-content.label-is-floating.paper-input-container label {
+            /*color: rgba(0, 0, 0, 0.54);*/
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 600px) {
+            .page-title {
+                font-size: 24px!important;
+            }
+        }
+        /* Courrier font */
+
+        .monospace {
+            font-family: monospace;
+        }
+
+        .page {
+            display: block;
+        }
+
+        .page-block {
+            width: 100%;
+            padding-right: 24px;
+        }
+
+        .smallcaps {
+            text-transform: uppercase;
+            font-size: 14px;
+            opacity: 0.54;
+        }
+
+        .inline {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            align-self: center;
+        }
+
+        .no-pad {
+            padding: 0;
+        }
+
+        .pad-left {
+            padding-left: 8px;
+        }
+
+        .pad-right {
+            padding-right: 8px;
+        }
+
+        .pad1 {
+            padding-right: 8px;
+            padding-left: 8px;
+        }
+
+        .pad2 {
+            padding-right: 16px;
+            padding-left: 16px;
+        }
+
+        .pad-left2 {
+            padding-left: 16px;
+        }
+
+        .pad-right2 {
+            padding-right: 16px;
+        }
+
+        .blue-link {
+            color: var(--mist-blue);
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .opaque54,
+        .micon {
+            opacity: 0.54;
+        }
+        .micon {
+            float: left;
+        }
+        .micon-wrap {
+            display: inline;
+            vertical-align: baseline;
+        }
+
+        paper-fab {
+            background: var(--mist-blue);
+        }
+
+        /* Paper progress */
+
+        paper-progress {
+            --paper-progress-active-color: var(--mist-blue);
+        }
+        /* paper header */
+        .paper-header [paper-drawer-toggle] {
+            margin-left: 10px;
+        }
+
+        .paper-header {
+            @apply(--layout-horizontal);
+            @apply(--layout-center);
+        }
+
+        .paper-header h2 {
+            margin-left: 20px;
+            @apply(--layout-flex);
+            text-transform: capitalize;
+        }
+
+        .paper-header .toggleViewButton {
+            --paper-icon-button-ink-color: transparent;
+        }
+
+        .paper-header .cartButton {
+            margin-right: 10px;
+        }
+        .is-loading {
+            top: 15px;
+            left: 200px;
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            display: block;
+            height: 100vh;
+            background-color: #eee;
+        }
+        .is-loading paper-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 10% auto;
+            display: block;
+        }
+        </style>
+    </template>
+</dom-module>
+<dom-module id="tags-and-labels">
+    <template>
+        <style>
+        .label > span{
+            padding-right: 10px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .label:not(.reverse) {
+            padding-left: 16px;
+        }
+
+        .label:not(.reverse) > span {
+            padding: 0.3em 0.57em;
+            border-radius: 2px;
+            font-weight: 700;
+            cursor: inherit;
+        }
+
+        .label:not(.reverse) .unknown {
+            background-color: var(--gray-light-color);
+            color: rgba(0, 0, 0, 0.82);
+        }
+
+        .label:not(.reverse) .running {
+            background-color: var(--green-color);
+        }
+
+        .label:not(.reverse) .terminated {
+            background-color: var(--mist-dark-color);
+        }
+
+        .label:not(.reverse) .stopped {
+            background-color: var(--orange-color);
+        }
+
+        .label:not(.reverse) .error {
+            background-color: var(--red-color);
+        }
+
+        .label.reverse .unknown,  {
+            color: var(--mist-light-color);
+            background-color: transparent;
+        }
+
+        .label.reverse .running,
+        .running {
+            color: var(--green-color);
+            background-color: transparent;
+        }
+
+        .label.reverse .terminated,
+        .terminated {
+            color: var(--mist-dark-color);
+            background-color: transparent;
+        }
+
+        .label.reverse .stopped,
+        .stopped {
+            color: var(--orange-color);
+            background-color: transparent;
+        }
+
+        .label.reverse .error,
+        .error {
+            color: var(--red-color);
+            background-color: transparent;
+        }
+
+        .tag {
+            display: inline-block;
+            background-color: #888;
+            color: #fff;
+            font-size: 14px;
+            padding: 0 0.5em;
+            margin: 0 1px;
+            border-radius: 2px;
+            letter-spacing: .4px;
+            font-weight: 500 !important;
+            word-break: break-all;
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        </style>
+    </template>
+</dom-module>
+<dom-module id="headings">
+    <template>
+        <style>
+        .app-title {
+            color: #fff;
+            text-transform: uppercase;
+            text-align: center;
+            background-color: var(--mist-dark-color);
+            border-bottom: 4px solid #37474F;
+            text-align: center;
+            padding-top: 4px;
+            margin: 0;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .app-title-light {
+            color: var(--mist-dark-color);
+            background-color: var(--mist-light-color);
+            padding: 2px 16px 0 16px;
+            border-bottom: 4px solid #90A4AE;
+        }
+
+        .app-title-lighter {
+            color: var(--mist-dark-color);
+            background-color: var(--mist-very-light-color);
+            padding: 2px 16px 0 16px;
+            border-bottom: 4px solid #CFD8DC;
+        }
+        </style>
+    </template>
+</dom-module>
+<dom-module id="list-items">
+    <template>
+        <style>
+        paper-item.border {
+            border-bottom: 1px solid #ddd;
+        }
+        </style>
+    </template>
+</dom-module>
+<dom-module id="lists">
+    <template>
+        <style>
+        .check {
+            border: 1px solid #ddd;
+        }
+        /* none of the two below works */
+
+        paper-input >::content div[pseudo="-webkit-search-cancel-button"] {
+            opacity: 0 !important;
+            display: none;
+            !important;
+        }
+
+        key-item-element::content .paper-item:focus:before {
+            background-color: none !important;
+            opacity: 0 !important;
+        }
+
+        .list-head {
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06), 0 2px 0 rgba(0, 0, 0, 0.075), 0 3px 0 rgba(0, 0, 0, 0.05), 0 4px 0 rgba(0, 0, 0, 0.015);
+            background-color: #f2f2f2;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 0 16px;
+            font-weight: 400;
+            font-size: 0.9em;
+            color: inherit;
+            position: relative;
+            z-index: 2;
+        }
+
+        .list-head > * {
+            padding: 8px 0;
+            line-height: 43px;
+        }
+
+        ::content paper-item {
+            padding: 8px 16px;
+            border-bottom: 1px solid #ddd;
+            min-height: inherit;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        ::content paper-item .name {
+            font-weight: 500;
+        }
+
+        ::content paper-item paper-checkbox[disabled] ~ .name {
+            opacity: 0.54;
+            font-weight: 400;
+        }
+
+        .row:nth-child(2n+1):hover,
+        .row:hover {
+            background-color: #eee;
+        }
+
+        .list {
+            position: relative;
+            padding-bottom: 120px;
+        }
+
+        .title-text {
+            padding: 16px 16px 0 16px;
+        }
+
+        .list-options {
+            background-color: #dedede;
+            /*border-bottom: 1px solid #e5e5e5;*/
+            display: flex;
+            align-items: baseline;
+            position: relative;
+        }
+
+        .list-options > .search {
+            padding: 8px 8px 8px 16px;
+            margin-right: 0;
+            background-color: #fff;
+            transition: all 200ms;
+            background-color: #dedede;
+        }
+
+        .list-options > .search.true {
+            margin-right: 16px;
+            background-color: #fff;
+        }
+
+        .list-options paper-icon-button {
+            vertical-align: top;
+        }
+
+        -webkit-search-cancel-button {
+            display: none !important;
+        }
+
+        .list-title {
+            margin: 0;
+            color: #90A4AE;
+            font-size: 0.9em;
+            font-weight: 500;
+            line-height: 40px;
+            text-transform: uppercase;
+            transition: 200ms color;
+        }
+
+        .list-head {
+            text-transform: uppercase;
+        }
+
+        paper-tooltip {
+            text-transform: none;
+            font-size: 16px;
+        }
+
+        .search {
+            display: inline-block;
+        }
+
+        .list-options paper-icon-button >::content iron-icon:hover {
+            color: var(--mist-blue);
+        }
+
+        .row {
+            overflow: hidden;
+            background-color: #fff;
+        }
+
+        .row-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 3;
+            display: none;
+            transition: 200ms color;
+            height: inherit;
+        }
+
+        .row:hover .row-actions {
+            display: block;
+        }
+        /* tablet-large */
+
+        @media all and (max-width: 840px) {
+            .row .row-actions {
+                display: block;
+                opacity: 0.32;
+            }
+        }
+
+        .row .row-actions paper-icon-button:hover {
+            color: var(--mist-blue);
+        }
+
+        .list-options .label {
+            font-size: 0.8em;
+            color: inherit;
+            padding: 8px 8px 0 0;
+            line-height: 25px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+        .list-options paper-input[type='search'] {
+            width: 400px;
+        }
+
+        ::content iron-collapse.sub-items {
+            border-bottom: 2px solid #ccc;
+            background-color: #f6f6f6;
+        }
+
+        ::content iron-collapse.sub-items .info-item {
+            padding: 16px 0 16px 46px;
+            border-bottom: 1px solid #ccc;
+            min-height: inherit;
+            opacity: 0.54;
+            font-size: 0.9em;
+        }
+
+        ::content .active-true {
+            color: #999;
+        }
+
+        ::content .session-active {
+            color: #000;
+        }
+
+        ::content .revoke {
+            background-color: var(--red-color);
+            color: #fff;
+            padding: 2px 6px;
+        }
+
+
+        </style>
+    </template>
+</dom-module>
+<dom-module id="single-page">
+    <template>
+        <style>
+        #content {
+            -webkit-overflow-scrolling: touch;
+            max-width: 1500px;
+            margin: 0px auto;
+            overflow: visible;
+            padding: 36px 36px 80px 36px;
+            background-color: #eee;
+        }
+        .paper-toolbar .title {
+            pointer-events: all;
+        }
+        .info-head > * {
+            font-weight: 700;
+            padding: 16px 0;
+        }
+
+        .info-head {
+            border-bottom: 1px solid #7f7f7f;
+        }
+
+        paper-material.single-head,
+        .single-head {
+            height: 108px;
+            padding: 24px;
+            box-align: center;
+            align-items: center;
+            background-color: #424242;
+            border-radius: 4px 4px 0 0;
+            box-sizing: border-box;
+            display: flex !important;
+        }
+        .single-head .icon {
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.018em;
+            line-height: 24px;
+        }
+        .single-head .icon iron-icon {
+            border-radius: 50%;
+            box-sizing: border-box;
+            margin-top: 0;
+            position: relative;
+            flex: 0 0 auto;
+            height: 60px;
+            width: 60px;
+            background-color: rgba(255,255,255,0.15);
+            padding: 8px;
+        }
+        .single-head iron-icon {
+            color: #fff;
+        }
+        .single-head .title {
+            text-align: left;
+            margin-left: 24px;
+            overflow: hidden;
+            flex: 1;
+            color: #fff;
+        }
+        .single-head .title h2 {
+            font-size: 1.5em;
+            line-height: initial;
+        }
+        .single-head .subtitle {
+            margin-top: 4px;
+        }
+        .subtitle .sub {
+            padding-right: 16px;
+        }
+        .subtitle .desc {
+            opacity: 0.54;
+            font-size: 0.9em;
+        }
+
+        .subtitle a {
+            color: inherit;
+        }
+
+        .single-head .item-actions {
+            display: inline-block;
+            flex: 0 0 auto;
+            color: #fff;
+        }
+        .item-actions > * {
+            vertical-align: middle;
+        }
+        .item-actions > paper-button.left-icon iron-icon {
+            padding-right: 8px;
+        }
+        .item-actions > paper-button.right-icon iron-icon {
+            padding-left: 8px;
+        }
+        .single-head .item-actions ::content iron-icon {
+            color: #fff;
+            /*display: inline-block;*/
+            vertical-align: bottom;
+        }
+        .subhead {
+            background-color: #dedede;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: baseline;
+            padding: 16px 24px;
+            line-height: 20px;
+            font-size: 13px;
+            position: relative;
+        }
+
+        .subhead h5 {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .info-body .info-item {
+            border-bottom: 1px solid #d4d4d4;
+            padding: 16px 0;
+            min-height: inherit;
+        }
+
+        .info-body .sub-items .info-item {
+            color: #7f7f7f;
+        }
+
+        .info-body .info-item iron-icon {
+            margin-right: 10px;
+        }
+
+        .info-body .info-item.even {
+            background-color: #f2f2f2;
+        }
+
+        .info-body .info-item.last {
+            border: none;
+        }
+        /* Table Basic Styling */
+
+        .info-table .info-item .flexchild:first-of-type {
+            font-weight: 700;
+        }
+
+        .info-table .info-group .info-item:nth-of-type(2n) {
+            background-color: #f2f2f2;
+        }
+
+        .info-table .info-group .info-item:last-of-type {
+            border: none;
+        }
+
+        .info-group .info-item .flexchild:first-of-type {
+            font-weight: 700;
+        }
+
+        .info-group .info-item:nth-of-type(2n) {
+            background-color: #f2f2f2;
+        }
+
+        .info-group .info-item:last-of-type {
+            border: none;
+        }
+
+        .info-group .info-item {
+            border-bottom: 1px solid #d4d4d4;
+            padding: 16px 8px;
+            min-height: inherit;
+        }
+        </style>
+    </template>
+</dom-module>
+<dom-module id="forms">
+    <template>
+        <style>
+        :host {
+            display: block;
+        }
+
+        :host[focused] {
+            outline: none;
+        }
+
+        paper-material.form {
+            background-color: #fff;
+            padding: 24px;
+        }
+
+        :host::content form paper-button {
+            background-color: var(--mist-blue);
+            color: #fff;
+            margin: 0;
+            @apply(--layout-flex);
+        }
+
+        ::content paper-button {
+            font-weight: 400;
+            padding: 0.8em 1.57em 0.7em 1.57em;
+        }
+
+        ::content form paper-menu > paper-button {
+            margin: 8px;
+        }
+
+        ::content form paper-button > * {
+            color: #fff;
+        }
+
+        :host paper-button[disabled] {
+            background-color: #eaeaea;
+            color: #a8a8a8;
+            cursor: not-allowed;
+            margin: 0
+        }
+
+        ::content hr {
+            height: 0;
+            border-bottom: 1px solid #eee;
+            background: transparent;
+            border-width: 0 0 1px 0;
+            margin: 32px 0 8px 0;
+        }
+        ::content hr.appform {
+            margin: 0;
+        }
+
+        paper-material > h2 {
+            margin: 0;
+            height: 36px;
+            line-height: 36px;
+            padding-left: 0;
+        }
+
+        ::content paper-item:hover {
+            background-color: var(--mist-lighter-color);
+        }
+
+        paper-dropdown-menu::content paper-item:last-of-type {
+            border-bottom: 0 none;
+        }
+
+        paper-dropdown-menu::content paper-menu {
+            padding: 0;
+        }
+
+        paper-dropdown-menu::content iron-dropdown {
+            position: absolute !important;
+            top: 53px !important;
+            left: 0px !important;
+            right: 0;
+            width: 100%;
+        }
+
+        paper-dropdown-menu::content iron-dropdown .dropdown-content {
+            width: 100%;
+        }
+
+        paper-textarea.like-editor >::content textarea {
+            color: #fff !important;
+            padding: 2px !important;
+            padding: 4px 8px !important;
+            font-size: 0.9em !important;
+            font-family: monospace !important;
+        }
+
+        paper-textarea.like-editor >::content iron-autogrow-textarea {
+            background-color: var(--mist-dark-color);
+        }
+        .field-helptext {
+            font-size: 14px;
+            align-self: center;
+            color: rgba(0,0,0,0.54);
+        }
+        [focused] + .field-helptext {
+            font-size: 14px;
+            align-self: center;
+            color: rgba(0,0,0,0.87);
+        }
+        hr.hr-equal {
+            margin: 32px 0;
+        }
+        </style>
+    </template>
+</dom-module>
+<dom-module id="dialogs">
+    <template>
+        <style>
+        paper-menu,
+        paper-dropdown-menu {
+            width: 100%;
+        }
+
+        paper-dialog {
+            width: 300px;
+        }
+
+        paper-dialog-scrollable p {
+            margin: 0;
+            font-size: 16px;
+            color: rgba(0, 0, 0, 0.54);
+        }
+
+        paper-dialog paper-icon-button.close {
+            position: absolute;
+            margin: 0;
+            top: 15px;
+            right: 16px;
+        }
+
+        paper-button {
+            margin-left: 0;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            margin: 24px 0 0 0;
+        }
+        </style>
+    </template>
+</dom-module>
+<dom-module id="info-table-style">
+    <template>
+        <style>
+        /* Info Card */
+
+        .info-card {
+            display: block;
+        }
+
+        .info-card .title-text {
+            border-bottom: 2px solid #7f7f7f;
+            font-size: 18px !important;
+            text-transform: uppercase;
+        }
+
+        .info-card .card-content {
+            padding: 0;
+        }
+        /* Info Table */
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        .info-table .info-table-divider {
+            background-color: #eeedeb;
+        }
+        .info-teble table {
+            table-layout: fixed;
+        }
+        .info-table tr td {
+            width: 50%;
+            padding: 16px;
+            border-bottom: 1px solid #eeedeb;
+            font-size: 14px;
+            overflow: hidden !important;
+            word-break: break-all !important;
+            word-wrap: break-word !important;
+            white-space: normal !important;
+        }
+
+        .info-table tr td:first-child {
+            font-weight: 500;
+        }
+
+        .info-table tr:nth-of-type(2n) {
+            background-color: #f2f2f2;
+        }
+
+        .info-table tr:last-child td {
+            border: none;
+        }
+        </style>
+    </template>
+</dom-module>

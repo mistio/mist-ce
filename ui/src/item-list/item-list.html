@@ -1,0 +1,818 @@
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../../bower_components/paper-styles/paper-styles.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/vaadin-icons/vaadin-icons.html">
+
+<link rel="import" href="../app-image-icons/app-image-icons.html">
+<link rel="import" href="../app-check/app-check.html">
+
+<link rel="import" href="list-item.html">
+<link rel="import" href="item-actions.html">
+
+<dom-module id="item-list">
+    <template>
+        <style>
+        :host {
+            display: block;
+            position: relative;
+            background: white;
+            border-radius: 3px;
+            opacity: 1;
+            transition: opacity 0.4s;
+        }
+
+        :host(.hidden) {
+            transition: none;
+            opacity: 0;
+        }
+
+        iron-list {
+            border-right: 1px solid #d0d0d0;
+            border-left: 1px solid #d0d0d0;
+            border-bottom: 1px solid #d0d0d0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            max-height: calc(100vh - 168px);
+            margin-bottom: 24px;
+        }
+
+        paper-button {
+            padding: 0 8px 0 16px;
+        }
+
+        paper-button.more {
+            float: right;
+            margin-right: 0;
+        }
+
+        .row {
+            overflow: hidden;
+        }
+
+        .row paper-button.more {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0 0 0 24px;
+            background-color: inherit;
+            min-width: auto;
+            height: 64px;
+        }
+
+        .row paper-button.more iron-icon {
+            float: right;
+            margin-right: 31px;
+        }
+
+        paper-button > span {
+            padding: 0 .7em;
+        }
+
+        app-check {
+            margin-right: 24px;
+            margin-top: 14px;
+        }
+
+        .header {
+            padding: 0 24px;
+            line-height: 54px;
+            font-size: 14px;
+            font-weight: 400;
+            border-bottom: 1px solid #e5e5e5;
+            overflow: hidden;
+            border-right: 1px solid #d0d0d0;
+            border-left: 1px solid #d0d0d0;
+            border-top: 1px solid #d0d0d0;
+        }
+
+        .header > .field {
+            text-transform: uppercase;
+        }
+
+        app-check.check-all {
+            color: white;
+            margin: 8px 16px 0 0;
+        }
+
+        ::content .check-all iron-icon {
+            color: white;
+            opacity: 0.5;
+        }
+
+        :host(:not([narrow-viewport])) .header,
+        :host(:not([narrow-viewport])) .row {
+            @apply(--layout-horizontal);
+        }
+
+        :host([narrow-viewport]) .header {
+            @apply(--layout-horizontal);
+        }
+
+        :host([narrow-viewport]) .row,
+        :host([narrow-viewport]) .row a {
+            @apply(--layout-vertical);
+        }
+
+        .row {
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .row a {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 15px 24px;
+            font-weight: 400;
+            font-size: 13px;
+        }
+
+        .row:nth-child(2n+1) {
+            background-color: #fafafa;
+        }
+
+        .row:nth-child(2n) {
+            background-color: #fff;
+        }
+
+        .row.hover, .row:nth-child(2n+1).hover {
+            background: #eee;
+        }
+
+        .field.desc, .field.asc {
+            font-weight: 600;
+        }
+
+        .field.name {
+            min-width: 250px;
+        }
+
+        .field {
+            min-width: 150px;
+            margin-right: 17px;
+            margin-left: 7px;
+        }
+        .field.state,
+        /*.field.create_date,*/
+        .field.cloud,
+        .field.size,
+        .field.image,
+        .field.id {
+            width: 100px;
+            min-width: 100px;
+        }
+
+        .field.cost {
+            width: 70px;
+            min-width: 70px;
+        }
+
+        .tag {
+            background-color: #888;
+            color: #fff;
+            padding: 2px 6px;
+            margin: 0 6px;
+            border-radius: 2px;
+        }
+
+        .field.machines,
+        .field.default,
+        .field.id {
+            width: 100px;
+            min-width: 100px;
+        }
+
+        .no-data {
+            font-style: italic;
+            padding: 15px 24px;
+        }
+
+        /* hide for wide */
+        .header > .narrow {
+            display: none;
+        }
+
+        /* show for narrow */
+        :host([narrow-viewport]) .header > div.field,
+        :host([narrow-viewport]) .header span {
+            display: none;
+        }
+
+        :host([narrow-viewport]) .header > .narrow {
+            display: inline;
+        }
+
+        :host(:not([narrow-viewport])) .row .description {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* show arrow */
+        .field {
+            cursor: pointer;
+        }
+        .field #sortarrow {
+            display: none;
+            transition: transform 300ms ease-in-out 100ms;
+        }
+        .field.asc #sortarrow, .field.desc #sortarrow {
+            display: inline-block;
+        }
+        .field.asc #sortarrow {
+            transform: rotate3d(0, 0, 1, 0);
+        }
+        .field.desc #sortarrow {
+            transform: rotate3d(0, 0, 1, 180deg);
+        }
+        .monitoring:after {
+            position: absolute;
+            height: 200px;
+            content: " ";
+            left: 0;
+            width: 8px;
+            background: var(--green-color);
+        }
+        .pending:after {
+            background:  repeating-linear-gradient(
+              -45deg,
+              #ddd,
+              #ddd 2px,
+              #eee 2px,
+              #eee 4px
+            );
+        }
+        .failed:after {
+            background: var(--orange-color);
+        }
+        .has-incidents:after {
+            background: var(--red-color);
+        }
+        </style>
+
+        <iron-media-query query="(min-width: 1700px)" query-matches="{{xxwideViewport}}"></iron-media-query>
+        <iron-media-query query="(min-width: 1550px)" query-matches="{{xwideViewport}}"></iron-media-query>
+        <iron-media-query query="(min-width: 1400px)" query-matches="{{wideViewport}}"></iron-media-query>
+        <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
+        <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
+        <div class="header" style$="[[_getHeaderStyle(section.color, currentSelectedItems)]]">
+            <template is="dom-if" if="[[!isimages]]">
+                <app-check class="check-all" selected="[[allselected]]" on-tap="_onSelectAll">
+                    <template is="dom-if" if="[[!currentSelectedItems]]">
+                        <iron-icon icon="check"></iron-icon>
+                    </template>
+                    <template is="dom-if" if="[[currentSelectedItems]]">
+                        <strong>[[currentSelectedItems]]</strong>
+                    </template>
+                </app-check>
+            </template>
+            <template is="dom-if" if="[[isimages]]">
+                <app-check class="check-all">
+                    <iron-icon icon="star"></iron-icon>
+                </app-check>
+            </template>
+            <template is="dom-if" if="[[!currentSelectedItems]]">
+              <template is="dom-repeat" items="[[fields]]">
+                  <div class$="[[item]] field field[[index]] [[_isSortedBy(item, sortBy, sortOrder)]]" on-tap="_changeSortOrder">
+                      [[item]]
+                      <span id="sortarrow"><iron-icon icon$="[[_icon(sortOrder)]]"></iron-icon></span>
+                  </div>
+              </template>
+              <div class="field tags">tags</div>
+
+              <div class="narrow">
+                  <paper-dropdown-menu label="Sort by">
+                      <paper-listbox class="dropdown-content" selected="[[sortBy]]">
+                          <paper-item>[[sortBy]]</paper-item>
+                          <template is="dom-repeat" items="[[fields]]">
+                              <paper-item>[[item]]</paper-item>
+                          </template>
+                      </paper-listbox>
+                  </paper-dropdown-menu>[[_isSortedBy(sortBy, sortBy, sortOrder)]]
+              </div>
+            </template>
+            <item-actions id="actions" items="[[items]]" selected-items="[[selectedItems]]" section="[[section]]" org="[[org]]" model="[[model]]"></item-actions>
+        </div>
+        <div class="row no-data" hidden$="[[items.length]]">
+            no data yet
+        </div>
+        <iron-list items="[[items]]" as="item" style$="{{vpHeight}}">
+            <template>
+                <div class="row" data-index$="[[index]]">
+                    <list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]" uri$="[[_itemLink(item)]]">
+                        <template is="dom-if" if="[[ismachines]]">
+                            <span class$="[[itemMonitoringStatus(item, incidents, model.monitoring)]]"></span>
+                        </template>
+                        <template is="dom-if" if="[[!isimages]]">
+                            <app-check id="check" allselected="{{allselected}}" selected$="{{isSelected(item, selectedItems.splices)}}" item="[[item]]" on-tap="_selectItem">
+                                <iron-icon src="[[_computeItemImage(item)]]">M</iron-icon>
+                            </app-check>
+                            <paper-tooltip for="check" position="right">Select item</paper-tooltip>
+                        </template>
+                        <template is="dom-if" if="[[isimages]]">
+                            <app-check id="check" allselected="{{allselected}}" selected$="{{isSelected(item, selectedItems.splices)}}" item="[[item]]" on-tap="_selectItem">
+                                <iron-icon icon="[[_computeItemImage(item)]]"></iron-icon>
+                            </app-check>
+                        </template>
+                    </list-item>
+                    <paper-button class="more" on-tap="_openItemActions"><iron-icon icon="more-vert"></iron-icon></paper-button>
+                </div>
+            </template>
+        </iron-list>
+      </template>
+</dom-module>
+
+<script>
+
+Polymer({
+    is: 'item-list',
+
+    properties: {
+        model: Object,
+        org: Object,
+        items: {
+            type: Array
+        },
+        selectedItems: {
+            type: Array,
+            notify: true
+        },
+        allselected: {
+            type: Boolean,
+            value: false
+        },
+        sortBy: {
+            type: String,
+            notify: true
+        },
+        sortOrder: {
+            type: Number,
+            notify: true
+        },
+        icons: {
+            type: Array
+        },
+        tags: {
+            type: Array
+        },
+        section: {
+            type: Object,
+            notify: true
+        },
+        narrowViewport: {
+            type: Boolean,
+            reflectToAttribute: true
+        },
+        mediumViewport: Boolean,
+        wideViewport: Boolean,
+        xwideViewport: Boolean,
+        xxwideViewport: Boolean,
+        ismachines: {
+            type: Boolean,
+            computed: "isMachines(section)"
+        },
+        isimages: {
+            type: Boolean,
+            computed: "isImages(section)"
+        },
+        iskeys: {
+            type: Boolean,
+            computed: "isKeys(section)"
+        },
+        isnetworks: {
+            type: Boolean,
+            computed: "isNetworks(section)"
+        },
+        istunnels: {
+            type: Boolean,
+            computed: "isTunnels(section)"
+        },
+        isscripts: {
+            type: Boolean,
+            computed: "isScripts(section)"
+        },
+        fields: {
+            type: Array,
+            computed: "displayedFields(section, narrowViewport, mediumViewport, wideViewport, xwideViewport, xxwideViewport)"
+        },
+        vpHeight: {
+            type: String,
+            notify: true
+        },
+        currentSelectedItems: {
+            type: Number,
+            value: 0
+        },
+        incidents: {
+            type: Array,
+            computed: "_computeIncidents(model.incidentsArray.*)"
+        }
+    },
+
+    listeners: {
+        'selected-of-current-section-length' : 'updateNumber'
+        // 'list-selection' : 'itemsChanged'
+    },
+
+    observers: [
+      'itemsChanged(items.*)',
+    ],
+    updateNumber: function(e){
+        this.set('currentSelectedItems', e.detail.itemLength);
+    },
+    ready: function() {
+        this.set('items', []);
+        this.set('selectedItems', []);
+        var topOfset = 142;
+        var wh = window.innerHeight - topOfset;
+        var itemHeight = 65;
+        var criticalNumofItems = Math.floor(wh/itemHeight) + 1 ;
+
+        this.vpHeight = 'height:65px;';
+    },
+    itemMonitoringStatus: function(item, incidents, monitoring){
+        var classes = "";
+        //nstallation_status
+//case
+        // manual:true
+        // started_at:1477334865
+        // state:"installing"
+
+//case
+        // error_msg :""
+        // finished_at:1477335451
+        // manual:false
+        // started_at:1477335136
+        // state:"succeeded"
+        // stdout:
+
+        // check if machine is monitored
+        if (!this.model.monitoring) {
+            return " ";
+        }
+        else if (this.model.monitoring && this.model.monitoring.monitored_machines && this.model.monitoring.monitored_machines[item.uuid]) {
+            console.log('itemMonitoringStatus',this.model.monitoring.monitored_machines[item.uuid])
+            classes += "monitoring ";
+        }
+        else {
+            return " ";
+        }
+
+        //check state of monitoring
+        if (this.model.monitoring.monitored_machines[item.uuid].installation_status == "installing" || !this.model.monitoring.monitored_machines[item.uuid].installation_status.activated_at) {
+            classes += "pending "
+        }
+
+        if (this.model.monitoring.monitored_machines[item.uuid].installation_status == "failed"){
+            classes += "failed "
+        }
+
+
+        if (this.incidents.length > 0 && this.incidents.indexOf(item.id) > -1) {
+            classes += "has-incidents "
+        }
+
+        return classes;
+    },
+    attached: function() {
+        // Re-render iron-list a few times in case the items don't change
+        // Prevents empty iron-list when reloading from the list page
+        var that = this,
+            counter = 0,
+            looper = setInterval(function(){
+                counter++;
+            if (counter >= 5) {
+                clearInterval(looper);
+            }
+            that.querySelector('iron-list').notifyResize();
+        }, 300);
+    },
+    _icon: function(sortOrder){
+        // console.log(this.sortOrder);
+        if (this.sortOrder){
+            return 'icons:arrow-upward'
+        }
+        else {
+            return 'icons:arrow-downward'
+        }
+    },
+    itemsChanged: function (changeRecord) {
+        console.warn('scrollTop', this.querySelector('iron-list').scrollTop);
+        var that = this;
+        // update height of list depending on number of items
+        var topOfset = 168;
+        var wh = document.getElementById('mainPanel').offsetHeight - 24 - 54; //#mainPanel height - top padding - header height
+        var itemHeight = 64 + 1; //list item height + border
+        var criticalNumofItems = Math.floor(wh/itemHeight) - 1;
+
+        // console.log( wh, ' / ', itemHeight, ' -1 = ' , criticalNumofItems, '|', this.items.length, ' * 64 = ', itemHeight * this.items.length );
+
+        if (that.items.length > criticalNumofItems){
+            this.vpHeight = 'height:'+ wh +'px;';
+        }
+        else {
+            this.vpHeight = 'height:'+ itemHeight * this.items.length +'px;';
+        }
+
+        this.debounce('itemsChanged', function () {
+            // If some selectedItems are no longer in the items list, unselect them
+            // console.debug('itemsChanged');
+            if (!that.selectedItems) {
+                // console.log('returning');
+                return;
+            }
+            var oldSelected = that.get('selectedItems').slice(0);
+            while (that.get('selectedItems.length')) {
+                var popped = that.pop('selectedItems');
+                // console.log('poping 1 element', popped);
+            }
+            for (var i=0; i < that.items.length; i++) {
+                if (oldSelected.indexOf(that.itemUid(that.items[i]))>-1) {
+                  that.push('selectedItems', that.itemUid(that.items[i]));
+                  // console.log('pushing back 1 element', that.itemUid(that.items[i]));
+                }
+            }
+            // console.log('new selected', this.selectedItems);
+
+            if (that.get('items.length') != that.get('selectedItems.length'))
+                that.set('allselected', false);
+
+        }, 50);
+    },
+    _computeIncidents: function(incidents){
+         // update incidents
+        var machinesWithIncidents = [];
+        if (this.model && this.model.incidentsArray) {
+            machinesWithIncidents = this.model.incidentsArray.filter(function(inc){
+                    return !inc.finished_at || inc.finished_at == 0;
+                }).map(function(inc){
+                    if (this.model.clouds && this.model.clouds[inc.cloud_id] && this.model.clouds[inc.cloud_id].machines && this.model.clouds[inc.cloud_id].machines[inc.machine_id])
+                        return this.model.clouds[inc.cloud_id].machines[inc.machine_id].id;
+            }, this);
+        }
+        return machinesWithIncidents;
+    },
+    selectedItemsChanged: function (changeRecord) {
+        // recompute the actions array property as the intersection
+        // of the available actions of the selected items
+        if (!this.selectedItems || !this.selectedItems.length)
+            this.set('actions', []);
+        var actions = new swiftSet.Set(), isection = new swiftSet.Set();
+        actions.addItems(this.itemActions(this.selectedItems[0]) || []);
+        for (var i=1; i<this.selectedItems.length; i++) {
+            isection.clear()
+            isection.addItems(actions.intersection(this.itemActions(this.selectedItems[i])));
+            actions.clear();
+            actions.addItems(isection.items());
+        }
+
+        this.set('actions', actionDetails(actions.items()));
+    },
+
+    itemUid: function(item) {
+        // Returns a universal resource id of the form
+        //      resourceType:[cloudId]:itemId
+        // e.g. machine:3tm7aaHHZcMxpZ:bf04f27e924fa67023582,
+        //      key::MnhLdx9u22YjVJ
+        //
+        // TODO replace with mist uuids
+
+        return itemUid(item, this.section);
+    },
+
+    isMachines: function(section) {
+        return section && section.id == "machines";
+    },
+
+    isImages: function(section) {
+        return section && section.id == "images";
+    },
+
+    isKeys: function(section) {
+        return section && section.id == "keys";
+    },
+
+    isNetworks: function(section) {
+        return section && section.id == "networks";
+    },
+    isTunnels: function(section) {
+        return section && section.id == "tunnels";
+    },
+    isScripts: function(section) {
+        return section && section.id == "scripts";
+    },
+
+    isTemplates: function(section) {
+        return section && section.id == "templates";
+    },
+
+    isStacks: function(section) {
+        return section && section.id == "stacks";
+    },
+
+    isTeams: function(section) {
+        return section && section.id == "teams";
+    },
+
+    isIncidents: function(section) {
+        return section && section.id == "incidents";
+    },
+
+    isSelected: function(item, selectedItems, items) {
+        return this.selectedItems.indexOf(this.itemUid(item)) > -1;
+    },
+
+    displayedFields: function (section) {
+        if (this.isMachines(this.section)){
+            if (this.get('xxwideViewport'))
+                return ['name', 'state', 'cloud', 'cost', 'created', 'size', 'image', 'id'];
+            if (this.get('xwideViewport'))
+                return ['name', 'state', 'cloud', 'cost', 'size', 'image']
+            if (this.get('wideViewport'))
+                return ['name', 'state', 'cloud', 'size']
+            if (!this.get('mediumViewport') && !this.get('narrowViewport'))
+                return ['name', 'state', 'cloud']
+            else
+                return ['name', 'state', 'cloud'];
+        }
+        if (this.isImages(this.section)) {
+            return ['name', 'cloud', 'id']
+        }
+        if (this.isKeys(this.section)) {
+            return ['name', 'machines', 'id', 'default']
+        }
+        if (this.isNetworks(this.section)) {
+            return ['name', 'provider', 'status', 'id', 'network_type', 'subnets']
+        }
+        if (this.isTunnels(this.section)) {
+            return ['name', 'cidrs', 'id']
+        }
+        if (this.isScripts(this.section)) {
+            return ['name', 'id', 'exec_type', 'location_type'];
+        }
+        if (this.isTemplates(this.section)) {
+            return ['name', 'exec_type', 'location_type'];
+        }
+        if (this.isStacks(this.section)) {
+            return ['name', 'template', 'description', 'stack state']
+        }
+        if (this.isTeams(this.section)) {
+            return ['name', 'description', 'members']
+        }
+        if (this.isIncidents(this.section)) {
+            return ['incident_id', 'machine_id', 'cloud_id', 'rule_id', 'started_at', 'finished_at']
+        }
+        return ['id'];
+
+    },
+
+    _openItemActions: function (e) {
+        var actionsItem = this.$.actions;
+        var bodyRect = document.body.getBoundingClientRect(),
+            elemRect =  e.target.tagName == 'PAPER-BUTTON' ?
+                        e.target.getBoundingClientRect() :
+                        e.target.parentNode.getBoundingClientRect(),
+            offsetTop   = elemRect.top - bodyRect.top,
+            offsetRight   = elemRect.right - bodyRect.right;
+        e.model.item.type = e.model.item.type || (this.section && this.section.id.slice(0,-1));
+        actionsItem.openItemActions(e.model.item, offsetTop, - offsetRight);
+    },
+
+    _computeItemImage: function (item) {
+        if (this.section.id ==  'images') {
+            return item.star ? 'star' : 'star-border';
+        }
+
+        if (!item.cloud || !item.cloud.provider){
+            return ''
+        }
+        else {
+            var provider = item.cloud.provider.split('_')[0];
+            return '../assets/providers/provider-' + provider + '.png';
+        }
+    },
+
+    _selectItem: function(e, g) {
+        var item = e.model.item,
+            index = this.selectedItems.indexOf(this.itemUid(item)),
+            checkbox = g.sourceEvent.target.parentNode.parentNode;
+
+        if (index > -1) { // deselect
+            this.splice('selectedItems', index, 1);
+            //checkbox.set('selected', false);
+            this.set('allselected', false);
+        } else { // select
+            this.push('selectedItems', this.itemUid(item));
+            //checkbox.set('selected', true);
+            if (this.get('selectedItems.length') == this.get('items.length')){
+                this.set('allselected', true);
+            }
+        }
+    },
+
+    _changeSortOrder: function(e, g) {
+        if (this.get('sortBy') != e.model.item) {
+            //new sortBy chosen
+            this.set('sortBy', e.model.item);
+            this.set('sortOrder', 1);
+
+        } else if (this.get('sortBy') == e.model.item){
+            //same sortBy chosen
+            var newSortOrder = this.get('sortOrder')*(-1)
+            this.set('sortOrder', newSortOrder);
+        }
+    },
+
+    _isSortedBy: function (e) {
+        // console.info('_isSortedBy',e, this.sortBy, e == this.sortBy)
+
+        if (e == this.sortBy)
+          return this.sortOrder == 1 ? 'desc' : 'asc';
+    },
+
+    _currentRowIndex: -1,
+
+    _sharedActionMenu: null,
+
+    _findAncestor: function(node, fn) {
+        while (node && fn.call(this, node)) {
+            node = node.parentNode;
+        }
+        return node;
+    },
+
+    _tap: function(e) {
+        var sourceEvent = e.detail.sourceEvent;
+        var A = this._findAncestor(e.target, function(node) {
+            return node != this && node.tagName !== 'A';
+        });
+
+        if (A && A.tagName === 'A' && A.href.indexOf(location.host) > 0) {
+            if (sourceEvent.ctrlKey || sourceEvent.metaKey) {
+                window.open(A.href);
+            } else {
+                this.fire('nav', {
+                    url: A.href
+                });
+            }
+        }
+        this.fire('update-params');
+    },
+
+    _itemLink: function(item) {
+        var p, s = this.section.id;
+        if (s == "machines" && item.uuid)
+            p = item.uuid
+        else if (s == "networks")
+            p = item.id
+        else if (s == "incidents") {
+            if (this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id])
+                p = item.machine_id
+        }
+        else
+            p = item.id
+
+
+        if (s != "incidents")
+            return "/" + this.section.id + "/" + p;
+        else
+            return p ? "/machines/" + p : "/machines";
+    },
+
+    _getHeaderStyle: function(color, selectedItemsLength) {
+        if (selectedItemsLength > 0)
+            return 'background-color: #666; color: #fff; padding-right: 0px;';
+        else
+            return 'background-color: #F2F2F2;';
+
+    },
+
+    _layoutIfNeeded: function(el) {
+        return el.offsetTop;
+    },
+
+    _onSelectAll: function(e) {
+        this.set('allselected', !this.allselected);
+        if (this.allselected) {
+            for (var i=0; i<this.items.length; i++){
+                if (this.selectedItems.indexOf(this.itemUid(this.items[i]))==-1)
+                    this.push('selectedItems', this.itemUid(this.items[i]));
+            }
+        } else {
+            for (var i=this.selectedItems.length-1; i>=0; i--) {
+                var item = this.selectedItems[i];
+                var t = item.split(':')[0];
+                // pop items of the current section
+                if (this.section.id.indexOf(t) > -1){
+                    this.splice('selectedItems',i,1);
+                }
+            }
+        }
+
+    }
+});
+
+</script>
