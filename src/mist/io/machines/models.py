@@ -3,6 +3,7 @@ import json
 import uuid
 import mongoengine as me
 
+from mist.core import config as core_config
 import mist.core.tag.models
 from mist.io.clouds.models import Cloud
 from mist.io.machines.controllers import MachineController
@@ -26,13 +27,33 @@ class Actions(me.EmbeddedDocument):
 class Monitoring(me.EmbeddedDocument):
     # Most of these will change with the new UI.
     hasmonitoring = me.BooleanField()
-    monitor_server = me.StringField()
+    monitor_server = me.StringField()  # Deprecated
     collectd_password = me.StringField()
     metrics = me.ListField()  # list of metric_id's
     installation_status = me.EmbeddedDocumentField(InstallationStatus)
 
+    def get_commands(self):
+        # FIXME: This is a hack.
+        from mist.io.methods import get_deploy_collectd_command_unix
+        from mist.io.methods import get_deploy_collectd_command_windows
+        from mist.io.methods import get_deploy_collectd_command_coreos
+        args = (self._instance.id, self.collectd_password,
+                core_config.COLLECTD_HOST, core_config.COLLECTD_PORT)
+        return {
+            'unix': get_deploy_collectd_command_unix(*args),
+            'coreos': get_deploy_collectd_command_coreos(*args),
+            'windows': get_deploy_collectd_command_windows(*args),
+        }
+
     def as_dict(self):
-        return json.loads(self.to_json())
+        return {
+            'hasmonitoring': self.hasmonitoring,
+            'monitor_server': core_config.COLLECTD_HOST,
+            'collectd_password': self.collectd_password,
+            'metrics': self.metrics,
+            'installation_status': self.installation_status.as_dict(),
+            'commands': self.get_commands(),
+        }
 
 
 class Cost(me.EmbeddedDocument):

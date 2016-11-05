@@ -20,6 +20,7 @@ accessed through a cloud model, using the `ctl` abbreviation, like this:
 """
 
 
+import re
 import uuid
 import json
 import socket
@@ -77,14 +78,16 @@ class AmazonController(BaseController):
         # Autofill apisecret from other Amazon Cloud.
         apikey = kwargs.get('apikey')
         apisecret = kwargs.get('apisecret')
-        if apisecret == 'getsecretfromdb':
+        if apikey and apisecret == 'getsecretfromdb':
             cloud = type(self.cloud).objects(owner=self.cloud.owner,
                                              apikey=apikey).first()
             if cloud is not None:
                 kwargs['apisecret'] = cloud.apisecret
 
+    def _update__preparse_kwargs(self, kwargs):
+
         # Regions translations, eg ec2_ap_northeast to ap-northeast-1.
-        region = kwargs.get('region', '')
+        region = kwargs.get('region', self.cloud.region)
         if region.startswith('ec2_'):
             region = region[4:]
             parts = region.split('_')
@@ -107,6 +110,12 @@ class AmazonController(BaseController):
         machine.os_type = machine_libcloud.extra.get('platform', 'linux')
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
+        # TODO: stopped instances still charge for the EBS device
+        # https://aws.amazon.com/ebs/pricing/
+        # Need to add this cost for all instances
+        if machine_libcloud.state == NodeState.STOPPED:
+            return 0, 0
+
         image_id = machine_libcloud.extra.get('image_id')
         try:
             # FIXME: This is here to avoid circular imports.
@@ -131,7 +140,18 @@ class AmazonController(BaseController):
         default_images = config.EC2_IMAGES[self.cloud.region]
         image_ids = default_images.keys() + self.cloud.starred
         if not search:
-            images = self.connection.list_images(None, image_ids)
+            try:
+                # this might break if image_ids contains starred images
+                # that are not valid anymore for AWS
+                images = self.connection.list_images(None, image_ids)
+            except Exception as e:
+                bad_ids = re.findall(r'ami-\w*', e.message, re.DOTALL)
+                for bad_id in bad_ids:
+                    self.cloud.starred.remove(bad_id)
+                self.cloud.save()
+                images = self.connection.list_images(None,
+                                                     default_images.keys() +
+                                                     self.cloud.starred)
             for image in images:
                 if image.id in default_images:
                     image.name = default_images[image.id]
@@ -476,14 +496,9 @@ class GoogleController(BaseController):
                                         self.cloud.private_key,
                                         project=self.cloud.project_id)
 
-    def _add__preparse_kwargs(self, kwargs):
-        private_key = kwargs.get('private_key')
-        if not private_key:
-            raise RequiredParameterMissingError('private_key')
-        project_id = kwargs.get('project_id')
-        if not project_id:
-            raise RequiredParameterMissingError('project_id')
-        email = kwargs.get('email', '')
+    def _update__preparse_kwargs(self, kwargs):
+        private_key = kwargs.get('private_key', self.cloud.private_key)
+        email = kwargs.get('email', self.cloud.email)
         if not email:
             # Support both ways to authenticate a service account,
             # by either using a project id and json key file (highly
@@ -494,7 +509,8 @@ class GoogleController(BaseController):
                 kwargs['email'] = creds['client_email']
                 kwargs['private_key'] = creds['private_key']
             except:
-                raise MistError("Make sure you upload a valid json file.")
+                raise MistError("Specify both 'email' and 'private_key' "
+                                "params, or 'private_key' as a json file.")
 
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         # iso8601 string
@@ -673,11 +689,11 @@ class VSphereController(BaseController):
         """
         self.connect()
 
-    def _add__preparse_kwargs(self, kwargs):
-        if not kwargs.get('host'):
-            raise RequiredParameterMissingError('host')
-        kwargs['host'] = sanitize_host(kwargs['host'])
-        check_host(kwargs['host'])
+    def _update__preparse_kwargs(self, kwargs):
+        host = kwargs.get('host', self.cloud.host)
+        if host:
+            kwargs['host'] = sanitize_host(host)
+            check_host(kwargs['host'])
 
 
 class VCloudController(BaseController):
@@ -690,19 +706,20 @@ class VCloudController(BaseController):
                                          self.cloud.password, host=host,
                                          verify_match_hostname=False)
 
-    def _add__preparse_kwargs(self, kwargs):
-        if not kwargs.get('username'):
-            raise RequiredParameterMissingError('username')
-        if not kwargs.get('organization'):
-            if '@' not in kwargs['username']:
+    def _update__preparse_kwargs(self, kwargs):
+        username = kwargs.get('username', self.cloud.username) or ''
+        organization = kwargs.pop('organization')
+        if not organization:
+            if '@' not in username:
                 raise RequiredParameterMissingError('organization')
         else:
-            kwargs['username'] = '%s@%s' % (kwargs['username'],
-                                            kwargs.pop('organization'))
-        if not kwargs.get('host'):
-            raise RequiredParameterMissingError('host')
-        kwargs['host'] = sanitize_host(kwargs['host'])
-        check_host(kwargs['host'])
+            if '@' in username:
+                username = username.split('@')[0]
+            kwargs['username'] = '%s@%s' % (username, organization)
+        host = kwargs.get('host', self.cloud.host)
+        if host:
+            kwargs['host'] = sanitize_host(host)
+            check_host(kwargs['host'])
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(VCloudController, self)._list_machines__machine_actions(
@@ -716,12 +733,12 @@ class IndonesianVCloudController(VCloudController):
 
     provider = 'indonesian_vcloud'
 
-    def _add__preparse_kwargs(self, kwargs):
-        kwargs.setdefault('host', 'my.idcloudonline.com')
-        if kwargs['host'] not in ('my.idcloudonline.com',
-                                  'compute.idcloudonline.com'):
-            raise me.ValidationError("Invalid host '%s'." % kwargs['host'])
-        super(IndonesianVCloudController, self)._add__preparse_kwargs(kwargs)
+    def _update__preparse_kwargs(self, kwargs):
+        host = kwargs.get('host', self.cloud.host) or 'my.idcloudonline.com'
+        if host not in ('my.idcloudonline.com', 'compute.idcloudonline.com'):
+            raise me.ValidationError("Invalid host '%s'." % host)
+        super(IndonesianVCloudController,
+              self)._update__preparse_kwargs(kwargs)
 
 
 class OpenStackController(BaseController):
@@ -740,10 +757,10 @@ class OpenStackController(BaseController):
             ex_force_base_url=self.cloud.compute_endpoint,
         )
 
-    def _add__preparse_kwargs(self, kwargs):
+    def _update__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'auth_url', 'url')
         rename_kwargs(kwargs, 'tenant_name', 'tenant')
-        url = kwargs.get('url')
+        url = kwargs.get('url', self.cloud.url)
         if url:
             if url.endswith('/v2.0/'):
                 url = url.split('/v2.0/')[0]
@@ -798,13 +815,14 @@ class DockerController(BaseController):
                                            host, port,
                                            docker_host=self.cloud.host)
 
-    def _add__preparse_kwargs(self, kwargs):
+    def _update__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'docker_port', 'port')
         rename_kwargs(kwargs, 'docker_host', 'host')
         rename_kwargs(kwargs, 'auth_user', 'username')
         rename_kwargs(kwargs, 'auth_password', 'password')
-        if kwargs.get('host'):
-            kwargs['host'] = sanitize_host(kwargs['host'])
+        host = kwargs.get('host', self.cloud.host)
+        if host:
+            kwargs['host'] = sanitize_host(host)
             check_host(kwargs['host'])
 
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
@@ -905,10 +923,10 @@ class LibvirtController(BaseController):
             except Keypair.DoesNotExist:
                 raise NotFoundError("Keypair does not exist.")
 
-    def add(self, remove_on_error=True, fail_on_invalid_params=True, **kwargs):
+    def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
         """This is a hack to associate a key with the VM hosting this cloud"""
         super(LibvirtController, self).add(
-            remove_on_error=remove_on_error,
+            fail_on_error=fail_on_error,
             fail_on_invalid_params=fail_on_invalid_params,
             **kwargs
         )
@@ -918,6 +936,13 @@ class LibvirtController(BaseController):
             associate_key(self.cloud.owner, self.cloud.key.id, self.cloud.id,
                           self.cloud.host,  # hypervisor id is the hostname
                           username=self.cloud.username, port=self.cloud.port)
+
+    def update(self, fail_on_error=True, fail_on_invalid_params=True,
+               **kwargs):
+        # FIXME: Add update support, need to clean up kvm 'host' from libcloud,
+        # and especially stop using cloud.host as the machine id ffs.
+        raise BadRequestError("Update action is not currently support for "
+                              "Libvirt/KVM clouds.")
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(LibvirtController, self)._list_machines__machine_actions(
@@ -999,7 +1024,7 @@ class OtherController(BaseController):
         if machine.key_associations:
             machine.actions.reboot = True
 
-    def add(self, remove_on_error=True, fail_on_invalid_params=True, **kwargs):
+    def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
         """Add new Cloud to the database
 
         This is the only cloud controller subclass that overrides the `add`
@@ -1027,15 +1052,22 @@ class OtherController(BaseController):
         if kwargs:
             try:
                 self.add_machine_wrapper(
-                    self.cloud.title, remove_on_error=remove_on_error,
+                    self.cloud.title, fail_on_error=fail_on_error,
                     fail_on_invalid_params=fail_on_invalid_params, **kwargs
                 )
             except Exception as exc:
-                if remove_on_error:
+                if fail_on_error:
                     self.cloud.delete()
                 raise
 
-    def add_machine_wrapper(self, name, remove_on_error=True,
+    def update(self, fail_on_error=True, fail_on_invalid_params=True,
+               **kwargs):
+        raise BadRequestError("OtherServer clouds don't support `update`. "
+                              "Only title can be changed, using `rename`. "
+                              "To change machine details, one must edit the "
+                              "machines themselves, not the cloud.")
+
+    def add_machine_wrapper(self, name, fail_on_error=True,
                             fail_on_invalid_params=True, **kwargs):
         """Wrapper around add_machine for kwargs backwards compatibity
 
@@ -1069,12 +1101,12 @@ class OtherController(BaseController):
             })
 
         # Add machine.
-        return self.add_machine(name, remove_on_error=remove_on_error,
+        return self.add_machine(name, fail_on_error=fail_on_error,
                                 **kwargs)
 
     def add_machine(self, name, host='',
                     ssh_user='root', ssh_port=22, ssh_key=None,
-                    os_type='unix', rdp_port=3389, remove_on_error=True):
+                    os_type='unix', rdp_port=3389, fail_on_error=True):
         """Add machine to this dummy Cloud
 
         This is a special method that exists only on this Cloud subclass.
@@ -1134,15 +1166,15 @@ class OtherController(BaseController):
                     port=ssh_port
                 )
             except MachineUnauthorizedError as exc:
-                if remove_on_error:
+                if fail_on_error:
                     machine.delete()
                 raise CloudUnauthorizedError(exc)
             except ServiceUnavailableError as exc:
-                if remove_on_error:
+                if fail_on_error:
                     machine.delete()
                 raise MistError("Couldn't connect to host '%s'." % host)
             except:
-                if remove_on_error:
+                if fail_on_error:
                     machine.delete()
                 raise
 

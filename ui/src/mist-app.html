@@ -18,17 +18,18 @@
 
 <script type="text/javascript" src="../bower_components/swiftSet/swiftSet.js" inline></script>
 
-<link rel="import" href="../styles/app-theme.html">
-<link rel="import" href="../styles/shared-styles.html">
+<link rel="import" href="styles/app-theme.html">
+<link rel="import" href="styles/shared-styles.html">
 
-<link rel="import" href="../elements/mist-header/mist-header.html">
-<link rel="import" href="../elements/app-sidebar/app-sidebar.html">
-<link rel="import" href="../elements/app-styles/app-styles.html">
-<link rel="import" href="../elements/app-socket/app-socket.html">
-<link rel="import" href="../elements/app-icons/app-icons.html">
-<script type="text/javascript" src="../elements/providers.js" inline></script>
+<link rel="import" href="mist-header/mist-header.html">
+<link rel="import" href="app-sidebar/app-sidebar.html">
+<link rel="import" href="app-styles/app-styles.html">
+<link rel="import" href="app-icons/app-icons.html">
 
+<link rel="import" href="mist-socket.html">
 <link rel="import" href="mist-icons.html">
+
+<script type="text/javascript" src="providers.js" inline></script>
 
 <dom-module id="mist-app">
 
@@ -86,7 +87,7 @@
     </style>
 
     <style is="custom-style" include="shared-styles"></style>
-    <iron-media-query query="(max-width: 860px)" query-matches="{{smallscreen}}"></iron-media-query>
+    <iron-media-query query="(max-width: 1024px)" query-matches="{{smallscreen}}"></iron-media-query>
 
     <app-location route="{{route}}"></app-location>
     <app-route
@@ -102,7 +103,7 @@
           <paper-spinner active></paper-spinner>
         </div>
         <iron-pages id="iron-pages" role="main" selected="[[page]]" attr-for-selected="name" smallscreen$="{{smallscreen}}">
-          <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-dashboard>
+          <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]" is-over-using="[[model.isOverUsing]]"></page-dashboard>
           <page-clouds name="clouds" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-clouds>
           <page-machines name="machines" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-machines>
           <page-images name="images" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-images>
@@ -119,11 +120,11 @@
 
           <page-incidents name="incidents" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-incidents>
 
-          <page-my-account name="my-account" user="[[model.user]]" org="[[model.org]]"></page-my-account>
+          <page-my-account name="my-account" is-over-using="[[model.isOverUsing]]" user="[[model.user]]" org="[[model.org]]" machines="[[model.machinesArray]]"></page-my-account>
         </iron-pages>
     </paper-header-panel>
 
-    <app-socket model="{{model}}" onboarding="{{onboarding}}"></app-socket>
+    <mist-socket model="{{model}}" onboarding="{{onboarding}}"></mist-socket>
 
   </template>
 
@@ -195,7 +196,7 @@
       ],
 
       ready: function(){
-            
+
       },
 
       _style: function(page, sections) {
@@ -403,7 +404,7 @@
             count: '0',
             q: ''
         }, {
-            id: 'my-account',
+             id: 'my-account',
             color: '#2F2F3E',
             icon: 'account-circle',
             count: null

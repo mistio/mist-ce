@@ -85,7 +85,12 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
 
                 editOrg: function() {
                     Mist.organizationEditController.save();
+                },
+
+                toggleUIClicked: function() {
+                    window.location.href = '/toggle-ui/beta';
                 }
+
             },
 
 
