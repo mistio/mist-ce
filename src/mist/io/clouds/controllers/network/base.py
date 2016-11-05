@@ -1,15 +1,15 @@
 import logging
 
-from mist.io.clouds.network.models import Network, Subnet
+from mist.io.clouds.controllers.base import BaseController
+from mist.io.clouds.controllers.network.models import Network, Subnet
+
+from ipdb import launch_ipdb_on_exception
 
 log = logging.getLogger(__name__)
 
 
-class NetworkController(object):
+class BaseNetworkController(BaseController):
     """Abstract base class for networking-specific subcontrollers"""
-
-    def __init__(self, main_controller):
-        self.ctl = main_controller
 
     def create_network(self, network, subnet, router):
         """Create a new network"""
@@ -17,8 +17,8 @@ class NetworkController(object):
 
         network_object = self._create_network_db_object(network_info, do_save=False)
 
-        for subnet in network_info['subnets']:
-            subnet_object = self._create_subnet_db_object(subnet, do_save=False)
+        for subnet in network_info['network']['subnets']:
+            subnet_object = self._create_subnet_db_object(subnet, network_object, do_save=False)
             subnet_object.base_network = network_object
             network_object.subnets.append(subnet_object)
             subnet_object.save()
@@ -46,7 +46,8 @@ class NetworkController(object):
         """Create a new subnet"""
 
         subnet_info = self._create_subnet(subnet, parent_network_id)
-        self._create_subnet_db_object(subnet_info)
+        parent_network = Network.objects.get(id=parent_network_id)
+        self._create_subnet_db_object(subnet_info, parent_network)
 
         return subnet_info
 
@@ -56,11 +57,13 @@ class NetworkController(object):
 
         raise NotImplementedError()
 
-    def _create_subnet_db_object(self, subnet_info, do_save=True):
+    def _create_subnet_db_object(self, subnet_info, parent_network, do_save=True):
         """ Persist a new Subnet object to the DB """
+
         subnet_object = Subnet(title=subnet_info['name'],
                                libcloud_id=subnet_info['id'],
-                               cloud=self.ctl.cloud)
+                               cloud=self.ctl.cloud,
+                               base_network=parent_network)
         if do_save:
             subnet_object.save()
 
@@ -69,7 +72,7 @@ class NetworkController(object):
     def list_networks(self, return_format):
         """List Networks"""
 
-        libcloud_networks = self.ctl.connection.ex_list_networks()
+        libcloud_networks = self.connection.ex_list_networks()
         network_info = self._parse_network_listing(libcloud_networks, return_format)
 
         # TODO: Fetch all existing Network and subnet objects for this cloud, compare and sync
@@ -86,10 +89,17 @@ class NetworkController(object):
         """Delete Network"""
 
         delete_result = self._delete_network(network_id)
+        if delete_result:
+            self._delete_network_db_object(network_id)
         return delete_result
 
     def _delete_network(self, network_id):
         """Handles cloud-specific network deletion calls.
          Should be overridden by all subclasses that can support it"""
 
-        return self.ctl.connection.ex_delete_network(network_id)
+        raise NotImplementedError()
+
+    @staticmethod
+    def _delete_network_db_object(network_id):
+        network_doc = Network.objects.get(id=network_id)
+        network_doc.delete()

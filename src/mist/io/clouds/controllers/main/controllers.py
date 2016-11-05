@@ -46,6 +46,7 @@ from mist.core.vpn.methods import to_tunnel
 from mist.io.clouds.utils import rename_kwargs
 from mist.io.clouds.controllers.main.base import BaseMainController
 from mist.io.clouds.controllers.compute import controllers as compute_ctls
+from mist.io.clouds.controllers.network import controllers as network_ctls
 
 
 log = logging.getLogger(__name__)
@@ -55,6 +56,7 @@ class AmazonMainController(BaseMainController):
 
     provider = 'ec2'
     ComputeController = compute_ctls.AmazonComputeController
+    NetworkController = network_ctls.AmazonNetworkController
 
     def _add__preparse_kwargs(self, kwargs):
         # Autofill apisecret from other Amazon Cloud.
@@ -134,6 +136,7 @@ class GoogleMainController(BaseMainController):
 
     provider = 'gce'
     ComputeController = compute_ctls.GoogleComputeController
+    NetworkController = network_ctls.GoogleNetworkController
 
     def _update__preparse_kwargs(self, kwargs):
         private_key = kwargs.get('private_key', self.cloud.private_key)
@@ -220,6 +223,7 @@ class OpenStackMainController(BaseMainController):
 
     provider = 'openstack'
     ComputeController = compute_ctls.OpenStackComputeController
+    NetworkController = network_ctls.OpenStackNetworkController
 
     def _update__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'auth_url', 'url')

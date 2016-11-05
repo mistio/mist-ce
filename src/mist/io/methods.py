@@ -1671,6 +1671,7 @@ def create_network(owner, cloud_id, network, subnet, router):
     it will use the new network's id to create a subnet
 
     """
+    log.info(network)
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     ret = cloud.ctl.network.create_network(network, subnet, router)
@@ -1827,12 +1828,35 @@ def _create_network_openstack(conn, network, subnet, router):
 
 def delete_network(owner, cloud_id, network_id):
     """
-    Delete a neutron network
-    """
+        Delete a neutron network
+        """
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     if cloud.ctl.provider not in ['ec2', 'gce', 'openstack']:
         raise NetworkActionNotSupported()
     cloud.ctl.network.delete_network(network_id)
+
+    try:
+        task = mist.io.tasks.ListNetworks()
+        task.clear_cache(owner.id, cloud_id)
+        trigger_session_update(owner, ['clouds'])
+    except Exception as e:
+        pass
+
+
+def delete_network_legacy(owner, cloud_id, network_id):
+    """
+    Delete a neutron network
+    """
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    conn = connect_provider(cloud)
+
+    if conn.type is Provider.OPENSTACK:
+        try:
+            conn.ex_delete_network(network_id)
+        except Exception as e:
+            raise NetworkError(e)
+    else:
+        raise NetworkActionNotSupported()
 
     try:
         task = mist.io.tasks.ListNetworks()

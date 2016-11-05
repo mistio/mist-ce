@@ -1,27 +1,38 @@
 import logging
-from mist.io.clouds.network.base import NetworkController
+from mist.io.clouds.controllers.network.base import BaseNetworkController
 from mist.io.exceptions import RequiredParameterMissingError, NetworkCreationError, NetworkError
+from libcloud.compute.providers import get_driver
+from libcloud.compute.types import Provider
+
+from ipdb import launch_ipdb_on_exception
+
+from mist.core.vpn.methods import destination_nat as dnat
 
 log = logging.getLogger(__name__)
 
 
-class AmazonNetworkController(NetworkController):
+class AmazonNetworkController(BaseNetworkController):
+    def _connect(self):
+        return get_driver(Provider.EC2)(self.cloud.apikey,
+                                        self.cloud.apisecret,
+                                        region=self.cloud.region)
+
     def _delete_network(self, libcloud_network):
         try:
-            subnets = self.ctl.connection.ex_list_subnets(filters={'vpc-id': libcloud_network.id})
+            subnets = self.connection.ex_list_subnets(filters={'vpc-id': libcloud_network.id})
             for subnet in subnets:
-                    self.ctl.connection.ex_delete_subnet(subnet)
+                self.connection.ex_delete_subnet(subnet)
 
-            self.ctl.connection.ex_delete_network(libcloud_network)
+            self.connection.ex_delete_network(libcloud_network)
         except Exception as e:
             raise NetworkError(str(e))
 
     def _create_network(self, network, subnet, router):
         try:
-            new_network = self.ctl.connection.ex_create_network(name=network['name'],
-                                                                cidr_block=network['cidr_block'],
-                                                                instance_tenancy=network.get('instance_tenancy',
-                                                                                             'default'))
+            new_network = self.connection.ex_create_network(name=network['name'],
+                                                            cidr_block=network['cidr_block'],
+                                                            instance_tenancy=network.get('instance_tenancy',
+                                                                                         'default'))
         except Exception as e:
             raise NetworkCreationError("Got error %s" % str(e))
 
@@ -29,11 +40,13 @@ class AmazonNetworkController(NetworkController):
 
         if subnet:
             try:
-                new_subnet = self.create_subnet(subnet, new_network)
+                new_subnet = self._create_subnet(subnet, new_network)
             except Exception as e:
-                self.ctl.connection.ex_delete_network(new_network)
+                self.connection.ex_delete_network(new_network)
                 raise NetworkCreationError("Got error %s" % str(e))
-            ret['network']['subnets'] = (self._ec2_subnet_to_dict(new_subnet))
+            ret['network']['subnets'] = [self._ec2_subnet_to_dict(new_subnet)]
+        else:
+            ret['network']['subnets'] = []
 
         return ret
 
@@ -45,10 +58,10 @@ class AmazonNetworkController(NetworkController):
         except Exception as e:
             raise RequiredParameterMissingError(e)
 
-        subnet = self.ctl.connection.ex_create_subnet(name=subnet.get('name'),
-                                                      cidr_block=cidr,
-                                                      vpc_id=parent_network.id,
-                                                      availability_zone=availability_zone)
+        subnet = self.connection.ex_create_subnet(name=subnet.get('name'),
+                                                  cidr_block=cidr,
+                                                  vpc_id=parent_network.id,
+                                                  availability_zone=availability_zone)
         return subnet
 
     @staticmethod
@@ -72,16 +85,21 @@ class AmazonNetworkController(NetworkController):
                 'zone': subnet.extra.get('zone')}
 
     def _parse_network_listing(self, network_listing, return_format):
-        self.ctl.connection.ex_list_subnets()
+        self.connection.ex_list_subnets()
         for network in network_listing:
             network_entry = self._ec2_network_to_dict(network)
-            subnets = self.ctl.connection.ex_list_subnets(filters={'vpc-id': network.id})
+            subnets = self.connection.ex_list_subnets(filters={'vpc-id': network.id})
             network_entry['subnets'] = [self._ec2_subnet_to_dict(subnet) for subnet in subnets]
             return_format['public'].append(network_entry)
         return return_format
 
 
-class GoogleNetworkController(NetworkController):
+class GoogleNetworkController(BaseNetworkController):
+    def _connect(self):
+        return get_driver(Provider.GCE)(self.cloud.email,
+                                        self.cloud.private_key,
+                                        project=self.cloud.project_id)
+
     def _create_subnet(self, subnet, parent_network):
         try:
             name = subnet['name']
@@ -90,11 +108,11 @@ class GoogleNetworkController(NetworkController):
         except Exception as e:
             raise RequiredParameterMissingError(e)
 
-        subnet = self.ctl.connection.ex_create_subnet(name=name,
-                                                      cidr=cidr,
-                                                      region=region,
-                                                      description=subnet.get('description'),
-                                                      network=parent_network)
+        subnet = self.connection.ex_create_subnet(name=name,
+                                                  cidr=cidr,
+                                                  region=region,
+                                                  description=subnet.get('description'),
+                                                  network=parent_network)
         return subnet
 
     def _create_network(self, network, subnet, router):
@@ -104,10 +122,10 @@ class GoogleNetworkController(NetworkController):
         subnet_mode = network.get('mode', 'legacy')
 
         try:
-            new_network = self.ctl.connection.ex_create_network(name=network['name'],
-                                                                cidr=network.get('cidr_block'),
-                                                                description=network.get('description'),
-                                                                mode=subnet_mode)
+            new_network = self.connection.ex_create_network(name=network['name'],
+                                                            cidr=network.get('cidr_block'),
+                                                            description=network.get('description'),
+                                                            mode=subnet_mode)
         except Exception as e:
             raise NetworkCreationError("Got error %s" % str(e))
 
@@ -116,7 +134,7 @@ class GoogleNetworkController(NetworkController):
         if subnet_mode == 'custom':
             if subnet:
                 try:
-                    new_subnet = self.create_subnet(subnet, new_network)
+                    new_subnet = self._create_subnet(subnet, new_network)
                 except Exception as e:
                     self._delete_network(new_network)
                     raise NetworkCreationError("Got error %s" % str(e))
@@ -127,11 +145,11 @@ class GoogleNetworkController(NetworkController):
         return ret
 
     def _delete_network(self, libcloud_network):
-        self.ctl.connection.ex_destroy_network(libcloud_network)
+        self.connection.ex_destroy_network(libcloud_network)
 
     def _parse_network_listing(self, network_listing, return_format):
 
-        all_subnets = self.ctl.connection.ex_list_subnets()
+        all_subnets = self.connection.ex_list_subnets()
         subnets = []
         for region in all_subnets:
             subnets += all_subnets[region]['subnetworks']
@@ -173,16 +191,28 @@ class GoogleNetworkController(NetworkController):
         return ret
 
 
-class OpenStackNetworkController(NetworkController):
+class OpenStackNetworkController(BaseNetworkController):
+    def _connect(self):
+        url = dnat(self.cloud.owner, self.cloud.url)
+        return get_driver(Provider.OPENSTACK)(
+            self.cloud.username,
+            self.cloud.password,
+            ex_force_auth_version='2.0_password',
+            ex_force_auth_url=url,
+            ex_tenant_name=self.cloud.tenant,
+            ex_force_service_region=self.cloud.region,
+            ex_force_base_url=self.cloud.compute_endpoint,
+        )
+
     def _create_network(self, network, subnet, router):
 
         admin_state_up = network.get('admin_state_up', True)
         shared = network.get('shared', False)
 
         try:
-            new_network = self.ctl.connection.ex_create_network(name=network['name'],
-                                                                admin_state_up=admin_state_up,
-                                                                shared=shared)
+            new_network = self.connection.ex_create_network(name=network['name'],
+                                                            admin_state_up=admin_state_up,
+                                                            shared=shared)
         except Exception as e:
             raise NetworkCreationError("Got error %s" % str(e))
 
@@ -191,20 +221,21 @@ class OpenStackNetworkController(NetworkController):
             network_id = new_network.id
 
             try:
-                subnet = self.create_subnet(subnet, network_id)
+                subnet = self._create_subnet(subnet, new_network)
             except Exception as e:
-                self.ctl.connection.ex_delete_network(network_id)
+                self.connection.ex_delete_network(network_id)
                 raise NetworkCreationError("Got error %s" % str(e))
 
             ret['network'] = self._openstack_network_to_dict(new_network)
-            ret['network']['subnets'].append(self._openstack_subnet_to_dict(subnet))
+            ret['network']['subnets'] = [self._openstack_subnet_to_dict(subnet)]
 
         else:
-            ret[['network']] = self._openstack_network_to_dict(new_network)
+            ret['network'] = self._openstack_network_to_dict(new_network)
+            ret['network']['subnets'] = []
 
         return ret
 
-    def _create_subnet(self, subnet, parent_network_id):
+    def _create_subnet(self, subnet, parent_network):
 
         try:
             subnet_name = subnet.get('name')
@@ -217,12 +248,12 @@ class OpenStackNetworkController(NetworkController):
         ip_version = subnet.get('ip_version', '4')
         enable_dhcp = subnet.get('enable_dhcp', True)
 
-        return self.ctl.connection.ex_create_subnet(name=subnet_name,
-                                                    network_id=parent_network_id, cidr=cidr,
-                                                    allocation_pools=allocation_pools,
-                                                    gateway_ip=gateway_ip,
-                                                    ip_version=ip_version,
-                                                    enable_dhcp=enable_dhcp)
+        return self.connection.ex_create_subnet(name=subnet_name,
+                                                network_id=parent_network.id, cidr=cidr,
+                                                allocation_pools=allocation_pools,
+                                                gateway_ip=gateway_ip,
+                                                ip_version=ip_version,
+                                                enable_dhcp=enable_dhcp)
 
     @staticmethod
     def _openstack_network_to_dict(network, subnets=None, floating_ips=None, nodes=None):
@@ -297,7 +328,7 @@ class OpenStackNetworkController(NetworkController):
 
     def _parse_network_listing(self, network_listing, return_format):
 
-        conn = self.ctl.connection
+        conn = self.connection
 
         subnets = conn.ex_list_subnets()
         routers = conn.ex_list_routers()
