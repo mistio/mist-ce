@@ -298,3 +298,6 @@ class BaseMainController(object):
     def disable(self):
         self.cloud.enabled = False
         self.cloud.save()
+
+    def disconnect(self):
+        self.compute.disconnect()
