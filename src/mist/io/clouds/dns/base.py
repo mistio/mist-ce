@@ -19,8 +19,13 @@ from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.io.clouds.main.base import BaseController
 
+from libcloud.dns.types import Provider as DnsProvider
+from libcloud.dns.types import RecordType
+from libcloud.dns.types import ZoneDoesNotExistError
 
-#log = logging.getLogger(__name__)
+import logging
+
+log = logging.getLogger(__name__)
 
 
 class DNSController(object):
@@ -96,18 +101,68 @@ class DNSController(object):
 
     def list_zones(self):
         """
+        This is the public method to call when requesting all the DNS zones
+        under a specific cloud.
+        """
+
+        # Fetch zones, usually from libcloud connection.
+        zones = self._list_zones()
+
+        # Format zone information.
+        return [{'id': zone.id,
+                 'domain': zone.domain,
+                 'type': zone.type,
+                 'ttl': zone.ttl,
+                 'extra': zone.extra,
+                 'provider': self.ctl.dns_provider} for zone in zones]
+
+
+    def _list_zones(self):
+        """
         Returns a list of available DNS zones for the cloud.
+        This should not be overriden
 
-        All subclasses MUST implement this method.
         """
-        raise NotImplementedError()
 
-    def list_records(self, zone_id):
+        # TODO: I think this should be wrapped in try .. except
+        # Need to check which exceptions can be raised by list_zones()
+        return self.ctl.dns_connection.list_zones()
+
+
+    def list_records(self,zone_id):
         """
-        Returns a list of available DNS records for a particular DNS zone.
 
-        All subclasses MUST implement this method.
         """
-        raise NotImplementedError()
+
+        # Fetch zones, usually from libcloud connection.
+        records = self._list_records(zone_id)
+
+        # Format zone information.
+        return [{'id': record.id,
+                 'name': record.name,
+                 'type': record.type,
+                 'data': record.data,
+                 'zone': record.zone,
+                 'ttl': record.ttl,
+                 'extra': record.extra,
+                 'provider': self.ctl.dns_provider} for record in records]
 
 
+    def _list_records(self, zone_id):
+        """
+        Returns all available records on a specific zone.
+
+        """
+
+        # We cannot call list_records() with the zone_id, we need to provide
+        # a zone object. We will get that by calling the get_zone() method.
+        try:
+            zone = self.ctl.dns_connection.get_zone(zone_id)
+        except ZoneDoesNotExistError:
+            log.warning("No zone found with id: " + zone_id +
+                " under the " + self.ctl.dns_provider + " DNS provider")
+            return []
+        else:
+            # TODO: This should be wrapped in try .. except
+            # Need to check which exceptions can be raised by list_zones()
+            return self.ctl.dns_connection.list_records(zone)
