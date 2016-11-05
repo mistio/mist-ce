@@ -11,8 +11,8 @@
 
 <dom-module id="cloud-page">
     <template>
-        <style is="custom-style" include="single-page"></style>
-        <style include="shared-styles">
+        <style include="single-page"></style>
+        <style is="custom-style" include="shared-styles">
             :host {
                 display: block;
                 padding-bottom: 80px;
@@ -48,6 +48,10 @@
             a {
                 color: black;
                 text-decoration: none;
+            }
+
+            .icon iron-icon {
+                background-color: rgba(255,255,255,0.50) !important;
             }
 
             .paper-header [paper-drawer-toggle] {
