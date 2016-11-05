@@ -304,7 +304,7 @@
                                 <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
                             </a>
                         </div>
-                        <paper-material class="graphs" hidden="[[!model.monitoring.machines.length]]">
+                        <paper-material class="graphs" hidden="[[!showLoadOnAll(model.monitoring.monitored_machines)]]">
                             <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
                         </paper-material>
                     </div>
@@ -613,5 +613,18 @@
         _toggleUI: function() {
             window.location.href = '/toggle-ui/legacy';
         },
+        showLoadOnAll: function(machines){
+            //show load on all if at least one machine has activated monitoring
+            var show = false;
+            if (machines){
+                for (var p in machines) {
+                    if (machines[p].installation_status.activated_at){
+                        show = true;
+                    }
+                }
+
+            }
+            return show;
+        }
     });
 </script>
