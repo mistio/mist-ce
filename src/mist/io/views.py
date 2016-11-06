@@ -867,7 +867,14 @@ def list_dns_zones(request):
     ---
     """
     auth_context = auth_context_from_request(request)
-    return methods.list_dns_zones(auth_context.owner)
+    cloud_id = request.matchdict['cloud']
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
+    return cloud.ctl.dns.list_zones()
 
 
 @view_config(route_name='api_v1_zone_action', request_method='GET', renderer='json')
@@ -877,8 +884,15 @@ def list_dns_zone_records(request):
     ---
     """
     auth_context = auth_context_from_request(request)
+    cloud_id = request.matchdict['cloud']
     zone_id = request.matchdict['zone']
-    return methods.list_dns_zone_records(auth_context.owner,zone_id)
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
+    return cloud.ctl.dns.list_records(zone_id)
 
 @view_config(route_name='api_v1_zone_action', request_method='POST', renderer='json')
 def create_dns_zone_record(request):
@@ -899,9 +913,12 @@ def delete_dns_zone_record(request):
     """
     auth_context = auth_context_from_request(request)
     zone_id = request.matchdict['zone']
-    return {"status":"API endpoint not implemented yet"}
-    # return methods.delete_dns_zone_details(zone_id)
+    params = params_from_request(request)
+    record_id = params.get('record')
+    if not record_id:
+        raise RequiredParameterMissingError("record_id")
 
+    return cloud.ctl.dns.delete_record(zone_id, record_id)
 
 @view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
 def list_machines(request):
