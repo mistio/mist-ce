@@ -1,6 +1,7 @@
 <script src="../bower_components/sockjs-client/dist/sockjs.min.js"></script>
 <script>
     CSRF_TOKEN = '';
+    STRIPE_PUBLIC_APIKEY = ''
     DEBUG_SOCKET = false;
     Polymer({
         is: 'mist-socket',
@@ -449,6 +450,7 @@
         _updateUser: function(data) {
             this.set('model.user', data);
             CSRF_TOKEN = data.csrf_token;
+            STRIPE_PUBLIC_APIKEY = data.stripe_public_apikey;
         },
 
         _updateOrg: function(data) {

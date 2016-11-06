@@ -53,7 +53,7 @@
             }
             .errormsg-container iron-icon {
                 color: inherit;
-            }            
+            }
             paper-progress {
                 width: 100%;
                 left: 0;
@@ -68,7 +68,7 @@
             <div class="head">
                 <p>[[plan.title]] plan</p>
             </div>
-            <paper-dialog-scrollable>                
+            <paper-dialog-scrollable>
                 <div class="form-inputs">
                     <div class="form-row">
                         <label>
@@ -110,7 +110,6 @@
 
     </template>
     <script>
-    Stripe.setPublishableKey('pk_test_cCB2mLEoMDLnGXI7XPYE77Hw');
     Polymer({
         is: 'plan-purchase',
 
@@ -151,6 +150,7 @@
             this.querySelector("#form").open();
         },
         submit: function(){
+            Stripe.setPublishableKey(STRIPE_PUBLIC_APIKEY);
             Stripe.card.createToken(this.payload, stripeResponseHandler);
             this.set('sendingData', true);
             var that = this;
@@ -189,7 +189,7 @@
             if (this.valideNumber(this.payload.number,0) && this.valideNumber(this.payload.exp_month,2) && this.valideNumber(this.payload.exp_year,2) && this.valideNumber(this.payload.cvc,3))
                 this.set('formReady', true);
 
-            else 
+            else
                 this.set('formReady', false);
         },
         valideNumber: function(input, length){
