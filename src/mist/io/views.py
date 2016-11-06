@@ -1480,11 +1480,11 @@ def create_network(request):
       type: string
     network:
       required: true
-      type: string
+      type: dict
     router:
-      type: string
+      type: dict
     subnet:
-      type: string
+      type: dict
     """
     cloud_id = request.matchdict['cloud']
 
