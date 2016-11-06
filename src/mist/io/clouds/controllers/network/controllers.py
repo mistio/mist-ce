@@ -91,7 +91,6 @@ class AmazonNetworkController(BaseNetworkController):
                 'zone': subnet.extra.get('zone')}
 
     def _parse_network_listing(self, network_listing, return_format):
-        self.connection.ex_list_subnets()
         for network in network_listing:
             network_entry = self._ec2_network_to_dict(network)
             subnets = self.connection.ex_list_subnets(filters={'vpc-id': network.id})

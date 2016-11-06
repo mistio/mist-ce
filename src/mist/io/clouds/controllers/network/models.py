@@ -20,9 +20,9 @@ class Network(me.Document):
     def __repr__(self):
         return '<Network id:{id}, Title:{title}, Cloud:{cloud},' \
                'Cloud API id:{cloud_id}>'.format(id=self.id,
-                                                  title=self.title,
-                                                  cloud=self.cloud,
-                                                  cloud_id=self.libcloud_id)
+                                                 title=self.title,
+                                                 cloud=self.cloud,
+                                                 cloud_id=self.libcloud_id)
 
 
 class Subnet(me.Document):
