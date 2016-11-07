@@ -48,20 +48,11 @@
                 --paper-radio-button-unchecked-ink-color: var(--paper-light-blue-900);
             }
             hr {
-                margin-left: -16px;
-                margin-right: -16px;
                 width: 100%;
             }
-            paper-progress#orgProgress {
-                position: absolute;
-                bottom: 85px;
-                width: 100%;
-                left: 0;
-                right: 0;
-            }
-
+            paper-progress#orgProgress,
             paper-progress#userProgress {
-                position: relative;
+                position: absolute;
                 width: 100%;
                 left: 0;
                 right: 0;
@@ -73,6 +64,21 @@
             }
             .separator {
                 border-top: 4px solid #ddd;
+            }
+            .progress {
+                margin: 32px 0 8px 0;
+                width: 100%;
+            }
+            paper-progress.progresserror ::content #primaryProgress {
+                background-color: var(--red-color);
+            }
+            .errormsg-container {
+                color: var(--red-color);
+                padding-left: 24px;
+                padding-right: 24px
+            }
+            .errormsg-container iron-icon {
+                color: inherit;
             }
         </style>
         <paper-material>
@@ -88,8 +94,12 @@
                 <paper-input class="xs12 l6" id="email" label="Email *" required error-message="Please enter your email" value="[[user.email]]" auto-validate disabled></paper-input>
                 <p class="xs12 l12">* Currently you cannot change your account's email for security reasons. Please contact us at <a href="mailto:support@mist.io">support@mist.io</a>, if you wish to do so.</p>
 
-                <paper-progress id="userProgress" indeterminate hidden$="[[!loadingUser]]"></paper-progress>
-                <hr class="xs12" />
+                <div class="progress">
+                    <paper-progress id="userProgress" indeterminate hidden$="[[!loadingUser]]"></paper-progress>
+                    <paper-progress id="userprogresserror" class="progresserror" value="100" hidden$="[[!userError]]"></paper-progress>
+                    <hr class="appform"/>
+                    <p id="userprogressmessage" class="errormsg-container" hidden$="[[!userError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="usererrormsg"></span></p>
+                </div>
 
                 <div class="bottom-actions clearfix xs12">
                     <paper-button class="pull-right" disabled$="[[!userFormReady]]" raised on-tap="_submitUserForm" page="second">Save User Profile</paper-button>
@@ -97,8 +107,9 @@
                         url="/api/v1/account"
                         method="POST"
                         loading="{{loadingUser}}"
-                        on-response="_handleDetailsAjaxResponse"
-                        on-error="_handleDetailsAjaxError"></iron-ajax>
+                        on-response="_handleAjaxResponse"
+                        on-error="_handleDetailsAjaxError"
+                        handle-as="xml"></iron-ajax>
                 </div>
             </div>
 
@@ -116,16 +127,22 @@
 
                 <p class="xs12 l12">* In your organisation's alert email, you can specify the email you want your incidents' alerts to be sent to. This can be overriden when you add rules in your monitored machines.</p> -->
 
-                <paper-progress id="orgProgress" indeterminate hidden$="[[!loadingOrg]]"></paper-progress>
-                <hr class="xs12" />
+                <div class="progress">
+                    <paper-progress id="orgProgress" indeterminate hidden$="[[!loadingOrg]]"></paper-progress>
+                    <paper-progress id="orgprogresserror" class="progresserror" value="100" hidden$="[[!orgError]]"></paper-progress>
+                    <hr class="appform"/>
+                    <p id="orgprogressmessage" class="errormsg-container" hidden$="[[!orgError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="orgerrormsg"></span></p>
+                </div>
+
                 <div class="bottom-actions clearfix xs12">
                     <paper-button class="pull-right" disabled$="[[!orgFormReady]]" raised on-tap="_submitOrgForm" page="second">Save Organisation Profile</paper-button>
                     <iron-ajax id="orgAjaxRequest"
                         url="/api/v1/org/[[org.id]]"
                         method="PUT"
                         loading="{{loadingOrg}}"
-                        on-response="_handleOrgAjaxResponse"
-                        on-error="_handleOrgAjaxError"></iron-ajax>
+                        on-response="_handleAjaxResponse"
+                        on-error="_handleOrgAjaxError"
+                        handle-as="xml"></iron-ajax>
                 </div>
             </div>
 
@@ -173,7 +190,15 @@
                         type: Boolean,
                         value: false
                     },
+                    userError: {
+                        type: Boolean,
+                        value: false
+                    },
                     loadingOrg: {
+                        type: Boolean,
+                        value: false
+                    },
+                    orgError: {
                         type: Boolean,
                         value: false
                     }
@@ -207,7 +232,7 @@
                 },
 
                 _computeOrgFormReady: function(orgName, loading, org){
-                    if (orgName && orgName != org.name && org.is_owner && !loading)
+                    if (orgName && orgName != org.name && orgName.trim() != "" && org.is_owner && !loading)
                         return true;
                     return false;
                 },
@@ -243,11 +268,16 @@
                 },
 
                 _handleAjaxResponse: function(e) {
-                    // TODO
+                    document.querySelector('paper-toast#mist-toast').show({text: 'Changes saved succesfully!'})
                 },
 
                 _handleAjaxError: function() {
-                    // TODO
+                    this.set('userError', true);
+                    this.$.usererrormsg.textContent = e.detail.request.xhr.responseText;
+                },
+                _handleOrgAjaxError: function(e) {
+                    this.set('orgError', true);
+                    this.$.orgerrormsg.textContent = e.detail.request.xhr.responseText;
                 }
             });
         })();
