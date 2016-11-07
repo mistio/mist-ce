@@ -46,7 +46,7 @@
         },
 
         observers: [
-            "_updateIsOverusing(model.user, model.machinesArray)"
+            "_updateIsOverusing(model.user, model.org, model.machinesArray)"
         ],
 
         ready: function() {
@@ -654,10 +654,21 @@
             console.warn('_updateTags not implemented. Got data', data);
         },
 
-        _updateIsOverusing: function(user, machines){
+        _updateIsOverusing: function(user, org, machines){
             // console.log('_updateIsOverusing', user, machines);
-            if (user && machines)
-                this.set('model.isOverUsing', !user.current_plan.title && machines.length > 5);
+            if (user && machines){
+                var isOverUsing = false;
+                // user has free plan and more than 5 machines
+                if (!org.current_plan.title && machines.length > 5)
+                    isOverUsing = true;
+                // user has a paid plan and more than allowed machines
+                else if (org.current_plan.title && machines.length > org.current_plan.manage_limit)
+                    isOverUsing = true;
+                else
+                    isOverUsing = false;
+
+                this.set('model.isOverUsing', isOverUsing);
+            }
         },
 
         _probe: function(data) {
