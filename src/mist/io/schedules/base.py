@@ -1,12 +1,16 @@
-#  FIXME add docstring abstract bla bla
+"""Definition of base classes for Schedules
+
+This currently contains only BaseController. It includes basic functionality
+for a given schedule.
+Cloud specific controllers are in `mist.io.schedules.controllers`.
+"""
 import json
 import logging
 import datetime
 import mongoengine as me
 from mist.core.script.models import Script
-# import mist.io.schedules.models as schedules
 from mist.io.exceptions import MistError
-from mist.io.exceptions import InternalServerError # NotFoundError
+from mist.io.exceptions import InternalServerError
 from mist.core.exceptions import BadRequestError
 from mist.core.exceptions import ScriptNotFoundError
 from mist.core.exceptions import ScheduleOperationError
@@ -16,7 +20,15 @@ log = logging.getLogger(__name__)
 
 
 class BaseController(object):
-    # FIXME add docstring
+    """Abstract base class for every schedule/kind_of_machines controller
+
+    This base controller factors out all the steps common to all schedules
+    into a base class, and defines an interface for kinf_of_machines specific
+    schedule controllers
+
+    Subclasses are meant to extend or override methods of this base class to
+    account for differencies between different schedule types.
+    """
     def __init__(self, schedule, auth_context=None):
         """Initialize schedule controller given a schedule
 
