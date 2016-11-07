@@ -8,18 +8,18 @@
 <link rel="import" href="../bower_components/juicy-ace-editor/juicy-ace-editor.html">
 <dom-module id="add-panel">
     <template>
-    <style is="custom-style">
-      :host {
-        display: inline-block;
-      }
-      #alignedDialog {
-        margin: 0;
-      }
-      paper-header-panel {
-        background-color: #03a9f4;
-      }
-    </style>
-    <paper-button raised on-tap="openDialog">Add Graph</paper-button>
+      <style is="custom-style">
+        :host {
+          display: inline-block;
+        }
+        #alignedDialog {
+          margin: 0;
+        }
+        paper-header-panel {
+          background-color: #03a9f4;
+        }
+      </style>
+      <paper-button raised on-tap="openDialog">Add Graph</paper-button>
       <paper-dialog id="alignedDialog" no-overlap horizontal-align="left" vertical-align="top" style="height: 200px; width:550px">
         <iron-ajax
           id="metrics"
@@ -36,36 +36,36 @@
                       <template is="dom-repeat" items="[[combo0]]">
                           <paper-item name="[[item]]">[[item]]</paper-item>
                       </template>
-    </paper-menu>
-    </paper-dropdown-menu>
-    </div>
-    <template is="dom-repeat" items="{{optionsNum}}">
-            <iron-label>
-              <paper-button id="[[item.name]]" hidden="true" iron-label-target on-tap="_handleTap"></paper-button>
-            </iron-label>
-          </template>
-    <div id="addcustom" hidden="{{hide}}">
-        <iron-ajax id="postCustomgraph" url="[[uri]]"  handle-as="json" method="POST" contentType="application/json" on-response="_customgraphResponse">
-        </iron-ajax>
-        <div>
-            <paper-input id="name" value="{{metric.name}}" label="Enter name"></paper-input>
-            <paper-input id="unit" value="{{metric.unit}}" label="Enter unit"></paper-input>
+                </paper-menu>
+          </paper-dropdown-menu>
         </div>
-        <div>
-            <h3>Python script</h3>
-            <juicy-ace-editor id="script" style="height: 100px; width:500px">
-            <juicy-ace-editor>
+        <template is="dom-repeat" items="{{optionsNum}}">
+          <iron-label>
+            <paper-button id="[[item.name]]" hidden="true" iron-label-target on-tap="_handleTap"></paper-button>
+          </iron-label>
+        </template>
+        <div id="addcustom" hidden="{{hide}}">
+            <iron-ajax id="postCustomgraph" url="[[uri]]"  handle-as="json" method="POST" contentType="application/json" on-response="_customgraphResponse">
+            </iron-ajax>
+            <div>
+                <paper-input id="name" value="{{metric.name}}" label="Enter name"></paper-input>
+                <paper-input id="unit" value="{{metric.unit}}" label="Enter unit"></paper-input>
+            </div>
+            <div>
+                <h3>Python script</h3>
+                <juicy-ace-editor id="script" style="height: 100px; width:500px">
+                <juicy-ace-editor>
+            </div>
+            <h3>Advance settings</h3>
+            <div>
+                <paper-checkbox id="derivative">Calculate derivative</paper-checkbox>
+            </div>
+            <div>
+                <paper-button id="submit" align="center" style="display:block;" on-tap="_generateCustomgraphrequest"> Add custom graph</paper-button>
+            </div>
         </div>
-        <h3>Advance settings</h3>
-        <div>
-            <paper-checkbox id="derivative">Calculate derivative</paper-checkbox>
-        </div>
-        <div>
-            <paper-button id="submit" align="center" style="display:block;" on-tap="_generateCustomgraphrequest"> Add custom graph</paper-button>
-        </div>
-    </div>
-    </paper-dialog-scrollable>
-    </paper-dialog>
+        </paper-dialog-scrollable>
+      </paper-dialog>
     </template>
     <script>
         Polymer({
@@ -232,7 +232,7 @@
                             break;
                         }
                     }
-                } else {
+                } else if(e.target.value =="Custom") {
                     this.querySelector('#alignedDialog').style.height = '600px';
                     this.querySelector('#script').value=this.metric.script;
                     this.hide = false;
