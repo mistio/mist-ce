@@ -1,11 +1,13 @@
 import logging
+import time
 
 from mist.io.clouds.controllers.network.base import BaseNetworkController
-from mist.io.exceptions import RequiredParameterMissingError, NetworkCreationError, NetworkError
+from mist.io.exceptions import RequiredParameterMissingError, ParameterValueInvalid, NetworkCreationError, NetworkError
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from libcloud.compute.drivers.ec2 import EC2Network
-from libcloud.compute.drivers.gce import GCENetwork
+from libcloud.compute.drivers.gce import GCENetwork, GCESubnetwork
+from libcloud.compute.drivers.openstack import OpenStackNetwork
 
 from mist.core.vpn.methods import destination_nat as dnat
 
@@ -19,15 +21,20 @@ class AmazonNetworkController(BaseNetworkController):
                                         region=self.cloud.region)
 
     def _delete_network(self, network):
+        if isinstance(network, EC2Network):
+            vpc_id = network.id
+            libcloud_network = network
+        else:
+            vpc_id = network.libcloud_id
+            libcloud_network = EC2Network(id=network.libcloud_id, name='', cidr_block='')
+
         try:
-            subnets = self.connection.ex_list_subnets(filters={'vpc-id': network.libcloud_id})
+            subnets = self.connection.ex_list_subnets(filters={'vpc-id': vpc_id})
             for subnet in subnets:
                 self.connection.ex_delete_subnet(subnet)
 
-            # The EC2 network deletion call expects an EC2Network object with an id attribute
-            #  equal to the network's cloud-specific ID
-            libcloud_network_object = EC2Network(id=network.libcloud_id, name='', cidr_block='')
-            self.connection.ex_delete_network(libcloud_network_object)
+            self.connection.ex_delete_network(libcloud_network)
+
         except Exception as e:
             raise NetworkError(str(e))
         return True
@@ -143,21 +150,43 @@ class GoogleNetworkController(BaseNetworkController):
         except Exception as e:
             raise RequiredParameterMissingError(e)
 
-        subnet = self.connection.ex_create_subnet(name=name,
-                                                  cidr=cidr,
-                                                  region=region,
-                                                  description=subnet.get('description'),
-                                                  network=parent_network)
+        subnet = self.connection.ex_create_subnetwork(name=name,
+                                                      cidr=cidr,
+                                                      region=region,
+                                                      description=subnet.get('description'),
+                                                      network=parent_network)
         return subnet
 
     def _delete_network(self, network):
+        if isinstance(network, GCENetwork):
+            libcloud_network = network
+            associated_subnets = {}
+        else:
+            associated_subnets = [{'name': subnet.title, 'region': subnet.extra['region']}
+                                  for subnet in network.subnets]
+            libcloud_network = GCENetwork(id='', name=network.title, cidr='',
+                                          driver=None, extra=network.extra)
+
+        # Destroy all associated subnetworks before destroying the network object
         try:
-            # The GCE network deletion call expects an EC2Network object with a name attribute
-            #  equal to the network's cloud-specific name
-            libcloud_network_object = GCENetwork(id='', name=network.title, cidr_block='')
-            self.connection.ex_destroy_network(libcloud_network_object)
+            for subnet in associated_subnets:
+                self.connection.ex_destroy_subnetwork(subnet['name'], region=subnet['region'])
         except Exception as e:
             raise NetworkError(str(e))
+
+        # Subnet deletion calls are asynchronous and a network cannot be deleted before all of its subnets are gone
+        # The network deletion call may not succeed immediately
+        for attempt in range(10):
+            try:
+                self.connection.ex_destroy_network(libcloud_network)
+            except Exception as e:
+                time.sleep(1)
+            else:
+                break
+        # If all attempts are exhausted, raise an exception
+        else:
+            raise NetworkError('Failed to delete network {}'.format(libcloud_network.name))
+
         return True
 
     def _parse_network_listing(self, network_listing, return_format):
@@ -184,23 +213,40 @@ class GoogleNetworkController(BaseNetworkController):
 
     @staticmethod
     def _gce_subnet_to_dict(subnet):
-        # In case network is empty
-        if not subnet:
-            return {}
-        # Network and region come in URL form, so we have to split it
-        # and use the last element of the splited list
-        network = subnet['network'].split("/")[-1]
-        region = subnet['region'].split("/")[-1]
 
-        ret = {
-            'id': subnet['id'],
-            'name': subnet['name'],
-            'network': network,
-            'region': region,
-            'cidr': subnet['ipCidrRange'],
-            'gateway_ip': subnet['gatewayAddress'],
-            'creation_timestamp': subnet['creationTimestamp']
-        }
+        if isinstance(subnet, GCESubnetwork):
+            # Network and region come in URL form, so we have to split it
+            # and use the last element of the splited list
+            network = subnet.extra['network'].split("/")[-1]
+            region = subnet.extra['region'].split("/")[-1]
+
+            ret = {
+                'id': subnet.id,
+                'name': subnet.name,
+                'network': network,
+                'region': region,
+                'cidr': subnet.extra['ipCidrRange'],
+                'gateway_ip': subnet.extra['gatewayAddress'],
+                'creation_timestamp': subnet.extra['creationTimestamp']
+            }
+        else:
+            # In case network is empty
+            if not subnet:
+                return {}
+            # Network and region come in URL form, so we have to split it
+            # and use the last element of the splited list
+            network = subnet['network'].split("/")[-1]
+            region = subnet['region'].split("/")[-1]
+
+            ret = {
+                'id': subnet['id'],
+                'name': subnet['name'],
+                'network': network,
+                'region': region,
+                'cidr': subnet['ipCidrRange'],
+                'gateway_ip': subnet['gatewayAddress'],
+                'creation_timestamp': subnet['creationTimestamp']
+            }
         return ret
 
 
@@ -368,9 +414,13 @@ class OpenStackNetworkController(BaseNetworkController):
         return return_format
 
     def _delete_network(self, network):
+        if isinstance(network, OpenStackNetwork):
+            network_id = network.id
+        else:
+            network_id = network.libcloud_id
+
         try:
-            self.connection.ex_delete_network(network.libcloud_id)
+            self.connection.ex_delete_network(network_id)
         except Exception as e:
             raise NetworkError(e)
         return True
-
