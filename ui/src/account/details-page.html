@@ -42,10 +42,6 @@
                 margin-bottom: 0;
             }
 
-            .dropdown-block {
-                padding-top: 16px;
-            }
-
             paper-radio-button {
                 --paper-radio-button-checked-color: var(--paper-light-blue-500);
                 --paper-radio-button-checked-ink-color: var(--paper-light-blue-500);
@@ -73,7 +69,10 @@
 
             .bottom-actions {
                 padding-bottom: 24px;
-                padding-left: 2rem;
+                padding-left: 1rem;
+            }
+            .separator {
+                border-top: 4px solid #ddd;
             }
         </style>
         <paper-material>
@@ -86,11 +85,14 @@
 
                 <paper-input class="xs12 l6" id="lastName" label="Last Name" required error-message="Please enter your last name" value="{{lastName}}" auto-validate></paper-input>
 
-                <paper-input class="xs12 l6" id="email" label="Email" required error-message="Please enter your email" value="[[user.email]]" auto-validate disabled></paper-input>
+                <paper-input class="xs12 l6" id="email" label="Email *" required error-message="Please enter your email" value="[[user.email]]" auto-validate disabled></paper-input>
+                <p class="xs12 l12">* Currently you cannot change your account's email for security reasons. Please contact us at <a href="mailto:support@mist.io">support@mist.io</a>, if you wish to do so.</p>
 
                 <paper-progress id="userProgress" indeterminate hidden$="[[!loadingUser]]"></paper-progress>
+                <hr class="xs12" />
+
                 <div class="bottom-actions clearfix xs12">
-                    <paper-button class="pull-right" disabled$="[[!userFormReady]]" raised on-tap="_submitUserForm" page="second">Save Changes</paper-button>
+                    <paper-button class="pull-right" disabled$="[[!userFormReady]]" raised on-tap="_submitUserForm" page="second">Save User Profile</paper-button>
                     <iron-ajax id="userAjaxRequest"
                         url="/api/v1/account"
                         method="POST"
@@ -98,8 +100,10 @@
                         on-response="_handleDetailsAjaxResponse"
                         on-error="_handleDetailsAjaxError"></iron-ajax>
                 </div>
-                <p class="xs12 l12">Currently you cannot change your account's email for security reasons. Please contact us at <a href="mailto:support@mist.io">support@mist.io</a>, if you wish to do so.</p>
             </div>
+
+        </paper-material>
+        <paper-material class="separator">
 
             <div class="grid-row" hidden$="[[!org.is_owner]]">
                 <div class="xs12 head">
@@ -107,10 +111,15 @@
                     <p>Enter your organisation details. To switch organisation use the  user menu in the top right corner of your screen.</p>
                 </div>
                 <paper-input class="dropdown-block xs12 l6" id="orgName" label="Organization Name" required error-message="Please enter your company's name" value="{{orgName}}" auto-validate disabled$="[[!org.is_owner]]"></paper-input>
+                
+                <!-- <paper-input class="xs12 l6" id="org-email" label="Organisation Alert Email *" error-message="Please enter your email" value="[[org.email]]" auto-validate></paper-input>
+
+                <p class="xs12 l12">* In your organisation's alert email, you can specify the email you want your incidents' alerts to be sent to. This can be overriden when you add rules in your monitored machines.</p> -->
+
                 <paper-progress id="orgProgress" indeterminate hidden$="[[!loadingOrg]]"></paper-progress>
                 <hr class="xs12" />
                 <div class="bottom-actions clearfix xs12">
-                    <paper-button class="pull-right" disabled$="[[!orgFormReady]]" raised on-tap="_submitOrgForm" page="second">Save Changes</paper-button>
+                    <paper-button class="pull-right" disabled$="[[!orgFormReady]]" raised on-tap="_submitOrgForm" page="second">Save Organisation Profile</paper-button>
                     <iron-ajax id="orgAjaxRequest"
                         url="/api/v1/org/[[org.id]]"
                         method="PUT"
