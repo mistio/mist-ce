@@ -5,7 +5,7 @@
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/polyana-dashboard/polyana-dashboard.html">
-
+<link rel="import" href="add-panel.html">
 <link rel="import" href="helpers/dialog-element.html">
 
 <script src="../bower_components/yaml.js/dist/yaml.min.js"></script>
@@ -91,6 +91,7 @@
                     </div>
                     <!-- monitoring is activated. we expect to have data -->
                     <div hidden$="[[!isActivated]]">
+                        <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]"></add-panel>
                         <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
                     </div>
                 </div>
@@ -187,7 +188,9 @@
                 value: false
             },
         },
-
+        listeners:{
+          'panelAdded':'_panelAdded'
+        },
         observers: [
             '_reset(resource.id)'
         ],
@@ -197,6 +200,31 @@
         attached: function(){
 
         },
+        _panelAdded:function (e){
+           console.log("i got",e.detail);
+           var panel ={
+             "lines": true,
+             "aliasColors": {},
+             "datasource": "mist.monitor",
+             "id": this.dashboard.rows[0].panels.length,
+             "span": 12,
+             "stack": false,
+             "targets": [{
+                 "refId": "A",
+                 "target": e.detail
+             }],
+             "timeFrom": null,
+             "timeShift": null,
+             "title": e.detail.split(".")[0],
+             "type": "graph",
+             "machineArray": [[this.dashboard.rows[0].panels[0].machineArray[0][0], this.dashboard.rows[0].panels[0].machineArray[0][1]]],
+             "x-axis": true,
+             "y-axis": true
+           }
+           this.push("dashboard.rows.0.panels",panel);
+           console.log(this.dashboard);
+         },
+
         _computeIsMonitored: function(resource, monitoring){
         	if (this.resource && this.monitoring && this.monitoring.monitored_machines[resource.uuid])
         		return true;
