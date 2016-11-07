@@ -33,7 +33,6 @@ import mist.core.methods
 #     from mist.io.helpers import user_from_request
 #     from pyramid.view import view_config
 
-
 from mist.io import methods
 
 import mist.io.exceptions as exceptions

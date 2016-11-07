@@ -2838,50 +2838,6 @@ def machine_name_validator(provider, name):
                 "and be at least 3 characters long")
     return name
 
-def list_dns_zones(owner):
-    """
-    Will pick all user clouds, check each for all available zones,
-    and return those zone details.
-
-    """
-
-    # Create a list to store all customer zones
-    all_zones = []
-    # iterate over all clouds that can also be used as DNS providers
-    clouds = Cloud.objects(owner=owner)
-    for cloud in clouds:
-        try:
-            all_zones += cloud.ctl.dns.list_zones()
-        except Exception as exc:
-            log.error("%s", exc)
-
-    return all_zones
-
-def list_dns_zone_records(owner,zone_id):
-    """
-    Will pick all user clouds, check all DNS providers whether the zone is
-    under it and if so, get all available records.
-
-    """
-
-    # Create a list to store all customer zones
-    all_records = []
-    # iterate over all clouds that can also be used as DNS providers
-    clouds = Cloud.objects(owner=owner)
-    for cloud in clouds:
-        # FIXME with a DB model
-        # Normally we shouldn't get the records for more than one zone
-        # but since the zone id we are using is not unique, we haven't
-        # implemented a DB model yet, so for good measure, if there are more
-        # than zone we get all records from all zones.
-        try:
-            all_records += cloud.ctl.dns.list_records(zone_id)
-        except Exception as exc:
-            log.error("%s", exc)
-
-    return all_records
-
-
 
 def create_dns_a_record(user, domain_name, ip_addr):
     """Will try to create DNS A record for specified domain name and IP addr.
