@@ -8,7 +8,7 @@ from mist.core.tag.models import Tag
 from mist.core.keypair.models import Keypair
 from mist.core.user.models import Organization
 
-import mist.io.clouds.controllers as controllers
+from mist.io.clouds.controllers.main import controllers
 
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import CloudExistsError
@@ -60,13 +60,14 @@ class Cloud(me.Document):
     credential fields or associated handler to work with.
 
     Each Cloud subclass should define a `_controller_cls` class attribute. Its
-    value should be a subclass of `mist.io.clouds.base.BaseController`. These
+    value should be a subclass of
+    `mist.io.clouds.controllers.main.base.BaseMainController`. These
     subclasses are stored in `mist.io.clouds.controllers`. When a cloud is
     instanciated, it is given a `ctl` attribute which gives access to the
     clouds controller. This way it is possible to do things like:
 
         cloud = Cloud.objects.get(id=cloud_id)
-        print cloud.ctl.list_machines()
+        print cloud.ctl.compute.list_machines()
 
     """
 
@@ -108,13 +109,14 @@ class Cloud(me.Document):
                 "Can't initialize %s. Cloud is an abstract base class and "
                 "shouldn't be used to create cloud instances. All Cloud "
                 "subclasses should define a `_controller_cls` class attribute "
-                "pointing to a `BaseController` subclass." % self
+                "pointing to a `BaseMainController` subclass." % self
             )
-        elif not issubclass(self._controller_cls, controllers.BaseController):
+        elif not issubclass(self._controller_cls,
+                            controllers.BaseMainController):
             raise TypeError(
                 "Can't initialize %s.  All Cloud subclasses should define a "
                 "`_controller_cls` class attribute pointing to a "
-                "`BaseController` subclass." % self
+                "`BaseMainController` subclass." % self
             )
         self.ctl = self._controller_cls(self)
 
@@ -183,7 +185,7 @@ class AmazonCloud(Cloud):
     region = me.StringField(required=True)
 
     _private_fields = ('apisecret', )
-    _controller_cls = controllers.AmazonController
+    _controller_cls = controllers.AmazonMainController
 
 
 class DigitalOceanCloud(Cloud):
@@ -191,7 +193,7 @@ class DigitalOceanCloud(Cloud):
     token = me.StringField(required=True)
 
     _private_fields = ('token', )
-    _controller_cls = controllers.DigitalOceanController
+    _controller_cls = controllers.DigitalOceanMainController
 
 
 class LinodeCloud(Cloud):
@@ -199,7 +201,7 @@ class LinodeCloud(Cloud):
     apikey = me.StringField(required=True)
 
     _private_fields = ('apikey', )
-    _controller_cls = controllers.LinodeController
+    _controller_cls = controllers.LinodeMainController
 
 
 class RackSpaceCloud(Cloud):
@@ -209,7 +211,7 @@ class RackSpaceCloud(Cloud):
     region = me.StringField(required=True)
 
     _private_fields = ('apikey', )
-    _controller_cls = controllers.RackSpaceController
+    _controller_cls = controllers.RackSpaceMainController
 
 
 class SoftLayerCloud(Cloud):
@@ -218,7 +220,7 @@ class SoftLayerCloud(Cloud):
     apikey = me.StringField(required=True)
 
     _private_fields = ('apikey', )
-    _controller_cls = controllers.SoftLayerController
+    _controller_cls = controllers.SoftLayerMainController
 
 
 class NephoScaleCloud(Cloud):
@@ -227,7 +229,7 @@ class NephoScaleCloud(Cloud):
     password = me.StringField(required=True)
 
     _private_fields = ('password', )
-    _controller_cls = controllers.NephoScaleController
+    _controller_cls = controllers.NephoScaleMainController
 
 
 class AzureCloud(Cloud):
@@ -236,7 +238,7 @@ class AzureCloud(Cloud):
     certificate = me.StringField(required=True)
 
     _private_fields = ('certificate', )
-    _controller_cls = controllers.AzureController
+    _controller_cls = controllers.AzureMainController
 
 
 class AzureArmCloud(Cloud):
@@ -247,7 +249,7 @@ class AzureArmCloud(Cloud):
     secret = me.StringField(required=True)
 
     _private_fields = ('secret', )
-    _controller_cls = controllers.AzureArmController
+    _controller_cls = controllers.AzureArmMainController
 
 
 class GoogleCloud(Cloud):
@@ -257,7 +259,7 @@ class GoogleCloud(Cloud):
     project_id = me.StringField(required=True)
 
     _private_fields = ('private_key', )
-    _controller_cls = controllers.GoogleController
+    _controller_cls = controllers.GoogleMainController
 
 
 class HostVirtualCloud(Cloud):
@@ -265,7 +267,7 @@ class HostVirtualCloud(Cloud):
     apikey = me.StringField(required=True)
 
     _private_fields = ('apikey', )
-    _controller_cls = controllers.HostVirtualController
+    _controller_cls = controllers.HostVirtualMainController
 
 
 class PacketCloud(Cloud):
@@ -274,7 +276,7 @@ class PacketCloud(Cloud):
     project_id = me.StringField(required=False)
 
     _private_fields = ('apikey', )
-    _controller_cls = controllers.PacketController
+    _controller_cls = controllers.PacketMainController
 
 
 class VultrCloud(Cloud):
@@ -282,7 +284,7 @@ class VultrCloud(Cloud):
     apikey = me.StringField(required=True)
 
     _private_fields = ('apikey', )
-    _controller_cls = controllers.VultrController
+    _controller_cls = controllers.VultrMainController
 
 
 class VSphereCloud(Cloud):
@@ -292,7 +294,7 @@ class VSphereCloud(Cloud):
     password = me.StringField(required=True)
 
     _private_fields = ('password', )
-    _controller_cls = controllers.VSphereController
+    _controller_cls = controllers.VSphereMainController
 
 
 class VCloud(Cloud):
@@ -302,7 +304,7 @@ class VCloud(Cloud):
     password = me.StringField(required=True)
 
     _private_fields = ('password', )
-    _controller_cls = controllers.VCloudController
+    _controller_cls = controllers.VCloudMainController
 
 
 class IndonesianVCloud(Cloud):
@@ -312,7 +314,7 @@ class IndonesianVCloud(Cloud):
     password = me.StringField(required=True)
 
     _private_fields = ('password', )
-    _controller_cls = controllers.IndonesianVCloudController
+    _controller_cls = controllers.IndonesianVCloudMainController
 
 
 class OpenStackCloud(Cloud):
@@ -325,7 +327,7 @@ class OpenStackCloud(Cloud):
     compute_endpoint = me.StringField(required=False)
 
     _private_fields = ('password', )
-    _controller_cls = controllers.OpenStackController
+    _controller_cls = controllers.OpenStackMainController
 
 
 class DockerCloud(Cloud):
@@ -343,7 +345,7 @@ class DockerCloud(Cloud):
     ca_cert_file = me.StringField(required=False)
 
     _private_fields = ('password', 'key_file')
-    _controller_cls = controllers.DockerController
+    _controller_cls = controllers.DockerMainController
 
 
 class LibvirtCloud(Cloud):
@@ -354,7 +356,7 @@ class LibvirtCloud(Cloud):
     key = me.ReferenceField(Keypair, required=False)
     images_location = me.StringField(default="/var/lib/libvirt/images")
 
-    _controller_cls = controllers.LibvirtController
+    _controller_cls = controllers.LibvirtMainController
 
     def as_dict(self):
         cdict = super(LibvirtCloud, self).as_dict()
@@ -364,7 +366,7 @@ class LibvirtCloud(Cloud):
 
 class OtherCloud(Cloud):
 
-    _controller_cls = controllers.OtherController
+    _controller_cls = controllers.OtherMainController
 
 
 _populate_clouds()
