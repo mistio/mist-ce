@@ -431,7 +431,7 @@
                         "machineArray": [],
                         "timeFrom": null,
                         "timeShift": null,
-                        "title": "Load_on_all_monitored_machines",
+                        "title": "Load on all monitored machines",
                         "type": "graph",
                         "x-axis": true,
                         "y-axis": true
@@ -458,24 +458,8 @@
                 },
                 "timezone": "browser"
             };
-            var machinearray = [];
-            console.log(this.model.monitoring);
-            this.model.monitoring.machines.forEach(function(entry) {
-                machinearray.push(entry);
-            });
-            console.log(machinearray);
-            this.dashboard.rows[0].panels[0].machineArray = machinearray;
-            // var that = this;
-            // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-            //     if (that.querySelector('dashboard-panel'))
-            //         that.querySelector('dashboard-panel').resize();
-            // }, 5000, this);
-            /*this.async(function() {
-                this.importHref(this.resolveUrl('/elements/logs/log-list.html'),
-                                null,
-                                null,
-                                true)},
-                500);*/
+
+            this.dashboard.rows[0].panels[0].machineArray = this.model.monitoring.machines;
         },
         isOnline: function(cloud) {
             return cloud.state == 'online' && 'online';
