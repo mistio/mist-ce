@@ -1333,7 +1333,8 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
                 size=size,
                 location=location,
                 auth=auth,
-                ssh_key=tmp_key_path
+                ssh_key=tmp_key_path,
+                ex_private=True
             )
         except Exception as e:
             raise MachineCreationError("Linode, got exception %s" % e, e)
