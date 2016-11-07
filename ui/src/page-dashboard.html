@@ -136,6 +136,10 @@
             width: 100%;
             overflow: hidden;
         }
+        .graphs {
+            padding: 16px;
+            box-sizing: border-box;
+        }
         log-list {
             display: block;
         }
@@ -252,16 +256,18 @@
                 <div class="clouds top flexchild-wide-top">
                     <div id="cloudslist" class="flex">
                         <template is="dom-repeat" items="[[model.cloudsArray]]">
-                            <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" index$=[[index]] on-tap="_showCloudInfoDialog" id$="[[item.id]]">
-                                <div class="icon"></div>
-                                <!-- src="[[_computeProviderLogo(item.provider)]]" -->
-                                <h1 class="cloud-title">[[item.title]]</h1>
-                            </cloud-chip>
+                            <a class="cloud-chip" href="/clouds/[[item.id]]">
+                                <cloud-chip label="{{item.title}}" class$="link [[isOnline(item)]] [[isOffline(item)]]" index$=[[index]] id$="[[item.id]]">
+                                    <div class="icon"></div>
+                                    <!-- src="[[_computeProviderLogo(item.provider)]]" -->
+                                    <h1 class="cloud-title">[[item.title]]</h1>
+                                </cloud-chip>
+                            </a>
                         </template>
                     </div>
-                    <div class="ovhid">
+                    <!-- <div class="ovhid">
                         <cloud-info></cloud-info>
-                    </div>
+                    </div> -->
                 </div>
                 <div class="columns">
                     <div id="leftcolumn" class="left">
@@ -298,7 +304,7 @@
                                 <section-tile name="teams" color="[[sections.teams.color]]" icon="[[sections.teams.icon]]" count="{{model.teamsArray.length}}"></section-tile>
                             </a>
                         </div>
-                        <paper-material class="graphs">
+                        <paper-material class="graphs" hidden="[[!showLoadOnAll(model.monitoring.monitored_machines)]]">
                             <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
                         </paper-material>
                     </div>
@@ -607,5 +613,18 @@
         _toggleUI: function() {
             window.location.href = '/toggle-ui/legacy';
         },
+        showLoadOnAll: function(machines){
+            //show load on all if at least one machine has activated monitoring
+            var show = false;
+            if (machines){
+                for (var p in machines) {
+                    if (machines[p].installation_status.activated_at){
+                        show = true;
+                    }
+                }
+
+            }
+            return show;
+        }
     });
 </script>
