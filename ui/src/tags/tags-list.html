@@ -150,7 +150,10 @@
                     this.$.errormsg.textContent = '';
                 },
                 selectedItemsChanged: function(items, length){
-                    this._computeTags(this.items);
+                    // console.log('selectedItemsChanged',this.$.tagsModal.opened);
+                    // freeze updating of selectedItems when dialog is open
+                    if (!this.$.tagsModal.opened)
+                        this._computeTags(this.items);
                 },
                 _computeTags: function(lengths) {
                     var tags = this._computeCommonTags(this.items);
