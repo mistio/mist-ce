@@ -10,11 +10,13 @@ import datetime
 import mongoengine as me
 from mist.core.script.models import Script
 from mist.io.exceptions import MistError
+from mist.core.rbac.methods import AuthContext
 from mist.io.exceptions import InternalServerError
 from mist.core.exceptions import BadRequestError
 from mist.core.exceptions import ScriptNotFoundError
 from mist.core.exceptions import ScheduleOperationError
 from mist.core.exceptions import ScheduleNameExistsError
+
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +44,7 @@ class BaseController(object):
         self._auth_context = auth_context
 
     def set_auth_context(self, auth_context):
-        # assert isinstance(auth_context, )
+        assert isinstance(auth_context, AuthContext)
         self._auth_context = auth_context
 
     @property
