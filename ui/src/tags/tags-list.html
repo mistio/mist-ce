@@ -76,6 +76,7 @@
             <h2>Tags</h2>
             <paper-dialog-scrollable>
                 <div class="tag-list">
+                    <p hidden$="[[!showEmpty]]"><em>No tags. Save to clear all tags.</em></p>
                     <template is="dom-repeat" items="[[tags]]" as="tag">
                         <tag-item tag="[[tag]]" index=[[index]]></tag-item>
                     </template>
@@ -90,7 +91,7 @@
             <div class="clearfix bottom-actions xs12">
                 <paper-button class="submit-btn add" on-tap="_addTag">
                     <iron-icon icon="add"></iron-icon> Add Tag</paper-button>
-                <paper-button class="submit-btn pull-right blue save" on-tap="_saveTags">Save Tags</paper-button>
+                <paper-button class="submit-btn pull-right blue save" on-tap="_saveTags">Save <span hidden$="[[showEmpty]]"> Tags</span></paper-button>
                 <paper-button class="pull-right blue-link" dialog-dismiss>Cancel</paper-button>
             </div>
         </paper-dialog>
@@ -125,6 +126,12 @@
                     showProgress: {
                         type: Boolean,
                         value: false
+                    },
+                    showEmpty: {
+                        type: Boolean,
+                        computed: "_computeShowEmpty(tags, tags.length)",
+                        value: false,
+                        notify: true
                     }
                 },
                 observers: [
@@ -158,6 +165,12 @@
                     // freeze updating of selectedItems when dialog is open
                     if (!this.$.tagsModal.opened)
                         this._computeTags(this.items);
+                },
+                _computeShowEmpty: function(tags, length){
+                    if (this.tags && this.tags.length>0)
+                        return false;
+                    else
+                        return true;
                 },
                 _computeTags: function(lengths) {
                     var tags = this._computeCommonTags(this.items);
