@@ -3,10 +3,10 @@ import json
 import logging
 import datetime
 import mongoengine as me
-from mist.core.cloud.models import Machine
 from mist.core.script.models import Script
-import mist.io.schedules.models as schedules
-from mist.io.exceptions import NotFoundError
+# import mist.io.schedules.models as schedules
+from mist.io.exceptions import MistError
+from mist.io.exceptions import InternalServerError # NotFoundError
 from mist.core.exceptions import BadRequestError
 from mist.core.exceptions import ScriptNotFoundError
 from mist.core.exceptions import ScheduleOperationError
@@ -16,18 +16,32 @@ log = logging.getLogger(__name__)
 
 
 class BaseController(object):
-    def __init__(self, schedule):
+    # FIXME add docstring
+    def __init__(self, schedule, auth_context=None):
         """Initialize schedule controller given a schedule
 
         Most times one is expected to access a controller from inside the
         schedule. Like this:
 
           schedule = mist.io.schedules.models.Schedule.objects.get(id=s_id)
-          schedule.ctl.add_entry
+          schedule.ctl.add()
         """
         self.schedule = schedule
+        self._auth_context = auth_context
 
-    def add(self, auth_context, **kwargs):
+    def set_auth_context(self, auth_context):
+        # assert isinstance(auth_context, )
+        self._auth_context = auth_context
+
+    @property
+    def auth_context(self):
+        if self._auth_context is None:
+            raise Exception("Forgot to set auth_context")
+        elif self._auth_context is False:
+            return None
+        return self._auth_context
+
+    def add(self, **kwargs):
         """Add an entry to the database
 
         This is only to be called by `Schedule.add` classmethod to create
@@ -47,16 +61,23 @@ class BaseController(object):
                 "You must provide a list of machine ids or tags")
 
         try:
-            self.update(auth_context, **kwargs)
+            self.update(**kwargs)
         except me.ValidationError:
             # Propagate original error.
             raise
         return self.schedule.id
 
-    def update(self, auth_context, **kwargs):
+    def update(self, **kwargs):
+
+        import mist.io.schedules.models as schedules
 
         """Edit an existing Schedule
         """
+        if self.auth_context is not None:
+            auth_context = self.auth_context
+        else:
+            raise MistError("You are not authorized to update schedule")
+
         owner = auth_context.owner
 
         script_id = kwargs.get('script_id', '')
@@ -64,13 +85,6 @@ class BaseController(object):
 
         if action not in ['', 'reboot', 'destroy', 'start', 'stop']:
             raise BadRequestError("Action is not correct")
-
-        if (isinstance(self.schedule.task_type, schedules.ScriptTask)
-                and action):
-            raise BadRequestError("You cannot change from script to action")
-        if (isinstance(self.schedule.task_type, schedules.ActionTask)
-                and script_id):
-            raise BadRequestError("You cannot change from action to script")
 
         if script_id:
             try:
@@ -81,55 +95,22 @@ class BaseController(object):
             # SEC require permission RUN on script
             auth_context.check_perm('script', 'run', script_id)
 
-        machines_uuids = kwargs.get('machines_uuids', '')
-        machines_tags = kwargs.get('machines_tags', '')
-
-        # convert machines' uuids to machine objects
-        # and check permissions
-        if machines_uuids:
-            machines_obj = []
-            for machine_uuid in machines_uuids:
-                try:
-                    machine = Machine.objects.get(id=machine_uuid,
-                                                  state__ne='terminated')
-                except me.DoesNotExist:
-                    raise NotFoundError('Machine state is terminated')
-
-                cloud_id = machine.cloud.id
-                # SEC require permission READ on cloud
-                auth_context.check_perm("cloud", "read", cloud_id)
-
-                if action:
-                    # SEC require permission ACTION on machine
-                    auth_context.check_perm("machine", action, machine_uuid)
-                else:
-                    # SEC require permission RUN_SCRIPT on machine
-                    auth_context.check_perm("machine", "run_script",
-                                            machine_uuid)
-
-                machines_obj.append(machine)
-
-        # check permissions for machines' tags
-        if machines_tags:
-            if action:
-                # SEC require permission ACTION on machine
-                auth_context.check_perm("machine", action, None)
-            else:
-                # SEC require permission RUN_SCRIPT on machine
-                auth_context.check_perm("machine", "run_script", None)
-
         # set schedule attributes
         for key, value in kwargs.iteritems():
             if key in self.schedule._fields.keys():
                 setattr(self.schedule, key, value)
 
-        if machines_uuids:
-            self.schedule.machines_match = schedules.ListOfMachines(
-                machines=machines_obj)
-        elif machines_tags:
-            self.schedule.machines_match = schedules.TaggedMachines(
-                tags=machines_tags,
-                owner=owner)
+        # Schedule specific kwargs preparsing.
+        try:
+            self._update__preparse_machines(auth_context, kwargs)
+        except MistError as exc:
+            log.error("Error while updating schedule %s: %r",
+                      self.schedule.id, exc)
+            raise
+        except Exception as exc:
+            log.exception("Error while preparsing kwargs on update %s",
+                          self.schedule.id)
+            raise InternalServerError(exc=exc)
 
         if action:
             self.schedule.task_type = schedules.ActionTask(action=action)
@@ -197,7 +178,7 @@ class BaseController(object):
             self.schedule.save()
         except me.ValidationError as e:
             log.error("Error updating %s: %s", self.schedule.name,
-                      e.ti_dict())
+                      e.to_dict())
             raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
         except me.NotUniqueError:
             raise ScheduleNameExistsError()
@@ -205,3 +186,23 @@ class BaseController(object):
             raise ScheduleOperationError()
 
         return self.schedule.id
+
+    # FIXME
+    def _update__preparse_machines(self, auth_context, kwargs):
+        """Preparse machines arguments to `self.uppdate`
+
+        This is called by `self.update` when adding a new schedule,
+        in order to apply pre processing to the given params. Any subclass
+        that requires any special pre processing of the params passed to
+        `self.update`, SHOULD override this method.
+
+        Params:
+        kwargs: A dict of the keyword arguments that will be set as attributes
+            to the `Schedule` model instance stored in `self.schedule`.
+            This method is expected to modify `kwargs` in place and set the
+            specific field of each scheduler.
+
+        Subclasses MAY override this method.
+
+        """
+        return
