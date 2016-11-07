@@ -11,8 +11,8 @@
 
 <dom-module id="cloud-page">
     <template>
-        <style is="custom-style" include="single-page"></style>
-        <style include="shared-styles">
+        <style include="single-page"></style>
+        <style is="custom-style" include="shared-styles">
             :host {
                 display: block;
                 padding-bottom: 80px;
@@ -48,6 +48,10 @@
             a {
                 color: black;
                 text-decoration: none;
+            }
+
+            .icon iron-icon {
+                background-color: rgba(255,255,255,0.50) !important;
             }
 
             .paper-header [paper-drawer-toggle] {
@@ -202,12 +206,12 @@
                 </div>
                 <div class="item-actions">
                     <div class="head-toggle">
-                        <paper-toggle-button checked$="[[cloud.enabled]]" on-tap="_changeState">
+                        <paper-toggle-button id="enable-disable-cloud" checked$="[[cloud.enabled]]" on-tap="_changeState">
                             <span hidden$="[[!cloud.enabled]]">ENABLED</span>
                             <span hidden$="[[cloud.enabled]]">DISABLED</span>
                         </paper-toggle-button>
                     </div>
-                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>
+                    <paper-button id="edit-tags" on-tap="_editTags" class="simple">tags</paper-button>
                     <!-- <paper-button on-tap="_starcloud" class="simple">                        
                     </paper-button> -->
                 </div>
@@ -245,7 +249,7 @@
                 <h3>Delete Cloud: [[cloud.title]]</h3>
                 <p>Deleting clouds can not be undone. Alternatively you can disable the cloud temporarily by using the option on the top.</p>
                 <div class="button">
-                    <paper-button on-tap="_deleteCloud" class="red">Delete Cloud</paper-button>
+                    <paper-button id="delete-cloud" on-tap="_deleteCloud" class="red">Delete Cloud</paper-button>
                 </div>
             </paper-material>
             <!-- <div class="absolute-bottom-right">
