@@ -31,7 +31,7 @@
         plan-item {
             background-color: rgba(0,0,0,.06);
         }
-        plan-item[iscurrent='true'] {
+        plan-item[is-current='true'] {
             color: #ffffff;
             background-color: #039BE5;
         }
@@ -61,10 +61,10 @@
             <div class="grid-row">
                 <div class="xs12 head">
                     <h2 class="title">Your plan</h2>
-                    <p>Your current chosen plan, since [[_computeReadableDate(user.current_plan.started)]].</p>
+                    <p>Your current chosen plan, since [[_computeReadableDate(org.current_plan.started)]].</p>
                 </div>
                 <div class="plans xs12 l6">
-                    <plan-item user="[[user]]" plan="[[user.current_plan]]" iscurrent="true" index="0" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
+                    <plan-item plan="[[org.current_plan]]" is-current="true" index="0" class$="[[computeCurrentClass(plan, org)]] plan"></plan-item>
                 </div>
                 <div class="xs12 l6">
                     <plan-overusage is-over-using="[[isOverUsing]]"></plan-overusage>
@@ -79,15 +79,15 @@
                 </div>
                 <div class="plans xs12">
                     <template is="dom-repeat" items=[[plans]] as="plan">
-                        <plan-item class="xs6 l3" user="[[user]]" plan="[[plan]]" index="[[index]]" iscurrent="[[computeIsCurrent(plan, user)]]" class$="[[computeCurrentClass(plan, user)]] plan"></plan-item>
-                    </template>                    
+                        <plan-item class="xs6 l3" user="[[user]]" plan="[[plan]]" index="[[index]]" is-current="[[computeIsCurrent(plan, org)]]" class$="[[computeCurrentClass(plan, org)]] plan"></plan-item>
+                    </template>
                 </div>
                 <div class="xs12 center">
                     <p>Don't see a plan that meets your requirements? <a href="mailto:sales@mist.io">Contact sales.</a></p>
                 </div>
             </div>
         </paper-material>
-        <plan-purchase id="purcahseplan"></plan-purchase>
+        <plan-purchase id="purchasePlan"></plan-purchase>
     </template>
     <script>
     (function() {
@@ -106,30 +106,32 @@
                 },
                 plans: {
                     type: Array,
-                    computed: 'computePlans(user,org)'
+                    computed: 'computePlans(user, org)'
                 }
             },
             listeners: {
-                'plan-selected': 'purcahsePlan'
+                'plan-selected': 'purchasePlan'
             },
-            computeIsCurrent: function(plan, user) {
-                if (this.user.current_plan) {
-                    return plan.title == this.user.current_plan.title ? true : false;
+            computeIsCurrent: function(plan, org) {
+                if (this.org.current_plan) {
+                    return plan.title == this.org.current_plan.title ? true : false;
                 } else {
                     return false;
                 }
             },
             computePlans:  function(user, org){
-                return this.org.plans.filter(function(p){
-                    return p.visible && p.title != this.user.current_plan.title;
+                if (!this.org.available_plans)
+                    return [];
+                return this.org.available_plans.filter(function(p){
+                    return p.visible && p.title != this.org.current_plan.title;
                 }, this);
             },
             _computeReadableDate: function(date) {
                 return date ? moment(date * 1000).format("MMMM Do YYYY") : '...';
             },
-            purcahsePlan: function(e){
-                this.$.purcahseplan.plan = e.detail.plan;
-                this.$.purcahseplan.open();
+            purchasePlan: function(e){
+                this.$.purchasePlan.plan = e.detail.plan;
+                this.$.purchasePlan.open();
             }
         });
     })();

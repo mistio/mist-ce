@@ -26,7 +26,7 @@
                 color: #ffffff;
                 background-color: #039BE5;
             }
-            .plan {                
+            .plan {
                 text-align: center;
                 padding-bottom: 24px;
                 padding-top: 8px;
@@ -45,10 +45,10 @@
             </p>
             <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
             <p hidden$="[[!plan.expiration]]">expires on [[_computeReadableDate(plan.expiration)]]</p>
-            <template is="dom-if" if="[[!iscurrent]]">
-                <paper-button id="select" class="btn-block submit-btn" raised on-tap="_selectPlan">Select</paper-button>
+            <template is="dom-if" if="[[!isCurrent]]">
+                <paper-button id="select" class="btn-block submit-btn" raised on-tap="_selectPlan" hidden$="[[!plan.price]]">Select</paper-button>
             </template>
-        </div>        
+        </div>
 
     </template>
     <script src="../../bower_components/moment/moment.js"></script>
@@ -60,10 +60,6 @@
                 is: 'plan-item',
 
                 properties: {
-                    user: {
-                        type: Object,
-                        notify: true
-                    },
                     plan: {
                         type: Object
                     },
@@ -71,14 +67,14 @@
                         type: Number,
                         value: 0
                     },
-                    iscurrent: Boolean,
+                    isCurrent: Boolean,
                     priceText: {
                         type: String,
                         computed: '_computePriceText(plan.price)'
                     },
                     descriptionText: {
                         type: String,
-                        computed: '_computeDescriptionText(plan.description, plan.machine_limit)'
+                        computed: '_computeDescriptionText(plan.description, plan.manage_limit)'
                     },
                     discountedPriceText: {
                         type: String,
@@ -89,7 +85,7 @@
                     return price != null ? '$' + price + '/month' : '';
                 },
                 _computeDescriptionText: function(description, machineLimit) {
-                    return description != null && description ? description : machineLimit + ' monitored servers';
+                    return description || 'up to ' + machineLimit + '  machines';
                 },
                 _computeDiscountedPriceText: function(promo) {
                     if (promo) {
