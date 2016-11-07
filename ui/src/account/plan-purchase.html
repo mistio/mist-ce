@@ -11,7 +11,8 @@
         <style is="custom-style" include="forms"></style>
         <style include="shared-styles">
             :host {
-                /*width: 320px;*/
+                width: 320px;
+                box-sizing: border-box;
             }
             #form {
                 font-size: inherit;
@@ -59,6 +60,22 @@
                 left: 0;
                 right: 0;
             }
+            .head hr.headhr {
+                width: 40px;
+                height: 1px;
+                margin: 0 auto;
+                padding: 0;
+            }
+            .head .title {
+                font-weight: 500;
+                text-transform: uppercase;
+                font-size: 14px;
+            }
+            .head .desc {
+                font-weight: 400;
+                font-size: 14px;
+                color: #454545
+            }
         </style>
 
         <!-- 4242 4242 4242 4242 -->
@@ -66,7 +83,9 @@
         <paper-dialog id="form" with-backdrop>
             <img class="logo" src="/assets/logos/logo-vertical-v2.svg" width="80" alt="Mist.io Logo" tabindex="0" on-tap="_goToDashboard"></a>
             <div class="head">
-                <p>[[plan.title]] plan</p>
+                <p class="title">[[plan.title]] plan</p>
+                <hr class="headhr"/>
+                <p class="desc">Subscription of $[[plan.price]]/mo. <br/> up to [[plan.machine_limit]] machines, monitoring for [[plan.motor_limit]] of them.</p>
             </div>
             <paper-dialog-scrollable>
                 <div class="form-inputs">
@@ -102,7 +121,7 @@
             </div>
             <div class="buttons">
                 <paper-button dialog-dismiss>Cancel</paper-button>
-                <paper-button autofocus on-tap="submit" class="blue" disabled="[[!formReady]]">Submit Payment</paper-button>
+                <paper-button autofocus on-tap="submit" class="blue" disabled="[[!formReady]]">Purchase </paper-button>
             </div>
         <paper-dialog>
 
@@ -218,6 +237,8 @@
             console.log('purchaseResponse',e);
             this.set('sendingData', false);
             this.set('formError', false);
+
+            this.querySelector("#form").close();
         },
         purchaseError: function(e){
             console.log('purchaseError',e);

@@ -91,7 +91,7 @@
                     },
                     descriptionText: {
                         type: String,
-                        computed: '_computeDescriptionText(plan.description, plan.manage_limit)'
+                        computed: '_computeDescriptionText(plan.description, plan)'
                     },
                     discountedPriceText: {
                         type: String,
@@ -106,9 +106,12 @@
                 _computePriceText: function(price) {
                     return price != null ? '$' + price + '/month' : '';
                 },
-                _computeDescriptionText: function(description, machinelimit) {
-                    console.log('_computeDescriptionText', description);
-                    return description != '' ? description : 'up to ' + machinelimit + '  machines';
+                _computeDescriptionText: function(description, plan) {
+                    var monitoringFor = '';
+                    if (plan.monitor_limit) {
+                        monitoringFor = " and monitoring for "+ plan.monitor_limit +"of them";
+                    }
+                    return description != '' ? description : 'up to ' + plan.machine_limit + '  machines'+monitoringFor;
                 },
                 _computeDiscountedPriceText: function(promo) {
                     if (promo) {

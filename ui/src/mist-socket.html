@@ -662,7 +662,7 @@
                 if (!org.current_plan.title && machines.length > 5)
                     isOverUsing = true;
                 // user has a paid plan and more than allowed machines
-                else if (org.current_plan.title && machines.length > org.current_plan.manage_limit)
+                else if (org.current_plan.title && machines.length > org.current_plan.machine_limit)
                     isOverUsing = true;
                 else
                     isOverUsing = false;
