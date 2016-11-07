@@ -15,6 +15,7 @@
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 <script type="text/javascript" src="../bower_components/swiftSet/swiftSet.js" inline></script>
 
@@ -122,6 +123,7 @@
 
           <page-my-account name="my-account" is-over-using="[[model.isOverUsing]]" user="[[model.user]]" org="[[model.org]]" machines="[[model.machinesArray]]"></page-my-account>
         </iron-pages>
+        <paper-toast id="mist-toast"></paper-toast>
     </paper-header-panel>
 
     <mist-socket model="{{model}}" onboarding="{{onboarding}}"></mist-socket>
