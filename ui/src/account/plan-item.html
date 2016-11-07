@@ -31,22 +31,39 @@
                 padding-bottom: 24px;
                 padding-top: 8px;
             }
+            p {
+                margin-right: 26px;
+                margin-left: 26px;
+            }
         </style>
         <div class="plan">
             <h2>[[plan.title]]
                 <span hidden$="[[plan.title]]">Free</span>
             </h2>
             <hr>
+            <!-- regular plans -->
             <p>[[priceText]]
                 <span hidden$="[[plan.title]]">$0 forever</span>
             </p>
-            <p>[[descriptionText]]
-            <span hidden$="[[descriptionText]]">Up to 5 machines. <br/> Monitoring for one of them.</span>
+            <div hidden$="[[enterprise]]">
+                <p>[[descriptionText]]
+                    <span hidden$="[[descriptionText]]">Up to 5 machines. <br/> Monitoring for one of them.</span>
+                </p>
+            </div>
+            <!-- if plan is enterprise -->
+            <p hidden$="[[!enterprise]]">
+                Contact us for your custom Enterprise plan of more than 300 machines
             </p>
+            <div hidden$="[[!enterprise]]">
+                tel: +1-650-605-3299 <br/>
+                <a href="mailto:sales@mist.io">sales@mist.io</a>
+            </div>
+            
+            <!-- regular plans -->
             <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
             <p hidden$="[[!plan.expiration]]">expires on [[_computeReadableDate(plan.expiration)]]</p>
             <template is="dom-if" if="[[!isCurrent]]">
-                <paper-button id="select" class="btn-block submit-btn" raised on-tap="_selectPlan" hidden$="[[!plan.price]]">Select</paper-button>
+                <paper-button id="select" class="btn-block submit-btn blue" raised on-tap="_selectPlan" hidden$="[[!plan.price]]">[[buttonText]]</paper-button>
             </template>
         </div>
 
@@ -79,13 +96,19 @@
                     discountedPriceText: {
                         type: String,
                         computed: '_computeDiscountedPriceText(plan.promo)'
-                    }
+                    },
+                    enterprise: {
+                        type: Boolean,
+                        computed: "_computeIsEnteriprise(plan.title)"
+                    },
+                    buttonText: String
                 },
                 _computePriceText: function(price) {
                     return price != null ? '$' + price + '/month' : '';
                 },
-                _computeDescriptionText: function(description, machineLimit) {
-                    return description || 'up to ' + machineLimit + '  machines';
+                _computeDescriptionText: function(description, machinelimit) {
+                    console.log('_computeDescriptionText', description);
+                    return description != '' ? description : 'up to ' + machinelimit + '  machines';
                 },
                 _computeDiscountedPriceText: function(promo) {
                     if (promo) {
@@ -102,6 +125,9 @@
                 },
                 _triggerInfo: function() {
                     console.log('info popup');
+                },
+                _computeIsEnteriprise: function(title){
+                    return title == "Enterprise";
                 }
             });
         })();
