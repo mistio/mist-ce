@@ -202,7 +202,7 @@ class Schedule(me.Document):
 
         # Calculate and store cloud type specific fields.
         self._schedule_specific_fields = [field for field in type(self)._fields
-                                       if field not in Schedule._fields]
+                                          if field not in Schedule._fields]
 
     @classmethod
     def add(cls, auth_context, name, **kwargs):
