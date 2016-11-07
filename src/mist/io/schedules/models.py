@@ -201,7 +201,7 @@ class Schedule(me.Document):
         self.ctl = self._controller_cls(self)
 
         # Calculate and store cloud type specific fields.
-        self._cloud_specific_fields = [field for field in type(self)._fields
+        self._schedule_specific_fields = [field for field in type(self)._fields
                                        if field not in Schedule._fields]
 
     @classmethod
@@ -313,7 +313,7 @@ class Schedule(me.Document):
         }
 
         sdict.update({key: self.get_machines()
-                      for key in self._cloud_specific_fields})
+                      for key in self._schedule_specific_fields})
 
         return sdict
 
