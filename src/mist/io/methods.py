@@ -1360,16 +1360,6 @@ def destroy_machine(user, cloud_id, machine_id):
                         "machine never had monitoring enabled. Error: %r", exc)
 
     machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-    # delete schedules for this machine or
-    # remove it from schedule.machines_match.machines
-    schedules = Schedule.objects(owner=user)
-    for sched in schedules:
-        if machine in sched.machines_match.machines:
-            if len(sched.machines_match) > 1:
-                sched.machines_match.machines.remove(machine)
-                sched.save()
-            else:
-                sched.delete()
 
     machine.ctl.destroy()
 
