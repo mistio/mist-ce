@@ -32,7 +32,7 @@
                         <div class="flexchild text-right">Action</div>
                     </div>
                     <div class="info-body">
-                        <template is="dom-repeat" items=[[user.user_plans]] as="subscription">
+                        <template is="dom-repeat" items={{org.subscription_history}} as="subscription">
                             <div class="row">
                                 <subscription-item subscription="[[subscription]]" index="[[index]]" count="[[subscriptions.length]]"></subscription-item>
                             </div>
@@ -50,9 +50,8 @@
                 is: 'subscriptions-list',
 
                 properties: {
-                  user: {
-                      type: Object,
-                      notify: true
+                  org: {
+                      type: Object
                   }
                 }
             });
