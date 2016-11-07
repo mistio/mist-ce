@@ -194,8 +194,8 @@ class Schedule(me.Document):
             )
         elif not issubclass(self._controller_cls, controllers.BaseController):
             raise TypeError(
-                "Can't initialize %s.  All Schedule subclasses should define a "
-                "`_controller_cls` class attribute pointing to a "
+                "Can't initialize %s.  All Schedule subclasses should define a"
+                " `_controller_cls` class attribute pointing to a "
                 "`BaseController` subclass." % self
             )
         self.ctl = self._controller_cls(self)
