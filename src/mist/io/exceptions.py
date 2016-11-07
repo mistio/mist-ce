@@ -61,10 +61,6 @@ class RequiredParameterMissingError(BadRequestError):
     msg = "Required parameter not provided"
 
 
-class ParameterValueInvalid(BadRequestError):
-    msg = " A required parameter has an invalid value"
-
-
 class KeyParameterMissingError(RequiredParameterMissingError):
     msg = "Key id parameter missing"
 

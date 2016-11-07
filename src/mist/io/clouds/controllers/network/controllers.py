@@ -2,7 +2,7 @@ import logging
 import time
 
 from mist.io.clouds.controllers.network.base import BaseNetworkController
-from mist.io.exceptions import RequiredParameterMissingError, ParameterValueInvalid, NetworkCreationError, NetworkError
+from mist.io.exceptions import RequiredParameterMissingError, NetworkCreationError, NetworkError
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider
 from libcloud.compute.drivers.ec2 import EC2Network
