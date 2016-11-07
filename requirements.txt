@@ -1,6 +1,6 @@
 ansible==1.9.3
 apache-libcloud
-amqp==1.4.6
+amqp==1.4.7
 deepdiff
 celery==3.1.17
 flake8
@@ -8,7 +8,7 @@ gevent==1.0.2
 gevent-subprocess==0.1.1
 mongoengine==0.10.6
 netaddr==0.7.18
--e git+https://github.com/mgogoulos/paramiko.git@master#egg=paramiko
+-e git+https://gitlab.ops.mist.io/mistio/paramiko.git@master#egg=paramiko==2.0.3
 PasteDeploy==1.5.2
 PasteScript==2.0.2
 pika==0.10.0

@@ -431,12 +431,13 @@ def connect_provider(cloud):
     Cloud is expected to be a cloud mongoengine model instance.
 
     """
-    return cloud.ctl.connect()
+    return cloud.ctl.compute.connect()
 
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
-    machines = Cloud.objects.get(owner=user, id=cloud_id).ctl.list_machines()
+    machines = Cloud.objects.get(owner=user,
+                                 id=cloud_id).ctl.compute.list_machines()
     return [machine.as_dict_old() for machine in machines]
 
 
@@ -1333,7 +1334,8 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
                 size=size,
                 location=location,
                 auth=auth,
-                ssh_key=tmp_key_path
+                ssh_key=tmp_key_path,
+                ex_private=True
             )
         except Exception as e:
             raise MachineCreationError("Linode, got exception %s" % e, e)
@@ -1399,14 +1401,15 @@ def ssh_command(user, cloud_id, machine_id, host, command,
 
 def list_images(user, cloud_id, term=None):
     """List images from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_images(term)
+    return Cloud.objects.get(owner=user,
+                             id=cloud_id).ctl.compute.list_images(term)
 
 
 def star_image(user, cloud_id, image_id):
     """Toggle image star (star/unstar)"""
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
 
-    star = cloud.ctl.image_is_starred(image_id)
+    star = cloud.ctl.compute.image_is_starred(image_id)
     if star:
         if image_id in cloud.starred:
             cloud.starred.remove(image_id)
@@ -1458,12 +1461,13 @@ def list_keys(user):
 
 def list_sizes(user, cloud_id):
     """List sizes (aka flavors) from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_sizes()
+    return Cloud.objects.get(owner=user, id=cloud_id).ctl.compute.list_sizes()
 
 
 def list_locations(user, cloud_id):
     """List locations from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.list_locations()
+    return Cloud.objects.get(owner=user,
+                             id=cloud_id).ctl.compute.list_locations()
 
 
 def list_networks(user, cloud_id):
