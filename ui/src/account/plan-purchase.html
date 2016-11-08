@@ -128,6 +128,14 @@
                           <input type="text" size="4" data-stripe="cvc" value="{{payload.cvc::input}}">
                         </label>
                     </div>
+
+                    <div class="form-row">
+                        <label>
+                          <span>ZIP code</span>
+                          <input type="text" size="4" data-stripe="address_zip" value="{{payload.address_zip::input}}">
+                        </label>
+                    </div>
+
                 </div>
             </paper-dialog-scrollable>
             <div class="progress">
@@ -164,7 +172,8 @@
                         number: "",
                         exp_month: "",
                         exp_year: "",
-                        cvc: ""
+                        cvc: "",
+                        address_zip: ""
                     }
                 },
                 notify: true
@@ -209,7 +218,6 @@
                 this.set('sendingData', true);
                 var that = this;
                 function stripeResponseHandler(status, response){
-                    console.log('stripeResponseHandler', status, response);
                     if (response.error) {
                         console.log('stripeResponseHandler failed', response.error.message);
                         that.showError(response.error.message);
@@ -224,8 +232,6 @@
             }
         },
         sumbmitPayment: function(status, response){
-            console.log('sumbmitPayment');
-            console.log('stripeResponseHandler failed');
             var mistPayload = {
                 token: response.id,
                 plan: this.plan.title,
