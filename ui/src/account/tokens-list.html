@@ -189,7 +189,6 @@
                 },
                 createTokenResponse: function(e){
                     this.$.createTokenDialog.close();
-                    console.log('createTokenResponse',e);;
                     var res = JSON.parse(e.detail.xhr.response)
                     this.$.tokenValue.value = res.token;
                     this.$.copyToken.open();
@@ -205,7 +204,6 @@
                 },
                 getTokens: function(e){
                     this.set('tokens', e.detail.response);
-                    console.log('got tokens');
                 },
                 getTokensError: function(e){
                     this.set("hasError", true);
@@ -213,7 +211,6 @@
                     this.$.createTokenDialog.close();
                 },
                 getTokensAgain: function(e){
-                    console.log('listen token revoked');
                     var that = this;
                     this.async(function(){
                         that.$.getTokensAjax.generateRequest();
