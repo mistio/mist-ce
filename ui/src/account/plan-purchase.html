@@ -85,7 +85,7 @@
             <div class="head">
                 <p class="title">[[plan.title]] plan</p>
                 <hr class="headhr"/>
-                <p class="desc">Subscription of $[[plan.price]]/mo. <br/> up to [[plan.machine_limit]] machines, monitoring for [[plan.motor_limit]] of them.</p>
+                <p class="desc">Subscription of $[[plan.price]]/mo. <br/> up to [[plan.machine_limit]] machines, monitoring for [[plan.monitor_limit]] of them.</p>
             </div>
             <paper-dialog-scrollable>
                 <!-- <div class="form-inputs" hidden$="[[!hasCard]]">
@@ -124,7 +124,7 @@
             </div>
             <div class="buttons">
                 <paper-button dialog-dismiss>Cancel</paper-button>
-                <paper-button autofocus on-tap="submit" class="blue" disabled="[[!formReady]]">Purchase </paper-button>
+                <paper-button autofocus on-tap="submit" class="blue" disabled="[[!formReady]]">[[buttonText]] </paper-button>
             </div>
         <paper-dialog>
 
@@ -168,6 +168,10 @@
                 type: Boolean,
                 value: false
             },
+            buttonText: {
+                type: String,
+                computed: '_computeButtonText(plan,org)'
+            }
         },
         listeners: {
             'input': 'validateForm'
@@ -263,6 +267,17 @@
             this.set('sendingData', false);
             this.set('formError', true);
             this.$.errormsg.textContent = error;
+        },
+        _computeButtonText: function(plan, org){
+            if (this.org.current_plan.machine_limit > plan.machine_limit){
+                return 'Downgrade';
+            }
+            else if (this.org.current_plan.machine_limit < plan.machine_limit){
+                return 'Upgrade';
+            }
+            else {
+                return "Purchase";
+            }
         },
     });
     </script>

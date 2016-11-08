@@ -31,10 +31,14 @@
                 border-bottom-width: 2px;
                 border-color: #ccc; 
             }
+            h6.absolute-date {
+                display: inline;
+                opacity: 0.32;
+            }
         </style>
 
         <paper-item class$="info-item flex-horizontal-with-ratios plan-record [[isExpiringClass]] [[zebraClasses]]">
-            <div class="flexchild plan-date">[[dateText]]</div>
+            <div class="flexchild plan-date">[[dateText]] <h6 class="absolute-date">[[absoluteDateText]]</h6></div>
             <div class="flexchild plan-title text-center"><div class="name">[[titleText]]</div></div>
             <div class="flexchild plan-action text-right">[[subscription.action]]</div>
         </paper-item>
@@ -65,6 +69,10 @@
                         type: String,
                         computed: '_computeDateText(subscription.time)'
                     },
+                    absoluteDateText: {
+                        type: String,
+                        computed: '_computeAbsoluteDDateText(subscription.time)'
+                    },
                     isExpiringClass: {
                         type: String,
                         computed: '_computeIsExpiringClass(subscription.action)'
@@ -90,8 +98,13 @@
                 },
                 _computeDateText: function(time) {
                     var date = new Date(time * 1000);
-                    var month = new Date();
                     return moment(time *1000).fromNow();
+
+                },
+                _computeAbsoluteDDateText: function(time) {
+                    var date = new Date(time * 1000);
+                    return moment().format("MMMM") +' '+ date.getDate() +' '+ date.getFullYear();
+
                 },
                 _computeIsExpiringClass: function(action) {
                     return action == 'started' ? null : 'plan-end';
