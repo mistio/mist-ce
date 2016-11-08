@@ -49,20 +49,16 @@
             paper-button.red {
                 padding: 4px !important;
             }
-            paper-icon-button {
-                float: right;
-                vertical-align: middle;
-            }
         </style>
 
         <paper-item class$="info-item flex-horizontal-with-ratios plan-record [[zebraClasses]]">
             <div class="flexchild plan-title"><div class="name">[[token.name]]</div></div>
-            <div class="flexchild plan-date text-center">[[dateText]] <h6 class="absolute-date">[[absoluteDateText]]</h6></div>
+            <div class="flexchild plan-date text-left">[[token.last_accessed_at]] <h6 class="absolute-date">[[absoluteDateText]]</h6></div>
             <div class="flexchild plan-action text-right">
                 <paper-button class="red" on-tap="revokeToken">Revoke</paper-button>
                 <paper-spinner active="{{loading}}"></paper-spinner>
-                <paper-icon-button icon="icons:expand-more" on-tap="toggleInfo"></paper-icon-button>
             </div>
+            <paper-icon-button icon="icons:expand-more" on-tap="toggleInfo"></paper-icon-button>
         </paper-item>
         <div id="moreinfo">
             <element-for-in content="[[token]]"></element-for-in>
@@ -128,7 +124,6 @@
 
                 },
                 toggleInfo: function(e){
-                    console.log(this.$.moreinfo);
                     if (this.$.moreinfo.hasAttribute("opened")) { 
                         this.$.moreinfo.removeAttribute("opened")
                     }
@@ -149,11 +144,10 @@
                     this.$.spinner.setAttribute('active', true);
                 },
                 revokeTokenResponse: function(e){
-                    console.log('fire token revoked');
                     this.fire('token-revoked');
                 },
                 revokeTokenError: function(e){
-                    console.log('token revoke error');
+                    this.fire('token-revoking-error', {'event': e});                    
                 }
             });
         })();

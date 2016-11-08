@@ -44,7 +44,7 @@
                 <div class="info-list">
                     <div class="info-head flex-horizontal-with-ratios">
                         <div class="flexchild">Created At</div>
-                        <div class="flexchild text-center">Last Accessed</div>
+                        <div class="flexchild text-left">Last Accessed</div>
                         <div class="flexchild text-right">&nbsp;</div>
                     </div>
                     <div class="info-body">
@@ -56,7 +56,11 @@
                     </div>
                 </div>
             </div>
+            <div id="error" class="error" hidden$="[[!hasError]]"></div>
         </paper-card>
+
+        <iron-ajax id="getSessionsAjax" method="GET" url="/api/v1/sessions" auto on-response="getSessionsResponse" on-error="getSessionsError" handle-as="json"></iron-ajax>
+
     </template>
     <script>
         (function() {
@@ -68,8 +72,39 @@
                 properties: {
                   user: Object,
                   org: Object,
-                  sessions: Array
-                }
+                  sessions: Array,
+                  hasError: {
+                    type: Boolean,
+                    value: false
+                  }
+                },
+                listeners: {
+                    'session-terminated': 'getSessionsAgain',
+                    'terminating-session-error': 'showError'
+                },
+                getSessionsResponse: function(e){
+                    this.set('sessions', []);
+                    this.set('sessions', e.detail.response);
+                    this.set("hasError", true);
+                },
+                getSessionsError: function(e){
+                    this.set("hasError", true);
+                    this.$.error.textContent = e.detail.error;
+                },
+                getSessionsAgain: function(e){
+                    var that = this;
+                    this.async(function(){
+                        that.$.getSessionsAjax.generateRequest();
+                    }, 100)
+                },
+                showError: function(e){
+                    // this.set("hasError", true);
+                    // console.log('showError',e)
+                    // var error = e.detail.request.xhr.responseText;
+                    // if (!error)
+                    //     error = e.detail.error;
+                    // this.$.error.textContent = 'error';
+                },
             });
         })();
     </script>
