@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="token-item.html">
 
@@ -52,10 +53,17 @@
             #createTokenDialog > * {
                 max-width: 100%;
                 box-sizing: border-box;
+                margin-top: 0
             }
+            #createTokenDialog > *:first-child {
+                margin-top: 24px;
+            } 
             .buttons {
                 padding: 8px 24px 16px 24px;
-            }            
+            }
+            .error {
+                color: var(--red-color);
+            }   
         </style>
         <paper-material elevation="1">
             <div class="grid-row">
@@ -67,7 +75,7 @@
                 <div class="info-list">
                     <div class="info-head flex-horizontal-with-ratios">
                         <div class="flexchild">Name</div>
-                        <div class="flexchild text-center">Last Accessed</div>
+                        <div class="flexchild text-left">Last Accessed</div>
                         <div class="flexchild text-right">Action</div>
                     </div>
                     <div class="info-body">
@@ -78,10 +86,12 @@
                         </template>
                     </div>
                 </div>
-                <paper-button on-tap="createToken" class="blue create-token">Create an API Token</paper-button>
+                <div id="error" class="error" hidden$="[[!hasError]]"></div>
+                <paper-button on-tap="createToken" class="blue create-token">Create API Token</paper-button>
+                <paper-spinner active="{{loading}}"></paper-spinner>
 
                 <paper-dialog id="createTokenDialog" with-backdrop>
-                    <h2>Create an API Token</h2>
+                    <h2>Create API Token</h2>
 
                     <paper-input id="tokenName" value="{{newToken.name::input}}" label="Token Name"></paper-input>
 
@@ -115,9 +125,18 @@
             </div>
         </paper-material>
 
+        <paper-dialog id="copyToken" modal>
+            <h2>Copy your Token</h2>
+            <p>Grab your token below. This will be the last time that it will be visible to anybody.</p>
+            <paper-textarea id="tokenValue" value=""></paper-textarea>
+            <div class="buttons">
+                <paper-button class="blue" dialog-dismiss on-tap="resetAndClear">OK</paper-button>
+            </div>
+        </paper-dialog>
+
         <iron-ajax id="getTokensAjax" method="GET" url="/api/v1/tokens" auto on-response="getTokens" on-error="getTokensError" handle-as="json"></iron-ajax>
 
-        <iron-ajax id="createTokenAjax" method="POST" url="/api/v1/tokens" on-request="createTokenRequest" on-response="createTokenResponse" on-error="createTokenError"></iron-ajax>
+        <iron-ajax id="createTokenAjax" method="POST" url="/api/v1/tokens" loading="{{loading}}" on-request="createTokenRequest" on-response="createTokenResponse" on-error="createTokenError" handle-as="xml"></iron-ajax>
 
     </template>
     <script>
@@ -142,10 +161,16 @@
                             email: ''
                         }
                     }
+                  },
+                  hasError: {
+                    type: Boolean,
+                    value: false
                   }
                 },
                 listeners: {
-                    'token-revoked': 'getTokensAgain'
+                    'input': 'hideErrors',
+                    'token-revoked': 'getTokensAgain',
+                    'token-revoking-error': 'showError'
                 },
                 attached: function(){
                     this.set('newToken.org_id', this.org.id);
@@ -164,15 +189,28 @@
                 },
                 createTokenResponse: function(e){
                     this.$.createTokenDialog.close();
+                    console.log('createTokenResponse',e);;
+                    var res = JSON.parse(e.detail.xhr.response)
+                    this.$.tokenValue.value = res.token;
+                    this.$.copyToken.open();
+
                     this.reset();
                     this.getTokensAgain(e);
                 },
                 createTokenError: function(e){
-
+                    this.set("hasError", true);
+                    this.$.error.textContent = e.detail.request.xhr.responseText;
+                    this.$.createTokenDialog.close();
+                    this.reset();
                 },
                 getTokens: function(e){
                     this.set('tokens', e.detail.response);
                     console.log('got tokens');
+                },
+                getTokensError: function(e){
+                    this.set("hasError", true);
+                    this.$.error.textContent = e.detail.error;
+                    this.$.createTokenDialog.close();
                 },
                 getTokensAgain: function(e){
                     console.log('listen token revoked');
@@ -185,6 +223,21 @@
                     this.set('newToken.name', '');
                     this.set('newToken.ttl', '');
                     this.set('newToken.password', '');
+                },
+                copied: function(){
+                    this.reset();
+                    this.$.tokenValue.value = "";
+                },
+                showError: function(e){
+                    this.set("hasError", true);
+                    var error = e.detail.request.xhr.responseText;
+                    if (!error)
+                        error = e.detail.error;
+                    this.$.error.textContent = error;
+                    this.$.createTokenDialog.close();
+                },
+                hideErrors: function(){
+                    this.set('hasError', false);
                 }
             });
         })();
