@@ -4,8 +4,12 @@
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-menu/paper-submenu.html">
 <link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../bower_components/juicy-ace-editor/juicy-ace-editor.html">
+<link rel="import" href="../bower_components/iron-behaviors/iron-control-state.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+
 <dom-module id="add-panel">
     <template>
       <style is="custom-style">
@@ -20,7 +24,7 @@
         }
       </style>
       <paper-button raised on-tap="openDialog">Add Graph</paper-button>
-      <paper-dialog id="alignedDialog" no-overlap horizontal-align="left" vertical-align="top" style="height: 200px; width:550px">
+      <paper-dialog id="alignedDialog" no-overlap horizontal-align="left" vertical-align="top" style="height: 800px; width:550px">
         <iron-ajax
           id="metrics"
           url="[[_computeMetricsUri(cloudId,machineId)]]"
@@ -30,6 +34,17 @@
         </iron-ajax>
         <paper-dialog-scrollable>
           <h2>Select target for graph</h2>
+          <paper-menu></paper-menu>
+          <paper-menu>
+            <paper-submenu>
+              <paper-item class="menu-trigger">Topics</paper-item>
+              <paper-menu class="menu-content">
+                <paper-item>Topic 1</paper-item>
+                <paper-item>Topic 2</paper-item>
+                <paper-item>Topic 3</paper-item>
+              </paper-menu>
+            </paper-submenu>
+        </paper-menu>
           <div>
             <paper-dropdown-menu id="combo0" label="Select value" on-select="_nextOption" style="width: 180px;">
                 <paper-menu class="dropdown-content" attr-for-selected="name" selected="{{selectedValue}}">
@@ -134,118 +149,144 @@
                 this.validInput = "";
                 this.stepType = "";
                 this.querySelector("#metrics").generateRequest();
-                this.querySelector('#combo0').setAttribute("disabled", "true");
             },
             _handleMetricResponse: function(data) {
-                var metricsArray = [];
-                var item;
-                var metrics = [];
-                var options = 0;
-                for (var metric in data.detail.response) {
-                    item = metric.split(".");
-                    metricsArray.push(item);
-                    if (item.length > options) {
-                        options = item.length;
+                var output={};
+
+                Object.keys(data.detail.response).forEach(function(i){
+                  var res=output ;
+                  var splitArray=i.split(".")
+                  for(var p=0; p<splitArray.length; p++){
+                    if (!res[splitArray[p]]){
+                      res[splitArray[p]] = {};
                     }
-                }
-                var optionsArray = [];
-                var itemsArray = [];
-                for (var i = 1; i < options; i++) {
-                    itemsArray.push({
-                        'name': "combo" + i
-                    });
-                }
-                console.log("itemsArray", itemsArray);
-                this.optionsNum = itemsArray;
-                this.responseMetrics = metricsArray;
-                this.querySelector('#combo0').removeAttribute("disabled");
-                this.combo0 = this._getMetrics(0);
-                this.selectedValue = this.combo0[0];
+                   if (p==splitArray.length-1){
+                     res[splitArray[p]] = data.detail.response[i].id;
+                   }
+                    res = res[splitArray[p]];
+                  }
+                });
+                this.responseMetrics =output;
+                _createMenus(this,output);
             },
-            _handleTap: function(e) {
-                console.log(e);
-                var targetCut = -1;
-                if (e.target.id == "combo0") {
-                    targetCut = 0;
-                    this.querySelector("#combo0").hidden = true;
-                    for (var i = 0; i < this.optionsNum.length; i++) {
-                        this.querySelector("#" + this.optionsNum[v].name).hidden = true;
-                    }
-                }
-                for (var i = 0; i < this.optionsNum.length; i++) {
-                    if (e.target.id == this.optionsNum[i].name) {
-                        targetCut = i;
-                        for (var v = i; v < this.optionsNum.length; v++) {
-                            this.querySelector("#" + this.optionsNum[v].name).hidden = true;
-                        }
-                    }
-                }
-                if (this.target != null) {
-                    var selection;
-                    if (targetCut == 0) {
-                        selection = this.target.split(".")[0];
-                        console.log(this.selectedValue);
-                        this.target = null;
-                    } else if (targetCut > 0) {
-                        var tempTarget = this.target.split(".");
-                        selection = tempTarget[tempTarget.length - 1];
-                        tempTarget.splice(targetCut, tempTarget.length - 1);
-                        this.target = "";
-                        for (var y = 0; y < tempTarget.length; y++) {
-                            if (y < tempTarget.length - 1)
-                                this.target += tempTarget[y] + "."
-                            else {
-                                this.target += tempTarget[y];
-                            }
-                        }
-                    }
-                }
-                this._getMetrics(targetCut);
-                this.selectedValue = selection;
-                console.log(this.selectedValue);
-            },
-            _nextOption: function(e) {
-                if (e.target.value != "" && e.target.value != "Custom") {
-                    this.hide = true;
-                    if (this.target == null || this.target.length <= 1) {
-                        this.target = e.target.value;
-                    } else {
-                        this.target += "." + e.target.value;
-                    }
-                    for (var i = 0; i <= this.optionsNum.length; i++) {
-                        if (this.querySelector('#combo' + i).hidden) {
-                            var tempCombo = this._getMetrics(i);
-                            console.log(tempCombo, i == this.optionsNum.length);
-                            if (tempCombo[0] != null) {
-                                this.querySelector('#combo' + i).hidden = false;
-                                this.querySelector('#combo' + i).innerHTML = e.target.value;
-                                this.selectedValue = tempCombo[0];
-                                this.querySelector('#combo0').setAttribute("label", "Select next value");
-                            } else {
-                                this.fire('panelAdded', this.target);
-                                this._exit();
-                            }
-                            break;
-                        }
-                        if (!this.querySelector('#combo' + this.optionsNum.length).hidden && this.selectedValue != "Custom") {
-                            this._exit();
-                            break;
-                        }
-                    }
-                } else if(e.target.value =="Custom") {
-                    this.querySelector('#alignedDialog').style.height = '600px';
-                    this.querySelector('#script').value=this.metric.script;
-                    this.hide = false;
-                }
-            },
+
+
+
+
+              // if(parent==null){
+              //   var menu=this.querySelector('paper-menu');
+              // }else{
+              //   if(this.target==null){
+              //     this.target=index;
+              //   }
+              //   else{
+              //     this.target+="."+index;
+              //   }
+              //   index=this.target.split(".").length;
+              //   console.log(this.target,index);
+              //   var menu=document.createElement('paper-menu');
+              //   parent.appendChild(menu);
+              // }
+              // var metrics=this._getMetrics(index);
+              // console.log(index,metrics[0]!=null);
+              // if(metrics[0]!=null)
+              //   for(var i=0; i<metrics.length; i++){
+              //     var sub=document.createElement('paper-submenu');
+              //     var item=document.createElement('paper-item');
+              //     item.innerHTML=metrics[i];
+              //     sub.id=metrics[i];
+              //     sub.querySelector('div').appendChild(item);
+              //     //sub.querySelector('iron-collapse').appendChild("to menou ");  tis epiloges (item) mesa sto div tou menou opws apo panw
+              //     menu.querySelector('div').appendChild(sub);
+              //   }
+            //},
+            // test:function(e){
+            //   this._createMenus(e.target.id,e.srcElement.children[1]);
+            // },
+            // _handleTap: function(e) {
+            //     console.log(e);
+            //     var targetCut = -1;
+            //     if (e.target.id == "combo0") {
+            //         targetCut = 0;
+            //         this.querySelector("#combo0").hidden = true;
+            //         for (var i = 0; i < this.optionsNum.length; i++) {
+            //             this.querySelector("#" + this.optionsNum[v].name).hidden = true;
+            //         }
+            //     }
+            //     for (var i = 0; i < this.optionsNum.length; i++) {
+            //         if (e.target.id == this.optionsNum[i].name) {
+            //             targetCut = i;
+            //             for (var v = i; v < this.optionsNum.length; v++) {
+            //                 this.querySelector("#" + this.optionsNum[v].name).hidden = true;
+            //             }
+            //         }
+            //     }
+            //     if (this.target != null) {
+            //         var selection;
+            //         if (targetCut == 0) {
+            //             selection = this.target.split(".")[0];
+            //             console.log(this.selectedValue);
+            //             this.target = null;
+            //         } else if (targetCut > 0) {
+            //             var tempTarget = this.target.split(".");
+            //             selection = tempTarget[tempTarget.length - 1];
+            //             tempTarget.splice(targetCut, tempTarget.length - 1);
+            //             this.target = "";
+            //             for (var y = 0; y < tempTarget.length; y++) {
+            //                 if (y < tempTarget.length - 1)
+            //                     this.target += tempTarget[y] + "."
+            //                 else {
+            //                     this.target += tempTarget[y];
+            //                 }
+            //             }
+            //         }
+            //     }
+            //     this._getMetrics(targetCut);
+            //     this.selectedValue = selection;
+            //     console.log(this.selectedValue);
+            // },
+            // _nextOption: function(e) {
+            //     if (e.target.value != "" && e.target.value != "Custom") {
+            //         this.hide = true;
+            //         if (this.target == null || this.target.length <= 1) {
+            //             this.target = e.target.value;
+            //         } else {
+            //             this.target += "." + e.target.value;
+            //         }
+            //         for (var i = 0; i <= this.optionsNum.length; i++) {
+            //             if (this.querySelector('#combo' + i).hidden) {
+            //                 var tempCombo = this._getMetrics(i);
+            //                 console.log(tempCombo, i == this.optionsNum.length);
+            //                 if (tempCombo[0] != null) {
+            //                     this.querySelector('#combo' + i).hidden = false;
+            //                     this.querySelector('#combo' + i).innerHTML = e.target.value;
+            //                     this.selectedValue = tempCombo[0];
+            //                     this.querySelector('#combo0').setAttribute("label", "Select next value");
+            //                 } else {
+            //                     this.fire('panelAdded', this.target);
+            //                     this._exit();
+            //                 }
+            //                 break;
+            //             }
+            //             if (!this.querySelector('#combo' + this.optionsNum.length).hidden && this.selectedValue != "Custom") {
+            //                 this._exit();
+            //                 break;
+            //             }
+            //         }
+            //     } else if(e.target.value =="Custom") {
+            //         this.querySelector('#alignedDialog').style.height = '600px';
+            //         this.querySelector('#script').value=this.metric.script;
+            //         this.hide = false;
+            //     }
+            // },
             _getMetrics: function(index) {
                 var targetArray = [];
                 if (this.target != null) {
                     targetArray = this.target.split(".");
+                    console.log(targetArray)
                 }
-                console.log(targetArray, index);
                 var metrics = [];
-                for (var j = 1; j < this.responseMetrics.length; j++) {
+                for (var j = 0; j < this.responseMetrics.length; j++) {
                     if (index == 0) {
                         if (metrics.length == 0) {
                             metrics.push(this.responseMetrics[j][index]);
@@ -274,39 +315,59 @@
                 this.set("combo0", metrics);
                 return metrics;
             },
-            _exit: function() {
-                this.target = null;
-                for (var i = 0; i < this.optionsNum; i++) {
-                    this.querySelector('#' + this.optionsNum[i].name).hidden = true;
-                }
-                this.optionsNum = [];
-                var dialog = this.querySelector('paper-dialog');
-                dialog.close();
-            },
-            _generateCustomgraphrequest(){
-              console.log(this.cloudId,this.machineId,this.metric.pluginId);
-              this._computeUrl(this.cloudId,this.machineId,this.metric.pluginId);
-              this.metric.script=this.querySelector('#script').value;
-              console.log(this.metric.script);
-              if(this.querySelector('#derivative').checked){
-                this.metric.type="derive";
-              }
-              else{
-                this.metric.type="gauge"
-              }
-              var payload=  {
-                   "plugin_type"   : "python",
-                   "name"          : this.metric.name,
-                   "unit"          : this.metric.unit,
-                   "value_type"    : this.metric.type,
-                   "read_function" : this.metric.script,
-                   "host"          : "172.17.0.1"
-               };
-              this.querySelector('#postCustomgraph').contentType="application/json"
-              this.querySelector('#postCustomgraph').headers["Csrf-Token"] = CSRF_TOKEN;
-              this.querySelector('#postCustomgraph').body =payload;
-              this.querySelector('#postCustomgraph').generateRequest();
-            }
+            // _exit: function() {
+            //     this.target = null;
+            //     for (var i = 0; i < this.optionsNum; i++) {
+            //         this.querySelector('#' + this.optionsNum[i].name).hidden = true;
+            //     }
+            //     this.optionsNum = [];
+            //     var dialog = this.querySelector('paper-dialog');
+            //     dialog.close();
+            // },
+            // _generateCustomgraphrequest(){
+            //   console.log(this.cloudId,this.machineId,this.metric.pluginId);
+            //   this._computeUrl(this.cloudId,this.machineId,this.metric.pluginId);
+            //   this.metric.script=this.querySelector('#script').value;
+            //   console.log(this.metric.script);
+            //   if(this.querySelector('#derivative').checked){
+            //     this.metric.type="derive";
+            //   }
+            //   else{
+            //     this.metric.type="gauge"
+            //   }
+            //   var payload=  {
+            //        "plugin_type"   : "python",
+            //        "name"          : this.metric.name,
+            //        "unit"          : this.metric.unit,
+            //        "value_type"    : this.metric.type,
+            //        "read_function" : this.metric.script,
+            //        "host"          : "172.17.0.1"
+            //    };
+            //   this.querySelector('#postCustomgraph').contentType="application/json"
+            //   this.querySelector('#postCustomgraph').headers["Csrf-Token"] = CSRF_TOKEN;
+            //   this.querySelector('#postCustomgraph').body =payload;
+            //   this.querySelector('#postCustomgraph').generateRequest();
+            // }
         });
+        function _createMenus(that,input){
+          var menu=that.querySelector('paper-menu');
+          menu.className="menu-content"
+          Object.keys(input).forEach(function(i){
+            var sub=document.createElement('paper-submenu');
+            var item=document.createElement('paper-item');
+            item.className="menu-trigger";
+            item.innerHTML=i;
+            sub.id=i;
+            sub.querySelector('div').appendChild(item);
+            //sub.querySelector('iron-collapse').appendChild("to menou ");  tis epiloges (item) mesa sto div tou menou opws apo panw
+            menu.querySelector('div').appendChild(sub);
+            if(typeof input[i]!='string'){
+              _createMenus(that,input[i]);
+            }
+            else{
+                console.log(input[i]  )
+            }
+          });
+        };
     </script>
 </dom-module>
