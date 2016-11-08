@@ -27,15 +27,6 @@
             @apply(--layout-flex);
             @apply(--shadow-elevation-2dp);
         }
-
-        plan-item {
-            background-color: rgba(0,0,0,.06);
-        }
-        plan-item[is-current='true'] {
-            color: #ffffff;
-            background-color: #039BE5;
-        }
-
         .grid-row {
             padding: 24px;
         }
@@ -64,7 +55,7 @@
                     <p>Your current chosen plan, since [[_computeReadableDate(org.current_plan.started)]].</p>
                 </div>
                 <div class="plans xs12 l6">
-                    <plan-item plan="[[currentPlanObj(org.current_plan)]]" is-current="true" index="0" class$="[[computeCurrentClass(plan, org)]] plan"></plan-item>
+                    <plan-item plan="[[org.current_plan]]" is-current="true" index="0" class="plan" org="[[org]]"></plan-item>
                 </div>
                 <div class="xs12 l6">
                     <plan-overusage is-over-using="[[isOverUsing]]"></plan-overusage>
@@ -79,7 +70,7 @@
                 </div>
                 <div class="plans xs12">
                     <template is="dom-repeat" items=[[plans]] as="plan">
-                        <plan-item class="xs6 l3" user="[[user]]" plan="[[plan]]" index="[[index]]" is-current="[[computeIsCurrent(plan, org)]]" button-text="[[buttonText(plan, org)]]" class$="[[computeCurrentClass(plan, org)]] plan"></plan-item>
+                        <plan-item user="[[user]]" plan="[[plan]]" index="[[index]]" class="plan" org="[[org]]"></plan-item>
                     </template>
                 </div>
                 <div class="xs12 center">
@@ -110,7 +101,8 @@
                 }
             },
             listeners: {
-                'plan-selected': 'purchasePlan'
+                'plan-selected': 'purchasePlan',
+                'error-on-cancel-plan': 'showErrorsOfCancel'
             },
             computeIsCurrent: function(plan, org) {
                 if (this.org.current_plan) {
@@ -119,20 +111,16 @@
                     return false;
                 }
             },
-            currentPlanObj: function(current_plan){
-                var planObj =  this.org.available_plans.find(function(p){
-                    return p.title == current_plan.title;
-                });
-                if (planObj)
-                    return planObj;
-                else
-                    return {};
-            },
             computePlans:  function(user, org){
                 if (!this.org.available_plans)
                     return [];
                 return this.org.available_plans.filter(function(p){
-                    return p.visible && p.title != this.org.current_plan.title;
+                    var showCurrent = true; // ommit current only if it has no expiration date 
+                    console.log(p.title, this.org.current_plan.expiration)
+                    if (p.title == this.org.current_plan.title && !this.org.current_plan.expiration){
+                        showCurrent = false;
+                    }
+                    return p.visible && showCurrent;
                 }, this);
             },
             _computeReadableDate: function(date) {
@@ -142,11 +130,8 @@
                 this.$.purchasePlan.plan = e.detail.plan;
                 this.$.purchasePlan.open();
             },
-            buttonText: function(plan, org){
-                if (this.org.current_plan.machine_limit > plan.machine_limit)
-                    return 'Downgrade';
-                else
-                    return 'Upgrade';
+            showErrorsOfCancel: function(errormessage){
+
             }
         });
     })();
