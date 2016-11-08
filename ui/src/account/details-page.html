@@ -261,7 +261,7 @@
                 _submitOrgForm: function(e, org) {
                     var payload = {
                         new_name: this.orgName,
-                        org_alert_email: this.orgAlertEmail
+                        alerts_email: this.orgAlertEmail
                     };
 
                     this.$.orgAjaxRequest.headers["Content-Type"] = 'application/json';
