@@ -8,6 +8,10 @@
 <link rel="import" href="account/plan-item.html">
 <link rel="import" href="account/subscriptions-list.html">
 <link rel="import" href="account/subscription-item.html">
+<link rel="import" href="account/sessions-list.html">
+<link rel="import" href="account/session-item.html">
+<link rel="import" href="account/tokens-list.html">
+<link rel="import" href="account/token-item.html">
 
 <dom-module id="page-my-account">
     <template>
@@ -43,8 +47,8 @@
                 <details-page org="[[org]]" user="[[user]]" data-route="0"></details-page>
                 <password-page user="[[user]]" data-route="1"></password-page>
                 <plans-list is-over-using="[[isOverUsing]]" org="[[org]]" user="[[user]]" data-route="2" hidden$="[[!org.is_owner]]"></plans-list>
-                <div data-route="3">Coming soon</div>
-                <div data-route="4">Coming soon</div>
+                <sessions-list org="[[org]]" user="[[user]]" sessions="[[sessions]]" data-route="3"></sessions-list>
+                <tokens-list org="[[org]]" user="[[user]]" tokens="[[tokens]]" data-route="4" ></tokens-list>
                 <subscriptions-list org="[[org]]" data-route="5" hidden$="[[!org.is_owner]]"></subscriptions-list>
             </iron-pages>
 
@@ -57,12 +61,10 @@
         is: 'page-my-account',
         properties: {
             isOverUsing: Boolean,
-            user: {
-                type: Object
-            },
-            org: {
-                type: Object
-            },
+            user: Object,
+            org: Object,
+            tokens: Array,
+            sessions: Array,
             selected: {
                 value: 0
             }
