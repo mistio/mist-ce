@@ -68,7 +68,7 @@ import mist.io.tasks
 import mist.io.inventory
 
 from mist.io.clouds.models import Cloud
-from mist.io.cronjobs.models import UserPeriodicTask
+from mist.io.schedules.models import Schedule
 from mist.core.cloud.models import Machine
 
 from mist.core.vpn.methods import destination_nat as dnat
@@ -1334,7 +1334,8 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
                 size=size,
                 location=location,
                 auth=auth,
-                ssh_key=tmp_key_path
+                ssh_key=tmp_key_path,
+                ex_private=True
             )
         except Exception as e:
             raise MachineCreationError("Linode, got exception %s" % e, e)
@@ -1347,7 +1348,6 @@ def destroy_machine(user, cloud_id, machine_id):
     After destroying a machine it also deletes all key associations. However,
     it doesn't undeploy the keypair. There is no need to do it because the
     machine will be destroyed.
-
     """
 
     log.info('Destroying machine %s in cloud %s' % (machine_id, cloud_id))
@@ -1374,18 +1374,8 @@ def destroy_machine(user, cloud_id, machine_id):
             log.warning("Didn't manage to disable monitoring, maybe the "
                         "machine never had monitoring enabled. Error: %r", exc)
 
-    # delete cronjobs for this machine or remove it from cron.machines_per_cloud
-    crons = UserPeriodicTask.objects(owner=user)
-    for cron in crons:
-        if [cloud_id, machine_id] in cron.machines_per_cloud:
-            if len(cron.machines_per_cloud) > 1:
-                cron.machines_per_cloud.remove([cloud_id, machine_id])
-                cron.save()
-            else:
-                cron.delete()
-
-    # we don't have to disassociate keys because
     machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+
     machine.ctl.destroy()
 
 
@@ -2315,9 +2305,16 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
     body = message + '\n' if message else ''
     if 'cloud_id' in kwargs:
         cloud_id = kwargs['cloud_id']
-        cloud = Cloud.objects.get(owner=user, id=cloud_id)
-        body += "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title,
-                                                      cloud_id)
+        body += "Cloud:\n"
+        try:
+            cloud = Cloud.objects.get(owner=user, id=cloud_id)
+            cloud_title = cloud.title
+        except DoesNotExist:
+            cloud_title = ''
+            cloud = ''
+        if cloud_title:
+            body += "  Name: %s\n" % cloud_title
+        body += "  Id: %s\n" % cloud_id
         if 'machine_id' in kwargs:
             machine_id = kwargs['machine_id']
             body += "Machine:\n"
@@ -2327,7 +2324,7 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
                 try:
                     name = Machine.objects.get(cloud=cloud,
                                                machine_id=machine_id).name
-                except MachineNotFoundError:
+                except DoesNotExist:
                     name = ''
             if name:
                 body += "  Name: %s\n" % name
