@@ -5,16 +5,20 @@
 
 <dom-module id="tokens-list">
     <template>
-        <style is="custom-style" include="forms"></style>
+        <style include="forms"></style>
         <style is="custom-style" include="lists"></style>
         <style is="custom-style" include="dialogs"></style>
-        <style include="shared-styles">
+        <style >
             :host {
                 display: block;
             }
 
-            paper-card {
+            paper-material {
                 display: block;
+            }
+
+            .card-content {
+                padding: 16px;
             }
 
             .flex-horizontal-with-ratios {
@@ -53,7 +57,7 @@
                 padding: 8px 24px 16px 24px;
             }            
         </style>
-        <paper-card>
+        <paper-material elevation="1">
             <div class="grid-row">
                 <div class="xs12 head">
                     <h2 class="title">API Tokens</h2>
@@ -99,7 +103,9 @@
                          </paper-menu>
                     </paper-dropdown-menu>
 
-                    <paper-input id="pass" value="{{newToken.password::input}}" label="Password" type="password"></paper-input>
+                    <paper-input id="pass" value="{{newToken.password::input}}" label="Password *" type="password"></paper-input>
+
+                    <p>* Password is required to create a token</p>
 
                     <div class="buttons">
                         <paper-button dialog-dismiss>Cancel</paper-button>
@@ -107,7 +113,7 @@
                     </div>
                 </paper-dialog>
             </div>
-        </paper-card>
+        </paper-material>
 
         <iron-ajax id="getTokensAjax" method="GET" url="/api/v1/tokens" auto on-response="getTokens" on-error="getTokensError" handle-as="json"></iron-ajax>
 
@@ -158,6 +164,7 @@
                 },
                 createTokenResponse: function(e){
                     this.$.createTokenDialog.close();
+                    this.reset();
                     this.getTokensAgain(e);
                 },
                 createTokenError: function(e){
@@ -172,7 +179,12 @@
                     var that = this;
                     this.async(function(){
                         that.$.getTokensAjax.generateRequest();
-                    }, 500)
+                    }, 100)
+                },
+                reset: function(){
+                    this.set('newToken.name', '');
+                    this.set('newToken.ttl', '');
+                    this.set('newToken.password', '');
                 }
             });
         })();

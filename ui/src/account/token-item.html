@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 
 <script src='../moment/min/moment.min.js'></script>
@@ -48,18 +49,26 @@
             paper-button.red {
                 padding: 4px !important;
             }
+            paper-icon-button {
+                float: right;
+                vertical-align: middle;
+            }
         </style>
 
         <paper-item class$="info-item flex-horizontal-with-ratios plan-record [[zebraClasses]]">
             <div class="flexchild plan-title"><div class="name">[[token.name]]</div></div>
             <div class="flexchild plan-date text-center">[[dateText]] <h6 class="absolute-date">[[absoluteDateText]]</h6></div>
-            <div class="flexchild plan-action text-right"><paper-button class="red" on-tap="revokeToken">Revoke</paper-button></div>
+            <div class="flexchild plan-action text-right">
+                <paper-button class="red" on-tap="revokeToken">Revoke</paper-button>
+                <paper-spinner active="{{loading}}"></paper-spinner>
+                <paper-icon-button icon="icons:expand-more" on-tap="toggleInfo"></paper-icon-button>
+            </div>
         </paper-item>
         <div id="moreinfo">
             <element-for-in content="[[token]]"></element-for-in>
         </div>
 
-        <iron-ajax id="revokeTokenAjax" method="DELETE" url="/api/v1/tokens" on-request="revokeTokenReQuest" on-response="revokeTokenResponse" on-error="revokeTokenError"></iron-ajax>
+        <iron-ajax id="revokeTokenAjax" method="DELETE" url="/api/v1/tokens" loading="{{loading}}" on-request="revokeTokenReQuest" on-response="revokeTokenResponse" on-error="revokeTokenError"></iron-ajax>
 
     </template>
 
@@ -137,7 +146,7 @@
                     this.$.revokeTokenAjax.generateRequest();
                 },
                 revokeTokenRequest: function(e){
-
+                    this.$.spinner.setAttribute('active', true);
                 },
                 revokeTokenResponse: function(e){
                     console.log('fire token revoked');
