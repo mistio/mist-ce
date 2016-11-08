@@ -128,7 +128,7 @@
                     },
                     descriptionText: {
                         type: String,
-                        computed: '_computeDescriptionText(plan.description, plan)'
+                        computed: '_computeDescriptionText(plan)'
                     },
                     discountedPriceText: {
                         type: String,
@@ -152,13 +152,13 @@
                 _computeIsCurrent: function(plan,org){
                     return plan.title == this.org.current_plan.title;
                 },
-                _computeDescriptionText: function(description, plan) {
-                    console.log('_computeDescriptionText', description, plan)
+                _computeDescriptionText: function(plan) {
+                    console.log('_computeDescriptionText', plan.description, plan)
                     var monitoringFor = '';
                     if (this.plan.monitor_limit) {
                         monitoringFor = " and monitoring for "+ this.plan.monitor_limit +" of them";
                     }
-                    return !description || description == "" ? 'up to ' + this.plan.machine_limit + '  machines'+monitoringFor : description;
+                    return !this.plan.description || this.plan.description == "" ? 'up to ' + this.plan.machine_limit + '  machines'+monitoringFor : this.plan.description;
                 },
                 _computeDiscountedPriceText: function(promo) {
                     if (promo) {
