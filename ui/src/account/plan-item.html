@@ -58,8 +58,9 @@
                 <span hidden$="[[plan.title]]">$0 forever</span>
             </p>
             <div hidden$="[[enterprise]]">
-                <p>[[descriptionText]]
-                    <span hidden$="[[descriptionText]]">Up to 5 machines. <br/> Monitoring for one of them.</span>
+                <p>
+                    <span hidden$="[[!plan.title]]">[[descriptionText]]</span>
+                    <span hidden$="[[plan.title]]">Up to 5 machines. <br/> Monitoring for one of them.</span>
                 </p>
             </div>
             <!-- if plan is enterprise -->
@@ -214,11 +215,11 @@
                     this.fire('error-on-cancel-plan',{error: e.detail.request.xhr.responseText});
                 },
                 _computeButtonText: function(plan, org){
-                    if (this.org.current_plan.machine_limit > plan.machine_limit){
+                    if (this.plan.title && this.org.current_plan.machine_limit > plan.machine_limit){
                         console.log('UP / DOWN', this.org.current_plan.machine_limit, plan.machine_limit)
                         return 'Downgrade';
                     }
-                    else if (this.org.current_plan.machine_limit < plan.machine_limit){
+                    else if (!this.org.current_plan.machine_limit || this.org.current_plan.machine_limit < plan.machine_limit){
                         return 'Upgrade';
                     }
                     else {
@@ -226,7 +227,7 @@
                     }
                 },
                 showCancel: function(plan, org){
-                    return this.org.current_plan.title == plan.title && !this.org.current_plan.expiration;
+                    return this.plan.title && this.org.current_plan.title == plan.title && !this.org.current_plan.expiration;
                 }
             });
         })();
