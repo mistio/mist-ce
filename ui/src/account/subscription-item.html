@@ -27,6 +27,10 @@
             .flexchild {
                 @apply(--layout-flex);
             }
+            paper-item.plan-end {
+                border-bottom-width: 2px;
+                border-color: #ccc; 
+            }
         </style>
 
         <paper-item class$="info-item flex-horizontal-with-ratios plan-record [[isExpiringClass]] [[zebraClasses]]">
@@ -87,7 +91,7 @@
                 _computeDateText: function(time) {
                     var date = new Date(time * 1000);
                     var month = new Date();
-                    return moment().format("MMMM") + ' - ' + date.getDate() + ' - ' + date.getFullYear();
+                    return moment(time *1000).fromNow();
                 },
                 _computeIsExpiringClass: function(action) {
                     return action == 'started' ? null : 'plan-end';
