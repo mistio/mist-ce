@@ -1,20 +1,24 @@
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 
-<link rel="import" href="tokens-item.html">
+<link rel="import" href="token-item.html">
 
 <dom-module id="tokens-list">
     <template>
+        <style include="forms"></style>
         <style is="custom-style" include="lists"></style>
-        <style is="custom-style" include="forms"></style>
         <style is="custom-style" include="dialogs"></style>
-        <style include="shared-styles">
+        <style >
             :host {
                 display: block;
             }
 
-            paper-card {
+            paper-material {
                 display: block;
+            }
+
+            .card-content {
+                padding: 16px;
             }
 
             .flex-horizontal-with-ratios {
@@ -42,12 +46,18 @@
             .create-token {
                 margin-top: 16px;
             }
+            #createTokenDialog {
+                padding-bottom: 16px;
+            }
             #createTokenDialog > * {
                 max-width: 100%;
                 box-sizing: border-box;
             }
+            .buttons {
+                padding: 8px 24px 16px 24px;
+            }            
         </style>
-        <paper-card>
+        <paper-material elevation="1">
             <div class="grid-row">
                 <div class="xs12 head">
                     <h2 class="title">API Tokens</h2>
@@ -63,45 +73,52 @@
                     <div class="info-body">
                         <template is="dom-repeat" items=[[tokens]] as="token">
                             <div class="row">
-                                <session-item token="[[token]]" index="[[index]]" count="[[tokens.length]]"></subscription-item>
+                                <token-item token="[[token]]" index="[[index]]" count="[[tokens.length]]"></token-item>
                             </div>
                         </template>
                     </div>
                 </div>
-                <!-- <paper-button on-tap="createToken" class="blue create-token">Create an API Token</paper-button> -->
+                <paper-button on-tap="createToken" class="blue create-token">Create an API Token</paper-button>
 
                 <paper-dialog id="createTokenDialog" with-backdrop>
                     <h2>Create an API Token</h2>
 
-                        <paper-input id="tokenName" value="{{newToken.name::input}}" label="Token Name"></paper-input>
+                    <paper-input id="tokenName" value="{{newToken.name::input}}" label="Token Name"></paper-input>
 
-                        <paper-dropdown-menu label="Expires After">
-                             <paper-menu id="tokenExpires" attr-for-selected="value" selected="{{newToken.ttl}}" class="dropdown-content">
-                                <paper-item value="0">Never</paper-item>
-                                <paper-item value="86400">1 Day</paper-item>
-                                <paper-item value="604800">1 Week</paper-item>
-                                <paper-item value="2592000">1 Month</paper-item>
-                                <paper-item value="31104000">1 Year</paper-item>
-                             </paper-menu>
-                        </paper-dropdown-menu>
+                    <paper-dropdown-menu label="Expires After">
+                         <paper-menu id="tokenExpires" attr-for-selected="value" selected="{{newToken.ttl}}" class="dropdown-content">
+                            <paper-item value="0">Never</paper-item>
+                            <paper-item value="86400">1 Day</paper-item>
+                            <paper-item value="604800">1 Week</paper-item>
+                            <paper-item value="2592000">1 Month</paper-item>
+                            <paper-item value="31104000">1 Year</paper-item>
+                         </paper-menu>
+                    </paper-dropdown-menu>
 
-                        <paper-dropdown-menu label="Context">
-                             <paper-menu id="tokenContexts" class="dropdown-content">
-                                 <template is="dom-repeat" items="[[user.orgs]]" as="org">
-                                    <paper-item value="[[org.id]]">[[org.name]]</paper-item>
-                                </template>
-                             </paper-menu>
-                        </paper-dropdown-menu>
+                    <paper-dropdown-menu label="Context">
+                         <paper-menu id="tokenContexts" class="dropdown-content">
+                             <template is="dom-repeat" items="[[user.orgs]]" as="org">
+                                <paper-item value="[[org.id]]">[[org.name]]</paper-item>
+                            </template>
+                         </paper-menu>
+                    </paper-dropdown-menu>
 
-                        <paper-input id="pass" value="{{newToken.password::input}}" label="Password"></paper-input>
+                    <paper-input id="pass" value="{{newToken.password::input}}" label="Password *" type="password"></paper-input>
+
+                    <p>* Password is required to create a token</p>
 
                     <div class="buttons">
-                        <paper-button dialog-dismiss class="link">Cancel</paper-button>
-                        <paper-button autofocus on-tap="submit" class="blue" disabled="[[!formReady]]">[[buttonText]] </paper-button>
+                        <paper-button dialog-dismiss>Cancel</paper-button>
+                        <paper-button autofocus on-tap="createTokenSubmit" class="blue" disabled="[[!formReady]]">Create </paper-button>
                     </div>
                 </paper-dialog>
             </div>
-        </paper-card>
+        </paper-material>
+
+        <iron-ajax id="getTokensAjax" method="GET" url="/api/v1/tokens" auto on-response="getTokens" on-error="getTokensError" handle-as="json"></iron-ajax>
+
+        <iron-ajax id="createTokenAjax" method="POST" url="/api/v1/tokens" on-request="createTokenRequest" on-response="createTokenResponse" on-error="createTokenError"></iron-ajax>
+
     </template>
     <script>
         (function() {
@@ -122,11 +139,13 @@
                             ttl: '',
                             password: '',
                             org_id: '',
-                            email: '',
-                            "session.id": ''
+                            email: ''
                         }
                     }
                   }
+                },
+                listeners: {
+                    'token-revoked': 'getTokensAgain'
                 },
                 attached: function(){
                     this.set('newToken.org_id', this.org.id);
@@ -135,7 +154,37 @@
                 },
                 createToken: function(e){
                     this.$.createTokenDialog.open();
-                    //{"name":"testname","ttl":86400,"org_id":"c173db8af14d4bee8824e1bdc1e11029","password":"makis","email":"makis@makis","session.id":"226c6d5953f40b88265351060e9bcf216a2b1019b48d6e41e39eecf19d03b34c"}
+                },
+                createTokenSubmit: function(e){
+                    var payload = this.newToken;
+                    this.$.createTokenAjax.headers["Content-Type"] = 'application/json';
+                    this.$.createTokenAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.createTokenAjax.body = payload;
+                    this.$.createTokenAjax.generateRequest();
+                },
+                createTokenResponse: function(e){
+                    this.$.createTokenDialog.close();
+                    this.reset();
+                    this.getTokensAgain(e);
+                },
+                createTokenError: function(e){
+
+                },
+                getTokens: function(e){
+                    this.set('tokens', e.detail.response);
+                    console.log('got tokens');
+                },
+                getTokensAgain: function(e){
+                    console.log('listen token revoked');
+                    var that = this;
+                    this.async(function(){
+                        that.$.getTokensAjax.generateRequest();
+                    }, 100)
+                },
+                reset: function(){
+                    this.set('newToken.name', '');
+                    this.set('newToken.ttl', '');
+                    this.set('newToken.password', '');
                 }
             });
         })();
