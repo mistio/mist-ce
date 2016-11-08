@@ -46,6 +46,13 @@
             .buttons {
                 padding: 8px 24px 16px 24px;
             }
+            .progress {
+                position: relative;
+                width: 100%;
+                left: 0;
+                right: 0;
+                margin-left: -24px;
+            }
             paper-progress#progresserror ::content #primaryProgress {
                 background-color: var(--red-color);
             }
@@ -75,6 +82,13 @@
                 font-weight: 400;
                 font-size: 14px;
                 color: #454545
+            }
+            .stripe {
+                background-color: #444;
+                color: #ccc;
+                margin-top: 0;
+                padding: 4px 16px;
+                font-size: 0.8em;
             }
         </style>
 
@@ -125,6 +139,9 @@
             <div class="buttons">
                 <paper-button dialog-dismiss>Cancel</paper-button>
                 <paper-button autofocus on-tap="submit" class="blue" disabled="[[!formReady]]">[[buttonText]] </paper-button>
+            </div>
+            <div class="stripe">
+                * Mist.io uses Stripe for safe payments
             </div>
         <paper-dialog>
 
