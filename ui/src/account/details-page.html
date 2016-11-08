@@ -123,9 +123,9 @@
                 </div>
                 <paper-input class="dropdown-block xs12 l6" id="orgName" label="Organization Name" required error-message="Please enter your company's name" value="{{orgName}}" auto-validate disabled$="[[!org.is_owner]]"></paper-input>
                 
-                <!-- <paper-input class="xs12 l6" id="org-email" label="Organisation Alert Email *" error-message="Please enter your email" value="[[org.email]]" auto-validate></paper-input>
+                <paper-input class="xs12 l6" id="org-email" label="Organisation Alert Email *" error-message="Please enter your email" value="{{orgAlertEmail}}" auto-validate></paper-input>
 
-                <p class="xs12 l12">* In your organisation's alert email, you can specify the email you want your incidents' alerts to be sent to. This can be overriden when you add rules in your monitored machines.</p> -->
+                <p class="xs12 l12">* In your organisation's alert email, you can specify the email you want your incidents' alerts to be sent to. This can be overriden when you add rules in your monitored machines.</p>
 
                 <div class="progress">
                     <paper-progress id="orgProgress" indeterminate hidden$="[[!loadingOrg]]"></paper-progress>
@@ -176,6 +176,9 @@
                         type: String
                     },
                     orgName: {
+                        type: String
+                    },
+                    orgAlertEmail: {
                         type: String
                     },
                     userFormReady: {
@@ -257,7 +260,8 @@
 
                 _submitOrgForm: function(e, org) {
                     var payload = {
-                        new_name: this.orgName
+                        new_name: this.orgName,
+                        org_alert_email:: this.orgAlertEmail
                     };
 
                     this.$.orgAjaxRequest.headers["Content-Type"] = 'application/json';
