@@ -88,7 +88,10 @@
                 <p class="desc">Subscription of $[[plan.price]]/mo. <br/> up to [[plan.machine_limit]] machines, monitoring for [[plan.motor_limit]] of them.</p>
             </div>
             <paper-dialog-scrollable>
-                <div class="form-inputs">
+                <!-- <div class="form-inputs" hidden$="[[!hasCard]]">
+
+                </div> -->
+                <div class="form-inputs" hidden$="[[hasCard]]">
                     <div class="form-row">
                         <label>
                         <span>Card Number</span>
@@ -160,28 +163,43 @@
             formReady: {
                 type: Boolean,
                 value: false
-            }
+            },
+            hasCard: {
+                type: Boolean,
+                value: false
+            },
         },
         listeners: {
             'input': 'validateForm'
+        },
+        attached: function(){
+            if (document.querySelector('mist-app').model.org.card){
+                this.set('hasCard', true);
+                this.set('formReady', true);
+            }
         },
         open: function(e){
             this.querySelector("#form").open();
         },
         submit: function(){
-            Stripe.setPublishableKey(STRIPE_PUBLIC_APIKEY);
-            Stripe.card.createToken(this.payload, stripeResponseHandler);
-            this.set('sendingData', true);
-            var that = this;
-            function stripeResponseHandler(status, response){
-                console.log('stripeResponseHandler', status, response);
-                if (response.error) {
-                    console.log('stripeResponseHandler failed', response.error.message);
-                    that.showError(response.error.message);
+            if (!this.hasCard) {
+                Stripe.setPublishableKey(STRIPE_PUBLIC_APIKEY);
+                Stripe.card.createToken(this.payload, stripeResponseHandler);
+                this.set('sendingData', true);
+                var that = this;
+                function stripeResponseHandler(status, response){
+                    console.log('stripeResponseHandler', status, response);
+                    if (response.error) {
+                        console.log('stripeResponseHandler failed', response.error.message);
+                        that.showError(response.error.message);
+                    }
+                    else {
+                        that.sumbmitPayment(status, response);
+                    }
                 }
-                else {
-                    that.sumbmitPayment(status, response);
-                }
+            }
+            else {
+                this.sumbmitPayment(null, {id: ''});
             }
         },
         sumbmitPayment: function(status, response){
