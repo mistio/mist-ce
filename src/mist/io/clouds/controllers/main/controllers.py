@@ -40,7 +40,7 @@ from mist.io.exceptions import RequiredParameterMissingError
 
 from mist.io.helpers import sanitize_host, check_host
 
-from mist.core.keypair.models import Keypair
+from mist.io.keypairs.models import Keypair
 from mist.core.vpn.methods import to_tunnel
 
 from mist.io.clouds.utils import rename_kwargs

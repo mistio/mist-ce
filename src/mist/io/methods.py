@@ -45,7 +45,7 @@ import ansible.constants
 # from mist.core.user.models import User
 from mist.core.tag.models import Tag
 from mist.core.cloud.models import KeyAssociation, CloudSize, CloudImage
-from mist.core.keypair.models import Keypair
+from mist.io.keypairs.models import Keypair
 from mist.core import config
 # except ImportError:
 #     print "Seems to be on IO version"

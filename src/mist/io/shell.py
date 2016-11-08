@@ -31,7 +31,7 @@ try:
     from mist.core.user.models import User
     from mist.io.clouds.models import Cloud
     from mist.core.cloud.models import Machine, KeyAssociation
-    from mist.core.keypair.models import Keypair
+    from mist.io.keypairs.models import Keypair
     from mist.core import config
 except ImportError:
     from mist.io import config

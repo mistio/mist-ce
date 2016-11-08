@@ -5,7 +5,7 @@ import uuid
 import mongoengine as me
 
 from mist.core.tag.models import Tag
-from mist.core.keypair.models import Keypair
+from mist.io.keypairs.models import Keypair
 from mist.core.user.models import Organization
 
 from mist.io.clouds.controllers.main import controllers

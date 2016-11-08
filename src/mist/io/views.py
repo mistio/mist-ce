@@ -22,7 +22,7 @@ from pyramid.renderers import render_to_response
 # try:
 from mist.core.helpers import view_config
 from mist.core.auth.methods import user_from_request
-from mist.core.keypair.models import Keypair
+from mist.io.keypairs.models import Keypair
 from mist.io.clouds.models import Cloud
 from mist.core.cloud.models import Machine, KeyAssociation
 from mist.core.exceptions import PolicyUnauthorizedError

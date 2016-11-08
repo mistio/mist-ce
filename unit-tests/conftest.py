@@ -5,7 +5,7 @@ import uuid
 import yaml
 import pytest
 import mist.io.clouds.models as models
-from mist.core.keypair.models import Keypair
+from mist.io.keypairs.models import Keypair
 from mist.core.user.models import Organization, User
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
