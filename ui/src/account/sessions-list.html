@@ -1,0 +1,76 @@
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+
+<link rel="import" href="sessions-item.html">
+
+<dom-module id="sessions-list">
+    <template>
+        <style is="custom-style" include="lists"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+            }
+
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+            }
+
+            .flexchild {
+                @apply(--layout-flex);
+            }
+            .info-head {
+                padding: 8px 16px;
+                background: #eee;
+                border-bottom: 2px solid #ddd;
+            }
+            .grid-row {
+                padding: 24px 24px 0 24px;
+            }
+
+            h2.title {
+                font-weight: 500;
+            }
+        </style>
+        <paper-card>
+            <div class="grid-row">
+                <div class="xs12 head">
+                    <h2 class="title">Active Sessions</h2>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="info-list">
+                    <div class="info-head flex-horizontal-with-ratios">
+                        <div class="flexchild">Created At</div>
+                        <div class="flexchild text-center">Last Accessed</div>
+                        <div class="flexchild text-right">&nbsp;</div>
+                    </div>
+                    <div class="info-body">
+                        <template is="dom-repeat" items="[[sessions]]" as="session">
+                            <div class="row">
+                                <session-item session="[[session]]" index="[[index]]" count="[[sessions.length]]"></session-item>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </paper-card>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'sessions-list',
+
+                properties: {
+                  user: Object,
+                  org: Object,
+                  sessions: Array
+                }
+            });
+        })();
+    </script>
+</dom-module>

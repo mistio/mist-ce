@@ -1,0 +1,136 @@
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../element-for-in/element-for-in.html">
+
+<script src='../moment/min/moment.min.js'></script>
+
+<dom-module id="session-item">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                width: 100%;
+            }
+
+            paper-card {
+                display: block;
+            }
+
+            .plan-action {
+                color: var(--green-color);
+            }
+
+            .plan-end .plan-action {
+                color: var(--red-color);
+            }
+
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+            }
+
+            .flexchild {
+                @apply(--layout-flex);
+            }
+            paper-item.plan-end {
+                border-bottom-width: 2px;
+                border-color: #ccc; 
+            }
+            h6.absolute-date {
+                display: inline;
+                opacity: 0.32;
+            }
+            element-for-in {
+                font-size: 0.9em;
+                opacity: 0.54;
+            }
+            element-for-in::content .flexchild {
+                padding: 8px 16px;
+            }
+            #moreinfo{
+                height: 0;
+                transition: height 200ms ease-in;
+            }
+            #moreinfo[opened]{
+                height: auto;
+            }
+        </style>
+
+        <paper-item class$="info-item flex-horizontal-with-ratios plan-record [[zebraClasses]]" on-tap="toggleInfo">
+            <div class="flexchild plan-date"><span class="name">[[createdAt]]</span> <h6 class="absolute-date">[[absoluteDateText]]</h6></div>
+            <div class="flexchild plan-title text-center">[[lastAccessed]]</div>
+            <div class="flexchild plan-action text-right">
+                <span hidden$="[[session.finished_at]]">Current Session</span>
+            </div>
+        </paper-item>
+        <div id="moreinfo">
+            <element-for-in content="[[session.logs.0]]"></element-for-in>
+        </div>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'session-item',
+
+                properties: {
+                    session: {
+                        type: Object
+                    },
+                    index: {
+                        type: Number
+                    },
+                    count: {
+                        type: Number
+                    },
+                    createdAt: {
+                        type: String,
+                        computed: '_computeDateFromNow(session.started_at)'
+                    },
+                    lastAccessed: {
+                        type: String,
+                        computed: '_computeDateFromNow(session.logs.0.time)'
+                    },
+                    absoluteDateText: {
+                        type: String,
+                        computed: '_computeAbsoluteDateText(session.started_at)'
+                    },
+                    zebraClasses: {
+                        type: String,
+                        computed: '_computeZebraClasses(index, count)'
+                    }
+                },
+                ready: function() {
+
+                },
+                _computeZebraClasses: function(index, count) {
+                    var classes = [];
+                    classes.push(
+                        (index + 1) % 2 == 0 ? 'even' : 'odd',
+                        index + 1 == count ? 'last' : null
+                    );
+                    return classes.join(' ');
+                },
+                _computeDateFromNow: function(time) {
+                    var date = new Date(time * 1000);
+                    return moment(time *1000).fromNow();
+
+                },
+                _computeAbsoluteDateText: function(time) {
+                    var date = new Date(time * 1000);
+                    return moment().format("MMMM") +' '+ date.getDate() +' '+ date.getFullYear();
+
+                },
+                toggleInfo: function(e){
+                    console.log(this.$.moreinfo);
+                    if (this.$.moreinfo.hasAttribute("opened")) { 
+                        this.$.moreinfo.removeAttribute("opened")
+                    }
+                    else {
+                        this.$.moreinfo.setAttribute("opened",true)
+                    }
+                }
+            });
+        })();
+    </script>
+</dom-module>
