@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner-lite.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
 
@@ -47,6 +48,9 @@
                 font-size: 0.8em;
                 margin-top: 16px;
             }
+            paper-spinner-lite.white {
+                --paper-spinner-color: #fff;
+            }
         </style>
         <div class="plan">
             <h2>[[plan.title]]
@@ -88,7 +92,13 @@
             </template>
 
             <!-- is current plan, not cancelled-->
-            <paper-button id="cancel" on-tap="_cancelPlan" hidden$="[[!showCancel(plan,org)]]">Cancel Plan</paper-button>
+            <div hidden$="[[!showCancel(plan,org)]]">
+                <paper-button id="cancel" on-tap="_cancelPlan" hidden$="{{loadingCancel}}">Cancel Plan</paper-button>
+                <div hidden$="{{!loadingCancel}}">
+                    Canceling Plan <br/><br/>
+                    <paper-spinner-lite class="white" active="{{loadingCancel}}"></paper-spinner-lite>
+                </div>
+            </div>
 
         </div>
 
@@ -146,6 +156,10 @@
                     buttonText: {
                         type: String,
                         computed: '_computeButtonText(plan, org.current_plan)'
+                    },
+                    loadingCancel: {
+                        type: Boolean,
+                        value: false
                     }
                 },
                 listeners: {
