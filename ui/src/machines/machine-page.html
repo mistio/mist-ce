@@ -632,15 +632,15 @@ MACHINEACTIONS = {
         _computeItemInArray: function() {
             var tempdash = {
                 "id": 1,
-                // "refresh": "",
+                "refresh": "10s",
                 "rows": [{
-                    "height": "500px",
                     "panels": [{
-                        "aliasColors": {},
-                        "datasource": "mist.monitor",
                         "id": 2,
+                        "title": "Load",
+                        "type": "graph",
                         "span": 12,
                         "stack": false,
+                        "datasource": "mist.monitor",
                         "targets": [{
                             "refId": "A",
                             "target": "load.longterm"
@@ -648,30 +648,43 @@ MACHINEACTIONS = {
                             "refId": "B",
                             "target": "load.shortterm"
                         }],
-                        "timeFrom": null,
-                        "timeShift": null,
-                        "title": "Load",
-                        "type": "graph",
                         "machineArray": [],
                         "x-axis": true,
                         "y-axis": true
                     }, {
-                        "aliasColors": {},
-                        "datasource": "mist.monitor",
                         "id": 3,
-                        "span": 12,
-                        "stack": false,
-                        "targets": [{
-                            "refId": "A",
-                            "target": "cpu"
-                        }],
-                        "timeFrom": null,
-                        "timeShift": null,
                         "title": "CPU",
                         "type": "graph",
+                        "span": 12,
+                        "stack": true,
+                        "datasource": "mist.monitor",
+                        "targets": [{
+                            "refId": "A",
+                            "target": "cpu.total.*"
+                        }],
                         "machineArray": [],
                         "x-axis": true,
                         "y-axis": true
+                    }, {
+                      "id": 1,
+                      "title": "MEM",
+                      "type": "graph",
+                      "span": 12,
+                      "stack": true,
+                      "datasource": "mist.monitor",
+                      "targets": [{
+                          "refId": "A",
+                          "target": "memory.used_percent"
+                      }, {
+                          "refId": "B",
+                          "target": "memory.cached_percent"
+                      }, {
+                          "refId": "C",
+                          "target": "memory.free_percent"
+                      }],
+                      "machineArray": [],
+                      "x-axis": true,
+                      "y-axis": true
                     }],
                 }],
                 "time": {
