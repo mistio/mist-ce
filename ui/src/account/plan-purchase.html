@@ -199,6 +199,9 @@
                 computed: '_computeButtonText(plan,org)'
             }
         },
+        observers: [
+            'updateHasCard(org.card)'
+        ],
         listeners: {
             'input': 'validateForm',
             'iron-overlay-closed' : 'reset'
@@ -208,6 +211,10 @@
                 this.set('hasCard', true);
                 this.set('formReady', true);
             }
+        },
+        updateHasCard: function(card){
+            if (card)
+                this.set('hasCard', true)
         },
         open: function(e){
             this.querySelector("#form").open();
