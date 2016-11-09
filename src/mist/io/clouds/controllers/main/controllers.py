@@ -278,11 +278,11 @@ class LibvirtMainController(BaseMainController):
             **kwargs
         )
         if self.cloud.key is not None:
-            # FIXME
-            from mist.io.methods import associate_key
-            associate_key(self.cloud.owner, self.cloud.key.id, self.cloud.id,
-                          self.cloud.host,  # hypervisor id is the hostname
-                          username=self.cloud.username, port=self.cloud.port)
+            # hypervisor id is the hostname
+            self.cloud.key.ctl.associate(self.cloud.id,
+                                         self.cloud.host,
+                                         username=self.cloud.username,
+                                         port=self.cloud.port)
 
     def update(self, fail_on_error=True, fail_on_invalid_params=True,
                **kwargs):
