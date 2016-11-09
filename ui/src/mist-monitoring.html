@@ -45,7 +45,15 @@
                 opacity: 0.54;
                 font-size: 0.9em;
             }
-        </style>
+            polyana-dashboard::content timerange-picker {
+              margin-bottom: 4px;
+            }
+            add-panel {
+              position: absolute;
+              right: 8px;
+              top: 0;
+            }
+            </style>
         <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
         <div class="monitoringArea">
             <!-- the machine is running -->
@@ -55,10 +63,10 @@
                 <div hidden$="[[!isMonitored]]">
                     <!-- monitoring is not activated -->
 
+                    <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
                     <!-- monitoring is activated. we expect to have data -->
                     <div hidden$="[[!isActivated]]">
                         <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]"></add-panel>
-                        <polyana-dashboard dashboard="[[dashboard]]" refresh-interval="[[dashboard.refresh]]" datasources="[[datasources]]"></polyana-dashboard>
                     </div>
                 </div>
 
