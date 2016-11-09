@@ -31,7 +31,8 @@ class InstallationStatus(me.EmbeddedDocument):
     # - succeeded: Ansible job succeeded (also set finished_at)
     # manual:
     # - preparing: Same as for automatic
-    # - installing: Enabled on mist.monitor, returned command for manual install
+    # - installing: Enabled on mist.monitor,
+    #               returned command for manual install
     # - succeeded: Set when activated_at is set (see below)
     state = me.StringField()
     # True only for mist.core automatic installations
