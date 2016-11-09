@@ -9,6 +9,7 @@ from mist.io.exceptions import BadRequestError
 from mist.io.keypairs.controllers import KeypairController
 from mist.io.exceptions import RequiredParameterMissingError
 
+
 # TODO rename sshkeys
 class Keypair(me.Document):
     """An ssh keypair."""
@@ -23,7 +24,7 @@ class Keypair(me.Document):
 
     def __init__(self, *args, **kwargs):
         super(Keypair, self).__init__(*args, **kwargs)
-        self.ctl = self.KeypairController(self)
+        self.ctl = KeypairController(self)
 
     @classmethod
     def add(cls, owner, name, id='', **kwargs):
@@ -38,7 +39,12 @@ class Keypair(me.Document):
         return keypair
 
     def clean(self):
-        """Ensures that self is a valid RSA keypair."""
+        """Checks if certificate is specific ssh-rsa-cert
+           and ensures that self is a valid RSA keypair."""
+        if (self.certificate and
+            not self.certificate.startswith('ssh-rsa-cert-v01@openssh.com')):
+            self.certificate = ''
+
         from Crypto import Random
         Random.atfork()
         message = 'Message 1234567890'
@@ -49,7 +55,7 @@ class Keypair(me.Document):
             decr_message = private_key_container.decrypt(encr_message)
             if message == decr_message:
                 return True
-        raise me.ValidationError("Invalid RSA keypair") # FIXME is it correct?
+            raise me.ValidationError("Invalid RSA keypair") # TODO is it ok?
 
     def delete(self):
         super(Keypair, self).delete()
