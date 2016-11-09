@@ -58,6 +58,8 @@
             }
             .errormsg-container {
                 color: var(--red-color);
+                width: 300px;
+                padding-left: 20px;
             }
             .errormsg-container iron-icon {
                 color: inherit;
@@ -198,7 +200,8 @@
             }
         },
         listeners: {
-            'input': 'validateForm'
+            'input': 'validateForm',
+            'iron-overlay-closed' : 'reset'
         },
         attached: function(){
             if (document.querySelector('mist-app').model.org.card){
@@ -209,20 +212,46 @@
         open: function(e){
             this.querySelector("#form").open();
         },
-        submit: function(){
+        submit: function(){        
             if (!this.hasCard) {
-                Stripe.setPublishableKey(STRIPE_PUBLIC_APIKEY);
-                Stripe.card.createToken(this.payload, stripeResponseHandler);
-                this.set('sendingData', true);
-                var that = this;
-                function stripeResponseHandler(status, response){
-                    if (response.error) {
-                        console.log('stripeResponseHandler failed', response.error.message);
-                        that.showError(response.error.message);
+
+                //extra stripe validation
+                var isValid = Stripe.card.validateCardNumber(this.payload.number) &&
+                    Stripe.card.validateExpiry(this.payload.exp_month, this.payload.exp_year) && 
+                    Stripe.card.validateCVC(this.payload.cvc) && this.payload.address_zip != '';
+
+                if (isValid){
+                    Stripe.setPublishableKey(STRIPE_PUBLIC_APIKEY);
+                    Stripe.card.createToken(this.payload, stripeResponseHandler);
+                    this.set('sendingData', true);
+                    var that = this;
+                    function stripeResponseHandler(status, response){
+                        if (response.error) {
+                            console.log('stripeResponseHandler failed', response.error.message);
+                            that.showError(response.error.message);
+                        }
+                        else {
+                            that.sumbmitPayment(status, response);
+                        }
                     }
-                    else {
-                        that.sumbmitPayment(status, response);
-                    }
+                }
+                else {
+                    var errorText = 'There seems to be an error in';
+                    if (!Stripe.card.validateCardNumber(this.payload.number))
+                        errorText += ' card number';
+
+                    if (!Stripe.card.validateExpiry(this.payload.exp_month, this.payload.exp_year))
+                        errorText += ' expiration';
+
+                    if (!Stripe.card.validateCVC(this.payload.cvc))
+                        errorText += ' cvc';
+
+                    if (this.payload.address_zip == '')
+                        errorText += ' zip code';
+                    
+                    errorText += '.';
+
+                    this.showError(errorText);
                 }
             }
             else {
@@ -257,17 +286,14 @@
         valideNumber: function(input, length){
             if (!input || !input.length){
                 //no input
-                console.log('1');
                 return false;
             }
             if (length !=0 && input.length > length){
                 //input longer than constrain
-                console.log('2');
                 return false;
             }
             if (!(/^[0-9 ]*$/.test(input))){
                 //input is not number
-                console.log('3');
                 return false;
             }
             return true;
@@ -282,6 +308,18 @@
             this.set('formError', false);
 
             this.querySelector("#form").close();
+            this.reset();
+        },
+        reset: function(){
+            // reset form after submit
+            this.set("payload", {
+                        number: "",
+                        exp_month: "",
+                        exp_year: "",
+                        cvc: "",
+                        address_zip: ""
+                    });
+            this.set('formError', false);
         },
         purchaseError: function(e){
             console.log('purchaseError',e);
