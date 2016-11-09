@@ -50,20 +50,23 @@
         </style>
         <div class="plan">
             <h2>[[plan.title]]
+                <!-- any plan but free has title -->
                 <span hidden$="[[plan.title]]">Free</span>
             </h2>
             <hr>
             <!-- regular plans -->
             <p>[[priceText]]
+                <!-- any plan but free has title -->
                 <span hidden$="[[plan.title]]">$0 forever</span>
             </p>
             <div hidden$="[[enterprise]]">
                 <p>
+                    <!-- any plan but free has title -->
                     <span hidden$="[[!plan.title]]">[[descriptionText]]</span>
                     <span hidden$="[[plan.title]]">Up to 5 machines. <br/> Monitoring for one of them.</span>
                 </p>
             </div>
-            <!-- if plan is enterprise -->
+            <!-- if plan is enterprise but not current. show text -->
             <p hidden$="[[!enterprise]]">
                 Contact us for your custom Enterprise plan of more than 300 machines
             </p>
@@ -137,7 +140,8 @@
                     },
                     enterprise: {
                         type: Boolean,
-                        computed: "_computeIsEnteriprise(plan.title)"
+                        computed: "_computeIsEnteriprise(plan.title, org)",
+                        value: false
                     },
                     buttonText: {
                         type: String,
@@ -177,8 +181,8 @@
                 _triggerInfo: function() {
                     console.log('info popup');
                 },
-                _computeIsEnteriprise: function(title){
-                    return title == "Enterprise";
+                _computeIsEnteriprise: function(title, org){
+                    return this.plan.title && this.plan.title == "Enterprise" && !this.org.enterprise_plan.title;
                 },
                 _cancelPlan: function(){
                     this._showDialog({
