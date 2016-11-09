@@ -20,6 +20,9 @@
                 background-color: rgba(0,0,0,.13) !important;
                 color: rgba(0,0,0,0.32) !important;
             }
+            paper-material {
+                border-top: 2px solid #ddd;
+            }
         </style>
         <!-- <style is="custom-style" include="shared-styles"></style>
         <style is="custom-style" include="forms"></style> -->
@@ -84,7 +87,7 @@
                 display: inline-block;
             }
         </style>
-        <paper-material>
+        <paper-material elevation="0">
             <template is="dom-repeat" items="{{items}}">
                 <rules-item builtin-metrics="[[builtinMetrics]]" rule="[[item]]" incidents="[[incidents]]" resource="[[resource]]"></rules-item>
             </template>
