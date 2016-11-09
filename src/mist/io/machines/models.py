@@ -6,9 +6,48 @@ import mongoengine as me
 from mist.core import config as core_config
 import mist.core.tag.models
 from mist.io.clouds.models import Cloud
+from mist.io.keypairs.models import Keypair
 from mist.io.machines.controllers import MachineController
-# # TODO move these when keys port is completed
-from mist.core.cloud.models import KeyAssociation, InstallationStatus
+
+
+class KeyAssociation(me.EmbeddedDocument):
+    keypair = me.ReferenceField(Keypair)
+    last_used = me.IntField(default=0)
+    ssh_user = me.StringField()
+    sudo = me.BooleanField()
+    port = me.IntField(default=22)
+
+
+class InstallationStatus(me.EmbeddedDocument):
+    # automatic: refers to automatic installations from mist.core
+    # manual: refers to manual deployments and everything from
+    #         standalone mist.io
+
+    # automatic:
+    # - preparing: Set on first API call before everything else
+    # - pending: Enabled on mist.monitor, submitted celery task
+    # - installing: Celery task running
+    # - failed: Ansible job failed (also set finished_at)
+    # - succeeded: Ansible job succeeded (also set finished_at)
+    # manual:
+    # - preparing: Same as for automatic
+    # - installing: Enabled on mist.monitor, returned command for manual install
+    # - succeeded: Set when activated_at is set (see below)
+    state = me.StringField()
+    # True only for mist.core automatic installations
+    manual = me.BooleanField()
+
+    activated_at = me.IntField()  # Data for period after started_at received
+
+    started_at = me.IntField()  # timestamp: First enable_monitoring API call
+
+    # following apply only for automatic:
+    finished_at = me.IntField()  # Ansible job completed (also set state)
+    stdout = me.StringField()  # Ansible job captured stdout/stderr mux streams
+    error_msg = me.StringField()
+
+    def as_dict(self):
+        return json.loads(self.to_json())
 
 
 class Actions(me.EmbeddedDocument):
