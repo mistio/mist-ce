@@ -135,7 +135,7 @@ class BaseComputeController(BaseController):
         # FIXME: Move this to top of the file once Machine model is migrated.
         # The import statement is currently here to avoid circular import
         # issues.
-        from mist.core.cloud.models import Machine
+        from mist.io.machines.models import Machine
 
         # Try to query list of machines from provider API.
         try:

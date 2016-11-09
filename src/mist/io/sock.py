@@ -24,7 +24,7 @@ try:
     from mist.core import config
     from mist.core.methods import get_stats
     from mist.io.clouds.models import Cloud
-    from mist.core.cloud.models import Machine
+    from mist.io.machines.models import Machine
     from mist.io.keypairs.models import Keypair
     multi_user = True
 except ImportError:
