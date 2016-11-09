@@ -127,8 +127,11 @@
                 color: #ccc !important;
             }
 
-            paper-material > .smallcaps {
+            paper-material .smallcaps {
                 margin-top: 0;
+            }
+            paper-material .tags-head {
+                margin-bottom: 8px;
             }
             :host .tag {
                 display: inline !important;
@@ -307,25 +310,27 @@
                         <span hidden$="{{!probeData}}"> {{probeData}} </span>
                     </div>
                 </paper-material>
-                <paper-material id="rightcolumn" class="right" hidden$="[[hideAssociatedKeys]]">
-                    <h3 class="smallcaps">Associated Keys:</h3>
-                    <div class="associatedKeys">
-                        <template is="dom-repeat" items="[[associatedKeys]]">
-                            <div class="machine-key">
-                                <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
-                                <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
+                <paper-material id="rightcolumn" class="right">
+                    <div  hidden$="[[hideAssociatedKeys]]">
+                        <h3 class="smallcaps">Associated Keys:</h3>
+                        <div class="associatedKeys">
+                            <template is="dom-repeat" items="[[associatedKeys]]">
+                                <div class="machine-key">
+                                    <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
+                                    <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
+                                </div>
+                            </template>
+                            <div class="machine-key" id="pendingKeyRequest">
+                                <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
                             </div>
-                        </template>
-                        <div class="machine-key" id="pendingKeyRequest">
-                            <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
                         </div>
                     </div>
-                </paper-material>
-                <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
-                    <h3 class="smallcaps">TAGS:</h3>
-                    <template is="dom-repeat" items="[[machine.tags]]">
-                        <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
-                    </template>
+                    <div hidden$="[[!machine.tags.length]]">
+                        <h3 class="smallcaps tags-head">TAGS:</h3>
+                        <template is="dom-repeat" items="[[machine.tags]]">
+                            <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
+                        </template>
+                    </div>
                 </paper-material>
             </div>
             <paper-material class="info-card">
