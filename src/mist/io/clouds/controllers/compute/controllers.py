@@ -490,21 +490,19 @@ class GoogleComputeController(BaseComputeController):
         if machine_libcloud.state == NodeState.TERMINATED:
             return 0, 0
         # https://cloud.google.com/compute/pricing
-        size = machine_libcloud.extra.get('machineType')
+        size = machine_libcloud.extra.get('machineType').split('/')[-1]
         # eg europe-west1-d
         location = machine_libcloud.extra.get('location').split('-')[0]
         driver_name = 'google_' + location
         price = get_size_price(driver_type='compute', driver_name=driver_name,
                                size_id=size)
         if not price:
-            return 0, 0
+            if size.startswith('custom'):
+                return 0, 0
+                # TODO
+            else:
+                return 0, 0
         os_type = machine_libcloud.extra.get('os_type')
-        if 'sles' in machine_libcloud.image:
-            os_type = 'sles'
-        if 'rhel' in machine_libcloud.image:
-            os_type = 'rhel'
-        if 'win' in machine_libcloud.image:
-            os_type = 'win'
         os_cost_per_hour = 0
         if os_type == 'sles':
             if size in ('f1-micro', 'g1-small'):
