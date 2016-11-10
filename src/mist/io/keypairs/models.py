@@ -1,5 +1,4 @@
 """Keypair entity model"""
-import json
 from uuid import uuid4
 import mongoengine as me
 import mist.core.tag.models
@@ -42,7 +41,8 @@ class Keypair(me.Document):
         """Checks if certificate is specific ssh-rsa-cert
            and ensures that self is a valid RSA keypair."""
         if (self.certificate and
-            not self.certificate.startswith('ssh-rsa-cert-v01@openssh.com')):
+                not self.certificate.startswith('ssh-rsa-cert-v01@openssh.com'
+                                                )):
             self.certificate = ''
 
         from Crypto import Random
@@ -55,7 +55,7 @@ class Keypair(me.Document):
             decr_message = private_key_container.decrypt(encr_message)
             if message == decr_message:
                 return True
-            raise me.ValidationError("Invalid RSA keypair") # TODO is it ok?
+            raise me.ValidationError("Invalid RSA keypair")  # TODO is it ok?
 
     def delete(self):
         super(Keypair, self).delete()

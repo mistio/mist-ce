@@ -210,7 +210,8 @@ class KeypairController(object):
                 ssh_command(self.keypair.owner, cloud_id, machine_id,
                             host, 'uptime', key_id=self.keypair.id,
                             username=username, port=port)
-                log.info("Key was already deployed, local association created.")
+                log.info("Key was already deployed, "
+                         "local association created.")
             except MachineUnauthorizedError:
                 # oh screw this
                 raise MachineUnauthorizedError(
@@ -241,10 +242,10 @@ class KeypairController(object):
         # key = Keypair.objects.get(owner=owner, id=key_id)
         # FIXME
         cloud = Cloud.objects.get(owner=self.keypair.owner, id=cloud_id)
-        machine = Machine.objects.get(cloud=cloud,
-                                      key_associations__keypair__exact=
-                                      self.keypair,
-                                      machine_id=machine_id)
+        machine = Machine.objects.get(
+            cloud=cloud,
+            key_associations__keypair__exact=self.keypair,
+            machine_id=machine_id)
         # key not associated
         if not machine:
             raise BadRequestError("Key '%s' is not associated with "
@@ -273,7 +274,3 @@ class KeypairController(object):
         machine.key_associations.remove(assoc)
         machine.save()
         trigger_session_update(self.keypair.owner, ['keys'])
-
-    # TODO command()
-
-
