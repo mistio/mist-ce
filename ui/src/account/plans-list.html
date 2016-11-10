@@ -2,6 +2,8 @@
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 
+<script src='../../bower_components/moment/min/moment.min.js'></script>
+
 <link rel="import" href="plan-purchase.html">
 <link rel="import" href="plan-overusage.html">
 
@@ -81,9 +83,6 @@
         <plan-purchase id="purchasePlan" org="[[org]]"></plan-purchase>
     </template>
     <script>
-    (function() {
-        'use strict';
-
         Polymer({
             is: 'plans-list',
 
@@ -115,7 +114,7 @@
                 if (!this.org.available_plans)
                     return [];
                 return this.org.available_plans.filter(function(p){
-                    var showCurrent = true; // ommit current only if it has no expiration date 
+                    var showCurrent = true; // ommit current only if it has no expiration date
                     console.log(p.title, this.org.current_plan.expiration)
                     if (p.title == this.org.current_plan.title && !this.org.current_plan.expiration){
                         showCurrent = false;
@@ -134,6 +133,5 @@
 
             }
         });
-    })();
     </script>
 </dom-module>

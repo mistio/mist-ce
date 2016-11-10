@@ -78,7 +78,7 @@
                 tel: +1-650-605-3299 <br/>
                 <a href="mailto:sales@mist.io">sales@mist.io</a>
             </div>
-            
+
             <!-- regular plans -->
             <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
 
@@ -112,11 +112,7 @@
                         handle-as="xml"></iron-ajax>
 
     </template>
-    <script src="../../bower_components/moment/moment.js"></script>
     <script>
-        (function() {
-            'use strict';
-
             Polymer({
                 is: 'plan-item',
 
@@ -248,6 +244,5 @@
                     return this.plan.title && this.org.current_plan.title == plan.title && !this.org.current_plan.expiration;
                 }
             });
-        })();
     </script>
 </dom-module>

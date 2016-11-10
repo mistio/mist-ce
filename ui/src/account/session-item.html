@@ -1,8 +1,6 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 
-<script src='../moment/min/moment.min.js'></script>
-
 <dom-module id="session-item">
     <template>
         <style include="shared-styles">
@@ -32,7 +30,7 @@
             }
             paper-item.plan-end {
                 border-bottom-width: 2px;
-                border-color: #ccc; 
+                border-color: #ccc;
             }
             h6.absolute-date {
                 display: inline;
@@ -82,9 +80,6 @@
     </template>
 
     <script>
-        (function() {
-            'use strict';
-
             Polymer({
                 is: 'session-item',
 
@@ -134,7 +129,7 @@
 
                 },
                 toggleInfo: function(e){
-                    if (this.$.moreinfo.hasAttribute("opened")) { 
+                    if (this.$.moreinfo.hasAttribute("opened")) {
                         this.$.moreinfo.removeAttribute("opened")
                     }
                     else {
@@ -157,6 +152,5 @@
                     this.fire('terminating-session-error', {'event': e});
                 }
             });
-        })();
     </script>
 </dom-module>

@@ -1,7 +1,5 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 
-<script src='../moment/min/moment.min.js'></script>
-
 <dom-module id="subscription-item">
     <template>
         <style include="shared-styles">
@@ -31,7 +29,7 @@
             }
             paper-item.plan-end {
                 border-bottom-width: 2px;
-                border-color: #ccc; 
+                border-color: #ccc;
             }
             h6.absolute-date {
                 display: inline;
@@ -47,9 +45,6 @@
     </template>
 
     <script>
-        (function() {
-            'use strict';
-
             Polymer({
                 is: 'subscription-item',
 
@@ -112,6 +107,5 @@
                     return action == 'started' ? null : 'plan-end';
                 }
             });
-        })();
     </script>
 </dom-module>

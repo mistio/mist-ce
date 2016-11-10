@@ -129,7 +129,7 @@
                           <span>CVC</span>
                           <input type="text" size="4" data-stripe="cvc" value="{{payload.cvc::input}}">
                         </label>
-                        
+
                         <label>
                           <span>ZIP code</span>
                           <input type="text" size="4" data-stripe="address_zip" value="{{payload.address_zip::input}}">
@@ -219,12 +219,12 @@
         open: function(e){
             this.querySelector("#form").open();
         },
-        submit: function(){        
+        submit: function(){
             if (!this.hasCard) {
 
                 //extra stripe validation
                 var isValid = Stripe.card.validateCardNumber(this.payload.number) &&
-                    Stripe.card.validateExpiry(this.payload.exp_month, this.payload.exp_year) && 
+                    Stripe.card.validateExpiry(this.payload.exp_month, this.payload.exp_year) &&
                     Stripe.card.validateCVC(this.payload.cvc) && this.payload.address_zip != '';
 
                 if (isValid){
@@ -255,7 +255,7 @@
 
                     if (this.payload.address_zip == '')
                         errorText += ' zip code';
-                    
+
                     errorText += '.';
 
                     this.showError(errorText);

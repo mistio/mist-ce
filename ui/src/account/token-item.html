@@ -2,8 +2,6 @@
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 
-<script src='../moment/min/moment.min.js'></script>
-
 <dom-module id="token-item">
     <template>
         <style include="shared-styles">
@@ -33,7 +31,7 @@
             }
             paper-item.plan-end {
                 border-bottom-width: 2px;
-                border-color: #ccc; 
+                border-color: #ccc;
             }
             h6.absolute-date {
                 display: inline;
@@ -69,9 +67,6 @@
     </template>
 
     <script>
-        (function() {
-            'use strict';
-
             Polymer({
                 is: 'token-item',
 
@@ -124,7 +119,7 @@
 
                 },
                 toggleInfo: function(e){
-                    if (this.$.moreinfo.hasAttribute("opened")) { 
+                    if (this.$.moreinfo.hasAttribute("opened")) {
                         this.$.moreinfo.removeAttribute("opened")
                     }
                     else {
@@ -147,9 +142,8 @@
                     this.fire('token-revoked');
                 },
                 revokeTokenError: function(e){
-                    this.fire('token-revoking-error', {'event': e});                    
+                    this.fire('token-revoking-error', {'event': e});
                 }
             });
-        })();
     </script>
 </dom-module>
