@@ -1517,7 +1517,6 @@ def delete_network(request):
       required: true
       type: string
     """
-    log.info(request)
     cloud_id = request.matchdict['cloud']
     network_id = request.matchdict['network']
 

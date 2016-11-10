@@ -1487,41 +1487,9 @@ def list_networks(user, cloud_id):
 
     """
 
-    ret = {
-        'public': [],
-        'private': [],
-        'routers': []
-    }
-
     cloud = Cloud.objects.get(owner=user, id=cloud_id)
-    if cloud.ctl.provider not in ['ec2', 'gce', 'openstack']:
-        return list_networks_legacy(connect_provider(cloud), ret)
-    controller_networks = cloud.ctl.network.list_networks(ret)
-    ret.update(controller_networks)
-    return ret
-
-
-def list_networks_legacy(conn, ret):
-
-    # Get the actual networks
-    if conn.type in [Provider.NEPHOSCALE]:
-        networks = conn.ex_list_networks()
-        for network in networks:
-            ret['public'].append(nephoscale_network_to_dict(network))
-    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        networks = conn.ex_list_networks()
-
-        for network in networks:
-            ret['public'].append({
-                'id': network.id,
-                'name': network.name,
-                'extra': network.extra,
-            })
-
-    if conn.type == 'libvirt':
-        # close connection with libvirt
-        conn.disconnect()
-    return ret
+    controller_networks = cloud.ctl.network.list_networks()
+    return controller_networks
 
 
 def list_projects(user, cloud_id):
@@ -1551,19 +1519,6 @@ def list_projects(user, cloud_id):
     return ret
 
 
-def ec2_network_to_dict(network):
-    net = {}
-    net['name'] = network.name
-    net['id'] = network.id
-    net['is_default'] = network.extra.get('is_default', False)
-    net['state'] = network.extra.get('state')
-    net['instance_tenancy'] = network.extra.get('instance_tenancy')
-    net['dhcp_options_id'] = network.extra.get('dhcp_options_id')
-    net['tags'] = network.extra.get('tags', [])
-    net['subnets'] = [{'name': network.cidr_block}]
-    return net
-
-
 def nephoscale_network_to_dict(network):
     net = {}
     net['name'] = network.name
@@ -1572,52 +1527,6 @@ def nephoscale_network_to_dict(network):
     net['is_default'] = network.is_default
     net['zone'] = network.zone
     net['domain_type'] = network.domain_type
-    return net
-
-
-def gce_network_to_dict(network, subnets=[]):
-    net = {}
-    net['name'] = network.name
-    net['id'] = network.id
-    net['extra'] = network.extra
-    net['subnets'] = [gce_subnet_to_dict(s) for s in subnets]
-    return net
-
-
-def gce_subnet_to_dict(subnet):
-    # In case network is empty
-    if not subnet:
-        return {}
-    # Network and region come in URL form, so we have to split it
-    # and use the last element of the splited list
-    network = subnet['network'].split("/")[-1]
-    region = subnet['region'].split("/")[-1]
-
-    ret = {
-        'id': subnet['id'],
-        'name': subnet['name'],
-        'network': network,
-        'region': region,
-        'cidr': subnet['ipCidrRange'],
-        'gateway_ip': subnet['gatewayAddress'],
-        'creation_timestamp': subnet['creationTimestamp']
-    }
-    return ret
-
-
-def openstack_network_to_dict(network, subnets=[], floating_ips=[], nodes=[]):
-    net = {}
-    net['name'] = network.name
-    net['id'] = network.id
-    net['status'] = network.status
-    net['router_external'] = network.router_external
-    net['extra'] = network.extra
-    net['public'] = bool(network.router_external)
-    net['subnets'] = [openstack_subnet_to_dict(subnet) for subnet in subnets if subnet.id in network.subnets]
-    net['floating_ips'] = []
-    for floating_ip in floating_ips:
-        if floating_ip.floating_network_id == network.id:
-            net['floating_ips'].append(openstack_floating_ip_to_dict(floating_ip, nodes))
     return net
 
 
@@ -1637,21 +1546,6 @@ def openstack_floating_ip_to_dict(floating_ip, nodes=[]):
             ret['node_id'] = node.id
 
     return ret
-
-def openstack_subnet_to_dict(subnet):
-    net = {}
-
-    net['name'] = subnet.name
-    net['id'] = subnet.id
-    net['cidr'] = subnet.cidr
-    net['enable_dhcp'] = subnet.enable_dhcp
-    net['dns_nameservers'] = subnet.dns_nameservers
-    net['allocation_pools'] = subnet.allocation_pools
-    net['gateway_ip'] = subnet.gateway_ip
-    net['ip_version'] = subnet.ip_version
-    net['extra'] = subnet.extra
-
-    return net
 
 
 def openstack_router_to_dict(router):
@@ -1684,199 +1578,27 @@ def create_network(owner, cloud_id, network, subnet, router):
     it will use the new network's id to create a subnet
 
     """
-    log.info(network)
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     ret = cloud.ctl.network.create_network(network, subnet, router)
 
     # Schedule a UI update
-    task = mist.io.tasks.ListNetworks()
-    task.clear_cache(owner.id, cloud_id)
     trigger_session_update(owner, ['clouds'])
-
-    return ret
-
-
-def _create_network_hpcloud(conn, network, subnet, router):
-    """
-    Create hpcloud network
-    NOT used anymore, stays for reference
-
-    """
-    try:
-        network_name = network.get('name')
-    except Exception as e:
-        raise RequiredParameterMissingError(e)
-
-    admin_state_up = network.get('admin_state_up', True)
-    shared = network.get('shared', False)
-
-    # First we create the network
-
-    try:
-        new_network = conn.ex_create_network(name=network_name,
-                                             admin_state_up=admin_state_up,
-                                             shared=shared)
-    except Exception as e:
-        raise NetworkCreationError("Got error %s" % str(e))
-
-    ret = dict()
-    if subnet:
-        network_id = new_network.id
-
-        try:
-            subnet_name = subnet.get('name')
-            cidr = subnet.get('cidr')
-        except Exception as e:
-            raise RequiredParameterMissingError(e)
-
-        allocation_pools = subnet.get('allocation_pools', [])
-        gateway_ip = subnet.get('gateway_ip', None)
-        ip_version = subnet.get('ip_version', '4')
-        enable_dhcp = subnet.get('enable_dhcp', True)
-
-        try:
-            subnet = conn.ex_create_subnet(name=subnet_name,
-                                           network_id=network_id, cidr=cidr,
-                                           allocation_pools=allocation_pools,
-                                           gateway_ip=gateway_ip,
-                                           ip_version=ip_version,
-                                           enable_dhcp=enable_dhcp)
-        except Exception as e:
-            conn.ex_delete_network(network_id)
-            raise NetworkError(e)
-
-        ret['network'] = openstack_network_to_dict(new_network)
-        ret['network']['subnets'].append(openstack_subnet_to_dict(subnet))
-
-        if router:
-            try:
-                router_name = router.get('name')
-            except Exception as e:
-                raise RequiredParameterMissingError(e)
-
-            subnet_id = ret['network']['subnets'][0]['id']
-            external_gateway = router.get('publicGateway', False)
-
-            # If external gateway, find the ext-net
-            if external_gateway:
-                available_networks = conn.ex_list_networks()
-                external_networks = [net for net in available_networks if net.router_external]
-                if external_networks:
-                    ext_net_id = external_networks[0].id
-                else:
-                    external_gateway = False
-                    ext_net_id = ""
-
-            # First we create the router
-            router_obj = conn.ex_create_router(name=router_name,
-                                               external_gateway=external_gateway,
-                                               ext_net_id=ext_net_id)
-
-            # Then we attach the router to the subnet
-            router_obj = conn.ex_add_router_interface(
-                         router_obj['router']['id'], subnet_id
-            )
-
-    else:
-        ret = openstack_network_to_dict(new_network)
-
-    return ret
-
-
-def _create_network_openstack(conn, network, subnet, router):
-    """
-    Create openstack specific network
-    """
-    try:
-        network_name = network.get('name')
-    except Exception as e:
-        raise RequiredParameterMissingError(e)
-
-    admin_state_up = network.get('admin_state_up', True)
-    shared = network.get('shared', False)
-
-    # First we create the network
-    try:
-        new_network = conn.ex_create_network(name=network_name,
-                                             admin_state_up=admin_state_up,
-                                             shared=shared)
-    except Exception as e:
-        raise NetworkCreationError("Got error %s" % str(e))
-
-    ret = dict()
-    if subnet:
-        network_id = new_network.id
-
-        try:
-            subnet_name = subnet.get('name')
-            cidr = subnet.get('cidr')
-        except Exception as e:
-            raise RequiredParameterMissingError(e)
-
-        allocation_pools = subnet.get('allocation_pools', [])
-        gateway_ip = subnet.get('gateway_ip', None)
-        ip_version = subnet.get('ip_version', '4')
-        enable_dhcp = subnet.get('enable_dhcp', True)
-
-        try:
-            subnet = conn.ex_create_subnet(name=subnet_name,
-                                           network_id=network_id, cidr=cidr,
-                                           allocation_pools=allocation_pools,
-                                           gateway_ip=gateway_ip,
-                                           ip_version=ip_version,
-                                           enable_dhcp=enable_dhcp)
-        except Exception as e:
-            conn.ex_delete_network(network_id)
-            raise NetworkError(e)
-
-        ret['network'] = openstack_network_to_dict(new_network)
-        ret['network']['subnets'].append(openstack_subnet_to_dict(subnet))
-
-    else:
-        ret = openstack_network_to_dict(new_network)
 
     return ret
 
 
 def delete_network(owner, cloud_id, network_id):
     """
-        Delete a neutron network
-        """
+    Delete a network.
+
+    Network_id can either be the DB ID of a Network object (the intended way)
+    or the network's libcloud cloud-specific id  (for backwards compatibility)
+    """
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
-    if cloud.ctl.provider not in ['ec2', 'gce', 'openstack']:
-        raise NetworkActionNotSupported()
     cloud.ctl.network.delete_network(network_id)
 
-    try:
-        task = mist.io.tasks.ListNetworks()
-        task.clear_cache(owner.id, cloud_id)
-        trigger_session_update(owner, ['clouds'])
-    except Exception as e:
-        pass
-
-
-def delete_network_legacy(owner, cloud_id, network_id):
-    """
-    Delete a neutron network
-    """
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
-    conn = connect_provider(cloud)
-
-    if conn.type is Provider.OPENSTACK:
-        try:
-            conn.ex_delete_network(network_id)
-        except Exception as e:
-            raise NetworkError(e)
-    else:
-        raise NetworkActionNotSupported()
-
-    try:
-        task = mist.io.tasks.ListNetworks()
-        task.clear_cache(owner.id, cloud_id)
-        trigger_session_update(owner, ['clouds'])
-    except Exception as e:
-        pass
+    trigger_session_update(owner, ['clouds'])
 
 
 def set_machine_tags(user, cloud_id, machine_id, tags):
