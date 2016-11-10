@@ -320,7 +320,8 @@
                 });
             },
             userEmail: function(){
-                return document.querySelector("mist-app").model.user.email;
+                if (document.querySelector("mist-app") && document.querySelector("mist-app").model && document.querySelector("mist-app").model.user)
+                    return document.querySelector("mist-app").model.user.email;
             },
             _computeShowCommandTextarea: function(action){
                 if(action != "command" && this.newRule.command) {
