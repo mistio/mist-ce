@@ -27,19 +27,24 @@
             .flexchild {
                 @apply(--layout-flex);
             }
+            paper-item.plan-end {
+                border-bottom-width: 2px;
+                border-color: #ccc;
+            }
+            h6.absolute-date {
+                display: inline;
+                opacity: 0.32;
+            }
         </style>
 
         <paper-item class$="info-item flex-horizontal-with-ratios plan-record [[isExpiringClass]] [[zebraClasses]]">
-            <div class="flexchild plan-date">[[dateText]]</div>
+            <div class="flexchild plan-date">[[dateText]] <h6 class="absolute-date">[[absoluteDateText]]</h6></div>
             <div class="flexchild plan-title text-center"><div class="name">[[titleText]]</div></div>
             <div class="flexchild plan-action text-right">[[subscription.action]]</div>
         </paper-item>
     </template>
 
     <script>
-        (function() {
-            'use strict';
-
             Polymer({
                 is: 'subscription-item',
 
@@ -60,6 +65,10 @@
                     dateText: {
                         type: String,
                         computed: '_computeDateText(subscription.time)'
+                    },
+                    absoluteDateText: {
+                        type: String,
+                        computed: '_computeAbsoluteDDateText(subscription.time)'
                     },
                     isExpiringClass: {
                         type: String,
@@ -82,17 +91,21 @@
                     return classes.join(' ');
                 },
                 _computeTitleText: function(title, isTrial, promoCode) {
-                    return title + (isTrial ? ' (trial)' : (promoCode ? ' (promo)' : null));
+                    return title + (promoCode ? ' (promo)' : '');
                 },
                 _computeDateText: function(time) {
                     var date = new Date(time * 1000);
-                    var month = new Date();
-                    return moment().format("MMMM") + ' - ' + date.getDate() + ' - ' + date.getFullYear();
+                    return moment(time *1000).fromNow();
+
+                },
+                _computeAbsoluteDDateText: function(time) {
+                    var date = new Date(time * 1000);
+                    return moment().format("MMMM") +' '+ date.getDate() +' '+ date.getFullYear();
+
                 },
                 _computeIsExpiringClass: function(action) {
                     return action == 'started' ? null : 'plan-end';
                 }
             });
-        })();
     </script>
 </dom-module>

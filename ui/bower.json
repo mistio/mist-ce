@@ -27,7 +27,7 @@
     "swiftSet": "jabney/swiftSet#^0.9.15",
     "polyana-dashboard": "mistio/polyana-dashboard#^0.1.5",
     "paper-datatable": "^0.9.8",
-    "vaadin-grid": "^1.1.1",
+    "vaadin-grid": "^1.2.0",
     "vaadin-combo-box": "^1.1.1",
     "vaadin-icons": "^1.0.2",
     "yaml.js": "jeremyfa/yaml.js#^0.2.8",
@@ -44,11 +44,12 @@
     "web-component-tester": "^4.0.0"
   },
   "resolutions": {
-    "polymer": "^1.6.0",
-    "paper-styles": "^1.1.4",
-    "paper-item": "^1.1.4",
+    "polymer": "^1.7.0",
+    "paper-styles": "^1.1.5",
+    "paper-item": "^1.2.1",
     "iron-list": "^1.3.3",
-    "paper-icon-button": "~1.1.1",
+    "paper-icon-button": "~1.1.3",
+    "vaadin-grid": "~1.2.0",
     "timerange-picker": "*",
     "c3-chart": "*"
   }
