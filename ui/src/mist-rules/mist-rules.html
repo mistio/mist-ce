@@ -151,7 +151,7 @@
 
                     and email
 
-                    <paper-input id="emails" placeholder="[[userEmail()]]" value="{{newRule.emails}}" auto-validate></paper-input>
+                    <paper-input id="emails" placeholder="[[userEmail]]" value="{{newRule.emails}}" auto-validate></paper-input>
 
 
                 </div>
@@ -205,7 +205,8 @@
                 showCommandTextarea: {
                     type: Boolean,                    
                     value: false
-                }
+                },
+                userEmail: String
             },
             listeners: {
                 'iron-select':'userChanges',
@@ -318,9 +319,6 @@
                         el.set('editMode', false);
                     }
                 });
-            },
-            userEmail: function(){
-                return document.querySelector("mist-app").model.user.email;
             },
             _computeShowCommandTextarea: function(action){
                 if(action != "command" && this.newRule.command) {
