@@ -35,13 +35,19 @@
                     [[subscript]]
                 </p>
                 <div hidden$="[[!_computeType(type, 'isYesNo')]]" class="clearfix btn-group">
-                    <paper-button hidden$="[[danger]]" class="link" dialog-dismiss>Cancel</paper-button>
+                    <paper-button hidden$="[[danger]]" class="link" dialog-dismiss>
+                        <span hidden$="[[!undo]]"> [[undo]] </span>
+                        <span hidden$="[[undo]]"> Cancel</span>
+                    </paper-button>
                     <paper-button hidden$="[[danger]]" class="blue" dialog-confirm>
                         <span hidden$="[[action]]"> Proceed </span>
                         <span hidden$="[[!action]]">[[action]]</span>
                     </paper-button>
 
-                    <paper-button hidden$="[[!danger]]" dialog-dismiss>Cancel</paper-button>
+                    <paper-button hidden$="[[!danger]]" dialog-dismiss>
+                        <span hidden$="[[!undo]]"> [[undo]] </span>
+                        <span hidden$="[[undo]]"> Cancel</span>
+                    </paper-button>
                     <paper-button hidden$="[[!danger]]" class="red" dialog-confirm>
                         <span hidden$="[[action]]"> Delete </span>
                         <span hidden$="[[!action]]">[[action]]</span>
@@ -88,6 +94,10 @@
                         value: false
                     },
                     subscript: {
+                        type: String,
+                        value: false
+                    },
+                    undo: {
                         type: String,
                         value: false
                     },

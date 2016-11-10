@@ -5,12 +5,13 @@
 <link rel="import" href="account/password-page.html">
 <link rel="import" href="account/feedback-page.html">
 <link rel="import" href="account/plans-list.html">
-<link rel="import" href="account/plan-item.html">
 <link rel="import" href="account/subscriptions-list.html">
-<link rel="import" href="account/subscription-item.html">
+<link rel="import" href="account/sessions-list.html">
+<link rel="import" href="account/tokens-list.html">
+
+<script src='../bower_components/moment/min/moment.min.js'></script>
 
 <dom-module id="page-my-account">
-
     <template>
         <style is="custom-style" include="single-page">
             #container {
@@ -32,22 +33,21 @@
         </style>
         <div id="content">
             <paper-tabs attr-for-selected="data-route" selected="{{selected}}">
-                <paper-tab data-route="0" current="account" title="Account">Profile</paper-tab>
-                <paper-tab data-route="1" current="account" title="Account">Password</paper-tab>
-                <paper-tab data-route="2" current="account" title="Account">Billing</paper-tab>
-                <paper-tab data-route="3" current="account" title="Account">Acive Sessions</paper-tab>
-                <paper-tab data-route="4" current="account" title="Account">API Tokens</paper-tab>
-                <paper-tab data-route="5" current="account" title="Account">Subscription History</paper-tab>
+                <paper-tab data-route="0">Profile</paper-tab>
+                <paper-tab data-route="1">Password</paper-tab>
+                <paper-tab data-route="2" hidden$="[[!org.is_owner]]">Billing</paper-tab>
+                <paper-tab data-route="3">Active Sessions</paper-tab>
+                <paper-tab data-route="4">API Tokens</paper-tab>
+                <paper-tab data-route="5" hidden$="[[!org.is_owner]]">Subscription History</paper-tab>
             </paper-tabs>
 
             <iron-pages selected="{{selected}}">
                 <details-page org="[[org]]" user="[[user]]" data-route="0"></details-page>
                 <password-page user="[[user]]" data-route="1"></password-page>
-                <plans-list is-over-using="[[isOverUsing]]" org="[[org]]" user="[[user]]" data-route="2"></plans-list>
-                <div data-route="3"></div>
-                <div data-route="4"></div>
-                <subscriptions-list user="[[user]]" data-route="5"></subscriptions-list>
-                <feedback-page user="[[user]]" data-route="6"></feedback-page>
+                <plans-list is-over-using="[[isOverUsing]]" org="[[org]]" user="[[user]]" data-route="2" hidden$="[[!org.is_owner]]"></plans-list>
+                <sessions-list org="[[org]]" user="[[user]]" data-route="3"></sessions-list>
+                <tokens-list org="[[org]]" user="[[user]]" data-route="4" ></tokens-list>
+                <subscriptions-list org="[[org]]" data-route="5" hidden$="[[!org.is_owner]]"></subscriptions-list>
             </iron-pages>
 
         </div>
@@ -59,18 +59,16 @@
         is: 'page-my-account',
         properties: {
             isOverUsing: Boolean,
-            user: {
-                type: Object
-            },
-            org: {
-                type: Object
-            },
+            user: Object,
+            org: Object,
+            tokens: Array,
+            sessions: Array,
             selected: {
                 value: 0
             }
         },
         attached: function(){
-            console.log(document.querySelector("app-location").queryParams);
+            // console.log(document.querySelector("app-location").queryParams);
             if (document.querySelector("app-location").queryParams["plans"] == "true") {
                 this.set("selected",2);
             }

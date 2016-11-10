@@ -15,6 +15,7 @@
     "src/page-incidents.html",
     "src/page-my-account.html",
     "src/page-clouds.html",
-    "src/page-members.html"
+    "src/page-members.html",
+    "bower_components/polyana-dashboard/polyana-dashboard.html"
   ]
 }

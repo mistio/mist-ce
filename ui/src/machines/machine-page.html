@@ -311,10 +311,10 @@
                     </div>
                 </paper-material>
                 <paper-material id="rightcolumn" class="right">
-                    <div  hidden$="[[hideAssociatedKeys]]">
+                    <div hidden$="[[!machine.keys.length]]">
                         <h3 class="smallcaps">Associated Keys:</h3>
                         <div class="associatedKeys">
-                            <template is="dom-repeat" items="[[associatedKeys]]">
+                            <template is="dom-repeat" items="{{machine.keys}}">
                                 <div class="machine-key">
                                     <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
                                     <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
@@ -518,10 +518,6 @@ MACHINEACTIONS = {
                 computed: '_computeIsloading(machine)',
                 value: true
             },
-            associatedKeys: {
-                type: Array,
-                computed: '_computeAssociatedKeys(machine, model.keysArray)'
-            },
             newKeyId: {
                 type: String,
                 value: ''
@@ -558,8 +554,7 @@ MACHINEACTIONS = {
             }
         },
         observers: [
-            '_isMonitored(machine, model.monitoring.machines.*)',
-            '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)'
+            '_isMonitored(machine, model.monitoring.machines.*)'
         ],
         listeners: {
             'confirmation': '_machineActionConfirmation',
@@ -632,15 +627,15 @@ MACHINEACTIONS = {
         _computeItemInArray: function() {
             var tempdash = {
                 "id": 1,
-                // "refresh": "",
+                "refresh": "10sec",
                 "rows": [{
-                    "height": "500px",
                     "panels": [{
-                        "aliasColors": {},
-                        "datasource": "mist.monitor",
                         "id": 2,
-                        "span": 12,
+                        "title": "Load",
+                        "type": "graph",
+                        "span": 6,
                         "stack": false,
+                        "datasource": "mist.monitor",
                         "targets": [{
                             "refId": "A",
                             "target": "load.longterm"
@@ -648,27 +643,58 @@ MACHINEACTIONS = {
                             "refId": "B",
                             "target": "load.shortterm"
                         }],
-                        "timeFrom": null,
-                        "timeShift": null,
-                        "title": "Load",
-                        "type": "graph",
                         "machineArray": [],
                         "x-axis": true,
                         "y-axis": true
                     }, {
-                        "aliasColors": {},
-                        "datasource": "mist.monitor",
                         "id": 3,
-                        "span": 12,
-                        "stack": false,
-                        "targets": [{
-                            "refId": "A",
-                            "target": "cpu"
-                        }],
-                        "timeFrom": null,
-                        "timeShift": null,
                         "title": "CPU",
                         "type": "graph",
+                        "span": 6,
+                        "stack": true,
+                        "datasource": "mist.monitor",
+                        "targets": [{
+                            "refId": "C",
+                            "target": "cpu.total.*"
+                        }],
+                        "machineArray": [],
+                        "x-axis": true,
+                        "y-axis": true
+                    }]}, {
+                    "panels": [{
+                        "id": 1,
+                        "title": "MEM",
+                        "type": "graph",
+                        "span": 6,
+                        "stack": true,
+                        "datasource": "mist.monitor",
+                        "targets": [{
+                            "refId": "D",
+                            "target": "memory.used_percent"
+                        }, {
+                            "refId": "E",
+                            "target": "memory.cached_percent"
+                        }, {
+                            "refId": "F",
+                            "target": "memory.free_percent"
+                        }],
+                        "machineArray": [],
+                        "x-axis": true,
+                        "y-axis": true
+                      }, {
+                        "id": 5,
+                        "title": "NET",
+                        "type": "graph",
+                        "span": 6,
+                        "stack": true,
+                        "datasource": "mist.monitor",
+                        "targets": [{
+                            "refId": "G",
+                            "target": "interface.total.if_octets.rx"
+                        }, {
+                            "refId": "H",
+                            "target": "interface.total.if_octets.tx"
+                        }],
                         "machineArray": [],
                         "x-axis": true,
                         "y-axis": true
@@ -682,13 +708,10 @@ MACHINEACTIONS = {
                     "now": true,
                     "refresh_intervals": [],
                     "time_options": [
-                        "5m",
-                        "15m",
+                        "10m",
                         "1h",
                         "6h",
-                        "12h",
                         "24h",
-                        "2d",
                         "7d",
                         "30d"
                     ]
@@ -717,17 +740,6 @@ MACHINEACTIONS = {
             var itemUidInArray = [];
             itemUidInArray.push(itemUid(this.machine, this.sections['machines']));
             return itemUidInArray;
-        },
-
-        _computeAssociatedKeys: function(machine, keys) {
-            var machineId = this.machine.id;
-            var associatedKeys = [];
-            associatedKeys = this.model.keysArray.filter(function(key) {
-                return key.machines.filter(function(machine) {
-                    return machine[1] == machineId;
-                }).length;
-            }, this);
-            return associatedKeys || [];
         },
         _computeAssociatedKeys: function(machine, keys) {
             return machine.keys || [];
@@ -835,13 +847,6 @@ MACHINEACTIONS = {
                 this.set('isPendingKeyRequest', false);
                 this._showToast(e.detail.errormsg);
             }
-        },
-        _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest) {
-            var hide = !(associatedKeys.base.length > 0 || isPendingKeyRequest);
-        },
-        _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest) {
-            var hide = !(this.machine.keys.length > 0 || isPendingKeyRequest);
-            this.set('hideAssociatedKeys', hide);
         },
         _feedbackOnScript: function(e) {
             if (e.detail.response) {
