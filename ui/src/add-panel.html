@@ -76,13 +76,12 @@
           }
         </style>
 
-        <paper-button on-tap="openDialog" class="add-button"><iron-icon icon="icons:add-circle"></iron-icon></iron-icon> Add Graph</paper-button>
+        <paper-button onclick="selectTarget.open()" on-tap="openDialog" class="add-button"><iron-icon icon="icons:add-circle"></iron-icon></iron-icon> Add Graph</paper-button>
         <paper-dialog id="selectTarget" horizontal-align="right" vertical-align="top">
             <h2>Select target for graph</h2>
             <paper-dialog-scrollable>
-                <paper-menu class="main">
-                  <paper-item on-tap="_showMe">Custom</paper-item>
-                </paper-menu>
+                <paper-item on-tap="_showMe">Custom</paper-item>
+                <paper-menu class="main"></paper-menu>
                 <paper-spinner active="{{loadingMetrics}}" hidden$="{{!loadingMetrics}}"></paper-spinner>
             </paper-dialog-scrollable>
         </paper-dialog>
@@ -155,7 +154,7 @@
                 formReady: {
                   type: Boolean,
                   value: false,
-                  computed: 'computeFormReady(metric.name,metric.script)'
+                  computed: 'computeFormReady(metric.*)'
                 },
                 sendingData: {
                     type: Boolean,
@@ -186,10 +185,8 @@
               'keyup':'_scriptValue'
             },
             _scriptValue:function(e){
-              console.log(e.target.nodeName=="JUICY-ACE-EDITOR");
               if(e.target.nodeName=="JUICY-ACE-EDITOR"){
-                this.metric.script=e.target.value.trim();
-                this.computeFormReady();
+                this.set("metric.script", e.target.value.trim());
               }
             },
             _customgraphResponse: function (data){
@@ -202,8 +199,7 @@
             _handleError: function(e,d) {
                 this.set('sendingData', false);
                 this.set('formError', true);
-                console.log(e);
-                this.$.errormsg.textContent = e.detail.error.message; // e.detail.request.xhr.statusText;
+                this.$.errormsg.textContent = e.detail.error.message;
             },
             _computeplugidId: function(name) {
                 if (!this.metric.name) return;
@@ -214,6 +210,7 @@
                     .replace(/^_/, '') // trim heading underscore
                     .replace(/_$/, ''); // trim trailing underscore
                 this.set('metric.pluginId', newPluginId);
+                this.set('metric.name',name);
             },
             _computeMetricsUri: function(cloudId, machineId) {
                 return "/api/v1/clouds/" + cloudId + "/machines/" + machineId + "/metrics";
@@ -224,17 +221,11 @@
                     '/plugins/' + pluginId;
             },
             openDialog: function() {
-                var dialog = this.querySelector('paper-dialog');
-                dialog.positionTarget = this;
-                dialog.open();
-                this.validInput = "";
-                this.stepType = "";
                 if(this.responseMetrics==null)
                 this.querySelector("#metrics").generateRequest();
             },
-            computeFormReady: function(name,script){
-              console.log(script)
-              return name != '' && name != null && script != '' ;
+            computeFormReady: function(metric){
+              return metric.base.name != '' && metric.base.name != null && typeof metric.base.name !=="undefined" && metric.base.script != '' && typeof metric.base.script!=="undefined" ;
             },
             _handleMetricResponse: function(data) {
                 var output={};
@@ -257,11 +248,8 @@
             },
             _showMe:function (){
               var dialog = this.querySelector('#customOptions');
-              dialog.positionTarget = this;
               dialog.open();
               this.querySelector('#juicyScript').value=this.metric.script;
-              this.validInput = "";
-              this.stepType = "";
             },
             _createMenus: function(input,parent){
               if(parent==null){
