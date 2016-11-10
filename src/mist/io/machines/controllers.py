@@ -49,3 +49,9 @@ class MachineController(object):
         """Undefines machine - used in KVM libvirt
         to destroy machine and delete XML conf"""
         return self.machine.cloud.ctl.compute.undefine_machine(self.machine)
+
+    def associate(self, host='', username=None, port=22):
+        """Associate machine with an sshkey throw key_association field"""
+        return self.machine.key_associations[-1].keypair.ctl.associate(
+            self.machine.cloud_id, self.machine.machine_id, host=host,
+            username=username, port=port)
