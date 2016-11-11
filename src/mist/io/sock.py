@@ -25,7 +25,7 @@ try:
     from mist.core.methods import get_stats
     from mist.io.clouds.models import Cloud
     from mist.io.machines.models import Machine
-    from mist.io.keypairs.models import Keypair
+    from mist.io.keys.models import Key
     multi_user = True
 except ImportError:
     from mist.io import config
@@ -381,7 +381,7 @@ class MainConnection(MistConnection):
                             continue
 
                     has_key = False
-                    keypairs = Keypair.objects(owner=self.owner)
+                    keypairs = Key.objects(owner=self.owner)
                     machine_obj = Machine.objects(cloud=cloud,
                                                   machine_id=machine["id"],
                                                   key_associations__not__size=0).first()

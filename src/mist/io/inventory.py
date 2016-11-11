@@ -2,7 +2,7 @@ try:
     from mist.core.user.models import User
     from mist.io.clouds.models import Cloud
     from mist.io.machines.models import Machine, KeyAssociation
-    from mist.io.keypairs.models import Keypair
+    from mist.io.keys.models import Key
     from mist.core import config
     from mist.core.vpn.methods import destination_nat as dnat
 except ImportError:
@@ -35,7 +35,7 @@ class MistInventory(object):
                 continue
             ip_addr, port = dnat(self.user, ip_addr, port)
             if key_id not in self.keys:
-                keypair = Keypair.objects.get(owner=self.user, name=key_id)
+                keypair = Key.objects.get(owner=self.user, name=key_id)
                 self.keys[key_id] = keypair.private
                 if keypair.certificate:
                     # if signed ssh key, provide the key appending a -cert.pub

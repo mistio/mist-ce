@@ -40,7 +40,7 @@ from mist.io.exceptions import RequiredParameterMissingError
 
 from mist.io.helpers import sanitize_host, check_host
 
-from mist.io.keypairs.models import Keypair
+from mist.io.keys.models import Key
 from mist.core.vpn.methods import to_tunnel
 
 from mist.io.clouds.utils import rename_kwargs
@@ -265,10 +265,10 @@ class LibvirtMainController(BaseMainController):
             check_host(kwargs['host'])
         if kwargs.get('key'):
             try:
-                kwargs['key'] = Keypair.objects.get(owner=self.cloud.owner,
+                kwargs['key'] = Key.objects.get(owner=self.cloud.owner,
                                                     id=kwargs['key'])
-            except Keypair.DoesNotExist:
-                raise NotFoundError("Keypair does not exist.")
+            except Key.DoesNotExist:
+                raise NotFoundError("Key does not exist.")
 
     def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
         """This is a hack to associate a key with the VM hosting this cloud"""
@@ -404,7 +404,7 @@ class OtherMainController(BaseMainController):
         except (ValueError, TypeError):
             rdp_port = 3389
         if ssh_key:
-            ssh_key = Keypair.objects.get(owner=self.cloud.owner, id=ssh_key)
+            ssh_key = Key.objects.get(owner=self.cloud.owner, id=ssh_key)
 
         # Create and save machine entry to database.
         machine = Machine(

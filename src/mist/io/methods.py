@@ -44,7 +44,7 @@ import ansible.constants
 # try:
 # from mist.core.user.models import User
 from mist.core.tag.models import Tag
-from mist.io.keypairs.models import Keypair
+from mist.io.keys.models import Key
 from mist.core import config
 # except ImportError:
 #     print "Seems to be on IO version"
@@ -186,12 +186,12 @@ def delete_key(user, key_id):
     :return:
     """
     log.info("Deleting key with id '%s'.", key_id)
-    key = Keypair.objects.get(owner=user, id=key_id)
+    key = Key.objects.get(owner=user, id=key_id)
     default_key = key.default
     # if key.default:
     #     default_key = key.default
     key.delete()
-    other_key = Keypair.objects(owner=user, id__ne=key_id).first()
+    other_key = Key.objects(owner=user, id__ne=key_id).first()
     if default_key and other_key:
         other_key.default = True
         other_key.save()
@@ -264,12 +264,12 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     machine_name = machine_name_validator(conn.type, machine_name)
     key = None
     if key_id:
-        key = Keypair.objects.get(owner=user, id=key_id)
+        key = Key.objects.get(owner=user, id=key_id)
 
     # if key_id not provided, search for default key
     if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
         if not key_id:
-            key = Keypair.objects.get(owner=user, default=True)
+            key = Key.objects.get(owner=user, default=True)
             key_id = key.name
     if key:
         private_key = key.private
@@ -389,12 +389,12 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         raise BadRequestError("Provider unknown.")
 
     if conn.type == Provider.AZURE and key_id:
-        key = Keypair.objects.get(owner=user, id=key_id)
+        key = Key.objects.get(owner=user, id=key_id)
         # we have the username
         key.ctl.associate(cloud_id, node.id,
                           username=node.extra.get('username'), port=ssh_port)
     elif key_id:
-        key = Keypair.objects.get(owner=user, id=key_id)
+        key = Key.objects.get(owner=user, id=key_id)
         key.ctl.associate(cloud_id, node.id, port=ssh_port)
     # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
@@ -856,7 +856,7 @@ def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, loc
     """
     key = public_key.replace('\n', '')
 
-    auth = NodeAuthSSHKey(pubkey=key)
+    auth = NodeAuthKey(pubkey=key)
 
     try:
         node = conn.create_node(
@@ -1100,7 +1100,7 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
 
     """
 
-    auth = NodeAuthSSHKey(public_key)
+    auth = NodeAuthKey(public_key)
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -1218,7 +1218,7 @@ def list_keys(user):
     :return:
     """
     from mist.core.tag.methods import get_tags_for_resource
-    keys = Keypair.objects(owner=user).only("default", "name")
+    keys = Key.objects(owner=user).only("default", "name")
     clouds = Cloud.objects(owner=user)
     key_objects = []
     for key in keys:

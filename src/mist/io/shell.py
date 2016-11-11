@@ -31,7 +31,7 @@ try:
     from mist.core.user.models import User
     from mist.io.clouds.models import Cloud
     from mist.io.machines.models import Machine, KeyAssociation
-    from mist.io.keypairs.models import Keypair
+    from mist.io.keys.models import Key
     from mist.core import config
 except ImportError:
     from mist.io import config
@@ -247,11 +247,11 @@ class ParamikoShell(object):
         except me.DoesNotExist:
             machine = Machine(cloud=cloud, machine_id=machine_id)
         if key_id:
-            keys = [Keypair.objects.get(owner=user, id=key_id)]
+            keys = [Key.objects.get(owner=user, id=key_id)]
         else:
             keys = [key_assoc.keypair
                     for key_assoc in machine.key_associations
-                    if isinstance(key_assoc.keypair, Keypair)]
+                    if isinstance(key_assoc.keypair, Key)]
         if username:
             users = [username]
         else:

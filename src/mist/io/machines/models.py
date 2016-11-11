@@ -6,12 +6,12 @@ import mongoengine as me
 from mist.core import config as core_config
 import mist.core.tag.models
 from mist.io.clouds.models import Cloud
-from mist.io.keypairs.models import Keypair
+from mist.io.keys.models import Key
 from mist.io.machines.controllers import MachineController
 
 
 class KeyAssociation(me.EmbeddedDocument):
-    keypair = me.ReferenceField(Keypair)
+    keypair = me.ReferenceField(Key)
     last_used = me.IntField(default=0)
     ssh_user = me.StringField()
     sudo = me.BooleanField()
