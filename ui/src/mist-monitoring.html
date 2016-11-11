@@ -196,7 +196,8 @@
              "x-axis": true,
              "y-axis": true
            }
-           this.push("dashboard.rows.0.panels",panel);
+           var index = this.dashboard.rows.length-1;
+           this.push("dashboard.rows."+index+".panels",panel);
            console.log(this.dashboard);
          },
 
