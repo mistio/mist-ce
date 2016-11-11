@@ -491,15 +491,41 @@ class GoogleComputeController(BaseComputeController):
             return 0, 0
         # https://cloud.google.com/compute/pricing
         size = machine_libcloud.extra.get('machineType').split('/')[-1]
+        location = machine_libcloud.extra.get('location')
+        # Get the location, locations currently are
+        # europe us asia-east asia-northeast
+        # all with different pricing
+        if 'asia-northeast' in location:
+            # eg asia-northeast1-a
+            location = 'asia_northeast'
+        elif 'asia-east' in location:
+            # eg asia-east1-a
+            location = 'asia_east1-a'
+        else:
         # eg europe-west1-d
-        location = machine_libcloud.extra.get('location').split('-')[0]
+            location = location.split('-')[0]
         driver_name = 'google_' + location
         price = get_size_price(driver_type='compute', driver_name=driver_name,
                                size_id=size)
+
         if not price:
             if size.startswith('custom'):
-                return 0, 0
-                # TODO
+                cpu_price = 'custom_vcpu'
+                ram_price = 'custom_ram'
+                if 'preemptible' in size:
+                    cpu_price = 'custom_vcpu_preemptible'
+                    ram_price = 'custom_ram_preemptible'
+
+                cpu_price = get_size_price(driver_type='compute',
+                                           driver_name=driver_name,
+                                           size_id=cpu_price)
+                ram_price = get_size_price(driver_type='compute',
+                                           driver_name=driver_name,
+                                           size_id=ram_price)
+                # Example custom-4-16384
+                cpu = int(size.split('-')[1])
+                ram = int(size.split('-')[2]) / 1024
+                price = cpu * cpu_price + ram * ram_price
             else:
                 return 0, 0
         os_type = machine_libcloud.extra.get('os_type')
