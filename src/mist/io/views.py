@@ -22,7 +22,7 @@ from pyramid.renderers import render_to_response
 # try:
 from mist.core.helpers import view_config
 from mist.core.auth.methods import user_from_request
-from mist.io.keypairs.models import Keypair
+from mist.io.keys.models import Key, SSHKey
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.core.exceptions import PolicyUnauthorizedError
@@ -491,11 +491,11 @@ def add_key(request):
     if not private_key:
         raise RequiredParameterMissingError("Private key is not provided")
 
-    keypair = Keypair.add(auth_context.owner, key_name, **params)
+    keypair = SSHKey.add(auth_context.owner, key_name, **params)
     # TODO here or inside add? But we must set owner
     trigger_session_update(auth_context.owner, ['keys'])
 
-    key = Keypair.objects.get(owner=auth_context.owner, name=keypair.name)
+    key = Key.objects.get(owner=auth_context.owner, name=keypair.name)
 
     if key_tags:
         from mist.core.tag.methods import add_tags_to_resource
@@ -538,7 +538,7 @@ def delete_key(request):
         raise KeyParameterMissingError()
 
     try:
-        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+        key = Key.objects.get(owner=auth_context.owner, id=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -578,7 +578,7 @@ def delete_keys(request):
     report = {}
     for key_id in key_ids:
         try:
-            key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+            key = Key.objects.get(owner=auth_context.owner, id=key_id)
         except me.DoesNotExist:
             report[key_id] = 'not_found'
             continue
@@ -626,7 +626,7 @@ def edit_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+        key = Key.objects.get(owner=auth_context.owner, id=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key with that id does not exist')
     auth_context.check_perm('key', 'edit', key.id)
@@ -653,7 +653,7 @@ def set_default_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+        key = Key.objects.get(owner=auth_context.owner, id=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -686,7 +686,7 @@ def get_private_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+        key = Key.objects.get(owner=auth_context.owner, id=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -715,7 +715,7 @@ def get_public_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+        key = Key.objects.get(owner=auth_context.owner, id=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -731,7 +731,7 @@ def generate_keypair(request):
     Generate key pair
     ---
     """
-    key = Keypair()
+    key = SSHKey()
     key.ctl.generate()
     return {'priv': key.private, 'public': key.public}
 
@@ -788,7 +788,7 @@ def associate_key(request):
         raise RequiredParameterMissingError('host')
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
-    key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+    key = Key.objects.get(owner=auth_context.owner, id=key_id)
     auth_context.check_perm('key', 'read_private', key.id)
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
@@ -853,7 +853,7 @@ def disassociate_key(request):
         machine_uuid = ""
     auth_context.check_perm("machine", "disassociate_key", machine_uuid)
 
-    key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+    key = Key.objects.get(owner=auth_context.owner, id=key_id)
     key.ctl.disassociate(cloud_id, machine_id, host)
     clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
