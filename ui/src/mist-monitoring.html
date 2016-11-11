@@ -64,7 +64,7 @@
                 <div hidden$="[[!isMonitored]]">
                     <!-- monitoring is not activated -->
 
-                    <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
+                    <polyana-dashboard dashboard="{{dashboard}}" datasources="[[datasources]]"></polyana-dashboard>
                     <!-- monitoring is activated. we expect to have data -->
                     <div hidden$="[[!isActivated]]">
                         <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]"></add-panel>

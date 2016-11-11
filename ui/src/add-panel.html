@@ -273,7 +273,6 @@
               this.querySelector('#juicyScript').value=this.metric.script;
             },
             _createMenus: function(input,parent){
-              console.info('_createMenus');
               if(parent==null){
                 var menu=this.querySelector('paper-menu');
               }
@@ -283,7 +282,6 @@
                 Polymer.dom(par).appendChild(menu);
               }
               Object.keys(input).forEach(function(i){
-                console.info('keys loop');
                 var sub=document.createElement('paper-submenu');
                 var item=document.createElement('paper-item');
                 Polymer.dom(item).textContent=i;
@@ -319,7 +317,6 @@
               return isIn ? true : false;
             },
             _exit: function(who) {
-              console.info('_exit');
               if(who==null){
                 var dialog = this.querySelector('paper-dialog');
               }else{
@@ -328,7 +325,6 @@
               dialog.close();
             },
             _generateCustomgraphrequest(){
-              console.info('REQUESt');
               this.set('formError', false);
               this._computeUrl(this.cloudId,this.machineId,this.metric.pluginId);
               this.metric.script=this.querySelector('#juicyScript').value;
