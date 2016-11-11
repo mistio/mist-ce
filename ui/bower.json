@@ -40,7 +40,8 @@
     "c3": "^0.4.11",
     "iron-component-page": "^1.1.7",
     "iron-collapse": "PolymerElements/iron-collapse#^1.2.1",
-    "webcomponentsjs": "^0.7.23"
+    "webcomponentsjs": "^0.7.23",
+    "juicy-ace-editor": "^1.2.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
