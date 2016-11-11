@@ -15,7 +15,10 @@
     "src/page-incidents.html",
     "src/page-my-account.html",
     "src/page-clouds.html",
-    "src/page-members.html",
+    "src/page-members.html"
+  ],
+  "includeDependencies": [
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js",
     "bower_components/polyana-dashboard/polyana-dashboard.html"
   ]
 }
