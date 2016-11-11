@@ -1,0 +1,242 @@
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+
+<link rel="import" href="token-item.html">
+
+<dom-module id="tokens-list">
+    <template>
+        <style include="forms"></style>
+        <style is="custom-style" include="lists"></style>
+        <style is="custom-style" include="dialogs"></style>
+        <style >
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                display: block;
+            }
+
+            .card-content {
+                padding: 16px;
+            }
+
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+            }
+
+            .flexchild {
+                @apply(--layout-flex);
+            }
+            .info-head {
+                padding: 8px 16px;
+                background: #eee;
+                border-bottom: 2px solid #ddd;
+            }
+            .grid-row {
+                padding: 24px 24px 0 24px;
+            }
+
+            h2.title {
+                font-weight: 500;
+            }
+            .info-list {
+                margin-bottom: 16px;
+            }
+            .create-token {
+                margin-top: 16px;
+            }
+            #createTokenDialog {
+                padding-bottom: 16px;
+            }
+            #createTokenDialog > * {
+                max-width: 100%;
+                box-sizing: border-box;
+                margin-top: 0
+            }
+            #createTokenDialog > *:first-child {
+                margin-top: 24px;
+            } 
+            .buttons {
+                padding: 8px 24px 16px 24px;
+            }
+            .error {
+                color: var(--red-color);
+            }   
+        </style>
+        <paper-material elevation="1">
+            <div class="grid-row">
+                <div class="xs12 head">
+                    <h2 class="title">API Tokens</h2>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="info-list">
+                    <div class="info-head flex-horizontal-with-ratios">
+                        <div class="flexchild">Name</div>
+                        <div class="flexchild text-left">Last Accessed</div>
+                        <div class="flexchild text-right">Action</div>
+                    </div>
+                    <div class="info-body">
+                        <template is="dom-repeat" items=[[tokens]] as="token">
+                            <div class="row">
+                                <token-item token="[[token]]" index="[[index]]" count="[[tokens.length]]"></token-item>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <div id="error" class="error" hidden$="[[!hasError]]"></div>
+                <paper-button on-tap="createToken" class="blue create-token">Create API Token</paper-button>
+                <paper-spinner active="{{loading}}"></paper-spinner>
+
+                <paper-dialog id="createTokenDialog" with-backdrop>
+                    <h2>Create API Token</h2>
+
+                    <paper-input id="tokenName" value="{{newToken.name::input}}" label="Token Name"></paper-input>
+
+                    <paper-dropdown-menu label="Expires After">
+                         <paper-menu id="tokenExpires" attr-for-selected="value" selected="{{newToken.ttl}}" class="dropdown-content">
+                            <paper-item value="0">Never</paper-item>
+                            <paper-item value="86400">1 Day</paper-item>
+                            <paper-item value="604800">1 Week</paper-item>
+                            <paper-item value="2592000">1 Month</paper-item>
+                            <paper-item value="31104000">1 Year</paper-item>
+                         </paper-menu>
+                    </paper-dropdown-menu>
+
+                    <paper-dropdown-menu label="Context">
+                         <paper-menu id="tokenContexts" class="dropdown-content">
+                             <template is="dom-repeat" items="[[user.orgs]]" as="org">
+                                <paper-item value="[[org.id]]">[[org.name]]</paper-item>
+                            </template>
+                         </paper-menu>
+                    </paper-dropdown-menu>
+
+                    <paper-input id="pass" value="{{newToken.password::input}}" label="Password *" type="password"></paper-input>
+
+                    <p>* Password is required to create a token</p>
+
+                    <div class="buttons">
+                        <paper-button dialog-dismiss>Cancel</paper-button>
+                        <paper-button autofocus on-tap="createTokenSubmit" class="blue" disabled="[[!formReady]]">Create </paper-button>
+                    </div>
+                </paper-dialog>
+            </div>
+        </paper-material>
+
+        <paper-dialog id="copyToken" modal>
+            <h2>Copy your Token</h2>
+            <p>Grab your token below. This will be the last time that it will be visible to anybody.</p>
+            <paper-textarea id="tokenValue" value=""></paper-textarea>
+            <div class="buttons">
+                <paper-button class="blue" dialog-dismiss on-tap="resetAndClear">OK</paper-button>
+            </div>
+        </paper-dialog>
+
+        <iron-ajax id="getTokensAjax" method="GET" url="/api/v1/tokens" auto on-response="getTokens" on-error="getTokensError" handle-as="json"></iron-ajax>
+
+        <iron-ajax id="createTokenAjax" method="POST" url="/api/v1/tokens" loading="{{loading}}" on-request="createTokenRequest" on-response="createTokenResponse" on-error="createTokenError" handle-as="xml"></iron-ajax>
+
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'tokens-list',
+
+                properties: {
+                  user: Object,
+                  org: Object,
+                  tokens: Array,
+                  newToken: {
+                    type: Object,
+                    value: function(){
+                        return {
+                            name: '',
+                            ttl: '',
+                            password: '',
+                            org_id: '',
+                            email: ''
+                        }
+                    }
+                  },
+                  hasError: {
+                    type: Boolean,
+                    value: false
+                  }
+                },
+                listeners: {
+                    'input': 'hideErrors',
+                    'token-revoked': 'getTokensAgain',
+                    'token-revoking-error': 'showError'
+                },
+                attached: function(){
+                    this.set('newToken.org_id', this.org.id);
+                    this.set('newToken.email', this.user.email);
+                    this.set('newToken.session.id', '');
+                },
+                createToken: function(e){
+                    this.$.createTokenDialog.open();
+                },
+                createTokenSubmit: function(e){
+                    var payload = this.newToken;
+                    this.$.createTokenAjax.headers["Content-Type"] = 'application/json';
+                    this.$.createTokenAjax.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.createTokenAjax.body = payload;
+                    this.$.createTokenAjax.generateRequest();
+                },
+                createTokenResponse: function(e){
+                    this.$.createTokenDialog.close();
+                    var res = JSON.parse(e.detail.xhr.response)
+                    this.$.tokenValue.value = res.token;
+                    this.$.copyToken.open();
+
+                    this.reset();
+                    this.getTokensAgain(e);
+                },
+                createTokenError: function(e){
+                    this.set("hasError", true);
+                    this.$.error.textContent = e.detail.request.xhr.responseText;
+                    this.$.createTokenDialog.close();
+                    this.reset();
+                },
+                getTokens: function(e){
+                    this.set('tokens', e.detail.response);
+                },
+                getTokensError: function(e){
+                    this.set("hasError", true);
+                    this.$.error.textContent = e.detail.error;
+                    this.$.createTokenDialog.close();
+                },
+                getTokensAgain: function(e){
+                    var that = this;
+                    this.async(function(){
+                        that.$.getTokensAjax.generateRequest();
+                    }, 100)
+                },
+                reset: function(){
+                    this.set('newToken.name', '');
+                    this.set('newToken.ttl', '');
+                    this.set('newToken.password', '');
+                },
+                copied: function(){
+                    this.reset();
+                    this.$.tokenValue.value = "";
+                },
+                showError: function(e){
+                    this.set("hasError", true);
+                    var error = e.detail.request.xhr.responseText;
+                    if (!error)
+                        error = e.detail.error;
+                    this.$.error.textContent = error;
+                    this.$.createTokenDialog.close();
+                },
+                hideErrors: function(){
+                    this.set('hasError', false);
+                }
+            });
+        })();
+    </script>
+</dom-module>

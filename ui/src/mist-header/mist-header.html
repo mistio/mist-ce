@@ -103,7 +103,7 @@
             <div class="container" tabindex="4">
                 <!--notifications-element></notifications-element-->
             </div>
-            <app-user-menu user="[[model.user]]" org="[[model.org]]" teams="[[model.teamsArray]]" tabindex="5"></app-user-menu>
+            <app-user-menu user="[[model.user]]" org="[[model.org]]" teams="[[_computeUserTeams(model.user, model.teamsArray)]]" tabindex="5"></app-user-menu>
         </paper-toolbar>
     </template>
     <script>
@@ -127,6 +127,16 @@
             var main = document.querySelector('app-main');
             if (main)
                 main.updateCurrent('show-dashboard');
+        },
+        _computeUserTeams: function(user, teams){
+            if (!teams.length)
+                return [];
+            return teams.filter(function(t){
+                if (t.members.indexOf(user.id) == -1)
+                    return false;
+                return true;
+
+            });
         }
     });
     </script>

@@ -33,6 +33,7 @@
             #select-action paper-listbox {
                 margin-top: 0;
                 margin-bottom: 0;
+                padding: 0;
             }
             #select-multi-action-dropdown paper-listbox ::content iron-icon,
             #select-action paper-listbox ::content iron-icon {
@@ -549,15 +550,15 @@ Polymer({
             }
             ret.push('delete');
         } else if (item.type == 'script') {
-            ret.push('run');
+            // ret.push('run');
             ret.push('delete');
         } else if (item.type == 'network') {
             ret.push('delete');
         } else if (item.type == 'tunnel') {
-            if(item.active)
-                ret.push('disable');
-            if(!item.active)
-                ret.push('enable');
+            // if(item.active)
+            //     ret.push('disable');
+            // if(!item.active)
+            //     ret.push('enable');
             ret.push('delete');
         } else if (item.type == 'template') {
             ret.push('delete');

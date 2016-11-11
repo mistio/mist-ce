@@ -28,7 +28,7 @@
       } else {
         // polyfill web components
         var e = document.createElement('script');
-        e.src = 'bower_components/webcomponentsjs/webcomponents-lite.min.js';
+        e.src = BUILD_PATH + 'bower_components/webcomponentsjs/webcomponents-lite.min.js';
         document.head.appendChild(e);
       }
     })();

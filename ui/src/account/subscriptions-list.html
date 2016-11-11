@@ -21,9 +21,25 @@
             .flexchild {
                 @apply(--layout-flex);
             }
+            .info-head {
+                padding: 8px 16px;
+                background: #eee;
+                border-bottom: 2px solid #ddd;
+            }
+            .grid-row {
+                padding: 24px 24px 0 24px;
+            }
+
+            h2.title {
+                font-weight: 500;
+            }
         </style>
         <paper-card>
-          <h2>Subscription History</h2>
+            <div class="grid-row">
+                <div class="xs12 head">
+                    <h2 class="title">Subscription History</h2>
+                </div>
+            </div>
             <div class="card-content">
                 <div class="info-list">
                     <div class="info-head flex-horizontal-with-ratios">
@@ -32,7 +48,7 @@
                         <div class="flexchild text-right">Action</div>
                     </div>
                     <div class="info-body">
-                        <template is="dom-repeat" items=[[user.user_plans]] as="subscription">
+                        <template is="dom-repeat" items={{org.subscription_history}} as="subscription">
                             <div class="row">
                                 <subscription-item subscription="[[subscription]]" index="[[index]]" count="[[subscriptions.length]]"></subscription-item>
                             </div>
@@ -50,10 +66,7 @@
                 is: 'subscriptions-list',
 
                 properties: {
-                  user: {
-                      type: Object,
-                      notify: true
-                  }
+                  org: Object
                 }
             });
         })();

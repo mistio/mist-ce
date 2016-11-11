@@ -797,7 +797,7 @@ def associate_key(request):
 
     assoc_machines = transform_key_machine_associations(machines, key)
     # FIX filter machines based on auth_context
-
+    trigger_session_update(auth_context, ['keys'])
     return assoc_machines
 
 
