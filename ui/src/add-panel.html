@@ -60,29 +60,35 @@
           paper-dialog-scrollable {
             padding: 0 !important;
           }
-          paper-menu:not(.main)::content .selectable-content {
+          paper-dialog-scrollable ::content paper-item {
             padding-left: 10px !important;
-          }
-          paper-item {
-            background-color: #eee;
             position: relative;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
           }
-          .expand-more{
+          paper-dialog-scrollable ::content .expand-more {
             position: absolute;
             right: 4px;
           }
-          paper-spinner {
-            margin: 0 auto;
+          paper-dialog-scrollable ::content paper-menu:not(.main) {
+            padding: 0 0 0 16px;
+          }
+          .loader {
+            display: block;
+            text-align: center;
           }
         </style>
 
-        <paper-button onclick="selectTarget.open()" on-tap="openDialog" class="add-button"><iron-icon icon="icons:add-circle"></iron-icon></iron-icon> Add Graph</paper-button>
+        <paper-button on-tap="openDialog" class="add-button"><iron-icon icon="icons:add-circle"></iron-icon></iron-icon> Add Graph</paper-button>
         <paper-dialog id="selectTarget" horizontal-align="right" vertical-align="top">
             <h2>Select target for graph</h2>
             <paper-dialog-scrollable>
-                <paper-item on-tap="_showMe">Custom</paper-item>
-                <paper-menu class="main"></paper-menu>
-                <paper-spinner active="{{loadingMetrics}}" hidden$="{{!loadingMetrics}}"></paper-spinner>
+                <paper-menu class="main">
+                    <paper-item on-tap="_showMe">Custom</paper-item>
+                </paper-menu>
+                <div class="loader" hidden$="{{!loadingMetrics}}">Loading custom server metrics <br/>
+                    <paper-spinner active="{{loadingMetrics}}"></paper-spinner>
+                </div>
             </paper-dialog-scrollable>
         </paper-dialog>
 
@@ -222,7 +228,8 @@
             },
             openDialog: function() {
                 if(this.responseMetrics==null)
-                this.querySelector("#metrics").generateRequest();
+                    this.querySelector("#metrics").generateRequest();
+                this.querySelector("#selectTarget").open();
             },
             computeFormReady: function(metric){
               return metric.base.name != '' && metric.base.name != null && typeof metric.base.name !=="undefined" && metric.base.script != '' && typeof metric.base.script!=="undefined" ;
