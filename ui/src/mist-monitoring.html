@@ -67,7 +67,7 @@
                     <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
                     <!-- monitoring is activated. we expect to have data -->
                     <div hidden$="[[!isActivated]]">
-                        <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]"></add-panel>
+                        <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]"></add-panel>
                     </div>
                 </div>
 
@@ -111,6 +111,7 @@
         	resource: Object, //currently machines only, later other resources too
         	monitoring: Object,
         	section: Object,
+            dashboard: Object,
         	isRunning: {
         		type: Boolean,
         		computed: '_computeIsRunning(resource)'
@@ -202,11 +203,9 @@
            var index = this.dashboard.rows.length-1;
            this.push("dashboard.rows."+index+".panels",panel);
            this.async(function(){
-                this._smoothScrollIntoView(this.querySelector('#panel-'+panel.id));
+                this.querySelector('#panel-'+panel.id).scrollIntoView();
            }, 100);
-
          },
-
         _computeIsMonitored: function(resource, monitoring){
         	if (this.resource && this.monitoring && this.monitoring.monitored_machines[resource.uuid])
         		return true;

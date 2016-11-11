@@ -93,7 +93,7 @@
           }
         </style>
 
-        <paper-button onclick="selectTarget.open()" on-tap="openDialog" class="add-button"><iron-icon icon="icons:add-circle"></iron-icon></iron-icon> Add Graph</paper-button>
+        <paper-button on-tap="openDialog" class="add-button"><iron-icon icon="icons:add-circle"></iron-icon></iron-icon> Add Graph</paper-button>
         <paper-dialog id="selectTarget" horizontal-align="right" vertical-align="top">
             <h2>Select target for graph</h2>
             <paper-dialog-scrollable>
@@ -130,7 +130,7 @@
           </div>
             <div class="buttons">
               <paper-button dialog-dismiss>Cancel</paper-button>
-              <paper-button id="submit" align="center" on-tap="_generateCustomgraphrequest" disabled="[[!formReady]]"> Add custom graph</paper-button>
+              <paper-button id="submit" align="center" on-tap="_generateCustomgraphrequest" disabled="[[!formReady]]" class="blue"> Add custom graph</paper-button>
           </div>
         </paper-dialog>
 
@@ -242,7 +242,7 @@
             openDialog: function() {
                 if(!this.responseMetrics)
                     this.querySelector("#metrics").generateRequest();
-                // this.querySelector("#selectTarget").open();
+                this.querySelector("#selectTarget").open();
             },
             computeFormReady: function(metric){
               return metric.base.name != '' && metric.base.name != null && typeof metric.base.name !=="undefined" && metric.base.script != '' && typeof metric.base.script!=="undefined" ;
@@ -287,6 +287,8 @@
                 var sub=document.createElement('paper-submenu');
                 var item=document.createElement('paper-item');
                 Polymer.dom(item).textContent=i;
+                // TODO 
+                // item.disabled = this.checkIfInGraph(i);
                 sub.id=i;
                 Polymer.dom(sub.querySelector('div')).appendChild(item);
                 //sub.querySelector('iron-collapse').appendChild("to menou ");  tis epiloges (item) mesa sto div tou menou opws apo panw
@@ -305,6 +307,16 @@
                   }.bind(this)
                 }
               },this);
+            },
+            checkIfInGraph: function(i){
+              var isIn = this.dashboard.rows.forEach(function(r){
+                  return r.panels.forEach(function(p){
+                    return p.targets.find(function(t){
+                      return i.indexOf(t.target)!=1;
+                    });
+                  });
+              });
+              return isIn ? true : false;
             },
             _exit: function(who) {
               console.info('_exit');
