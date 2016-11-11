@@ -177,11 +177,14 @@
         },
         _panelAdded:function (e){
            console.log("i got",e.detail);
+           var totalPanels = this.dashboard.rows.reduce(function(r, t){
+                return r.panels.length + t.panels.length;
+           })
            var panel ={
              "lines": true,
              "aliasColors": {},
              "datasource": "mist.monitor",
-             "id": this.dashboard.rows[0].panels.length,
+             "id": totalPanels+1,
              "span": 12,
              "stack": false,
              "targets": [{
@@ -198,7 +201,10 @@
            }
            var index = this.dashboard.rows.length-1;
            this.push("dashboard.rows."+index+".panels",panel);
-           console.log(this.dashboard);
+           this.async(function(){
+                this._smoothScrollIntoView(this.querySelector('#panel-'+panel.id));
+           }, 100);
+
          },
 
         _computeIsMonitored: function(resource, monitoring){
