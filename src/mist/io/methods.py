@@ -1427,23 +1427,32 @@ def star_image(user, cloud_id, image_id):
     return not star
 
 
-def list_clouds(user):
+def list_clouds(user, cloud_ids=None):
     # FIXME: Move import to the top of the file.
     from mist.core.tag.methods import get_tags_for_resource
-    clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=user)]
+
+    query = {'owner': user}
+    if cloud_ids is not None:  # Can be an empty list
+        query['id__in'] = cloud_ids
+    clouds = [cloud.as_dict() for cloud in Cloud.objects(**query)]
     for cloud in clouds:
-        cloud['tags'] = get_tags_for_resource(user,  cloud)
+        cloud['tags'] = get_tags_for_resource(user, cloud)
     return clouds
 
 
-def list_keys(user):
+def list_keys(user, key_ids=None):
     """List user's keys
     :param user:
     :return:
     """
     from mist.core.tag.methods import get_tags_for_resource
-    keys = Keypair.objects(owner=user).only("default", "name")
+
+    query = {'owner': user}
+    if key_ids is not None:  # Can be an empty list
+        query['id__in'] = key_ids
+    keys = Keypair.objects(**query).only("default", "name")
     clouds = Cloud.objects(owner=user)
+
     key_objects = []
     for key in keys:
         key_object = {}
