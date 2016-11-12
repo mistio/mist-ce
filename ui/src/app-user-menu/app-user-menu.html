@@ -32,6 +32,7 @@
                 border-radius: 50%;
                 border: 2px solid #212121;
                 overflow: hidden;
+                outline: 0;
             }
 
             :host iron-icon {
@@ -154,13 +155,13 @@
                     <div class="org xs8">
                         <h4>[[org.name]]</h4>
                         <div>[[user.email]]</div>
-                        <template is="dom-repeat" items="[[teams]]">
+                        <template is="dom-repeat" items="{{teams}}">
                             <span class="current-org-teams">[[item.name]]</span>
                         </template>
                     </div>
                 </div>
                 <paper-menu>
-                    <template is="dom-repeat" items="[[organizationsList]]" as="organization">
+                    <template is="dom-repeat" items="[[orgsList]]" as="organization">
                         <paper-item class="context">
                             <a href="javascript:void(0)" on-tap="_goToOrg" id="[[organization.id]]" class="grid-row">
                                 <iron-icon class="user-menu-icon" icon$="[[_computeOrganizationIcon(organization)]]"></iron-icon>
@@ -213,8 +214,7 @@
         is: 'app-user-menu',
         properties: {
             user: {
-                type: Object,
-                notify: true
+                type: Object
             },
             org: {
                 type: Object
@@ -240,17 +240,14 @@
                 type: String,
                 computed: '_computeGravatarName(user.first_name, user.last_name, user.email)'
             },
-            organizationsList: {
+            orgs: {
                 type: Array
             },
-            memberOfTeamsText: {
-                type: String,
-                computed: '_computeMemberOfTeamsText(user.orgs)'
+            orgsList: {
+                type: Array,
+                computed: '_computeOrganizationsList(user, org)'
             }
         },
-        observers: [
-            '_computeOrganizationsList(user.orgs.*, org)'
-        ],
         _computeGravatar: function(email, size, placeholder) {
             var avatarString = md5(email),
                 url = 'http://www.gravatar.com/avatar/' + avatarString + '.jpg?s=' + size + '&d=' + placeholder;
@@ -259,10 +256,10 @@
         _computeGravatarName: function(first_name, last_name, email) {
             return first_name && last_name ? first_name + ' ' + last_name : email;
         },
-        _computeOrganizationsList: function(orgs, org) {
-            if (orgs.base) {
-                var curOrgName = this.org.name;
-                var organizations = orgs.base.filter(function(o) {
+        _computeOrganizationsList: function(user, org) {
+            if (user.orgs) {
+                var curOrgName = org.name;
+                var organizations = user.orgs.filter(function(o) {
                         return o.name != curOrgName;
                     }, this).sort(function(a, b) {
                         if (a.name > b.name) {
@@ -272,9 +269,10 @@
                             return -1;
                         }
                         return 0;
-                    });
+                    }
+                );
             }
-            this.set('organizationsList', organizations);
+            return organizations;
         },
         _computeOrganizationIcon: function(organization) {
             return organization.id ? 'social:group' : 'social:person';
