@@ -43,8 +43,11 @@ from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, transform_key_machine_associations
 
 from mist.core.auth.methods import auth_context_from_request
+from mist.core.rbac.methods import update_rbac_mapping, remove_rbac_mapping
 
 import logging
+
+
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
@@ -303,6 +306,10 @@ def add_cloud(request):
     ret['index'] = c_count - 1
     if monitoring:
         ret['monitoring'] = monitoring
+
+    # SEC
+    update_rbac_mapping(auth_context, cloud)
+
     return ret
 
 
@@ -325,8 +332,13 @@ def delete_cloud(request):
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
+
+    # SEC require REMOVE permission on CLOUD
     auth_context.check_perm('cloud', 'remove', cloud_id)
     methods.delete_cloud(auth_context.owner, cloud_id)
+    # SEC
+    remove_rbac_mapping(auth_context, cloud)
+
     return OK
 
 
@@ -501,6 +513,9 @@ def add_key(request):
 
     assoc_machines = transform_key_machine_associations(machines, key)
 
+    # SEC
+    update_rbac_mapping(auth_context, key)
+
     return {'id': key.id,
             'name': key.name,
             'machines': assoc_machines,
@@ -535,8 +550,12 @@ def delete_key(request):
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
+    # SEC require REMOVE permission on KEY
     auth_context.check_perm('key', 'remove', key.id)
     methods.delete_key(auth_context.owner, key_id)
+    # SEC
+    remove_rbac_mapping(auth_context, key)
+
     return list_keys(request)
 
 
