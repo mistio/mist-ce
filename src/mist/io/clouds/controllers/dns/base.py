@@ -95,6 +95,7 @@ class BaseDNSController(BaseController):
             zones = self.connection.list_zones()
             log.info("List zones returned %d results for %s.",
                      len(zones), self.cloud)
+            return zones
         except InvalidCredsError as exc:
             log.warning("Invalid creds on running list_zones on %s: %s",
                         self.cloud, exc)
@@ -106,7 +107,6 @@ class BaseDNSController(BaseController):
         except Exception as exc:
             log.exception("Error while running list_zones on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
-        return zones
 
     def list_records(self, zone_id):
         """
@@ -136,6 +136,7 @@ class BaseDNSController(BaseController):
             records = self.connection.get_zone(zone_id).list_records()
             log.info("List records returned %d results for %s.",
                      len(records), self.cloud)
+            return records
         except InvalidCredsError as exc:
             log.warning("Invalid creds on running list_zones on %s: %s",
                         self.cloud, exc)
@@ -151,7 +152,6 @@ class BaseDNSController(BaseController):
         except Exception as exc:
             log.exception("Error while running list_zones on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
-        return records
 
     def delete_record(self, zone_id, record_id):
         """
