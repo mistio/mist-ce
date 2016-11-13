@@ -7,20 +7,17 @@ with libcloud's DNS API.
 """
 import ssl
 
-from mist.io import config
+import logging
 
 from mist.io.clouds.controllers.base import BaseController
 
 from libcloud.common.types import InvalidCredsError
 
+from mist.io.exceptions import NotFoundError
 from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 from mist.io.exceptions import ZoneNotFoundError
 from mist.io.exceptions import RecordNotFoundError
-
-from libcloud.dns.types import RecordType
-
-import logging
 
 log = logging.getLogger(__name__)
 
@@ -60,7 +57,7 @@ class BaseDNSController(BaseController):
     `BaseDNSController` call a number of private methods. These methods will
     always start with an underscore, such as `_list_zones`.
 
-    This `BaseDNSController` defines a strict interface to controlling clouds 
+    This `BaseDNSController` defines a strict interface to controlling clouds
     that allow for DNS specific actions.
     For each different cloud type, a subclass needs to be defined. Each
     subclass MUST receive its main controller as its sole init argument
@@ -86,7 +83,7 @@ class BaseDNSController(BaseController):
     def _list_zones__fetch_zones(self):
         """
         Returns a list of available DNS zones for the cloud.
-        This should not be overriden as the implementation is the same across 
+        This should not be overriden as the implementation is the same across
         all implemented DNS providers.
 
         """
@@ -146,8 +143,7 @@ class BaseDNSController(BaseController):
                       self.cloud, exc)
             raise CloudUnavailableError(exc=exc)
         except ZoneNotFoundError as exc:
-            log.warning("No zone found for %s in: %s ",
-                         zone_id, self.cloud, exc)
+            log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
             raise NotFoundError(exc=exc)
         except Exception as exc:
             log.exception("Error while running list_zones on %s", self.cloud)
@@ -158,7 +154,7 @@ class BaseDNSController(BaseController):
         Public method to be called with a zone and record ids to delete the
         specific record under the specified zone.
         """
-        return self._delete_record__from_id(zone_id,record_id)
+        return self._delete_record__from_id(zone_id, record_id)
 
     def _delete_record__from_id(self, zone_id, record_id):
         """
@@ -166,15 +162,14 @@ class BaseDNSController(BaseController):
         specified zone.
         """
         try:
-            status = self.connection.get_record(zone_id,record_id).delete()
+            status = self.connection.get_record(zone_id, record_id).delete()
             return status
         except ZoneNotFoundError as exc:
-            log.warning("No zone found for id: " + zone_id +
-                        " under the " + self.ctl.dnsprovider + " DNS provider")
+            log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
             raise NotFoundError(exc=exc)
         except RecordNotFoundError:
-            log.warning("No record found for id: " + record_id +
-                        " under zone_id: " + zone_id )
+            log.warning("No record found for id: %s under zone %s",
+                        record_id, zone_id)
             raise NotFoundError(exc=exc)
         except Exception as exc:
             log.exception("Error while running create_record on %s", self.cloud)
@@ -194,8 +189,7 @@ class BaseDNSController(BaseController):
             status = self.connection.get_zone(zone_id).delete()
             return status
         except ZoneNotFoundError as exc:
-            log.warning("No zone found for id: " + zone_id +
-                        " under the " + self.ctl.dnsprovider + " DNS provider")
+            log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
             raise NotFoundError(exc=exc)
         except Exception as exc:
             log.exception("Error while running create_record on %s", self.cloud)
@@ -217,7 +211,7 @@ class BaseDNSController(BaseController):
         ----
         """
         try:
-            zone = self.connection.create_zone(domain, type='master', 
+            zone = self.connection.create_zone(domain, type='master',
                                                ttl=None, extra=None)
             log.info("Zone %s created successfully for %s.",
                      zone.domain, self.cloud)
@@ -264,8 +258,7 @@ class BaseDNSController(BaseController):
                       self.cloud, exc)
             raise CloudUnavailableError(exc=exc)
         except ZoneNotFoundError as exc:
-            log.warning("No zone found for %s in: %s ",
-                         zone_id, self.cloud, exc)
+            log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
             raise NotFoundError(exc=exc)
         except Exception as exc:
             log.exception("Error while running create_record on %s", self.cloud)
