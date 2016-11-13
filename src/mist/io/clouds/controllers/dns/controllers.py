@@ -28,15 +28,20 @@ from libcloud.dns.types import Provider
 
 
 class AmazonDNSController(BaseDNSController):
+    """
+    Amazon Route53 specific overrides.
+    """
 
     def _connect(self):
         return get_driver(Provider.ROUTE53)(self.cloud.apikey,
-                                        self.cloud.apisecret)
+                                            self.cloud.apisecret)
 
 
 class GoogleDNSController(BaseDNSController):
-
+    """
+    Google DNS provider specific overrides.
+    """
     def _connect(self):
         return get_driver(Provider.GOOGLE)(self.cloud.email,
-                                        self.cloud.private_key,
-                                        project=self.cloud.project_id)
+                                           self.cloud.private_key,
+                                           project=self.cloud.project_id)

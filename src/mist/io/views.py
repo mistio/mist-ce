@@ -873,7 +873,6 @@ def list_dns_zones(request):
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
-    # import ipdb; ipdb.set_trace()
     return cloud.ctl.dns.list_zones()
 
 
@@ -886,12 +885,10 @@ def list_dns_records(request):
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     zone_id = request.matchdict['zone']
-    
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
-    
     return cloud.ctl.dns.list_records(zone_id)
 
 @view_config(route_name='api_v1_zones', request_method='POST', renderer='json')
@@ -902,13 +899,11 @@ def create_dns_zone(request):
     """
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
-    
     # Try to get the specific cloud for which we will create the zone.
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
-    
     # Get the rest of the params
     # domain is required and must contain a trailing period(.)
     # type should be master or slave, and defaults to master.
@@ -921,7 +916,6 @@ def create_dns_zone(request):
         raise RequiredParameterMissingError('domain')
     if not re.match(".*\.$", domain):
         domain += "."
-    
     type = params.get('type', '')
     ttl = params.get('ttl', '')
     extra = params.get('extra', '')
@@ -936,7 +930,6 @@ def create_dns_record(request):
     """
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
-    
     # Try to get the specific cloud for which we will create the zone.
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
