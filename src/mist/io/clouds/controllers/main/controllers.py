@@ -56,7 +56,6 @@ log = logging.getLogger(__name__)
 class AmazonMainController(BaseMainController):
 
     provider = 'ec2'
-    dnsprovider = 'route53'
     ComputeController = compute_ctls.AmazonComputeController
     DnsController = dns_ctls.AmazonDNSController
 
@@ -137,7 +136,6 @@ class AzureArmMainController(BaseMainController):
 class GoogleMainController(BaseMainController):
 
     provider = 'gce'
-    dnsprovider = 'google'
     ComputeController = compute_ctls.GoogleComputeController
     DnsController = dns_ctls.GoogleDNSController
 

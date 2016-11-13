@@ -5,13 +5,20 @@ The `BaseDNSController` is a sub-controller, which is set as an attribute to a
 with libcloud's DNS API.
 
 """
+import ssl
 
 from mist.io import config
 
 from mist.io.clouds.controllers.base import BaseController
 
+from libcloud.common.types import InvalidCredsError
+
+from mist.io.exceptions import CloudUnavailableError
+from mist.io.exceptions import CloudUnauthorizedError
+from mist.io.exceptions import ZoneNotFoundError
+from mist.io.exceptions import RecordNotFoundError
+
 from libcloud.dns.types import RecordType
-from libcloud.dns.types import ZoneDoesNotExistError
 
 import logging
 
@@ -67,36 +74,46 @@ class BaseDNSController(BaseController):
         """
 
         # Fetch zones, usually from libcloud connection.
-        zones = self._list_zones()
+        zones = self._list_zones__fetch_zones()
 
         # Format zone information.
         return [{'id': zone.id,
                  'domain': zone.domain,
                  'type': zone.type,
                  'ttl': zone.ttl,
-                 'extra': zone.extra,
-                 'provider': self.ctl.dnsprovider} for zone in zones]
+                 'extra': zone.extra} for zone in zones]
 
-
-    def _list_zones(self):
+    def _list_zones__fetch_zones(self):
         """
         Returns a list of available DNS zones for the cloud.
-        This should not be overriden
+        This should not be overriden as the implementation is the same across 
+        all implemented DNS providers.
 
         """
+        # Try to get the list of DNS zones from provider API.
+        try:
+            zones = self.connection.list_zones()
+            log.info("List zones returned %d results for %s.",
+                     len(zones), self.cloud)
+        except InvalidCredsError as exc:
+            log.warning("Invalid creds on running list_zones on %s: %s",
+                        self.cloud, exc)
+            raise CloudUnauthorizedError()
+        except ssl.SSLError as exc:
+            log.error("SSLError on running list_zones on %s: %s",
+                      self.cloud, exc)
+            raise CloudUnavailableError(exc=exc)
+        except Exception as exc:
+            log.exception("Error while running list_zones on %s", self.cloud)
+            raise CloudUnavailableError(exc=exc)
+        return zones
 
-        # TODO: I think this should be wrapped in try .. except
-        # Need to check which exceptions can be raised by list_zones()
-        return self.connection.list_zones()
-
-
-    def list_records(self,zone_id):
+    def list_records(self, zone_id):
         """
-
+        Public method to return a list of  records under a specific zone.
         """
-
         # Fetch zones, usually from libcloud connection.
-        records = self._list_records(zone_id)
+        records = self._list_records__fetch_records(zone_id)
 
         # Format zone information.
         return [{'id': record.id,
@@ -104,52 +121,153 @@ class BaseDNSController(BaseController):
                  'type': record.type,
                  'data': record.data,
                  'ttl': record.ttl,
-                 'extra': record.extra,
-                 'provider': self.ctl.dnsprovider} for record in records]
+                 'extra': record.extra} for record in records]
 
-
-    def _list_records(self, zone_id):
+    def _list_records__fetch_records(self, zone_id):
         """
         Returns all available records on a specific zone.
 
         """
-
+        # Try to get the list of DNS records under a specific zone from
+        # the provider API.
         # We cannot call list_records() with the zone_id, we need to provide
         # a zone object. We will get that by calling the get_zone() method.
         try:
-            zone = self.connection.get_zone(zone_id)
-        except ZoneDoesNotExistError:
-            log.warning("No zone found for id: " + zone_id +
-                " under the " + self.ctl.dnsprovider + " DNS provider")
-            return []
-        else:
-            # TODO: This should be wrapped in try .. except
-            # Need to check which exceptions can be raised by list_records()
-            return self.connection.list_records(zone)
+            records = self.connection.get_zone(zone_id).list_records()
+            log.info("List records returned %d results for %s.",
+                     len(records), self.cloud)
+        except InvalidCredsError as exc:
+            log.warning("Invalid creds on running list_zones on %s: %s",
+                        self.cloud, exc)
+            raise CloudUnauthorizedError()
+        except ssl.SSLError as exc:
+            log.error("SSLError on running list_zones on %s: %s",
+                      self.cloud, exc)
+            raise CloudUnavailableError(exc=exc)
+        except ZoneNotFoundError as exc:
+            log.warning("No zone found for %s in: %s ",
+                         zone_id, self.cloud, exc)
+            raise NotFoundError(exc=exc)
+        except Exception as exc:
+            log.exception("Error while running list_zones on %s", self.cloud)
+            raise CloudUnavailableError(exc=exc)
+        return records
 
-    def delete_record(self,zone_id,record_id):
+    def delete_record(self, zone_id, record_id):
         """
-
+        Public method to be called with a zone and record ids to delete the
+        specific record under the specified zone.
         """
-        return self._delete_record(zone_id,record_id)
+        return self._delete_record__from_id(zone_id,record_id)
 
-    def _delete_record(self,zone_id,record_id):
+    def _delete_record__from_id(self, zone_id, record_id):
         """
         We use the zone and record ids to delete the specific record under the
         specified zone.
         """
         try:
-            record = self.connection.get_record(zone_id,record_id)
-        except ZoneDoesNotExistError:
+            status = self.connection.get_record(zone_id,record_id).delete()
+            return status
+        except ZoneNotFoundError as exc:
             log.warning("No zone found for id: " + zone_id +
-                " under the " + self.ctl.dnsprovider + " DNS provider")
-            return []
-        except RecordDoesNotExistError:
+                        " under the " + self.ctl.dnsprovider + " DNS provider")
+            raise NotFoundError(exc=exc)
+        except RecordNotFoundError:
             log.warning("No record found for id: " + record_id +
-                " under zone_id: " + zone_id )
-            return []
-        else:
-            return self.connection.delete_record(record)
+                        " under zone_id: " + zone_id )
+            raise NotFoundError(exc=exc)
+        except Exception as exc:
+            log.exception("Error while running create_record on %s", self.cloud)
+            raise CloudUnavailableError(exc=exc)
 
+    def delete_zone(self, zone_id):
+        """
+        Public method called to delete the specific zone for the provided id.
+        """
+        return self._delete_zone__for_cloud(zone_id)
 
-    
+    def _delete_zone__for_cloud(self, zone_id):
+        """
+        We use the zone id to retrieve and delete it for this cloud.
+        """
+        try:
+            status = self.connection.get_zone(zone_id).delete()
+            return status
+        except ZoneNotFoundError as exc:
+            log.warning("No zone found for id: " + zone_id +
+                        " under the " + self.ctl.dnsprovider + " DNS provider")
+            raise NotFoundError(exc=exc)
+        except Exception as exc:
+            log.exception("Error while running create_record on %s", self.cloud)
+            raise CloudUnavailableError(exc=exc)
+
+    def create_zone(self, domain, type='master', ttl=None, extra=None):
+        """
+        This is the public method that is called to create a new DNS zone.
+        """
+        return self._create_zone__for_cloud(domain, type, ttl, extra)
+
+    def _create_zone__for_cloud(
+            self, domain, type='master', ttl=None, extra=None):
+        """
+        This is the private method called to create a record under a specific
+        zone. The underlying functionality is implement in the same way for
+        all available providers so there shouldn't be any reason to override
+        this.
+        ----
+        """
+        try:
+            zone = self.connection.create_zone(domain, type='master', 
+                                               ttl=None, extra=None)
+            log.info("Zone %s created successfully for %s.",
+                     zone.domain, self.cloud)
+            return zone.id
+        except InvalidCredsError as exc:
+            log.warning("Invalid creds on running create_record on %s: %s",
+                        self.cloud, exc)
+            raise CloudUnauthorizedError()
+        except ssl.SSLError as exc:
+            log.error("SSLError on running create_record on %s: %s",
+                      self.cloud, exc)
+            raise CloudUnavailableError(exc=exc)
+        except Exception as exc:
+            log.exception("Error while running create_record on %s", self.cloud)
+            raise CloudUnavailableError(exc=exc)
+
+    def create_record(self, zone_id, name, type, data):
+        """
+        This is the public method that is called to create a new DNS record
+        under a specific zone.
+        """
+        return self._create_record__for_zone(zone_id, name, type, data)
+
+    def _create_record__for_zone(self, zone_id, name, type, data):
+        """
+        This is the private method called to create a record under a specific
+        zone. The underlying functionality is implement in the same way for
+        all available providers so there shouldn't be any reason to override
+        this.
+        ----
+        """
+        try:
+            zone = self.connection.get_zone(zone_id)
+            record = zone.create_record(name, type, data)
+            log.info("Type %s record created successfully for %s.",
+                     record.type, self.cloud)
+            return record
+        except InvalidCredsError as exc:
+            log.warning("Invalid creds on running create_record on %s: %s",
+                        self.cloud, exc)
+            raise CloudUnauthorizedError()
+        except ssl.SSLError as exc:
+            log.error("SSLError on running create_record on %s: %s",
+                      self.cloud, exc)
+            raise CloudUnavailableError(exc=exc)
+        except ZoneNotFoundError as exc:
+            log.warning("No zone found for %s in: %s ",
+                         zone_id, self.cloud, exc)
+            raise NotFoundError(exc=exc)
+        except Exception as exc:
+            log.exception("Error while running create_record on %s", self.cloud)
+            raise CloudUnavailableError(exc=exc)
+        

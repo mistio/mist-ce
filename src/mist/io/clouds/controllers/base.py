@@ -40,7 +40,6 @@ class BaseController(object):
         self.ctl = main_ctl
         self.cloud = main_ctl.cloud
         self.provider = main_ctl.provider
-        self.dnsprovider = main_ctl.dnsprovider
         self._conn = None
 
     def _connect(self):
