@@ -22,7 +22,7 @@ from pyramid.renderers import render_to_response
 # try:
 from mist.core.helpers import view_config
 from mist.core.auth.methods import user_from_request
-from mist.io.keys.models import Key, SSHKey
+from mist.io.keys.models import Key, SSHKey, SignedSSHKey
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.core.exceptions import PolicyUnauthorizedError
@@ -482,7 +482,7 @@ def add_key(request):
     params = params_from_request(request)
     key_name = params.pop('name', None)
     private_key = params.get('priv', None)
-
+    certificate = params.get('certificate', None)
     auth_context = auth_context_from_request(request)
     key_tags = auth_context.check_perm("key", "add", None)
 
@@ -491,7 +491,10 @@ def add_key(request):
     if not private_key:
         raise RequiredParameterMissingError("Private key is not provided")
 
-    keypair = SSHKey.add(auth_context.owner, key_name, **params)
+    if certificate:
+        keypair = SignedSSHKey.add(auth_context.owner, key_name, **params)
+    else:
+        keypair = SSHKey.add(auth_context.owner, key_name, **params)
     # TODO here or inside add? But we must set owner
     trigger_session_update(auth_context.owner, ['keys'])
 
