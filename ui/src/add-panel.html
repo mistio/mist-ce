@@ -28,28 +28,35 @@
             background-color: #03a9f4;
           }
           .progress {
-              margin: 32px 0 0 0;
-              width: 100%;
+            margin: 32px 0 0 0;
+            width: 100%;
+          }
+          #juicyScript {
+            width: 500px;
+            height: 100px;
           }
           paper-progress {
             width: 100%;
             margin-left: -24px;
           }
           paper-progress#progresserror ::content #primaryProgress {
-              background-color: var(--red-color);
+            background-color: var(--red-color);
           }
           hr {
             margin-left: -24px;
             margin-right: 24px;
           }
           h2 {
-            padding:0 24px;
+            padding: 0 24px;
+          }
+          div > h2 {
+            padding: 24px 0; 
           }
           .errormsg-container {
-              color: var(--red-color);
+            color: var(--red-color);
           }
           .errormsg-container iron-icon {
-              color: inherit;
+            color: inherit;
           }
           .add-button {
             margin-bottom: 16px;
@@ -60,29 +67,42 @@
           paper-dialog-scrollable {
             padding: 0 !important;
           }
-          paper-menu:not(.main)::content .selectable-content {
+          paper-dialog-scrollable ::content paper-item {
             padding-left: 10px !important;
-          }
-          paper-item {
-            background-color: #eee;
             position: relative;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
           }
-          .expand-more{
+          paper-dialog-scrollable ::content .expand-more {
             position: absolute;
             right: 4px;
           }
-          paper-spinner {
-            margin: 0 auto;
+          paper-dialog-scrollable ::content paper-menu:not(.main) {
+            padding: 0 0 0 16px;
+          }
+          .loader {
+            margin: 8px;
+            display: block;
+            text-align: center;
+          }
+          .loader paper-spinner {
+            padding: 8px
+          }
+          #customButton {
+            width: 100%;
           }
         </style>
 
-        <paper-button onclick="selectTarget.open()" on-tap="openDialog" class="add-button"><iron-icon icon="icons:add-circle"></iron-icon></iron-icon> Add Graph</paper-button>
+        <paper-button on-tap="openDialog" class="add-button"><iron-icon icon="icons:add-circle"></iron-icon></iron-icon> Add Graph</paper-button>
         <paper-dialog id="selectTarget" horizontal-align="right" vertical-align="top">
             <h2>Select target for graph</h2>
             <paper-dialog-scrollable>
-                <paper-item on-tap="_showMe">Custom</paper-item>
-                <paper-menu class="main"></paper-menu>
-                <paper-spinner active="{{loadingMetrics}}" hidden$="{{!loadingMetrics}}"></paper-spinner>
+                <paper-menu class="main">
+                    <paper-button id="customButton" on-tap="_showMe" class="blue">Custom</paper-button>
+                </paper-menu>
+                <div class="loader" hidden$="{{!loadingMetrics}}">Loading custom server metrics <br/>
+                    <paper-spinner active="{{loadingMetrics}}"></paper-spinner>
+                </div>
             </paper-dialog-scrollable>
         </paper-dialog>
 
@@ -94,12 +114,11 @@
                 <paper-input id="unit" value="{{metric.unit}}" label="Unit" placeholder="e.g bytes (optional)"></paper-input>
             </div>
             <div>
-                <h3>Python script</h3>
-                <juicy-ace-editor id="juicyScript" value="{{metricScript}}" style="height: 100px; width:500px">
-                </juicy-ace-editor>
+                <h2>Python script</h2>
+                <juicy-ace-editor id="juicyScript" value="{{metricScript}}"></juicy-ace-editor>
             </div>
-                <h3>Advance settings</h3>
             <div>
+                <h2>Advance settings</h2>
                 <paper-checkbox id="derivative">Calculate derivative</paper-checkbox>
             </div>
           </paper-dialog-scrollable>
@@ -111,7 +130,7 @@
           </div>
             <div class="buttons">
               <paper-button dialog-dismiss>Cancel</paper-button>
-              <paper-button id="submit" align="center" on-tap="_generateCustomgraphrequest" disabled="[[!formReady]]"> Add custom graph</paper-button>
+              <paper-button id="submit" align="center" on-tap="_generateCustomgraphrequest" disabled="[[!formReady]]" class="blue"> Add custom graph</paper-button>
           </div>
         </paper-dialog>
 
@@ -221,13 +240,15 @@
                     '/plugins/' + pluginId;
             },
             openDialog: function() {
-                if(this.responseMetrics==null)
-                this.querySelector("#metrics").generateRequest();
+                if(!this.responseMetrics)
+                    this.querySelector("#metrics").generateRequest();
+                this.querySelector("#selectTarget").open();
             },
             computeFormReady: function(metric){
               return metric.base.name != '' && metric.base.name != null && typeof metric.base.name !=="undefined" && metric.base.script != '' && typeof metric.base.script!=="undefined" ;
             },
             _handleMetricResponse: function(data) {
+                console.log('_handleMetricResponse', data);
                 var output={};
 
                 Object.keys(data.detail.response).forEach(function(i){
@@ -243,10 +264,10 @@
                     res = res[splitArray[p]];
                   }
                 });
-                this.responseMetrics =output;
+                this.set('responseMetrics',output);
                 this._createMenus(output,null);
             },
-            _showMe:function (){
+            _showMe: function(){
               var dialog = this.querySelector('#customOptions');
               dialog.open();
               this.querySelector('#juicyScript').value=this.metric.script;
@@ -258,30 +279,42 @@
               else{
                 var par=parent.querySelector('iron-collapse')
                 var menu=document.createElement('paper-menu');
-                par.appendChild(menu);
+                Polymer.dom(par).appendChild(menu);
               }
               Object.keys(input).forEach(function(i){
                 var sub=document.createElement('paper-submenu');
                 var item=document.createElement('paper-item');
-                item.innerHTML=i;
+                Polymer.dom(item).textContent=i;
+                // TODO 
+                // item.disabled = this.checkIfInGraph(i);
                 sub.id=i;
-                sub.querySelector('div').appendChild(item);
+                Polymer.dom(sub.querySelector('div')).appendChild(item);
                 //sub.querySelector('iron-collapse').appendChild("to menou ");  tis epiloges (item) mesa sto div tou menou opws apo panw
-                menu.querySelector('div').appendChild(sub);
+                Polymer.dom(menu.querySelector('div')).appendChild(sub);
                 if(typeof input[i]!='string'){
                   var icon=document.createElement('iron-icon');
                   icon.icon="icons:expand-more";
-                  item.appendChild(icon);
+                  Polymer.dom(item).appendChild(icon);
                   icon.classList.add("expand-more");
                   this._createMenus(input[i],sub);
                 }
                 else{
                   item.onclick= function(){
                     this.fire('panelAdded', input[i]);
-                    this._exit();
+                    this._exit('selectTarget');
                   }.bind(this)
                 }
               },this);
+            },
+            checkIfInGraph: function(i){
+              var isIn = this.dashboard.rows.forEach(function(r){
+                  return r.panels.forEach(function(p){
+                    return p.targets.find(function(t){
+                      return i.indexOf(t.target)!=1;
+                    });
+                  });
+              });
+              return isIn ? true : false;
             },
             _exit: function(who) {
               if(who==null){
@@ -289,7 +322,7 @@
               }else{
                 var dialog=this.querySelector('#'+who);
               }
-                dialog.close();
+              dialog.close();
             },
             _generateCustomgraphrequest(){
               this.set('formError', false);

@@ -127,8 +127,11 @@
                 color: #ccc !important;
             }
 
-            paper-material > .smallcaps {
+            paper-material .smallcaps {
                 margin-top: 0;
+            }
+            paper-material .tags-head {
+                margin-bottom: 8px;
             }
             :host .tag {
                 display: inline !important;
@@ -307,30 +310,32 @@
                         <span hidden$="{{!probeData}}"> {{probeData}} </span>
                     </div>
                 </paper-material>
-                <paper-material id="rightcolumn" class="right" hidden$="[[hideAssociatedKeys]]">
-                    <h3 class="smallcaps">Associated Keys:</h3>
-                    <div class="associatedKeys">
-                        <template is="dom-repeat" items="[[associatedKeys]]">
-                            <div class="machine-key">
-                                <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
-                                <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
+                <paper-material id="rightcolumn" class="right">
+                    <div hidden$="[[!machine.keys.length]]">
+                        <h3 class="smallcaps">Associated Keys:</h3>
+                        <div class="associatedKeys">
+                            <template is="dom-repeat" items="{{machine.keys}}">
+                                <div class="machine-key">
+                                    <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
+                                    <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
+                                </div>
+                            </template>
+                            <div class="machine-key" id="pendingKeyRequest">
+                                <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
                             </div>
-                        </template>
-                        <div class="machine-key" id="pendingKeyRequest">
-                            <paper-spinner active hidden$="[[!isPendingKeyRequest]]"></paper-spinner>
                         </div>
                     </div>
-                </paper-material>
-                <paper-material id="rightcolumn" class="right" hidden$="[[!machine.tags.length]]">
-                    <h3 class="smallcaps">TAGS:</h3>
-                    <template is="dom-repeat" items="[[machine.tags]]">
-                        <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
-                    </template>
+                    <div hidden$="[[!machine.tags.length]]">
+                        <h3 class="smallcaps tags-head">TAGS:</h3>
+                        <template is="dom-repeat" items="[[machine.tags]]">
+                            <span class="tag">[[item.key]]<span hidden$="[[!item.value]]">=</span>[[item.value]]</span>
+                        </template>
+                    </div>
                 </paper-material>
             </div>
             <paper-material class="info-card">
                 <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" dashboard="[[dashboard]]" datasources="[[datasources]]"></mist-monitoring>
-                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" hidden$="{{!isActivated}}"></mist-rules>
+                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" user-email="[[model.user.email]]" hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
             <paper-material class="info-card">
                 <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
@@ -513,10 +518,6 @@ MACHINEACTIONS = {
                 computed: '_computeIsloading(machine)',
                 value: true
             },
-            associatedKeys: {
-                type: Array,
-                computed: '_computeAssociatedKeys(machine, model.keysArray)'
-            },
             newKeyId: {
                 type: String,
                 value: ''
@@ -553,8 +554,7 @@ MACHINEACTIONS = {
             }
         },
         observers: [
-            '_isMonitored(machine, model.monitoring.machines.*)',
-            '_computeHideAssociatedKeys(params, associatedKeys.*, isPendingKeyRequest)'
+            '_isMonitored(machine, model.monitoring.machines.*)'
         ],
         listeners: {
             'confirmation': '_machineActionConfirmation',
@@ -629,13 +629,15 @@ MACHINEACTIONS = {
                 "id": 1,
                 "refresh": "10sec",
                 "rows": [{
-                    "height": "500px",
                     "panels": [{
-                        "aliasColors": {},
-                        "datasource": "mist.monitor",
                         "id": 2,
                         "span": 12,
                         "stack": true,
+                        "title": "Load",
+                        "type": "graph",
+                        "span": 6,
+                        "stack": false,
+                        "datasource": "mist.monitor",
                         "targets": [{
                             "refId": "A",
                             "target": "load.longterm"
@@ -643,27 +645,58 @@ MACHINEACTIONS = {
                             "refId": "B",
                             "target": "load.shortterm"
                         }],
-                        "timeFrom": null,
-                        "timeShift": null,
-                        "title": "Load",
-                        "type": "graph",
                         "machineArray": [],
                         "x-axis": true,
                         "y-axis": true
                     }, {
-                        "aliasColors": {},
-                        "datasource": "mist.monitor",
                         "id": 3,
-                        "span": 12,
-                        "stack": false,
-                        "targets": [{
-                            "refId": "A",
-                            "target": "cpu"
-                        }],
-                        "timeFrom": null,
-                        "timeShift": null,
                         "title": "CPU",
                         "type": "graph",
+                        "span": 6,
+                        "stack": true,
+                        "datasource": "mist.monitor",
+                        "targets": [{
+                            "refId": "C",
+                            "target": "cpu.total.*"
+                        }],
+                        "machineArray": [],
+                        "x-axis": true,
+                        "y-axis": true
+                    }]}, {
+                    "panels": [{
+                        "id": 1,
+                        "title": "MEM",
+                        "type": "graph",
+                        "span": 6,
+                        "stack": true,
+                        "datasource": "mist.monitor",
+                        "targets": [{
+                            "refId": "D",
+                            "target": "memory.used_percent"
+                        }, {
+                            "refId": "E",
+                            "target": "memory.cached_percent"
+                        }, {
+                            "refId": "F",
+                            "target": "memory.free_percent"
+                        }],
+                        "machineArray": [],
+                        "x-axis": true,
+                        "y-axis": true
+                      }, {
+                        "id": 5,
+                        "title": "NET",
+                        "type": "graph",
+                        "span": 6,
+                        "stack": true,
+                        "datasource": "mist.monitor",
+                        "targets": [{
+                            "refId": "G",
+                            "target": "interface.total.if_octets.rx"
+                        }, {
+                            "refId": "H",
+                            "target": "interface.total.if_octets.tx"
+                        }],
                         "machineArray": [],
                         "x-axis": true,
                         "y-axis": true
@@ -677,13 +710,10 @@ MACHINEACTIONS = {
                     "now": true,
                     "refresh_intervals": [],
                     "time_options": [
-                        "5m",
-                        "15m",
+                        "10m",
                         "1h",
                         "6h",
-                        "12h",
                         "24h",
-                        "2d",
                         "7d",
                         "30d"
                     ]
@@ -712,17 +742,6 @@ MACHINEACTIONS = {
             var itemUidInArray = [];
             itemUidInArray.push(itemUid(this.machine, this.sections['machines']));
             return itemUidInArray;
-        },
-
-        _computeAssociatedKeys: function(machine, keys) {
-            var machineId = this.machine.id;
-            var associatedKeys = [];
-            associatedKeys = this.model.keysArray.filter(function(key) {
-                return key.machines.filter(function(machine) {
-                    return machine[1] == machineId;
-                }).length;
-            }, this);
-            return associatedKeys || [];
         },
         _computeAssociatedKeys: function(machine, keys) {
             return machine.keys || [];
@@ -830,13 +849,6 @@ MACHINEACTIONS = {
                 this.set('isPendingKeyRequest', false);
                 this._showToast(e.detail.errormsg);
             }
-        },
-        _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest) {
-            var hide = !(associatedKeys.base.length > 0 || isPendingKeyRequest);
-        },
-        _computeHideAssociatedKeys: function(machine, associatedKeys, isPendingKeyRequest) {
-            var hide = !(this.machine.keys.length > 0 || isPendingKeyRequest);
-            this.set('hideAssociatedKeys', hide);
         },
         _feedbackOnScript: function(e) {
             if (e.detail.response) {

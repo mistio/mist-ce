@@ -1,6 +1,7 @@
 <script src="../bower_components/sockjs-client/dist/sockjs.min.js"></script>
 <script>
     CSRF_TOKEN = '';
+    STRIPE_PUBLIC_APIKEY = ''
     DEBUG_SOCKET = false;
     Polymer({
         is: 'mist-socket',
@@ -45,7 +46,7 @@
         },
 
         observers: [
-            "_updateIsOverusing(model.user, model.machinesArray)"
+            "_updateIsOverusing(model.user, model.org, model.machinesArray)"
         ],
 
         ready: function() {
@@ -449,6 +450,7 @@
         _updateUser: function(data) {
             this.set('model.user', data);
             CSRF_TOKEN = data.csrf_token;
+            STRIPE_PUBLIC_APIKEY = data.stripe_public_apikey;
         },
 
         _updateOrg: function(data) {
@@ -546,7 +548,7 @@
                 return false;
 
             var allMachines = [];
-            if (this.model != undefined) {
+            if (this.model != undefined && this.model.cloudsArray.length>0) {
                 this.model.cloudsArray.forEach(
                     function(cloud) {
                         if (cloud.machinesArray != undefined && cloud.enabled) {
@@ -578,22 +580,24 @@
 
             //update cloud's networks
             var cloudNetworks = [];
-            data.networks.private.forEach(function(net) {
-                if (net.id) {
-                    net["network_type"] = "private";
-                    net["provider"] = this.model.clouds[data.cloud_id].provider;
-                    net["cloud_id"] = data.cloud_id;
-                    cloudNetworks.push(net);
-                }
-            }, this);
-            data.networks.public.forEach(function(net) {
-                if (net.id) {
-                    net["network_type"] = "public";
-                    net["provider"] = this.model.clouds[data.cloud_id].provider;
-                    net["cloud_id"] = data.cloud_id;
-                    cloudNetworks.push(net);
-                }
-            }, this);
+            if (this.model.clouds && this.model.clouds[data.cloud_id] && this.model.clouds[data.cloud_id].provider) {
+                data.networks.private.forEach(function(net) {
+                    if (net.id) {
+                        net["network_type"] = "private";
+                        net["provider"] = this.model.clouds[data.cloud_id].provider;
+                        net["cloud_id"] = data.cloud_id;
+                        cloudNetworks.push(net);
+                    }
+                }, this);
+                data.networks.public.forEach(function(net) {
+                    if (net.id) {
+                        net["network_type"] = "public";
+                        net["provider"] = this.model.clouds[data.cloud_id].provider;
+                        net["cloud_id"] = data.cloud_id;
+                        cloudNetworks.push(net);
+                    }
+                }, this);
+            }
             // data.networks.routers.forEach(function(net){
             //     if (net.id){
             //         net["network_type"] = "router";
@@ -652,10 +656,21 @@
             console.warn('_updateTags not implemented. Got data', data);
         },
 
-        _updateIsOverusing: function(user, machines){
+        _updateIsOverusing: function(user, org, machines){
             // console.log('_updateIsOverusing', user, machines);
-            if (user && machines)
-                this.set('model.isOverUsing', !user.current_plan.title && machines.length > 5);
+            if (user && machines){
+                var isOverUsing = false;
+                // user has free plan and more than 5 machines
+                if ((!org.current_plan || !org.current_plan.title) && machines.length > 5)
+                    isOverUsing = true;
+                // user has a paid plan and more than allowed machines
+                else if (org.current_plan && org.current_plan.title && machines.length > org.current_plan.machine_limit)
+                    isOverUsing = true;
+                else
+                    isOverUsing = false;
+
+                this.set('model.isOverUsing', isOverUsing);
+            }
         },
 
         _probe: function(data) {

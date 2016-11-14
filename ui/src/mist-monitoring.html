@@ -45,15 +45,16 @@
                 opacity: 0.54;
                 font-size: 0.9em;
             }
-            polyana-dashboard::content timerange-picker {
-              margin-bottom: 4px;
-            }
             add-panel {
               position: absolute;
               right: 8px;
               top: 0;
             }
-            </style>
+            div#errormsgArea {
+                display: block;
+                clear: both;
+            }
+        </style>
         <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
         <div class="monitoringArea">
             <!-- the machine is running -->
@@ -63,10 +64,10 @@
                 <div hidden$="[[!isMonitored]]">
                     <!-- monitoring is not activated -->
 
-                    <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
+                    <polyana-dashboard dashboard="{{dashboard}}" datasources="[[datasources]]"></polyana-dashboard>
                     <!-- monitoring is activated. we expect to have data -->
                     <div hidden$="[[!isActivated]]">
-                        <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]"></add-panel>
+                        <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]"></add-panel>
                     </div>
                 </div>
 
@@ -81,7 +82,7 @@
 
 
                 <!-- the machine is considered monitored -->
-                <div hidden$="[[!isMonitored]]">
+                <div hidden$="[[!isMonitored]]" class="monitored">
                     <!-- instalation succeeded but is not yet activated ie. we have no data yet-->
                     <div hidden$="[[!waitingData]]">
                         <p>Waiting for data</p>
@@ -110,6 +111,7 @@
         	resource: Object, //currently machines only, later other resources too
         	monitoring: Object,
         	section: Object,
+            dashboard: Object,
         	isRunning: {
         		type: Boolean,
         		computed: '_computeIsRunning(resource)'
@@ -175,12 +177,15 @@
 
         },
         _panelAdded:function (e){
-           console.log("i got",e.detail,this.resource);
+           console.log("i got",e.detail);
+           var totalPanels = this.dashboard.rows.reduce(function(r, t){
+                return r.panels.length + t.panels.length;
+           })
            var panel ={
              "lines": true,
              "aliasColors": {},
              "datasource": "mist.monitor",
-             "id": this.dashboard.rows[0].panels.length,
+             "id": totalPanels+1,
              "span": 12,
              "stack": false,
              "targets": [{
@@ -195,10 +200,12 @@
              "x-axis": true,
              "y-axis": true
            }
-           this.push("dashboard.rows.0.panels",panel);
-           console.log(this.dashboard);
+           var index = this.dashboard.rows.length-1;
+           this.push("dashboard.rows."+index+".panels",panel);
+           this.async(function(){
+                this.querySelector('#panel-'+panel.id).scrollIntoView();
+           }, 100);
          },
-
         _computeIsMonitored: function(resource, monitoring){
         	if (this.resource && this.monitoring && this.monitoring.monitored_machines[resource.uuid])
         		return true;
@@ -283,7 +290,7 @@
             }
         },
         _computeIsActivated(resource, monitoring){
-            if (!this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || !this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at)
+            if (!this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || (!this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at && !this.waitingData))
                 return false;
             else
                 return true;

@@ -40,7 +40,8 @@
     "excess-router": "~0.9.9",
     "iron-routes": "*",
     "vaadin-grid": "^1.0.0",
-    "vaadin-core-elements": "^0.3.0"
+    "vaadin-core-elements": "^0.3.0",
+    "juicy-ace-editor": "^1.2.0"
   },
   "resolutions": {
     "jquery": "~2.1.4",
@@ -49,6 +50,7 @@
     "ember-data": "1.13.5",
     "ember-load-initializers": "0.1.5",
     "ember-qunit": "0.4.1",
-    "qunit": "~1.18.0"
+    "qunit": "~1.18.0",
+    "firebase": "^3.0"
   }
 }
