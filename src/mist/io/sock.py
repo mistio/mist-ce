@@ -271,7 +271,7 @@ class MainConnection(MistConnection):
                   core_methods.filter_list_clouds(self.auth_context))
         clouds = Cloud.objects(owner=self.owner, enabled=True)
         log.info(clouds)
-        for key, task in (('list_machines', tasks.ListMachines()),
+        for key, task in (#('list_machines', tasks.ListMachines()),
                           ('list_images', tasks.ListImages()),
                           ('list_sizes', tasks.ListSizes()),
                           ('list_networks', tasks.ListNetworks()),
