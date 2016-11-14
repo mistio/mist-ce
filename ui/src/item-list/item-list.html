@@ -432,7 +432,7 @@ Polymer({
 
     observers: [
       'itemsChanged(items.*)',
-      'showRecommendations(fields.*, model.probes.*)'
+      // 'showRecommendations(fields.*, model.probes.*)'
     ],
     updateNumber: function(e){
         this.set('currentSelectedItems', e.detail.itemLength);
@@ -448,27 +448,30 @@ Polymer({
         this.vpHeight = 'height:65px;';
     },
     showRecommendations: function(fields, probes){
-        var show = false;
-        if (!this.model.probes || !this.fields) {
-            show = false;
-        }
+        if (this.section.id != 'machines')
+            this.set('withRecommendations', false)
         else {
-            for (var p in this.model.probes) {
-                if (this.model.probes[p].dirty_cow == true){
-                    show = true;
+            var show = false;
+            if (!this.model.probes || !this.fields) {
+                show = false;
+            }
+            else {
+                for (var p in this.model.probes) {
+                    if (this.model.probes[p].dirty_cow == true){
+                        show = true;
+                    }
                 }
             }
-        }
 
-        if (!show && this.fields.indexOf('recommendations') >-1){
-            this.splice('fields', this.fields.indexOf('recommendations'), 1);
-            this.set('withRecommendations', false)
+            if (!show && this.fields.indexOf('recommendations') >-1){
+                this.splice('fields', this.fields.indexOf('recommendations'), 1);
+                this.set('withRecommendations', false)
+            }
+            else if (show && this.fields.indexOf('recommendations') ==-1){
+                this.splice('fields', 2, 0 , 'recommendations');
+                this.set('withRecommendations', true)
+            }
         }
-        else if (show && this.fields.indexOf('recommendations') ==-1){
-            this.splice('fields', 2, 0 , 'recommendations');
-            this.set('withRecommendations', true)
-        }
-
     },
     itemMonitoringStatus: function(item, incidents, monitoring){
         var classes = "";
