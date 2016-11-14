@@ -414,10 +414,10 @@
                     //if both properties exist
                     if (a.extra.cost_per_month && b.extra.cost_per_month){
                         if (parseInt(a.extra.cost_per_month) < parseInt(b.extra.cost_per_month)) {
-                            return -1 * order;
+                            return 1 * order;
                         }
                         if (parseInt(a.extra.cost_per_month) > parseInt(b.extra.cost_per_month)) {
-                            return 1 * order;
+                            return -1 * order;
                         }
                         return 0;
                     }
