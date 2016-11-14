@@ -16,7 +16,7 @@
             }
         </style>
         <div class="notice" hidden$="[[!isOverUsing]]">
-            <p><strong>Attention:</strong> You have exceed the limits of the free plan! The free plan includes unlimited clouds and up to 5 machines with monitoring for one of them. To continue using Mist.io <a href="/my-account/?plans=true">upgrade your plan.</a> 
+            <p><strong>Attention:</strong> You have exceeded the limits of the free plan! The free plan includes unlimited clouds and up to 5 machines with monitoring for one of them. To continue using Mist.io <a href="/my-account/?plans=true">upgrade your plan.</a>
             </p>
         </div>
     </template>
@@ -28,10 +28,7 @@
             isOverUsing: {
                 type: Boolean
             }
-        },
-        _toggleUI: function() {
-            window.location.href = '/toggle-ui/legacy';
-        },
+        }
     });
     </script>
 </dom-module>

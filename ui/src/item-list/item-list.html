@@ -664,11 +664,11 @@ Polymer({
     displayedFields: function (section) {
         if (this.isMachines(this.section)){
             if (this.get('xxwideViewport'))
-                return ['name', 'state','recommendations', 'cloud', 'cost', 'created', 'size', 'image', 'id'];
+                return ['name', 'state', 'cloud', 'cost', 'created', 'size', 'image', 'id'];
             if (this.get('xwideViewport'))
-                return ['name', 'state','recommendations', 'cloud','cost', 'size', 'image']
+                return ['name', 'state', 'cloud','cost', 'size', 'image']
             if (this.get('wideViewport'))
-                return ['name', 'state', 'recommendations', 'cloud', 'size']
+                return ['name', 'state', 'cloud', 'size']
             if (!this.get('mediumViewport') && !this.get('narrowViewport'))
                 return ['name', 'state', 'cloud']
             else
