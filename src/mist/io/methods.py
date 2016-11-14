@@ -856,7 +856,7 @@ def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, loc
     """
     key = public_key.replace('\n', '')
 
-    auth = NodeAuthKey(pubkey=key)
+    auth = NodeAuthSSHKey(pubkey=key)
 
     try:
         node = conn.create_node(
@@ -1100,7 +1100,7 @@ def _create_machine_linode(conn, key_name, private_key, public_key,
 
     """
 
-    auth = NodeAuthKey(public_key)
+    auth = NodeAuthSSHKey(public_key)
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
