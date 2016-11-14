@@ -283,6 +283,15 @@ def add_cloud(request):
     title = params.get('title', '')
     provider = params.get('provider', '')
 
+    if config.NEW_UI_EXPERIMENT_ENABLE:
+        from mist.core.experiments import NewUIExperiment
+        from mist.core.auth.methods import session_from_request
+
+        session = session_from_request(request)
+        experiment = NewUIExperiment(userid=session.user_id)
+        experiment.log_event('add_cloud', {'title': title,
+                                           'provider': provider})
+
     if not provider:
         raise RequiredParameterMissingError('provider')
 
@@ -808,7 +817,7 @@ def associate_key(request):
 
     assoc_machines = transform_key_machine_associations(machines, key)
     # FIX filter machines based on auth_context
-
+    trigger_session_update(auth_context, ['keys'])
     return assoc_machines
 
 

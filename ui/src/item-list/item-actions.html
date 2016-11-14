@@ -33,6 +33,7 @@
             #select-action paper-listbox {
                 margin-top: 0;
                 margin-bottom: 0;
+                padding: 0;
             }
             #select-multi-action-dropdown paper-listbox ::content iron-icon,
             #select-action paper-listbox ::content iron-icon {
@@ -91,7 +92,7 @@
             }
             tags-list,
             associate-key,
-            run-script-on-machine, 
+            run-script-on-machine,
             machine-edit {
                 position: absolute;
             }
@@ -254,12 +255,6 @@ ACTIONS = {
     'name': 'destroy',
     'icon': 'delete',
     'confirm': true,
-    'multi': true
-  },
-  'probe': {
-    'name': 'probe',
-    'icon': 'icons:compare-arrows',
-    'confirm': false,
     'multi': true
   },
   'star': {
@@ -511,7 +506,6 @@ Polymer({
               // if not monitoring then enable monitoring
               ret.push('associate-key');
               ret.push('shell');
-              ret.push('probe');
               if (item.keys.length) {
                   ret.push('run-script');
               }

@@ -422,8 +422,10 @@ class MainConnection(MistConnection):
             if 'monitoring' in sections:
                 self.check_monitoring()
             if 'user' in sections:
+                self.auth_context.user.reload()
                 self.update_user()
             if 'org' in sections:
+                self.auth_context.org.reload()
                 self.update_org()
 
     def on_close(self, stale=False):

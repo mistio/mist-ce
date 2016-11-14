@@ -28,11 +28,11 @@
             .grid-row {
                 padding: 24px;
             }
-            
+
             .head {
                 margin-bottom: 16px;
             }
-            
+
             h2.title {
                 font-weight: 500;
             }
@@ -42,30 +42,43 @@
                 margin-bottom: 0;
             }
 
-            .dropdown-block {
-                padding-top: 16px;
-            }
-
             paper-radio-button {
                 --paper-radio-button-checked-color: var(--paper-light-blue-500);
                 --paper-radio-button-checked-ink-color: var(--paper-light-blue-500);
                 --paper-radio-button-unchecked-ink-color: var(--paper-light-blue-900);
             }
             hr {
-                margin-left: -16px;
-                margin-right: -16px;
                 width: 100%;
             }
-            paper-progress {
+            paper-progress#orgProgress,
+            paper-progress#userProgress {
                 position: absolute;
-                bottom: 85px;
                 width: 100%;
                 left: 0;
                 right: 0;
             }
+
             .bottom-actions {
                 padding-bottom: 24px;
-                padding-left: 2rem;
+                padding-left: 1rem;
+            }
+            .separator {
+                border-top: 4px solid #ddd;
+            }
+            .progress {
+                margin: 32px 0 8px 0;
+                width: 100%;
+            }
+            paper-progress.progresserror ::content #primaryProgress {
+                background-color: var(--red-color);
+            }
+            .errormsg-container {
+                color: var(--red-color);
+                padding-left: 24px;
+                padding-right: 24px
+            }
+            .errormsg-container iron-icon {
+                color: inherit;
             }
         </style>
         <paper-material>
@@ -74,55 +87,73 @@
                     <h2 class="title">User Profile</h2>
                     <p>Enter your name and email.</p>
                 </div>
-                <paper-input class="xs12 l6" id="firstName" label="First Name" required error-message="Please enter your first name" value="[[user.first_name]]" auto-validate></paper-input>
+                <paper-input class="xs12 l6" id="firstName" label="First Name" required error-message="Please enter your first name" value="{{firstName}}" auto-validate></paper-input>
 
-                <paper-input class="xs12 l6" id="lastName" label="Last Name" required error-message="Please enter your last name" value="[[user.last_name]]" auto-validate></paper-input>
+                <paper-input class="xs12 l6" id="lastName" label="Last Name" required error-message="Please enter your last name" value="{{lastName}}" auto-validate></paper-input>
 
-                <paper-input class="xs12 l6" id="email" label="Email" required error-message="Please enter your email" value="[[user.email]]" auto-validate disabled></paper-input>
+                <paper-input class="xs12 l6" id="email" label="Email *" required error-message="Please enter your email" value="[[user.email]]" auto-validate disabled></paper-input>
+                <p class="xs12 l12">* Currently you cannot change your account's email for security reasons. Please contact us at <a href="mailto:support@mist.io">support@mist.io</a>, if you wish to do so.</p>
 
-                <p class="xs12 l12">Currently you cannot change your account's email for security reasons. Please contact us at <a href="mailto:support@mist.io">support@mist.io</a>, if you wish to do so.</p>
+                <div class="progress">
+                    <paper-progress id="userProgress" indeterminate hidden$="[[!loadingUser]]"></paper-progress>
+                    <paper-progress id="userprogresserror" class="progresserror" value="100" hidden$="[[!userError]]"></paper-progress>
+                    <hr class="appform"/>
+                    <p id="userprogressmessage" class="errormsg-container" hidden$="[[!userError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="usererrormsg"></span></p>
+                </div>
+
+                <div class="bottom-actions clearfix xs12">
+                    <paper-button class="pull-right" disabled$="[[!userFormReady]]" raised on-tap="_submitUserForm" page="second">Save User Profile</paper-button>
+                    <iron-ajax id="userAjaxRequest"
+                        url="/api/v1/account"
+                        method="POST"
+                        loading="{{loadingUser}}"
+                        on-response="_handleAjaxResponse"
+                        on-error="_handleDetailsAjaxError"
+                        handle-as="xml"></iron-ajax>
+                </div>
             </div>
-            <br/>
-            <div class="grid-row">
+
+        </paper-material>
+        <paper-material class="separator">
+
+            <div class="grid-row" hidden$="[[!org.is_owner]]">
                 <div class="xs12 head">
                     <h2 class="title">Organisation Profile</h2>
                     <p>Enter your organisation details. To switch organisation use the  user menu in the top right corner of your screen.</p>
                 </div>
-                <paper-input class="dropdown-block xs12 l6" id="companyName" label="Company Name" required error-message="Please enter your company's name" value="[[org.name]]" auto-validate></paper-input>
+                <paper-input class="dropdown-block xs12 l6" id="orgName" label="Organization Name" required error-message="Please enter your company's name" value="{{orgName}}" auto-validate disabled$="[[!org.is_owner]]"></paper-input>
 
-                <paper-dropdown-menu class="dropdown-block xs12 l6" id="country" label="Company Location" horizontal-align="left">
-                    <paper-menu attr-for-selected="value" selected="[[user.feedback.country]]" class="dropdown-content">
-                        <template is="dom-repeat" items="[[countriesOptions]]" as="country">
-                            <paper-item value="[[country]]">[[country]]</paper-item>
-                        </template>
-                    </paper-menu>
-                </paper-dropdown-menu>
+                <paper-textarea class="xs12 l6" id="org-email" label="Organisation Alert Email *" error-message="Please enter your email" value="{{orgAlertEmails}}" auto-validate></paper-textarea>
 
-                <div class="dropdown-block xs12" horizontal-align="left">
-                    <label id="label1">Number of Employees</label> <br/>
-                    <paper-radio-group id="numberOfPeople" attr-for-selected="value" selected="[[user.feedback.number_of_people]]" aria-labelledby="label1">
-                        <template is="dom-repeat" items="[[numberOfPeopleOptions]]" as="people">
-                            <paper-radio-button value="[[people]]">[[people]]</paper-radio-button>
-                        </template>
-                    </paper-radio-group>
+                <p class="xs12 l12">* In your organisation's alert email, you can specify the email you want your incidents' alerts to be sent to. This can be overriden when you add rules in your monitored machines.</p>
+
+                <div class="progress">
+                    <paper-progress id="orgProgress" indeterminate hidden$="[[!loadingOrg]]"></paper-progress>
+                    <paper-progress id="orgprogresserror" class="progresserror" value="100" hidden$="[[!orgError]]"></paper-progress>
+                    <hr class="appform"/>
+                    <p id="orgprogressmessage" class="errormsg-container" hidden$="[[!orgError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="orgerrormsg"></span></p>
                 </div>
 
-                <div class="dropdown-block xs12" horizontal-align="left">
-                    <label id="label2">Number of Servers</label> <br/>
-                    <paper-radio-group  id="numberOfServers"  attr-for-selected="value" selected="[[user.feedback.number_of_servers]]" aria-labelledby="label2">
-                        <template is="dom-repeat" items="[[numberOfServersOptions]]" as="servers">
-                            <paper-radio-button value="[[servers]]">[[servers]]</paper-radio-button>
-                        </template>
-                    </paper-radio-group>
+                <div class="bottom-actions clearfix xs12">
+                    <paper-button class="pull-right" disabled$="[[!orgFormReady]]" raised on-tap="_submitOrgForm" page="second">Save Organisation Profile</paper-button>
+                    <iron-ajax id="orgAjaxRequest"
+                        url="/api/v1/org/[[org.id]]"
+                        method="PUT"
+                        loading="{{loadingOrg}}"
+                        on-response="_handleAjaxResponse"
+                        on-error="_handleOrgAjaxError"
+                        handle-as="xml"></iron-ajax>
                 </div>
             </div>
-            <paper-progress indeterminate hidden$="[[!showProgress]]"></paper-progress> <!--   -->
-            <hr class="xs12" />
-            <div class="bottom-actions clearfix xs12">
-                <paper-button class="pull-right" disabled$="[[!formReady]]" raised on-tap="_submitForm" page="second">Save Changes</paper-button>
+
+            <div class="grid-row" hidden$="[[org.is_owner]]">
+              <div class="xs12 head">
+                  <h2 class="title">Organisation</h2>
+                  <p>You are operating as a member of <strong>[[org.name]]</strong>. To switch between organisations use the user menu in the top right corner of your screen.</p>
+              </div>
             </div>
+
         </paper-material>
-        <iron-ajax id="detailsAjaxRequest" url="/account" method="POST" on-response="_handleDetailsAjaxResponse" on-error="_handleDetailsAjaxError"></iron-ajax>
     </template>
     <script>
         (function() {
@@ -136,171 +167,122 @@
                         type: Object
                     },
                     user: {
-                        type: Object
-                    },
-                    countriesOptions: {
-                        type: Array,
-                        value: ["Afghanistan", "Åland Islands", "Albania", "Algeria",
-                            "American Samoa", "Andorra", "Angola", "Anguilla",
-                            "Antarctica", "Antigua and Barbuda", "Argentina",
-                            "Armenia", "Aruba", "Australia", "Austria",
-                            "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh",
-                            "Barbados", "Belarus", "Belgium", "Belize", "Benin",
-                            "Bermuda", "Bhutan", "Bolivia",
-                            "Bosnia and Herzegovina", "Botswana", "Bouvet Island",
-                            "Brazil", "British Indian Ocean Territory",
-                            "Brunei Darussalam", "Bulgaria", "Burkina Faso",
-                            "Burundi", "Cambodia", "Cameroon", "Canada",
-                            "Cape Verde", "Cayman Islands",
-                            "Central African Republic", "Chad", "Chile", "China",
-                            "Christmas Island", "Cocos (Keeling) Islands",
-                            "Colombia", "Comoros", "Congo",
-                            "Congo, The Democratic Republic of the",
-                            "Cook Islands", "Costa Rica", "Cote D'Ivoire",
-                            "Croatia", "Cuba", "Cyprus", "Czech Republic",
-                            "Denmark", "Djibouti", "Dominica",
-                            "Dominican Republic", "Ecuador", "Egypt",
-                            "El Salvador", "Equatorial Guinea", "Eritrea",
-                            "Estonia", "Ethiopia", "Falkland Islands (Malvinas)",
-                            "Faroe Islands", "Fiji", "Finland", "France",
-                            "French Guiana", "French Polynesia",
-                            "French Southern Territories", "Gabon", "Gambia",
-                            "Georgia", "Germany", "Ghana", "Gibraltar", "Greece",
-                            "Greenland", "Grenada", "Guadeloupe", "Guam",
-                            "Guatemala", "Guernsey", "Guinea", "Guinea-Bissau",
-                            "Guyana", "Haiti", "Heard Island and Mcdonald Islands",
-                            "Holy See (Vatican City State)", "Honduras",
-                            "Hong Kong", "Hungary", "Iceland", "India",
-                            "Indonesia", "Iran, Islamic Republic Of", "Iraq",
-                            "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica",
-                            "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya",
-                            "Kiribati", "Korea, Democratic People'S Republic of",
-                            "Korea, Republic of", "Kuwait", "Kyrgyzstan",
-                            "Lao People'S Democratic Republic", "Latvia", "Lebanon",
-                            "Lesotho", "Liberia", "Libyan Arab Jamahiriya",
-                            "Liechtenstein", "Lithuania", "Luxembourg", "Macao",
-                            "Macedonia, The Former Yugoslav Republic of",
-                            "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali",
-                            "Malta", "Marshall Islands", "Martinique", "Mauritania",
-                            "Mauritius", "Mayotte", "Mexico",
-                            "Micronesia, Federated States of",
-                            "Moldova, Republic of", "Monaco", "Mongolia",
-                            "Montserrat", "Morocco", "Mozambique", "Myanmar",
-                            "Namibia", "Nauru", "Nepal", "Netherlands",
-                            "Netherlands Antilles", "New Caledonia", "New Zealand",
-                            "Nicaragua", "Niger", "Nigeria", "Niue",
-                            "Norfolk Island", "Northern Mariana Islands", "Norway",
-                            "Oman", "Pakistan", "Palau",
-                            "Palestinian Territory, Occupied", "Panama",
-                            "Papua New Guinea", "Paraguay", "Peru", "Philippines",
-                            "Pitcairn", "Poland", "Portugal", "Puerto Rico",
-                            "Qatar", "Reunion", "Romania", "Russian Federation",
-                            "RWANDA", "Saint Helena", "Saint Kitts and Nevis",
-                            "Saint Lucia", "Saint Pierre and Miquelon",
-                            "Saint Vincent and the Grenadines", "Samoa",
-                            "San Marino", "Sao Tome and Principe", "Saudi Arabia",
-                            "Senegal", "Serbia and Montenegro", "Seychelles",
-                            "Sierra Leone", "Singapore", "Slovakia", "Slovenia",
-                            "Solomon Islands", "Somalia", "South Africa",
-                            "South Georgia and the South Sandwich Islands",
-                            "Spain", "Sri Lanka", "Sudan", "Suriname",
-                            "Svalbard and Jan Mayen", "Swaziland", "Sweden",
-                            "Switzerland", "Syrian Arab Republic",
-                            "Taiwan, Province of China", "Tajikistan",
-                            "Tanzania, United Republic of", "Thailand",
-                            "Timor-Leste", "Togo", "Tokelau", "Tonga",
-                            "Trinidad and Tobago", "Tunisia", "Turkey",
-                            "Turkmenistan", "Turks and Caicos Islands", "Tuvalu",
-                            "Uganda", "Ukraine", "United Arab Emirates",
-                            "United Kingdom", "United States",
-                            "United States Minor Outlying Islands", "Uruguay",
-                            "Uzbekistan", "Vanuatu", "Venezuela", "Viet Nam",
-                            "Virgin Islands, British", "Virgin Islands, U.S.",
-                            "Wallis and Futuna", "Western Sahara", "Yemen",
-                            "Zambia", "Zimbabwe"
-                        ]
+                        type: Object,
                     },
                     firstName: {
-                        type: String,
-                        // computed: 'userFisrtName(user)'
+                        type: String
                     },
                     lastName: {
+                        type: String
+                    },
+                    orgName: {
+                        type: String
+                    },
+                    orgAlertEmails: {
                         type: String,
-                        // computed: 'lastName(user)'
-                    }, 
-                    numberOfPeopleOptions: {
-                        type: Array,
-                        value: ['1-5', '6-20', '21-100', '100+']
                     },
-                    numberOfServersOptions: {
-                        type: Array,
-                        value: ['1-5', '6-20', '21-100', '100+']
-                    },
-                    formReady: {
+                    userFormReady: {
                         type: Boolean,
-                        computed: '_computeFormReady(user.firstName, user.lastName, user.country, user.companyName, user.numberOfPeople, user.numberOfServers, sendingData)'
+                        computed: '_computeUserFormReady(firstName, lastName, loadingUser, user)'
                     },
-                    sendingData: {
+                    orgFormReady: {
+                        type: Boolean,
+                        computed: '_computeOrgFormReady(orgName, orgAlertEmails, loadingOrg, org)'
+                    },
+                    loadingUser: {
                         type: Boolean,
                         value: false
                     },
-                    showProgress: {
+                    userError: {
                         type: Boolean,
-                        computed: '_computeShowProgress(sendingData)'
+                        value: false
+                    },
+                    loadingOrg: {
+                        type: Boolean,
+                        value: false
+                    },
+                    orgError: {
+                        type: Boolean,
+                        value: false
                     }
+
                 },
-                // userFisrtName: function(user){
-                //     return user.first_name;
-                // },
-                // userFisrtName: function(user){
-                //     return user.first_name;
-                // },
-                _computeFormReady: function(firstName, lastName, country, companyName, numberOfPeople, numberOfServers, sendingData) {
-                    var formReady = false;
+                observers: [
+                    '_userUpdated(user)',
+                    '_orgUpdated(org)'
+                ],
 
-                    if (firstName && lastName && country && companyName && numberOfPeople && numberOfServers) {
-                        formReady = true;
-                    }
-
-                    if (sendingData) {
-                        formReady = false;
-                    }
-
-                    return formReady;
+                _userUpdated: function(user) {
+                    this.firstName = user.first_name;
+                    this.lastName = user.last_name;
                 },
+
+                _orgUpdated: function(org) {
+                    this.orgName = org.name;
+                    this.orgAlertEmails = org.alerts_email.join('\n')
+                },
+
+                _computeUserFormReady: function(firstName, lastName, loading, user) {
+                    if (loading || !user)
+                        return false;
+
+                    if (firstName == user.first_name && lastName == user.last_name)
+                        return false;
+
+                    if (firstName && lastName)
+                        return true;
+
+                    return false;
+                },
+
+                _computeOrgFormReady: function(orgName, orgAlertEmails, loading, org){
+                    if (orgName && orgName.trim() != "" && org.is_owner && !loading && (orgName != org.name || (orgAlertEmails && orgAlertEmails != org.alerts_email.join('\n'))))
+                        return true;
+                    return false;
+                },
+
                 _computeShowProgress: function(sendingData) {
                     return sendingData;
                 },
-                _submitForm: function(e, user) {
-                    var fn = this.querySelector('#firstName').value;
-                    var ln = this.querySelector('#lastName').value;
-                    var cn = this.querySelector('#companyName').value;
-                    var cc = this.querySelector('#country').value;
-                    var nos = this.querySelector('#numberOfServers').selected;
-                    var nop = this.querySelector('#numberOfPeople').selected;
 
+                _submitUserForm: function(e, user) {
                     var payload = {
                         action: 'update_details',
-                        first_name: fn,
-                        last_name: ln,
-                        company_name: cn,
-                        country: cc,
-                        number_of_servers: nos,
-                        number_of_people: nop
+                        first_name: this.firstName,
+                        last_name: this.lastName
                     };
 
-                    this.set('sendingData', true);
+                    this.$.userAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.userAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.userAjaxRequest.body = payload;
+                    this.$.userAjaxRequest.generateRequest();
+                    console.log('loadingUser', this.loadingUser);
+                },
 
-                    this.$.detailsAjaxRequest.headers["Content-Type"] = 'application/json';
-                    this.$.detailsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.detailsAjaxRequest.body = payload;
-                    this.$.detailsAjaxRequest.generateRequest();
+                _submitOrgForm: function(e, org) {
+                    var payload = {
+                        new_name: this.orgName,
+                        alerts_email: this.orgAlertEmails
+                    };
+
+                    this.$.orgAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.orgAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.orgAjaxRequest.body = payload;
+                    this.$.orgAjaxRequest.generateRequest();
+                    console.log('loadingOrg', this.loadingOrg);
                 },
-                _handleDetailsAjaxResponse: function(e) {
-                    this.set('sendingData', false);
+
+                _handleAjaxResponse: function(e) {
+                    document.querySelector('paper-toast#mist-toast').show({text: 'Changes saved succesfully!'})
                 },
-                _handleDetailsAjaxError: function() {
-                    this.set('sendingData', false);
+
+                _handleAjaxError: function() {
+                    this.set('userError', true);
+                    this.$.usererrormsg.textContent = e.detail.request.xhr.responseText;
+                },
+                _handleOrgAjaxError: function(e) {
+                    this.set('orgError', true);
+                    this.$.orgerrormsg.textContent = e.detail.request.xhr.responseText;
                 }
             });
         })();
