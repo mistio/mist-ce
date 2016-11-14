@@ -175,7 +175,7 @@
 
         },
         _panelAdded:function (e){
-           console.log("i got",e.detail);
+           console.log("i got",e.detail,this.resource);
            var panel ={
              "lines": true,
              "aliasColors": {},
@@ -191,7 +191,7 @@
              "timeShift": null,
              "title": e.detail.split(".")[0],
              "type": "graph",
-             "machineArray": [[this.dashboard.rows[0].panels[0].machineArray[0][0], this.dashboard.rows[0].panels[0].machineArray[0][1]]],
+             "machineArray": [[this.resource.cloud.id, this.resource.id]],
              "x-axis": true,
              "y-axis": true
            }
