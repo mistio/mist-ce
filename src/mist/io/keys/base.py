@@ -171,8 +171,8 @@ class BaseKeyController(object):
         if isinstance(port, basestring):
             if port.isdigit():
                 port = int(port)
-                # else:
-                #     port = 22 # FIXME wd son't need this
+            else:
+                port = 22 # FIXME do we need this?
         elif isinstance(port, int):
             port = port
         else:
