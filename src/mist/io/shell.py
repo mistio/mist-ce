@@ -31,7 +31,7 @@ try:
     from mist.core.user.models import User
     from mist.io.clouds.models import Cloud
     from mist.io.machines.models import Machine, KeyAssociation
-    from mist.io.keys.models import Key
+    from mist.io.keys.models import Key, SignedSSHKey
     from mist.core import config
 except ImportError:
     from mist.io import config
@@ -104,11 +104,13 @@ class ParamikoShell(object):
         if not key and not password:
             raise RequiredParameterMissingError("neither key nor password "
                                                 "provided.")
+        # FIXME change this with isinstance(key, SignedSSHKey)
         if key:
-            if cert_file and cert_file.startswith('ssh-rsa-cert-v01@openssh.com'):
+            if isinstance(key, SignedSSHKey) and (cert_file
+            and cert_file.startswith('ssh-rsa-cert-v01@openssh.com')):
                 # signed ssh key, use RSACert
                 rsa_key = paramiko.RSACert(privkey_file_obj=StringIO(key),
-                       cert_file_obj=StringIO(cert_file))
+                                           cert_file_obj=StringIO(cert_file))
             else:
                 rsa_key = paramiko.RSAKey.from_private_key(StringIO(key))
         else:
@@ -282,10 +284,14 @@ class ParamikoShell(object):
                         self.host, port = dnat(user, ssh_host, port)
                         log.info("ssh -i %s %s@%s:%s",
                                  key.name, ssh_user, self.host, port)
+                        cert_file = ''
+                        if isinstance(key, SignedSSHKey):
+                            cert_file = key.certificate
+
                         self.connect(username=ssh_user,
                                      key=key.private,
                                      password=password,
-                                     cert_file=key.certificate,
+                                     cert_file=cert_file,
                                      port=port)
                     except MachineUnauthorizedError:
                         continue
@@ -301,10 +307,13 @@ class ParamikoShell(object):
                         log.info("retrying as %s", new_ssh_user)
                         try:
                             self.disconnect()
+                            cert_file = ''
+                            if isinstance(key, SignedSSHKey):
+                                cert_file = key.certificate
                             self.connect(username=new_ssh_user,
                                          key=key.private,
                                          password=password,
-                                         cert_file=key.certificate,
+                                         cert_file=cert_file,
                                          port=port)
                             ssh_user = new_ssh_user
                         except MachineUnauthorizedError:
