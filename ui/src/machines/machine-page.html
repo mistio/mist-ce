@@ -630,10 +630,10 @@ MACHINEACTIONS = {
                 "refresh": "10sec",
                 "rows": [{
                     "panels": [{
-                        "id": 2,
-                        "span": 12,
+                        "id": 0,
                         "stack": true,
                         "title": "Load",
+                        "removable":false,
                         "type": "graph",
                         "span": 6,
                         "stack": false,
@@ -649,9 +649,10 @@ MACHINEACTIONS = {
                         "x-axis": true,
                         "y-axis": true
                     }, {
-                        "id": 3,
+                        "id": 1,
                         "title": "CPU",
                         "type": "graph",
+                        "removable":false,
                         "span": 6,
                         "stack": true,
                         "datasource": "mist.monitor",
@@ -664,9 +665,10 @@ MACHINEACTIONS = {
                         "y-axis": true
                     }]}, {
                     "panels": [{
-                        "id": 1,
+                        "id": 2,
                         "title": "MEM",
                         "type": "graph",
+                        "removable":false,
                         "span": 6,
                         "stack": true,
                         "datasource": "mist.monitor",
@@ -684,9 +686,10 @@ MACHINEACTIONS = {
                         "x-axis": true,
                         "y-axis": true
                       }, {
-                        "id": 5,
+                        "id": 3,
                         "title": "NET",
                         "type": "graph",
+                        "removable":false,
                         "span": 6,
                         "stack": true,
                         "datasource": "mist.monitor",

@@ -178,13 +178,17 @@
         },
         _panelAdded:function (e){
            console.log("i got",e.detail);
-           var totalPanels = this.dashboard.rows.reduce(function(r, t){
-                return r.panels.length + t.panels.length;
-           })
+           var totalPanels=0;
+           for(var i=0; i<this.dashboard.rows.length; i++){
+             for(var j=0; j<this.dashboard.rows[i].panels.length; j++){
+               totalPanels+=1;
+             }
+           }
            var panel ={
              "lines": true,
              "aliasColors": {},
              "datasource": "mist.monitor",
+             "removable":true,
              "id": totalPanels+1,
              "span": 12,
              "stack": false,
@@ -200,8 +204,22 @@
              "x-axis": true,
              "y-axis": true
            }
-           var index = this.dashboard.rows.length-1;
-           this.push("dashboard.rows."+index+".panels",panel);
+           if(this.dashboard.rows[this.dashboard.rows.length-1].panels.length==2){
+             this.push("dashboard.rows",{panels:[]});
+           }
+           if(this.dashboard.rows[this.dashboard.rows.length-1].panels.length<2){
+              var index = this.dashboard.rows.length-1;
+
+              if(this.dashboard.rows[this.dashboard.rows.length-1].panels.length==1){
+                var previousPanel=this.querySelector("#panel-"+this.dashboard.rows[this.dashboard.rows.length-1].panels[0].id);
+                console.log(previousPanel);
+                previousPanel.style.width='50%';
+                previousPanel.chartElement.resize(previousPanel.style.width);
+                this.dashboard.rows[this.dashboard.rows.length-1].panels[0].span=6;
+                panel.span=6;
+              }
+              this.push("dashboard.rows."+index+".panels",panel);
+           }
            this.async(function(){
                 this.querySelector('#panel-'+panel.id).scrollIntoView();
            }, 100);
