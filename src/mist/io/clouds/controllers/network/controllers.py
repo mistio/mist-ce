@@ -4,8 +4,7 @@ import time
 from mist.io.clouds.controllers.network.base import BaseNetworkController
 from mist.io.exceptions import RequiredParameterMissingError, NetworkCreationError, NetworkError
 from libcloud.compute.drivers.ec2 import EC2Network, EC2NetworkSubnet
-from libcloud.compute.drivers.gce import GCENetwork, GCESubnetwork
-from libcloud.compute.drivers.openstack import OpenStackNetwork, OpenStackSubnet
+from libcloud.compute.drivers.gce import GCENetwork
 import mist.io.clouds.controllers.network.models as netmodels
 
 
@@ -45,31 +44,37 @@ class AmazonNetworkController(BaseNetworkController):
 
         subnet = self.ctl.compute.connection.ex_create_subnet(name=name,
                                                               cidr_block=cidr,
-                                                              vpc_id=parent_network.id,
+                                                              vpc_id=parent_network.network_id,
                                                               availability_zone=availability_zone)
         return subnet
 
-    def _list_subnets_for_network(self, libcloud_network):
-        return self.ctl.compute.connection.ex_list_subnets(filters={'vpc-id': libcloud_network.id})
+    def _list_subnets(self, for_network=None):
+        if for_network:
+            return self.ctl.compute.connection.ex_list_subnets(filters={'vpc-id': for_network.network_id})
+        else:
+            return self.ctl.compute.connection.ex_list_subnets()
 
     def _delete_network(self, network):
 
         libcloud_network = EC2Network(id=network.network_id, name='', cidr_block='')
+        try:
+            self.ctl.compute.connection.ex_delete_network(libcloud_network)
+        except Exception as e:
+            raise NetworkError("Got error %s" % str(e))
 
-        for subnet in network.subnets:
-            self._delete_subnet(subnet)
+    def _delete_subnet(self, subnet_doc):
 
-        self.ctl.compute.connection.ex_delete_network(libcloud_network)
-
-    def _delete_subnet(self, subnet):
-
-        libcloud_subnet = EC2NetworkSubnet(id=subnet.network_id, name='', state=None)
-        self.ctl.compute.connection.ex_delete_subnet(libcloud_subnet)
+        libcloud_subnet = EC2NetworkSubnet(id=subnet_doc.subnet_id, name='', state=None)
+        try:
+            self.ctl.compute.connection.ex_delete_subnet(libcloud_subnet)
+        except Exception as e:
+            raise NetworkError("Got error %s" % str(e))
 
 
 class GoogleNetworkController(BaseNetworkController):
+
     NetworkModelClass = netmodels.GoogleNetwork
-    SubnetModelClass = netmodels.AmazonSubnet
+    SubnetModelClass = netmodels.GoogleSubnet
 
     def _create_network(self, network):
 
@@ -103,22 +108,13 @@ class GoogleNetworkController(BaseNetworkController):
                                                                   cidr=cidr,
                                                                   region=region,
                                                                   description=subnet.get('description'),
-                                                                  network=parent_network)
+                                                                  network=parent_network.title)
         return subnet
 
     def _delete_network(self, network):
 
-        associated_subnets = [{'name': subnet.title, 'region': subnet.extra['region']}
-                              for subnet in network.subnets]
         libcloud_network = GCENetwork(id='', name=network.title, cidr='',
-                                      driver=None, extra=network.extra)
-
-        # Destroy all associated subnetworks before destroying the network object
-        try:
-            for subnet in associated_subnets:
-                self.ctl.compute.connection.ex_destroy_subnetwork(subnet['name'], region=subnet['region'])
-        except Exception as e:
-            raise NetworkError(str(e))
+                                      driver=None, extra={})
 
         # Subnet deletion calls are asynchronous and a network cannot be deleted before all of its subnets are gone
         # The network deletion call may not succeed immediately
@@ -131,15 +127,27 @@ class GoogleNetworkController(BaseNetworkController):
                 break
         # If all attempts are exhausted, raise an exception
         else:
-            raise NetworkError('Failed to delete network {}'.format(libcloud_network.name))
+            raise NetworkError('Failed to delete network {}'.format(network.title))
 
-        return True
+    def _list_subnets(self, for_network=None):
+        requested_subnets = []
+        all_subnets = self.ctl.compute.connection.ex_list_subnetworks()
+        for subnet in all_subnets:
+            if not for_network or subnet.network == for_network.title:
+                requested_subnets.append(subnet)
+        return requested_subnets
 
+    def _delete_subnet(self, subnet_doc):
+        try:
+            self.ctl.compute.connection.ex_destroy_subnetwork(subnet_doc.title, region=subnet_doc.region)
+        except Exception as e:
+            raise NetworkError("Got error %s" % str(e))
 
 
 class OpenStackNetworkController(BaseNetworkController):
-    NetworkModelClass = netmodels.AmazonNetwork
-    SubnetModelClass = netmodels.AmazonSubnet
+
+    NetworkModelClass = netmodels.OpenStackNetwork
+    SubnetModelClass = netmodels.OpenStackSubnet
 
     def _create_network(self, network):
 
@@ -169,82 +177,11 @@ class OpenStackNetworkController(BaseNetworkController):
         enable_dhcp = subnet.get('enable_dhcp', True)
 
         return self.ctl.compute.connection.ex_create_subnet(name=subnet_name,
-                                                            network_id=parent_network.id, cidr=cidr,
+                                                            network_id=parent_network.network_id, cidr=cidr,
                                                             allocation_pools=allocation_pools,
                                                             gateway_ip=gateway_ip,
                                                             ip_version=ip_version,
                                                             enable_dhcp=enable_dhcp)
-
-    @staticmethod
-    def _openstack_network_to_dict(network, subnets=None, floating_ips=None, nodes=None):
-
-        if nodes is None:
-            nodes = []
-        if floating_ips is None:
-            floating_ips = []
-        if subnets is None:
-            subnets = []
-
-        net = {'name': network.name,
-               'id': network.id,
-               'status': network.status,
-               'router_external': network.router_external,
-               'extra': network.extra,
-               'public': bool(network.router_external),
-               'subnets': [OpenStackNetworkController._openstack_subnet_to_dict(subnet)
-                           for subnet in subnets if subnet.id in network.subnets], 'floating_ips': []}
-        for floating_ip in floating_ips:
-            if floating_ip.floating_network_id == network.id:
-                net['floating_ips'].append(
-                    OpenStackNetworkController._openstack_floating_ip_to_dict(floating_ip, nodes))
-        return net
-
-    @staticmethod
-    def _openstack_floating_ip_to_dict(floating_ip, nodes=None):
-
-        if nodes is None:
-            nodes = []
-
-        ret = {'id': floating_ip.id,
-               'floating_network_id': floating_ip.floating_network_id,
-               'floating_ip_address': floating_ip.floating_ip_address,
-               'fixed_ip_address': floating_ip.fixed_ip_address,
-               'status': str(floating_ip.status),
-               'port_id': floating_ip.port_id,
-               'extra': floating_ip.extra,
-               'node_id': ''}
-
-        for node in nodes:
-            if floating_ip.fixed_ip_address in node.private_ips:
-                ret['node_id'] = node.id
-
-        return ret
-
-    @staticmethod
-    def _openstack_subnet_to_dict(subnet):
-        net = {'name': subnet.name,
-               'id': subnet.id,
-               'cidr': subnet.cidr,
-               'enable_dhcp': subnet.enable_dhcp,
-               'dns_nameservers': subnet.dns_nameservers,
-               'allocation_pools': subnet.allocation_pools,
-               'gateway_ip': subnet.gateway_ip,
-               'ip_version': subnet.ip_version,
-               'extra': subnet.extra}
-
-        return net
-
-    @staticmethod
-    def _openstack_router_to_dict(router):
-        ret = {'name': router.name,
-               'id': router.id,
-               'status': router.status,
-               'external_gateway_info': router.external_gateway_info,
-               'external_gateway': router.external_gateway,
-               'admin_state_up': router.admin_state_up,
-               'extra': router.extra}
-
-        return ret
 
     def _delete_network(self, network):
 
@@ -252,7 +189,20 @@ class OpenStackNetworkController(BaseNetworkController):
             self.ctl.compute.connection.ex_delete_network(network.network_id)
         except Exception as e:
             raise NetworkError(e)
-        return True
+
+    def _list_subnets(self, for_network=None):
+        all_subnets = self.ctl.compute.connection.ex_list_subnets()
+        db_subnet_ids = [subnet.subnet_id for subnet in for_network.subnets] if for_network else []
+        if for_network:
+            return [sub for sub in all_subnets if sub.id in db_subnet_ids]
+        else:
+            return all_subnets
+
+    def _delete_subnet(self, subnet):
+        try:
+            self.ctl.compute.connection.ex_delete_subnet(subnet.subnet_id)
+        except Exception as e:
+            raise NetworkError(e)
 
 
 class DigitalOceanNetworkController(BaseNetworkController):
@@ -267,7 +217,7 @@ class RackSpaceNetworkController(BaseNetworkController):
     pass
 
 
-class SoftLayerNetworkController(BaseNetworkController):
+class SoftlayerNetworkController(BaseNetworkController):
     pass
 
 

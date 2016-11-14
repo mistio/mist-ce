@@ -1522,7 +1522,7 @@ def delete_network(request):
 
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "create_resources", cloud_id)
-    methods.delete_network_legacy(auth_context.owner, cloud_id, network_id)
+    methods.delete_network(auth_context.owner, cloud_id, network_id)
 
     return OK
 
