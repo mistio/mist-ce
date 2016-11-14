@@ -3,6 +3,7 @@
 <script src="../../bower_components/moment/moment.js"></script>
 
 <link rel="import" href="../app-image-icons/app-image-icons.html">
+<link rel="import" href="../helpers/dialog-element.html">
 
 <dom-module id="list-item">
     <template>
@@ -287,15 +288,16 @@ Polymer({
         narrowViewport: {
             type: Boolean,
             reflectToAttribute: true
-        }
+        },
+        probes: Object
     },
 
     itemField: function(item, field, index) {
 
         if (field == 'recommendations'){
             // temp for machines only
-            if (this.section.id == "machines" && document.querySelector('mist-app').model.probes && document.querySelector('mist-app').model.probes[item.uuid]){
-                if (document.querySelector('mist-app').model.probes[item.uuid].dirty_cow == true) {
+            if (this.section.id == "machines" && this.probes && this.probes[item.uuid]){
+                if (this.probes[item.uuid].dirty_cow == true) {
                     this._appendIconOnRecommendations(index, 'icons:report-problem');
                     return "Dirty COW alert! Update kernel.";
                 }
@@ -445,14 +447,20 @@ Polymer({
 
         return ret;
     },
-    _appendIconOnRecommendations function(index, icontext){
+    _appendIconOnRecommendations: function(index, icontext){
         var parent = this.querySelector('.recommendations.field'+index+' .field-icon');
         if (parent && parent.children.length == 0) {
             var icon = document.createElement('iron-icon');
             icon.setAttribute('icon', icontext);
-            icon.setAttribute('on-tap', icontext);
+            icon.setAttribute('on-tap', "_showRecommendationDialog");
             Polymer.dom(parent).appendChild(icon);
         }
+    },
+
+    _showRecommendationDialog: function(){
+        console.log('_showRecommendationDialog');
+        e.preventDefault();
+        this.fire("open-recommendation-dialog", {'item-type': this.section.id, 'item': this.item})
     },
 
     _itemTagsArray: function(tagsobject) {
@@ -474,15 +482,13 @@ Polymer({
             return false;
         }
         else {
-            var model = document.querySelector('mist-app').model;
-
-            if (!model || !model.probes || !model.probes[item.uuid] || !model.probes[item.uuid].loadavg) {
+            if (!this.probes || !this.probes[item.uuid] || !this.probes[item.uuid].loadavg) {
                 return "";
             }
 
             else {
-                var probe = model.probes[item.uuid].loadavg;
-                var cores =  parseInt(model.probes[item.uuid].cores);
+                var probe = this.probes[item.uuid].loadavg;
+                var cores =  parseInt(this.probes[item.uuid].cores);
                 var classes = '';
                 var prefix = '';
                 console.log(parseInt(probe[0]),probe[0]);

@@ -211,6 +211,15 @@
             <team-add id="isTeamsPage" organization="[[model.org]]"></team-add>
         </template>
 
+        <paper-dialog id="recommendationsDialog">
+            <h2>Recommendation</h2>
+            <p>test</p>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button class="blue" dialog-confirm>open shell</paper-button>
+            </div>
+        </dialog-dialog>
+
     </template>
 </dom-module>
 <script>
@@ -269,6 +278,9 @@
         observers: [
             'sortingObserver(items.*, sortBy, sortOrder, section.q.*)',
         ],
+        listeners: {
+            'open-recommendation-dialog': 'openRecommendationsDialog'
+        },
         ready: function() {
 
         },
@@ -583,6 +595,11 @@
         clearSearch: function(e){
             this.set('section.q', "");
             document.querySelector('top-search').query = "";
+        },
+        openRecommendationsDialog: function(e){
+            var item = this.e.detail.item.uuid;
+            console.log('openRecommendationsDialog', e, item);
+            this.$.recommendationsDialog.open();
         }
     });
 })();

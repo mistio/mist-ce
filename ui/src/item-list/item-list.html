@@ -309,7 +309,7 @@
         <iron-list items="[[items]]" as="item" style$="{{vpHeight}}">
             <template>
                 <div class="row" data-index$="[[index]]">
-                    <list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]" uri$="[[_itemLink(item)]]">
+                    <list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]" uri$="[[_itemLink(item)]]" probes="[[model.probes]]">
                         <template is="dom-if" if="[[ismachines]]">
                             <span class$="[[itemMonitoringStatus(item, incidents, model.monitoring)]]"></span>
                         </template>
@@ -329,6 +329,7 @@
                 </div>
             </template>
         </iron-list>
+
       </template>
 </dom-module>
 
