@@ -750,7 +750,7 @@ Polymer({
         for (var i = 0; i < tempdash.rows.length; i++) {
             for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
                 if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
-                    if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
+                    if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray && this.dashboard.rows[i].panels[j].machineArray[0] && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
                         tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
                         changeit = true;
                     }
