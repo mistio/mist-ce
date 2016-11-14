@@ -914,8 +914,6 @@ def create_dns_zone(request):
     domain = params.get('domain', '')
     if not domain:
         raise RequiredParameterMissingError('domain')
-    if not re.match(".*\.$", domain):
-        domain += "."
     type = params.get('type', '')
     ttl = params.get('ttl', '')
     extra = params.get('extra', '')
@@ -939,10 +937,10 @@ def create_dns_record(request):
     zone_id = request.matchdict['zone']
     # Get the rest of the params
     # name is required and must contain a trailing period(.)
-    # type should be master or slave, and defaults to master.
-    # ttl is the time for which the zone should be valid for. Defaults to None.
+    # type should be the type of the record we want to create (A,MX,CNAME etc),
+    # and it is required.
+    # ttl is the time for which the record should be valid for. Defaults to 0.
     # Should be an integer value.
-    # extra is a dictionary with extra details. Defaults to None.
     params = params_from_request(request)
     name = params.get('name', '')
     if not name:
@@ -953,8 +951,9 @@ def create_dns_record(request):
     data = params.get('data', '')
     if not data:
         raise RequiredParameterMissingError('data')
+    ttl = params.get('ttl', '')
 
-    return cloud.ctl.dns.create_record(zone_id, name, type, data)
+    return cloud.ctl.dns.create_record(zone_id, name, type, data, ttl)
 
 @view_config(route_name='api_v1_zone', request_method='DELETE', renderer='json')
 def delete_dns_zone(request):

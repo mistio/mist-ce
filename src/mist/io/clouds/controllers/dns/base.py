@@ -5,15 +5,15 @@ The `BaseDNSController` is a sub-controller, which is set as an attribute to a
 with libcloud's DNS API.
 
 """
+import re
 import ssl
-
 import logging
 
 from mist.io.clouds.controllers.base import BaseController
 
 from libcloud.common.types import InvalidCredsError
+from libcloud.dns.types import ZoneDoesNotExistError, RecordDoesNotExistError
 
-from mist.io.exceptions import NotFoundError
 from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 from mist.io.exceptions import ZoneNotFoundError
@@ -142,9 +142,9 @@ class BaseDNSController(BaseController):
             log.error("SSLError on running list_zones on %s: %s",
                       self.cloud, exc)
             raise CloudUnavailableError(exc=exc)
-        except ZoneNotFoundError as exc:
+        except ZoneDoesNotExistError as exc:
             log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
-            raise NotFoundError(exc=exc)
+            raise ZoneNotFoundError(exc=exc)
         except Exception as exc:
             log.exception("Error while running list_zones on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
@@ -162,15 +162,14 @@ class BaseDNSController(BaseController):
         specified zone.
         """
         try:
-            status = self.connection.get_record(zone_id, record_id).delete()
-            return status
-        except ZoneNotFoundError as exc:
+            self.connection.get_record(zone_id, record_id).delete()
+        except ZoneDoesNotExistError as exc:
             log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
-            raise NotFoundError(exc=exc)
-        except RecordNotFoundError:
+            raise ZoneNotFoundError(exc=exc)
+        except RecordDoesNotExistError:
             log.warning("No record found for id: %s under zone %s",
                         record_id, zone_id)
-            raise NotFoundError(exc=exc)
+            raise RecordNotFoundError(exc=exc)
         except Exception as exc:
             log.exception("Error while running create_record on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
@@ -186,11 +185,10 @@ class BaseDNSController(BaseController):
         We use the zone id to retrieve and delete it for this cloud.
         """
         try:
-            status = self.connection.get_zone(zone_id).delete()
-            return status
-        except ZoneNotFoundError as exc:
+            self.connection.get_zone(zone_id).delete()
+        except ZoneDoesNotExistError as exc:
             log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
-            raise NotFoundError(exc=exc)
+            raise ZoneNotFoundError(exc=exc)
         except Exception as exc:
             log.exception("Error while running create_record on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
@@ -201,8 +199,7 @@ class BaseDNSController(BaseController):
         """
         return self._create_zone__for_cloud(domain, type, ttl, extra)
 
-    def _create_zone__for_cloud(
-            self, domain, type='master', ttl=None, extra=None):
+    def _create_zone__for_cloud(self, domain, type, ttl, extra):
         """
         This is the private method called to create a record under a specific
         zone. The underlying functionality is implement in the same way for
@@ -210,6 +207,8 @@ class BaseDNSController(BaseController):
         this.
         ----
         """
+        if not re.match(".*\.$", domain):
+            domain += "."
         try:
             zone = self.connection.create_zone(domain, type='master',
                                                ttl=None, extra=None)
@@ -228,14 +227,14 @@ class BaseDNSController(BaseController):
             log.exception("Error while running create_record on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
-    def create_record(self, zone_id, name, type, data):
+    def create_record(self, zone_id, name, type, data, ttl):
         """
         This is the public method that is called to create a new DNS record
         under a specific zone.
         """
-        return self._create_record__for_zone(zone_id, name, type, data)
+        return self._create_record__for_zone(zone_id, name, type, data, ttl)
 
-    def _create_record__for_zone(self, zone_id, name, type, data):
+    def _create_record__for_zone(self, zone_id, name, type, data, ttl):
         """
         This is the private method called to create a record under a specific
         zone. The underlying functionality is implement in the same way for
@@ -243,24 +242,5 @@ class BaseDNSController(BaseController):
         this.
         ----
         """
-        try:
-            zone = self.connection.get_zone(zone_id)
-            record = zone.create_record(name, type, data)
-            log.info("Type %s record created successfully for %s.",
-                     record.type, self.cloud)
-            return record
-        except InvalidCredsError as exc:
-            log.warning("Invalid creds on running create_record on %s: %s",
-                        self.cloud, exc)
-            raise CloudUnauthorizedError()
-        except ssl.SSLError as exc:
-            log.error("SSLError on running create_record on %s: %s",
-                      self.cloud, exc)
-            raise CloudUnavailableError(exc=exc)
-        except ZoneNotFoundError as exc:
-            log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
-            raise NotFoundError(exc=exc)
-        except Exception as exc:
-            log.exception("Error while running create_record on %s", self.cloud)
-            raise CloudUnavailableError(exc=exc)
+        raise NotImplementedError()
         
