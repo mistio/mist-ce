@@ -809,8 +809,7 @@ def associate_key(request):
         machine_uuid = ""
     auth_context.check_perm("machine", "associate_key", machine_uuid)
 
-    key.ctl.associate(cloud_id, machine_id, host,
-                      username=ssh_user, port=ssh_port)
+    key.ctl.associate(machine, username=ssh_user, port=ssh_port)
     clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=key)
@@ -866,7 +865,7 @@ def disassociate_key(request):
     auth_context.check_perm("machine", "disassociate_key", machine_uuid)
 
     key = Key.objects.get(owner=auth_context.owner, id=key_id)
-    key.ctl.disassociate(cloud_id, machine_id, host)
+    key.ctl.disassociate(machine)
     clouds = Cloud.objects(owner=auth_context.owner)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=key)
