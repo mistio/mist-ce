@@ -104,10 +104,9 @@ class ParamikoShell(object):
         if not key and not password:
             raise RequiredParameterMissingError("neither key nor password "
                                                 "provided.")
-        # FIXME change this with isinstance(key, SignedSSHKey)
+
         if key:
-            if isinstance(key, SignedSSHKey) and (cert_file
-            and cert_file.startswith('ssh-rsa-cert-v01@openssh.com')):
+            if isinstance(key, SignedSSHKey) and cert_file:
                 # signed ssh key, use RSACert
                 rsa_key = paramiko.RSACert(privkey_file_obj=StringIO(key),
                                            cert_file_obj=StringIO(cert_file))
