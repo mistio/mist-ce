@@ -37,6 +37,7 @@ from mist.io.exceptions import CloudUnauthorizedError
 from mist.io.exceptions import ServiceUnavailableError
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
+from mist.io.exceptions import CloudUnavailableError
 
 from mist.io.helpers import sanitize_host, check_host
 
@@ -271,12 +272,75 @@ class LibvirtMainController(BaseMainController):
                 raise NotFoundError("Keypair does not exist.")
 
     def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
-        """This is a hack to associate a key with the VM hosting this cloud"""
-        super(LibvirtMainController, self).add(
-            fail_on_error=fail_on_error,
-            fail_on_invalid_params=fail_on_invalid_params,
-            **kwargs
-        )
+        """Temporarily solution until update is implemented here"""
+
+        # Transform params with extra underscores for compatibility.
+        rename_kwargs(kwargs, 'api_key', 'apikey')
+        rename_kwargs(kwargs, 'api_secret', 'apisecret')
+
+        # Cloud specific kwargs preparsing.
+        try:
+            self._add__preparse_kwargs(kwargs)
+        except MistError as exc:
+            log.error("Error while adding cloud %s: %r", self.cloud, exc)
+            raise
+        except Exception as exc:
+            log.exception("Error while preparsing kwargs on add %s",
+                          self.cloud)
+            raise InternalServerError(exc=exc)
+
+        # Check for invalid `kwargs` keys.
+        errors = {}
+        for key in kwargs.keys():
+            if key not in self.cloud._cloud_specific_fields:
+                error = "Invalid parameter %s=%r." % (key, kwargs[key])
+                if fail_on_invalid_params:
+                    errors[key] = error
+                else:
+                    log.warning(error)
+                    kwargs.pop(key)
+        if errors:
+            log.error("Error updating %s: %s", self.cloud, errors)
+            raise BadRequestError({
+                'msg': "Invalid parameters %s." % errors.keys(),
+                'errors': errors,
+            })
+
+        # Set fields to cloud model and perform early validation.
+        for key, value in kwargs.iteritems():
+            setattr(self.cloud, key, value)
+        try:
+            self.cloud.validate(clean=True)
+        except me.ValidationError as exc:
+            log.error("Error updating %s: %s", self.cloud, exc.to_dict())
+            raise BadRequestError({'msg': exc.message,
+                                   'errors': exc.to_dict()})
+
+        # Try to connect to cloud.
+        if fail_on_error:
+            try:
+                self.compute.check_connection()
+            except (CloudUnavailableError, CloudUnauthorizedError) as exc:
+                log.error("Will not update cloud %s because "
+                          "we couldn't connect: %r", self.cloud, exc)
+                raise
+            except Exception as exc:
+                log.exception("Will not update cloud %s because "
+                              "we couldn't connect.", self.cloud)
+                raise CloudUnavailableError(exc=exc)
+
+        # Attempt to save.
+        try:
+            self.cloud.save()
+        except me.ValidationError as exc:
+            log.error("Error updating %s: %s", self.cloud, exc.to_dict())
+            raise BadRequestError({'msg': exc.message,
+                                   'errors': exc.to_dict()})
+        except me.NotUniqueError as exc:
+            log.error("Cloud %s not unique error: %s", self.cloud, exc)
+            raise CloudExistsError()
+
+        # This is a hack to associate a key with the VM hosting this cloud
         if self.cloud.key is not None:
             # FIXME
             from mist.io.methods import associate_key
