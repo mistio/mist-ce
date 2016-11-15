@@ -562,122 +562,10 @@ Polymer({
         'confirmation': '_machineActionConfirmation',
         'pending-key-request': '_updateKeyLoader',
     },
-        _computeItemInArray: function() {
-            var tempdash = {
-                "id": 1,
-                "refresh": "10sec",
-                "rows": [{
-                    "panels": [{
-                        "id": 0,
-                        "stack": true,
-                        "title": "Load",
-                        "removable":false,
-                        "type": "graph",
-                        "span": 6,
-                        "stack": false,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "A",
-                            "target": "load.longterm"
-                        }, {
-                            "refId": "B",
-                            "target": "load.shortterm"
-                        }],
-                        "machineArray": [],
-                        "x-axis": true,
-                        "y-axis": true
-                    }, {
-                        "id": 1,
-                        "title": "CPU",
-                        "type": "graph",
-                        "removable":false,
-                        "span": 6,
-                        "stack": true,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "C",
-                            "target": "cpu.total.*"
-                        }],
-                        "machineArray": [],
-                        "x-axis": true,
-                        "y-axis": true
-                    }]}, {
-                    "panels": [{
-                        "id": 2,
-                        "title": "MEM",
-                        "type": "graph",
-                        "removable":false,
-                        "span": 6,
-                        "stack": true,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "D",
-                            "target": "memory.used_percent"
-                        }, {
-                            "refId": "E",
-                            "target": "memory.cached_percent"
-                        }, {
-                            "refId": "F",
-                            "target": "memory.free_percent"
-                        }],
-                        "machineArray": [],
-                        "x-axis": true,
-                        "y-axis": true
-                      }, {
-                        "id": 3,
-                        "title": "NET",
-                        "type": "graph",
-                        "removable":false,
-                        "span": 6,
-                        "stack": true,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "G",
-                            "target": "interface.total.if_octets.rx"
-                        }, {
-                            "refId": "H",
-                            "target": "interface.total.if_octets.tx"
-                        }],
-                        "machineArray": [],
-                        "x-axis": true,
-                        "y-axis": true
-                    }],
-                }],
-                "time": {
-                    "from": "now-10m",
-                    "to": "now"
-                },
-                "timepicker": {
-                    "now": true,
-                    "refresh_intervals": [],
-                    "time_options": [
-                        "10m",
-                        "1h",
-                        "6h",
-                        "24h",
-                        "7d",
-                        "30d"
-                    ]
-                },
-                "timezone": "browser"
-            };
-            var changeit = false;
-            for (var i = 0; i < tempdash.rows.length; i++) {
-                for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
-                    if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
-                        if ((this.dashboard != null && typeof this.dashboard.rows[i].panels[j].machineArray!='undefined' && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
-                            tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
-                            changeit = true;
-                        }
-                    }
-                }
-            }
-            if (changeit)
-                this.dashboard = tempdash;
-
-            var arr = [];
-            arr.push(this.machine);
-            return arr;
+    _computeItemInArray: function() {
+          var arr = [];
+          arr.push(this.machine);
+          return arr;
     },
     ready: function() {
         this.set('hideAssociatedKeys', true);
@@ -753,7 +641,7 @@ Polymer({
                         "refId": "A",
                         "target": "load.*"
                     }],
-                    "machineArray": [],
+                    "machineArray": [ [this.machine.cloud.id, this.machine.id]],
                     "x-axis": true,
                     "y-axis": true
                 }, {
@@ -767,7 +655,7 @@ Polymer({
                         "refId": "C",
                         "target": "cpu.total.*"
                     }],
-                    "machineArray": [],
+                    "machineArray": [ [this.machine.cloud.id, this.machine.id]],
                     "x-axis": true,
                     "y-axis": true
                 }]}, {
@@ -788,7 +676,7 @@ Polymer({
                         "refId": "F",
                         "target": "memory.free_percent"
                     }],
-                    "machineArray": [],
+                    "machineArray": [ [this.machine.cloud.id, this.machine.id]],
                     "x-axis": true,
                     "y-axis": true
                   }, {
@@ -805,7 +693,7 @@ Polymer({
                         "refId": "H",
                         "target": "interface.total.if_octets.tx"
                     }],
-                    "machineArray": [],
+                    "machineArray": [ [this.machine.cloud.id, this.machine.id]],
                     "x-axis": true,
                     "y-axis": true
                 }],
@@ -829,25 +717,7 @@ Polymer({
             "timezone": "browser"
         };
 
-
-        var changeit = false;
-        for (var i = 0; i < tempdash.rows.length; i++) {
-            for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
-                if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
-                    if ((this.dashboard != null && typeof this.dashboard.rows[i].panels[j].machineArray!="undefined" && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
-                        tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
-                        changeit = true;
-                    }
-                }
-            }
-        }
         return tempdash;
-        // var that = this;
-        // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-        //     // if (that.querySelector('dashboard-panel'))
-        //     //     that.querySelector('dashboard-panel').resize();
-        //
-        // }, 5000);
     },
     _computeThisItemUid: function(machine) {
         var itemUidInArray = [];
