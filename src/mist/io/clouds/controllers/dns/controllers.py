@@ -49,35 +49,15 @@ class AmazonDNSController(BaseDNSController):
         return get_driver(Provider.ROUTE53)(self.cloud.apikey,
                                             self.cloud.apisecret)
 
-    def _create_record__for_zone(self, zone_id, name, type, data, ttl):
+    def _create_record__prepare_args(self, name, data, ttl):
         """
-        This is the private method called to create a record under a specific
-        zone. The underlying functionality is implement in the same way for
-        all available providers so there shouldn't be any reason to override
-        this.
-        ----
+        This is a private
+        ---
         """
         extra = {'ttl':ttl}
-        try:
-            zone = self.connection.get_zone(zone_id)
-            record = zone.create_record(name, type, data, extra)
-            log.info("Type %s record created successfully for %s.",
-                     record.type, self.cloud)
-            return record
-        except InvalidCredsError as exc:
-            log.warning("Invalid creds on running create_record on %s: %s",
-                        self.cloud, exc)
-            raise CloudUnauthorizedError()
-        except ssl.SSLError as exc:
-            log.error("SSLError on running create_record on %s: %s",
-                      self.cloud, exc)
-            raise CloudUnavailableError(exc=exc)
-        except ZoneDoesNotExistError as exc:
-            log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
-            raise ZoneNotFoundError(exc=exc)
-        except Exception as exc:
-            log.exception("Error while running create_record on %s", self.cloud)
-            raise CloudUnavailableError(exc=exc)
+        if not re.match(".*\.$", name):
+            name += "."
+        return name, data, extra
 
 
 class GoogleDNSController(BaseDNSController):
@@ -89,36 +69,14 @@ class GoogleDNSController(BaseDNSController):
                                            self.cloud.private_key,
                                            project=self.cloud.project_id)
 
-    def _create_record__for_zone(self, zone_id, name, type, data, ttl):
+    def _create_record__prepare_args(self, name, data, ttl):
         """
-        This is the private method called to create a record under a specific
-        zone. The underlying functionality is implement in the same way for
-        all available providers so there shouldn't be any reason to override
-        this.
-        ----
+        This is a private
+        ---
         """
+        extra = None
         record_data = {'ttl':ttl, 'rrdatas':[]}
         record_data['rrdatas'].append(data)
         if not re.match(".*\.$", name):
             name += "."
-        try:
-            zone = self.connection.get_zone(zone_id)
-            record = zone.create_record(name, type, record_data)
-            log.info("Type %s record created successfully for %s.",
-                     record.type, self.cloud)
-            return record
-        except InvalidCredsError as exc:
-            log.warning("Invalid creds on running create_record on %s: %s",
-                        self.cloud, exc)
-            raise CloudUnauthorizedError()
-        except ssl.SSLError as exc:
-            log.error("SSLError on running create_record on %s: %s",
-                      self.cloud, exc)
-            raise CloudUnavailableError(exc=exc)
-        except ZoneDoesNotExistError as exc:
-            log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
-            raise ZoneNotFoundError(exc=exc)
-        except Exception as exc:
-            log.exception("Error while running create_record on %s", self.cloud)
-            raise CloudUnavailableError(exc=exc)
-
+        return name, record_data, extra

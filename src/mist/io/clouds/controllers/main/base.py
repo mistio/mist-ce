@@ -80,7 +80,6 @@ class BaseMainController(object):
     ComputeController = None
     DnsController = None
     # NetworkController = None
-    dnsprovider = None
 
     def __init__(self, cloud):
         """Initialize main cloud controller given a cloud

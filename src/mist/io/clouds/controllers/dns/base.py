@@ -242,5 +242,31 @@ class BaseDNSController(BaseController):
         this.
         ----
         """
+        name, data, extra = self._create_record__prepare_args(name, data, ttl)
+        try:
+            zone = self.connection.get_zone(zone_id)
+            record = zone.create_record(name, type, data, extra)
+            log.info("Type %s record created successfully for %s.",
+                     record.type, self.cloud)
+            return record
+        except InvalidCredsError as exc:
+            log.warning("Invalid creds on running create_record on %s: %s",
+                        self.cloud, exc)
+            raise CloudUnauthorizedError()
+        except ssl.SSLError as exc:
+            log.error("SSLError on running create_record on %s: %s",
+                      self.cloud, exc)
+            raise CloudUnavailableError(exc=exc)
+        except ZoneDoesNotExistError as exc:
+            log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
+            raise ZoneNotFoundError(exc=exc)
+        except Exception as exc:
+            log.exception("Error while running create_record on %s", self.cloud)
+            raise CloudUnavailableError(exc=exc)
+
+    def _create_record__prepare_args(self, name, data, ttl):
+        """
+        This is a private
+        ---
+        """
         raise NotImplementedError()
-        

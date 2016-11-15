@@ -951,7 +951,7 @@ def create_dns_record(request):
     data = params.get('data', '')
     if not data:
         raise RequiredParameterMissingError('data')
-    ttl = params.get('ttl', '')
+    ttl = params.get('ttl', 0)
 
     return cloud.ctl.dns.create_record(zone_id, name, type, data, ttl)
 
