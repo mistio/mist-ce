@@ -266,7 +266,7 @@ class LibvirtMainController(BaseMainController):
         if kwargs.get('key'):
             try:
                 kwargs['key'] = Key.objects.get(owner=self.cloud.owner,
-                                                    id=kwargs['key'])
+                                                id=kwargs['key'])
             except Key.DoesNotExist:
                 raise NotFoundError("Key does not exist.")
 
