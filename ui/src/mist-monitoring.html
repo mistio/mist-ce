@@ -215,7 +215,7 @@
                 console.log(previousPanel);
                 previousPanel.style.width='50%';
                 previousPanel.chartElement.resize(previousPanel.style.width);
-                this.dashboard.rows[this.dashboard.rows.length-1].panels[0].span=6;
+                previousPanel.span=6;
                 panel.span=6;
               }
               this.push("dashboard.rows."+index+".panels",panel);
@@ -256,11 +256,11 @@
         },
         toggleMonitoring: function(e){
             var payload = {}
-                payload.action = this.isMonitored ? "disable" : "enable";
-                payload.public_ips = this.resource.public_ips ? this.resource.public_ips : [];
-                payload.name = this.resource.name ? this.resource.name : this.resource.uuid;
-                payload.dns_name = this.resource.extra.dns_name ? this.resource.extra.dns_name : "n/a";
-                payload.no_ssh = !this.resource.keys && !this.resource.keys.length ? "true" : "";
+            payload.action = this.isMonitored ? "disable" : "enable";
+            payload.public_ips = this.resource.public_ips ? this.resource.public_ips : [];
+            payload.name = this.resource.name ? this.resource.name : this.resource.uuid;
+            payload.dns_name = this.resource.extra.dns_name ? this.resource.extra.dns_name : "n/a";
+            payload.no_ssh = !this.resource.keys && !this.resource.keys.length ? "true" : "";
             console.log("toggleMonitoring",payload);
             this.$.monitoringRequest.headers["Csrf-Token"] = CSRF_TOKEN;
             this.$.monitoringRequest.params = payload;
