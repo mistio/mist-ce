@@ -22,21 +22,12 @@ controller, using the `ctl` abbreviation, like this:
 
 """
 
-import re
-import ssl
 import logging
 
 from libcloud.dns.types import Provider
-from libcloud.dns.types import ZoneDoesNotExistError, RecordDoesNotExistError
 from libcloud.dns.providers import get_driver
 
 from mist.io.clouds.controllers.dns.base import BaseDNSController
-
-from libcloud.common.types import InvalidCredsError
-
-from mist.io.exceptions import CloudUnavailableError
-from mist.io.exceptions import CloudUnauthorizedError
-from mist.io.exceptions import ZoneNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -49,15 +40,13 @@ class AmazonDNSController(BaseDNSController):
         return get_driver(Provider.ROUTE53)(self.cloud.apikey,
                                             self.cloud.apisecret)
 
-    def _create_record__prepare_args(self, name, data, ttl):
+    def _create_record__prepare_args(self, data, ttl):
         """
         This is a private
         ---
         """
         extra = {'ttl':ttl}
-        if not re.match(".*\.$", name):
-            name += "."
-        return name, data, extra
+        return data, extra
 
 
 class GoogleDNSController(BaseDNSController):
@@ -69,7 +58,7 @@ class GoogleDNSController(BaseDNSController):
                                            self.cloud.private_key,
                                            project=self.cloud.project_id)
 
-    def _create_record__prepare_args(self, name, data, ttl):
+    def _create_record__prepare_args(self, data, ttl):
         """
         This is a private
         ---
@@ -77,6 +66,4 @@ class GoogleDNSController(BaseDNSController):
         extra = None
         record_data = {'ttl':ttl, 'rrdatas':[]}
         record_data['rrdatas'].append(data)
-        if not re.match(".*\.$", name):
-            name += "."
-        return name, record_data, extra
+        return record_data, extra

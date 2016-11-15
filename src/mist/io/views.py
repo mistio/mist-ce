@@ -915,7 +915,7 @@ def create_dns_zone(request):
     if not domain:
         raise RequiredParameterMissingError('domain')
     type = params.get('type', '')
-    ttl = params.get('ttl', '')
+    ttl = params.get('ttl', 0)
     extra = params.get('extra', '')
 
     return cloud.ctl.dns.create_zone(domain, type, ttl, extra)

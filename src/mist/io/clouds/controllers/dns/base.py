@@ -242,7 +242,9 @@ class BaseDNSController(BaseController):
         this.
         ----
         """
-        name, data, extra = self._create_record__prepare_args(name, data, ttl)
+        if not re.match(".*\.$", name):
+            name += "."
+        data, extra = self._create_record__prepare_args(data, ttl)
         try:
             zone = self.connection.get_zone(zone_id)
             record = zone.create_record(name, type, data, extra)
@@ -264,7 +266,7 @@ class BaseDNSController(BaseController):
             log.exception("Error while running create_record on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
-    def _create_record__prepare_args(self, name, data, ttl):
+    def _create_record__prepare_args(self, data, ttl):
         """
         This is a private
         ---
