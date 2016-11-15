@@ -334,7 +334,7 @@
                 </paper-material>
             </div>
             <paper-material class="info-card">
-                <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" dashboard="{{dashboard}}" datasources="[[datasources]]"></mist-monitoring>
+                <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" dashboard="[[dashboard]]" datasources="[[datasources]]"></mist-monitoring>
                 <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" user-email="[[model.user.email]]" hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
             <paper-material class="info-card">
@@ -510,7 +510,7 @@ Polymer({
         },
         dashboard: {
             type: Object,
-            computed: "_computeDashboard(machine.cloud.id, machine.id)"
+            computed: "_computeDashboard(machine, model.monitoring.monitored_machines.*)"
         },
         replaceTargets: {
             type: Object,
@@ -561,11 +561,6 @@ Polymer({
     listeners: {
         'confirmation': '_machineActionConfirmation',
         'pending-key-request': '_updateKeyLoader',
-    },
-    _computeItemInArray: function() {
-          var arr = [];
-          arr.push(this.machine);
-          return arr;
     },
     ready: function() {
         this.set('hideAssociatedKeys', true);
@@ -625,104 +620,120 @@ Polymer({
             return machine.uuid == params.uuid;
         }, this);
     },
-    _computeDashboard: function(machinecloudid, machineid) {
-        if(this.dashboard==null){
-            var tempdash = {
-                "id": 1,
-                "refresh": "10sec",
-                "rows": [{
-                    "panels": [{
-                        "id": 0,
-                        "title": "Load",
-                        "type": "graph",
-                        "span": 6,
-                        "stack": false,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "A",
-                            "target": "load.*"
-                        }],
-                        "machineArray": [ [this.machine.cloud.id, this.machine.id]],
-                        "x-axis": true,
-                        "y-axis": true
-                    }, {
-                        "id": 1,
-                        "title": "CPU",
-                        "type": "graph",
-                        "span": 6,
-                        "stack": true,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "C",
-                            "target": "cpu.total.*"
-                        }],
-                        "machineArray": [ [this.machine.cloud.id, this.machine.id]],
-                        "x-axis": true,
-                        "y-axis": true
-                    }]}, {
-                    "panels": [{
-                        "id": 2,
-                        "title": "MEM",
-                        "type": "graph",
-                        "span": 6,
-                        "stack": true,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "D",
-                            "target": "memory.used_percent"
-                        }, {
-                            "refId": "E",
-                            "target": "memory.cached_percent"
-                        }, {
-                            "refId": "F",
-                            "target": "memory.free_percent"
-                        }],
-                        "machineArray": [ [this.machine.cloud.id, this.machine.id]],
-                        "x-axis": true,
-                        "y-axis": true
-                      }, {
-                        "id": 3,
-                        "title": "NET",
-                        "type": "graph",
-                        "span": 6,
-                        "stack": false,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "G",
-                            "target": "interface.total.if_octets.rx"
-                        }, {
-                            "refId": "H",
-                            "target": "interface.total.if_octets.tx"
-                        }],
-                        "machineArray": [ [this.machine.cloud.id, this.machine.id]],
-                        "x-axis": true,
-                        "y-axis": true
+    _computeDashboard: function(machine, monitored_machines) {
+        var tempdash = {
+            "id": 1,
+            "refresh": "10sec",
+            "rows": [{
+                "panels": [{
+                    "id": 2,
+                    "title": "Load",
+                    "type": "graph",
+                    "span": 6,
+                    "stack": false,
+                    "datasource": "mist.monitor",
+                    "targets": [{
+                        "refId": "A",
+                        "target": "load.*"
                     }],
+                    "machineArray": [],
+                    "x-axis": true,
+                    "y-axis": true
+                }, {
+                    "id": 3,
+                    "title": "CPU",
+                    "type": "graph",
+                    "span": 6,
+                    "stack": true,
+                    "datasource": "mist.monitor",
+                    "targets": [{
+                        "refId": "C",
+                        "target": "cpu.total.*"
+                    }],
+                    "machineArray": [],
+                    "x-axis": true,
+                    "y-axis": true
+                }]}, {
+                "panels": [{
+                    "id": 1,
+                    "title": "MEM",
+                    "type": "graph",
+                    "span": 6,
+                    "stack": true,
+                    "datasource": "mist.monitor",
+                    "targets": [{
+                        "refId": "D",
+                        "target": "memory.used_percent"
+                    }, {
+                        "refId": "E",
+                        "target": "memory.cached_percent"
+                    }, {
+                        "refId": "F",
+                        "target": "memory.free_percent"
+                    }],
+                    "machineArray": [],
+                    "x-axis": true,
+                    "y-axis": true
+                  }, {
+                    "id": 5,
+                    "title": "NET",
+                    "type": "graph",
+                    "span": 6,
+                    "stack": false,
+                    "datasource": "mist.monitor",
+                    "targets": [{
+                        "refId": "G",
+                        "target": "interface.total.if_octets.rx"
+                    }, {
+                        "refId": "H",
+                        "target": "interface.total.if_octets.tx"
+                    }],
+                    "machineArray": [],
+                    "x-axis": true,
+                    "y-axis": true
                 }],
-                "time": {
-                    "from": "now-10m",
-                    "to": "now"
-                },
-                "timepicker": {
-                    "now": true,
-                    "refresh_intervals": [],
-                    "time_options": [
-                        "10m",
-                        "1h",
-                        "6h",
-                        "24h",
-                        "7d",
-                        "30d"
-                    ]
-                },
-                "timezone": "browser"
-            };
-            console.log("PANEL DELETE")
-            return tempdash;
+            }],
+            "time": {
+                "from": "now-10m",
+                "to": "now"
+            },
+            "timepicker": {
+                "now": true,
+                "refresh_intervals": [],
+                "time_options": [
+                    "10m",
+                    "1h",
+                    "6h",
+                    "24h",
+                    "7d",
+                    "30d"
+                ]
+            },
+            "timezone": "browser"
+        };
+
+
+        var changeit = false;
+        for (var i = 0; i < tempdash.rows.length; i++) {
+            for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
+                if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
+                    if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
+                        tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
+                        changeit = true;
+                    }
+                }
+            }
         }
-        else{
-          return this.dashboard;
-        }
+        return tempdash;
+        // var that = this;
+        // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
+        //     // if (that.querySelector('dashboard-panel'))
+        //     //     that.querySelector('dashboard-panel').resize();
+        //
+        // }, 5000);
+    },
+    _computeItemInArray: function() {
+        return [this.machine];
     },
     _computeThisItemUid: function(machine) {
         var itemUidInArray = [];
