@@ -52,16 +52,13 @@ class Key(me.Document):
     """
     meta = {
         'allow_inheritance': True,
-        'collection': 'keypair',
+        'collection': 'keys',
     }
 
     id = me.StringField(primary_key=True,
                         default=lambda: uuid4().hex)
     name = me.StringField(required=True, unique_with="owner")
-    owner = me.ReferenceField(Owner)  # TODO Organization required?
-
-    public = me.StringField(required=True)
-    private = me.StringField(required=True)
+    owner = me.ReferenceField(Owner)
     default = me.BooleanField(default=False)
 
     _controller_cls = None
@@ -105,9 +102,6 @@ class Key(me.Document):
             raise RequiredParameterMissingError('title')
         if not owner or not isinstance(owner, Organization):
             raise BadRequestError('owner')
-        # if it already exist?  # TODO
-        # if Key.objects(owner=owner, name=name):
-        #     raise KeyExistsError()
         key = cls(owner=owner, name=name)
         key.ctl.add(**kwargs)
         return key
@@ -141,6 +135,9 @@ class SSHKey(Key):
         'allow_inheritance': True,
     }
 
+    public = me.StringField(required=True)
+    private = me.StringField(required=True)
+
     _controller_cls = controllers.SSHKeyController
 
     def clean(self):
@@ -160,7 +157,7 @@ class SSHKey(Key):
 
 class SignedSSHKey(SSHKey):
     """An signed ssh key"""
-    certificate = me.StringField(required=False)  # TODO True?
+    certificate = me.StringField(required=True)
 
     _controller_cls = controllers.BaseKeyController
 
