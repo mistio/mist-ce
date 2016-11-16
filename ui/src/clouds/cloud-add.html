@@ -145,6 +145,7 @@
 
                 },
                 _cloudAddAjaxResponse: function(response) {
+                    this._providerReset();
                     document.querySelector('app-location').set('path', '/');
                 },
                 _cloudAddAjaxError: function(response) {
@@ -189,7 +190,7 @@
                     this.set('providerFields.' + index + '.value', '');
                 },
                 _providerReset: function() {
-                    this.set('provider', null);
+                    this.set('selectedProvider', false)
                 },
                 _submitForm: function(e) {
                     console.log(this.cloud);
