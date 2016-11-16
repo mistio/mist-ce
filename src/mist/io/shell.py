@@ -106,12 +106,13 @@ class ParamikoShell(object):
                                                 "provided.")
 
         if key:
+            private = key.private
             if isinstance(key, SignedSSHKey) and cert_file:
                 # signed ssh key, use RSACert
-                rsa_key = paramiko.RSACert(privkey_file_obj=StringIO(key),
+                rsa_key = paramiko.RSACert(privkey_file_obj=StringIO(private),
                                            cert_file_obj=StringIO(cert_file))
             else:
-                rsa_key = paramiko.RSAKey.from_private_key(StringIO(key))
+                rsa_key = paramiko.RSAKey.from_private_key(StringIO(private))
         else:
             rsa_key = None
 
@@ -288,7 +289,7 @@ class ParamikoShell(object):
                             cert_file = key.certificate
 
                         self.connect(username=ssh_user,
-                                     key=key.private,
+                                     key=key,
                                      password=password,
                                      cert_file=cert_file,
                                      port=port)
@@ -310,7 +311,7 @@ class ParamikoShell(object):
                             if isinstance(key, SignedSSHKey):
                                 cert_file = key.certificate
                             self.connect(username=new_ssh_user,
-                                         key=key.private,
+                                         key=key,
                                          password=password,
                                          cert_file=cert_file,
                                          port=port)
