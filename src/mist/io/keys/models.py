@@ -117,11 +117,11 @@ class Key(me.Document):
             'name': self.name,
             'owner': self.owner.id,
             'default': self.default,
-            'public': self.public,
         }
 
         mdict.update({key: getattr(self, key)
-                      for key in self._key_specific_fields})
+                      for key in self._key_specific_fields
+                      if key not in self._private_fields})
         return mdict
 
     def __str__(self):
@@ -139,6 +139,7 @@ class SSHKey(Key):
     private = me.StringField(required=True)
 
     _controller_cls = controllers.SSHKeyController
+    _private_fields = ('private',)
 
     def clean(self):
         """Ensures that self is a valid RSA keypair."""
