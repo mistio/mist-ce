@@ -105,10 +105,6 @@
                         type: String,
                         computed: '_getHeaderStyle(section)'
                     },
-                    cloud: {
-                        type: Object,
-                        value: {}
-                    },
                     selectedProvider: {
                         type: String,
                         value: null,
@@ -151,16 +147,8 @@
                 _cloudAddAjaxError: function(response) {
                     console.error('add-cloud error', response);
                 },
-                _openDocs: function(href) {
-                    document.location = href;
-                },
                 _computeProviderLogo: function(className) {
                     return '../assets/providers/' + className + '.png';
-                },
-                _computeFieldType: function(field, value, show) {
-                    if (!(field.showIf && !field.show)) {
-                        return field.type == value;
-                    }
                 },
                 _providerChanged: function(selectedProvider, providers) {
                     this._resetForm();
@@ -192,21 +180,7 @@
                 _providerReset: function() {
                     this.set('selectedProvider', false)
                 },
-                _submitForm: function(e) {
-                    console.log(this.cloud);
-                    this.$.cloudAddAjaxRequest.body = this.cloud;
-                    this.$.cloudAddAjaxRequest.headers["Content-Type"] = 'application/json';
-                    this.$.cloudAddAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.cloudAddAjaxRequest.generateRequest();
-                    this.set('sendingData', true);
-                },
-                _addCloudResponse: function(e) {
-                    this.set('sendingData', false);
-                },
                 _resetForm: function(e) {
-                    // Reset cloud
-                    this.set('cloud', {});
-
                     // Reset Form Fields
                     this.providerFields.forEach(function(el, index) {
                         if (el.showIf) {
