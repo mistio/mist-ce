@@ -126,7 +126,7 @@ class Key(me.Document):
 
     def __str__(self):
         return '%s key %s (%s) of %s' % (type(self), self.name,
-                                           self.id, self.owner)
+                                         self.id, self.owner)
 
 
 class SSHKey(Key):
@@ -159,7 +159,7 @@ class SignedSSHKey(SSHKey):
     """An signed ssh key"""
     certificate = me.StringField(required=True)
 
-    _controller_cls = controllers.BaseKeyController
+    _controller_cls = controllers.SSHKeyController
 
     def clean(self):
         """
