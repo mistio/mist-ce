@@ -85,21 +85,18 @@ class DigitalOceanMainController(BaseMainController):
 
     provider = 'digitalocean'
     ComputeController = compute_ctls.DigitalOceanComputeController
-    NetworkController = network_ctls.DigitalOceanNetworkController
 
 
 class LinodeMainController(BaseMainController):
 
     provider = 'linode'
     ComputeController = compute_ctls.LinodeComputeController
-    NetworkController = network_ctls.LinodeNetworkController
 
 
 class RackSpaceMainController(BaseMainController):
 
     provider = 'rackspace'
     ComputeController = compute_ctls.RackSpaceComputeController
-    NetworkController = network_ctls.RackSpaceNetworkController
 
     def _add__preparse_kwargs(self, kwargs):
         username = kwargs.get('username')
@@ -115,28 +112,24 @@ class SoftLayerMainController(BaseMainController):
 
     provider = 'softlayer'
     ComputeController = compute_ctls.SoftLayerComputeController
-    NetworkController = network_ctls.SoftlayerNetworkController
 
 
 class NephoScaleMainController(BaseMainController):
 
     provider = 'nephoscale'
     ComputeController = compute_ctls.NephoScaleComputeController
-    NetworkController = network_ctls.NephoScaleNetworkController
 
 
 class AzureMainController(BaseMainController):
 
     provider = 'azure'
     ComputeController = compute_ctls.AzureComputeController
-    NetworkController = network_ctls.AzureNetworkController
 
 
 class AzureArmMainController(BaseMainController):
 
     provider = 'azure_arm'
     ComputeController = compute_ctls.AzureArmComputeController
-    NetworkController = network_ctls.AzureArmNetworkController
 
 
 class GoogleMainController(BaseMainController):
@@ -166,28 +159,24 @@ class HostVirtualMainController(BaseMainController):
 
     provider = 'hostvirtual'
     ComputeController = compute_ctls.HostVirtualComputeController
-    NetworkController = network_ctls.HostVirtualNetworkController
 
 
 class PacketMainController(BaseMainController):
 
     provider = 'packet'
     ComputeController = compute_ctls.PacketComputeController
-    NetworkController = network_ctls.PacketNetworkController
 
 
 class VultrMainController(BaseMainController):
 
     provider = 'vultr'
     ComputeController = compute_ctls.VultrComputeController
-    NetworkController = network_ctls.VultrNetworkController
 
 
 class VSphereMainController(BaseMainController):
 
     provider = 'vsphere'
     ComputeController = compute_ctls.VSphereComputeController
-    NetworkController = network_ctls.VSphereNetworkController
 
     def _update__preparse_kwargs(self, kwargs):
         host = kwargs.get('host', self.cloud.host)
@@ -200,7 +189,6 @@ class VCloudMainController(BaseMainController):
 
     provider = 'vcloud'
     ComputeController = compute_ctls.VCloudComputeController
-    NetworkController = network_ctls.VCloudNetworkController
 
     def _update__preparse_kwargs(self, kwargs):
         username = kwargs.get('username', self.cloud.username) or ''
@@ -222,8 +210,6 @@ class IndonesianVCloudMainController(VCloudMainController):
 
     provider = 'indonesian_vcloud'
     ComputeController = compute_ctls.VCloudComputeController
-    NetworkController = network_ctls.IndonesianVCloudNetworkController
-
 
     def _update__preparse_kwargs(self, kwargs):
         host = kwargs.get('host', self.cloud.host) or 'my.idcloudonline.com'
@@ -256,7 +242,6 @@ class DockerMainController(BaseMainController):
 
     provider = 'docker'
     ComputeController = compute_ctls.DockerComputeController
-    NetworkController = network_ctls.DockerNetworkController
 
     def _update__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'docker_port', 'port')
@@ -273,7 +258,6 @@ class LibvirtMainController(BaseMainController):
 
     provider = 'libvirt'
     ComputeController = compute_ctls.LibvirtComputeController
-    NetworkController = network_ctls.LibvirtNetworkController
 
     def _add__preparse_kwargs(self, kwargs):
         rename_kwargs(kwargs, 'machine_hostname', 'host')
@@ -316,7 +300,6 @@ class OtherMainController(BaseMainController):
 
     provider = 'bare_metal'
     ComputeController = compute_ctls.OtherComputeController
-    NetworkController = network_ctls.OtherNetworkController
 
     def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
         """Add new Cloud to the database

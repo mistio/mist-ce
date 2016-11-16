@@ -168,6 +168,18 @@ class NetworkCreationError(InternalServerError):
     msg = "Network creation failed"
 
 
+class NetworkNotFound(InternalServerError):
+    msg = "Network not found"
+
+
+class SubnetCreationError(InternalServerError):
+    msg = "Subnet creation failed"
+
+
+class SubnetNotFound(InternalServerError):
+    msg = "Subnet not found"
+
+
 class SSLError(MistError):
     msg = "SSL certificate verification error"
 

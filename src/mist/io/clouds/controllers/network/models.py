@@ -3,7 +3,24 @@ import logging
 
 import mongoengine as me
 
+from mist.io.exceptions import RequiredParameterMissingError
+from mist.io.clouds.controllers.network import controllers
+
+
 log = logging.getLogger(__name__)
+
+
+NETWORKS = {}
+SUBNETS = {}
+
+
+def _populate_class_mapping(mapping, class_suffix, base_class):
+    """Populates a mapping that matches a provider name with its provider-specific model classes"""
+    for key, value in globals().items():
+        if key.endswith(class_suffix) and key != class_suffix:
+            value = globals()[key]
+            if issubclass(value, base_class) and value is not base_class:
+                mapping[value._controller_cls.provider] = value
 
 
 class Network(me.Document):
@@ -11,13 +28,59 @@ class Network(me.Document):
     network_id = me.StringField(required=True)
     title = me.StringField(required=True)
     cloud = me.ReferenceField('Cloud', required=True)
+    extra = me.DictField()
 
-    subnets = me.ListField(me.ReferenceField('Subnet'))
+    _controller_cls = None
 
     meta = {
         'allow_inheritance': True,
         'collection': 'networks'
     }
+
+    def __init__(self, *args, **kwargs):
+        super(Network, self).__init__(*args, **kwargs)
+        # Set attribute `ctl` to an instance of the appropriate controller.
+        if self._controller_cls is None:
+            raise NotImplementedError(
+                "Can't initialize %s. Network is an abstract base class and "
+                "shouldn't be used to create network instances. All Cloud "
+                "subclasses should define a `_controller_cls` class attribute "
+                "pointing to a `BaseNetworkController` subclass." % self
+            )
+        elif not issubclass(self._controller_cls,
+                            controllers.BaseNetworkController):
+            raise TypeError(
+                "Can't initialize %s.  All Network subclasses should define a "
+                "`_controller_cls` class attribute pointing to a "
+                "`BaseNEtworkController` subclass." % self
+            )
+        self.ctl = self._controller_cls(self)
+        # Calculate and store cloud type specific fields.
+        self._cloud_specific_fields = [field for field in type(self)._fields if field not in Network._fields]
+
+    @classmethod
+    def add(cls, title, cloud, object_id='', **kwargs):
+
+        if not title:
+            raise RequiredParameterMissingError('title')
+        if not cloud:
+            raise RequiredParameterMissingError('cloud')
+
+        network = cls(title=title, cloud=cloud)
+
+        if object_id:
+            network.id = object_id
+            network.ctl.add_network(**kwargs)
+        return network
+
+    def as_dict(self):
+        netdict = {'name': self.title,
+                   'id': self.id,
+                   'network_id': self.network_id}
+
+        netdict.update({key: getattr(self, key) for key in self._cloud_specific_fields})
+
+        return netdict
 
     def __repr__(self):
         return '<Network id:{id}, Title:{title}, Cloud:{cloud},' \
@@ -36,28 +99,9 @@ class AmazonNetwork(Network):
     is_default = me.BooleanField()
     state = me.StringField()
     instance_tenancy = me.StringField()
-    dhcp_options_id = me.StringField()
     tags = me.DictField()
 
-    @classmethod
-    def from_libcloud(cls, libcloud_network):
-        return AmazonNetwork(title=libcloud_network.name,
-                             network_id=libcloud_network.id,
-                             is_default=libcloud_network.extra['is_default'],
-                             state=libcloud_network.extra['state'],
-                             instance_tenancy=libcloud_network.extra['instance_tenancy'],
-                             dhcp_options_id=libcloud_network.extra['dhcp_options_id'],
-                             tags=libcloud_network.extra['tags'])
-
-    def as_dict(self):
-        return {'name': self.title,
-                'id': self.id,
-                'network_id': self.network_id,
-                'is_default': self.is_default,
-                'state': self.state,
-                'instance_tenancy': self.instance_tenancy,
-                'dhcp_options_id': self.dhcp_options_id,
-                'tags': self.tags}
+    _controller_cls = controllers.AmazonNetworkController
 
 
 class GoogleNetwork(Network):
@@ -69,29 +113,7 @@ class GoogleNetwork(Network):
     mode = me.StringField()
     cidr = me.StringField()
 
-    @classmethod
-    def from_libcloud(cls, libcloud_network):
-        return GoogleNetwork(title=libcloud_network.name,
-                             network_id=libcloud_network.id,
-                             cidr=libcloud_network.cidr,
-                             IPv4Range=libcloud_network.extra['IPv4Range'],
-                             autoCreateSubnetworks=libcloud_network.extra['autoCreateSubnetworks'],
-                             creationTimestamp=libcloud_network.extra['creationTimestamp'],
-                             description=libcloud_network.extra['description'],
-                             gatewayIPv4=libcloud_network.extra['gatewayIPv4'],
-                             mode=libcloud_network.extra['mode']
-                             )
-
-    def as_dict(self):
-        return {'name': self.title,
-                'id': self.id,
-                'network_id': self.network_id,
-                'IPv4Range': self.IPv4Range,
-                'autoCreateSubnetworks': self.autoCreateSubnetworks,
-                'creationTimestamp': self.creationTimestamp,
-                'description': self.description,
-                'gatewayIPv4': self.gatewayIPv4,
-                'mode': self.mode}
+    _controller_cls = controllers.GoogleNetworkController
 
 
 class OpenStackNetwork(Network):
@@ -103,49 +125,69 @@ class OpenStackNetwork(Network):
     provider_physical_network = me.StringField()
     provider_segmentation_id = me.IntField()
     shared = me.BooleanField()
-    tenant_id = me.StringField()
 
-    @classmethod
-    def from_libcloud(cls, libcloud_network):
-        return OpenStackNetwork(title=libcloud_network.name,
-                                network_id=libcloud_network.id,
-                                status=libcloud_network.status,
-                                router_external=libcloud_network.router_external,
-                                admin_state_up=libcloud_network.extra['admin_state_up'],
-                                mtu=libcloud_network.extra['mtu'],
-                                provider_network_type=libcloud_network.extra['provider:network_type'],
-                                provider_physical_network=libcloud_network.extra['provider:physical_network'],
-                                provider_segmentation_id=libcloud_network.extra['provider:segmentation_id'],
-                                shared=libcloud_network.extra['shared'],
-                                tenant_id=libcloud_network.extra['tenant_id']
-                                )
-
-    def as_dict(self):
-        return {'name': self.title,
-                'id': self.id,
-                'network_id': self.network_id,
-                'status': self.status,
-                'router_external': self.router_external,
-                'admin_state_up': self.admin_state_up,
-                'mtu': self.mtu,
-                'provider_network_type': self.provider_network_type,
-                'provider_physical_network': self.provider_physical_network,
-                'provider_segmentation_id': self.provider_segmentation_id,
-                'shared': self.shared,
-                'tenant_id': self.tenant_id}
+    _controller_cls = controllers.OpenStackNetworkController
 
 
 class Subnet(me.Document):
     id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
     subnet_id = me.StringField(required=True)
     title = me.StringField(required=True)
+    cidr = me.StringField(required=True)
+    network = me.ReferenceField('Network', required=True, reverse_delete_rule=me.CASCADE)
+    extra = me.DictField()
 
-    network = me.ReferenceField('Network', required=True)
+    _controller_cls = None
 
     meta = {
         'allow_inheritance': True,
         'collection': 'subnets'
     }
+
+    def __init__(self, *args, **kwargs):
+        super(Subnet, self).__init__(*args, **kwargs)
+        # Set attribute `ctl` to an instance of the appropriate controller.
+        if self._controller_cls is None:
+            raise NotImplementedError(
+                "Can't initialize %s. Subnet is an abstract base class and "
+                "shouldn't be used to create subnet instances. All Subnet "
+                "subclasses should define a `_controller_cls` class attribute "
+                "pointing to a `BaseNetworkController` subclass." % self
+            )
+        elif not issubclass(self._controller_cls,
+                            controllers.BaseNetworkController):
+            raise TypeError(
+                "Can't initialize %s.  All Subnet subclasses should define a "
+                "`_controller_cls` class attribute pointing to a "
+                "`BaseNetworkController` subclass." % self
+            )
+        self.ctl = self._controller_cls(self)
+        # Calculate and store cloud type specific fields.
+        self._cloud_specific_fields = [field for field in type(self)._fields if field not in Network._fields]
+
+    @classmethod
+    def add(cls, title, base_network, object_id='', **kwargs):
+
+        if not title:
+            raise RequiredParameterMissingError('title')
+        if not base_network:
+            raise RequiredParameterMissingError('base_network')
+
+        subnet = cls(title=title, base_network=base_network)
+
+        if object_id:
+            subnet.id = object_id
+            subnet.ctl.add_subnet(**kwargs)
+        return subnet
+
+    def as_dict(self):
+        netdict = {'name': self.title,
+                   'id': self.id,
+                   'subnet_id': self.subnet_id}
+
+        netdict.update({key: getattr(self, key) for key in self._cloud_specific_fields})
+
+        return netdict
 
     def __repr__(self):
         return '<Subnet id:{id}, Title:{title} Cloud API id:{cloud_id},' \
@@ -163,60 +205,21 @@ class Subnet(me.Document):
 class AmazonSubnet(Subnet):
     state = me.StringField()
     available_ips = me.IntField()
-    cidr_block = me.StringField()
     tags = me.DictField()
     zone = me.StringField()
 
-    @classmethod
-    def from_libcloud(cls, libcloud_subnet):
-        return AmazonSubnet(title=libcloud_subnet.name,
-                            subnet_id=libcloud_subnet.id,
-                            state=libcloud_subnet.state,
-                            available_ips=libcloud_subnet.extra['available_ips'],
-                            cidr_block=libcloud_subnet.extra['cidr_block'],
-                            tags=libcloud_subnet.extra['tags'],
-                            zone=libcloud_subnet.extra['zone'])
-
-    def as_dict(self):
-        return {'name': self.title,
-                'id': self.id,
-                'subnet_id': self.subnet_id,
-                'state': self.state,
-                'available_ips': self.available_ips,
-                'cidr_block': self.cidr_block,
-                'tags': self.tags,
-                'zone': self.zone}
+    _controller_cls = controllers.AmazonNetworkController
 
 
 class GoogleSubnet(Subnet):
     region = me.StringField()
-    cidr = me.StringField()
     gateway_ip = me.StringField()
     creationTimestamp = me.StringField()
 
-    @classmethod
-    def from_libcloud(cls, libcloud_subnet):
-        region = libcloud_subnet.extra['region'].split("/")[-1]
-
-        return GoogleSubnet(title=libcloud_subnet.name,
-                            subnet_id=libcloud_subnet.id,
-                            region=region,
-                            cidr=libcloud_subnet.extra['ipCidrRange'],
-                            gateway_ip=libcloud_subnet.extra['gatewayAddress'],
-                            creationTimestamp=libcloud_subnet.extra['creationTimestamp'])
-
-    def as_dict(self):
-        return {'name': self.title,
-                'id': self.id,
-                'subnet_id': self.subnet_id,
-                'region': self.region,
-                'cidr': self.cidr,
-                'gateway_ip': self.gateway_ip,
-                'creationTimestamp': self.creationTimestamp}
+    _controller_cls = controllers.GoogleNetworkController
 
 
 class OpenStackSubnet(Subnet):
-    cidr = me.StringField()
     enable_dhcp = me.BooleanField()
     dns_nameservers = me.ListField()
     allocation_pools = me.ListField()
@@ -226,36 +229,9 @@ class OpenStackSubnet(Subnet):
     ipv6_address_mode = me.StringField()
     ipv6_ra_mode = me.StringField()
     subnetpool_id = me.StringField()
-    tenant_id = me.StringField()
 
-    @classmethod
-    def from_libcloud(cls, libcloud_subnet):
-        return OpenStackSubnet(title=libcloud_subnet.name,
-                               subnet_id=libcloud_subnet.id,
-                               cidr=libcloud_subnet.cidr,
-                               enable_dhcp=libcloud_subnet.enable_dhcp,
-                               dns_nameservers=libcloud_subnet.dns_nameservers,
-                               allocation_pools=libcloud_subnet.allocation_pools,
-                               gateway_ip=libcloud_subnet.gateway_ip,
-                               ip_version=libcloud_subnet.ip_version,
-                               host_routes=libcloud_subnet.extra['host_routes'],
-                               ipv6_address_mode=libcloud_subnet.extra['ipv6_address_mode'],
-                               ipv6_ra_mode=libcloud_subnet.extra['ipv6_ra_mode'],
-                               subnetpool_id=libcloud_subnet.extra['subnetpool_id'],
-                               tenant_id=libcloud_subnet.extra['tenant_id']
-                               )
+    _controller_cls = controllers.OpenStackNetworkController
 
-    def as_dict(self):
-        return {'name': self.title,
-                'id': self.id,
-                'subnet_id': self.subnet_id,
-                'enable_dhcp': self.enable_dhcp,
-                'dns_nameservers': self.dns_nameservers,
-                'allocation_pools': self.allocation_pools,
-                'gateway_ip': self.gateway_ip,
-                'ip_version': self.ip_version,
-                'host_routes': self.host_routes,
-                'ipv6_address_mode': self.ipv6_address_mode,
-                'ipv6_ra_mode': self.ipv6_ra_mode,
-                'subnetpool_id': self.subnetpool_id,
-                'tenant_id': self.tenant_id}
+
+_populate_class_mapping(NETWORKS, 'Network', Network)
+_populate_class_mapping(SUBNETS, 'Subnet', Subnet)
