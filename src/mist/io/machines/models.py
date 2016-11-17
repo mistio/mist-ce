@@ -75,7 +75,7 @@ class Machine(me.Document):
     # Info gathered mostly by libcloud (or in some cases user input).
     # Be more specific about what this is.
     # We should perhaps come up with a better name.
-    machine_id = me.StringField(required=True, unique_with="cloud")
+    machine_id = me.StringField(required=True)
     hostname = me.StringField()
     public_ips = me.ListField()
     private_ips = me.ListField()
@@ -107,6 +107,14 @@ class Machine(me.Document):
 
     meta = {
         'collection': 'machines',
+        'indexes': [
+            {
+                'fields': ['cloud', 'machine_id'],
+                'sparse': False,
+                'unique': True,
+                'cls': False,
+            },
+        ],
     }
 
     def __init__(self, *args, **kwargs):
