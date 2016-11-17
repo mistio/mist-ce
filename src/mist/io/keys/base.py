@@ -110,19 +110,19 @@ class BaseKeyController(object):
 
         log.info("Setting key with id '%s' as default.", key_id)
 
-        default_key = Key.objects(owner=self.key.owner,
-                                  default=True).first()
-        if default_key:
-            default_key.default = False
-            default_key.save()
-
-        key = Key.objects.get(owner=self.key.owner, id=key_id)
-        key.default = True
-        key.save()
+        # default_key = Key.objects(owner=self.key.owner,
+        #                           default=True).first()
+        # if default_key:
+        #     default_key.default = False
+        #     default_key.save()
+        #
+        # key = Key.objects.get(owner=self.key.owner, id=key_id)
+        # key.default = True
+        # key.save()
 
         # TODO do we prefer this?
-        # Key.objects(default=True).update(default=False)
-        # Key.objects(owner=self.key.owner, id=key_id).update(default=True)
+        Key.objects(default=True).update(default=False)
+        Key.objects(owner=self.key.owner, id=key_id).update(default=True)
 
         log.info("Successfully set key with id '%s' as default.", key_id)
         trigger_session_update(self.key.owner, ['keys'])
