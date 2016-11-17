@@ -468,25 +468,30 @@ Polymer({
         return ret;
     },
     _probesChanged: function(probes, item, section){
-        console.log('PROBES CHANGED', this.probes && this.section.id == "machines" && this.item.uuid && this.probes[item.uuid] && this.probes[item.uuid].dirty_cow == true)
+        console.log('PROBES CHANGED')
 
         if (this.probes && this.section.id == "machines" && this.item.uuid && this.probes[item.uuid] && this.probes[item.uuid].dirty_cow == true) {
                 //hardcoded index = 1 which is the state column
+                console.log('PROBES CHANGED TRUE', item.uuid)
                 this._appendIconOnRecommendations(1, 'icons:report-problem');
         }
     },
     _appendIconOnRecommendations: function(index, icontext){
         var parent = this.querySelector('.state.field'+index+' .field-icon');
         var link = this.querySelector('a.field-link-'+index+'-state'); 
+        console.log('PARENT LINK', parent, link, this.item.uuid);
         if (link){
             link.setAttribute('href','#');
-        }
-        if (parent && parent.children.length == 0) {
-            var icon = document.createElement('iron-icon');
-            icon.classList.add('recommendations');
-            icon.setAttribute('icon', icontext);
-            icon.setAttribute('data-attr', 'recommendations');
-            Polymer.dom(parent).appendChild(icon);
+            //show icon only after the link has been disabled
+            this.async(function(){
+                if (parent && parent.children.length == 0) {
+                    var icon = document.createElement('iron-icon');
+                    icon.classList.add('recommendations');
+                    icon.setAttribute('icon', icontext);
+                    icon.setAttribute('data-attr', 'recommendations');
+                    Polymer.dom(parent).appendChild(icon);
+                }
+            }, 50);
         }
     },
 
