@@ -200,7 +200,7 @@
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
         <content></content>
         <template is="dom-repeat" items="{{fields}}" as="field">        
-          <a href="[[uri]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false" class$="field-link-[[index]]-[[field]]">            
+          <a href="{{_computeUri(uri, field, item, probes)}}" is="pushstate-anchor" ondragstart="return false" ondrop="return false" class$="field-link-[[index]]-[[field]]">            
             <div class$="[[field]] field field[[index]] {{itemField(item, field, index)}}  {{itemProbeClasses(item, field, index, probes)}}"><span class$="field-icon [[field]]"></span>{{itemField(item, field, index, probes)}}</div>
           </a>
         </template>
@@ -334,12 +334,6 @@ Polymer({
         }
 
         var ret = item[field];
-
-        //machines: state
-        if (field == "state") {
-            
-            return ret;
-        }
 
         // networks
         if (field == 'subnets')
@@ -476,22 +470,23 @@ Polymer({
                 this._appendIconOnRecommendations(1, 'icons:report-problem');
         }
     },
+
+    _computeUri: function(uri,field, item, probes){
+        if (this.field == 'state', this.probes && this.section.id == "machines" && this.item.uuid && this.probes[item.uuid] && this.probes[item.uuid].dirty_cow == true) {
+            return '#';
+        }
+        else
+            return this.uri;
+    },
+
     _appendIconOnRecommendations: function(index, icontext){
         var parent = this.querySelector('.state.field'+index+' .field-icon');
-        var link = this.querySelector('a.field-link-'+index+'-state'); 
-        console.log('PARENT LINK', parent, link, this.item.uuid);
-        if (link){
-            link.setAttribute('href','#');
-            //show icon only after the link has been disabled
-            this.async(function(){
-                if (parent && parent.children.length == 0) {
-                    var icon = document.createElement('iron-icon');
-                    icon.classList.add('recommendations');
-                    icon.setAttribute('icon', icontext);
-                    icon.setAttribute('data-attr', 'recommendations');
-                    Polymer.dom(parent).appendChild(icon);
-                }
-            }, 50);
+        if (parent && parent.children.length == 0) {
+            var icon = document.createElement('iron-icon');
+            icon.classList.add('recommendations');
+            icon.setAttribute('icon', icontext);
+            icon.setAttribute('data-attr', 'recommendations');
+            Polymer.dom(parent).appendChild(icon);
         }
     },
 
