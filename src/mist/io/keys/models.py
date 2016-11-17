@@ -53,11 +53,19 @@ class Key(me.Document):
     meta = {
         'allow_inheritance': True,
         'collection': 'keys',
+        'indexes': [
+            {
+                'fields': ['owner', 'name'],
+                'sparse': False,
+                'unique': True,
+                'cls': False,
+            },
+        ],
     }
 
     id = me.StringField(primary_key=True,
                         default=lambda: uuid4().hex)
-    name = me.StringField(required=True, unique_with="owner")
+    name = me.StringField(required=True)
     owner = me.ReferenceField(Owner)
     default = me.BooleanField(default=False)
 
