@@ -151,10 +151,18 @@ class Schedule(me.Document):
     meta = {
         'collection': 'schedules',
         'allow_inheritance': True,
+        'indexes': [
+            {
+                'fields': ['owner', 'name'],
+                'sparse': False,
+                'unique': True,
+                'cls': False,
+            },
+        ],
     }
 
     id = me.StringField(primary_key=True, default=lambda: uuid4().hex)
-    name = me.StringField(required=True, unique_with='owner')
+    name = me.StringField(required=True)
     description = me.StringField()
     owner = me.ReferenceField(Owner, required=True)
 
