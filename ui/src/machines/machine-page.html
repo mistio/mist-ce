@@ -314,7 +314,7 @@
                     <div hidden$="[[!machine.keys.length]]">
                         <h3 class="smallcaps">Associated Keys:</h3>
                         <div class="associatedKeys">
-                            <template is="dom-repeat" items="{{machine.keys}}">
+                            <template is="dom-repeat" items="{{machineKeys}}">
                                 <div class="machine-key">
                                     <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
                                     <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
@@ -375,8 +375,6 @@
             </paper-material>
         </div>
         <dialog-element id="machinedialog"></dialog-element>
-        <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
-        <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
         <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
         <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
         <machine-edit machine="[[machine]]"></machine-edit>
@@ -481,7 +479,8 @@ Polymer({
         },
         machine: {
             type: Object,
-            computed: '_computeMachine(params, model.machinesArray.*)'
+            // computed: '_computeMachine(params.*, model.machinesArray.*)',
+            notify: true
         },
         sections: {
             type: Array,
@@ -537,6 +536,12 @@ Polymer({
         hideAssociatedKeys: {
             type: Boolean
         },
+        machineKeys: {
+            type: Array,
+            computed: '_computeAssociatedKeys(machine.*, machine.keys.*, machine.keys.length, model.keysArray.*)',
+            value: [],
+            notify: true
+        },
         itemInArray: {
             type: Array,
             computed: '_computeItemInArray(machine)'
@@ -578,7 +583,7 @@ Polymer({
 
     _computeActions: function(item) {
         var ret = [];
-        if (item.state == 'running') {
+        if (item && item.state == 'running') {
             // if key then add shell / run script
             // if not monitoring then enable monitoring
             ret.push('shell');
@@ -586,23 +591,23 @@ Polymer({
             if(this.hideAssociatedKeys)
                 ret.push('run-script');
         }
-        if (item.can_tag)
+        if (item && item.can_tag)
             ret.push('tag');
-        if (item.can_start)
+        if (item && item.can_start)
             ret.push('start');
-        if (item.can_stop)
+        if (item && item.can_stop)
             ret.push('stop');
-        if (item.can_suspend)
+        if (item && item.can_suspend)
             ret.push('suspend');
-        if (item.can_reboot)
+        if (item && item.can_reboot)
             ret.push('reboot');
-        if (item.can_resume)
+        if (item && item.can_resume)
             ret.push('resume');
-        if (item.can_rename)
+        if (item && item.can_rename)
             ret.push('rename');
-        if (item.can_destroy)
+        if (item && item.can_destroy)
             ret.push('destroy');
-        if (item.can_undefine)
+        if (item && item.can_undefine)
             ret.push('undefine');
 
         var actions = [];
@@ -612,14 +617,14 @@ Polymer({
 
         return actions;
     },
-    _computeMachine: function(params, machines) {
-        if (this.machine && this.machine.uuid && params.uuid != this.machine.uuid) {
-            this.set('isPendingKeyRequest', false);
-        }
-        return machines.base.find(function(machine) {
-            return machine.uuid == params.uuid;
-        }, this);
-    },
+    // _computeMachine: function(params, machines) {
+    //     if (this.machine && this.machine.uuid && this.params.uuid != this.machine.uuid) {
+    //         this.set('isPendingKeyRequest', false);
+    //     }
+    //     return machines.base.find(function(machine) {
+    //         return machine.uuid == this.params.uuid;
+    //     }, this);
+    // },
     _computeDashboard: function(machine, monitored_machines) {
         var tempdash = {
             "id": 1,
@@ -636,7 +641,7 @@ Polymer({
                         "refId": "A",
                         "target": "load.*"
                     }],
-                    "machineArray": [],
+                    "machineArray": [this.machine.cloud.id, this.machine.id],
                     "x-axis": true,
                     "y-axis": true
                 }, {
@@ -650,7 +655,7 @@ Polymer({
                         "refId": "C",
                         "target": "cpu.total.*"
                     }],
-                    "machineArray": [],
+                    "machineArray": [this.machine.cloud.id, this.machine.id],
                     "x-axis": true,
                     "y-axis": true
                 }]}, {
@@ -671,7 +676,7 @@ Polymer({
                         "refId": "F",
                         "target": "memory.free_percent"
                     }],
-                    "machineArray": [],
+                    "machineArray": [this.machine.cloud.id, this.machine.id],
                     "x-axis": true,
                     "y-axis": true
                   }, {
@@ -688,7 +693,7 @@ Polymer({
                         "refId": "H",
                         "target": "interface.total.if_octets.tx"
                     }],
-                    "machineArray": [],
+                    "machineArray": [this.machine.cloud.id, this.machine.id],
                     "x-axis": true,
                     "y-axis": true
                 }],
@@ -713,17 +718,17 @@ Polymer({
         };
 
 
-        var changeit = false;
-        for (var i = 0; i < tempdash.rows.length; i++) {
-            for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
-                if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
-                    if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
-                        tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
-                        changeit = true;
-                    }
-                }
-            }
-        }
+        // var changeit = false;
+        // for (var i = 0; i < tempdash.rows.length; i++) {
+        //     for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
+        //         if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
+        //             if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
+        //                 tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
+        //                 changeit = true;
+        //             }
+        //         }
+        //     }
+        // }
         return tempdash;
         // var that = this;
         // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
@@ -731,7 +736,7 @@ Polymer({
         //     //     that.querySelector('dashboard-panel').resize();
         //
         // }, 5000);
-    },
+    },    
     _computeItemInArray: function() {
         return [this.machine];
     },
@@ -740,8 +745,8 @@ Polymer({
         itemUidInArray.push(itemUid(this.machine, this.sections['machines']));
         return itemUidInArray;
     },
-    _computeAssociatedKeys: function(machine, keys) {
-        return machine.keys || [];
+    _computeAssociatedKeys: function(machine, machinekeys, length, keys) {
+        return this.machine.keys;
     },
     computeMachineIp: function(machineips) {
         if (this.machine.public_ips) {
@@ -803,7 +808,8 @@ Polymer({
         toast.show();
     },
     isState: function(machine) {
-        return machine.state == machine.extra.status;
+        if (machine)
+            return machine.state == machine.extra.status;
     },
     _computeIsloading: function(machine) {
         return !this.machine ? true : false;
@@ -836,6 +842,10 @@ Polymer({
     _disassociateKeyError: function(e) {
         this.set('isPendingKeyRequest', false);
     },
+    _machineActionConfirmation: function(e){
+        this.$.disassociateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+        this.$.disassociateKeyRequest.generateRequest();
+    },
     _updateKeyLoader: function(e) {
         //console.log(e.detail);
         if (e.detail.request) {
@@ -856,19 +866,7 @@ Polymer({
         }
     },
     _feedbackOnRename: function(e) {
-        console.log("_feedbackOnRename")
-        if (e.detail.request) {
-            this._showToast('Rename request sent. Waiting for machine to respond');
-        }
-        if (e.detail.response) {
-            this._showToast('Renaming was successful.');
-        }
-        if (e.detail.error) {
-            this._showToast(e.detail.errormsg);
-        }
-    },
-    _feedbackOnRename: function(e){
-        console.log("_feedbackOnRename")
+        // console.log("_feedbackOnRename")
         if (e.detail.request) {
             this._showToast('Rename request sent. Waiting for machine to respond');
         }

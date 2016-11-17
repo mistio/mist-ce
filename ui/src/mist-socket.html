@@ -470,7 +470,7 @@
                         key.machines.forEach(function(m, index) {
                             var cloud = m[0],
                                 machine = m[1];
-                            if (this.model.clouds && this.model.clouds[cloud] && this.model.clouds[cloud].machines && this.model.clouds[cloud].machines[machine]) {
+                            if (this.model.clouds && this.model.clouds[cloud] && this.model.clouds[cloud].machines && this.model.clouds[cloud].machines[machine] && this.model.clouds[cloud].machines[machine].keys) {
                                 // check if machine has this key, if not add
                                 var keyexists = this.model.clouds[cloud].machines[machine].keys.find(function(k) {
                                     return k.name == key.name;
@@ -701,7 +701,7 @@
         },
 
         _machineKeys: function(machineID, cloudID) {
-            // console.log('Update _machineKeys',cloudID,machineID);
+            console.log('Update _machineKeys',cloudID,machineID);
             if (machineID && cloudID) {
                 var keys = this.model.keysArray.filter(function(k) {
                     return k.machines.find(function(m) {

@@ -476,7 +476,7 @@ Polymer({
             cloudId = chunks[1];
 
         for (var i = 0; i < this.items.length; i++) {
-            if (this.items[i].id == itemId && (!cloudId || cloudId == this.items[i].cloud.id))
+            if (this.items && this.items[i] && this.items[i].id == itemId && (!cloudId || cloudId == this.items[i].cloud.id))
                 return i;
         }
         return -1;

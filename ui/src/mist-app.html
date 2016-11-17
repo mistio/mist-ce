@@ -190,7 +190,8 @@
           'page-meta': 'updateTitle',
           'toast': 'showToast',
           'subscribeLogEvents': 'subscribeLogEvents',
-          'search': 'updateSearchQuery'
+          'search': 'updateSearchQuery',
+          'open-and-select' : 'openAndSelect'
       },
 
       observers: [
@@ -199,6 +200,13 @@
 
       ready: function(){
 
+      },
+
+      openAndSelect: function(e){
+        console.log('KEY HEARD', e.detail.key);
+        document.addEventListener('open-and-select', function(e) {
+            this.querySelector('machine-page item-actions associate-key').openAndSelect(e);
+        }.bind(this));
       },
 
       _style: function(page, sections) {
