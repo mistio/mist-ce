@@ -472,7 +472,7 @@ Polymer({
     },
 
     _computeUri: function(uri,field, item, probes){
-        if (this.field == 'state', this.probes && this.section.id == "machines" && this.item.uuid && this.probes[item.uuid] && this.probes[item.uuid].dirty_cow == true) {
+        if ( field == 'state' && this.probes && this.section.id == "machines" && this.item.uuid && this.probes[item.uuid] && this.probes[item.uuid].dirty_cow == true) {
             return '#';
         }
         else
