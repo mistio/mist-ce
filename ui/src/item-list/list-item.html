@@ -201,7 +201,7 @@
         <content></content>
         <template is="dom-repeat" items="{{fields}}" as="field">        
           <a href="[[uri]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false" class$="field-link-[[index]]-[[field]]">            
-            <div class$="[[field]] field field[[index]] {{itemField(item, field, index, probes)}} {{itemProbeClasses(item, field, index, probes)}}"><span class$="field-icon [[field]]"></span>{{itemField(item, field, index, probes)}}</div>
+            <div class$="[[field]] field field[[index]] {{itemField(item, field, index)}}  {{itemProbeClasses(item, field, index, probes)}}"><span class$="field-icon [[field]]"></span>{{itemField(item, field, index, probes)}}</div>
           </a>
         </template>
         <div class="field tags" hidden$="[[!item.tags.length]]">
@@ -295,12 +295,17 @@ Polymer({
             type: Boolean,
             reflectToAttribute: true
         },
-        probes: Object
+        probes: {
+            type: Object
+        }
     },
+    observers: [
+        '_probesChanged(probes.*, item, section)'
+    ],
     listeners: {
         'tap': '_showRecommendationDialog'
     },
-    itemField: function(item, field, index, probes) {
+    itemField: function(item, field, index) {
 
         // if (field == 'recommendations'){
         //     // temp for machines only
@@ -331,11 +336,7 @@ Polymer({
 
         //machines: state
         if (field == "state") {
-            if (this.section.id == "machines" && this.probes[item.uuid]){
-                if (this.probes[item.uuid].dirty_cow == true) {
-                    this._appendIconOnRecommendations(index, 'icons:report-problem');
-                }
-            }
+            
             return ret;
         }
 
@@ -465,21 +466,28 @@ Polymer({
 
         return ret;
     },
+    _probesChanged: function(probes, item, section){
+        console.log('PROBES CHANGED', this.probes && this.section.id == "machines" && this.item.uuid && this.probes[item.uuid] && this.probes[item.uuid].dirty_cow == true)
+
+        if (this.probes && this.section.id == "machines" && this.item.uuid && this.probes[item.uuid] && this.probes[item.uuid].dirty_cow == true) {
+                //hardcoded index = 1 which is the state column
+                this._appendIconOnRecommendations(1, 'icons:report-problem');
+        }
+    },
     _appendIconOnRecommendations: function(index, icontext){
-        this.async(function(){
+
             var parent = this.querySelector('.state.field'+index+' .field-icon');
             var link = this.querySelector('a.field-link-'+index+'-state'); 
             if (link){
                 link.setAttribute('href','#');
             }
-            console.log('Append', parent, link, parent.children.length == 0)
             if (parent && parent.children.length == 0) {
                 var icon = document.createElement('iron-icon');
                 icon.classList.add('recommendations');
                 icon.setAttribute('icon', icontext);
                 Polymer.dom(parent).appendChild(icon);
             }
-        }, 50)
+
     },
 
     _showRecommendationDialog: function(event){
