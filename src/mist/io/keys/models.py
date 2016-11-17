@@ -61,6 +61,7 @@ class Key(me.Document):
     owner = me.ReferenceField(Owner)
     default = me.BooleanField(default=False)
 
+    _private_fields = ()
     _controller_cls = None
 
     def __init__(self, *args, **kwargs):
@@ -103,6 +104,8 @@ class Key(me.Document):
         if not owner or not isinstance(owner, Organization):
             raise BadRequestError('owner')
         key = cls(owner=owner, name=name)
+        if id:
+            key.id = id
         key.ctl.add(**kwargs)
         return key
 
