@@ -2,10 +2,8 @@ var MACHINE_CREATE_FIELDS = []
 
 // // AZURE
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'Azure',
-//     val: 'azure',
-//     className: 'provider-azure',
-//     options: [{
+//     provider: 'azure',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -42,10 +40,8 @@ var MACHINE_CREATE_FIELDS = []
 
 // // AZURE ARM
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'Azure ARM',
-//     val: 'azure_arm',
-//     className: 'provider-azure',
-//     options: [{
+//     provider: 'azure_arm',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -105,10 +101,8 @@ var MACHINE_CREATE_FIELDS = []
 // // COREOS
 // MACHINE_CREATE_FIELDS.push(
 //     {
-//         title: 'CoreOS',
-//         val: 'coreos',
-//         className: 'provider-coreos',
-//         options: [{
+//         provider: 'coreos',
+//         fields: [{
 //             name: "title",
 //             label: "Title *",
 //             type: "text",
@@ -179,10 +173,8 @@ var MACHINE_CREATE_FIELDS = []
 
 // // DIGITALOCEAN
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'Digital Ocean',
-//     val: 'digitalocean',
-//     className: 'provider-digitalocean',
-//     options: [{
+//     provider: 'digitalocean',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -205,124 +197,21 @@ var MACHINE_CREATE_FIELDS = []
 //     }]
 // });
 
-// // DOCKER
-// MACHINE_CREATE_FIELDS.push({
-//     title: 'Docker',
-//     val: 'docker',
-//     className: 'provider-docker',
-//     options: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "Docker",
-//         defaultValue: "Docker",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "docker_host",
-//         label: "Host",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter Docker host IP or DNS name",
-//     }, {
-//         name: "docker_port",
-//         label: "port",
-//         type: "text",
-//         value: 2375,
-//         defaultValue: 2375,
-//         show: true,
-//         required: false
-//     }, {
-//         name: "authentication",
-//         label: "Authentication",
-//         type: "dropdown",
-//         value: "basic",
-//         defaultValue: "basic",
-//         options: [{
-//             val: "basic",
-//             title: "Basic"
-//         }, {
-//             val: "tls",
-//             title: "TLS"
-//         }],
-//         show: true,
-//         required: true,
-//         errorMessage: "Please choose authentication method",
-//     }, {
-//         name: "auth_user",
-//         label: "Username",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: false,
-//         showIf: {
-//             fieldName: "authentication",
-//             fieldValues: ["basic"]
-//         }
-//     }, {
-//         name: "auth_password",
-//         label: "Password",
-//         type: "password",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: false,
-//         showIf: {
-//             fieldName: "authentication",
-//             fieldValues: ["basic"]
-//         }
-//     }, {
-//         name: "key_file",
-//         label: "Key",
-//         type: "textarea",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: false,
-//         showIf: {
-//             fieldName: "authentication",
-//             fieldValues: ["tls"]
-//         }
-//     }, {
-//         name: "cert_file",
-//         label: "Certificate",
-//         type: "textarea",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: false,
-//         showIf: {
-//             fieldName: "authentication",
-//             fieldValues: ["tls"]
-//         }
-//     }, {
-//         name: "ca_cert_file",
-//         label: "CA Certificate",
-//         type: "textarea",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: false,
-//         showIf: {
-//             fieldName: "authentication",
-//             fieldValues: ["tls"]
-//         }
-//     }]
-// });
-
-// AWS
+// DOCKER
 MACHINE_CREATE_FIELDS.push({
-    provider: 'ec2',
-    className: 'provider-ec2',
+    provider: 'docker',
     fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
         name: "image",
         label: "Image *",
-        type: "dropdown",
+        type: "mist_dropdown",
         value: "",
         defaultValue: "",
         show: true,
@@ -331,6 +220,56 @@ MACHINE_CREATE_FIELDS.push({
     }, {
         name: "size",
         label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "ports",
+        label: "Ports *",
+        type: "textarea",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: 'e.g. 80:80'
+    }, {
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: '',
+    }]
+});
+
+// AWS
+MACHINE_CREATE_FIELDS.push({
+    provider: 'ec2',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "mist_image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "mist_size",
+        label: "Size *",
         type: "dropdown",
         value: "",
         defaultValue: "",
@@ -338,33 +277,39 @@ MACHINE_CREATE_FIELDS.push({
         required: true,
         options: []
     }, {
-        name: "location",
+        name: "mist_location",
         label: "Location *",
-        type: "dropdown",
+        type: "mist_dropdown",
         value: "",
         defaultValue: "",
         show: true,
         required: true,
         options: []
     }, {
-        name: "apisecret",
-        label: "API Secret *",
-        type: "password",
+        name: "cloud_init",
+        label: "Cloud Init *",
+        type: "textarea",
         value: "",
         defaultValue: "",
         show: true,
-        required: true,
-        helptext: 'You can find your API secret on your Amazon console',
-        helpHref: 'http://docs.mist.io/article/17-adding-amazon-ec2'
+        required: false,
+        helptext: '',
+    }, {
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: '',
     }]
 });
 
 // // GCE
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'GCE',
-//     val: 'gce',
-//     className: 'provider-gce',
-//     options: [{
+//     provider: 'gce',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -400,10 +345,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // HOSTVIRTUAL
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'HostVirtual',
-//     val: 'hostvirtual',
-//     className: 'provider-hostvirtual',
-//     options: [{
+//     provider: 'hostvirtual',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -428,10 +371,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // INDONESIAN CLOUD
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'Indonesian Cloud',
-//     val: 'indonesian_vcloud',
-//     className: 'provider-indonesian',
-//     options: [{
+//     provider: 'indonesian_vcloud',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -491,10 +432,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // KVM
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'KVM (via libvirt)',
-//     val: 'libvirt',
-//     className: 'provider-libvirt',
-//     options: [{
+//     provider: 'libvirt',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -556,10 +495,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // LINODE
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'Linode',
-//     val: 'linode',
-//     className: 'provider-linode',
-//     options: [{
+//     provider: 'linode',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -584,10 +521,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // NEPHOSCALE
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'NephoScale',
-//     val: 'nephoscale',
-//     className: 'provider-nephoscale',
-//     options: [{
+//     provider: 'nephoscale',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -621,10 +556,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // OPENSTACK
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'Openstack',
-//     val: 'openstack',
-//     className: 'provider-openstack',
-//     options: [{
+//     provider: 'openstack',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -684,10 +617,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // PACKET
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'Packet',
-//     val: 'packet',
-//     className: 'provider-packet',
-//     options: [{
+//     provider: 'packet',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -722,10 +653,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // RACKSPACE
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'Rackspace',
-//     val: 'rackspace',
-//     className: 'provider-rackspace',
-//     options: [{
+//     provider: 'rackspace',
+//     fields: [{
 //         name: "region",
 //         label: "Region *",
 //         type: "dropdown",
@@ -770,10 +699,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // SOFTLAYER
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'SoftLayer',
-//     val: 'softlayer',
-//     className: 'provider-softlayer',
-//     options: [{
+//     provider: 'softlayer',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -808,10 +735,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // VCLOUD
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'VMWare vCloud',
-//     val: 'vcloud',
-//     className: 'provider-vcloud',
-//     options: [{
+//     provider: 'vcloud',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -865,10 +790,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // VSPHERE
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'VMWare vSphere',
-//     val: 'vsphere',
-//     className: 'provider-vsphere',
-//     options: [{
+//     provider: 'vsphere',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -911,10 +834,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // VULTR
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'Vultr',
-//     val: 'vultr',
-//     className: 'provider-vultr',
-//     options: [{
+//     provider: 'vultr',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",
@@ -939,10 +860,8 @@ MACHINE_CREATE_FIELDS.push({
 
 // // OTHER SERVER
 // MACHINE_CREATE_FIELDS.push({
-//     title: 'Other Server',
-//     val: 'bare_metal',
-//     className: 'provider-baremetal',
-//     options: [{
+//     provider: 'bare_metal',
+//     fields: [{
 //         name: "title",
 //         label: "Title *",
 //         type: "text",

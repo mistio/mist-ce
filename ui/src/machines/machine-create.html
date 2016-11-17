@@ -5,6 +5,8 @@
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
 
+<link rel="import" href="../app-form/app-form.html">
+
 <dom-module id="machine-create">
     <template>
         <style is="custom-style" include="forms"></style>
@@ -67,57 +69,21 @@
                     <paper-dropdown-menu class="dropdown-block l6 xs12 dropdown-with-logos" label="Choose Cloud" horizontal-align="left">
                         <paper-menu attr-for-selected="value" selected="{{selectedCloud}}" class="dropdown-content">
                             <template is="dom-repeat" items="[[model.cloudsArray]]" as="provider">
-                                <paper-item value="[[provider.id]]"><img src="[[_computeProviderLogo(provider.provider)]]" width="24px" />[[provider.title]]</paper-item>
+                                <paper-item value="[[provider.id]]"><img src="[[_computeProviderLogo(provider.provider)]]" width="24px" / disabled$="[[!_isOnline(provider.id, model)]]">[[provider.title]]</paper-item>
                             </template>
                         </paper-menu>
                     </paper-dropdown-menu>
                 </div>
             </paper-material>
-            <!-- <paper-material class$=" selected-[[!selectedCloud]]">
+            <paper-material class$="selected-[[!selectedCloud]]">
                 <h3 class="smallcaps">Machine Setup</h3>
                 <div hidden$=[[selectedCloud]]>
                     <p>Depending on the cloud there maybe needed different machine parameters. Choose a provider for the coresponding fields to appear.</p>
                 </div>
-                <div hidden$=[[!selectedProvider]]>
-                    <template is="dom-repeat" items="{{machineFields}}" as="field">
-                        <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
-                            <paper-input id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-                        </template>
-                        <template is="dom-if" if="[[_computeFieldType(field, 'password', field.show)]]">
-                            <paper-input id="[[field.name]]" type="password" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-input>
-                        </template>
-                        <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
-                            <paper-textarea id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="15" value="{{field.value}}" placeholder="[[field.placeholder]]" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]"></paper-textarea>
-                        </template>
-                        <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
-                            <paper-dropdown-menu class="dropdown-block" label="[[field.label]]" horizontal-align="left">
-                                <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
-                                    <template is="dom-repeat" items="[[field.options]]" as="option">
-                                        <paper-item value="[[option.val]]">[[option.title]]</paper-item>
-                                    </template>
-                                </paper-menu>
-                            </paper-dropdown-menu>
-                        </template>
-                        <template is="dom-if" if="[[_computeFieldType(field, 'ssh_key', field.show)]]">
-                            <paper-dropdown-menu class="dropdown-block" label="[[field.label]]" horizontal-align="left">
-                                <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
-                                    <template is="dom-repeat" items="[[field.options]]" as="option">
-                                        <paper-item value="[[option.val]]">[[option.title]]</paper-item>
-                                    </template>
-                                </paper-menu>
-                            </paper-dropdown-menu>
-                        </template>
-                        <template is="dom-if" if="[[_computeFieldType(field, 'switch', field.show)]]">
-                            <paper-toggle-button checked="{{field.value}}">[[field.label]]</paper-toggle-button>
-                        </template>
-                    </template>
-                    <hr/>
-                    <div class="clearfix">
-                        <paper-button class="submit-btn pull-left blue" disabled$="[[!formReady]]" on-tap="_submitForm">Add</paper-button>
-                        <paper-button class="submit-btn pull-right blue" on-tap="_resetForm">Reset</paper-button>
-                    </div>
+                <div hidden$=[[!selectedCloud]]>
+                    <app-form fields="{{machineFields}}" method="POST" url="/api/v1/clouds/[[selectedCloud]]/machines" on-response="_machineAddAjaxResponse" on-error="_machineAddAjaxError" btncontent="Create Machine"></app-form>
                 </div>
-            </paper-material> -->
+            </paper-material>
         </div>
     </template>
 
@@ -130,16 +96,29 @@
 
                 properties: {
                     model: Object,
-                    selectedCloud: String,
-                    machineFields: Array,
+                    selectedCloud: {
+                        type: String,
+                        value: false
+                    },
+                    machineFields: {
+                        type: Array,
+                        value: []
+                    },
                     machinesFields: Array
                 },
                 observers: [
                     '_cloudChanged(selectedCloud, machinesFields)'
                 ],
+                listeners: {
+                    // 'change': '_updateFields',
+                    // 'iron-select': '_updateFields',
+                },
                 _computeProviderLogo: function(className) {
                     var identifier = className.split('_')[0];
                     return '../assets/providers/provider-' + identifier + '.png';
+                },
+                _isOnline: function(cloud, model){
+                    return this.model.clouds[cloud].state == 'running';
                 },
                 _computeFieldType: function(field, value, show) {
                     if (!(field.showIf && !field.show)) {
@@ -147,43 +126,32 @@
                     }
                 },
                 _cloudChanged: function(selectedCloud, machinesFields) {
-                    this._resetForm();
+                    console.log('_cloudChanged',selectedCloud, machinesFields);
+                    //this._resetForm();
                     // console.log('_cloudChanged',this.selectedCloud);
                     if (selectedCloud){
                         var cloudName =  this.model.clouds[selectedCloud].provider.split('_')[0];
-                        var machineFields = this.machinesFields[cloudName].machine;
-                        console.log('ssssssss', selectedCloud, cloudName, this.machinesFields[cloudName].machine)
+                        console.log('cloud name', cloudName)
+                        var machineFields = this.machinesFields.find(function(c){
+                            return c.provider == cloudName;
+                        });
                     }
                     else {
                         machineFields = []
                     }
-                    this.set('machineFields', machineFields);
+                    console.log('machineFields', machineFields)
+                    this.set('machineFields', machineFields.fields);
+
+                    this._updateFields();
                 },
-                _providerChanged: function(selectedProvider, providers) {
-                    this._resetForm();
-                    var selectedCloudDetails = machinesFields
-                        .filter(function(fields) {
-                            return fields.val == selectedProvider;
-                        });
-                    console.warn('providerFields', providerFields);
-                    var providerFields = selectedProviderDetails.length ? selectedProviderDetails.shift().options : [];
-                    this.set('providerFields', [{
-                          name: "provider",
-                          type: "text",
-                          show: false,
-                          value: selectedProvider
-                    }].concat(providerFields));
-                    
-                    this.fillInKnownData(selectedProvider, this.clouds);
-                },
-                _resetForm: function(e) {
+                _resetForm: function() {
                     // Reset cloud
                     this.set('cloud', {});
 
                     // Reset Form Fields
                     this.machineFields.forEach(function(el, index) {
                         if (el.showIf) {
-                            this.set('providerFields.' + index + '.show', false);
+                            this.set('machineFields.' + index + '.show', false);
                         }
 
                         // Reset Form Fields Validation
@@ -191,11 +159,39 @@
                     }, this);
                 },
                 _resetField: function(el, index) {
-                    this.set('providerFields.' + index + '.value', el.defaultValue);
+                    this.set('machineFields.' + index + '.value', el.defaultValue);
 
                     var input = this.querySelector('#' + el.name);
                     if (input) {
                         input.invalid = false;
+                    }
+                },
+                _updateFields: function(){
+                    console.log('_updateFields', this.selectedCloud)
+                    if (this.selectedCloud) {
+                        var cloudId = this.selectedCloud;
+                        this.machineFields.forEach(function(f, index) {
+                            if (f.name.startsWith("location")) {
+                                f.options = this.model.clouds[cloudId].locationsArray;
+                            }
+                            if (f.name.startsWith("image")) {
+                                f.options = this.model.clouds[cloudId].imagesArray;
+                            }
+                            if (f.name.startsWith("size")) {
+                                f.options = this.model.clouds[cloudId].sizesArray;
+                            }
+                            if (f.name.startsWith("key")) {
+                                f.options = this.model.clouds[cloudId].keysArray;
+                            }
+
+                            if (f.options && f.options.length == 1){
+                                if (f.type == "dropdown")
+                                   this.set('machineFields.'+index+'.value', f.options[0].val);
+                                else
+                                   this.set('machineFields.'+index+'.value', f.options[0].id);
+                            }
+
+                        }, this);
                     }
                 },
                 _goBack: function(){
