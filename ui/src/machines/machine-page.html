@@ -557,7 +557,7 @@ Polymer({
         },
         machineIp: {
             type: String,
-            computed: 'computeMachineIp(machine.public_ips)'
+            computed: 'computeMachineIp(machine, machine.public_ips)'
         },
         disassociateKeyId: {
             type: String
