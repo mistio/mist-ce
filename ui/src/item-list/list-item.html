@@ -475,24 +475,24 @@ Polymer({
         }
     },
     _appendIconOnRecommendations: function(index, icontext){
-
-            var parent = this.querySelector('.state.field'+index+' .field-icon');
-            var link = this.querySelector('a.field-link-'+index+'-state'); 
-            if (link){
-                link.setAttribute('href','#');
-            }
-            if (parent && parent.children.length == 0) {
-                var icon = document.createElement('iron-icon');
-                icon.classList.add('recommendations');
-                icon.setAttribute('icon', icontext);
-                Polymer.dom(parent).appendChild(icon);
-            }
-
+        var parent = this.querySelector('.state.field'+index+' .field-icon');
+        var link = this.querySelector('a.field-link-'+index+'-state'); 
+        if (link){
+            link.setAttribute('href','#');
+        }
+        if (parent && parent.children.length == 0) {
+            var icon = document.createElement('iron-icon');
+            icon.classList.add('recommendations');
+            icon.setAttribute('icon', icontext);
+            icon.setAttribute('data-attr', 'recommendations');
+            Polymer.dom(parent).appendChild(icon);
+        }
     },
 
     _showRecommendationDialog: function(event){
         var e = Polymer.dom(event);
-        if (e.event.srcElement.attributes.class.nodeValue.indexOf("recommendations") > -1)
+        // console.log(e, event)
+        if (e.event.srcElement.dataset.attr == "recommendations")
             this.fire("open-recommendation-dialog", {'item-type': this.section.id, 'item': this.item, 'event': e})
     },
 
