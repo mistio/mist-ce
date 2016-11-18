@@ -496,7 +496,7 @@ def add_key(request):
     key_tags = auth_context.check_perm("key", "add", None)
 
     if not key_name:
-        raise KeyParameterMissingError(key_name)
+        raise BadRequestError("Key name is not provided")
     if not private_key:
         raise RequiredParameterMissingError("Private key is not provided")
 
@@ -698,7 +698,7 @@ def get_private_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Key.objects.get(owner=auth_context.owner, id=key_id)
+        key = SSHKey.objects.get(owner=auth_context.owner, id=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -727,7 +727,7 @@ def get_public_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Key.objects.get(owner=auth_context.owner, id=key_id)
+        key = SSHKey.objects.get(owner=auth_context.owner, id=key_id)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
