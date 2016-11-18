@@ -317,9 +317,10 @@ def add_cloud(request):
         ret['monitoring'] = monitoring
 
     # SEC
-    update_rbac_mapping(auth_context, cloud)
+    rlist = [cloud]
     # Need to take into account both the newly added cloud and its VMs.
-    update_rbac_mapping(auth_context, list(Machine.objects(cloud=cloud)))
+    rlist.extend(list(Machine.objects(cloud=cloud)))
+    update_rbac_mapping(auth_context, rlist)
 
     trigger_session_update(owner, ['clouds'])
     return ret
@@ -348,10 +349,12 @@ def delete_cloud(request):
     # SEC require REMOVE permission on CLOUD
     auth_context.check_perm('cloud', 'remove', cloud_id)
     methods.delete_cloud(auth_context.owner, cloud_id)
+
     # SEC
-    remove_rbac_mapping(auth_context, cloud)
+    rlist = [cloud]
     # Need to take into account both the cloud and its VMs.
-    remove_rbac_mapping(auth_context, list(Machine.objects(cloud=cloud)))
+    rlist.extend(list(Machine.objects(cloud=cloud)))
+    remove_rbac_mapping(auth_context, rlist)
 
     trigger_session_update(auth_context.owner, ['clouds'])
     return OK
