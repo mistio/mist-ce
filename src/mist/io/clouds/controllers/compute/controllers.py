@@ -523,9 +523,14 @@ class GoogleComputeController(BaseComputeController):
                                            driver_name=driver_name,
                                            size_id=ram_price)
                 # Example custom-4-16384
-                cpu = int(size.split('-')[1])
-                ram = int(size.split('-')[2]) / 1024
-                price = cpu * cpu_price + ram * ram_price
+                try:
+                    cpu = int(size.split('-')[1])
+                    ram = int(size.split('-')[2]) / 1024
+                    price = cpu * cpu_price + ram * ram_price
+                except:
+                    log.exception("Couldn't parse custom size %s for cloud %s",
+                                  size, self.cloud)
+                    return 0, 0
             else:
                 return 0, 0
         os_type = machine_libcloud.extra.get('os_type')
