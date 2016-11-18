@@ -136,7 +136,8 @@
             :host .tag {
                 display: inline !important;
                 padding: 4px;
-                margin: 4px;
+                margin-bottom: : 4px;
+                margin-right: 4px;
             }
             polyana-dashboard ::content h3 {
                 text-transform: uppercase;
@@ -168,11 +169,14 @@
                 opacity: 0.32;
                 cursor: pointer;
             }
-            .machine-key iron-icon[icon='close'] {
-                opacity: 0;
+            .machine-key iron-icon.delete {
+                opacity: 0.13;
                 margin-right: 16px;
+                height: 12px;
+                width: 12px;
+                transition: opacity 100 ease-in;
             }
-            .machine-key:hover iron-icon[icon='close'] {
+            .machine-key:hover iron-icon.delete {
                 opacity: 0.32;
             }
             #pendingKeyrequest paper-spinner {
@@ -279,6 +283,14 @@
             .shorteco.longeco {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #69b46c; /*green green*/
             }
+            @media (max-width: 1024px) {
+                .machine-key {
+                    display: block;
+                }
+                .tag {
+                    display: inline-block !important;
+                }
+            }
         </style>
 
         <div id="content">
@@ -301,7 +313,6 @@
             </paper-material>
             <div class="columns">
                 <paper-material id="leftcolumn" class="left">
-                    <h3 class="smallcaps">Info:</h3>
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
                     <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
@@ -311,13 +322,13 @@
                     </div>
                 </paper-material>
                 <paper-material id="rightcolumn" class="right">
-                    <div hidden$="[[!machine.keys.length]]">
+                    <div hidden$="[[!machineKeys.length]]">
                         <h3 class="smallcaps">Associated Keys:</h3>
                         <div class="associatedKeys">
                             <template is="dom-repeat" items="{{machineKeys}}">
                                 <div class="machine-key">
                                     <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
-                                    <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
+                                    <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="icons:cancel" on-tap="disassociateKey" class="delete"></iron-icon>
                                 </div>
                             </template>
                             <div class="machine-key" id="pendingKeyRequest">
@@ -375,8 +386,20 @@
             </paper-material>
         </div>
         <dialog-element id="machinedialog"></dialog-element>
-        <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-        <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
+        <iron-ajax  id="machineDeleteAjaxRequest" 
+                    url="/api/v1/machines/[[machine.id]]" 
+                    method="DELETE" 
+                    on-response="_handleMachineDeleteAjaxResponse" 
+                    on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+
+        <iron-ajax  id="disassociateKeyRequest" 
+                    url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" 
+                    method="DELETE" 
+                    on-response="_disassociateKeyResponse" 
+                    on-error="_disassociateKeyError" 
+                    on-request="_disassociateKeyRequest" 
+                    handle-as="xml"></iron-ajax>
+
         <machine-edit machine="[[machine]]"></machine-edit>
         <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
@@ -479,7 +502,6 @@ Polymer({
         },
         machine: {
             type: Object,
-            // computed: '_computeMachine(params.*, model.machinesArray.*)',
             notify: true
         },
         sections: {
@@ -617,14 +639,6 @@ Polymer({
 
         return actions;
     },
-    // _computeMachine: function(params, machines) {
-    //     if (this.machine && this.machine.uuid && this.params.uuid != this.machine.uuid) {
-    //         this.set('isPendingKeyRequest', false);
-    //     }
-    //     return machines.base.find(function(machine) {
-    //         return machine.uuid == this.params.uuid;
-    //     }, this);
-    // },
     _computeDashboard: function(machine, monitored_machines) {
         var tempdash = {
             "id": 1,
@@ -641,7 +655,7 @@ Polymer({
                         "refId": "A",
                         "target": "load.*"
                     }],
-                    "machineArray": [this.machine.cloud.id, this.machine.id],
+                    "machineArray": [],
                     "x-axis": true,
                     "y-axis": true
                 }, {
@@ -655,7 +669,7 @@ Polymer({
                         "refId": "C",
                         "target": "cpu.total.*"
                     }],
-                    "machineArray": [this.machine.cloud.id, this.machine.id],
+                    "machineArray": [],
                     "x-axis": true,
                     "y-axis": true
                 }]}, {
@@ -676,7 +690,7 @@ Polymer({
                         "refId": "F",
                         "target": "memory.free_percent"
                     }],
-                    "machineArray": [this.machine.cloud.id, this.machine.id],
+                    "machineArray": [],
                     "x-axis": true,
                     "y-axis": true
                   }, {
@@ -693,7 +707,7 @@ Polymer({
                         "refId": "H",
                         "target": "interface.total.if_octets.tx"
                     }],
-                    "machineArray": [this.machine.cloud.id, this.machine.id],
+                    "machineArray": [],
                     "x-axis": true,
                     "y-axis": true
                 }],
@@ -718,17 +732,17 @@ Polymer({
         };
 
 
-        // var changeit = false;
-        // for (var i = 0; i < tempdash.rows.length; i++) {
-        //     for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
-        //         if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
-        //             if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
-        //                 tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
-        //                 changeit = true;
-        //             }
-        //         }
-        //     }
-        // }
+        var changeit = false;
+        for (var i = 0; i < tempdash.rows.length; i++) {
+            for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
+                if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
+                    if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
+                        tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
+                        changeit = true;
+                    }
+                }
+            }
+        }
         return tempdash;
         // var that = this;
         // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
@@ -831,7 +845,7 @@ Polymer({
 
         this._showDialog({
             title: 'Disassociate key',
-            body: "You are about to disassociate key '" + keyName + "' from machine.",
+            body: "Disassociating key '" + keyName + "' from machine, will remove the key from the machine.",
             danger: false,
             reason: "disassociate.key",
             action: 'disassociate',
@@ -843,9 +857,12 @@ Polymer({
     },
     _disassociateKeyResponse: function(e) {
         this.set('isPendingKeyRequest', false);
+        document.querySelector('paper-toast#mist-toast').show({text: 'Key was removed from machine!'})
     },
     _disassociateKeyError: function(e) {
         this.set('isPendingKeyRequest', false);
+        console.log(e)
+        document.querySelector('paper-toast#mist-toast').show({text: e.detail.request.xhr.responseText})
     },
     _machineActionConfirmation: function(e){
         this.$.disassociateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
