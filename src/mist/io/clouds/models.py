@@ -11,7 +11,6 @@ from mist.core.user.models import Organization
 from mist.io.clouds.controllers.main import controllers
 
 from mist.io.exceptions import BadRequestError
-from mist.io.exceptions import CloudExistsError
 from mist.io.exceptions import RequiredParameterMissingError
 
 
