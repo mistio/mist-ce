@@ -472,8 +472,16 @@ Polymer({
         // returns the index of the item in the items list based on the itemUid
 
         var chunks = itemUid.split(':'),
-            itemId = chunks[2];
+            itemId = chunks[2],
             cloudId = chunks[1];
+
+        // there are items whose ides contain ':', like imahes sha256:e02e811..
+        // we reconstruct the id if chunk's length is bigger than expected
+        if (chunks.length > 3) {
+            for (var i=3; i<chunks.length; i++){
+                itemId += ':'+chunks[i];
+            }
+        }
 
         for (var i = 0; i < this.items.length; i++) {
             if (this.items[i].id == itemId && (!cloudId || cloudId == this.items[i].cloud.id))

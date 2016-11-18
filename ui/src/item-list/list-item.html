@@ -462,8 +462,6 @@ Polymer({
         return ret;
     },
     _probesChanged: function(probes, item, section){
-        console.log('PROBES CHANGED')
-
         if (this.probes != {} && this.section.id == "machines" && this.item.uuid && this.probes[item.uuid] && this.probes[item.uuid].dirty_cow == true) {
                 //hardcoded index = 1 which is the state column
                 console.log('PROBES CHANGED TRUE', item.uuid)
