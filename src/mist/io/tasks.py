@@ -74,7 +74,7 @@ def update_machine_count(owner, cloud_id, machine_count):
     cloud.save()
     # TODO machine count property function
     # TODO total machine count property function
-    clouds = Cloud.objects(owner=owner)
+    clouds = Cloud.objects(owner=owner, deleted=None)
 
     owner.total_machine_count = sum(
         [cloud.machine_count for cloud in clouds]
@@ -84,7 +84,7 @@ def update_machine_count(owner, cloud_id, machine_count):
     org_machine_count = 0
     orgs = Organization.objects(members=owner)
     for org in orgs:
-        org_clouds = Cloud.objects(owner=org)
+        org_clouds = Cloud.objects(owner=org, deleted=None)
         org.total_machine_count = sum(
             [cloud.machine_count for cloud in org_clouds]
         )
@@ -898,7 +898,7 @@ def undeploy_collectd(owner, cloud_id, machine_id):
 
 
 @app.task
-def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
+def create_machine_async(auth_context, cloud_id, key_id, machine_name, location_id,
                          image_id, size_id, image_extra, disk,
                          image_name, size_name, location_name, ips, monitoring,
                          networks, docker_env, docker_command, script='',
@@ -921,11 +921,11 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
 
     job_id = job_id or uuid.uuid4().hex
 
-
-    if owner.find("@") != -1:
-        owner = Owner.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
+    # Re-construct AuthContext.
+    if isinstance(auth_context, dict):
+        from mist.core.rbac.methods import AuthContext
+        auth_context = AuthContext.deserialize(auth_context)
+    assert isinstance(auth_context, AuthContext)
 
     names = []
     if quantity == 1:
@@ -935,7 +935,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
         for i in range(1, quantity + 1):
             names.append('%s-%d' % (machine_name, i))
 
-    log_event(owner.id, 'job', 'async_machine_creation_started', job_id=job_id,
+    log_event(auth_context.owner.id, 'job', 'async_machine_creation_started', job_id=job_id,
               cloud_id=cloud_id, script=script, script_id=script_id,
               script_params=script_params, monitoring=monitoring,
               persist=persist, quantity=quantity, key_id=key_id,
@@ -946,7 +946,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
     specs = []
     for name in names:
         specs.append((
-            (owner, cloud_id, key_id, name, location_id, image_id,
+            (auth_context, cloud_id, key_id, name, location_id, image_id,
              size_id, image_extra, disk, image_name, size_name,
              location_name, ips, monitoring, networks, docker_env,
              docker_command, 22, script, script_id, script_params, job_id),
@@ -976,7 +976,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
             error = repr(exc)
         finally:
             name = args[3]
-            log_event(owner.id, 'job', 'machine_creation_finished',
+            log_event(auth_context.owner.id, 'job', 'machine_creation_finished',
                       job_id=job_id, cloud_id=cloud_id, machine_name=name,
                       error=error, machine_id=node.get('id', ''))
 
