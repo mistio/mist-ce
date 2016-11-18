@@ -109,7 +109,7 @@ class Key(me.Document):
         """
         if not name:
             raise RequiredParameterMissingError('title')
-        if not owner or not isinstance(owner, Organization):
+        if not owner or not isinstance(owner, Owner):
             raise BadRequestError('owner')
         key = cls(owner=owner, name=name)
         if id:
