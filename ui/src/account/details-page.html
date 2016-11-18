@@ -122,8 +122,8 @@
                     <p>Enter your organisation details. To switch organisation use the  user menu in the top right corner of your screen.</p>
                 </div>
                 <paper-input class="dropdown-block xs12 l6" id="orgName" label="Organization Name" required error-message="Please enter your company's name" value="{{orgName}}" auto-validate disabled$="[[!org.is_owner]]"></paper-input>
-                
-                <paper-input class="xs12 l6" id="org-email" label="Organisation Alert Email *" error-message="Please enter your email" value="{{orgAlertEmail}}" auto-validate></paper-input>
+
+                <paper-textarea class="xs12 l6" id="org-email" label="Organisation Alert Email *" error-message="Please enter your email" value="{{orgAlertEmails}}" auto-validate></paper-textarea>
 
                 <p class="xs12 l12">* In your organisation's alert email, you can specify the email you want your incidents' alerts to be sent to. This can be overriden when you add rules in your monitored machines.</p>
 
@@ -178,8 +178,8 @@
                     orgName: {
                         type: String
                     },
-                    orgAlertEmail: {
-                        type: String
+                    orgAlertEmails: {
+                        type: String,
                     },
                     userFormReady: {
                         type: Boolean,
@@ -187,7 +187,7 @@
                     },
                     orgFormReady: {
                         type: Boolean,
-                        computed: '_computeOrgFormReady(orgName, loadingOrg, org)'
+                        computed: '_computeOrgFormReady(orgName, orgAlertEmails, loadingOrg, org)'
                     },
                     loadingUser: {
                         type: Boolean,
@@ -219,6 +219,7 @@
 
                 _orgUpdated: function(org) {
                     this.orgName = org.name;
+                    this.orgAlertEmails = org.alerts_email.join('\n')
                 },
 
                 _computeUserFormReady: function(firstName, lastName, loading, user) {
@@ -234,8 +235,8 @@
                     return false;
                 },
 
-                _computeOrgFormReady: function(orgName, loading, org){
-                    if (orgName && orgName != org.name && orgName.trim() != "" && org.is_owner && !loading)
+                _computeOrgFormReady: function(orgName, orgAlertEmails, loading, org){
+                    if (orgName && orgName.trim() != "" && org.is_owner && !loading && (orgName != org.name || (orgAlertEmails && orgAlertEmails != org.alerts_email.join('\n'))))
                         return true;
                     return false;
                 },
@@ -261,7 +262,7 @@
                 _submitOrgForm: function(e, org) {
                     var payload = {
                         new_name: this.orgName,
-                        alerts_email: this.orgAlertEmail
+                        alerts_email: this.orgAlertEmails
                     };
 
                     this.$.orgAjaxRequest.headers["Content-Type"] = 'application/json';

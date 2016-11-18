@@ -137,27 +137,27 @@
             opacity: 0.54;
         }
 
-        .field.state,
+        .field.state:not(.name),
         /*.field.create_date,*/
-        .field.cloud,
-        .field.size,
-        .field.image,
-        .field.id {
+        .field.cloud:not(.name),
+        .field.size:not(.name),
+        .field.image:not(.name),
+        .field.id:not(.name) {
             width: 100px;
         }
-        .field.cost {
+        .field.cost:not(.name) {
             width: 70px;
         }
 
-        .field.tags {
+        .field.tags:not(.name) {
             width: auto;
             padding: 20px 0 0;
             white-space: inherit;
         }
 
-        .field.machines,
-        .field.default,
-        .field.id {
+        .field.machines:not(.name),
+        .field.default:not(.name),
+        .field.id:not(.name) {
             width: 100px;
         }
 
