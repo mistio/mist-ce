@@ -746,7 +746,12 @@ Polymer({
         return itemUidInArray;
     },
     _computeAssociatedKeys: function(machine, machinekeys, length, keys) {
-        return this.machine.keys;
+        var keys = this.model.keysArray.filter(function(k) {
+            return k.machines.find(function(m) {
+                return m[1] == this.machine.id && m[0] == this.machine.cloud.id;
+            }, this)
+        }, this);
+        return keys || [];
     },
     computeMachineIp: function(machineips) {
         if (this.machine.public_ips) {

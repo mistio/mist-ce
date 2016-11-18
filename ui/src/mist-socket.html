@@ -701,7 +701,7 @@
         },
 
         _machineKeys: function(machineID, cloudID) {
-            console.log('Update _machineKeys',cloudID,machineID);
+            // console.log('Update _machineKeys',cloudID,machineID);
             if (machineID && cloudID) {
                 var keys = this.model.keysArray.filter(function(k) {
                     return k.machines.find(function(m) {
