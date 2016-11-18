@@ -13,7 +13,7 @@
 <dom-module id="mist-monitoring">
     <template>
         <style include="shared-styles">
-        	.monitoringArea {
+          .monitoringArea {
                 padding: 24px;
             }
             .console {
@@ -95,7 +95,7 @@
                     </div>
                     <!-- monitoring is activated. we expect to have data -->
                     <template is="dom-if" if="[[isActivated]]">
-                        <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
+                        <polyana-dashboard uri$="[[_computeDashboardUri(resource)]]" datasources="[[datasources]]"></polyana-dashboard>
                     </template>
                 </div>
 
@@ -103,9 +103,9 @@
                     <p class="errormsg-container" hidden$="[[!monitoringError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
                 </div>
 
-            	<!-- we can request monitoring button -->
+              <!-- we can request monitoring button -->
                 <div hidden$="[[isMonitored]]">
-                    <paper-button class="blue" on-tap="toggleMonitoring">enable Monitoring</paper-button>
+                    <paper-button class="blue" on-tap="toggleMonitoring">Enable Monitoring</paper-button>
                 </div>
 
 
@@ -115,8 +115,8 @@
                     <div hidden$="[[!waitingData]]">
                         <p>Waiting for data</p>
                     </div>
-    	            <paper-button class="red" on-tap="toggleMonitoring">disable Monitoring</paper-button>
-    	        </div>
+                  <paper-button class="red" on-tap="toggleMonitoring">Disable Monitoring</paper-button>
+              </div>
 
             </div>
 
@@ -132,43 +132,43 @@
      </template>
 </dom-module>
 <script>
-	Polymer({
+  Polymer({
         is: 'mist-monitoring',
 
         properties: {
-        	resource: Object, //currently machines only, later other resources too
-        	monitoring: Object,
-        	section: Object,
-        	isRunning: {
-        		type: Boolean,
-        		computed: '_computeIsRunning(resource)'
-        	},
+          resource: Object, //currently machines only, later other resources too
+          monitoring: Object,
+          section: Object,
+          isRunning: {
+            type: Boolean,
+            computed: '_computeIsRunning(resource)'
+          },
             resourceMonitoringInfo: {
                 type: Object,
                 computed: '_computeResourceMonitoringInfo(resource, monitoring.monitored_machines.*)'
             },
-        	isMonitored: {
-        		type: Boolean,
-        		computed: '_computeIsMonitored(resource, monitoring.monitored_machines.*)'
-        	},
-        	waitingData: {
-        		type: Boolean,
+          isMonitored: {
+            type: Boolean,
+            computed: '_computeIsMonitored(resource, monitoring.monitored_machines.*)'
+          },
+          waitingData: {
+            type: Boolean,
                 computed: '_computeWaitingData(resource, monitoring.monitored_machines.*)',
-        		value: false
-        	},
-        	installationError: {
-        		type: Boolean,
-        		value: false
-        	},
-        	isActivated: {
-        		type: Boolean,
-        		computed: '_computeIsActivated(resource, monitoring.monitored_machines.*)'
-        	},
-        	script: {
-        		type: String,
-        		computed: '_computeScript(resource, monitoring.monitored_machines.*)',
-        	},
-        	monitoringError: {
+            value: false
+          },
+          installationError: {
+            type: Boolean,
+            value: false
+          },
+          isActivated: {
+            type: Boolean,
+            computed: '_computeIsActivated(resource, monitoring.monitored_machines.*)'
+          },
+          script: {
+            type: String,
+            computed: '_computeScript(resource, monitoring.monitored_machines.*)',
+          },
+          monitoringError: {
                 type: Boolean,
                 value: false
             },
@@ -201,12 +201,15 @@
         attached: function(){
 
         },
+        _computeDashboardUri: function(resource) {
+            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/dashboard';
+        },
         _computeIsMonitored: function(resource, monitoring){
-        	if (this.resource && this.monitoring && this.monitoring.monitored_machines[resource.uuid])
-        		return true;
-        	else {
-        		return false;
-        	}
+          if (this.resource && this.monitoring && this.monitoring.monitored_machines[resource.uuid])
+            return true;
+          else {
+            return false;
+          }
         },
         _computeIsRunning: function(resource) {
             return this.resource.state == "running";
@@ -274,14 +277,14 @@
             this.set("failed", false);
         },
         _computeScript: function(resource, monitoring){
-        	if (!this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid]){
+          if (!this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid]){
                 return "";
             }
             else if (this.monitoring.monitored_machines[resource.uuid].commands){
                 return this.monitoring.monitored_machines[resource.uuid].commands[this.resource.os_type] || this.monitoring.monitored_machines[resource.uuid].commands["unix"];
             }
             else {
-            	return "";
+              return "";
             }
         },
         _computeIsActivated(resource, monitoring){

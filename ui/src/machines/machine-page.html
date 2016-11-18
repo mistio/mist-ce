@@ -323,10 +323,10 @@
                         <span hidden$="[[!probeData]]"> [[probeData]] </span> <br/>
                         <span hidden$="[[!lastProbe]]"> [[lastProbe]] </span>
                     </div>
-                    <div hidden$="[[!kernelInfo]]"> 
+                    <div hidden$="[[!kernelInfo]]">
                         [[kernelInfo]]
                     </div>
-                    <div hidden$="[[!probeObj]]"> 
+                    <div hidden$="[[!probeObj]]">
                         <span class$="dc-[[probeObj.dirty_cow]]" hidden$="[[probeObj.dirty_cow]]">
                             Dirty COW check passed.
                         </span>
@@ -360,7 +360,7 @@
                 </paper-material>
             </div>
             <paper-material class="info-card">
-                <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" dashboard="[[dashboard]]" datasources="[[datasources]]"></mist-monitoring>
+                <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" datasources="[[datasources]]"></mist-monitoring>
                 <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" user-email="[[model.user.email]]" hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
             <paper-material class="info-card">
@@ -543,8 +543,7 @@ Polymer({
             computed: "_machineImage(machine.imageId)"
         },
         dashboard: {
-            type: Object,
-            computed: "_computeDashboard(machine, model.monitoring.monitored_machines.*)"
+            type: Object
         },
         isLoading: {
             type: Boolean,
@@ -589,7 +588,7 @@ Polymer({
              type: String,
              computed: '_computeDirtyCowAlert(machine, model.probes.*)',
              value: false
-         }, 
+         },
         probeObj: {
             type: Object,
             computed: '_computeProbeObj(machine, model.probes.*)',
@@ -653,121 +652,11 @@ Polymer({
 
         return actions;
     },
-    _computeDashboard: function(machine, monitored_machines) {
-        var tempdash = {
-            "id": 1,
-            "refresh": "10sec",
-            "rows": [{
-                "panels": [{
-                    "id": 2,
-                    "title": "Load",
-                    "type": "graph",
-                    "span": 6,
-                    "stack": false,
-                    "datasource": "mist.monitor",
-                    "targets": [{
-                        "refId": "A",
-                        "target": "load.*"
-                    }],
-                    "machineArray": [],
-                    "x-axis": true,
-                    "y-axis": true
-                }, {
-                    "id": 3,
-                    "title": "CPU",
-                    "type": "graph",
-                    "span": 6,
-                    "stack": true,
-                    "datasource": "mist.monitor",
-                    "targets": [{
-                        "refId": "C",
-                        "target": "cpu.total.*"
-                    }],
-                    "machineArray": [],
-                    "x-axis": true,
-                    "y-axis": true
-                }]}, {
-                "panels": [{
-                    "id": 1,
-                    "title": "MEM",
-                    "type": "graph",
-                    "span": 6,
-                    "stack": true,
-                    "datasource": "mist.monitor",
-                    "targets": [{
-                        "refId": "D",
-                        "target": "memory.used_percent"
-                    }, {
-                        "refId": "E",
-                        "target": "memory.cached_percent"
-                    }, {
-                        "refId": "F",
-                        "target": "memory.free_percent"
-                    }],
-                    "machineArray": [],
-                    "x-axis": true,
-                    "y-axis": true
-                  }, {
-                    "id": 5,
-                    "title": "NET",
-                    "type": "graph",
-                    "span": 6,
-                    "stack": false,
-                    "datasource": "mist.monitor",
-                    "targets": [{
-                        "refId": "G",
-                        "target": "interface.total.if_octets.rx"
-                    }, {
-                        "refId": "H",
-                        "target": "interface.total.if_octets.tx"
-                    }],
-                    "machineArray": [],
-                    "x-axis": true,
-                    "y-axis": true
-                }],
-            }],
-            "time": {
-                "from": "now-10m",
-                "to": "now"
-            },
-            "timepicker": {
-                "now": true,
-                "refresh_intervals": [],
-                "time_options": [
-                    "10m",
-                    "1h",
-                    "6h",
-                    "24h",
-                    "7d",
-                    "30d"
-                ]
-            },
-            "timezone": "browser"
-        };
 
-
-        var changeit = false;
-        for (var i = 0; i < tempdash.rows.length; i++) {
-            for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
-                if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
-                    if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray && this.dashboard.rows[i].panels[j].machineArray[0] && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
-                        tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
-                        changeit = true;
-                    }
-                }
-            }
-        }
-        return tempdash;
-        // var that = this;
-        // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-        //     // if (that.querySelector('dashboard-panel'))
-        //     //     that.querySelector('dashboard-panel').resize();
-        //
-        // }, 5000);
-    },
     _computeItemInArray: function() {
         return [this.machine];
     },
+
     _computeThisItemUid: function(machine) {
         var itemUidInArray = [];
         itemUidInArray.push(itemUid(this.machine, this.sections['machines']));
@@ -876,7 +765,7 @@ Polymer({
         } else if (e.detail.response) {
             this.set('isPendingKeyRequest', false);
         } else if (e.detail.error) {
-            this.set('isPendingKeyRequest', false);            
+            this.set('isPendingKeyRequest', false);
             this._showToast(e.detail.errormsg);
         }
     },
@@ -970,7 +859,7 @@ Polymer({
                 b = str.split(" ")[1];
             return "Up "+a+". Idle:"+b;
         }
-        else 
+        else
             return "";
 
     }
