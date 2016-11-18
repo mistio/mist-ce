@@ -26,7 +26,7 @@
                 flex: 1 100%;
                 margin-bottom: 16px;
             }
-            .columns paper-material > * {
+            .columns paper-material > .break {
                 word-break: break-all;
             }
             .left {
@@ -206,6 +206,19 @@
             item-actions ::content .item-actions {
                 margin-left: 0 !important;
             }
+            .dc-true {
+                color: #F57F17;
+            }
+            .dc-true iron-icon {
+                color: inherit;
+            }
+            .dc-false {
+                color: var(--green-color);
+            }
+            .probe-df {
+                height: 240px;
+                overflow-y: scroll;
+            }
             .probe-data {
                 position: relative;
             }
@@ -314,11 +327,24 @@
             <div class="columns">
                 <paper-material id="leftcolumn" class="left">
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
-                    <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
+                    <span hidden$="[[!machine.extra.image]]" class="break">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
-                    <div hidden$="{{!probeData}}"> Probe Data:
-                        <span class$="probe-data {{itemProbeClasses(machine, model.probes)}}"> </span>
-                        <span hidden$="{{!probeData}}"> {{probeData}} </span>
+                    <div hidden$="[[!probeData]]"> Probe Data:
+                        <span class$="probe-data [[itemProbeClasses(machine, model.probes)]]"> </span>
+                        <span hidden$="[[!probeData]]"> [[probeData]] </span> <br/>
+                        <span hidden$="[[!lastProbe]]"> [[lastProbe]] </span>
+                    </div>
+                    <div hidden$="[[!kernelInfo]]"> 
+                        [[kernelInfo]]
+                    </div>
+                    <div hidden$="[[!probeObj]]"> 
+                        <span class$="dc-[[probeObj.dirty_cow]]" hidden$="[[probeObj.dirty_cow]]">
+                            Dirty COW check passed.
+                        </span>
+                        <span class$="dc-[[probeObj.dirty_cow]]" hidden$="[[!probeObj.dirty_cow]]">
+                            <iron-icon hidden$="[[!probeObj.dirty_cow]]" icon="icons:report-problem"></iron-icon> [[dirtyCowAlert]]
+                        </span>
+                        <!-- <a href="/link-to-blog" target="new" class="regular" hidden$="[[!probeObj.dirty_cow]]">read more...</a> -->
                     </div>
                 </paper-material>
                 <paper-material id="rightcolumn" class="right">
@@ -372,6 +398,22 @@
                                 <td><template is="dom-repeat" items="[[machine.private_ips]]">
                                         [[item]]
                                     </template>
+                                </td>
+                            </tr>
+                            <tr hidden$="[[!probeObj]]">
+                                <td>Users</td>
+                                <td>[[probeObj.users]]</td>
+                            </tr>
+                            <tr hidden$="[[!probeObj]]">
+                                <td>Uptime</td>
+                                <td>[[probeObj.uptime]]</td>
+                            </tr>
+                            <tr hidden$="[[!probeData]]">
+                                <td>Filesystem Info</td>
+                                <td>
+                                    <div class="probe-df">
+<pre><code>[[probeObj.df]]</code></pre>
+                                    </div>
                                 </td>
                             </tr>
                         </template>
@@ -489,21 +531,13 @@ MACHINEACTIONS = {
 
 Polymer({
     is: 'machine-page',
-
     properties: {
         model: {
             type: Object,
             notify: true
         },
         router: Object,
-        params: {
-            type: Object,
-            notify: true
-        },
-        machine: {
-            type: Object,
-            notify: true
-        },
+        machine: Object,
         sections: {
             type: Array,
             notify: true
@@ -533,9 +567,6 @@ Polymer({
             type: Object,
             computed: "_computeDashboard(machine, model.monitoring.monitored_machines.*)"
         },
-        replaceTargets: {
-            type: Object,
-        },
         isLoading: {
             type: Boolean,
             computed: '_computeIsloading(machine)',
@@ -547,7 +578,7 @@ Polymer({
         },
         machineIp: {
             type: String,
-            computed: 'computeMachineIp(machine.public_ips)'
+            computed: 'computeMachineIp(machine, machine.public_ips)'
         },
         disassociateKeyId: {
             type: String
@@ -579,6 +610,16 @@ Polymer({
         probeData: {
             type: String,
             computed: '_computeProbeData(machine, model.probes.*)',
+            value: false
+        },
+        dirtyCowAlert: {
+             type: String,
+             computed: '_computeDirtyCowAlert(machine, model.probes.*)',
+             value: false
+         }, 
+        probeObj: {
+            type: Object,
+            computed: '_computeProbeObj(machine, model.probes.*)',
             value: false
         }
     },
@@ -736,7 +777,7 @@ Polymer({
         for (var i = 0; i < tempdash.rows.length; i++) {
             for (var j = 0; j < tempdash.rows[i].panels.length; j++) {
                 if (tempdash.rows[i].panels[j].datasource == "mist.monitor") {
-                    if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
+                    if ((this.dashboard != null && this.dashboard.rows[i].panels[j].machineArray && this.dashboard.rows[i].panels[j].machineArray[0] && this.dashboard.rows[i].panels[j].machineArray[0][1] != this.machine.id) || this.dashboard == null) {
                         tempdash.rows[i].panels[j].machineArray[0] = [this.machine.cloud.id, this.machine.id];
                         changeit = true;
                     }
@@ -875,7 +916,7 @@ Polymer({
         } else if (e.detail.response) {
             this.set('isPendingKeyRequest', false);
         } else if (e.detail.error) {
-            this.set('isPendingKeyRequest', false);
+            this.set('isPendingKeyRequest', false);            
             this._showToast(e.detail.errormsg);
         }
     },
@@ -903,6 +944,14 @@ Polymer({
         if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid].loadavg.length)
             return this.model.probes[machine.uuid].loadavg[0]+", "+this.model.probes[machine.uuid].loadavg[1]+", "+this.model.probes[machine.uuid].loadavg[2]+" - "+this.model.probes[machine.uuid].cores+" cores. Last probe: "+moment(this.model.probes[machine.uuid].timestamp*1000).fromNow();
     },
+    _computeDirtyCowAlert: function(machine, probes){
+         var info = "";
+         if (this.model && this.model.probes && this.model.probes[machine.uuid]){
+             if (this.model.probes[machine.uuid].dirty_cow != undefined)
+                 info += "Dirty COW vulnerability found. Update kernel.";
+         }
+         return info.length ? info : '';
+     },
     itemProbeClasses: function(item, probes) {
         if (!probes) {
             return false;
@@ -927,6 +976,10 @@ Polymer({
             }
         }
     },
+     _computeProbeObj: function (machine, probes){
+         if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid])
+             return this.model.probes[machine.uuid];
+     },
     loadToColor: function(load, prefix){
         if (load > 1.2)
             return prefix+"high ";
@@ -938,6 +991,16 @@ Polymer({
             return prefix+"low ";
         else
             return prefix+"low ";
+    },
+    readableUptime: function(str){
+        if (str) {
+            var a = str.split(" ")[0],
+                b = str.split(" ")[1];
+            return "Up "+a+". Idle:"+b;
+        }
+        else 
+            return "";
+
     }
 });
 </script>

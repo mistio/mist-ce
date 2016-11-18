@@ -43,7 +43,7 @@
           return !path;
       },
       _getMachine: function(id) {
-        if (id && this.model.machines[id])
+        if (id && this.model && this.model.machines && this.model.machines[id])
           return this.model.machines[id];
       }
 
