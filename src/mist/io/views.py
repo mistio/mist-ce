@@ -310,7 +310,7 @@ def add_cloud(request):
         from mist.core.tag.methods import add_tags_to_resource
         add_tags_to_resource(owner, cloud, cloud_tags.items())
 
-    c_count = Cloud.objects(owner=owner).count()
+    c_count = Cloud.objects(owner=owner, deleted=None).count()
     ret = cloud.as_dict()
     ret['index'] = c_count - 1
     if monitoring:
@@ -318,7 +318,10 @@ def add_cloud(request):
 
     # SEC
     update_rbac_mapping(auth_context, cloud)
+    # Need to take into account both the newly added cloud and its VMs.
+    update_rbac_mapping(auth_context, list(Machine.objects(cloud=cloud)))
 
+    trigger_session_update(owner, ['clouds'])
     return ret
 
 
@@ -347,7 +350,10 @@ def delete_cloud(request):
     methods.delete_cloud(auth_context.owner, cloud_id)
     # SEC
     remove_rbac_mapping(auth_context, cloud)
+    # Need to take into account both the cloud and its VMs.
+    remove_rbac_mapping(auth_context, list(Machine.objects(cloud=cloud)))
 
+    trigger_session_update(auth_context.owner, ['clouds'])
     return OK
 
 
@@ -516,7 +522,7 @@ def add_key(request):
         add_tags_to_resource(auth_context.owner, key, key_tags.items())
     # since its a new key machines fields should be an empty list
 
-    clouds = Cloud.objects(owner=auth_context.owner)
+    clouds = Cloud.objects(owner=auth_context.owner, deleted=None)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=key)
 
@@ -525,6 +531,7 @@ def add_key(request):
     # SEC
     update_rbac_mapping(auth_context, key)
 
+    trigger_session_update(auth_context.owner, ['keys'])
     return {'id': key.id,
             'name': key.name,
             'machines': assoc_machines,
@@ -565,7 +572,8 @@ def delete_key(request):
     # SEC
     remove_rbac_mapping(auth_context, key)
 
-    return list_keys(request)
+    trigger_session_update(auth_context.owner, ['keys'])
+    return OK
 
 
 @view_config(route_name='api_v1_keys', request_method='DELETE', renderer='json')
@@ -652,7 +660,10 @@ def edit_key(request):
         raise NotFoundError('Key with that id does not exist')
     auth_context.check_perm('key', 'edit', key.id)
     methods.edit_key(auth_context.owner, new_name, key_id)
-    return {'new_name': new_name}
+    return {
+        'id': key.id,
+        'new_name': new_name
+    }
 
 
 @view_config(route_name='api_v1_key_action', request_method='POST')
@@ -819,7 +830,7 @@ def associate_key(request):
 
     methods.associate_key(auth_context.owner, key_id, cloud_id, machine_id, host,
                           username=ssh_user, port=ssh_port)
-    clouds = Cloud.objects(owner=auth_context.owner)
+    clouds = Cloud.objects(owner=auth_context.owner, deleted=None)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=key)
 
@@ -876,7 +887,7 @@ def disassociate_key(request):
     methods.disassociate_key(auth_context.owner, key_id,
                              cloud_id, machine_id, host)
     key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
-    clouds = Cloud.objects(owner=auth_context.owner)
+    clouds = Cloud.objects(owner=auth_context.owner, deleted=None)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=key)
 
@@ -1130,9 +1141,12 @@ def create_machine(request):
               'cronjob': cronjob,
               'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
     if not async:
-        ret = methods.create_machine(auth_context.owner, *args, **kwargs)
+        ret = methods.create_machine(auth_context, *args, **kwargs)
     else:
-        args = (auth_context.owner.id, ) + args
+        # NOTE: The AuthContext needs to be passed into create_machine in order
+        # for the RBAC Mappings to be updated even when machine creation takes
+        # place asynchronously.
+        args = (auth_context.serialize(), ) + args
         kwargs.update({'quantity': quantity, 'persist': persist})
         tasks.create_machine_async.apply_async(args, kwargs, countdown=2)
         ret = {'job_id': job_id}

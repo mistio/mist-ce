@@ -138,7 +138,7 @@ class Schedule(me.Document):
     common to all schedules of all types. For each different schedule type, a
     subclass should be created adding any schedule specific fields and methods.
 
-     Documents of all Schedule subclasses will be stored on the same mongo
+    Documents of all Schedule subclasses will be stored on the same mongo
     collection.
 
     One can perform a query directly on Schedule to fetch all cloud types, like
@@ -157,6 +157,7 @@ class Schedule(me.Document):
     name = me.StringField(required=True, unique_with='owner')
     description = me.StringField()
     owner = me.ReferenceField(Owner, required=True)
+    deleted = me.DateTimeField()
 
     # celery periodic task specific fields
     queue = me.StringField()
@@ -195,7 +196,7 @@ class Schedule(me.Document):
         elif not issubclass(self._controller_cls, controllers.BaseController):
             raise TypeError(
                 "Can't initialize %s.  All Schedule subclasses should define a"
-                " `_controller_cls` class attribute pointing to a "
+                "`_controller_cls` class attribute pointing to a "
                 "`BaseController` subclass." % self
             )
         self.ctl = self._controller_cls(self)

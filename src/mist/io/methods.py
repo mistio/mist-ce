@@ -120,7 +120,6 @@ def add_cloud_v_2(owner, title, provider, params):
                         machine.key_associations)
         )
     log.info("Cloud with id '%s' added succesfully.", cloud.id)
-    trigger_session_update(owner, ['clouds'])
     return ret
 
 
@@ -156,6 +155,7 @@ def delete_cloud(owner, cloud_id):
 
     try:
         cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+        cloud.update(set__deleted=datetime.utcnow())
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
@@ -172,9 +172,7 @@ def delete_cloud(owner, cloud_id):
         except:
             pass
 
-    cloud.delete()
     log.info("Succesfully deleted cloud '%s'", cloud_id)
-    trigger_session_update(owner, ['clouds'])
 
 
 def add_key(user, key_name, private_key, certificate=None):
@@ -186,7 +184,7 @@ def add_key(user, key_name, private_key, certificate=None):
         raise KeyParameterMissingError(key_name)
     if not private_key:
         raise RequiredParameterMissingError("Private key is not provided")
-    key = Keypair.objects(owner=user, name=key_name)
+    key = Keypair.objects(owner=user, name=key_name, deleted=None)
     if key:
         raise KeyExistsError(key_name)
 
@@ -196,7 +194,7 @@ def add_key(user, key_name, private_key, certificate=None):
     if certificate and certificate.startswith('ssh-rsa-cert-v01@openssh.com'):
         key.certificate = certificate
     key.construct_public_from_private()
-    if not Keypair.objects(owner=user, default=True):
+    if not Keypair.objects(owner=user, default=True, deleted=None):
         key.default = True
 
     if not key.isvalid():
@@ -205,7 +203,6 @@ def add_key(user, key_name, private_key, certificate=None):
     key.save()
 
     log.info("Added key with name '%s'", key_name)
-    trigger_session_update(user, ['keys'])
     return key_name
 
 
@@ -223,13 +220,12 @@ def delete_key(user, key_id):
     default_key = key.default
     # if key.default:
     #     default_key = key.default
-    key.delete()
-    other_key = Keypair.objects(owner=user, id__ne=key_id).first()
+    key.update(set__deleted=datetime.utcnow())
+    other_key = Keypair.objects(owner=user, id__ne=key_id, deleted=None).first()
     if default_key and other_key:
         other_key.default = True
         other_key.save()
     log.info("Deleted key with id '%s'.", key_id)
-    trigger_session_update(user, ['keys'])
 
 
 def set_default_key(user, key_id):
@@ -241,7 +237,7 @@ def set_default_key(user, key_id):
 
     log.info("Setting key with id '%s' as default.", key_id)
 
-    default_key = Keypair.objects(owner=user, default=True).first()
+    default_key = Keypair.objects(owner=user, default=True, deleted=None).first()
     if default_key:
         default_key.default = False
         default_key.save()
@@ -436,12 +432,12 @@ def connect_provider(cloud):
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
-    machines = Cloud.objects.get(owner=user,
-                                 id=cloud_id).ctl.compute.list_machines()
+    machines = Cloud.objects.get(id=cloud_id,
+                                 owner=user).ctl.compute.list_machines()
     return [machine.as_dict_old() for machine in machines]
 
 
-def create_machine(user, cloud_id, key_id, machine_name, location_id,
+def create_machine(auth_context, cloud_id, key_id, machine_name, location_id,
                    image_id, size_id, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22, script='',
@@ -484,18 +480,18 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     # post_script_params: extra params, for post_script_id
 
     log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     conn = connect_provider(cloud)
 
     machine_name = machine_name_validator(conn.type, machine_name)
     key = None
     if key_id:
-        key = Keypair.objects.get(owner=user, id=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
 
     # if key_id not provided, search for default key
     if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
         if not key_id:
-            key = Keypair.objects.get(owner=user, default=True)
+            key = Keypair.objects.get(owner=auth_context.owner, default=True)
             key_id = key.name
     if key:
         private_key = key.private
@@ -616,16 +612,16 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
 
     if conn.type == Provider.AZURE:
         #we have the username
-        associate_key(user, key_id, cloud_id, node.id,
+        associate_key(auth_context.owner, key_id, cloud_id, node.id,
                       username=node.extra.get('username'), port=ssh_port)
     elif key_id:
-        associate_key(user, key_id, cloud_id, node.id, port=ssh_port)
+        associate_key(auth_context.owner, key_id, cloud_id, node.id, port=ssh_port)
     # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calls post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
-            user.id, cloud_id, node.id, monitoring, key_id,
+            auth_context.owner.id, cloud_id, node.id, monitoring, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script=script,
             script_id=script_id, script_params=script_params, job_id = job_id,
@@ -634,9 +630,9 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         )
     elif conn.type == Provider.OPENSTACK:
         if associate_floating_ip:
-            networks = list_networks(user, cloud_id)
+            networks = list_networks(auth_context.owner, cloud_id)
             mist.io.tasks.openstack_post_create_steps.delay(
-                user.id, cloud_id, node.id, monitoring, key_id,
+                auth_context.owner.id, cloud_id, node.id, monitoring, key_id,
                 node.extra.get('username'), node.extra.get('password'),
                 public_key, script=script, script_id=script_id, script_params=script_params,
                 job_id = job_id, hostname=hostname, plugins=plugins,
@@ -648,7 +644,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
-            user.id, cloud_id, node.id, monitoring, key_id,
+            auth_context.owner.id, cloud_id, node.id, monitoring, key_id,
             node.extra.get('password'), public_key, script=script,
             script_id=script_id, script_params=script_params,
             job_id = job_id, hostname=hostname, plugins=plugins,
@@ -658,7 +654,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
 
     elif key_id:
         mist.io.tasks.post_deploy_steps.delay(
-            user.id, cloud_id, node.id, monitoring, script=script,
+            auth_context.owner.id, cloud_id, node.id, monitoring, script=script,
             key_id=key_id, script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
@@ -667,8 +663,19 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
 
     if tags:
         from mist.core.tag.methods import resolve_id_and_set_tags
-        resolve_id_and_set_tags(user, 'machine', node.id, tags,
+        resolve_id_and_set_tags(auth_context.owner, 'machine', node.id, tags,
                                 cloud_id=cloud_id)
+
+    # SEC
+    # TODO: This must be properly implemented once `create_machine` is
+    # migrated to io.
+    from mist.core.rbac.methods import update_rbac_mapping
+    from mist.io.machines.models import Machine
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=node.id)
+    except me.DoesNotExist:
+        machine = Machine(cloud=cloud_id, machine_id=node.id).save()
+    update_rbac_mapping(auth_context, machine)
 
     ret = {'id': node.id,
            'name': node.name,
@@ -1375,7 +1382,6 @@ def destroy_machine(user, cloud_id, machine_id):
                         "machine never had monitoring enabled. Error: %r", exc)
 
     machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-
     machine.ctl.destroy()
 
 
@@ -1428,10 +1434,11 @@ def star_image(user, cloud_id, image_id):
 
 
 def list_clouds(user, cloud_ids=None):
-    # FIXME: Move import to the top of the file.
+    """Return a list of Clouds. The list can be further filtered by providing
+    a list of Cloud IDs."""
     from mist.core.tag.methods import get_tags_for_resource
 
-    query = {'owner': user}
+    query = {'owner': user, 'deleted': None}
     if cloud_ids is not None:  # Can be an empty list
         query['id__in'] = cloud_ids
     clouds = [cloud.as_dict() for cloud in Cloud.objects(**query)]
@@ -1441,17 +1448,16 @@ def list_clouds(user, cloud_ids=None):
 
 
 def list_keys(user, key_ids=None):
-    """List user's keys
-    :param user:
-    :return:
-    """
+    """Return a list of Keys. The final list can be further filtered by
+    providing a list of IDs."""
     from mist.core.tag.methods import get_tags_for_resource
 
-    query = {'owner': user}
+    query = {'owner': user, 'deleted': None}
     if key_ids is not None:  # Can be an empty list
         query['id__in'] = key_ids
-    keys = Keypair.objects(**query).only("default", "name")
-    clouds = Cloud.objects(owner=user)
+
+    keys = Keypair.objects(**query)
+    clouds = Cloud.objects(owner=user, deleted=None)
 
     key_objects = []
     for key in keys:

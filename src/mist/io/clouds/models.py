@@ -82,18 +82,21 @@ class Cloud(me.Document):
     starred = me.ListField()
     unstarred = me.ListField()
 
+    deleted = me.DateTimeField()
+
     meta = {
         'allow_inheritance': True,
         'collection': 'clouds',  # collection 'cloud' is used by core's model
         'indexes': [
             'owner',
             # Following index ensures owner with title combos are unique
+            # for non-deleted documents
             {
-                'fields': ['owner', 'title'],
+                'fields': ['owner', 'title', 'deleted'],
                 'sparse': False,
                 'unique': True,
                 'cls': False,
-            }
+            },
         ],
     }
 
@@ -114,7 +117,7 @@ class Cloud(me.Document):
         elif not issubclass(self._controller_cls,
                             controllers.BaseMainController):
             raise TypeError(
-                "Can't initialize %s.  All Cloud subclasses should define a "
+                "Can't initialize %s. All Cloud subclasses should define a "
                 "`_controller_cls` class attribute pointing to a "
                 "`BaseMainController` subclass." % self
             )
@@ -148,8 +151,6 @@ class Cloud(me.Document):
             raise RequiredParameterMissingError('title')
         if not owner or not isinstance(owner, Organization):
             raise BadRequestError('owner')
-        if Cloud.objects(owner=owner, title=title):
-            raise CloudExistsError()
         cloud = cls(owner=owner, title=title)
         if id:
             cloud.id = id
