@@ -593,15 +593,6 @@ class VSphereComputeController(BaseComputeController):
                                             username=self.cloud.username,
                                             password=self.cloud.password)
 
-    def check_connection(self):
-        """Check connection without performing `list_machines`
-
-        In vSphere we are sure we got a successful connection with the provider
-        if `self.connect` works, no need to run a `list_machines` to find out.
-
-        """
-        self.connect()
-
 
 class VCloudComputeController(BaseComputeController):
 
