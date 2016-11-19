@@ -153,7 +153,7 @@ class Schedule(me.Document):
         'allow_inheritance': True,
         'indexes': [
             {
-                'fields': ['owner', 'name'],
+                'fields': ['owner', 'name', 'deleted'],
                 'sparse': False,
                 'unique': True,
                 'cls': False,
