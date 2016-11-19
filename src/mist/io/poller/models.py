@@ -81,8 +81,11 @@ class PollingSchedule(me.Document):
         return '%s(%s)' % (self.task, ', '.join(parts))
 
     def clean(self):
-        """Automatically set value of name"""
+        """Automatically set value of name and remove expired overrides"""
         self.name = self.get_name()
+        self.override_intervals = [override
+                                   for override in self.override_intervals
+                                   if not override.expired()]
 
     @property
     def task(self):
