@@ -16,6 +16,8 @@ import traceback
 import datetime
 import netaddr
 
+import tornado.gen
+
 from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
 
@@ -44,6 +46,8 @@ from mist.core.rbac import methods as rbac_methods
 
 from mist.io import tasks
 from mist.io.hub.tornado_shell_client import ShellHubClient
+
+from mist.io.poller.models import ListMachinesPollingSchedule
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -225,6 +229,19 @@ class MainConnection(MistConnection):
         self.list_tunnels()
         self.list_clouds()
         self.check_monitoring()
+        self.update_poller()
+
+    @tornado.gen.coroutine
+    def update_poller(self):
+        """Every 4 minutes, tell poller to continue for next 5 minutes"""
+        while True:
+            if self.closed:
+                break
+            log.info("Updating poller for %s", self)
+            for cloud in Cloud.objects(owner=self.owner):
+                ListMachinesPollingSchedule.add(cloud=cloud,
+                                                interval=10, ttl=300)
+            yield tornado.gen.sleep(240)
 
     def update_user(self):
         self.send('user', core_methods.get_user_data(self.auth_context))
@@ -271,8 +288,7 @@ class MainConnection(MistConnection):
                   core_methods.filter_list_clouds(self.auth_context))
         clouds = Cloud.objects(owner=self.owner, enabled=True)
         log.info(clouds)
-        for key, task in (#('list_machines', tasks.ListMachines()),
-                          ('list_images', tasks.ListImages()),
+        for key, task in (('list_images', tasks.ListImages()),
                           ('list_sizes', tasks.ListSizes()),
                           ('list_networks', tasks.ListNetworks()),
                           ('list_locations', tasks.ListLocations()),
