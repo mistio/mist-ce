@@ -56,9 +56,9 @@ class PollingSchedule(me.Document):
 
     # Scheduling information. Don't edit them directly, just use the model
     # methods.
-    default_interval = me.EmbeddedDocumentField(Interval, required=True)
+    default_interval = me.EmbeddedDocumentField(Interval, required=True,
+                                                default=Interval(every=0))
     override_intervals = me.EmbeddedDocumentListField(Interval)
-    enabled = me.BooleanField(default=True)
 
     # Optional arguments.
     queue = me.StringField()
@@ -78,7 +78,6 @@ class PollingSchedule(me.Document):
             parts.append('%r' % arg)
         for kwarg in self.kwargs.iteritems():
             parts.append('%s=%r' % kwarg)
-        print parts
         return '%s(%s)' % (self.task, ', '.join(parts))
 
     def clean(self):
@@ -110,6 +109,11 @@ class PollingSchedule(me.Document):
         return {}
 
     @property
+    def enabled(self):
+        """Whether this task is currently enabled or not"""
+        return bool(self.interval.timedelta)
+
+    @property
     def interval(self):
         """Merge multiple intervals into one
 
@@ -119,8 +123,9 @@ class PollingSchedule(me.Document):
         """
         interval = self.default_interval
         for i in self.override_intervals:
-            if not i.expired() and i.timedelta < interval.timedelta:
-                interval = i
+            if not i.expired():
+                if not interval.timedelta or i.timedelta < interval.timedelta:
+                    interval = i
         return interval
 
     @property
@@ -135,7 +140,7 @@ class PollingSchedule(me.Document):
     def expires(self):
         return None
 
-    def add_interval(self, interval, ttl, name=''):
+    def add_interval(self, interval, ttl=300, name=''):
         """Add an override schedule to the scheduled task
 
         Override schedules must define an interval in seconds, as well as a
@@ -147,6 +152,8 @@ class PollingSchedule(me.Document):
         Override schedules can only increase, not decrease frequency of the
         schedule, in relation to that define in the `default_interval`.
         """
+        assert isinstance(interval, int) and interval > 0
+        assert isinstance(ttl, int) and 0 < ttl < 3600
         expires = datetime.datetime.now() + datetime.timedelta(seconds=ttl)
         self.override_intervals.append(Interval(name=name, expires=expires,
                                                 every=interval))
@@ -177,19 +184,35 @@ class DebugPollingSchedule(PollingSchedule):
         return [self.value]
 
 
-class ListMachinesPollingSchedule(PollingSchedule):
+class CloudPollingSchedule(PollingSchedule):
 
-    owner = me.ReferenceField(Owner)
     cloud = me.ReferenceField(Cloud)
 
-    # Redefine default_interval to give it a default value.
-    default_interval = me.EmbeddedDocumentField(Interval, required=True,
-                                                default=Interval(every=3600))
-
-    @property
-    def task(self):
-        return 'mist.io.poller.tasks.list_machines'
+    @classmethod
+    def add(cls, cloud, default=None, interval=None, ttl=300):
+        try:
+            schedule = cls.objects.get(cloud=cloud)
+        except cls.DoesNotExist:
+            schedule = cls(cloud=cloud)
+        if default is not None and schedule.default_interval.every != default:
+            schedule.set_default_interval(default)
+        if interval is not None:
+            schedule.add_interval(interval, ttl)
+        schedule.run_immediately = True
+        schedule.save()
+        return schedule
 
     @property
     def args(self):
         return [self.cloud.id]
+
+    @property
+    def enabled(self):
+        return super(CloudPollingSchedule, self).enabled and self.cloud.enabled
+
+
+class ListMachinesPollingSchedule(CloudPollingSchedule):
+
+    @property
+    def task(self):
+        return 'mist.io.poller.tasks.list_machines'
