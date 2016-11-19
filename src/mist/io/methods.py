@@ -1435,29 +1435,26 @@ def star_image(user, cloud_id, image_id):
     return not star
 
 
-def list_clouds(user, cloud_ids=None):
-    """Return a list of Clouds. The list can be further filtered by providing
-    a list of Cloud IDs."""
+def list_clouds(user):
+    """Return a list of Clouds"""
     from mist.core.tag.methods import get_tags_for_resource
 
-    query = {'owner': user, 'deleted': None}
-    if cloud_ids is not None:  # Can be an empty list
-        query['id__in'] = cloud_ids
-    clouds = [cloud.as_dict() for cloud in Cloud.objects(**query)]
-    for cloud in clouds:
-        cloud['tags'] = get_tags_for_resource(user, cloud)
+    clouds = []
+    for cloud in Cloud.objects(owner=user, deleted=None):
+        cdict = cloud.as_dict()
+        cdict['tags'] = get_tags_for_resource(user, cloud)
+        clouds.append(cdict)
     return clouds
 
 
-def list_keys(user, key_ids=None):
+def list_keys(user, keys=None):
     """Return a list of Keys. The final list can be further filtered by
-    providing a list of IDs."""
+    providing a list of keys to actually query for."""
     from mist.core.tag.methods import get_tags_for_resource
 
     query = {'owner': user, 'deleted': None}
-    if key_ids is not None:  # Can be an empty list
-        query['id__in'] = key_ids
-
+    if keys is not None:  # Can be an empty list.
+        query['id__in'] = [key.id for key in keys]
     keys = Keypair.objects(**query)
     clouds = Cloud.objects(owner=user, deleted=None)
 
