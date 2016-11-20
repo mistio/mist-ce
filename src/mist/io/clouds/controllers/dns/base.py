@@ -210,8 +210,7 @@ class BaseDNSController(BaseController):
         if not re.match(".*\.$", domain):
             domain += "."
         try:
-            zone = self.connection.create_zone(domain, type='master',
-                                               ttl=None, extra=None)
+            zone = self.connection.create_zone(domain, type, ttl, extra)
             log.info("Zone %s created successfully for %s.",
                      zone.domain, self.cloud)
             return zone.id
