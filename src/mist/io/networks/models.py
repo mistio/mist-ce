@@ -4,8 +4,9 @@ import logging
 import mongoengine as me
 
 from mist.io.clouds.models import Cloud
-from mist.io.exceptions import RequiredParameterMissingError
+import mist.io.exceptions
 from mist.io.networks.controllers import NetworkController, SubnetController
+
 
 
 log = logging.getLogger(__name__)
@@ -61,9 +62,9 @@ class Network(me.Document):
     def add(cls, title, cloud, description='', object_id='', create_on_cloud=True, **kwargs):
 
         if not title:
-            raise RequiredParameterMissingError('title')
+            raise mist.io.exceptions.RequiredParameterMissingError('title')
         if not cloud:
-            raise RequiredParameterMissingError('cloud')
+            raise mist.io.exceptions.RequiredParameterMissingError('cloud')
 
         network = cls(title=title,
                       cloud=cloud,
@@ -75,6 +76,23 @@ class Network(me.Document):
         if create_on_cloud:
             network.ctl.create_network(**kwargs)
         return network
+
+    def update(self):
+        """Persists changes to a Network Object.
+        Performs validation and uniqueness tests.
+
+        Subclasses SHOULD NOT override or extend this method.
+
+        """
+        # Attempt to save.
+        try:
+            self.save()
+        except me.ValidationError as exc:
+            log.error("Error updating Network %s: %s", self.title, exc.to_dict())
+            raise mist.io.exceptions.NetworkCreationError(exc.message)
+        except me.NotUniqueError as exc:
+            log.error("Network %s not unique error: %s", self.title, exc)
+            raise mist.io.exceptions.NetworkExistsError()
 
     def as_dict(self):
         netdict = {'name': self.title,
@@ -158,9 +176,9 @@ class Subnet(me.Document):
     def add(cls, title, network, cloud, description='', object_id='', create_on_cloud=True, **kwargs):
 
         if not title:
-            raise RequiredParameterMissingError('title')
+            raise mist.io.exceptions.RequiredParameterMissingError('title')
         if not cloud:
-            raise RequiredParameterMissingError('cloud')
+            raise mist.io.exceptions.RequiredParameterMissingError('cloud')
 
         subnet = cls(title=title,
                      network=network,
@@ -173,6 +191,23 @@ class Subnet(me.Document):
         if create_on_cloud:
             subnet.ctl.create_subnet(**kwargs)
         return subnet
+
+    def update(self):
+        """Persists changes to a Subnet Object.
+        Performs validation and uniqueness tests.
+
+        Subclasses SHOULD NOT override or extend this method.
+
+        """
+        # Attempt to save.
+        try:
+            self.save()
+        except me.ValidationError as exc:
+            log.error("Error updating Subnet %s: %s", self.title, exc.to_dict())
+            raise mist.io.exceptions.NetworkCreationError(exc.message)
+        except me.NotUniqueError as exc:
+            log.error("Subnet %s not unique error: %s", self.title, exc)
+            raise mist.io.exceptions.NetworkExistsError()
 
     def as_dict(self):
         netdict = {'name': self.title,

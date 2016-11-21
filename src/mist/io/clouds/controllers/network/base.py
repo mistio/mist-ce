@@ -22,7 +22,7 @@ class BaseNetworkController(BaseController):
             raise mist.io.exceptions.NetworkCreationError("Got error %s" % str(e))
 
         self._create_network__parse_libcloud_object(network_doc, libcloud_network)
-        network_doc.save()
+        network_doc.update()
         return network_doc.as_dict()
 
     def _create_network__parse_args(self, network_doc, kwargs):
@@ -42,7 +42,7 @@ class BaseNetworkController(BaseController):
             raise mist.io.exceptions.SubnetCreationError("Got error %s" % str(e))
 
         self._create_subnet__parse_libcloud_object(subnet_doc, libcloud_subnet)
-        subnet_doc.save()
+        subnet_doc.update()
 
         return subnet_doc.as_dict()
 
@@ -78,7 +78,7 @@ class BaseNetworkController(BaseController):
                                                           object_id=db_network.id,
                                                           create_on_cloud=False)
             self._create_network__parse_libcloud_object(network_doc, network)
-            network_doc.save()
+            network_doc.update()
 
             # Syncing Subnets
             subnets_in_current_network = network_doc.ctl.list_subnets()
@@ -122,7 +122,7 @@ class BaseNetworkController(BaseController):
 
             self._create_subnet__parse_libcloud_object(subnet_doc, subnet)
             if subnet_doc.network:  # Do not persist this subnet without a parent network reference
-                subnet_doc.save()
+                subnet_doc.update()
             subnet_listing.append(subnet_doc.as_dict())
 
         return subnet_listing

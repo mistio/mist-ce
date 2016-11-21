@@ -1536,9 +1536,11 @@ def associate_ip(user, cloud_id, network_id, ip, machine_id=None, assign=True):
 def create_network(owner, cloud_id, network, subnet, router):
     """
     Creates a new network. If subnet dict is specified, after creating the network
-    it will use the new network's id to create a subnet
+    it will use the new network's id to create a subnet.
 
     """
+
+    # TODO: Split this up after network, subnet and router creation are separated in the frontend
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     created_network = NETWORKS[cloud.ctl.provider].add(network.pop('name'),
@@ -1548,11 +1550,17 @@ def create_network(owner, cloud_id, network, subnet, router):
     network_dict = created_network.as_dict()
 
     if subnet:
-        created_subnet = SUBNETS[cloud.ctl.provider].add(subnet.pop('name'),
-                                                         created_network,
-                                                         cloud,
-                                                         subnet.pop('description', ''),
-                                                         **subnet)
+        try:
+            created_subnet = SUBNETS[cloud.ctl.provider].add(subnet.pop('name'),
+                                                             created_network,
+                                                             cloud,
+                                                             subnet.pop('description', ''),
+                                                             **subnet)
+        except Exception as e:
+            # Clean up the network if subnet creation fails
+            # This behavior is expected by the frontend
+            created_network.ctl.delete_network()
+            raise e
 
         network_dict['subnet'] = created_subnet.as_dict()
 
@@ -1570,12 +1578,8 @@ def delete_network(owner, cloud_id, network_id):
     network = Network.objects.get(cloud=cloud, id=network_id)
     network.ctl.delete_network()
 
-    try:
-        task = mist.io.tasks.ListNetworks()
-        task.clear_cache(owner.id, cloud_id)
-        trigger_session_update(owner, ['clouds'])
-    except Exception as e:
-        pass
+    # Schedule a UI update
+    trigger_session_update(owner, ['clouds'])
 
 
 def set_machine_tags(user, cloud_id, machine_id, tags):

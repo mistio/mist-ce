@@ -176,6 +176,10 @@ class NetworkNotFound(NotFoundError):
     msg = "Network not found"
 
 
+class NetworkExistsError(ConflictError):
+    msg = "Network already exists"
+
+
 class SubnetCreationError(InternalServerError):
     msg = "Subnet creation failed"
 
@@ -186,6 +190,10 @@ class SubnetDeletionError(InternalServerError):
 
 class SubnetNotFound(NotFoundError):
     msg = "Subnet not found"
+
+
+class SubnetExistsError(ConflictError):
+    msg = "Subnet already exists"
 
 
 class SSLError(MistError):
