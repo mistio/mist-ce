@@ -214,7 +214,7 @@
                 'edit-request': 'editRequest'
             },
             observers: [
-                'updateNewrule(resource.id)',
+                'updateNewrule(resource, resource.id)',
                 "_computeShowCommandTextarea(newRule.action)",
             ],
             ready: function() {
@@ -231,7 +231,7 @@
                     }
                 this.set('newRule', new_rule);
             },
-            updateNewrule: function(id){
+            updateNewrule: function(resource, id){
                 // for machines only for now
                 this.set('newRule.cloudId', this.resource.cloud.id);
                 this.set('newRule.machineId', this.resource.id);
