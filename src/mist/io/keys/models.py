@@ -1,9 +1,9 @@
-"""Keypair entity model"""
+"""Key entity model"""
 from uuid import uuid4
 import mongoengine as me
 import mist.core.tag.models
 from Crypto.PublicKey import RSA
-from mist.core.user.models import Owner, Organization
+from mist.core.user.models import Owner
 from mist.io.exceptions import BadRequestError
 from mist.io.keys import controllers
 from mist.io.keys.base import BaseKeyController
