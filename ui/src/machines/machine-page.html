@@ -661,22 +661,28 @@ Polymer({
     },
 
     isInPageChanged: function(machine, isInPage){
-        var parent = this.$.monitoringBlock;
-        if (this.isInPage == true) {
-            var monitoringNode = document.createElement('mist-monitoring');
-            monitoringNode.id = "mistMonitoring";
-            monitoringNode.resource = this.machine;
-            monitoringNode.monitoring = this.model.monitoring;
-            monitoringNode.section = this.section;
-            monitoringNode.datasources = this.datasources;
+        console.log('machine', machine);
+        if (!this.machine)
+            return;
 
-            Polymer.dom(parent).insertBefore(monitoringNode, this.$.monitoringRules);
-            // <mist-monitoring 
-            //         id="mistMonitoring"
-            //         resource="[[machine]]" 
-            //         monitoring="[[model.monitoring]]" 
-            //         section="[[section]]" 
-            //         datasources="[[datasources]]"></mist-monitoring>
+        var parent = this.$.monitoringBlock;
+        if (this.isInPage == true ) {
+            if (!this.querySelector('#mistMonitoring')) {
+                var monitoringNode = document.createElement('mist-monitoring');
+                monitoringNode.id = "mistMonitoring";
+                monitoringNode.resource = this.machine;
+                monitoringNode.monitoring = this.model.monitoring;
+                monitoringNode.section = this.section;
+                monitoringNode.datasources = this.datasources;
+
+                Polymer.dom(parent).insertBefore(monitoringNode, this.$.monitoringRules);
+                // <mist-monitoring 
+                //         id="mistMonitoring"
+                //         resource="[[machine]]" 
+                //         monitoring="[[model.monitoring]]" 
+                //         section="[[section]]" 
+                //         datasources="[[datasources]]"></mist-monitoring>
+            }
         }
         else {
             console.log('delete ', this.querySelector('#mistMonitoring'))
@@ -684,6 +690,7 @@ Polymer({
                 Polymer.dom(parent).removeChild(this.querySelector('#mistMonitoring'));
             }
         }
+        Polymer.dom.flush()
     },
 
     _computeActions: function(item) {

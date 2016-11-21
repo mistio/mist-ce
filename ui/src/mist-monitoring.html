@@ -144,39 +144,39 @@
         is: 'mist-monitoring',
 
         properties: {
-          resource: Object, //currently machines only, later other resources too
-          monitoring: Object,
-          section: Object,
-          isRunning: {
-            type: Boolean,
-            computed: '_computeIsRunning(resource)'
-          },
+            resource: Object, //currently machines only, later other resources too
+            monitoring: Object,
+            section: Object,
+            isRunning: {
+                type: Boolean,
+                computed: '_computeIsRunning(resource)'
+            },
             resourceMonitoringInfo: {
                 type: Object,
                 computed: '_computeResourceMonitoringInfo(resource, monitoring.monitored_machines.*)'
             },
-          isMonitored: {
-            type: Boolean,
-            computed: '_computeIsMonitored(resource, monitoring.monitored_machines.*)'
-          },
-          waitingData: {
-            type: Boolean,
+            isMonitored: {
+                type: Boolean,
+                computed: '_computeIsMonitored(resource, monitoring.monitored_machines.*)'
+            },
+            waitingData: {
+                type: Boolean,
                 computed: '_computeWaitingData(resource, monitoring.monitored_machines.*)',
-            value: false
-          },
-          installationError: {
-            type: Boolean,
-            value: false
-          },
-          isActivated: {
-            type: Boolean,
-            computed: '_computeIsActivated(resource, monitoring.monitored_machines.*)'
-          },
-          script: {
-            type: String,
-            computed: '_computeScript(resource, monitoring.monitored_machines.*)',
-          },
-          monitoringError: {
+                value: false
+            },
+            installationError: {
+                type: Boolean,
+                value: false
+            },
+            isActivated: {
+                type: Boolean,
+                computed: '_computeIsActivated(resource, monitoring.monitored_machines.*)'
+            },
+            script: {
+                type: String,
+                computed: '_computeScript(resource, monitoring.monitored_machines.*)',
+            },
+            monitoringError: {
                 type: Boolean,
                 value: false
             },
@@ -210,6 +210,9 @@
 
         },
         attached: function(){
+            // this.fire('monitor-attached', {cloud:this.resource.cloud.id, machine:this.resource.id})
+        },
+        dettached: function () {
 
         },
         _forwardEvent: function(e){
@@ -217,15 +220,15 @@
                 this.querySelector('polyana-dashboard')._updateDashboard(e);
             }.bind(this));
         },
+
         _computeDashboardUri: function(resource) {
             return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/dashboard';
         },
         _computeIsMonitored: function(resource, monitoring){
           if (this.resource && this.monitoring && this.monitoring.monitored_machines[resource.uuid])
             return true;
-          else {
+          else 
             return false;
-          }
         },
         _computeIsRunning: function(resource) {
             return this.resource && this.resource.state && this.resource.state == "running" ? true : false ;
