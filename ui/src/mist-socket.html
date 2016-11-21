@@ -2,6 +2,7 @@
 <script>
     CSRF_TOKEN = '';
     DEBUG_SOCKET = false;
+    STRIPE_PUBLIC_APIKEY = ''
     Polymer({
         is: 'mist-socket',
         url: '/socket',
@@ -45,7 +46,7 @@
         },
 
         observers: [
-            "_updateIsOverusing(model.user, model.machinesArray)"
+            "_updateIsOverusing(model.user, model.org, model.machinesArray)"
         ],
 
         ready: function() {
@@ -449,7 +450,8 @@
         _updateUser: function(data) {
             this.set('model.user', data);
             CSRF_TOKEN = data.csrf_token;
-        },
+            STRIPE_PUBLIC_APIKEY = data.stripe_public_apikey;
+          },
 
         _updateOrg: function(data) {
             this.set('onboarding.isLoadingTeams', false);
@@ -468,7 +470,7 @@
                         key.machines.forEach(function(m, index) {
                             var cloud = m[0],
                                 machine = m[1];
-                            if (this.model.clouds && this.model.clouds[cloud] && this.model.clouds[cloud].machines && this.model.clouds[cloud].machines[machine]) {
+                            if (this.model.clouds && this.model.clouds[cloud] && this.model.clouds[cloud].machines && this.model.clouds[cloud].machines[machine] && this.model.clouds[cloud].machines[machine].keys) {
                                 // check if machine has this key, if not add
                                 var keyexists = this.model.clouds[cloud].machines[machine].keys.find(function(k) {
                                     return k.name == key.name;
@@ -546,7 +548,7 @@
                 return false;
 
             var allMachines = [];
-            if (this.model != undefined) {
+            if (this.model != undefined && this.model.cloudsArray.length>0) {
                 this.model.cloudsArray.forEach(
                     function(cloud) {
                         if (cloud.machinesArray != undefined && cloud.enabled) {
@@ -652,10 +654,21 @@
             console.warn('_updateTags not implemented. Got data', data);
         },
 
-        _updateIsOverusing: function(user, machines){
+        _updateIsOverusing: function(user, org, machines){
             // console.log('_updateIsOverusing', user, machines);
-            if (user && machines)
-                this.set('model.isOverUsing', !user.current_plan.title && machines.length > 5);
+            if (user && machines){
+               var isOverUsing = false;
+               // user has free plan and more than 5 machines
+               if ((!org.current_plan || !org.current_plan.title) && machines.length > 5)
+                   isOverUsing = true;
+               // user has a paid plan and more than allowed machines
+               else if (org.current_plan && org.current_plan.title && machines.length > org.current_plan.machine_limit)
+                   isOverUsing = true;
+               else
+                   isOverUsing = false;
+
+               this.set('model.isOverUsing', isOverUsing);
+           }
         },
 
         _probe: function(data) {
