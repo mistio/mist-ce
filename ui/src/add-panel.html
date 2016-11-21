@@ -134,14 +134,24 @@
           </div>
         </paper-dialog>
 
-        <iron-ajax id="postCustomgraph" url="[[uri]]"  handle-as="xml" method="POST" contentType="application/json" on-response="_customgraphResponse" on-error="_handleError"></iron-ajax>
+        <iron-ajax id="postCustomgraph" url="[[uri]]"  handle-as="xml" method="POST" contentType="application/json" on-response="_customgraphResponse" on-error="_handleError"></iron-ajax>        
+        <iron-ajax
+          id="associateMetric"          
+          handle-as="xml"
+          method="PUT" 
+          contentType="application/json"
+          loading="{{loadingMetrics}}"
+          on-response="_handleAssociateResponse" 
+          on-error="_handleAssociateError">
+        </iron-ajax>
         <iron-ajax
           id="metrics"
           url="[[_computeMetricsUri(cloudId,machineId)]]"
           handle-as="json" method="GET"
           contentType="application/json"
           loading="{{loadingMetrics}}"
-          on-response="_handleMetricResponse">
+          on-response="_handleMetricResponse"
+          on-error="_handleMetricError">
         </iron-ajax>
     </template>
     <script>
@@ -201,7 +211,8 @@
               '_computeplugidId(metric.name)',
             ],
             listeners: {
-              'keyup':'_scriptValue'
+              'keyup':'_scriptValue',
+              'panelAdded': '_associateMetric'
             },
             _scriptValue:function(e){
               if(e.target.nodeName=="JUICY-ACE-EDITOR"){
@@ -213,7 +224,6 @@
                 this.set('formError', false);
                 console.log("CUSTOM GRAPH",data.detail.response);
                 this.fire('panelAdded',data.detail.response.metric_id);
-
             },
             _handleError: function(e,d) {
                 this.set('sendingData', false);
@@ -300,7 +310,7 @@
                 }
                 else{
                   item.onclick= function(){
-                    this.fire('panelAdded', input[i]);
+                    this.fire('panelAdded', {metric:input[i]});
                     this._exit('selectTarget');
                   }.bind(this)
                 }
@@ -315,6 +325,19 @@
                   });
               });
               return isIn ? true : false;
+            },
+            _associateMetric: function(e){
+              var metric = e.detail.metric;
+              var payload = {
+                metric_id: metric
+              };
+              this.$.associateMetric.url = "/api/v1/clouds/"+this.cloudId+"/machines/"+this.machineId+"/metrics";
+              this.$.associateMetric.headers["Csrf-Token"] = CSRF_TOKEN;
+              this.$.associateMetric.params = payload;
+              this.$.associateMetric.generateRequest();
+            },
+            _handleAssociateResponse: function () {
+              this.fire('update-dashboard');
             },
             _exit: function(who) {
               if(who==null){

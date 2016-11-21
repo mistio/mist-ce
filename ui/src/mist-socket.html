@@ -252,9 +252,7 @@
                 }
             };
         },
-        // _handleStats:function(data){
-        //   console.log("hey",data);
-        // },
+
         heartbeat: function() {
             console.debug('got heartbeat');
             this.send('h'); // reply with empty frame
@@ -263,9 +261,10 @@
         getStats: function(data, callback) {
             var reqId =this.generateGuid();// Math.floor(10000 * Math.random());
             data[5] = reqId;
-            this.send('msg', 'main', 'stats', data);
             this.openRequests[reqId] = callback;
+            this.send('msg', 'main', 'stats', data);
         },
+
         generateGuid:function(){
           function s4() {
               return Math.floor((1 + Math.random()) * 0x10000)
@@ -275,8 +274,8 @@
             return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
               s4() + '-' + s4() + s4() + s4();
         },
-        send: function(type, namespace, body, params) {
 
+        send: function(type, namespace, body, params) {
             if (namespace == undefined)
                 namespace = 'main';
 

@@ -343,9 +343,12 @@
                    }
                 },
                 _handleCloudDeletionAjaxResponse: function(e){
+                    var title = '';
+                    if (this.cloud && this.cloud.title)
+                        title = this.cloud.title;
                     document.querySelector('paper-header-panel').scroller.scrollTop = 0;
                     document.querySelector('app-location').set('path', '/');
-                    var msg = 'Cloud ' + this.cloud.title + ' was deleted';
+                    var msg = 'Cloud ' + title + ' was deleted';
                     this._showToast(msg);
                 },
                 _handleCloudDeletionAjaxError: function(e){

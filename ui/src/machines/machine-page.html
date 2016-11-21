@@ -26,7 +26,7 @@
                 flex: 1 100%;
                 margin-bottom: 16px;
             }
-            .columns paper-material > * {
+            .columns paper-material > .break {
                 word-break: break-all;
             }
             .left {
@@ -202,6 +202,19 @@
             item-actions ::content .item-actions {
                 margin-left: 0 !important;
             }
+            .dc-true {
+                color: #F57F17;
+            }
+            .dc-true iron-icon {
+                color: inherit;
+            }
+            .dc-false {
+                color: var(--green-color);
+            }
+            .probe-df {
+                height: 240px;
+                overflow-y: scroll;
+            }
             .probe-data {
                 position: relative;
             }
@@ -303,11 +316,24 @@
                 <paper-material id="leftcolumn" class="left">
                     <h3 class="smallcaps">Info:</h3>
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
-                    <span hidden$="[[!machine.extra.image]]">Image: [[machine.extra.image]]</span>
+                    <span hidden$="[[!machine.extra.image]]" class="break">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
-                    <div hidden$="{{!probeData}}"> Probe Data:
-                        <span class$="probe-data {{itemProbeClasses(machine, model.probes)}}"> </span>
-                        <span hidden$="{{!probeData}}"> {{probeData}} </span>
+                    <div hidden$="[[!probeData]]"> Probe Data:
+                        <span class$="probe-data [[itemProbeClasses(machine, model.probes)]]"> </span>
+                        <span hidden$="[[!probeData]]"> [[probeData]] </span> <br/>
+                        <span hidden$="[[!lastProbe]]"> [[lastProbe]] </span>
+                    </div>
+                    <div hidden$="[[!kernelInfo]]">
+                        [[kernelInfo]]
+                    </div>
+                    <div hidden$="[[!probeObj]]">
+                        <span class$="dc-[[probeObj.dirty_cow]]" hidden$="[[probeObj.dirty_cow]]">
+                            Dirty COW check passed.
+                        </span>
+                        <span class$="dc-[[probeObj.dirty_cow]]" hidden$="[[!probeObj.dirty_cow]]">
+                            <iron-icon hidden$="[[!probeObj.dirty_cow]]" icon="icons:report-problem"></iron-icon> [[dirtyCowAlert]]
+                        </span>
+                        <!-- <a href="/link-to-blog" target="new" class="regular" hidden$="[[!probeObj.dirty_cow]]">read more...</a> -->
                     </div>
                 </paper-material>
                 <paper-material id="rightcolumn" class="right">
@@ -334,7 +360,7 @@
                 </paper-material>
             </div>
             <paper-material class="info-card">
-                <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" dashboard="{{dashboard}}" datasources="[[datasources]]"></mist-monitoring>
+                <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" datasources="[[datasources]]"></mist-monitoring>
                 <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" user-email="[[model.user.email]]" hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
             <paper-material class="info-card">
@@ -361,6 +387,22 @@
                                 <td><template is="dom-repeat" items="[[machine.private_ips]]">
                                         [[item]]
                                     </template>
+                                </td>
+                            </tr>
+                            <tr hidden$="[[!probeObj]]">
+                                <td>Users</td>
+                                <td>[[probeObj.users]]</td>
+                            </tr>
+                            <tr hidden$="[[!probeObj]]">
+                                <td>Uptime</td>
+                                <td>[[probeObj.uptime]]</td>
+                            </tr>
+                            <tr hidden$="[[!probeData]]">
+                                <td>Filesystem Info</td>
+                                <td>
+                                    <div class="probe-df">
+<pre><code>[[probeObj.df]]</code></pre>
+                                    </div>
                                 </td>
                             </tr>
                         </template>
@@ -468,21 +510,13 @@ MACHINEACTIONS = {
 
 Polymer({
     is: 'machine-page',
-
     properties: {
         model: {
             type: Object,
             notify: true
         },
         router: Object,
-        params: {
-            type: Object,
-            notify: true
-        },
-        machine: {
-            type: Object,
-            computed: '_computeMachine(params, model.machinesArray.*)'
-        },
+        machine: Object,
         sections: {
             type: Array,
             notify: true
@@ -509,11 +543,7 @@ Polymer({
             computed: "_machineImage(machine.imageId)"
         },
         dashboard: {
-            type: Object,
-            computed: "_computeDashboard(machine.cloud.id, machine.id)"
-        },
-        replaceTargets: {
-            type: Object,
+            type: Object
         },
         isLoading: {
             type: Boolean,
@@ -526,7 +556,7 @@ Polymer({
         },
         machineIp: {
             type: String,
-            computed: 'computeMachineIp(machine.public_ips)'
+            computed: 'computeMachineIp(machine, machine.public_ips)'
         },
         disassociateKeyId: {
             type: String
@@ -553,6 +583,16 @@ Polymer({
             type: String,
             computed: '_computeProbeData(machine, model.probes.*)',
             value: false
+        },
+        dirtyCowAlert: {
+             type: String,
+             computed: '_computeDirtyCowAlert(machine, model.probes.*)',
+             value: false
+         },
+        probeObj: {
+            type: Object,
+            computed: '_computeProbeObj(machine, model.probes.*)',
+            value: false
         }
     },
     observers: [
@@ -561,11 +601,6 @@ Polymer({
     listeners: {
         'confirmation': '_machineActionConfirmation',
         'pending-key-request': '_updateKeyLoader',
-    },
-    _computeItemInArray: function() {
-          var arr = [];
-          arr.push(this.machine);
-          return arr;
     },
     ready: function() {
         this.set('hideAssociatedKeys', true);
@@ -617,113 +652,11 @@ Polymer({
 
         return actions;
     },
-    _computeMachine: function(params, machines) {
-        if (this.machine && this.machine.uuid && params.uuid != this.machine.uuid) {
-            this.set('isPendingKeyRequest', false);
-        }
-        return machines.base.find(function(machine) {
-            return machine.uuid == params.uuid;
-        }, this);
+
+    _computeItemInArray: function() {
+        return [this.machine];
     },
-    _computeDashboard: function(machinecloudid, machineid) {
-        if(this.dashboard==null){
-            var tempdash = {
-                "id": 1,
-                "refresh": "10sec",
-                "rows": [{
-                    "panels": [{
-                        "id": 0,
-                        "title": "Load",
-                        "type": "graph",
-                        "span": 6,
-                        "stack": false,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "A",
-                            "target": "load.*"
-                        }],
-                        "machineArray": [ [this.machine.cloud.id, this.machine.id]],
-                        "x-axis": true,
-                        "y-axis": true
-                    }, {
-                        "id": 1,
-                        "title": "CPU",
-                        "type": "graph",
-                        "span": 6,
-                        "stack": true,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "C",
-                            "target": "cpu.total.*"
-                        }],
-                        "machineArray": [ [this.machine.cloud.id, this.machine.id]],
-                        "x-axis": true,
-                        "y-axis": true
-                    }]}, {
-                    "panels": [{
-                        "id": 2,
-                        "title": "MEM",
-                        "type": "graph",
-                        "span": 6,
-                        "stack": true,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "D",
-                            "target": "memory.used_percent"
-                        }, {
-                            "refId": "E",
-                            "target": "memory.cached_percent"
-                        }, {
-                            "refId": "F",
-                            "target": "memory.free_percent"
-                        }],
-                        "machineArray": [ [this.machine.cloud.id, this.machine.id]],
-                        "x-axis": true,
-                        "y-axis": true
-                      }, {
-                        "id": 3,
-                        "title": "NET",
-                        "type": "graph",
-                        "span": 6,
-                        "stack": false,
-                        "datasource": "mist.monitor",
-                        "targets": [{
-                            "refId": "G",
-                            "target": "interface.total.if_octets.rx"
-                        }, {
-                            "refId": "H",
-                            "target": "interface.total.if_octets.tx"
-                        }],
-                        "machineArray": [ [this.machine.cloud.id, this.machine.id]],
-                        "x-axis": true,
-                        "y-axis": true
-                    }],
-                }],
-                "time": {
-                    "from": "now-10m",
-                    "to": "now"
-                },
-                "timepicker": {
-                    "now": true,
-                    "refresh_intervals": [],
-                    "time_options": [
-                        "10m",
-                        "1h",
-                        "6h",
-                        "24h",
-                        "7d",
-                        "30d"
-                    ]
-                },
-                "timezone": "browser"
-            };
-            console.log("PANEL DELETE")
-            return tempdash;
-        }
-        else{
-          return this.dashboard;
-        }
-    },
+
     _computeThisItemUid: function(machine) {
         var itemUidInArray = [];
         itemUidInArray.push(itemUid(this.machine, this.sections['machines']));
@@ -872,6 +805,14 @@ Polymer({
         if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid].loadavg.length)
             return this.model.probes[machine.uuid].loadavg[0]+", "+this.model.probes[machine.uuid].loadavg[1]+", "+this.model.probes[machine.uuid].loadavg[2]+" - "+this.model.probes[machine.uuid].cores+" cores. Last probe: "+moment(this.model.probes[machine.uuid].timestamp*1000).fromNow();
     },
+    _computeDirtyCowAlert: function(machine, probes){
+         var info = "";
+         if (this.model && this.model.probes && this.model.probes[machine.uuid]){
+             if (this.model.probes[machine.uuid].dirty_cow != undefined)
+                 info += "Dirty COW vulnerability found. Update kernel.";
+         }
+         return info.length ? info : '';
+     },
     itemProbeClasses: function(item, probes) {
         if (!probes) {
             return false;
@@ -896,6 +837,10 @@ Polymer({
             }
         }
     },
+     _computeProbeObj: function (machine, probes){
+         if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid])
+             return this.model.probes[machine.uuid];
+     },
     loadToColor: function(load, prefix){
         if (load > 1.2)
             return prefix+"high ";
@@ -907,6 +852,16 @@ Polymer({
             return prefix+"low ";
         else
             return prefix+"low ";
+    },
+    readableUptime: function(str){
+        if (str) {
+            var a = str.split(" ")[0],
+                b = str.split(" ")[1];
+            return "Up "+a+". Idle:"+b;
+        }
+        else
+            return "";
+
     }
 });
 </script>
