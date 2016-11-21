@@ -25,6 +25,7 @@ from mist.core.auth.methods import user_from_request
 from mist.core.keypair.models import Keypair
 from mist.io.clouds.models import Cloud
 from mist.core.cloud.models import Machine, KeyAssociation
+from mist.io.networks.models import Network, Subnet
 from mist.core.exceptions import PolicyUnauthorizedError
 from mist.core import config
 import mist.core.methods
@@ -1435,7 +1436,7 @@ def list_locations(request):
     List locations from each cloud. Locations mean different things in each cl-
     oud. e.g. EC2 uses it as a datacenter in a given availability zone, where-
     as Linode lists availability zones. However all responses share id, name
-    and country eventhough in some cases might be empty, e.g. Openstack. In E-
+    and country even though in some cases might be empty, e.g. Openstack. In E-
     C2 all locations by a provider have the same name, so the availability zo-
     nes are listed instead of name.
     READ permission required on cloud.
@@ -1471,6 +1472,28 @@ def list_networks(request):
     networks = methods.list_networks(auth_context.owner, cloud_id)
 
     return networks
+
+
+@view_config(route_name='api_v1_subnets', request_method='GET', renderer='json')
+def list_subnets(request):
+    """
+    List subnets of a cloud
+    Currently supports the EC2, GCE and OpenStack clouds.
+    For other providers this returns an empty list.
+    READ permission required on cloud.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    """
+
+    cloud_id = request.matchdict['cloud']
+    auth_context = auth_context_from_request(request)
+    auth_context.check_perm("cloud", "read", cloud_id)
+    subnets = methods.list_subnets(auth_context.owner, cloud_id)
+
+    return subnets
 
 
 @view_config(route_name='api_v1_networks', request_method='POST', renderer='json')
@@ -1510,6 +1533,50 @@ def create_network(request):
                                   network, subnet, router)
 
 
+@view_config(route_name='api_v1_subnets', request_method='POST', renderer='json')
+def create_subnet(request):
+    """
+    Create subnet on a given network on a cloud.
+    CREATE_RESOURCES permission required on cloud.
+    ---
+    cloud_id:
+      in: path
+      required: true
+      description: The Cloud ID
+      type: string
+    network_id:
+      type: string
+    subnet:
+      required: true
+      type: dict
+    """
+    cloud_id = request.matchdict['cloud']
+
+    try:
+        network_id = request.json_body.get('network_id')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    try:
+        subnet = request.json_body.get('subnet')
+    except Exception as e:
+        raise RequiredParameterMissingError(e)
+
+    auth_context = auth_context_from_request(request)
+    auth_context.check_perm("cloud", "create_resources", cloud_id)
+
+    try:
+        cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+    try:
+        network = Network.objects.get(id=network_id, cloud=cloud)
+    except Network.DoesNotExist:
+        raise NotFoundError('Network does not exist')
+
+    return methods.create_subnet(auth_context.owner, cloud, network, subnet)
+
+
 @view_config(route_name='api_v1_network', request_method='DELETE')
 def delete_network(request):
     """
@@ -1532,6 +1599,41 @@ def delete_network(request):
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "create_resources", cloud_id)
     methods.delete_network(auth_context.owner, cloud_id, network_id)
+
+    return OK
+
+
+@view_config(route_name='api_v1_subnet', request_method='DELETE')
+def delete_subnet(request):
+    """
+    Delete a subnet
+    CREATE_RESOURCES permission required on cloud.
+    ---
+    cloud_id:
+      in: path
+      required: true
+      type: string
+    subnet_id:
+      in: path
+      required: true
+      type: string
+    """
+    cloud_id = request.matchdict['cloud']
+    subnet_id = request.matchdict['subnet_id']
+
+    auth_context = auth_context_from_request(request)
+
+    try:
+        cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+    try:
+        subnet = Subnet.objects.get(id=subnet_id, cloud=cloud)
+    except Network.DoesNotExist:
+        raise NotFoundError('Subnet does not exist')
+
+    auth_context.check_perm("cloud", "create_resources", cloud_id)
+    methods.delete_subnet(auth_context.owner, subnet)
 
     return OK
 

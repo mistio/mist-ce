@@ -114,10 +114,13 @@ def add_routes(configurator):
     configurator.add_route('api_v1_sizes', '/api/v1/clouds/{cloud}/sizes')
     configurator.add_route('api_v1_locations',
                            '/api/v1/clouds/{cloud}/locations')
+
     configurator.add_route('api_v1_networks', '/api/v1/clouds/{cloud}/networks')
-    configurator.add_route('api_v1_network',
-                           '/api/v1/clouds/{cloud}/networks/{network}')
+    configurator.add_route('api_v1_subnets', '/api/v1/clouds/{cloud}/subnets')
+    configurator.add_route('api_v1_network', '/api/v1/clouds/{cloud}/networks/{network}')
+    configurator.add_route('api_v1_subnet', '/api/v1/clouds/{cloud}/networks/{subnet}')
     configurator.add_route('network', '/clouds/{cloud}/networks/{network}')
+    configurator.add_route('subnet', '/clouds/{cloud}/networks/{subnet}')
 
     configurator.add_route('api_v1_keys', '/api/v1/keys')
     configurator.add_route('api_v1_key_action', '/api/v1/keys/{key}')

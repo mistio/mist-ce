@@ -1475,7 +1475,7 @@ def list_locations(user, cloud_id):
 
 def list_networks(user, cloud_id):
     """List networks from each cloud.
-    Currently NephoScale and Openstack networks are supported. For other providers
+    Currently EC2, Openstack and GCE clouds are supported. For other providers
     this returns an empty list
 
     """
@@ -1494,6 +1494,17 @@ def list_networks(user, cloud_id):
         else:
             ret['public'].append(net)
     return ret
+
+
+def list_subnets(user, cloud_id, for_network=None):
+    """List subnets for a cloud.
+    Currently EC2, Openstack and GCE clouds are supported. For other providers
+    this returns an empty list
+
+    """
+
+    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    return cloud.ctl.network.list_subnets(for_network=for_network)
 
 
 def list_projects(user, cloud_id):
@@ -1570,6 +1581,22 @@ def create_network(owner, cloud_id, network, subnet, router):
     return network_dict
 
 
+def create_subnet(owner, cloud, network, subnet):
+    """
+        Creates a new subnet attached to the specified network.
+
+    """
+    created_subnet = SUBNETS[cloud.ctl.provider].add(subnet.pop('name'),
+                                                     network,
+                                                     cloud,
+                                                     subnet.pop('description', ''),
+                                                     **subnet)
+    # Schedule a UI update
+    trigger_session_update(owner, ['clouds'])
+
+    return created_subnet.as_dict()
+
+
 def delete_network(owner, cloud_id, network_id):
     """
     Delete a network.
@@ -1577,6 +1604,16 @@ def delete_network(owner, cloud_id, network_id):
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     network = Network.objects.get(cloud=cloud, id=network_id)
     network.ctl.delete_network()
+
+    # Schedule a UI update
+    trigger_session_update(owner, ['clouds'])
+
+
+def delete_subnet(owner, subnet):
+    """
+    Delete a subnet.
+    """
+    subnet.ctl.delete_network()
 
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])
