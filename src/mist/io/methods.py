@@ -161,18 +161,18 @@ def delete_cloud(owner, cloud_id):
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
-    machines = Machine.objects(cloud=cloud)
-    for machine in machines:
-        tags = Tag.objects(owner=owner, resource=machine)
-        for tag in tags:
-            try:
-                tag.delete()
-            except:
-                 pass
-        try:
-            machine.delete()
-        except:
-            pass
+#    machines = Machine.objects(cloud=cloud)
+#    for machine in machines:
+#        tags = Tag.objects(owner=owner, resource=machine)
+#        for tag in tags:
+#            try:
+#                tag.delete()
+#            except:
+#                 pass
+#        try:
+#            machine.delete()
+#        except:
+#            pass
 
     log.info("Succesfully deleted cloud '%s'", cloud_id)
 
@@ -1455,6 +1455,7 @@ def list_keys(user, keys=None):
     query = {'owner': user, 'deleted': None}
     if keys is not None:  # Can be an empty list.
         query['id__in'] = [key.id for key in keys]
+
     keys = Keypair.objects(**query)
     clouds = Cloud.objects(owner=user, deleted=None)
 
