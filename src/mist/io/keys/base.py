@@ -1,11 +1,9 @@
 import logging
 import mongoengine as me
-from Crypto.PublicKey import RSA
 from mist.io.exceptions import KeyExistsError
 from mist.io.exceptions import BadRequestError
 from mist.io.clouds.utils import rename_kwargs
 from mist.io.helpers import trigger_session_update
-from mist.io.exceptions import MachineUnauthorizedError
 
 log = logging.getLogger(__name__)
 
@@ -125,7 +123,9 @@ class BaseKeyController(object):
         """
         from mist.io.machines.models import Machine, KeyAssociation
 
-        log.info("Associating key %s to host %s", self.key.id, machine.hostname)
+        log.info("Associating key %s to host %s", self.key.id,
+                 machine.hostname)
+
         if not machine.hostname:
             log.info("Host not given so will only create association without "
                      "actually deploying the key to the server.")
@@ -175,7 +175,6 @@ class BaseKeyController(object):
     def disassociate(self, machine):
         """Disassociates a key from a machine."""
         from mist.io.machines.models import Machine
-        from mist.io.clouds.models import Cloud
 
         log.info("Disassociating key, undeploy = %s" % machine.hostname)
 

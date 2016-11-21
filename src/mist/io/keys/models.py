@@ -93,7 +93,7 @@ class Key(me.Document):
 
         # Calculate and store key type specific fields.
         self._key_specific_fields = [field for field in type(self)._fields
-                                          if field not in Key._fields]
+                                     if field not in Key._fields]
 
     @classmethod
     def add(cls, owner, name, id='', **kwargs):

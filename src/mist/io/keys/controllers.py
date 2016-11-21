@@ -1,12 +1,7 @@
 import logging
-import mongoengine as me
 from Crypto.PublicKey import RSA
-from mist.io.exceptions import KeyExistsError
-from mist.io.exceptions import BadRequestError
-from mist.io.helpers import trigger_session_update
-from mist.io.exceptions import MachineUnauthorizedError
-
 from mist.io.keys.base import BaseKeyController
+from mist.io.exceptions import MachineUnauthorizedError
 
 log = logging.getLogger(__name__)
 
