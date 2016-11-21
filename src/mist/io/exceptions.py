@@ -168,7 +168,11 @@ class NetworkCreationError(InternalServerError):
     msg = "Network creation failed"
 
 
-class NetworkNotFound(InternalServerError):
+class NetworkDeletionError(InternalServerError):
+    msg = "Network deletion failed"
+
+
+class NetworkNotFound(NotFoundError):
     msg = "Network not found"
 
 
@@ -176,7 +180,11 @@ class SubnetCreationError(InternalServerError):
     msg = "Subnet creation failed"
 
 
-class SubnetNotFound(InternalServerError):
+class SubnetDeletionError(InternalServerError):
+    msg = "Subnet deletion failed"
+
+
+class SubnetNotFound(NotFoundError):
     msg = "Subnet not found"
 
 

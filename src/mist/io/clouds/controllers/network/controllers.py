@@ -2,182 +2,283 @@ import logging
 import time
 
 from mist.io.clouds.controllers.network.base import BaseNetworkController
-from mist.io.exceptions import RequiredParameterMissingError, NetworkCreationError, NetworkError
-from libcloud.compute.drivers.ec2 import EC2Network, EC2NetworkSubnet
-from libcloud.compute.drivers.gce import GCENetwork
+from mist.io.clouds.utils import rename_kwargs
+import mist.io.exceptions
 
-
+from libcloud.common.google import ResourceInUseError
 log = logging.getLogger(__name__)
 
 
 class AmazonNetworkController(BaseNetworkController):
+    provider = 'ec2'
 
-    # def add_network(cls, libcloud_network):
-    #     return AmazonNetwork(title=libcloud_network.name,
-    #                          network_id=libcloud_network.id,
-    #                          is_default=libcloud_network.extra['is_default'],
-    #                          state=libcloud_network.extra['state'],
-    #                          instance_tenancy=libcloud_network.extra['instance_tenancy'],
-    #                          dhcp_options_id=libcloud_network.extra['dhcp_options_id'],
-    #                          tags=libcloud_network.extra['tags'])
-    #
-    # @classmethod
-    # def add_subnet(cls, libcloud_subnet):
-    #     return AmazonSubnet(title=libcloud_subnet.name,
-    #                         subnet_id=libcloud_subnet.id,
-    #                         state=libcloud_subnet.state,
-    #                         available_ips=libcloud_subnet.extra['available_ips'],
-    #                         cidr=libcloud_subnet.extra['cidr_block'],
-    #                         tags=libcloud_subnet.extra['tags'],
-    #                         zone=libcloud_subnet.extra['zone'])
+    def _create_network__parse_args(self, network_doc, kwargs):
+        if 'cidr' not in kwargs:
+            raise mist.io.exceptions.RequiredParameterMissingError('cidr')
+        kwargs['name'] = network_doc.title
+        rename_kwargs(kwargs, 'cidr', 'cidr_block')
 
-    def _create_network__parse_args(self, network_args):
-        for required_key in ['name', 'cidr']:
-            if required_key not in network_args:
-                raise RequiredParameterMissingError(required_key)
-        network_args['instance_tenancy'] = network_args.get('instance_tenancy', 'default')
+    def _create_network__parse_libcloud_object(self, network_doc, libcloud_network):
+        network_doc.network_id = libcloud_network.id
+        network_doc.cidr = libcloud_network.cidr_block
+        network_doc.is_default = libcloud_network.extra.pop('is_default')
+        network_doc.state = libcloud_network.extra.pop('state')
+        network_doc.extra = libcloud_network.extra
 
-    def _create_subnet__parse_args(self, subnet_args, parent_network):
-        for required_key in ['name', 'cidr', 'availability_zone']:
-            if required_key not in subnet_args:
-                raise RequiredParameterMissingError(required_key)
-        subnet_args['vpc_id'] = parent_network.network_id
+    def _create_subnet__parse_args(self, subnet_doc, kwargs):
+        for required_key in ['cidr', 'availability_zone']:
+            if required_key not in kwargs:
+                raise mist.io.exceptions.RequiredParameterMissingError(required_key)
+        kwargs['name'] = subnet_doc.title
+        kwargs['vpc_id'] = subnet_doc.network.network_id
+        rename_kwargs(kwargs, 'cidr', 'cidr_block')
 
-    def _list_subnets__parse_args(self, list_subnet_args, for_network=None):
+    def _create_subnet__parse_libcloud_object(self, subnet_doc, libcloud_subnet):
+        subnet_doc.cidr = libcloud_subnet.extra.pop('cidr_block')
+        subnet_doc.subnet_id = libcloud_subnet.id
+        subnet_doc.available_ips = libcloud_subnet.extra.pop('available_ips')
+        subnet_doc.zone = libcloud_subnet.extra.pop('zone')
+        subnet_doc.extra = libcloud_subnet.extra
+
+    def _list_subnets__parse_args(self, kwargs):
+        for_network = kwargs.pop('for_network', None)
         if for_network:
-            list_subnet_args['filters'] = {'vpc-id': for_network.network_id}
+            kwargs['filters'] = {'vpc-id': for_network.network_id}
 
-    def _delete_network__parse_args(self, delete_network_args, network):
-        delete_network_args['vpc'] = EC2Network(id=network.network_id, name='', cidr_block='')
+    def _delete_network__parse_args(self, network, kwargs):
+        kwargs['vpc'] = self._get_libcloud_network(network)
 
-    def _delete_subnet__parse_args(self, subnet_args, subnet):
-        subnet_args['subnet'] = EC2NetworkSubnet(id=subnet.network_id, name='', state='')
+    def _delete_subnet__parse_args(self, subnet, kwargs):
+        kwargs['subnet'] = self._get_libcloud_subnet(subnet)
+
+    def _get_libcloud_network(self, network):
+        networks = self.ctl.compute.connection.ex_list_networks(network_ids=[network.network_id])
+        if networks:
+            return networks[0]
+        return None
+
+    def _get_libcloud_subnet(self, subnet):
+        subnets = self.ctl.compute.connection.ex_list_subnets(subnet_ids=[subnet.subnet_id])
+        if subnets:
+            return subnets[0]
+        return None
 
 
 class GoogleNetworkController(BaseNetworkController):
+    provider = 'gce'
 
-    override_list_subnets = 'ex_list_subnetworks'
-    override_delete_network = 'ex_destroy_network'
-    override_delete_subnet = 'ex_destroy_subnetwork'
+    def _create_network__parse_args(self, network_doc, kwargs):
+        kwargs['mode'] = kwargs.get('mode', 'legacy')
+        if kwargs['mode'] == 'legacy':
+            if 'cidr' not in kwargs:
+                raise mist.io.exceptions.RequiredParameterMissingError('cidr')
+        else:
+            kwargs['cidr'] = kwargs.get('cidr', None)
+        kwargs['name'] = network_doc.title
 
-    # @classmethod
-    # def add_network(cls, libcloud_network):
-    #     return GoogleNetwork(title=libcloud_network.name,
-    #                          network_id=libcloud_network.id,
-    #                          cidr=libcloud_network.cidr,
-    #                          IPv4Range=libcloud_network.extra['IPv4Range'],
-    #                          autoCreateSubnetworks=libcloud_network.extra['autoCreateSubnetworks'],
-    #                          creationTimestamp=libcloud_network.extra['creationTimestamp'],
-    #                          description=libcloud_network.extra['description'],
-    #                          gatewayIPv4=libcloud_network.extra['gatewayIPv4'],
-    #                          mode=libcloud_network.extra['mode']
-    #                          )
-    #
-    # @classmethod
-    # def add_subnet(cls, libcloud_subnet):
-    #     region = libcloud_subnet.extra['region'].split("/")[-1]
-    #
-    #     return GoogleSubnet(title=libcloud_subnet.name,
-    #                         subnet_id=libcloud_subnet.id,
-    #                         region=region,
-    #                         cidr=libcloud_subnet.extra['ipCidrRange'],
-    #                         gateway_ip=libcloud_subnet.extra['gatewayAddress'],
-    #                         creationTimestamp=libcloud_subnet.extra['creationTimestamp'])
+    def _create_network__parse_libcloud_object(self, network_doc, libcloud_network):
+        network_doc.network_id = libcloud_network.id
+        network_doc.cidr = libcloud_network.cidr
+        network_doc.gateway_ip = libcloud_network.extra.pop('gatewayIPv4')
+        network_doc.mode = libcloud_network.mode
+        network_doc.extra = libcloud_network.extra
 
-    def _create_network_parse_args(self, network_args):
-        for required_key in ['name']:
-            if required_key not in network_args:
-                raise RequiredParameterMissingError(required_key)
-        network_args['mode'] = network_args.get('mode', 'legacy')
+    def _create_subnet__parse_args(self, subnet_doc, kwargs):
+        for required_key in ['cidr', 'region']:
+            if required_key not in kwargs:
+                raise mist.io.exceptions.RequiredParameterMissingError(required_key)
+        kwargs['name'] = subnet_doc.title
+        kwargs['network'] = subnet_doc.network.title
 
-    def _create_subnet_parse_args(self, subnet_args, parent_network):
-        for required_key in ['name', 'cidr', 'region']:
-            if required_key not in subnet_args:
-                raise RequiredParameterMissingError(required_key)
-        subnet_args['parent_network'] = parent_network.title
+    def _create_subnet__parse_libcloud_object(self, subnet_doc, libcloud_subnet):
+        subnet_doc.subnet_id = libcloud_subnet.id
+        subnet_doc.cidr = libcloud_subnet.cidr
+        subnet_doc.gateway_ip = libcloud_subnet.extra.pop('gatewayAddress')
+        subnet_doc.region = libcloud_subnet.region.name
+        subnet_doc.extra = libcloud_subnet.extra
 
-    def _list_subnets__parse_args(self, list_subnet_args, for_network=None):
-       pass
+    def create_subnet(self, subnet_doc, **kwargs):
+        """Creates a new subnet.
+        Overriden because of different libcloud method name."""
 
-    def _delete_network__parse_args(self, delete_network_args, network):
-        pass
+        self._create_subnet__parse_args(subnet_doc, kwargs)
 
-    def _delete_subnet__parse_args(self, subnet_args, subnet):
-        pass
+        try:
+            libcloud_subnet = self.ctl.compute.connection.ex_create_subnetwork(**kwargs)
+        except Exception as e:
+            raise mist.io.exceptions.SubnetCreationError("Got error %s" % str(e))
 
-    # def _delete_network(self, network):
-    #
-    #     libcloud_network = GCENetwork(id='', name=network.title, cidr='',
-    #                                   driver=None, extra={})
-    #
-    #     # Subnet deletion calls are asynchronous and a network cannot be deleted before all of its subnets are gone
-    #     # The network deletion call may not succeed immediately
-    #     for attempt in range(10):
-    #         try:
-    #             self.ctl.compute.connection.ex_destroy_network(libcloud_network)
-    #         except Exception as e:
-    #             time.sleep(1)
-    #         else:
-    #             break
-    #     # If all attempts are exhausted, raise an exception
-    #     else:
-    #         raise NetworkError('Failed to delete network {}'.format(network.title))
-    #
-    # def _list_subnets(self, for_network=None):
-    #     requested_subnets = []
-    #     all_subnets = self.ctl.compute.connection.ex_list_subnetworks()
-    #     for subnet in all_subnets:
-    #         if not for_network or subnet.network == for_network.title:
-    #             requested_subnets.append(subnet)
-    #     return requested_subnets
-    #
-    # def _delete_subnet(self, subnet_doc):
-    #     try:
-    #         self.ctl.compute.connection.ex_destroy_subnetwork(subnet_doc.title, region=subnet_doc.region)
-    #     except Exception as e:
-    #         raise NetworkError("Got error %s" % str(e))
+        self._create_subnet__parse_libcloud_object(subnet_doc, libcloud_subnet)
+        subnet_doc.save()
+
+        return subnet_doc.as_dict()
+
+    def list_subnets(self, **kwargs):
+        """List all Subnets for a particular network present on the cloud.
+        Overriden because of different libcloud method name."""
+
+        from mist.io.networks.models import Subnet
+        from mist.io.networks.models import SUBNETS
+        for_network = kwargs.pop('for_network', None)
+        libcloud_subnets = self.ctl.compute.connection.ex_list_subnetworks(**kwargs)
+
+        subnet_listing = []
+        for subnet in libcloud_subnets:
+            if for_network is None or subnet.network.id == for_network.network_id:
+                try:
+                    db_subnet = Subnet.objects.get(subnet_id=subnet.id)
+                except Subnet.DoesNotExist:
+                    subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
+                                                            network=for_network,
+                                                            cloud=self.cloud,
+                                                            create_on_cloud=False)
+
+                else:
+                    subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
+                                                            network=db_subnet.network,
+                                                            cloud=self.cloud,
+                                                            description=db_subnet.description,
+                                                            object_id=db_subnet.id,
+                                                            create_on_cloud=False)
+
+                self._create_subnet__parse_libcloud_object(subnet_doc, subnet)
+                if subnet_doc.network:  # Do not persist this subnet without a parent network reference
+                    subnet_doc.save()
+                subnet_listing.append(subnet_doc.as_dict())
+
+        return subnet_listing
+
+    def delete_network(self, network, **kwargs):
+        """Delete a Network.
+        Overriden because of different libcloud method name."""
+
+        from mist.io.networks.models import Subnet
+
+        associated_subnets = Subnet.objects(network=network)
+        if network.mode == 'custom':
+            for subnet in associated_subnets:
+                subnet.ctl.delete_subnet()
+
+        self._delete_network__parse_args(network, kwargs)
+
+        # For custom networks, subnet deletion calls are asynchronous and a network cannot be deleted
+        # before all of its subnets are gone. The network deletion call may not succeed immediately
+        for attempt in range(10):
+            try:
+                self.ctl.compute.connection.ex_destroy_network(**kwargs)
+            except ResourceInUseError:
+                time.sleep(1)
+            else:
+                break
+        # If all attempts are exhausted, raise an exception
+        else:
+            raise mist.io.exceptions.NetworkCreationError('Failed to delete network {}'.format(network.title))
+        network.delete()
+
+    def _delete_network__parse_args(self, network, kwargs):
+        kwargs['network'] = self._get_libcloud_network(network)
+
+    def delete_subnet(self, subnet, **kwargs):
+        """Delete a Subnet."""
+
+        self._delete_subnet__parse_args(subnet, kwargs)
+        self.ctl.compute.connection.ex_destroy_subnetwork(**kwargs)
+        subnet.delete()
+
+    def _delete_subnet__parse_args(self, subnet, kwargs):
+        kwargs['name'] = self._get_libcloud_subnet(subnet)
+
+    def _get_libcloud_network(self, network):
+        return self.ctl.compute.connection.ex_get_network(network.title)
+
+    def _get_libcloud_subnet(self, subnet):
+        return self.ctl.compute.connection.ex_get_subnetwork(name=subnet.title, region=subnet.region)
+
 
 class OpenStackNetworkController(BaseNetworkController):
-    # @classmethod
-    # def add_network(cls, libcloud_network):
-    #     return OpenStackNetwork(title=libcloud_network.name,
-    #                             network_id=libcloud_network.id,
-    #                             status=libcloud_network.status,
-    #                             router_external=libcloud_network.router_external,
-    #                             admin_state_up=libcloud_network.extra['admin_state_up'],
-    #                             mtu=libcloud_network.extra['mtu'],
-    #                             provider_network_type=libcloud_network.extra['provider:network_type'],
-    #                             provider_physical_network=libcloud_network.extra['provider:physical_network'],
-    #                             provider_segmentation_id=libcloud_network.extra['provider:segmentation_id'],
-    #                             shared=libcloud_network.extra['shared'],
-    #                             )
+    provider = 'openstack'
 
-    @classmethod
-    def _create_network_parse_args(cls, network_args):
-        for required_key in ['name']:
-            if required_key not in network_args:
-                raise RequiredParameterMissingError(required_key)
+    def _create_network__parse_args(self, network_doc, kwargs):
+        kwargs['admin_state_up'] = kwargs.get('admin_state_up', True)
+        kwargs['shared'] = kwargs.get('shared', False)
+        kwargs['name'] = network_doc.title
 
-        network_args['admin_state_up'] = network_args.get('admin_state_up', True)
-        network_args['shared'] = network_args.get('shared', False)
+    def _create_network__parse_libcloud_object(self, network_doc, libcloud_network):
+        network_doc.network_id = libcloud_network.id
+        network_doc.admin_state_up = libcloud_network.extra.pop('admin_state_up')
+        network_doc.extra = libcloud_network.extra
 
-    @classmethod
-    def _create_subnet_parse_args(cls, subnet_args, parent_network):
-        for required_key in ['name', 'cidr']:
-            if required_key not in subnet_args:
-                raise RequiredParameterMissingError(required_key)
+    def _create_subnet__parse_args(self, subnet_doc, kwargs):
+        for required_key in ['cidr']:
+            if required_key not in kwargs:
+                raise mist.io.exceptions.RequiredParameterMissingError(required_key)
+        kwargs['name'] = subnet_doc.title
+        kwargs['network_id'] = subnet_doc.network.network_id
+        kwargs['allocation_pools'] = kwargs.get('allocation_pools', [])
+        kwargs['gateway_ip'] = kwargs.get('gateway_ip', None)
+        kwargs['ip_version'] = kwargs.get('ip_version', '4')
+        kwargs['enable_dhcp'] = kwargs.get('enable_dhcp', True)
 
-        subnet_args['allocation_pools'] = subnet_args.get('allocation_pools', [])
-        subnet_args['gateway_ip'] = subnet_args.get('gateway_ip', None)
-        subnet_args['ip_version'] = subnet_args.get('ip_version', '4')
-        subnet_args['enable_dhcp'] = subnet_args.get('enable_dhcp', True)
-        subnet_args['network_id'] = parent_network.network_id
+    def _create_subnet__parse_libcloud_object(self, subnet_doc, libcloud_subnet):
+        subnet_doc.subnet_id = libcloud_subnet.id
+        subnet_doc.cidr = libcloud_subnet.cidr
+        subnet_doc.gateway_ip = libcloud_subnet.gateway_ip
+        subnet_doc.enable_dhcp = libcloud_subnet.enable_dhcp
+        subnet_doc.dns_nameservers = libcloud_subnet.dns_nameservers
+        subnet_doc.allocation_pools = libcloud_subnet.allocation_pools
+        subnet_doc.extra = libcloud_subnet.extra
 
-    def _list_subnets__parse_args(self, list_subnet_args, for_network=None):
-        pass
+    def list_subnets(self, **kwargs):
+        """List all Subnets for a particular network present on the cloud.
+        Overtiden to implement filtering with the for_network kwarg"""
 
-    def _delete_network__parse_args(self, delete_network_args, network):
-        pass
+        from mist.io.networks.models import Subnet
+        from mist.io.networks.models import SUBNETS
+        for_network = kwargs.pop('for_network', None)
+        libcloud_subnets = self.ctl.compute.connection.ex_list_subnets(**kwargs)
 
-    def _delete_subnet__parse_args(self, subnet_args, subnet):
-        pass
+        subnet_listing = []
+        for subnet in libcloud_subnets:
+            if for_network is None or subnet.network_id == for_network.network_id:
+                try:
+                    db_subnet = Subnet.objects.get(subnet_id=subnet.id)
+                except Subnet.DoesNotExist:
+                    subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
+                                                            network=for_network,
+                                                            cloud=self.cloud,
+                                                            create_on_cloud=False)
+
+                else:
+                    subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
+                                                            network=db_subnet.network,
+                                                            cloud=self.cloud,
+                                                            description=db_subnet.description,
+                                                            object_id=db_subnet.id,
+                                                            create_on_cloud=False)
+
+                self._create_subnet__parse_libcloud_object(subnet_doc, subnet)
+                if subnet_doc.network:  # Do not persist this subnet without a parent network reference
+                    subnet_doc.save()
+                subnet_listing.append(subnet_doc.as_dict())
+
+        return subnet_listing
+
+    def _delete_network__parse_args(self, network, kwargs):
+        kwargs['network_id'] = network.network_id
+
+    def _delete_subnet__parse_args(self, subnet, kwargs):
+        kwargs['subnet_id'] = subnet.subnet_id
+
+    def _get_libcloud_network(self, network):
+        networks = self.ctl.compute.connection.ex_list_networks()
+        for net in networks:
+            if net.network_id == network.network_id:
+                return net
+        return None
+
+    def _get_libcloud_subnet(self, subnet):
+        subnets = self.ctl.compute.connection.ex_list_subnets()
+        for sub in subnets:
+            if sub.subnet_id == subnet.subnet_id:
+                return sub
+        return None

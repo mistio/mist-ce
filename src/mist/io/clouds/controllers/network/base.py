@@ -1,185 +1,165 @@
 import logging
 
-from mist.io.clouds.controllers.base import BaseController
-from mist.io.clouds.controllers.network.models import Network, Subnet
 import mist.io.exceptions
-
-from mist.io.clouds.controllers.network.models import NETWORKS, SUBNETS
-
-from mongoengine.errors import DoesNotExist
+import mongoengine
+import mongoengine.errors
+from mist.io.clouds.controllers.base import BaseController
 
 log = logging.getLogger(__name__)
 
 
 class BaseNetworkController(BaseController):
-    """Abstract base class for networking-specific subcontrollers"""
+    """Abstract base class for networking-specific subcontrollers.
 
-    def create_network(self, network):
-        """Create a new network. Arguments:
-        network:
-          required: true
-          type: dict
-        Should not be overridden or extended."""
-        self._create_network__parse_args(network)
+    All public methods in this class should not be overridden or extended unless the corresponding method in libcloud
+        is significantly different from this implementation."""
+
+    def create_network(self, network_doc, **kwargs):
+        """Create a new network."""
+
+        self._create_network__parse_args(network_doc, kwargs)
         try:
-            if hasattr(self, 'override_create_network'):
-                libcloud_network = getattr(self.ctl.compute.connection, self.override_create_network)(**network)
-            else:
-                libcloud_network = self.ctl.compute.connection.ex_create_network(**network)
+            libcloud_network = self.ctl.compute.connection.ex_create_network(**kwargs)
         except Exception as e:
             raise mist.io.exceptions.NetworkCreationError("Got error %s" % str(e))
-        network_doc = NETWORKS[self.cloud.provider].add(name=network['name'], cloud=self.cloud, **libcloud_network)
 
+        self._create_network__parse_libcloud_object(network_doc, libcloud_network)
+        network_doc.save()
         return network_doc.as_dict()
 
-    def _create_network__parse_args(self, network_args):
-        pass
+    def _create_network__parse_args(self, network_doc, kwargs):
+        return
 
-    def create_subnet(self, subnet, parent_network_id):
-        """Creates a new subnet. Arguments:
-        subnet:
-          type: dict
-        parent_network_id: the DB id of the network this subnet belongs to
-          type: string
-        """
-        try:
-            parent_network = Network.objects.get(id=parent_network_id)
-        except Network.DoesNotExist:
-            raise mist.io.exceptions.NetworkNotFound()
+    def _create_network__parse_libcloud_object(self, network_doc, libcloud_network):
+        return
 
-        self._create_subnet__parse_args(subnet, parent_network)
+    def create_subnet(self, subnet_doc, **kwargs):
+        """Creates a new subnet."""
+
+        self._create_subnet__parse_args(subnet_doc, kwargs)
 
         try:
-            if hasattr(self, 'override_create_subnet'):
-                libcloud_subnet = getattr(self.ctl.compute.connection, self.override_create_subnet)(**subnet)
-            else:
-                libcloud_subnet = self.ctl.compute.connection.ex_create_subnet(**subnet)
+            libcloud_subnet = self.ctl.compute.connection.ex_create_subnet(**kwargs)
         except Exception as e:
             raise mist.io.exceptions.SubnetCreationError("Got error %s" % str(e))
-        subnet_doc = SUBNETS[self.cloud.provider].add(name=subnet['name'], cloud=self.cloud, **libcloud_subnet)
+
+        self._create_subnet__parse_libcloud_object(subnet_doc, libcloud_subnet)
+        subnet_doc.save()
 
         return subnet_doc.as_dict()
 
     def _create_subnet__parse_args(self, subnet_args, parent_network):
-        pass
+        return
 
-    def list_networks(self):
+    def _create_subnet__parse_libcloud_object(self, subnet_doc, libcloud_subnet):
+        return
+
+    def list_networks(self, **kwargs):
         """List all Networks present on the cloud. Also syncs the state of the Network and Subnet documents on the DB
-        with their state on the Cloud API.
-        Should not be overridden or extended by subclasses"""
+        with their state on the Cloud API."""
 
-        if hasattr(self, 'override_list_networks'):
-            libcloud_networks = getattr(self.ctl.compute.connection, self.override_list_subnets)()
-        else:
-            libcloud_networks = self.ctl.compute.connection.ex_list_subnets()
+        from mist.io.networks.models import Network, NETWORKS
+
+        self._list_networks__parse_args(kwargs)
+        libcloud_networks = self.ctl.compute.connection.ex_list_networks(**kwargs)
         network_listing = []
 
         # Sync the DB state to the API state
         # Syncing Networks
         for network in libcloud_networks:
-
             try:
                 db_network = Network.objects.get(cloud=self.cloud, network_id=network.id)
-            except DoesNotExist:
-                network_doc = NETWORKS[self.cloud.provider].add(name=network['name'],
-                                                                cloud=self.cloud,
-                                                                **network)
+            except Network.DoesNotExist:
+                network_doc = NETWORKS[self.provider].add(title=network.name,
+                                                          cloud=self.cloud,
+                                                          create_on_cloud=False)
             else:
-                network_doc = NETWORKS[self.cloud.provider].add(name=network['name'],
-                                                                cloud=self.cloud,
-                                                                object_id=db_network.id,
-                                                                **network)
+                network_doc = NETWORKS[self.provider].add(title=network.name,
+                                                          cloud=self.cloud,
+                                                          description=db_network.description,
+                                                          object_id=db_network.id,
+                                                          create_on_cloud=False)
+            self._create_network__parse_libcloud_object(network_doc, network)
+            network_doc.save()
 
             # Syncing Subnets
-            subnets_in_current_network = self.list_subnets(for_network=network_doc)
+            subnets_in_current_network = network_doc.ctl.list_subnets()
 
-            network_entry = network.as_dict()
-            subnet_listing = [sub.as_dict() for sub in subnets_in_current_network]
-            network_entry['subnets'] = subnet_listing
+            network_entry = network_doc.as_dict()
+            network_entry['subnets'] = subnets_in_current_network
             network_listing.append(network_entry)
 
         return network_listing
 
-    def list_subnets(self, for_network=None):
+    def _list_networks__parse_args(self, kwargs):
+        return
+
+    def list_subnets(self, **kwargs):
         """List all Subnets for a particular network present on the cloud."""
 
-        list_subnet_args = {}
-        self._list_subnets__parse_args(list_subnet_args, for_network)
-        if hasattr(self, 'override_list_subnets'):
-            libcloud_subnets = getattr(self.ctl.compute.connection, self.override_list_subnets)(**list_subnet_args)
-        else:
-            libcloud_subnets = self.ctl.compute.connection.ex_list_subnets(**list_subnet_args)
+        from mist.io.networks.models import Subnet
+        from mist.io.networks.models import SUBNETS
+
+        self._list_subnets__parse_args(kwargs)
+        libcloud_subnets = self.ctl.compute.connection.ex_list_subnets(**kwargs)
 
         subnet_listing = []
         for subnet in libcloud_subnets:
 
-            if for_network:
-                # A DB sync is only possible if there is a parent network to attach subnets to
-                try:
-                    db_subnet = Subnet.objects.get(subnet_id=subnet.id)
-                except DoesNotExist:
-                    subnet_doc = SUBNETS[self.cloud.provider].add(title=subnet['name'],
-                                                                  base_network=for_network,
-                                                                  **subnet)
-                else:
-                    subnet_doc = SUBNETS[self.cloud.provider].add(title=subnet['name'],
-                                                                  base_network=for_network,
-                                                                  object_id=db_subnet.id,
-                                                                  **subnet)
-                subnet_listing.append(subnet_doc.as_dict())
+            try:
+                db_subnet = Subnet.objects.get(subnet_id=subnet.id)
+            except Subnet.DoesNotExist:
+                subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
+                                                        network=kwargs.get('for_network'),
+                                                        cloud=self.cloud,
+                                                        create_on_cloud=False)
 
-            return subnet_listing
+            else:
+                subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
+                                                        network=db_subnet.network,
+                                                        cloud=self.cloud,
+                                                        description=db_subnet.description,
+                                                        object_id=db_subnet.id,
+                                                        create_on_cloud=False)
 
-    def _list_subnets__parse_args(self, list_subnet_args, for_network=None):
-        pass
+            self._create_subnet__parse_libcloud_object(subnet_doc, subnet)
+            if subnet_doc.network:  # Do not persist this subnet without a parent network reference
+                subnet_doc.save()
+            subnet_listing.append(subnet_doc.as_dict())
 
-    def delete_network(self, network_db_id):
-        """Delete a Network. Arguments:
-        network_id: the DB id of the network to delete
-          type: string
+        return subnet_listing
 
-        Should not be overridden or extended by subclasses"""
-        try:
-            network = Network.objects.get(id=network_db_id)
-        except Network.DoesNotExist:
-            raise mist.io.exceptions.NetworkNotFound()
+    def _list_subnets__parse_args(self, kwargs):
+        return
+
+    def delete_network(self, network, **kwargs):
+        """Delete a Network."""
+
+        from mist.io.networks.models import Subnet
+
         associated_subnets = Subnet.objects(network=network)
         for subnet in associated_subnets:
-            self.delete_subnet(subnet.id)
+            subnet.ctl.delete_subnet()
 
-        delete_network_args = {}
-        self._delete_network__parse_args(delete_network_args, network)
-        if hasattr(self, 'override_delete_network'):
-            getattr(self.ctl.compute.connection, self.override_delete_network)(**delete_network_args)
-        else:
-            self.ctl.compute.connection.ex_delete_network(**delete_network_args)
+        self._delete_network__parse_args(network, kwargs)
+        self.ctl.compute.connection.ex_delete_network(**kwargs)
         network.delete()
 
-    def _delete_network__parse_args(self, delete_network_args, network):
-        pass
+    def _delete_network__parse_args(self, network, kwargs):
+        return
 
-    def delete_subnet(self, subnet_db_id):
-        """Delete a Subnet. Arguments:
-        network_id: the DB id of the subnet to delete
-          type: string
+    def delete_subnet(self, subnet, **kwargs):
+        """Delete a Subnet."""
 
-        Should not be overridden or extended by subclasses"""
-
-        try:
-            subnet = Subnet.objects.get(id=subnet_db_id)
-        except Subnet.DoesNotExist:
-            raise mist.io.exceptions.SubnetNotFound()
-
-        delete_subnet_args = {}
-        self._delete_subnet__parse_args(delete_subnet_args, subnet)
-        if hasattr(self, 'override_delete_subnet'):
-            getattr(self.ctl.compute.connection, self.override_delete_subnet)(**delete_subnet_args)
-        else:
-            self.ctl.compute.connection.ex_delete_subnet(**delete_subnet_args)
+        self._delete_subnet__parse_args(subnet, kwargs)
+        self.ctl.compute.connection.ex_delete_subnet(**kwargs)
         subnet.delete()
 
-    def _delete_subnet__parse_args(self, subnet_args, subnet):
-        pass
+    def _delete_subnet__parse_args(self, subnet, kwargs):
+        return
 
+    def _get_libcloud_network(self, network):
+        return
 
-
+    def _get_libcloud_subnet(self, network):
+        return
