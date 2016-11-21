@@ -1,6 +1,9 @@
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
 <script src="../../bower_components/moment/moment.js"></script>
 
 <link rel="import" href="../app-image-icons/app-image-icons.html">
+<link rel="import" href="../helpers/dialog-element.html">
 
 <dom-module id="list-item">
     <template>
@@ -43,6 +46,22 @@
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
+        }
+        .field iron-icon {
+            color: inherit;
+        }
+
+        .field.recommendations {
+            min-width: 250px;      
+        }
+        .recommendations.Dirty.COW.Update iron-icon {
+            color: #F57F17;
+        }
+        iron-icon.recommendations {
+            color: #F57F17 !important;
+            margin-left: -30px;
+            padding-right: 5px;
+            height: 18px;
         }
         .field.state {
             position: relative;
@@ -114,16 +133,16 @@
             box-shadow: 1px 0 0 #fff, 4px 0 0 #EF5350, -1px 0 0 #fff, -4px 0 0 #69b46c; /*red green*/
         }
         /* shorteco + long */
-        .field.state..shorteco.longlow:after {
+        .field.state.shorteco.longlow:after {
             box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #42A5F5; /*green cyan*/
         }
-        .field.state..shorteco.longmedium:after {
+        .field.state.shorteco.longmedium:after {
             box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #FFCA28; /*green orange*/
         }
-        .field.state..shorteco.longhigh:after {
+        .field.state.shorteco.longhigh:after {
             box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #EF5350; /*green red*/
         }
-        .field.state..shorteco.longeco:after {
+        .field.state.shorteco.longeco:after {
             box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #69b46c; /*green green*/
         }
 
@@ -180,9 +199,9 @@
         <iron-media-query query="(max-width: 640px)" query-matches="{{narrowViewport}}"></iron-media-query>
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
         <content></content>
-        <template is="dom-repeat" items="{{fields}}" as="field">
-          <a href="[[uri]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false">
-            <div class$="[[field]] field field[[index]] {{itemField(item, field)}} {{itemProbeClasses(item, field)}}">{{itemField(item, field)}}</div>
+        <template is="dom-repeat" items="{{fields}}" as="field">        
+          <a href="{{_computeUri(uri, field, item, probes)}}" is="pushstate-anchor" ondragstart="return false" ondrop="return false" class$="field-link-[[index]]-[[field]]">            
+            <div class$="[[field]] field field[[index]] {{itemField(item, field, index)}}  {{itemProbeClasses(item, field, index, probes)}}"><span class$="field-icon [[field]]"></span>{{itemField(item, field, index)}}</div>
           </a>
         </template>
         <div class="field tags" hidden$="[[!item.tags.length]]">
@@ -275,10 +294,35 @@ Polymer({
         narrowViewport: {
             type: Boolean,
             reflectToAttribute: true
+        },
+        probes: {
+            type: Object,
+            value: {}
         }
     },
+    observers: [
+        '_probesChanged(probes.*, item, section)'
+    ],
+    listeners: {
+        'tap': '_showRecommendationDialog'
+    },
+    itemField: function(item, field, index) {
 
-    itemField: function(item, field) {
+        // if (field == 'recommendations'){
+        //     // temp for machines only
+        //     if (this.section.id == "machines" && this.probes && this.probes[item.uuid]){
+        //         if (this.probes[item.uuid].dirty_cow == true) {
+        //             this._appendIconOnRecommendations(index, 'icons:report-problem');
+        //             return "Dirty COW alert! Update kernel.";
+        //         }
+        //         else {
+        //             return "Dirty COW check passed.";
+        //         }
+        //     }
+        //     else {
+        //         return '';
+        //     }
+        // }
 
         if (field == 'cost') {
             if (item.extra.cost_per_month) {
@@ -417,6 +461,41 @@ Polymer({
 
         return ret;
     },
+    _probesChanged: function(probes, item, section){
+        console.log('PROBES CHANGED')
+
+        if (this.probes != {} && this.section.id == "machines" && this.item.uuid && this.probes[item.uuid] && this.probes[item.uuid].dirty_cow == true) {
+                //hardcoded index = 1 which is the state column
+                console.log('PROBES CHANGED TRUE', item.uuid)
+                this._appendIconOnRecommendations(1, 'icons:report-problem');
+        }
+    },
+
+    _computeUri: function(uri,field, item, probes){
+        if ( field == 'state' && this.probes != {} && this.section.id == "machines" && this.item.uuid && this.probes[item.uuid] && this.probes[item.uuid].dirty_cow == true) {
+            return '#';
+        }
+        else
+            return this.uri;
+    },
+
+    _appendIconOnRecommendations: function(index, icontext){
+        var parent = this.querySelector('.state.field'+index+' .field-icon');
+        if (parent && parent.children.length == 0) {
+            var icon = document.createElement('iron-icon');
+            icon.classList.add('recommendations');
+            icon.setAttribute('icon', icontext);
+            icon.setAttribute('data-attr', 'recommendations');
+            Polymer.dom(parent).appendChild(icon);
+        }
+    },
+
+    _showRecommendationDialog: function(event){
+        var e = Polymer.dom(event);
+        // console.log(e, event)
+        if (e.event.srcElement.dataset.attr == "recommendations")
+            this.fire("open-recommendation-dialog", {'item-type': this.section.id, 'item': this.item, 'event': e})
+    },
 
     _itemTagsArray: function(tagsobject) {
         var tagsArray = [];
@@ -433,19 +512,17 @@ Polymer({
     },
 
     itemProbeClasses: function(item, field) {
-        if (field != 'state') {
+        if (field != 'state' || this.probes == {}) {
             return false;
         }
         else {
-            var model = document.querySelector('mist-app').model;
-
-            if (!model || !model.probes || !model.probes[item.uuid] || !model.probes[item.uuid].loadavg) {
+            if (!this.probes[item.uuid] || !this.probes[item.uuid].loadavg) {
                 return "";
             }
 
             else {
-                var probe = model.probes[item.uuid].loadavg;
-                var cores =  parseInt(model.probes[item.uuid].cores);
+                var probe = this.probes[item.uuid].loadavg;
+                var cores =  parseInt(this.probes[item.uuid].cores);
                 var classes = '';
                 var prefix = '';
                 console.log(parseInt(probe[0]),probe[0]);

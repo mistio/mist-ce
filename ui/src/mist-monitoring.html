@@ -94,9 +94,9 @@
                         </div>
                     </div>
                     <!-- monitoring is activated. we expect to have data -->
-                    <div hidden$="[[!isActivated]]">
+                    <template is="dom-if" if="[[isActivated]]">
                         <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
-                    </div>
+                    </template>
                 </div>
 
                 <div id="errormsgArea">
