@@ -94,9 +94,9 @@
                         </div>
                     </div>
                     <!-- monitoring is activated. we expect to have data -->
-                    <div hidden$="[[!isActivated]]">
+                    <template is="dom-if" if="[[isActivated]]">
                         <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
-                    </div>
+                    </template>
                 </div>
 
                 <div id="errormsgArea">
@@ -209,7 +209,7 @@
         	}
         },
         _computeIsRunning: function(resource) {
-            return this.resource.state == "running";
+            return this.resource && this.resource.state && this.resource.state == "running" ? true : false ;
         },
         _computeWaitingData: function(resource, monitoring){
             if (!this.resource || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || !this.monitoring.monitored_machines[resource.uuid].installation_status){
