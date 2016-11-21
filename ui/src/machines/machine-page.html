@@ -370,9 +370,21 @@
                     </div>
                 </paper-material>
             </div>
-            <paper-material class="info-card">
-                <mist-monitoring resource="[[machine]]" monitoring="[[model.monitoring]]" section="[[section]]" datasources="[[datasources]]"></mist-monitoring>
-                <mist-rules builtin-metrics="[[model.monitoring.builtin_metrics]]" incidents="[[model.incidentsArray]]" rules="[[model.monitoring.rules]]" resource="[[machine]]" user-email="[[model.user.email]]" hidden$="{{!isActivated}}"></mist-rules>
+            <paper-material id="monitoringBlock" class="info-card">
+                <!-- <mist-monitoring 
+                    id="mistMonitoring"
+                    resource="[[machine]]" 
+                    monitoring="[[model.monitoring]]" 
+                    section="[[section]]" 
+                    datasources="[[datasources]]"></mist-monitoring> -->
+                <mist-rules 
+                    id="monitoringRules"
+                    builtin-metrics="[[model.monitoring.builtin_metrics]]" 
+                    incidents="[[model.incidentsArray]]" 
+                    rules="[[model.monitoring.rules]]" 
+                    resource="[[machine]]" 
+                    user-email="[[model.user.email]]" 
+                    hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
             <paper-material class="info-card">
                 <h2 style$="color:#fff;background-color: [[section.color]];">Basic Info</h2>
@@ -620,10 +632,15 @@ Polymer({
             type: Object,
             computed: '_computeProbeObj(machine, model.probes.*)',
             value: false
+        },
+        isInPage: {
+            type: Boolean,
+            value: false
         }
     },
     observers: [
-        '_isMonitored(machine, model.monitoring.machines.*)'
+        '_isMonitored(machine, model.monitoring.machines.*)',
+        'isInPageChanged(machine, isInPage)'
     ],
     listeners: {
         'confirmation': '_machineActionConfirmation',
@@ -641,6 +658,32 @@ Polymer({
             "type": "mist.monitor",
             "uri": "/api/v1/stats"
         }];
+    },
+
+    isInPageChanged: function(machine, isInPage){
+        var parent = this.$.monitoringBlock;
+        if (this.isInPage == true) {
+            var monitoringNode = document.createElement('mist-monitoring');
+            monitoringNode.id = "mistMonitoring";
+            monitoringNode.resource = this.machine;
+            monitoringNode.monitoring = this.model.monitoring;
+            monitoringNode.section = this.section;
+            monitoringNode.datasources = this.datasources;
+
+            Polymer.dom(parent).insertBefore(monitoringNode, this.$.monitoringRules);
+            // <mist-monitoring 
+            //         id="mistMonitoring"
+            //         resource="[[machine]]" 
+            //         monitoring="[[model.monitoring]]" 
+            //         section="[[section]]" 
+            //         datasources="[[datasources]]"></mist-monitoring>
+        }
+        else {
+            console.log('delete ', this.querySelector('#mistMonitoring'))
+            if (this.querySelector('#mistMonitoring')){
+                Polymer.dom(parent).removeChild(this.querySelector('#mistMonitoring'));
+            }
+        }
     },
 
     _computeActions: function(item) {
@@ -679,7 +722,7 @@ Polymer({
 
         return actions;
     },
-    
+
     _computeItemInArray: function() {
         return [this.machine];
     },

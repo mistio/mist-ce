@@ -196,7 +196,7 @@
                         document.location.pathname = '/';
                     },
                     stats: function(data) {
-                      console.log(that.openRequests)
+                      // console.log(that.openRequests)
                         if (!that.openRequests[data.request_id])
                             console.warn('cannot find open request', data.request_id)
                         else {

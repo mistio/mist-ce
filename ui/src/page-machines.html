@@ -18,7 +18,7 @@
 
     <page-items name="machines" class="keys" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
     <machine-create model="[[model]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isAddPageActive(route.path)]]></machine-create>
-    <machine-page model="[[model]]" machine="[[_getMachine(data.machine, model.machines)]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isDetailsPageActive(route.path)]] is-in-page="[[!_isDetailsPageActive(route.path)]]"></machine-page>
+    <machine-page model="[[model]]" machine="[[_getMachine(data.machine, model.machines)]]" sections="[[sections]]" section="[[sections.machines]]" is-in-page="[[_isDetailsPageActive(route.path)]]" hidden$=[[!_isDetailsPageActive(route.path)]]></machine-page>
   </template>
 
   <script>
@@ -37,7 +37,10 @@
           return path == '/+create';
       },
       _isDetailsPageActive: function(path) {
-          return path && path != '/+create';
+          if (path && path != '/+create') 
+            return true;
+          else 
+            return false;
       },
       _isListActive: function(path) {
           return !path;
