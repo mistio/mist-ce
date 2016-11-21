@@ -121,7 +121,7 @@ class BaseKeyController(object):
         # key.save()
 
         # TODO do we prefer this?
-        Key.objects(default=True).update(default=False)
+        Key.objects(owner=self.key.owner, default=True).update(default=False)
         Key.objects(owner=self.key.owner, id=key_id).update(default=True)
 
         log.info("Successfully set key with id '%s' as default.", key_id)
