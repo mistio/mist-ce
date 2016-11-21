@@ -136,7 +136,8 @@
             :host .tag {
                 display: inline !important;
                 padding: 4px;
-                margin: 4px;
+                margin-bottom: : 4px;
+                margin-right: 4px;
             }
             polyana-dashboard ::content h3 {
                 text-transform: uppercase;
@@ -168,11 +169,14 @@
                 opacity: 0.32;
                 cursor: pointer;
             }
-            .machine-key iron-icon[icon='close'] {
-                opacity: 0;
+            .machine-key iron-icon.delete {
+                opacity: 0.13;
                 margin-right: 16px;
+                height: 12px;
+                width: 12px;
+                transition: opacity 100 ease-in;
             }
-            .machine-key:hover iron-icon[icon='close'] {
+            .machine-key:hover iron-icon.delete {
                 opacity: 0.32;
             }
             #pendingKeyrequest paper-spinner {
@@ -292,6 +296,14 @@
             .shorteco.longeco {
                 box-shadow: 1px 0 0 #fff, 4px 0 0 #69b46c, -1px 0 0 #fff, -4px 0 0 #69b46c; /*green green*/
             }
+            @media (max-width: 1024px) {
+                .machine-key {
+                    display: block;
+                }
+                .tag {
+                    display: inline-block !important;
+                }
+            }
         </style>
 
         <div id="content">
@@ -314,7 +326,6 @@
             </paper-material>
             <div class="columns">
                 <paper-material id="leftcolumn" class="left">
-                    <h3 class="smallcaps">Info:</h3>
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
                     <span hidden$="[[!machine.extra.image]]" class="break">Image: [[machine.extra.image]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
@@ -337,13 +348,13 @@
                     </div>
                 </paper-material>
                 <paper-material id="rightcolumn" class="right">
-                    <div hidden$="[[!machine.keys.length]]">
+                    <div hidden$="[[!machineKeys.length]]">
                         <h3 class="smallcaps">Associated Keys:</h3>
                         <div class="associatedKeys">
-                            <template is="dom-repeat" items="{{machine.keys}}">
+                            <template is="dom-repeat" items="{{machineKeys}}">
                                 <div class="machine-key">
                                     <a class="regular blue-link flexchild" href$="/keys/[[item.id]]"><iron-icon icon="communication:vpn-key"></iron-icon> [[item.name]]</a>
-                                    <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="close" on-tap="disassociateKey"></iron-icon>
+                                    <iron-icon data-keyid="[[item.id]]" data-keyname="[[item.name]]" icon="icons:cancel" on-tap="disassociateKey" class="delete"></iron-icon>
                                 </div>
                             </template>
                             <div class="machine-key" id="pendingKeyRequest">
@@ -417,10 +428,20 @@
             </paper-material>
         </div>
         <dialog-element id="machinedialog"></dialog-element>
-        <!-- <associate-key keys=[[model.keysArray]] cloud-id="[[machine.cloud.id]]" machine-id="[[machine.id]]" host="[[machineIp]]"></associate-key> -->
-        <!-- <iron-ajax id="actionRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]" method="POST" on-response="_actionResponse" on-error="_actionError" on-request="_actionRequest"></iron-ajax> -->
-        <iron-ajax id="machineDeleteAjaxRequest" url="/api/v1/machines/[[machine.id]]" method="DELETE" on-response="_handleMachineDeleteAjaxResponse" on-error="_handleMachineDeleteAjaxError"></iron-ajax>
-        <iron-ajax id="disassociateKeyRequest" url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" method="DELETE" on-response="_disassociateKeyResponse" on-error="_disassociateKeyError" on-request="_disassociateKeyRequest"></iron-ajax>
+        <iron-ajax  id="machineDeleteAjaxRequest" 
+                    url="/api/v1/machines/[[machine.id]]" 
+                    method="DELETE" 
+                    on-response="_handleMachineDeleteAjaxResponse" 
+                    on-error="_handleMachineDeleteAjaxError"></iron-ajax>
+
+        <iron-ajax  id="disassociateKeyRequest" 
+                    url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" 
+                    method="DELETE" 
+                    on-response="_disassociateKeyResponse" 
+                    on-error="_disassociateKeyError" 
+                    on-request="_disassociateKeyRequest" 
+                    handle-as="xml"></iron-ajax>
+
         <machine-edit machine="[[machine]]"></machine-edit>
         <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
@@ -568,6 +589,12 @@ Polymer({
         hideAssociatedKeys: {
             type: Boolean
         },
+        machineKeys: {
+            type: Array,
+            computed: '_computeAssociatedKeys(machine.*, machine.keys.*, machine.keys.length, model.keysArray.*)',
+            value: [],
+            notify: true
+        },
         itemInArray: {
             type: Array,
             computed: '_computeItemInArray(machine)'
@@ -619,7 +646,7 @@ Polymer({
 
     _computeActions: function(item) {
         var ret = [];
-        if (item.state == 'running') {
+        if (item && item.state == 'running') {
             // if key then add shell / run script
             // if not monitoring then enable monitoring
             ret.push('shell');
@@ -627,23 +654,23 @@ Polymer({
             if(this.hideAssociatedKeys)
                 ret.push('run-script');
         }
-        if (item.can_tag)
+        if (item && item.can_tag)
             ret.push('tag');
-        if (item.can_start)
+        if (item && item.can_start)
             ret.push('start');
-        if (item.can_stop)
+        if (item && item.can_stop)
             ret.push('stop');
-        if (item.can_suspend)
+        if (item && item.can_suspend)
             ret.push('suspend');
-        if (item.can_reboot)
+        if (item && item.can_reboot)
             ret.push('reboot');
-        if (item.can_resume)
+        if (item && item.can_resume)
             ret.push('resume');
-        if (item.can_rename)
+        if (item && item.can_rename)
             ret.push('rename');
-        if (item.can_destroy)
+        if (item && item.can_destroy)
             ret.push('destroy');
-        if (item.can_undefine)
+        if (item && item.can_undefine)
             ret.push('undefine');
 
         var actions = [];
@@ -764,7 +791,7 @@ Polymer({
         //     //     that.querySelector('dashboard-panel').resize();
         //
         // }, 5000);
-    },
+    },    
     _computeItemInArray: function() {
         return [this.machine];
     },
@@ -773,8 +800,13 @@ Polymer({
         itemUidInArray.push(itemUid(this.machine, this.sections['machines']));
         return itemUidInArray;
     },
-    _computeAssociatedKeys: function(machine, keys) {
-        return machine.keys || [];
+    _computeAssociatedKeys: function(machine, machinekeys, length, keys) {
+        var keys = this.model.keysArray.filter(function(k) {
+            return k.machines.find(function(m) {
+                return m[1] == this.machine.id && m[0] == this.machine.cloud.id;
+            }, this)
+        }, this);
+        return keys || [];
     },
     computeMachineIp: function(machineips) {
         if (this.machine.public_ips) {
@@ -836,7 +868,8 @@ Polymer({
         toast.show();
     },
     isState: function(machine) {
-        return machine.state == machine.extra.status;
+        if (machine)
+            return machine.state == machine.extra.status;
     },
     _computeIsloading: function(machine) {
         return !this.machine ? true : false;
@@ -853,7 +886,7 @@ Polymer({
 
         this._showDialog({
             title: 'Disassociate key',
-            body: "You are about to disassociate key '" + keyName + "' from machine.",
+            body: "Disassociating key '" + keyName + "' from machine, will remove the key from the machine.",
             danger: false,
             reason: "disassociate.key",
             action: 'disassociate',
@@ -865,9 +898,16 @@ Polymer({
     },
     _disassociateKeyResponse: function(e) {
         this.set('isPendingKeyRequest', false);
+        document.querySelector('paper-toast#mist-toast').show({text: 'Key was removed from machine!'})
     },
     _disassociateKeyError: function(e) {
         this.set('isPendingKeyRequest', false);
+        console.log(e)
+        document.querySelector('paper-toast#mist-toast').show({text: e.detail.request.xhr.responseText})
+    },
+    _machineActionConfirmation: function(e){
+        this.$.disassociateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+        this.$.disassociateKeyRequest.generateRequest();
     },
     _updateKeyLoader: function(e) {
         //console.log(e.detail);
@@ -889,19 +929,7 @@ Polymer({
         }
     },
     _feedbackOnRename: function(e) {
-        console.log("_feedbackOnRename")
-        if (e.detail.request) {
-            this._showToast('Rename request sent. Waiting for machine to respond');
-        }
-        if (e.detail.response) {
-            this._showToast('Renaming was successful.');
-        }
-        if (e.detail.error) {
-            this._showToast(e.detail.errormsg);
-        }
-    },
-    _feedbackOnRename: function(e){
-        console.log("_feedbackOnRename")
+        // console.log("_feedbackOnRename")
         if (e.detail.request) {
             this._showToast('Rename request sent. Waiting for machine to respond');
         }

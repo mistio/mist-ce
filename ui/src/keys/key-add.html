@@ -235,13 +235,17 @@
                 _handleKeyAddAjaxResponse: function(e) {
                     this.set('sendingData', false);
                     console.log(e);
+                    var keyID = JSON.parse(e.detail.xhr.response).id;
                     if (!this.origin) {
-                        var keyID = JSON.parse(e.detail.xhr.response).id;
                         document.querySelector('app-location').path = '/keys/' + keyID;
                     }
                     else {
                         document.querySelector('app-location').path = this.origin;
                         document.querySelector('app-location').queryParams = {};
+                        //if origin machines/machine_id reopen associate key dialog
+                        if (this.origin.startsWith('/machines/')){
+                            this.fire('open-and-select', {key:keyID})
+                        }
                     }
 
                     this.debounce('formReset', function() {
