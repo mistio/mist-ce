@@ -158,11 +158,3 @@ def load_staging_l_images():
     with open(path) as fobj:
         return json.load(fobj)
 
-
-@pytest.fixture
-def load_reference_networks():
-    path = os.path.join(TEST_DIR, 'list_networks.json')
-    print "Reading networks from path '%s'." % path
-    with open(path) as fobj:
-        return json.load(fobj)
-
