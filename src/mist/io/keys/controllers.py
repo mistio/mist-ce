@@ -45,7 +45,8 @@ class SSHKeyController(BaseKeyController):
         super(SSHKeyController, self).associate(machine=machine,
                                                 username=username,
                                                 port=port)
-        self.deploy(machine=machine, username=username, port=port)
+        if machine.hostname:
+            self.deploy(machine=machine, username=username, port=port)
 
     def deploy(self, machine, username=None, port=22):
         """"""
