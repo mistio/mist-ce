@@ -1,9 +1,24 @@
 import logging
+import ssl
 
 import mist.io.exceptions
+from libcloud.common.types import InvalidCredsError
 from mist.io.clouds.controllers.base import BaseController
 
 log = logging.getLogger(__name__)
+
+
+def catch_common_exceptions(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except InvalidCredsError as exc:
+            log.warning("Invalid creds on running %: %s", func.__name__, exc)
+            raise mist.io.exceptions.CloudUnauthorizedError()
+        except ssl.SSLError as exc:
+            log.error("SSLError on running %s: %s", func.__name__, exc)
+            raise mist.io.exceptions.CloudUnavailableError(exc=exc)
+    return wrapper
 
 
 class BaseNetworkController(BaseController):
@@ -12,6 +27,7 @@ class BaseNetworkController(BaseController):
     All public methods in this class should not be overridden or extended unless the corresponding method in libcloud
         is significantly different from this implementation."""
 
+    @catch_common_exceptions
     def create_network(self, network_doc, **kwargs):
         """Create a new network."""
 
@@ -31,6 +47,7 @@ class BaseNetworkController(BaseController):
     def _create_network__parse_libcloud_object(self, network_doc, libcloud_network):
         return
 
+    @catch_common_exceptions
     def create_subnet(self, subnet_doc, **kwargs):
         """Creates a new subnet."""
 
@@ -52,6 +69,7 @@ class BaseNetworkController(BaseController):
     def _create_subnet__parse_libcloud_object(self, subnet_doc, libcloud_subnet):
         return
 
+    @catch_common_exceptions
     def list_networks(self, **kwargs):
         """List all Networks present on the cloud. Also syncs the state of the Network and Subnet documents on the DB
         with their state on the Cloud API."""
@@ -92,6 +110,7 @@ class BaseNetworkController(BaseController):
     def _list_networks__parse_args(self, kwargs):
         return
 
+    @catch_common_exceptions
     def list_subnets(self, **kwargs):
         """List all Subnets for a particular network present on the cloud."""
 
@@ -130,6 +149,7 @@ class BaseNetworkController(BaseController):
     def _list_subnets__parse_args(self, kwargs):
         return
 
+    @catch_common_exceptions
     def delete_network(self, network, **kwargs):
         """Delete a Network."""
 
@@ -146,6 +166,7 @@ class BaseNetworkController(BaseController):
     def _delete_network__parse_args(self, network, kwargs):
         return
 
+    @catch_common_exceptions
     def delete_subnet(self, subnet, **kwargs):
         """Delete a Subnet."""
 
