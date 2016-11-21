@@ -24,13 +24,16 @@
             border-radius: 3px;
             opacity: 1;
             transition: opacity 0.4s;
+            transition: max-width 500ms ease-in;
         }
 
         :host(.hidden) {
             transition: none;
             opacity: 0;
         }
-
+        :host[with-recommendations] {
+            max-width: 1750px !important;
+        }
         iron-list {
             border-right: 1px solid #d0d0d0;
             border-left: 1px solid #d0d0d0;
@@ -147,6 +150,10 @@
         }
 
         .field.name {
+            min-width: 250px;
+        }
+
+        .field.recommendations {
             min-width: 250px;
         }
 
@@ -302,7 +309,7 @@
         <iron-list items="[[items]]" as="item" style$="{{vpHeight}}">
             <template>
                 <div class="row" data-index$="[[index]]">
-                    <list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]" uri$="[[_itemLink(item)]]">
+                    <list-item section="[[section]]" item="[[item]]" fields="[[fields]]" id$="[[itemUid(item)]]" uri$="[[_itemLink(item)]]" probes="[[model.probes]]">
                         <template is="dom-if" if="[[ismachines]]">
                             <span class$="[[itemMonitoringStatus(item, incidents, model.monitoring)]]"></span>
                         </template>
@@ -322,6 +329,7 @@
                 </div>
             </template>
         </iron-list>
+
       </template>
 </dom-module>
 
@@ -409,6 +417,11 @@ Polymer({
         incidents: {
             type: Array,
             computed: "_computeIncidents(model.incidentsArray.*)"
+        },
+        withRecommendations: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true
         }
     },
 
@@ -419,6 +432,7 @@ Polymer({
 
     observers: [
       'itemsChanged(items.*)',
+      // 'showRecommendations(fields.*, model.probes.*)'
     ],
     updateNumber: function(e){
         this.set('currentSelectedItems', e.detail.itemLength);
@@ -432,6 +446,32 @@ Polymer({
         var criticalNumofItems = Math.floor(wh/itemHeight) + 1 ;
 
         this.vpHeight = 'height:65px;';
+    },
+    showRecommendations: function(fields, probes){
+        if (this.section.id != 'machines')
+            this.set('withRecommendations', false)
+        else {
+            var show = false;
+            if (!this.model.probes || !this.fields) {
+                show = false;
+            }
+            else {
+                for (var p in this.model.probes) {
+                    if (this.model.probes[p].dirty_cow == true){
+                        show = true;
+                    }
+                }
+            }
+
+            if (!show && this.fields.indexOf('recommendations') >-1){
+                this.splice('fields', this.fields.indexOf('recommendations'), 1);
+                this.set('withRecommendations', false)
+            }
+            else if (show && this.fields.indexOf('recommendations') ==-1){
+                this.splice('fields', 2, 0 , 'recommendations');
+                this.set('withRecommendations', true)
+            }
+        }
     },
     itemMonitoringStatus: function(item, incidents, monitoring){
         var classes = "";
@@ -454,7 +494,7 @@ Polymer({
             return " ";
         }
         else if (this.model.monitoring && this.model.monitoring.monitored_machines && this.model.monitoring.monitored_machines[item.uuid]) {
-            console.log('itemMonitoringStatus',this.model.monitoring.monitored_machines[item.uuid])
+            // console.log('itemMonitoringStatus',this.model.monitoring.monitored_machines[item.uuid])
             classes += "monitoring ";
         }
         else {
@@ -630,7 +670,7 @@ Polymer({
             if (this.get('xxwideViewport'))
                 return ['name', 'state', 'cloud', 'cost', 'created', 'size', 'image', 'id'];
             if (this.get('xwideViewport'))
-                return ['name', 'state', 'cloud', 'cost', 'size', 'image']
+                return ['name', 'state', 'cloud','cost', 'size', 'image']
             if (this.get('wideViewport'))
                 return ['name', 'state', 'cloud', 'size']
             if (!this.get('mediumViewport') && !this.get('narrowViewport'))
