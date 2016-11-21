@@ -1,8 +1,6 @@
 import logging
 
 import mist.io.exceptions
-import mongoengine
-import mongoengine.errors
 from mist.io.clouds.controllers.base import BaseController
 
 log = logging.getLogger(__name__)
