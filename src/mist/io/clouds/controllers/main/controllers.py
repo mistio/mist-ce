@@ -208,6 +208,12 @@ class IndonesianVCloudMainController(VCloudMainController):
     provider = 'indonesian_vcloud'
     ComputeController = compute_ctls.VCloudComputeController
 
+    def _add__preparse_kwargs(self, kwargs):
+        if not kwargs.get('host'):
+            kwargs['host'] = kwargs['indonesianRegion']
+        if kwargs['host'] not in ('my.idcloudonline.com', 'compute.idcloudonline.com'):
+            kwargs['host'] = 'my.idcloudonline.com'
+
     def _update__preparse_kwargs(self, kwargs):
         host = kwargs.get('host', self.cloud.host) or 'my.idcloudonline.com'
         if host not in ('my.idcloudonline.com', 'compute.idcloudonline.com'):
