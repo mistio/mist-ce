@@ -157,7 +157,7 @@
         </iron-ajax>
         <iron-ajax
           id="metrics"
-          url="[[_computeMetricsUri(cloudId,machineId)]]"
+          url="[[_computeMetricsUri(cloudId, machine.id)]]"
           handle-as="json" method="GET"
           contentType="application/json"
           loading="{{loadingMetrics}}"
@@ -175,7 +175,7 @@
                 data: {
                     type: Object
                 },
-                machineId: String,
+                machine: Object,
                 cloudId: String,
                 responseMetrics: {
                     type: Array,
@@ -359,7 +359,7 @@
               var payload = {
                 metric_id: metric
               };
-              this.$.associateMetric.url = "/api/v1/clouds/"+this.cloudId+"/machines/"+this.machineId+"/metrics";
+              this.$.associateMetric.url = "/api/v1/clouds/"+this.cloudId+"/machines/"+this.machine.id+"/metrics";
               this.$.associateMetric.headers["Csrf-Token"] = CSRF_TOKEN;
               this.$.associateMetric.params = payload;
               this.$.associateMetric.generateRequest();
@@ -377,7 +377,7 @@
             },
             _generateCustomgraphrequest(){
               this.set('formError', false);
-              this._computeUrl(this.cloudId,this.machineId,this.metric.pluginId);
+              this._computeUrl(this.cloudId, this.machine.id, this.metric.pluginId);
               this.metric.script=this.querySelector('#juicyScript').value;
               if(this.querySelector('#derivative').checked){
                 this.metric.type="derive";
@@ -391,7 +391,7 @@
                    "unit"          : this.metric.unit,
                    "value_type"    : this.metric.type,
                    "read_function" : this.metric.script,
-                   "host"          : "172.17.0.1"
+                   "host"          : this.machine.public_ips[0]
                };
               this.querySelector('#postCustomgraph').contentType="application/json"
               this.querySelector('#postCustomgraph').headers["Csrf-Token"] = CSRF_TOKEN;

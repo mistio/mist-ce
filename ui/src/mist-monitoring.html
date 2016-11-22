@@ -140,7 +140,7 @@
                     <!-- monitoring is activated. we expect to have data -->
                     <template is="dom-if" if="[[isActivated]]" restamp>
                         <polyana-dashboard uri$="[[_computeDashboardUri(resource)]]" datasources="[[datasources]]"></polyana-dashboard>
-                        <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]" machine-keys="[[machineKeys]]"></add-panel>
+                        <add-panel machine="[[resource]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]" machine-keys="[[machineKeys]]"></add-panel>
                     </template>
                 </div>
 
@@ -274,11 +274,8 @@
         detached: function () {
         },
         _forwardEvent: function(e){
-            document.addEventListener('update-dashboard', function(e) {
-                this.querySelector('polyana-dashboard')._updateDashboard(e);
-            }.bind(this));
+            this.querySelector('polyana-dashboard')._updateDashboard(e);
         },
-
         _computeDashboardUri: function(resource) {
             return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/dashboard';
         },
@@ -343,7 +340,7 @@
             if (this.resource.extra.os_type)
                 script = script[this.resource.extra[os_type]+"_command"];
             else
-                script = script.command; 
+                script = script.command;
 
             if (script != null)
                 this.set("showScript", true);
