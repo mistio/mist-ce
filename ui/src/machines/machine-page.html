@@ -377,7 +377,7 @@
                     monitoring="[[model.monitoring]]"
                     section="[[section]]"
                     datasources="[[datasources]]"
-                    is-in-page="[[isInPage]]"
+                    hidden$="[[hidden]]"
                     machine-keys="[[machineKeys]]"></mist-monitoring>
                 <mist-rules
                     id="monitoringRules"
@@ -635,7 +635,7 @@ Polymer({
             computed: '_computeProbeObj(machine, model.probes.*)',
             value: false
         },
-        isInPage: {
+        hidden: {
             type: Boolean,
             value: false
         }

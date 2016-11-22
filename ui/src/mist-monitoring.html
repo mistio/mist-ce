@@ -80,6 +80,12 @@
             .error {
                 color: var(--red-color);
             }
+            .logs {
+                background-color: #f1f1f1;
+                padding: 4px 16px;
+                border-radius: 3px;
+                margin-bottom: 24px;
+            }
         </style>
         <div class="monitoring-head horizontal layout" style$="color:#fff;background-color: [[section.color]];" >
             <h2 class="flex">Monitoring</h2>
@@ -96,13 +102,8 @@
 
             <!-- the machine is running -->
             <div hidden$="[[!isRunning]]">
-
                 <!-- the machine is considered monitored -->
                 <div hidden$="[[!isMonitored]]">
-                    <!-- activated at :[[resourceMonitoringInfo.installation_status.activated_at]]
-                    started at :[[resourceMonitoringInfo.installation_status.started_at]]
-                    finished at :[[resourceMonitoringInfo.installation_status.finished_at]] -->
-
                     <!-- monitoring is not activated -->
                     <div hidden$="[[isActivated]]">
                         <div hidden$="[[resourceMonitoringInfo.installation_status.activated_at]]">
@@ -112,16 +113,33 @@
                         <p hidden$="[[isManual]]">
                             When you enable monitoring Mist.io automatically installs the collectd monitoring agent and starts receiving data.
                         </p>
-                        <p hidden$="[[isManual]]">
-                            <span hidden$="[[failed]]">
-                                Agent installation status: [[monitoringState(resource, monitoring)]]
-                            </span>
-                            <!-- installation failed-->
-                            <span class="error" hidden$="[[!failed]]">
-                                Installation of the monitoring agent failed.
-                            </span>
+                    </div>
+                </div>
+                <div class="logs" hidden$="[[!showLogs]]">
+                    <p hidden$="[[!jobId]]">
+                        LOGS:
+                        <template is="dom-repeat" items="{{logItems}}" as="logItem">
+                            <div>
+                                [[removeUnderscore(logItem.action)]] <span class="error" hidden$="[[!logItem.error]]">[[logItem.error]]</span>
+                            </div>
+                        </template>
+                    </p>
+                    <div hidden$="[[jobId]]">
+                        <p hidden$="[[failed]]">
+                            Agent installation status: [[monitoringState(resource, monitoring)]]
                         </p>
-
+                        <!-- installation failed-->
+                        <p class="error" hidden$="[[!failed]]">
+                            Installation of the monitoring agent failed.
+                        </p>
+                    </div>
+                    <div hidden$="[[!waitingData]]">
+                        <p>Waiting for data</p>
+                    </div>
+                </div>
+                <div hidden$="[[!isMonitored]]">
+                    <!-- monitoring is not activated -->
+                    <div hidden$="[[isActivated]]">
                         <!-- machine has NO keys: manual installation -->
                         <div hidden$="[[!isManual]]">
                             Mist.io can not install the monitoring agent automatically, beacause there are no associated keys with this machine.
@@ -150,16 +168,13 @@
 
               <!-- we can request monitoring button -->
                 <div hidden$="[[isMonitored]]">
-                    <paper-button class="blue" on-tap="toggleMonitoring">Enable Monitoring</paper-button>
+                    <paper-button class="blue" on-tap="toggleMonitoring" disabled="{{showLogs}}">Enable Monitoring</paper-button>
                 </div>
 
 
                 <!-- the machine is considered monitored -->
                 <div hidden$="[[!isMonitored]]" class="monitored">
                     <!-- instalation succeeded but is not yet activated ie. we have no data yet-->
-                    <div hidden$="[[!waitingData]]">
-                        <p>Waiting for data</p>
-                    </div>
                   <paper-button class="red" on-tap="toggleMonitoring" hidden$="[[isActivated]]">Disable Monitoring</paper-button>
               </div>
 
@@ -177,14 +192,21 @@
         <iron-ajax id="monitoringRequest" url="/api/v1/clouds/[[resource.cloud.id]]/machines/[[resource.id]]/monitoring" method="POST" on-response="_monitoringResponse" on-error="_monitoringError" on-request="_monitoringRequest" handle-as="xml"></iron-ajax>
 
         <iron-ajax
-          id="disassociateMetric"
-          handle-as="xml"
-          method="DELETE"
-          contentType="application/json"
-          loading="{{loadingMetrics}}"
-          on-response="_handleAssociateResponse"
-          on-error="_handleAssociateError">
+            id="disassociateMetric"
+            handle-as="xml"
+            method="DELETE"
+            contentType="application/json"
+            loading="{{loadingMetrics}}"
+            on-response="_handleAssociateResponse"
+            on-error="_handleAssociateError">
         </iron-ajax>
+
+        <iron-ajax 
+            id="getJobLog" method="GET"  
+            url="/api/v1/jobs/[[jobId]]" 
+            handle-as="json" 
+            on-response="handleGetJobLog" 
+            on-error="handleGetJobLogError"></iron-ajax>
 
      </template>
 </dom-module>
@@ -219,7 +241,7 @@
             },
             isActivated: {
                 type: Boolean,
-                computed: '_computeIsActivated(resource, monitoring.monitored_machines.*, isInPage)'
+                computed: '_computeIsActivated(resource, monitoring.monitored_machines.*, hidden)'
             },
             script: {
                 type: String,
@@ -247,18 +269,34 @@
                 type: Boolean,
                 value: true
             },
-            isInPage: {
+            hidden: {
                 type: Boolean,
                 value: false
             },
             machineKeys:{
               type:Array,
               value:[]
+            },
+            jobId: {
+                type: String,
+                value: false
+            },
+            logItems: {
+                type: Array,
+                value: []
+            },
+            intervalID: String,
+            showLogs: {
+                type: Boolean,
+                computed: 'computeShowLogs(jobId, isMonitored, isActivated)',
+                value: false
             }
         },
 
         observers: [
-            '_reset(resource.id)'
+            '_reset(resource.id)',
+            '_jobIdChanged(jobId)',
+            'stopPolling(logItems)'
         ],
         listeners: {
             'update-dashboard' : '_forwardEvent',
@@ -269,7 +307,7 @@
 
         },
         attached: function(){
-            // this.fire('monitor-attached', {cloud:this.resource.cloud.id, machine:this.resource.id})
+
         },
         detached: function () {
         },
@@ -292,7 +330,7 @@
             if (!this.resource || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || !this.monitoring.monitored_machines[resource.uuid].installation_status){
                 return false;
             }
-            else if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == 'succeeded' && !this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at > 0){
+            else if (this.monitoring.monitored_machines[resource.uuid].installation_status.state == 'succeeded' && (!this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at > 0 || !this.monitoring.monitored_machines[resource.uuid].installation_status.finished_at > 0)){
                 return true;
             }
             else
@@ -349,8 +387,52 @@
 
             //in case of enabling we get the script response
             var response = YAML.parse(e.detail.xhr.response);
-            console.log('we have job id?', response["job_id"])
+            if (response["job_id"]) {
+                this.set('jobId', response["job_id"]);
+            }
+        },
+        handleGetJobLog: function(e){
+            console.log('handleGetJobLog',e);
+            this.set('logItems', e.detail.response.logs)
+        },
+        handleGetJobLogError: function(e){
 
+        },
+        _jobIdChanged: function(jobid){
+            if (!jobid) {
+                this.resetPolling();
+            }
+            else {
+                this.startPolling(jobid);
+            }
+        },
+        startPolling: function(jobid){
+            this.intervalID = window.setInterval(function() {
+                    console.log('we set setInterval');
+                    this.$.getJobLog.generateRequest();
+                }.bind(this), 1000);
+
+            console.log('startpolling');
+        },
+        stopPolling: function(logItems){
+            if (this.logItems && this.logItems.length > 0 ){
+                if (this.logItems[this.logItems.length-1].action.endsWith('deploy_collectd_finished')){
+                    this.resetPolling();
+                }
+            }
+        },
+        computeShowLogs: function(jobId, isMonitored, isActivated){
+            console.log(jobId, isMonitored, isActivated)
+            return this.jobId || (this.isMonitored && !this.isActivated);
+        },
+        removeUnderscore: function(action){
+            return action.replace(/_/g, " ");
+        },
+        resetPolling: function(){
+            this.set('jobId', false);
+            this.set('logItems', []);
+            window.clearInterval(this.intervalID);
+            this.set('intervalID', false);
         },
         _monitoringError: function(e){
             console.log("_monitoringError",e.detail.request.xhr.responseText);
@@ -373,9 +455,9 @@
               return "";
             }
         },
-        _computeIsActivated(resource, monitoring, isInPage){
+        _computeIsActivated(resource, monitoring, hidden){
             this.set("failed", false);
-            if (!isInPage || !this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || (!this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at && !this.waitingData))
+            if (this.hidden || !this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || (!this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at && !this.waitingData))
                 return false;
             else
                 return true;
