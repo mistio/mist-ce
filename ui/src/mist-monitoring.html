@@ -48,7 +48,7 @@
             }
             paper-button.red {
                 background-color: #d96557 !important;
-            }            
+            }
             .head {
                 margin-top: 0;
             }
@@ -138,7 +138,7 @@
                     <!-- monitoring is activated. we expect to have data -->
                     <template is="dom-if" if="[[isActivated]]" restamp>
                         <polyana-dashboard uri$="[[_computeDashboardUri(resource)]]" datasources="[[datasources]]"></polyana-dashboard>
-                        <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]"></add-panel>
+                        <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]" machine-keys="[[machineKeys]]"></add-panel>
                     </template>
                 </div>
 
@@ -238,6 +238,10 @@
             isInPage: {
                 type: Boolean,
                 value: false
+            },
+            machineKeys:{
+              type:Array,
+              value:[]
             }
         },
 
@@ -254,8 +258,7 @@
         attached: function(){
             // this.fire('monitor-attached', {cloud:this.resource.cloud.id, machine:this.resource.id})
         },
-        dettached: function () {
-
+        detached: function () {
         },
         _forwardEvent: function(e){
             document.addEventListener('update-dashboard', function(e) {
@@ -269,7 +272,7 @@
         _computeIsMonitored: function(resource, monitoring){
           if (this.resource && this.monitoring && this.monitoring.monitored_machines[resource.uuid])
             return true;
-          else 
+          else
             return false;
         },
         _computeIsRunning: function(resource) {
@@ -311,7 +314,6 @@
             this.$.monitoringRequest.headers["Csrf-Token"] = CSRF_TOKEN;
             this.$.monitoringRequest.params = payload;
             this.$.monitoringRequest.generateRequest();
-
             this.set("failed", false);
         },
         _monitoringDisableConfirmation: function(e){

@@ -371,20 +371,21 @@
                 </paper-material>
             </div>
             <paper-material id="monitoringBlock" class="info-card">
-                <mist-monitoring 
+                <mist-monitoring
                     id="mistMonitoring"
-                    resource="[[machine]]" 
-                    monitoring="[[model.monitoring]]" 
-                    section="[[section]]" 
+                    resource="[[machine]]"
+                    monitoring="[[model.monitoring]]"
+                    section="[[section]]"
                     datasources="[[datasources]]"
-                    is-in-page="[[isInPage]]"></mist-monitoring>
-                <mist-rules 
+                    is-in-page="[[isInPage]]"
+                    machine-keys="[[machineKeys]]"></mist-monitoring>
+                <mist-rules
                     id="monitoringRules"
-                    builtin-metrics="[[model.monitoring.builtin_metrics]]" 
-                    incidents="[[model.incidentsArray]]" 
-                    rules="[[model.monitoring.rules]]" 
-                    resource="[[machine]]" 
-                    user-email="[[model.user.email]]" 
+                    builtin-metrics="[[model.monitoring.builtin_metrics]]"
+                    incidents="[[model.incidentsArray]]"
+                    rules="[[model.monitoring.rules]]"
+                    resource="[[machine]]"
+                    user-email="[[model.user.email]]"
                     hidden$="{{!isActivated}}"></mist-rules>
             </paper-material>
             <paper-material class="info-card">
@@ -441,18 +442,18 @@
             </paper-material>
         </div>
         <dialog-element id="machinedialog"></dialog-element>
-        <iron-ajax  id="machineDeleteAjaxRequest" 
-                    url="/api/v1/machines/[[machine.id]]" 
-                    method="DELETE" 
-                    on-response="_handleMachineDeleteAjaxResponse" 
+        <iron-ajax  id="machineDeleteAjaxRequest"
+                    url="/api/v1/machines/[[machine.id]]"
+                    method="DELETE"
+                    on-response="_handleMachineDeleteAjaxResponse"
                     on-error="_handleMachineDeleteAjaxError"></iron-ajax>
 
-        <iron-ajax  id="disassociateKeyRequest" 
-                    url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]" 
-                    method="DELETE" 
-                    on-response="_disassociateKeyResponse" 
-                    on-error="_disassociateKeyError" 
-                    on-request="_disassociateKeyRequest" 
+        <iron-ajax  id="disassociateKeyRequest"
+                    url="/api/v1/clouds/[[machine.cloud.id]]/machines/[[machine.id]]/keys/[[disassociateKeyId]]"
+                    method="DELETE"
+                    on-response="_disassociateKeyResponse"
+                    on-error="_disassociateKeyError"
+                    on-request="_disassociateKeyRequest"
                     handle-as="xml"></iron-ajax>
 
         <machine-edit machine="[[machine]]"></machine-edit>
@@ -660,7 +661,6 @@ Polymer({
             "uri": "/api/v1/stats"
         }];
     },
-
     isInPageChanged: function(machine, isInPage){
         // console.log('machine', machine);
         // if (!this.machine)
@@ -677,11 +677,11 @@ Polymer({
         //         monitoringNode.datasources = this.datasources;
 
         //         Polymer.dom(parent).insertBefore(monitoringNode, this.$.monitoringRules);
-        //         // <mist-monitoring 
+        //         // <mist-monitoring
         //         //         id="mistMonitoring"
-        //         //         resource="[[machine]]" 
-        //         //         monitoring="[[model.monitoring]]" 
-        //         //         section="[[section]]" 
+        //         //         resource="[[machine]]"
+        //         //         monitoring="[[model.monitoring]]"
+        //         //         section="[[section]]"
         //         //         datasources="[[datasources]]"></mist-monitoring>
         //     }
         // }
@@ -746,6 +746,7 @@ Polymer({
                 return m[1] == this.machine.id && m[0] == this.machine.cloud.id;
             }, this)
         }, this);
+        console.log("machine-page",keys);
         return keys || [];
     },
     computeMachineIp: function(machineips) {
