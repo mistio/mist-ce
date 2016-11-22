@@ -414,15 +414,15 @@
                                     </template>
                                 </td>
                             </tr>
-                            <tr hidden$="[[!probeObj]]">
+                            <tr hidden$="[[!probeObj.users]]">
                                 <td>Users</td>
                                 <td>[[probeObj.users]]</td>
                             </tr>
-                            <tr hidden$="[[!probeObj]]">
+                            <tr hidden$="[[!probeObj.uptime]]">
                                 <td>Uptime</td>
                                 <td>[[probeObj.uptime]]</td>
                             </tr>
-                            <tr hidden$="[[!probeData]]">
+                            <tr hidden$="[[!probeObj.df]]">
                                 <td>Filesystem Info</td>
                                 <td>
                                     <div class="probe-df">
