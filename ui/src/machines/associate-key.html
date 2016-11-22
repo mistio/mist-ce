@@ -206,25 +206,20 @@ Polymer({
             return model.clouds[cloud].machines[machineid].extra.dns_name;
         } else {
             // if not ec2 it should have a public ip
-            try {
-                var ips_v4 = [];
-                model.clouds[cloud].machines[machineid].public_ips.forEach(function(ip) {
-                    if (ip.search(':') == -1) {
-                        // this is not an IPv6, so it is supported
-                        ips_v4.push(ip);
-                    }
-                });
-                model.clouds[cloud].machines[machineid].private_ips.forEach(function(ip) {
-                    if (ip.search(':') == -1) {
-                        // this is not an IPv6, so it is supported
-                        ips_v4.push(ip);
-                    }
-                });
-                console.log(ips_v4);
-                return ips_v4.length ? ips_v4[0]: '';
-            } catch (error) {
-                return null;
-            }
+            var ips_v4 = [];
+            model.clouds[cloud].machines[machineid].public_ips.forEach(function(ip) {
+                if (ip.search(':') == -1) {
+                    // this is not an IPv6, so it is supported
+                    ips_v4.push(ip);
+                }
+            });
+            model.clouds[cloud].machines[machineid].private_ips.forEach(function(ip) {
+                if (ip.search(':') == -1) {
+                    // this is not an IPv6, so it is supported
+                    ips_v4.push(ip);
+                }
+            });
+            return ips_v4.length ? ips_v4[0]: '';
         }
     },
     _associateKeyRequest: function(){
