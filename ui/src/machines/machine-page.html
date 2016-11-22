@@ -846,11 +846,12 @@ Polymer({
         document.querySelector('paper-toast#mist-toast').show({text: e.detail.request.xhr.responseText})
     },
     _machineActionConfirmation: function(e){
-        this.$.disassociateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-        this.$.disassociateKeyRequest.generateRequest();
+        if (e.detail.reason == "disassociate.key") {
+            this.$.disassociateKeyRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+            this.$.disassociateKeyRequest.generateRequest();
+        }
     },
     _updateKeyLoader: function(e) {
-        //console.log(e.detail);
         if (e.detail.request) {
             this.set('isPendingKeyRequest', true);
         } else if (e.detail.response) {
