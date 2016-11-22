@@ -115,35 +115,37 @@
                         </p>
                     </div>
                 </div>
-                <div class="logs" hidden$="[[!showLogs]]">
-                    <p hidden$="[[!jobId]]">
-                        LOGS:
-                        <template is="dom-repeat" items="{{logItems}}" as="logItem">
-                            <div>
-                                [[removeUnderscore(logItem.action)]] <span class="error" hidden$="[[!logItem.error]]">[[logItem.error]]</span>
-                            </div>
-                        </template>
-                    </p>
-                    <div hidden$="[[jobId]]">
-                        <p hidden$="[[failed]]">
-                            Agent installation status: [[monitoringState(resource, monitoring)]]
+                <div hidden$="[[isManual]]">
+                    <div class="logs" hidden$="[[!showLogs]]">
+                        <p hidden$="[[!jobId]]">
+                            LOGS:
+                            <template is="dom-repeat" items="{{logItems}}" as="logItem">
+                                <div>
+                                    [[removeUnderscore(logItem.action)]] <span class="error" hidden$="[[!logItem.error]]">[[logItem.error]]</span>
+                                </div>
+                            </template>
                         </p>
-                        <!-- installation failed-->
-                        <p class="error" hidden$="[[!failed]]">
-                            Installation of the monitoring agent failed.
-                        </p>
-                    </div>
-                    <div hidden$="[[!waitingData]]">
-                        <p>Waiting for data</p>
+                        <div hidden$="[[jobId]]">
+                            <p hidden$="[[failed]]">
+                                Agent installation status: [[monitoringState(resource, monitoring)]]
+                            </p>
+                            <!-- installation failed-->
+                            <p class="error" hidden$="[[!failed]]">
+                                Installation of the monitoring agent failed.
+                            </p>
+                        </div>
+                        <div hidden$="[[!waitingData]]">
+                            <p>Waiting for data</p>
+                        </div>
                     </div>
                 </div>
                 <div hidden$="[[!isMonitored]]">
                     <!-- monitoring is not activated -->
                     <div hidden$="[[isActivated]]">
                         <!-- machine has NO keys: manual installation -->
-                        <div hidden$="[[!isManual]]">
+                        <p hidden$="[[!isManual]]">
                             Mist.io can not install the monitoring agent automatically, beacause there are no associated keys with this machine.
-                        </div>
+                        </p>
                         <!-- always show script -->
                         <div>
                             You can install the agent manually by running the following command with ssh.
@@ -262,7 +264,7 @@
             },
             isManual: {
                 type: Boolean,
-                computed: '_computeIsManual(resource.keys.*, monitoring.monitored_machines.*)',
+                computed: '_computeIsManual(isMonitored, resource, monitoring.monitored_machines.*)',
                 value: true
             },
             failed: {
@@ -416,8 +418,8 @@
         },
         stopPolling: function(logItems){
             if (this.logItems && this.logItems.length > 0 ){
-                if (this.logItems[this.logItems.length-1].action.endsWith('deploy_collectd_finished') && this.logItems[this.logItems.length-1].finished_at>0){
-                    this.resetPolling(this.logItems[this.logItems.length-1].error);
+                if (this.logItems[this.logItems.length-1].action.endsWith('deploy_collectd_finished')){
+                    this.resetPolling();
                 }
             }
         },
@@ -477,8 +479,9 @@
             else
                 return false;
         },
-        _computeIsManual: function(resource, monitoring){
-            if (!this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || !this.monitoring.monitored_machines[resource.uuid].installation_status.manual)
+        _computeIsManual: function(isMonitored, resource, monitoring){
+            console.log(this.resource);
+            if (!this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[this.resource.uuid] || !this.monitoring.monitored_machines[this.resource.uuid].installation_status.manual)
                 return false;
             else
                 return true;
