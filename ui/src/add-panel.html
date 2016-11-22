@@ -48,7 +48,7 @@
             padding: 0 24px;
           }
           div > h2 {
-            padding: 24px 0; 
+            padding: 24px 0;
           }
           .errormsg-container {
             color: var(--red-color);
@@ -94,6 +94,10 @@
           #customButton {
             width: 100%;
           }
+          .sshKey-false{
+            opacity: 0.32
+          }
+
         </style>
 
         <paper-button on-tap="openDialog" class="add-button"><iron-icon icon="icons:add-circle"></iron-icon></iron-icon> Add Graph</paper-button>
@@ -101,7 +105,7 @@
             <h2>Select target for graph</h2>
             <paper-dialog-scrollable>
                 <paper-menu class="main">
-                    <paper-button id="customButton" on-tap="_showMe" class="blue">Custom</paper-button>
+                    <paper-button id="customButton" on-tap="_showCustomGraphDialog" class="blue">Custom</paper-button>
                 </paper-menu>
                 <div class="loader" hidden$="{{!loadingMetrics}}">Loading custom server metrics <br/>
                     <paper-spinner active="{{loadingMetrics}}"></paper-spinner>
@@ -112,17 +116,21 @@
         <paper-dialog id="customOptions" with-backdrop>
           <h2>Custom graph</h2>
           <paper-dialog-scrollable>
-            <div>
-                <paper-input id="name" value="{{metric.name}}" label="Name" placeholder="e.g my metric"></paper-input>
-                <paper-input id="unit" value="{{metric.unit}}" label="Unit" placeholder="e.g bytes (optional)"></paper-input>
+            <div id="sshKeyMissing" hidden="{{sshKeyExists}}">
+              <span>You need to have an associated SSH key to add custom graphs</span>
+              <paper-button id="addKey" on-tap="_openAddKeyPanel">Add Key</paper-button>
             </div>
             <div>
-                <h2>Python script</h2>
-                <juicy-ace-editor id="juicyScript" value="{{metricScript}}"></juicy-ace-editor>
+                <paper-input id="name" value="{{metric.name}}" label="Name" placeholder="e.g my metric" disabled$="[[!sshKeyExists]]"></paper-input>
+                <paper-input id="unit" value="{{metric.unit}}" label="Unit" placeholder="e.g bytes (optional)" disabled$="[[!sshKeyExists]]"></paper-input>
             </div>
             <div>
-                <h2>Advance settings</h2>
-                <paper-checkbox id="derivative">Calculate derivative</paper-checkbox>
+                <h2 class$="sshKey-[[sshKeyExists]]">Python script</h2>
+                <juicy-ace-editor id="juicyScript" value="{{metricScript}}" hidden$=[[!sshKeyExists]]></juicy-ace-editor>
+            </div>
+            <div>
+                <h2 class$="sshKey-[[sshKeyExists]]">Advance settings</h2>
+                <paper-checkbox id="derivative" disabled$="[[!sshKeyExists]]">Calculate derivative</paper-checkbox>
             </div>
           </paper-dialog-scrollable>
           <div class="progress">
@@ -137,14 +145,14 @@
           </div>
         </paper-dialog>
 
-        <iron-ajax id="postCustomgraph" url="[[uri]]"  handle-as="xml" method="POST" contentType="application/json" on-response="_customgraphResponse" on-error="_handleError"></iron-ajax>        
+        <iron-ajax id="postCustomgraph" url="[[uri]]"  handle-as="xml" method="POST" contentType="application/json" on-response="_customgraphResponse" on-error="_handleError"></iron-ajax>
         <iron-ajax
-          id="associateMetric"          
+          id="associateMetric"
           handle-as="xml"
-          method="PUT" 
+          method="PUT"
           contentType="application/json"
           loading="{{loadingMetrics}}"
-          on-response="_handleAssociateResponse" 
+          on-response="_handleAssociateResponse"
           on-error="_handleAssociateError">
         </iron-ajax>
         <iron-ajax
@@ -195,6 +203,15 @@
                 formError: {
                     type: Boolean,
                     value: false
+                },
+                machineKeys:{
+                  type:Array,
+                  value:[]
+                },
+                sshKeyExists:{
+                  type:Boolean,
+                  computed: "computeSshKeyExists(machineKeys)",
+                  value:true
                 },
                 uri:String,
                 metric: {
@@ -280,10 +297,18 @@
                 this.set('responseMetrics',output);
                 this._createMenus(output,null);
             },
-            _showMe: function(){
+            _showCustomGraphDialog: function(){
               var dialog = this.querySelector('#customOptions');
               dialog.open();
               this.querySelector('#juicyScript').value=this.metric.script;
+            },
+            computeSshKeyExists:function(keys){
+              return keys.length > 0;
+            },
+            _openAddKeyPanel:function(){
+              this.querySelector('#customOptions').close();
+              this.querySelector('#selectTarget').close();
+              this.fire("open-and-select");
             },
             _createMenus: function(input,parent){
               if(parent==null){
@@ -298,7 +323,7 @@
                 var sub=document.createElement('paper-submenu');
                 var item=document.createElement('paper-item');
                 Polymer.dom(item).textContent=i;
-                // TODO 
+                // TODO
                 // item.disabled = this.checkIfInGraph(i);
                 sub.id=i;
                 Polymer.dom(sub.querySelector('div')).appendChild(item);
