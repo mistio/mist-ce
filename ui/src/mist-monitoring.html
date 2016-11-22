@@ -357,7 +357,7 @@
                 payload.public_ips = this.resource.public_ips ? this.resource.public_ips : [];
                 payload.name = this.resource.name ? this.resource.name : this.resource.uuid;
                 payload.dns_name = this.resource.extra.dns_name ? this.resource.extra.dns_name : "n/a";
-                payload.no_ssh = !this.resource.keys && !this.resource.keys.length ? "true" : "";
+                payload.no_ssh = !this.resource.keys || this.resource.keys.length == 0 ? "true" : "";
             console.log("toggleMonitoring",payload);
             this.$.monitoringRequest.headers["Csrf-Token"] = CSRF_TOKEN;
             this.$.monitoringRequest.params = payload;
@@ -416,8 +416,8 @@
         },
         stopPolling: function(logItems){
             if (this.logItems && this.logItems.length > 0 ){
-                if (this.logItems[this.logItems.length-1].action.endsWith('deploy_collectd_finished')){
-                    this.resetPolling();
+                if (this.logItems[this.logItems.length-1].action.endsWith('deploy_collectd_finished') && this.logItems[this.logItems.length-1].finished_at>0){
+                    this.resetPolling(this.logItems[this.logItems.length-1].error);
                 }
             }
         },
@@ -428,9 +428,11 @@
         removeUnderscore: function(action){
             return action.replace(/_/g, " ");
         },
-        resetPolling: function(){
+        resetPolling: function(error){
+            if (!error) {
+                this.set('logItems', []);
+            }
             this.set('jobId', false);
-            this.set('logItems', []);
             window.clearInterval(this.intervalID);
             this.set('intervalID', false);
         },
