@@ -290,7 +290,7 @@
             intervalID: String,
             showLogs: {
                 type: Boolean,
-                computed: 'computeShowLogs(jobId, isMonitored, isActivated)',
+                computed: 'computeShowLogs(jobId, isManual, isMonitored, isActivated)',
                 value: false
             }
         },
@@ -423,9 +423,9 @@
                 }
             }
         },
-        computeShowLogs: function(jobId, isMonitored, isActivated){
-            console.log(jobId, isMonitored, isActivated)
-            return this.jobId || (this.isMonitored && !this.isActivated);
+        computeShowLogs: function(jobId, isManual, isMonitored, isActivated){
+            console.log("computeShowLogs", this.resource.id, jobId, isMonitored, isActivated)
+            return this.isManual && this.isMonitored && !this.isActivated;
         },
         removeUnderscore: function(action){
             return action.replace(/_/g, " ");
