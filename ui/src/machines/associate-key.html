@@ -176,17 +176,18 @@ Polymer({
 
         var items = this.items.slice(0);
         console.log('associateKey', this.items);
-
+        var that=this;
         var run = function(el, model) {
             var item = items.shift(),
                 itemType = item.split(':')[0],
                 itemCloud = item.split(':')[1],
                 itemId = item.split(':')[2],
-                machineHost = model.clouds[itemCloud].machines[itemId].public_ips ? model.clouds[itemCloud].machines[itemId].public_ips[0] : '',
+                //machineHost = model.clouds[itemCloud].machines[itemId].public_ips ? model.clouds[itemCloud].machines[itemId].public_ips[0] : '',
+                machineHost = that.getHost(model,itemCloud,itemId);
                 uri = "/api/v1/clouds/" + itemCloud + "/machines/" + itemId + "/keys/" + keyId;
 
             console.log('machineHost', machineHost, model.clouds[itemCloud].machines[itemId]);
-
+            console.log("MODEL",model);
             request.url = uri;
             request.headers["Content-Type"] = 'application/json';
             request.headers["Csrf-Token"] = CSRF_TOKEN;
@@ -198,6 +199,33 @@ Polymer({
             }
         }
         run(this, this.computeModel());
+    },
+    getHost: function(model,cloud,machineid){
+        if (model.clouds[cloud].machines[machineid].extra && model.clouds[cloud].machines[machineid].extra.dns_name) {
+            // it is an ec2 machine so it has dns_name
+            return model.clouds[cloud].machines[machineid].extra.dns_name;
+        } else {
+            // if not ec2 it should have a public ip
+            try {
+                var ips_v4 = [];
+                model.clouds[cloud].machines[machineid].public_ips.forEach(function(ip) {
+                    if (ip.search(':') == -1) {
+                        // this is not an IPv6, so it is supported
+                        ips_v4.push(ip);
+                    }
+                });
+                model.clouds[cloud].machines[machineid].private_ips.forEach(function(ip) {
+                    if (ip.search(':') == -1) {
+                        // this is not an IPv6, so it is supported
+                        ips_v4.push(ip);
+                    }
+                });
+                console.log(ips_v4);
+                return ips_v4.length ? ips_v4[0]: '';
+            } catch (error) {
+                return null;
+            }
+        }
     },
     _associateKeyRequest: function(){
         this.fire('pending-key-request', {request: true, keyId: this.selectedKeyId});
