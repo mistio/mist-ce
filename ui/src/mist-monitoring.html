@@ -306,7 +306,8 @@
             'delete-panel': '_disassociateMetric'
         },
         ready: function(){
-
+            //initialise each for every resource
+            this.set('jobId', '');
         },
         attached: function(){
 
@@ -425,7 +426,7 @@
         },
         computeShowLogs: function(jobId, isManual, isMonitored, isActivated){
             console.log("computeShowLogs", this.resource.id, this.jobId, this.isMonitored, this.isActivated)
-            return this.jobId && this.isMonitored && !this.isActivated;
+            return (this.isMonitored && !this.isActivated) && this.jobId;
         },
         removeUnderscore: function(action){
             return action.replace(/_/g, " ");
