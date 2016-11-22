@@ -371,12 +371,13 @@
                 </paper-material>
             </div>
             <paper-material id="monitoringBlock" class="info-card">
-                <!-- <mist-monitoring 
+                <mist-monitoring 
                     id="mistMonitoring"
                     resource="[[machine]]" 
                     monitoring="[[model.monitoring]]" 
                     section="[[section]]" 
-                    datasources="[[datasources]]"></mist-monitoring> -->
+                    datasources="[[datasources]]"
+                    is-in-page="[[isInPage]]"></mist-monitoring>
                 <mist-rules 
                     id="monitoringRules"
                     builtin-metrics="[[model.monitoring.builtin_metrics]]" 
@@ -661,36 +662,36 @@ Polymer({
     },
 
     isInPageChanged: function(machine, isInPage){
-        console.log('machine', machine);
-        if (!this.machine)
-            return;
+        // console.log('machine', machine);
+        // if (!this.machine)
+        //     return;
 
-        var parent = this.$.monitoringBlock;
-        if (this.isInPage == true ) {
-            if (!this.querySelector('#mistMonitoring')) {
-                var monitoringNode = document.createElement('mist-monitoring');
-                monitoringNode.id = "mistMonitoring";
-                monitoringNode.resource = this.machine;
-                monitoringNode.monitoring = this.model.monitoring;
-                monitoringNode.section = this.section;
-                monitoringNode.datasources = this.datasources;
+        // var parent = this.$.monitoringBlock;
+        // if (this.isInPage == true ) {
+        //     if (!this.querySelector('#mistMonitoring')) {
+        //         var monitoringNode = document.createElement('mist-monitoring');
+        //         monitoringNode.id = "mistMonitoring";
+        //         monitoringNode.resource = this.machine;
+        //         monitoringNode.set('monitoring',this.model.monitoring);
+        //         monitoringNode.section = this.section;
+        //         monitoringNode.datasources = this.datasources;
 
-                Polymer.dom(parent).insertBefore(monitoringNode, this.$.monitoringRules);
-                // <mist-monitoring 
-                //         id="mistMonitoring"
-                //         resource="[[machine]]" 
-                //         monitoring="[[model.monitoring]]" 
-                //         section="[[section]]" 
-                //         datasources="[[datasources]]"></mist-monitoring>
-            }
-        }
-        else {
-            console.log('delete ', this.querySelector('#mistMonitoring'))
-            if (this.querySelector('#mistMonitoring')){
-                Polymer.dom(parent).removeChild(this.querySelector('#mistMonitoring'));
-            }
-        }
-        Polymer.dom.flush()
+        //         Polymer.dom(parent).insertBefore(monitoringNode, this.$.monitoringRules);
+        //         // <mist-monitoring 
+        //         //         id="mistMonitoring"
+        //         //         resource="[[machine]]" 
+        //         //         monitoring="[[model.monitoring]]" 
+        //         //         section="[[section]]" 
+        //         //         datasources="[[datasources]]"></mist-monitoring>
+        //     }
+        // }
+        // else {
+        //     console.log('delete ', this.querySelector('#mistMonitoring'))
+        //     if (this.querySelector('#mistMonitoring')){
+        //         Polymer.dom(parent).removeChild(this.querySelector('#mistMonitoring'));
+        //     }
+        // }
+        // Polymer.dom.flush()
     },
 
     _computeActions: function(item) {
@@ -769,7 +770,7 @@ Polymer({
             this.set('isMonitored', false);
         }
     },
-    _computeIsActivated: function(machine, monitoring){
+    _computeIsActivated: function(machine, monitoring, isInPage){
         // if (!this.machine || this.model.monitoring || !this.model.monitoring.monitored_machines || !this.model.monitoring.monitored_machines[machine.uuid] || !this.model.monitoring.monitored_machines[machine.uuid].installation_status.activated_at)
         //     return false;
         // else

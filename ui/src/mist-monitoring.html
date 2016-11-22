@@ -2,6 +2,7 @@
 <link rel="import" href="../bower_components/paper-styles/typography.html">
 <link rel="import" href="../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/polyana-dashboard/polyana-dashboard.html">
@@ -14,8 +15,11 @@
 <dom-module id="mist-monitoring">
     <template>
         <style include="shared-styles">
-          .monitoringArea {
+            .monitoringArea {
                 padding: 24px;
+            }
+            h2 {
+                margin: 4px;
             }
             .console {
                 background-color: #444;
@@ -33,12 +37,15 @@
             .errormsg-container iron-icon {
                 color: inherit;
             }
+            polyana-dashboard {
+                overflow: hidden;
+            }
             paper-button {
                 margin: 24px 0 0 0;
             }
             paper-button.red {
                 background-color: #d96557 !important;
-            }
+            }            
             .head {
                 margin-top: 0;
             }
@@ -50,14 +57,20 @@
                 display: block;
                 clear: both;
             }
-            .waitingfordata-false {
-                position: absolute;
-                top: 0;
-                right: 0;
-                margin: 3px;
+            .monitoring-menu {
+                align-self: center;
+                margin-right: 8px;
+            }
+            paper-icon-button ::content iron-icon {
+                color: inherit;
             }
         </style>
-        <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
+        <div class="monitoring-head horizontal layout" style$="color:#fff;background-color: [[section.color]];" >
+            <h2 class="flex">Monitoring</h2>
+            <div class="monitoring-menu">
+                <paper-icon-button icon="icons:more-vert"></paper-icon-button>
+            </div>
+        </div>
         <div class="monitoringArea">
             <!-- the machine is running -->
             <div hidden$="[[!isRunning]]">
@@ -123,7 +136,7 @@
                     <div hidden$="[[!waitingData]]">
                         <p>Waiting for data</p>
                     </div>
-                  <paper-button class$="red waitingfordata-[[waitingData]]" on-tap="toggleMonitoring">Disable Monitoring</paper-button>
+                  <paper-button class="red" on-tap="toggleMonitoring">Disable Monitoring</paper-button>
               </div>
 
             </div>
@@ -170,7 +183,7 @@
             },
             isActivated: {
                 type: Boolean,
-                computed: '_computeIsActivated(resource, monitoring.monitored_machines.*)'
+                computed: '_computeIsActivated(resource, monitoring.monitored_machines.*, isInPage)'
             },
             script: {
                 type: String,
@@ -198,6 +211,10 @@
                 type: Boolean,
                 value: false
             },
+            isInPage: {
+                type: Boolean,
+                value: false
+            }
         },
 
         observers: [
@@ -265,6 +282,12 @@
             this.$.monitoringRequest.params = payload;
             this.$.monitoringRequest.generateRequest();
 
+            //dynamical insertion breaks binding, we need to update monitoring 
+            var that = this;
+            this.async(function(){
+                that.set('monitoring', document.querySelector("mist-app").model.monitoring);
+            },100)
+
             this.set("failed", false);
         },
         _monitoringRequest: function(e){
@@ -306,9 +329,9 @@
               return "";
             }
         },
-        _computeIsActivated(resource, monitoring){
+        _computeIsActivated(resource, monitoring, isInPage){
             this.set("failed", false);
-            if (!this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || (!this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at && !this.waitingData))
+            if (!isInPage || !this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || (!this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at && !this.waitingData))
                 return false;
             else
                 return true;
