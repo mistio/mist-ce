@@ -39,11 +39,6 @@
             paper-button.red {
                 background-color: #d96557 !important;
             }
-            add-panel {
-                position: absolute;
-                right: 8px;
-                top: 0;
-            }
             .head {
                 margin-top: 0;
             }
@@ -55,7 +50,12 @@
                 display: block;
                 clear: both;
             }
-            panelAdded
+            .waitingfordata-false {
+                position: absolute;
+                top: 0;
+                right: 0;
+                margin: 3px;
+            }
         </style>
         <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
         <div class="monitoringArea">
@@ -102,8 +102,8 @@
                     </div>
                     <!-- monitoring is activated. we expect to have data -->
                     <template is="dom-if" if="[[isActivated]]" restamp>
-                        <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]"></add-panel>
                         <polyana-dashboard uri$="[[_computeDashboardUri(resource)]]" datasources="[[datasources]]"></polyana-dashboard>
+                        <add-panel machine-id="[[resource.id]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]"></add-panel>
                     </template>
                 </div>
 
@@ -123,7 +123,7 @@
                     <div hidden$="[[!waitingData]]">
                         <p>Waiting for data</p>
                     </div>
-                  <paper-button class="red" on-tap="toggleMonitoring">Disable Monitoring</paper-button>
+                  <paper-button class$="red waitingfordata-[[waitingData]]" on-tap="toggleMonitoring">Disable Monitoring</paper-button>
               </div>
 
             </div>

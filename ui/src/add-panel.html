@@ -15,9 +15,8 @@
         <style is="custom-style" include="forms"></style>
         <style is="custom-style" include="shared-styles">
           :host {
-            display: inline-block;
+            display: block;
             position: relative;
-            color: #fff;
           }
           #selectTarget {
             position: absolute !important;
@@ -59,10 +58,15 @@
             color: inherit;
           }
           .add-button {
-            margin-bottom: 16px;
+            background-color: #f1f1f1;
+            float: right;
+            display: block;
+            text-align: right;
+            margin-top: 4px;
           }
           .add-button iron-icon {
             color: inherit;
+            opacity: 0.32;
           }
           paper-dialog-scrollable {
             padding: 0 !important;
@@ -94,7 +98,7 @@
         </style>
 
         <paper-button on-tap="openDialog" class="add-button"><iron-icon icon="icons:add-circle"></iron-icon></iron-icon> Add Graph</paper-button>
-        <paper-dialog id="selectTarget" horizontal-align="right" vertical-align="top">
+        <paper-dialog id="selectTarget" horizontal-align="right" vertical-align="bottom">
             <h2>Select target for graph</h2>
             <paper-dialog-scrollable>
                 <paper-menu class="main">
