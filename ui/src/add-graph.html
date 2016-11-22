@@ -243,7 +243,9 @@
                 this.set('sendingData', false);
                 this.set('formError', false);
                 console.log("CUSTOM GRAPH",data.detail.response);
-                this.fire('panelAdded',data.detail.response.metric_id);
+                this.fire('update-dashboard');
+                this.$.customOptions.close();
+                this.$.selectTarget.close();
             },
             _handleError: function(e,d) {
                 this.set('sendingData', false);

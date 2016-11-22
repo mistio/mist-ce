@@ -417,14 +417,27 @@
         },
         _disassociateMetric: function(e){
             console.log(e);
-            var metric = e.detail.metric;
-            var payload = {
-              metric_id: metric
-            };
-            this.$.disassociateMetric.url = "/api/v1/clouds/"+this.resource.cloud.id+"/machines/"+this.resource.id+"/metrics";
-            this.$.disassociateMetric.headers["Csrf-Token"] = CSRF_TOKEN;
-            this.$.disassociateMetric.params = payload;
-            this.$.disassociateMetric.generateRequest();
+            var targets = e.detail.panel.panel.targets;
+
+            targets.forEach(function(target){
+                if (target.target.startsWith("mist.python")){
+                    this.$.disassociateMetric.url = "/api/v1/clouds/"+this.resource.cloud.id+"/machines/"+this.resource.id+"/plugins/" + target.target;
+                    this.$.disassociateMetric.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.disassociateMetric.params = {plugin_type: "python"};
+                    this.$.disassociateMetric.generateRequest();
+                };
+
+                var payload = {
+                  metric_id: target.target
+                };
+                this.$.disassociateMetric.url = "/api/v1/clouds/"+this.resource.cloud.id+"/machines/"+this.resource.id+"/metrics";
+                this.$.disassociateMetric.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.disassociateMetric.params = payload;
+                this.$.disassociateMetric.generateRequest();
+            }, this);
         },
+        _handleAssociateResponse: function(target){
+            this.querySelector('polyana-dashboard')._updateDashboard();
+        }
     });
 </script>
