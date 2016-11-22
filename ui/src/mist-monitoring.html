@@ -8,7 +8,7 @@
 <link rel="import" href="../bower_components/polyana-dashboard/polyana-dashboard.html">
 
 <link rel="import" href="helpers/dialog-element.html">
-<link rel="import" href="add-panel.html">
+<link rel="import" href="add-graph.html">
 
 <script src="../bower_components/yaml.js/dist/yaml.min.js"></script>
 
@@ -140,7 +140,7 @@
                     <!-- monitoring is activated. we expect to have data -->
                     <template is="dom-if" if="[[isActivated]]" restamp>
                         <polyana-dashboard uri$="[[_computeDashboardUri(resource)]]" datasources="[[datasources]]"></polyana-dashboard>
-                        <add-panel machine="[[resource]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]" machine-keys="[[machineKeys]]"></add-panel>
+                        <add-graph machine="[[resource]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]" machine-keys="[[machineKeys]]"></add-graph>
                     </template>
                 </div>
 
