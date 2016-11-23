@@ -86,6 +86,9 @@
                 border-radius: 3px;
                 margin-bottom: 24px;
             }
+            paper-spinner {
+                margin-top: 16px;
+            }
         </style>
         <div class="monitoring-head horizontal layout" style$="color:#fff;background-color: [[section.color]];" >
             <h2 class="flex">Monitoring</h2>
@@ -118,20 +121,23 @@
                 <div hidden$="[[isManual]]">
                     <div class="logs" hidden$="[[!showLogs]]">
                         <p hidden$="[[!jobId]]">
-                            LOGS:
+                            LOGS <br/>
                             <template is="dom-repeat" items="{{logItems}}" as="logItem">
                                 <div>
                                     [[removeUnderscore(logItem.action)]] <span class="error" hidden$="[[!logItem.error]]">[[logItem.error]]</span>
                                 </div>
                             </template>
+                            <paper-spinner active="[[!isActivated]]"></paper-spinner>
                         </p>
                         <div hidden$="[[jobId]]">
                             <p hidden$="[[failed]]">
-                                Agent installation status: [[monitoringState(resource, monitoring)]]
+                                Agent installation status: [[monitoringState(resource, monitoring)]] <br/>
+                                [[monitoring.installation_status.error_msg]]
                             </p>
                             <!-- installation failed-->
                             <p class="error" hidden$="[[!failed]]">
                                 Installation of the monitoring agent failed.
+                                [[monitoring.installation_status.error_msg]]
                             </p>
                         </div>
                         <div hidden$="[[!waitingData]]">
@@ -192,6 +198,18 @@
         <dialog-element id="monitorindialog"></dialog-element>
 
         <iron-ajax id="monitoringRequest" url="/api/v1/clouds/[[resource.cloud.id]]/machines/[[resource.id]]/monitoring" method="POST" on-response="_monitoringResponse" on-error="_monitoringError" on-request="_monitoringRequest" handle-as="xml"></iron-ajax>
+
+        <!-- http://localhost/api/v1/clouds/0c4aeed5107e47179da1a4ad1e2f652e/machines/e36ce02992b1cd109e14696e05542b0315602ae361678e57d94a9c402c84d642/stats -->
+        <iron-ajax
+            id="getStats"
+            url= "/api/v1/clouds/[[resource.cloud.id]]/machines/[[resource.id]]/stats"
+            handle-as="xml"
+            method="GET"
+            contentType="application/json"
+            loading="{{loadingStats}}"
+            on-response="_handleStatsResponse"
+            on-error="_handleStatsError">
+        </iron-ajax>
 
         <iron-ajax
             id="disassociateMetric"
@@ -287,6 +305,7 @@
                 type: Array
             },
             intervalID: String,
+            intervalMonitoringID: String,
             showLogs: {
                 type: Boolean,
                 computed: 'computeShowLogs(jobId, isMonitored, isActivated)',
@@ -298,6 +317,7 @@
             '_reset(resource.id)',
             '_jobIdChanged(jobId)',
             'stopPolling(logItems)',
+            'getStats(isMonitored, isManual, waitingData, isActivated)',
             'clearJobID(resource.uuid)'
         ],
         listeners: {
@@ -528,6 +548,30 @@
         clearJobID: function(resource){
             // clear job when navigating away
             this.set('jobId', false);
-        }
+        },
+        getStats: function(isMonitored, isManual, waitingData, isActivated) {
+            if (this.isMonitored && this.isManual && !this.isActivated) {
+                if (!this.get('intervalMonitoringID'))
+                    this.monitoringPolling();
+            }
+            else {
+                console.log('stopGetStats');
+                this.stopGetStats();
+            }
+        },
+        monitoringPolling: function(){
+            console.log('started monitoringPolling')
+            this.intervalMonitoringID = window.setInterval(function() {
+                this.$.getStats.generateRequest();
+                console.log('monitoringPolling');
+            }.bind(this), 5000);
+
+            console.log('interval id', this.intervalMonitoringID);
+        },
+        stopGetStats: function(){
+            window.clearInterval(setInterval, this.get('intervalMonitoringID'));
+            this.set('intervalMonitoringID', false);
+            console.log('clearInterval');
+        },
     });
 </script>
