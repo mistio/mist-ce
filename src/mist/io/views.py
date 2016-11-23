@@ -320,7 +320,7 @@ def add_cloud(request):
     rlist = [cloud]
     # Need to take into account both the newly added cloud and its VMs.
     rlist.extend(list(Machine.objects(cloud=cloud)))
-    update_rbac_mapping(auth_context, rlist)
+    update_rbac_mapping(auth_context.owner, rlist)
 
     trigger_session_update(owner, ['clouds'])
     return ret
@@ -354,7 +354,7 @@ def delete_cloud(request):
     rlist = [cloud]
     # Need to take into account both the cloud and its VMs.
     rlist.extend(list(Machine.objects(cloud=cloud)))
-    remove_rbac_mapping(auth_context, rlist)
+    remove_rbac_mapping(auth_context.owner, rlist)
 
     trigger_session_update(auth_context.owner, ['clouds'])
     return OK
@@ -532,7 +532,7 @@ def add_key(request):
     assoc_machines = transform_key_machine_associations(machines, key)
 
     # SEC
-    update_rbac_mapping(auth_context, key)
+    update_rbac_mapping(auth_context.owner, key)
 
     trigger_session_update(auth_context.owner, ['keys'])
     return {'id': key.id,
@@ -573,7 +573,7 @@ def delete_key(request):
     auth_context.check_perm('key', 'remove', key.id)
     methods.delete_key(auth_context.owner, key_id)
     # SEC
-    remove_rbac_mapping(auth_context, key)
+    remove_rbac_mapping(auth_context.owner, key)
 
     trigger_session_update(auth_context.owner, ['keys'])
     return OK
@@ -1144,12 +1144,9 @@ def create_machine(request):
               'cronjob': cronjob,
               'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
     if not async:
-        ret = methods.create_machine(auth_context, *args, **kwargs)
+        ret = methods.create_machine(auth_context.owner, *args, **kwargs)
     else:
-        # NOTE: The AuthContext needs to be passed into create_machine in order
-        # for the RBAC Mappings to be updated even when machine creation takes
-        # place asynchronously.
-        args = (auth_context.serialize(), ) + args
+        args = (auth_context.owner.id, ) + args
         kwargs.update({'quantity': quantity, 'persist': persist})
         tasks.create_machine_async.apply_async(args, kwargs, countdown=2)
         ret = {'job_id': job_id}
