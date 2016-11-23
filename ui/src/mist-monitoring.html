@@ -551,7 +551,7 @@
         },
         getStats: function(isMonitored, isManual, waitingData, isActivated) {
             if (this.isMonitored && this.isManual && !this.isActivated) {
-                if (!this.get('intervalMonitoringID'))
+                if (!this.intervalMonitoringID)
                     this.monitoringPolling();
             }
             else {
@@ -569,7 +569,7 @@
             console.log('interval id', this.intervalMonitoringID);
         },
         stopGetStats: function(){
-            window.clearInterval(setInterval, this.get('intervalMonitoringID'));
+            window.clearInterval(this.get('intervalMonitoringID'));
             this.set('intervalMonitoringID', false);
             console.log('clearInterval');
         },
