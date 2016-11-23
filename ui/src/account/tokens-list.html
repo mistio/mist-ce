@@ -95,8 +95,8 @@
 
                     <paper-input id="tokenName" value="{{newToken.name::input}}" label="Token Name"></paper-input>
 
-                    <paper-dropdown-menu label="Expires After">
-                         <paper-menu id="tokenExpires" attr-for-selected="value" selected="{{newToken.ttl}}" class="dropdown-content">
+                    <paper-dropdown-menu id="tokenExpires" label="Expires After">
+                         <paper-menu attr-for-selected="value" selected="{{newToken.ttl}}" class="dropdown-content">
                             <paper-item value="0">Never</paper-item>
                             <paper-item value="86400">1 Day</paper-item>
                             <paper-item value="604800">1 Week</paper-item>
@@ -119,7 +119,7 @@
 
                     <div class="buttons">
                         <paper-button dialog-dismiss>Cancel</paper-button>
-                        <paper-button autofocus on-tap="createTokenSubmit" class="blue" disabled="[[!formReady]]">Create </paper-button>
+                        <paper-button id="Create" autofocus on-tap="createTokenSubmit" class="blue" disabled="[[!formReady]]">Create </paper-button>
                     </div>
                 </paper-dialog>
             </div>
