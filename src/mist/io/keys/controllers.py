@@ -6,27 +6,7 @@ from mist.io.exceptions import MachineUnauthorizedError
 log = logging.getLogger(__name__)
 
 
-class SignedSSHKeyController(BaseKeyController):
-
-    def construct_public_from_private(self):
-        """Constructs pub key from self.private and assigns to self.public.
-        Only works for RSA.
-
-        """
-        from Crypto import Random
-        Random.atfork()
-        if 'RSA' in self.key.private:
-            try:
-                key = RSA.importKey(self.key.private)
-                public = key.publickey().exportKey('OpenSSH')
-                self.key.public = public
-                return True
-            except:
-                pass
-        return False
-
-
-class SSHKeyController(SignedSSHKeyController):
+class SSHKeyController(BaseKeyController):
 
     def generate(self):
         """Generates a new RSA keypair and assigns to self."""

@@ -151,32 +151,33 @@ class SSHKey(Key):
 
     def clean(self):
         """Ensures that self is a valid RSA keypair."""
-        self.ctl.construct_public_from_private()
+
         from Crypto import Random
         Random.atfork()
-        message = 'Message 1234567890'
-        if self.public and 'ssh-rsa' in self.public:
-            public_key_container = RSA.importKey(self.public)
-            private_key_container = RSA.importKey(self.private)
-            encr_message = public_key_container.encrypt(message, 0)
-            decr_message = private_key_container.decrypt(encr_message)
-            if message == decr_message:
-                return True
-            raise me.ValidationError("Invalid RSA keypair")  # TODO is it ok?
+
+        if 'RSA' not in self.key.private:
+            raise me.ValidationError("Private key is not a valid RSA key.")
+
+        # Generate public key from private key file.
+        try:
+            key = RSA.importKey(self.private)
+            self.public = key.publickey().exportKey('OpenSSH')
+        except Exception as exc:
+            log.exception("Error while constructing public key "
+                          "from private.")
+            raise me.ValidationError("Private key is not a valid RSA key.")
 
 
 class SignedSSHKey(SSHKey):
     """An signed ssh key"""
     certificate = me.StringField(required=True)
 
-    _controller_cls = controllers.SignedSSHKeyController
+    _controller_cls = controllers.BaseKeyController
 
     def clean(self):
         """
         # Checks if certificate is specific ssh-rsa-cert
            and ensures that self is a valid RSA keypair."""
-        self.ctl.construct_public_from_private()
-
         super(SignedSSHKey, self).clean()
         if not self.certificate.startswith('ssh-rsa-cert-v01@openssh.com'):
-            raise BadRequestError("certificate is not valid")
+            raise BadRequestError("Certificate is not a valid signed RSA key.")

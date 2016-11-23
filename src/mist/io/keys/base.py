@@ -34,7 +34,7 @@ class BaseKeyController(object):
         # Check for invalid `kwargs` keys.
         errors = {}
         for key in kwargs.keys():
-            if key not in self.key._fields.keys():
+            if key not in self.key._key_specific_fields:
                 error = "Invalid parameter %s=%r." % (key, kwargs[key])
                 if fail_on_invalid_params:
                     errors[key] = error
