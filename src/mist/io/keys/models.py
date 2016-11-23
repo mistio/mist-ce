@@ -142,9 +142,6 @@ class Key(me.Document):
 
 class SSHKey(Key):
     """An ssh key."""
-    meta = {
-        'allow_inheritance': True,
-    }
 
     public = me.StringField(required=True)
     private = me.StringField(required=True)
@@ -154,6 +151,7 @@ class SSHKey(Key):
 
     def clean(self):
         """Ensures that self is a valid RSA keypair."""
+        self.ctl.construct_public_from_private()
         from Crypto import Random
         Random.atfork()
         message = 'Message 1234567890'
@@ -171,14 +169,14 @@ class SignedSSHKey(SSHKey):
     """An signed ssh key"""
     certificate = me.StringField(required=True)
 
-    _controller_cls = controllers.SSHKeyController
+    _controller_cls = controllers.SignedSSHKeyController
 
     def clean(self):
         """
         # Checks if certificate is specific ssh-rsa-cert
            and ensures that self is a valid RSA keypair."""
+        self.ctl.construct_public_from_private()
+
         super(SignedSSHKey, self).clean()
-        if (self.certificate and
-                not self.certificate.startswith('ssh-rsa-cert-v01@openssh.com'
-                                                )):
-            self.certificate = ''
+        if not self.certificate.startswith('ssh-rsa-cert-v01@openssh.com'):
+            raise BadRequestError("certificate is not valid")
