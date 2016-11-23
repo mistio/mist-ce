@@ -4,9 +4,11 @@
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
 <link rel="import" href="../bower_components/paper-menu/paper-submenu.html">
 <link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
-<link rel="import" href="../bower_components/juicy-ace-editor/juicy-ace-editor.html">
+<!-- <link rel="import" href="../bower_components/juicy-ace-editor/juicy-ace-editor.html"> -->
 <link rel="import" href="../bower_components/iron-behaviors/iron-control-state.html">
 <link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
@@ -29,9 +31,14 @@
             margin: 32px 0 0 0;
             width: 100%;
           }
-          #juicyScript {
+          paper-textarea#juicyScript {
             width: 500px;
-            height: 100px;
+          }
+          paper-textarea#juicyScript ::content paper-input-container #inner-editor {
+            font-family: monospace !important;
+          }
+          paper-textarea#juicyScript ::content .floated-label-placeholder {
+            display: none; 
           }
           paper-progress {
             width: 100%;
@@ -49,6 +56,9 @@
           }
           div > h2 {
             padding: 24px 0;
+          }
+          div > h2.textarea-h2 {
+            padding-bottom: 0; 
           }
           .errormsg-container {
             color: var(--red-color);
@@ -94,9 +104,6 @@
           #customButton {
             width: 100%;
           }
-          .sshKey-false{
-            opacity: 0.32
-          }
 
         </style>
 
@@ -125,8 +132,8 @@
                 <paper-input id="unit" value="{{metric.unit}}" label="Unit" placeholder="e.g bytes (optional)" disabled$="[[!sshKeyExists]]"></paper-input>
             </div>
             <div>
-                <h2 class$="sshKey-[[sshKeyExists]]">Python script</h2>
-                <juicy-ace-editor id="juicyScript" value="{{metricScript}}" hidden$=[[!sshKeyExists]]></juicy-ace-editor>
+                <h2 class$="sshKey-[[sshKeyExists]] textarea-h2">Python script</h2>
+                <paper-textarea id="juicyScript" value="{{metricScript}}" noLabelFloat hidden$=[[!sshKeyExists]]></paper-textarea>
             </div>
             <div>
                 <h2 class$="sshKey-[[sshKeyExists]]">Advance settings</h2>
@@ -235,7 +242,7 @@
               'panelAdded': '_associateMetric'
             },
             _scriptValue:function(e){
-              if(e.target.nodeName=="JUICY-ACE-EDITOR"){
+              if(e.target.id=="juicyScript"){
                 this.set("metric.script", e.target.value.trim());
               }
             },

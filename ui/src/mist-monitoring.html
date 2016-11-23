@@ -148,9 +148,9 @@
                             </div>
                         </div>
                     </div>
-                    <div hidden$="[[!isMonitored]]" class="isMonitored">
+                    <div class="isMonitored" hidden$="[[!isMonitored]]">
                         <!-- monitoring is not activated -->
-                        <div hidden$="[[isActivated]]" class="isActivated">
+                        <div class="isActivated" hidden$="[[isActivated]]">
                             <!-- machine has NO keys: manual installation -->
                             <p hidden$="[[!isManual]]">
                                 Mist.io can not install the monitoring agent automatically, beacause there are no associated keys with this machine.
@@ -179,13 +179,13 @@
                     </div>
 
                     <!-- we can request monitoring button -->
-                    <div hidden$="[[isMonitored]]" class="enableMonitoring">
+                    <div class="enableMonitoring" hidden$="[[isMonitored]]">
                         <paper-button class="blue" on-tap="toggleMonitoring" disabled="{{showLogs}}">Enable Monitoring</paper-button>
                     </div>
 
 
                     <!-- the machine is considered monitored -->
-                    <div hidden$="[[!isMonitored]]" class="monitored">
+                    <div class="monitored" hidden$="[[!isMonitored]]">
                         <!-- instalation succeeded but is not yet activated ie. we have no data yet-->
                         <paper-button class="red" on-tap="toggleMonitoring" hidden$="[[isActivated]]">Disable Monitoring</paper-button>
                     </div>
