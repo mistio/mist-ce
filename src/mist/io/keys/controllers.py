@@ -6,21 +6,10 @@ from mist.io.exceptions import MachineUnauthorizedError
 log = logging.getLogger(__name__)
 
 
-class SSHKeyController(BaseKeyController):
-
-    def _add__parse_key(self):
-        self.construct_public_from_private()
-
-    def generate(self):
-        """Generates a new RSA keypair and assigns to self."""
-        from Crypto import Random
-        Random.atfork()
-        key = RSA.generate(2048)
-        self.key.private = key.exportKey()
-        self.key.public = key.exportKey('OpenSSH')
+class SignedSSHKeyController(BaseKeyController):
 
     def construct_public_from_private(self):
-        """Constructs pub key from self.private and assignes to self.public.
+        """Constructs pub key from self.private and assigns to self.public.
         Only works for RSA.
 
         """
@@ -36,12 +25,29 @@ class SSHKeyController(BaseKeyController):
                 pass
         return False
 
+
+class SSHKeyController(SignedSSHKeyController):
+
+    def generate(self):
+        """Generates a new RSA keypair and assigns to self."""
+        from Crypto import Random
+        Random.atfork()
+        key = RSA.generate(2048)
+        self.key.private = key.exportKey()
+        self.key.public = key.exportKey('OpenSSH')
+
     def associate(self, machine, username='root', port=22):
-        super(SSHKeyController, self).associate(machine=machine,
+        super(SSHKeyController, self).associate(machine,
                                                 username=username,
                                                 port=port)
-        if machine.hostname:
-            self.deploy(machine=machine, username=username, port=port)
+
+        self.deploy(machine, username=username, port=port)
+
+    def disassociate(self, machine):
+        log.info("Undeploy key = %s" % machine.hostname)
+
+        self.undeploy(machine)
+        super(SSHKeyController, self).disassociate(machine)
 
     def deploy(self, machine, username=None, port=22):
         """"""
@@ -66,6 +72,7 @@ class SSHKeyController(BaseKeyController):
             ssh_command(self.key.owner, machine.cloud.id, machine.machine_id,
                         machine.hostname, command,
                         username=username, port=port)
+            log.info("Key associated and deployed successfully.")
         except MachineUnauthorizedError:
             # couldn't deploy key
             try:
@@ -81,18 +88,6 @@ class SSHKeyController(BaseKeyController):
                 raise MachineUnauthorizedError(
                     "Couldn't connect to deploy new SSH key."
                 )
-        else:
-            # deployment probably succeeded
-            # attempt to connect with new key
-            # if it fails to connect it'll raise exception
-            # there is no need to manually set the association
-            # in keypair.machines that is automatically handled by Shell,
-            # if it is configured by
-            # shell.autoconfigure (which ssh_command does)
-            ssh_command(self.key.owner, machine.cloud.id, machine.machine_id,
-                        machine.hostname, 'uptime', key_id=self.key.id,
-                        username=username, port=port)
-            log.info("Key associated and deployed successfully.")
 
     def undeploy(self, machine):
         log.info("Trying to actually remove key from authorized_keys.")
@@ -109,6 +104,3 @@ class SSHKeyController(BaseKeyController):
                         machine.machine_id, machine.hostname, command)
         except:
             pass
-
-    def _undeploy(self, machine):
-        self.undeploy(machine=machine)
