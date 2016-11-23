@@ -28,4 +28,3 @@ def tags_to_dict(tags):
             elif 'key' in tag:
                 tdict[tag['key']] = tag.get('value')
     return tdict
-
