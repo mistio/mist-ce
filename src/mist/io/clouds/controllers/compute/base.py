@@ -197,6 +197,9 @@ class BaseComputeController(BaseController):
                     extra[key] = str(val)
 
             machine.extra = extra
+            hostname = extra.get('dns_name', '') or (machine.public_ips[0] or
+                                                     machine.private_ips[0])
+            machine.hostname = hostname
 
             # Get machine tags from db
             tags = {tag.key: tag.value for tag in Tag.objects(
