@@ -2,7 +2,7 @@ import logging
 import mongoengine as me
 from mist.io.exceptions import KeyExistsError
 from mist.io.exceptions import BadRequestError
-from mist.io.clouds.utils import rename_kwargs
+from mist.io.helpers import rename_kwargs
 from mist.io.helpers import trigger_session_update
 
 log = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class BaseKeyController(object):
 
         """
         from mist.io.keys.models import Key
-        # TODO add specific func for specific key implementation
+
         rename_kwargs(kwargs, 'priv', 'private')
         # Check for invalid `kwargs` keys.
         errors = {}
@@ -47,23 +47,12 @@ class BaseKeyController(object):
                 'msg': "Invalid parameters %s." % errors.keys(),
                 'errors': errors,
             })
-        # FIXME is it necessary?
-        # Set fields to cloud model and perform early validation.
+
         for key, value in kwargs.iteritems():
             setattr(self.key, key, value)
 
-        self._add__parse_key()
-
         if not Key.objects(owner=self.key.owner, default=True):
             self.key.default = True
-            # Attempt to save.
-
-        try:
-            self.key.validate(clean=True)
-        except me.ValidationError as exc:
-            log.error("Error adding %s: %s", self.key.name, exc.to_dict())
-            raise BadRequestError({'msg': exc.message,
-                                   'errors': exc.to_dict()})
 
         try:
             self.key.save()
@@ -75,17 +64,7 @@ class BaseKeyController(object):
             log.error("Key %s not unique error: %s", self.key.name, exc)
             raise KeyExistsError()
         log.info("Added key with name '%s'", self.key.name)
-
-    def _add__parse_key(self):
-        """Preparse key to 'self.add'
-
-        This is called by 'self.add' when adding a new key, in order to
-        apply specific parsing. Any subclass that requires any special parsing,
-        SHOULD override this method.
-
-        Subclasses MAY override this method.
-        """
-        return
+        trigger_session_update(self.key.owner, ['keys'])
 
     def generate(self):
         raise NotImplementedError()
@@ -102,33 +81,30 @@ class BaseKeyController(object):
         log.info("Renamed key '%s' to '%s'.", self.key.name, name)
         trigger_session_update(self.key.owner, ['keys'])
 
-    def set_default(self, key_id):
+    def set_default(self):
         from mist.io.keys.models import Key
         """Set a new key as default key, given a key_id"""
 
-        log.info("Setting key with id '%s' as default.", key_id)
+        log.info("Setting key with id '%s' as default.", self.key.id)
 
         Key.objects(owner=self.key.owner, default=True).update(default=False)
-        Key.objects(owner=self.key.owner, id=key_id).update(default=True)
+        Key.objects(owner=self.key.owner, id=self.key.id).update(default=True)
 
-        log.info("Successfully set key with id '%s' as default.", key_id)
+        log.info("Successfully set key with id '%s' as default.", self.key.id)
         trigger_session_update(self.key.owner, ['keys'])
 
     def associate(self, machine, username='root', port=22):
-        """Associates a key with a machine.
+        """Associates a key with a machine."""
 
-            If host is set it will also attempt to actually deploy it to the
-            machine. To do that it requires another key (existing_key) that can
-            connect to the machine.
-        """
         from mist.io.machines.models import Machine, KeyAssociation
 
         log.info("Associating key %s to host %s", self.key.id,
                  machine.hostname)
 
-        if not machine.hostname:
-            log.info("Host not given so will only create association without "
-                     "actually deploying the key to the server.")
+        # check if key already associated, if not already associated,
+        # create the association.This is only needed if association doesn't
+        # exist. Associations will otherwise be
+        # created by shell.autoconfigure upon successful connection
 
         associated = False
         if Machine.objects(cloud=machine.cloud,
@@ -139,10 +115,6 @@ class BaseKeyController(object):
                         machine.cloud.id, machine.machine_id)
             associated = True
 
-        # check if key already associated, if not already associated,
-        # create the association.This is only needed if association doesn't
-        # exist. Associations will otherwise be
-        # created by shell.autoconfigure upon successful connection
         if isinstance(port, basestring):
             if port.isdigit():
                 port = int(port)
@@ -153,42 +125,21 @@ class BaseKeyController(object):
         elif isinstance(port, int):
             port = port
         else:
-            port = 22
+            port = 22  # FIXME maybe fail
 
-        if not machine.hostname:
-            if not associated:
-                # try:
-                #     machine = Machine.objects.get(cloud=cloud,
-                #                                   machine_id=machine.machine_id)
-                # except me.DoesNotExist:
-                #     machine = Machine(cloud=cloud,
-                #                       machine_id=machine.machine_id)
-
-                key_assoc = KeyAssociation(keypair=self.key, last_used=0,
-                                           ssh_user=username, sudo=False,
-                                           port=port)
-                machine.key_associations.append(key_assoc)
-                machine.save()
-                trigger_session_update(self.key.owner, ['keys'])
-            return
+        if not associated:
+            key_assoc = KeyAssociation(keypair=self.key, last_used=0,
+                                       ssh_user=username, sudo=False,
+                                       port=port)
+            machine.key_associations.append(key_assoc)
+            machine.save()
+            trigger_session_update(self.key.owner, ['keys'])
+        return
 
     def disassociate(self, machine):
         """Disassociates a key from a machine."""
-        from mist.io.machines.models import Machine
 
-        log.info("Disassociating key, undeploy = %s" % machine.hostname)
-
-        machine = Machine.objects.get(
-            cloud=machine.cloud,
-            key_associations__keypair__exact=self.key,
-            machine_id=machine.machine_id)
-        # key not associated
-        if not machine:
-            raise BadRequestError("Key '%s' is not associated with "
-                                  "machine '%s'" % (self.key.id,
-                                                    machine.machine_id))
-
-        self._undeploy(machine)
+        log.info("Disassociating key of machine '%s' " % machine.machine_id)
 
         # removing key association
         for assoc in machine.key_associations:
@@ -197,6 +148,3 @@ class BaseKeyController(object):
         machine.key_associations.remove(assoc)
         machine.save()
         trigger_session_update(self.key.owner, ['keys'])
-
-    def _undeploy(self, machine):
-        raise NotImplementedError("Undeploy implemented only for sshkeys")
