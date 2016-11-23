@@ -199,7 +199,7 @@ class BaseComputeController(BaseController):
             machine.extra = extra
 
             if machine.extra.get('dns_name'):
-                machine.hostname= machine.extra['dns_name']
+                machine.hostname = machine.extra['dns_name']
             else:
                 for ip in machine.public_ips + machine.private_ips:
                     if ':' not in ip:
