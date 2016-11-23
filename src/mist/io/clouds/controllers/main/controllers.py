@@ -43,7 +43,7 @@ from mist.io.helpers import sanitize_host, check_host
 from mist.io.keys.models import Key
 from mist.core.vpn.methods import to_tunnel
 
-from mist.io.clouds.utils import rename_kwargs
+from mist.io.helpers import rename_kwargs
 from mist.io.clouds.controllers.main.base import BaseMainController
 from mist.io.clouds.controllers.compute import controllers as compute_ctls
 

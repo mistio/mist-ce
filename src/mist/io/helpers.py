@@ -556,3 +556,15 @@ def random_string(length=5, punc=False):
     _chars = string.letters + string.digits
     _chars += string.punctuation if punc else ''
     return ''.join(random.choice(_chars) for _ in range(length))
+
+
+def rename_kwargs(kwargs, old_key, new_key):
+    """Given a `kwargs` dict rename `old_key` to `new_key`"""
+    if old_key in kwargs:
+        if new_key not in kwargs:
+            log.warning("Got param '%s' when expecting '%s', transforming.",
+                        old_key, new_key)
+            kwargs[new_key] = kwargs.pop(old_key)
+        else:
+            log.warning("Got both param '%s' and '%s', will not transform.",
+                        old_key, new_key)

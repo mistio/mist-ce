@@ -26,7 +26,7 @@ from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.io.clouds.controllers.compute.base import BaseComputeController
-from mist.io.clouds.utils import rename_kwargs
+from mist.io.helpers import rename_kwargs
 
 # from mist.core.cloud.models import Machine
 
