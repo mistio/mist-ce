@@ -653,13 +653,7 @@ Polymer({
         this.set('isPendingKeyRequest', false);
     },
     attached: function() {
-        this.datasources = [{
-            "id": 1,
-            "orgId": 1,
-            "name": "mist.monitor",
-            "type": "mist.monitor",
-            "uri": "/api/v1/stats"
-        }];
+
     },
     isInPageChanged: function(machine, isInPage){
         // console.log('machine', machine);
@@ -893,7 +887,7 @@ Polymer({
                  info += "Dirty COW vulnerability found. Update kernel.";
          }
          return info.length ? info : '';
-     },
+    },
     itemProbeClasses: function(item, probes) {
         if (!probes) {
             return false;
@@ -918,10 +912,11 @@ Polymer({
             }
         }
     },
-     _computeProbeObj: function (machine, probes){
-         if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid])
-             return this.model.probes[machine.uuid];
-     },
+    _computeProbeObj: function (machine, probes){
+        if (this.model && this.model.probes && this.model.probes[machine.uuid] && this.model.probes[machine.uuid])
+            return this.model.probes[machine.uuid];
+        return false;
+    },
     loadToColor: function(load, prefix){
         if (load > 1.2)
             return prefix+"high ";

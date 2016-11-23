@@ -90,111 +90,113 @@
                 margin-top: 16px;
             }
         </style>
-        <div class="monitoring-head horizontal layout" style$="color:#fff;background-color: [[section.color]];" >
-            <h2 class="flex">Monitoring</h2>
-            <div class="monitoring-menu" hidden="[[!isActivated]]">
-                <paper-menu-button id="monitoring-menu-wrapper" horizontal-align="right" vertical-align="top">
-                    <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
-                    <paper-menu id="monitoring-actions" class="dropdown-content">
-                        <paper-button id="disable" on-tap="_showDisableDialog" class="simple"> Disable  Monitoring </paper-button>
-                    </paper-menu>
-                </paper-menu-button>
+        <template is="dom-if" if="[[!resource.id]]" restamp>
+            <polyana-dashboard uri="/api/v1/dashboard" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+        </template>
+        <template is="dom-if" if="[[resource.id]]" restamp>
+            <div class="monitoring-head horizontal layout" style$="color:#fff;background-color: [[section.color]];" >
+                <h2 class="flex">Monitoring</h2>
+                <div class="monitoring-menu" hidden="[[!isActivated]]">
+                    <paper-menu-button id="monitoring-menu-wrapper" horizontal-align="right" vertical-align="top">
+                        <paper-icon-button icon="icons:more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu id="monitoring-actions" class="dropdown-content">
+                            <paper-button id="disable" on-tap="_showDisableDialog" class="simple">Disable  Monitoring </paper-button>
+                        </paper-menu>
+                    </paper-menu-button>
+                </div>
             </div>
-        </div>
-        <div class="monitoringArea">
-
-            <!-- the machine is running -->
-            <div hidden$="[[!isRunning]]">
-                <!-- the machine is considered monitored -->
-                <div hidden$="[[!isMonitored]]">
-                    <!-- monitoring is not activated -->
-                    <div hidden$="[[isActivated]]">
-                        <div hidden$="[[resourceMonitoringInfo.installation_status.activated_at]]">
-                            <h4 class="head"><strong>Monitoring is not yet activated</strong></h4>
-                        </div>
-                        <!-- machine has keys: automatic installation -->
-                        <p hidden$="[[isManual]]">
-                            When you enable monitoring Mist.io automatically installs the collectd monitoring agent and starts receiving data.
-                        </p>
-                    </div>
-                </div>
-                <div hidden$="[[isManual]]">
-                    <div class="logs" hidden$="[[!showLogs]]">
-                        <p hidden$="[[!jobId]]">
-                            LOGS <br/>
-                            <template is="dom-repeat" items="{{logItems}}" as="logItem">
-                                <div>
-                                    [[removeUnderscore(logItem.action)]] <span class="error" hidden$="[[!logItem.error]]">[[logItem.error]]</span>
-                                </div>
-                            </template>
-                            <paper-spinner active="[[!isActivated]]"></paper-spinner>
-                        </p>
-                        <div hidden$="[[jobId]]">
-                            <p hidden$="[[failed]]">
-                                Agent installation status: [[monitoringState(resource, monitoring)]] <br/>
-                                [[monitoring.installation_status.error_msg]]
-                            </p>
-                            <!-- installation failed-->
-                            <p class="error" hidden$="[[!failed]]">
-                                Installation of the monitoring agent failed.
-                                [[monitoring.installation_status.error_msg]]
-                            </p>
-                        </div>
-                        <div hidden$="[[!waitingData]]">
-                            <p>Waiting for data</p>
-                        </div>
-                    </div>
-                </div>
-                <div hidden$="[[!isMonitored]]">
-                    <!-- monitoring is not activated -->
-                    <div hidden$="[[isActivated]]">
-                        <!-- machine has NO keys: manual installation -->
-                        <p hidden$="[[!isManual]]">
-                            Mist.io can not install the monitoring agent automatically, beacause there are no associated keys with this machine.
-                        </p>
-                        <!-- always show script -->
-                        <div>
-                            You can install the agent manually by running the following command with ssh.
-                            <div class="console">
-                                <code id="monitoringscript">
-                                    [[script]]
-                                </code>
+            <div class="monitoringArea">
+                <!-- the machine is running -->
+                <div hidden$="[[!isRunning]]">
+                    <!-- the machine is considered monitored -->
+                    <div hidden$="[[!isMonitored]]">
+                        <!-- monitoring is not activated -->
+                        <div hidden$="[[isActivated]]">
+                            <div hidden$="[[resourceMonitoringInfo.installation_status.activated_at]]">
+                                <h4 class="head"><strong>Monitoring is not yet activated</strong></h4>
                             </div>
-                            <h4 class="tip"><strong>Tip:</strong> Alternatively you can disable monitoring, associate a key, and enable monitoring again, so Mist.io will automativally connect and install the monitoring agent.</h4>
+                            <!-- machine has keys: automatic installation -->
+                            <p hidden$="[[isManual]]">
+                                When you enable monitoring Mist.io automatically installs the collectd monitoring agent and starts receiving data.
+                            </p>
                         </div>
                     </div>
-                    <!-- monitoring is activated. we expect to have data -->
-                    <template is="dom-if" if="[[isActivated]]" restamp>
-                        <polyana-dashboard uri$="[[_computeDashboardUri(resource)]]" datasources="[[datasources]]"></polyana-dashboard>
-                        <add-graph machine="[[resource]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]" machine-keys="[[machineKeys]]"></add-graph>
-                    </template>
+                    <div hidden$="[[isManual]]">
+                        <div class="logs" hidden$="[[!showLogs]]">
+                            <p hidden$="[[!jobId]]">
+                                LOGS <br/>
+                                <template is="dom-repeat" items="{{logItems}}" as="logItem">
+                                    <div>
+                                        [[removeUnderscore(logItem.action)]] <span class="error" hidden$="[[!logItem.error]]">[[logItem.error]]</span>
+                                    </div>
+                                </template>
+                                <paper-spinner active="[[!isActivated]]"></paper-spinner>
+                            </p>
+                            <div hidden$="[[jobId]]">
+                                <p hidden$="[[failed]]">
+                                    Agent installation status: [[monitoringState(resource, monitoring)]] <br/>
+                                    [[monitoring.installation_status.error_msg]]
+                                </p>
+                                <!-- installation failed-->
+                                <p class="error" hidden$="[[!failed]]">
+                                    Installation of the monitoring agent failed.
+                                    [[monitoring.installation_status.error_msg]]
+                                </p>
+                            </div>
+                            <div hidden$="[[!waitingData]]">
+                                <p>Waiting for data</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div hidden$="[[!isMonitored]]" class="isMonitored">
+                        <!-- monitoring is not activated -->
+                        <div hidden$="[[isActivated]]" class="isActivated">
+                            <!-- machine has NO keys: manual installation -->
+                            <p hidden$="[[!isManual]]">
+                                Mist.io can not install the monitoring agent automatically, beacause there are no associated keys with this machine.
+                            </p>
+                            <!-- always show script -->
+                            <div>
+                                You can install the agent manually by running the following command with ssh.
+                                <div class="console">
+                                    <code id="monitoringscript">
+                                        [[script]]
+                                    </code>
+                                </div>
+                                <h4 class="tip"><strong>Tip:</strong> Alternatively you can disable monitoring, associate a key, and enable monitoring again, so Mist.io will automativally connect and install the monitoring agent.</h4>
+                            </div>
+                        </div>
+                        <!-- monitoring is activated. we expect to have data -->
+                        <template is="dom-if" if="[[isActivated]]" restamp>
+                            <polyana-dashboard uri$="[[_computeDashboardUri(resource)]]" datasources="[[datasources]]"></polyana-dashboard>
+                            <add-graph machine="[[resource]]" cloud-id="[[resource.cloud.id]]" dashboard="[[dashboard]]" machine-keys="[[machineKeys]]"></add-graph>
+                        </template>
+
+                    </div>
+
+                    <div id="errormsgArea">
+                        <p class="errormsg-container" hidden$="[[!monitoringError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
+                    </div>
+
+                    <!-- we can request monitoring button -->
+                    <div hidden$="[[isMonitored]]" class="enableMonitoring">
+                        <paper-button class="blue" on-tap="toggleMonitoring" disabled="{{showLogs}}">Enable Monitoring</paper-button>
+                    </div>
+
+
+                    <!-- the machine is considered monitored -->
+                    <div hidden$="[[!isMonitored]]" class="monitored">
+                        <!-- instalation succeeded but is not yet activated ie. we have no data yet-->
+                        <paper-button class="red" on-tap="toggleMonitoring" hidden$="[[isActivated]]">Disable Monitoring</paper-button>
+                    </div>
                 </div>
-
-                <div id="errormsgArea">
-                    <p class="errormsg-container" hidden$="[[!monitoringError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
+                <!-- the machine cannot be monitored, it is not running -->
+                <div hidden$="[[isRunning]]">
+                    The machine is [[resource.state]]. It must be running to enable monitoring.<br/>
+                    <paper-button class="blue" on-tap="toggleMonitoring" disabled>enable Monitoring</paper-button>
                 </div>
-
-              <!-- we can request monitoring button -->
-                <div hidden$="[[isMonitored]]">
-                    <paper-button class="blue" on-tap="toggleMonitoring" disabled="{{showLogs}}">Enable Monitoring</paper-button>
-                </div>
-
-
-                <!-- the machine is considered monitored -->
-                <div hidden$="[[!isMonitored]]" class="monitored">
-                    <!-- instalation succeeded but is not yet activated ie. we have no data yet-->
-                  <paper-button class="red" on-tap="toggleMonitoring" hidden$="[[isActivated]]">Disable Monitoring</paper-button>
-              </div>
-
             </div>
-
-            <!-- the machine cannot be monitored, it is not running -->
-            <div hidden$="[[isRunning]]">
-                The machine is [[resource.state]]. It must be running to enable monitoring.<br/>
-                <paper-button class="blue" on-tap="toggleMonitoring" disabled>enable Monitoring</paper-button>
-            </div>
-        </div>
-
+        </template>
         <dialog-element id="monitorindialog"></dialog-element>
 
         <iron-ajax id="monitoringRequest" url="/api/v1/clouds/[[resource.cloud.id]]/machines/[[resource.id]]/monitoring" method="POST" on-response="_monitoringResponse" on-error="_monitoringError" on-request="_monitoringRequest" handle-as="xml"></iron-ajax>
@@ -221,11 +223,11 @@
             on-error="_handleAssociateError">
         </iron-ajax>
 
-        <iron-ajax 
-            id="getJobLog" method="GET"  
-            url="/api/v1/jobs/[[jobId]]" 
-            handle-as="json" 
-            on-response="handleGetJobLog" 
+        <iron-ajax
+            id="getJobLog" method="GET"
+            url="/api/v1/jobs/[[jobId]]"
+            handle-as="json"
+            on-response="handleGetJobLog"
             on-error="handleGetJobLogError"></iron-ajax>
 
      </template>
@@ -235,7 +237,10 @@
         is: 'mist-monitoring',
 
         properties: {
-            resource: Object, //currently machines only, later other resources too
+            resource: {
+                type: Object, //currently machines only, later other resources too
+                value: {id: false}
+            },
             monitoring: Object,
             section: Object,
             isRunning: {
@@ -310,6 +315,19 @@
                 type: Boolean,
                 computed: 'computeShowLogs(jobId, isMonitored, isActivated)',
                 value: false
+            },
+            datasources: {
+                type: Array,
+                value: [{
+                    "id": 1,
+                    "orgId": 1,
+                    "name": "mist.monitor",
+                    "type": "mist.monitor",
+                    "uri": "/api/v1/stats"
+                }]
+            },
+            replaceTargets: {
+                type: Object,
             }
         },
 
@@ -340,10 +358,16 @@
             return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/dashboard';
         },
         _computeIsMonitored: function(resource, monitoring){
-          if (this.resource && this.monitoring && this.monitoring.monitored_machines[resource.uuid])
-            return true;
-          else
-            return false;
+            if (this.resource && this.monitoring && this.monitoring.monitored_machines[this.resource.uuid])
+                return true;
+            else
+                return false;
+        },
+        _computeReplaceTargets: function(machines){
+            for (uuid in machines){
+                var m = machines[uuid]
+            }
+            return {'817a2276a74b47c98d803324ba9df410': 'yolo'}
         },
         _computeIsRunning: function(resource) {
             return this.resource && this.resource.state && this.resource.state == "running" ? true : false ;
@@ -459,7 +483,7 @@
         },
         _monitoringError: function(e){
             console.log("_monitoringError",e.detail.request.xhr.responseText);
-            this.$.errormsg.textContent = e.detail.request.xhr.responseText;
+            this.querySelector('#errormsg').textContent = e.detail.request.xhr.responseText;
             this.set("monitoringError", true);
         },
         _reset: function(resource){
