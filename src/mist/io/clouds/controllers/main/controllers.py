@@ -277,11 +277,15 @@ class LibvirtMainController(BaseMainController):
             fail_on_invalid_params=fail_on_invalid_params,
             add=True, **kwargs
         )
-        if self.cloud.key is not None:
-            from mist.io.methods import associate_key
-            associate_key(self.cloud.owner, self.cloud.key.id, self.cloud.id,
-                          self.cloud.host,  # hypervisor id is the hostname
-                          username=self.cloud.username, port=self.cloud.port)
+        # FIXME: Resolve cyclic dependency issues
+        from mist.io.machines.models import Machine
+        # FIXME: Don't use self.cloud.host as machine_id, this prevents us from
+        # changing the cloud's host.
+        # FIXME: Add type field to differentiate between actual vm's and the
+        # host.
+        machine = Machine(cloud=self.cloud, machine_id=self.cloud.host).save()
+        machine.ctl.associate_key(self.cloud.key, username=self.cloud.username,
+                                  port=self.cloud.port)
 
     def update(self, fail_on_error=True, fail_on_invalid_params=True,
                add=False, **kwargs):

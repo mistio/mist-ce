@@ -50,6 +50,6 @@ class MachineController(object):
         to destroy machine and delete XML conf"""
         return self.machine.cloud.ctl.compute.undefine_machine(self.machine)
 
-    def associate(self, key, username=None, port=22):
+    def associate_key(self, key, username=None, port=22, no_connect=False):
         """Associate an sshkey with a machine"""
         return key.ctl.associate(self.machine, username=username, port=port)

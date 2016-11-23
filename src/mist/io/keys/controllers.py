@@ -36,12 +36,13 @@ class SSHKeyController(SignedSSHKeyController):
         self.key.private = key.exportKey()
         self.key.public = key.exportKey('OpenSSH')
 
-    def associate(self, machine, username='root', port=22):
-        super(SSHKeyController, self).associate(machine,
-                                                username=username,
-                                                port=port)
+    def associate(self, machine, username='root', port=22, no_connect=False):
+        super(SSHKeyController, self).associate(machine, username=username,
+                                                port=port,
+                                                no_connect=no_connect)
 
-        self.deploy(machine, username=username, port=port)
+        if not no_connect:
+            self.deploy(machine, username=username, port=port)
 
     def disassociate(self, machine):
         log.info("Undeploy key = %s" % machine.hostname)
@@ -67,27 +68,25 @@ class SSHKeyController(SignedSSHKeyController):
         # FIXME
         from mist.io.methods import ssh_command
 
+        deploy_error = False
         try:
-            # deploy key
+            # Deploy key.
             ssh_command(self.key.owner, machine.cloud.id, machine.machine_id,
                         machine.hostname, command,
                         username=username, port=port)
             log.info("Key associated and deployed successfully.")
         except MachineUnauthorizedError:
-            # couldn't deploy key
-            try:
-                # maybe key was already deployed?
-                ssh_command(self.key.owner, machine.cloud.id,
-                            machine.machine_id, machine.hostname,
-                            'uptime', key_id=self.key.id,
-                            username=username, port=port)
-                log.info("Key was already deployed, "
-                         "local association created.")
-            except MachineUnauthorizedError:
-                # oh screw this
-                raise MachineUnauthorizedError(
-                    "Couldn't connect to deploy new SSH key."
-                )
+            # Couldn't deploy key, maybe key was already deployed?
+            deploy_error = True
+        try:
+            ssh_command(self.key.owner, machine.cloud.id, machine.machine_id,
+                        machine.hostname, 'uptime', key_id=self.key.id,
+                        username=username, port=port)
+        except MachineUnauthorizedError:
+            if deploy_error:
+                raise MachineUnauthorizedError("Couldn't connect to "
+                                               "deploy new SSH key.")
+            raise
 
     def undeploy(self, machine):
         log.info("Trying to actually remove key from authorized_keys.")

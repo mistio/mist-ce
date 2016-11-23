@@ -201,26 +201,6 @@ def delete_key(user, key_id):
     trigger_session_update(user, ['keys'])
 
 
-def associate_key(user, key_id, cloud_id, machine_id,
-                  host='', username=None, port=22):
-    """Associates a key with a machine.
-       This function exists only for call key.ctl.associate
-       for the cases of create machine, and add libvirt cloud.
-       Because we don't have the machine instance that we must
-       provide."""
-
-    key = Key.objects.get(owner=user, id=key_id)
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
-    try:
-        machine = Machine.objects.get(cloud=cloud,
-                                      machine_id=machine_id)
-    except me.DoesNotExist:
-        # TODO maybe machine.hostname=host
-        machine = Machine(cloud=cloud, machine_id=machine_id)
-
-    key.ctl.associate(machine, username=username, port=port)
-
-
 def connect_provider(cloud):
     """Establishes cloud connection using the credentials specified.
 
@@ -410,13 +390,10 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     else:
         raise BadRequestError("Provider unknown.")
 
-    if conn.type == Provider.AZURE and key_id:
-        key = Key.objects.get(owner=user, id=key_id)
-        # we have the username
-        associate_key(user, key_id, cloud_id, node.id,
-                      username=node.extra.get('username'), port=ssh_port )
-    elif key_id:
-        associate_key(user, key_id, cloud_id, node.id, port=ssh_port)
+    if key is not None
+        machine = Machine(cloud=cloud, machine_id=node.id).save()
+        username = node.extra.get('username', 'root')
+        machine.ctl.associate_key(key, username=username, port=ssh_port)
     # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
