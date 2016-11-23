@@ -281,16 +281,15 @@
             },
             jobId: {
                 type: String,
-                value: false
+
             },
             logItems: {
-                type: Array,
-                value: []
+                type: Array
             },
             intervalID: String,
             showLogs: {
                 type: Boolean,
-                computed: 'computeShowLogs(jobId, isManual, isMonitored, isActivated)',
+                computed: 'computeShowLogs(jobId, isMonitored, isActivated)',
                 value: false
             }
         },
@@ -298,7 +297,8 @@
         observers: [
             '_reset(resource.id)',
             '_jobIdChanged(jobId)',
-            'stopPolling(logItems)'
+            'stopPolling(logItems)',
+            'clearJobID(resource.uuid)'
         ],
         listeners: {
             'update-dashboard' : '_forwardEvent',
@@ -306,8 +306,7 @@
             'delete-panel': '_disassociateMetric'
         },
         ready: function(){
-            //initialise each for every resource
-            this.set('jobId', '');
+
         },
         attached: function(){
 
@@ -410,10 +409,9 @@
             }
         },
         startPolling: function(jobid){
-            this.intervalID = window.setInterval(function() {
-                    console.log('we set setInterval');
-                    this.$.getJobLog.generateRequest();
-                }.bind(this), 1000);
+            this.intervalID = setInterval(function() {
+                this.$.getJobLog.generateRequest();
+            }.bind(this), 1000);
 
             console.log('startpolling');
         },
@@ -424,9 +422,9 @@
                 }
             }
         },
-        computeShowLogs: function(jobId, isManual, isMonitored, isActivated){
-            console.log("computeShowLogs", this.resource.id, this.jobId, this.isMonitored, this.isActivated)
-            return (this.isMonitored && !this.isActivated) && this.jobId;
+        computeShowLogs: function(jobId, isMonitored, isActivated){
+            console.log("computeShowLogs", this.resource.id)
+            return (this.isMonitored && !this.isActivated) || this.jobId;
         },
         removeUnderscore: function(action){
             return action.replace(/_/g, " ");
@@ -526,6 +524,10 @@
         },
         _handleAssociateResponse: function(target){
             this.querySelector('polyana-dashboard')._updateDashboard();
+        },
+        clearJobID: function(resource){
+            // clear job when navigating away
+            this.set('jobId', false);
         }
     });
 </script>
