@@ -88,7 +88,8 @@ class BaseKeyController(object):
         log.info("Setting key with id '%s' as default.", self.key.id)
 
         Key.objects(owner=self.key.owner, default=True).update(default=False)
-        Key.objects(owner=self.key.owner, id=self.key.id).update(default=True)
+        self.key.default = True
+        self.key.save()
 
         log.info("Successfully set key with id '%s' as default.", self.key.id)
         trigger_session_update(self.key.owner, ['keys'])
@@ -125,7 +126,7 @@ class BaseKeyController(object):
         elif isinstance(port, int):
             port = port
         else:
-            port = 22  # FIXME maybe fail
+            raise BadRequestError("Invalid port type: %r" % port)
 
         if not associated:
             key_assoc = KeyAssociation(keypair=self.key, last_used=0,
