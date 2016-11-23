@@ -501,13 +501,9 @@ def add_key(request):
         raise RequiredParameterMissingError("Private key is not provided")
 
     if certificate:
-        keypair = SignedSSHKey.add(auth_context.owner, key_name, **params)
+        key = SignedSSHKey.add(auth_context.owner, key_name, **params)
     else:
-        keypair = SSHKey.add(auth_context.owner, key_name, **params)
-    # TODO here or inside add? But we must set owner
-    trigger_session_update(auth_context.owner, ['keys'])
-
-    key = Key.objects.get(owner=auth_context.owner, name=keypair.name)
+        key = SSHKey.add(auth_context.owner, key_name, **params)
 
     if key_tags:
         from mist.core.tag.methods import add_tags_to_resource
@@ -671,7 +667,7 @@ def set_default_key(request):
 
     auth_context.check_perm('key', 'edit', key.id)
 
-    key.ctl.set_default(key_id)
+    key.ctl.set_default()
     return OK
 
 
@@ -774,8 +770,6 @@ def associate_key(request):
       in: path
       required: true
       type: string
-    host:
-      type: string
     port:
       default: 22
       type: integer
@@ -792,22 +786,17 @@ def associate_key(request):
         ssh_port = int(request.json_body.get('port', 22))
     except:
         ssh_port = 22
-    try:
-        host = request.json_body.get('host')
-    except:
-        host = None
-    if not host:
-        raise RequiredParameterMissingError('host')
+
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
     key = Key.objects.get(owner=auth_context.owner, id=key_id)
     auth_context.check_perm('key', 'read_private', key.id)
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-        machine_uuid = machine.id
     except me.DoesNotExist:
-        machine_uuid = ""
-    auth_context.check_perm("machine", "associate_key", machine_uuid)
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
+
+    auth_context.check_perm("machine", "associate_key", machine.id)
 
     key.ctl.associate(machine, username=ssh_user, port=ssh_port)
     clouds = Cloud.objects(owner=auth_context.owner)
@@ -816,7 +805,7 @@ def associate_key(request):
 
     assoc_machines = transform_key_machine_associations(machines, key)
     # FIX filter machines based on auth_context
-    trigger_session_update(auth_context, ['keys'])
+    trigger_session_update(auth_context.owner, ['keys'])
     return assoc_machines
 
 
@@ -844,25 +833,18 @@ def disassociate_key(request):
       in: path
       required: true
       type: string
-    host:
-      type: string
     """
     key_id = request.matchdict['key']
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
-    try:
-        host = request.json_body.get('host')
-    except:
-        host = None
 
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-        machine_uuid = machine.id
     except me.DoesNotExist:
-        machine_uuid = ""
-    auth_context.check_perm("machine", "disassociate_key", machine_uuid)
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
+    auth_context.check_perm("machine", "disassociate_key", machine.id)
 
     key = Key.objects.get(owner=auth_context.owner, id=key_id)
     key.ctl.disassociate(machine)
