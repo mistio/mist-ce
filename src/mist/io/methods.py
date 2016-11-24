@@ -1486,7 +1486,11 @@ def list_networks(user, cloud_id):
            'private': [],
            'routers': []}
 
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    try:
+        cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+
     networks = cloud.ctl.network.list_networks()
 
     # TODO: Backwards-compatible network privacy detection, to be replaced
@@ -1501,11 +1505,14 @@ def list_networks(user, cloud_id):
 def list_subnets(user, cloud_id, for_network=None):
     """List subnets for a cloud.
     Currently EC2, Openstack and GCE clouds are supported. For other providers
-    this returns an empty list
+    this returns an empty list.
 
     """
 
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    try:
+        cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
     return cloud.ctl.network.list_subnets(for_network=for_network)
 
 
@@ -1546,7 +1553,7 @@ def associate_ip(user, cloud_id, network_id, ip, machine_id=None, assign=True):
     return conn.ex_associate_ip(ip, server=machine_id, assign=assign)
 
 
-def create_network(owner, cloud_id, network, subnet, router):
+def create_network(owner, cloud, network, subnet, router):
     """
     Creates a new network. If subnet dict is specified, after creating the network
     it will use the new network's id to create a subnet.
@@ -1555,7 +1562,7 @@ def create_network(owner, cloud_id, network, subnet, router):
 
     # TODO: Split this up after network, subnet and router creation are separated in the frontend
 
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+
     created_network = NETWORKS[cloud.ctl.provider].add(network.pop('name'),
                                                        cloud,
                                                        network.pop('description', ''),
@@ -1599,12 +1606,10 @@ def create_subnet(owner, cloud, network, subnet):
     return created_subnet.as_dict()
 
 
-def delete_network(owner, cloud_id, network_id):
+def delete_network(owner, network):
     """
     Delete a network.
     """
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
-    network = Network.objects.get(cloud=cloud, id=network_id)
     network.ctl.delete_network()
 
     # Schedule a UI update

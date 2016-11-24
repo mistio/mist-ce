@@ -1475,6 +1475,7 @@ def list_networks(request):
 
 
 @view_config(route_name='api_v1_subnets', request_method='GET', renderer='json')
+@view_config(route_name='api_v1_subnets_on_network', request_method='GET', renderer='json')
 def list_subnets(request):
     """
     List subnets of a cloud
@@ -1486,12 +1487,18 @@ def list_subnets(request):
       in: path
       required: true
       type: string
+    network_id:
+      in: path
+      required: false
+      description: If provided, only networks belonging ot this subnet will be returned
+      type: string
     """
 
     cloud_id = request.matchdict['cloud']
+    network_id = request.matchdict.get('network')
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
-    subnets = methods.list_subnets(auth_context.owner, cloud_id)
+    subnets = methods.list_subnets(auth_context.owner, cloud_id, for_network=network_id)
 
     return subnets
 
@@ -1529,11 +1536,17 @@ def create_network(request):
     router = request.json_body.get('router', None)
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "create_resources", cloud_id)
-    return methods.create_network(auth_context.owner, cloud_id,
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+
+    return methods.create_network(auth_context.owner, cloud,
                                   network, subnet, router)
 
 
-@view_config(route_name='api_v1_subnets', request_method='POST', renderer='json')
+@view_config(route_name='api_v1_subnets_on_network', request_method='POST', renderer='json')
 def create_subnet(request):
     """
     Create subnet on a given network on a cloud.
@@ -1545,22 +1558,21 @@ def create_subnet(request):
       description: The Cloud ID
       type: string
     network_id:
+      in: path
+      required: true
+      description: The ID of the Network that will contain the new subnet
       type: string
     subnet:
       required: true
       type: dict
     """
     cloud_id = request.matchdict['cloud']
-
-    try:
-        network_id = request.json_body.get('network_id')
-    except Exception as e:
-        raise RequiredParameterMissingError(e)
+    network_id = request.matchdict['network']
 
     try:
         subnet = request.json_body.get('subnet')
-    except Exception as e:
-        raise RequiredParameterMissingError(e)
+    except KeyError:
+        raise RequiredParameterMissingError('subnet')
 
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "create_resources", cloud_id)
@@ -1568,11 +1580,11 @@ def create_subnet(request):
     try:
         cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
     except Cloud.DoesNotExist:
-        raise NotFoundError('Cloud does not exist')
+        raise CloudNotFoundError
     try:
         network = Network.objects.get(id=network_id, cloud=cloud)
     except Network.DoesNotExist:
-        raise NotFoundError('Network does not exist')
+        raise NetworkNotFoundError
 
     return methods.create_subnet(auth_context.owner, cloud, network, subnet)
 
@@ -1598,7 +1610,17 @@ def delete_network(request):
 
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "create_resources", cloud_id)
-    methods.delete_network(auth_context.owner, cloud_id, network_id)
+
+    try:
+        cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+    try:
+        network = Network.objects.get(id=network_id, cloud=cloud)
+    except Network.DoesNotExist:
+        raise NetworkNotFoundError
+
+    methods.delete_network(auth_context.owner, network)
 
     return OK
 
@@ -1626,11 +1648,11 @@ def delete_subnet(request):
     try:
         cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
     except Cloud.DoesNotExist:
-        raise NotFoundError('Cloud does not exist')
+        raise CloudNotFoundError
     try:
         subnet = Subnet.objects.get(id=subnet_id, cloud=cloud)
-    except Network.DoesNotExist:
-        raise NotFoundError('Subnet does not exist')
+    except Subnet.DoesNotExist:
+        raise SubnetNotFoundError
 
     auth_context.check_perm("cloud", "create_resources", cloud_id)
     methods.delete_subnet(auth_context.owner, subnet)

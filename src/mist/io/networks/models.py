@@ -30,8 +30,6 @@ class Network(me.Document):
     network_id = me.StringField(required=True)
     title = me.StringField(required=True)
     cloud = me.ReferenceField(Cloud, required=True)
-    cidr = me.StringField()  # Cannot be required, some drivers do not provide it
-    gateway_ip = me.StringField()  # Cannot be required, some drivers do not provide it
     description = me.StringField()
 
     extra = me.DictField()
@@ -77,23 +75,6 @@ class Network(me.Document):
             network.ctl.create_network(**kwargs)
         return network
 
-    def update(self):
-        """Persists changes to a Network Object.
-        Performs validation and uniqueness tests.
-
-        Subclasses SHOULD NOT override or extend this method.
-
-        """
-        # Attempt to save.
-        try:
-            self.save()
-        except me.ValidationError as exc:
-            log.error("Error updating Network %s: %s", self.title, exc.to_dict())
-            raise mist.io.exceptions.NetworkCreationError(exc.message)
-        except me.NotUniqueError as exc:
-            log.error("Network %s not unique error: %s", self.title, exc)
-            raise mist.io.exceptions.NetworkExistsError()
-
     def as_dict(self):
         netdict = {'name': self.title,
                    'id': self.id,
@@ -122,12 +103,15 @@ class AmazonNetwork(Network):
     provider = 'ec2'
 
     state = me.StringField()
+    cidr = me.StringField()
 
 
 class GoogleNetwork(Network):
     provider = 'gce'
 
     mode = me.StringField()
+    cidr = me.StringField()
+    gateway_ip = me.StringField()
 
 
 class OpenStackNetwork(Network):
@@ -191,23 +175,6 @@ class Subnet(me.Document):
         if create_on_cloud:
             subnet.ctl.create_subnet(**kwargs)
         return subnet
-
-    def update(self):
-        """Persists changes to a Subnet Object.
-        Performs validation and uniqueness tests.
-
-        Subclasses SHOULD NOT override or extend this method.
-
-        """
-        # Attempt to save.
-        try:
-            self.save()
-        except me.ValidationError as exc:
-            log.error("Error updating Subnet %s: %s", self.title, exc.to_dict())
-            raise mist.io.exceptions.NetworkCreationError(exc.message)
-        except me.NotUniqueError as exc:
-            log.error("Subnet %s not unique error: %s", self.title, exc)
-            raise mist.io.exceptions.NetworkExistsError()
 
     def as_dict(self):
         netdict = {'name': self.title,

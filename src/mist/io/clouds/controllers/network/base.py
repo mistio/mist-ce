@@ -1,6 +1,8 @@
 import logging
 import ssl
 
+import mongoengine.errors
+
 import mist.io.exceptions
 from libcloud.common.types import InvalidCredsError
 from mist.io.clouds.controllers.base import BaseController
@@ -38,8 +40,18 @@ class BaseNetworkController(BaseController):
             raise mist.io.exceptions.NetworkCreationError("Got error %s" % str(e))
 
         self._create_network__parse_libcloud_object(network_doc, libcloud_network)
-        network_doc.update()
-        return network_doc.as_dict()
+
+        # Save the new network document
+        try:
+            network_doc.save()
+        except mongoengine.errors.ValidationError as exc:
+            log.error("Error updating Network %s: %s", network_doc.title, exc.to_dict())
+            raise mist.io.exceptions.NetworkCreationError(exc.message)
+        except mongoengine.errors.NotUniqueError as exc:
+            log.error("Network %s not unique error: %s", network_doc.title, exc)
+            raise mist.io.exceptions.NetworkExistsError()
+
+        return network_doc
 
     def _create_network__parse_args(self, network_doc, kwargs):
         return
@@ -59,9 +71,17 @@ class BaseNetworkController(BaseController):
             raise mist.io.exceptions.SubnetCreationError("Got error %s" % str(e))
 
         self._create_subnet__parse_libcloud_object(subnet_doc, libcloud_subnet)
-        subnet_doc.update()
 
-        return subnet_doc.as_dict()
+        try:
+            subnet_doc.save()
+        except mongoengine.errors.ValidationError as exc:
+            log.error("Error updating Subnet %s: %s", subnet_doc.title, exc.to_dict())
+            raise mist.io.exceptions.NetworkCreationError(exc.message)
+        except mongoengine.errors.NotUniqueError as exc:
+            log.error("Subnet %s not unique error: %s", subnet_doc.title, exc)
+            raise mist.io.exceptions.SubnetExistsError(exc.message)
+
+        return subnet_doc
 
     def _create_subnet__parse_args(self, subnet_args, parent_network):
         return
@@ -96,7 +116,16 @@ class BaseNetworkController(BaseController):
                                                           object_id=db_network.id,
                                                           create_on_cloud=False)
             self._create_network__parse_libcloud_object(network_doc, network)
-            network_doc.update()
+
+            # Save the new network document
+            try:
+                network_doc.save()
+            except mongoengine.errors.ValidationError as exc:
+                log.error("Error updating Network %s: %s", network_doc.title, exc.to_dict())
+                raise mist.io.exceptions.NetworkCreationError(exc.message)
+            except mongoengine.errors.NotUniqueError as exc:
+                log.error("Network %s not unique error: %s", network_doc.title, exc)
+                raise mist.io.exceptions.NetworkExistsError()
 
             # Syncing Subnets
             subnets_in_current_network = network_doc.ctl.list_subnets()
@@ -141,7 +170,14 @@ class BaseNetworkController(BaseController):
 
             self._create_subnet__parse_libcloud_object(subnet_doc, subnet)
             if subnet_doc.network:  # Do not persist this subnet without a parent network reference
-                subnet_doc.update()
+                try:
+                    subnet_doc.save()
+                except mongoengine.errors.ValidationError as exc:
+                    log.error("Error updating Subnet %s: %s", subnet_doc.title, exc.to_dict())
+                    raise mist.io.exceptions.NetworkCreationError(exc.message)
+                except mongoengine.errors.NotUniqueError as exc:
+                    log.error("Subnet %s not unique error: %s", subnet_doc.title, exc)
+                    raise mist.io.exceptions.SubnetExistsError(exc.message)
             subnet_listing.append(subnet_doc.as_dict())
 
         return subnet_listing
@@ -160,7 +196,10 @@ class BaseNetworkController(BaseController):
             subnet.ctl.delete_subnet()
 
         self._delete_network__parse_args(network, kwargs)
-        self.ctl.compute.connection.ex_delete_network(**kwargs)
+        try:
+            self.ctl.compute.connection.ex_delete_network(**kwargs)
+        except Exception as e:
+            raise mist.io.exceptions.NetworkDeletionError("Got error %s" % str(e))
         network.delete()
 
     def _delete_network__parse_args(self, network, kwargs):
@@ -171,7 +210,10 @@ class BaseNetworkController(BaseController):
         """Delete a Subnet."""
 
         self._delete_subnet__parse_args(subnet, kwargs)
-        self.ctl.compute.connection.ex_delete_subnet(**kwargs)
+        try:
+            self.ctl.compute.connection.ex_delete_subnet(**kwargs)
+        except Exception as e:
+            raise mist.io.exceptions.SubnetDeletionError("Got error %s" % str(e))
         subnet.delete()
 
     def _delete_subnet__parse_args(self, subnet, kwargs):

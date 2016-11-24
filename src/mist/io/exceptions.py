@@ -114,6 +114,10 @@ class NetworkNotFoundError(NotFoundError, KeyError):
     msg = "Network not found"
 
 
+class SubnetNotFoundError(NotFoundError, KeyError):
+    msg = "Subnet not found"
+
+
 class NetworkError(NotFoundError, KeyError):
     msg = "Error on network action"
 
@@ -172,10 +176,6 @@ class NetworkDeletionError(InternalServerError):
     msg = "Network deletion failed"
 
 
-class NetworkNotFound(NotFoundError):
-    msg = "Network not found"
-
-
 class NetworkExistsError(ConflictError):
     msg = "Network already exists"
 
@@ -186,10 +186,6 @@ class SubnetCreationError(InternalServerError):
 
 class SubnetDeletionError(InternalServerError):
     msg = "Subnet deletion failed"
-
-
-class SubnetNotFound(NotFoundError):
-    msg = "Subnet not found"
 
 
 class SubnetExistsError(ConflictError):

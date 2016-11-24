@@ -1,11 +1,13 @@
 import logging
 import time
 
+import mongoengine.errors
+
 from mist.io.clouds.controllers.network.base import BaseNetworkController, catch_common_exceptions
 from mist.io.clouds.utils import rename_kwargs
 import mist.io.exceptions
 
-from libcloud.common.google import ResourceInUseError
+from libcloud.common.google import ResourceInUseError, LibcloudError
 log = logging.getLogger(__name__)
 
 
@@ -110,7 +112,14 @@ class GoogleNetworkController(BaseNetworkController):
             raise mist.io.exceptions.SubnetCreationError("Got error %s" % str(e))
 
         self._create_subnet__parse_libcloud_object(subnet_doc, libcloud_subnet)
-        subnet_doc.save()
+        try:
+            subnet_doc.save()
+        except mongoengine.errors.ValidationError as exc:
+            log.error("Error updating Subnet %s: %s", subnet_doc.title, exc.to_dict())
+            raise mist.io.exceptions.NetworkCreationError(exc.message)
+        except mongoengine.errors.NotUniqueError as exc:
+            log.error("Subnet %s not unique error: %s", subnet_doc.title, exc)
+            raise mist.io.exceptions.SubnetExistsError(exc.message)
 
         return subnet_doc.as_dict()
 
@@ -145,7 +154,14 @@ class GoogleNetworkController(BaseNetworkController):
 
                 self._create_subnet__parse_libcloud_object(subnet_doc, subnet)
                 if subnet_doc.network:  # Do not persist this subnet without a parent network reference
-                    subnet_doc.save()
+                    try:
+                        subnet_doc.save()
+                    except mongoengine.errors.ValidationError as exc:
+                        log.error("Error updating Subnet %s: %s", subnet_doc.title, exc.to_dict())
+                        raise mist.io.exceptions.NetworkCreationError(exc.message)
+                    except mongoengine.errors.NotUniqueError as exc:
+                        log.error("Subnet %s not unique error: %s", subnet_doc.title, exc)
+                        raise mist.io.exceptions.SubnetExistsError(exc.message)
                 subnet_listing.append(subnet_doc.as_dict())
 
         return subnet_listing
@@ -171,11 +187,13 @@ class GoogleNetworkController(BaseNetworkController):
                 self.ctl.compute.connection.ex_destroy_network(**kwargs)
             except ResourceInUseError:
                 time.sleep(1)
+            except LibcloudError as e:
+                raise mist.io.exceptions.NetworkDeletionError("Got error %s" % str(e))
             else:
                 break
         # If all attempts are exhausted, raise an exception
         else:
-            raise mist.io.exceptions.NetworkCreationError('Failed to delete network {}'.format(network.title))
+            raise mist.io.exceptions.NetworkDeletionError('Failed to delete network {}'.format(network.title))
         network.delete()
 
     def _delete_network__parse_args(self, network, kwargs):
@@ -186,7 +204,10 @@ class GoogleNetworkController(BaseNetworkController):
         """Delete a Subnet."""
 
         self._delete_subnet__parse_args(subnet, kwargs)
-        self.ctl.compute.connection.ex_destroy_subnetwork(**kwargs)
+        try:
+            self.ctl.compute.connection.ex_destroy_subnetwork(**kwargs)
+        except Exception as e:
+            raise mist.io.exceptions.SubnetDeletionError("Got error %s" % str(e))
         subnet.delete()
 
     def _delete_subnet__parse_args(self, subnet, kwargs):
@@ -263,7 +284,14 @@ class OpenStackNetworkController(BaseNetworkController):
 
                 self._create_subnet__parse_libcloud_object(subnet_doc, subnet)
                 if subnet_doc.network:  # Do not persist this subnet without a parent network reference
-                    subnet_doc.save()
+                    try:
+                        subnet_doc.save()
+                    except mongoengine.errors.ValidationError as exc:
+                        log.error("Error updating Subnet %s: %s", subnet_doc.title, exc.to_dict())
+                        raise mist.io.exceptions.NetworkCreationError(exc.message)
+                    except mongoengine.errors.NotUniqueError as exc:
+                        log.error("Subnet %s not unique error: %s", subnet_doc.title, exc)
+                        raise mist.io.exceptions.SubnetExistsError(exc.message)
                 subnet_listing.append(subnet_doc.as_dict())
 
         return subnet_listing
