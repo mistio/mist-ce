@@ -165,7 +165,7 @@ class SSHKey(Key):
         try:
             key = RSA.importKey(self.private)
             self.public = key.publickey().exportKey('OpenSSH')
-        except Exception as exc:
+        except Exception:
             log.exception("Error while constructing public key "
                           "from private.")
             raise me.ValidationError("Private key is not a valid RSA key.")
