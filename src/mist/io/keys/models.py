@@ -1,4 +1,5 @@
 """Key entity model"""
+import logging
 from uuid import uuid4
 import mongoengine as me
 import mist.core.tag.models
@@ -8,6 +9,8 @@ from mist.io.exceptions import BadRequestError
 from mist.io.keys import controllers
 from mist.io.keys.base import BaseKeyController
 from mist.io.exceptions import RequiredParameterMissingError
+
+log = logging.getLogger(__name__)
 
 
 class Key(me.Document):
@@ -46,7 +49,7 @@ class Key(me.Document):
     instanciated, it is given a `ctl` attribute which gives access to the
     keys controller. This way it is possible to do things like:
 
-        key = Key.objects.get(id=key_id)
+        key = SSKey.objects.get(id=key_id)
         key.ctl.generate()
 
     """
@@ -155,7 +158,7 @@ class SSHKey(Key):
         from Crypto import Random
         Random.atfork()
 
-        if 'RSA' not in self.key.private:
+        if 'RSA' not in self.private:
             raise me.ValidationError("Private key is not a valid RSA key.")
 
         # Generate public key from private key file.
