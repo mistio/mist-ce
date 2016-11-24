@@ -99,8 +99,8 @@ class BaseKeyController(object):
 
         from mist.io.machines.models import Machine, KeyAssociation
 
-        log.info("Associating key %s to host %s", self.key.id,
-                 machine.hostname)
+        log.info("Associating key %s to machine %s", self.key.id,
+                 machine.machine_id)
 
         # check if key already associated, if not already associated,
         # create the association.This is only needed if association doesn't
@@ -135,7 +135,7 @@ class BaseKeyController(object):
             machine.key_associations.append(key_assoc)
             machine.save()
             trigger_session_update(self.key.owner, ['keys'])
-        return
+        return port
 
     def disassociate(self, machine):
         """Disassociates a key from a machine."""
