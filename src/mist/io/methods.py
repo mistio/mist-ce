@@ -190,8 +190,6 @@ def delete_key(user, key_id):
     log.info("Deleting key with id '%s'.", key_id)
     key = Key.objects.get(owner=user, id=key_id)
     default_key = key.default
-    # if key.default:
-    #     default_key = key.default
     key.delete()
     other_key = Key.objects(owner=user, id__ne=key_id).first()
     if default_key and other_key:
@@ -390,10 +388,11 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     else:
         raise BadRequestError("Provider unknown.")
 
-    if key is not None
+    if key is not None:
         machine = Machine(cloud=cloud, machine_id=node.id).save()
         username = node.extra.get('username', 'root')
-        machine.ctl.associate_key(key, username=username, port=ssh_port)
+        machine.ctl.associate_key(key, username=username,
+                                  port=ssh_port, no_connect=True)
     # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
