@@ -17,9 +17,10 @@ class SSHKeyController(BaseKeyController):
         self.key.public = key.exportKey('OpenSSH')
 
     def associate(self, machine, username='root', port=22, no_connect=False):
-        super(SSHKeyController, self).associate(machine, username=username,
-                                                port=port,
-                                                no_connect=no_connect)
+        port = super(SSHKeyController, self).associate(machine,
+                                                       username=username,
+                                                       port=port,
+                                                       no_connect=no_connect)
 
         if not no_connect:
             self.deploy(machine, username=username, port=port)
@@ -33,7 +34,7 @@ class SSHKeyController(BaseKeyController):
     def deploy(self, machine, username=None, port=22):
         """"""
         # try to actually deploy
-        log.info("Deploying key to machine.")
+        log.info("Deploying key to host %s", machine.hostname)
         filename = '~/.ssh/authorized_keys'
         grep_output = '`grep \'%s\' %s`' % (self.key.public, filename)
         new_line_check_cmd = (
@@ -49,6 +50,7 @@ class SSHKeyController(BaseKeyController):
         from mist.io.methods import ssh_command
 
         deploy_error = False
+
         try:
             # Deploy key.
             ssh_command(self.key.owner, machine.cloud.id, machine.machine_id,
