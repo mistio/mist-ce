@@ -17,13 +17,14 @@ class SSHKeyController(BaseKeyController):
         self.key.public = key.exportKey('OpenSSH')
 
     def associate(self, machine, username='root', port=22, no_connect=False):
-        port = super(SSHKeyController, self).associate(machine,
-                                                       username=username,
-                                                       port=port,
-                                                       no_connect=no_connect)
+        key_assoc = super(SSHKeyController, self).associate(
+            machine,
+            username=username,
+            port=port,
+            no_connect=no_connect)
 
         if not no_connect:
-            self.deploy(machine, username=username, port=port)
+            self.deploy(machine, username=username, port=key_assoc.port)
 
     def disassociate(self, machine):
         log.info("Undeploy key = %s" % machine.hostname)

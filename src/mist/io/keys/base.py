@@ -106,11 +106,9 @@ class BaseKeyController(object):
         # create the association.This is only needed if association doesn't
         # exist. Associations will otherwise be
         # created by shell.autoconfigure upon successful connection
-
         associated = False
-        if Machine.objects(cloud=machine.cloud,
-                           key_associations__keypair__exact=self.key,
-                           machine_id=machine.machine_id):
+        key_assoc = machine.key_associations.filter(keypair=self.key)
+        if key_assoc:
             log.warning("Key '%s' already associated with machine '%s' "
                         "in cloud '%s'", self.key.id,
                         machine.cloud.id, machine.machine_id)
@@ -135,7 +133,7 @@ class BaseKeyController(object):
             machine.key_associations.append(key_assoc)
             machine.save()
             trigger_session_update(self.key.owner, ['keys'])
-        return port
+        return key_assoc
 
     def disassociate(self, machine):
         """Disassociates a key from a machine."""
