@@ -191,7 +191,8 @@
           'toast': 'showToast',
           'subscribeLogEvents': 'subscribeLogEvents',
           'search': 'updateSearchQuery',
-          'open-and-select' : 'openAndSelect'
+          'open-and-select' : 'openAndSelect',
+          'update-keys': 'stackUpdateKeys',
       },
 
       observers: [
@@ -207,6 +208,10 @@
         document.addEventListener('open-and-select', function(e) {
             this.querySelector('machine-page item-actions associate-key').openAndSelect(e);
         }.bind(this));
+      },
+
+      stackUpdateKeys: function(e){
+          this.querySelector('stack-create').updateKeys(e);
       },
 
       _style: function(page, sections) {
