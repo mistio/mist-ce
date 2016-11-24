@@ -148,4 +148,3 @@ class BaseKeyController(object):
             machine.key_associations.remove(key_assoc)
             machine.save()
             trigger_session_update(self.key.owner, ['keys'])
-
