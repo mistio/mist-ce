@@ -804,8 +804,6 @@ def associate_key(request):
                                key_associations__keypair__exact=key)
 
     assoc_machines = transform_key_machine_associations(machines, key)
-    # FIX filter machines based on auth_context
-    trigger_session_update(auth_context.owner, ['keys'])
     return assoc_machines
 
 
@@ -853,8 +851,6 @@ def disassociate_key(request):
                                key_associations__keypair__exact=key)
 
     assoc_machines = transform_key_machine_associations(machines, key)
-    # FIX filter machines based on auth_context
-
     return assoc_machines
 
 
