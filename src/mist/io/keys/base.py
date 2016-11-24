@@ -119,7 +119,7 @@ class BaseKeyController(object):
         # exist. Associations will otherwise be
         # created by shell.autoconfigure upon successful connection
         key_assoc = machine.key_associations.filter(keypair=self.key,
-                                                    shh_user=username,
+                                                    ssh_user=username,
                                                     port=port)
         if key_assoc:
             log.warning("Key '%s' already associated with machine '%s' "
