@@ -39,8 +39,7 @@
     "polymer-sortablejs": "^0.1.3",
     "c3": "^0.4.11",
     "iron-component-page": "^1.1.7",
-    "webcomponentsjs": "^0.7.23",
-    "juicy-ace-editor": "^1.2.0"
+    "webcomponentsjs": "^0.7.23"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"
