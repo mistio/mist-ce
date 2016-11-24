@@ -288,8 +288,8 @@ class LibvirtMainController(BaseMainController):
             machine = Machine.objects.get(cloud=self.cloud,
                                           machine_id=self.cloud.host)
         except me.DoesNotExist:
-            machine = Machine.objects.get(cloud=self.cloud,
-                                          machine_id=self.cloud.host).save()
+            machine = Machine.objects(cloud=self.cloud,
+                                      machine_id=self.cloud.host).save()
 
         machine.ctl.associate_key(self.cloud.key, username=self.cloud.username,
                                   port=self.cloud.port)
