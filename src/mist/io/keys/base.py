@@ -126,7 +126,7 @@ class BaseKeyController(object):
                         "in cloud '%s'", self.key.id,
                         machine.cloud.id, machine.machine_id)
 
-            return key_assoc
+            return key_assoc[0]
 
         key_assoc = KeyAssociation(keypair=self.key, last_used=0,
                                    ssh_user=username, sudo=False,
@@ -145,6 +145,6 @@ class BaseKeyController(object):
         # removing key association
         key_assoc = machine.key_associations.filter(keypair=self.key)
         if key_assoc:
-            machine.key_associations.remove(key_assoc)
+            machine.key_associations.remove(key_assoc[0])
             machine.save()
             trigger_session_update(self.key.owner, ['keys'])
