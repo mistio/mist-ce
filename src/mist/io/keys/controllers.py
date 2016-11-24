@@ -84,5 +84,5 @@ class SSHKeyController(BaseKeyController):
             from mist.io.methods import ssh_command
             ssh_command(self.key.owner, machine.cloud.id,
                         machine.machine_id, machine.hostname, command)
-        except:
-            pass
+        except Exception as exc:
+            log.info("Undeploying key %s failed: %s", self.key.id, str(exc))

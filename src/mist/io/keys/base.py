@@ -33,7 +33,7 @@ class BaseKeyController(object):
         rename_kwargs(kwargs, 'priv', 'private')
         # Check for invalid `kwargs` keys.
         errors = {}
-        for key in kwargs.keys():
+        for key in kwargs:
             if key not in self.key._key_specific_fields:
                 error = "Invalid parameter %s=%r." % (key, kwargs[key])
                 if fail_on_invalid_params:
@@ -97,22 +97,10 @@ class BaseKeyController(object):
     def associate(self, machine, username='root', port=22, no_connect=False):
         """Associates a key with a machine."""
 
-        from mist.io.machines.models import Machine, KeyAssociation
+        from mist.io.machines.models import KeyAssociation
 
         log.info("Associating key %s to machine %s", self.key.id,
                  machine.machine_id)
-
-        # check if key already associated, if not already associated,
-        # create the association.This is only needed if association doesn't
-        # exist. Associations will otherwise be
-        # created by shell.autoconfigure upon successful connection
-        associated = False
-        key_assoc = machine.key_associations.filter(keypair=self.key)
-        if key_assoc:
-            log.warning("Key '%s' already associated with machine '%s' "
-                        "in cloud '%s'", self.key.id,
-                        machine.cloud.id, machine.machine_id)
-            associated = True
 
         if isinstance(port, basestring):
             if port.isdigit():
@@ -126,13 +114,27 @@ class BaseKeyController(object):
         else:
             raise BadRequestError("Invalid port type: %r" % port)
 
-        if not associated:
-            key_assoc = KeyAssociation(keypair=self.key, last_used=0,
-                                       ssh_user=username, sudo=False,
-                                       port=port)
-            machine.key_associations.append(key_assoc)
-            machine.save()
-            trigger_session_update(self.key.owner, ['keys'])
+        # check if key already associated, if not already associated,
+        # create the association.This is only needed if association doesn't
+        # exist. Associations will otherwise be
+        # created by shell.autoconfigure upon successful connection
+        key_assoc = machine.key_associations.filter(keypair=self.key,
+                                                    shh_user=username,
+                                                    port=port)
+        if key_assoc:
+            log.warning("Key '%s' already associated with machine '%s' "
+                        "in cloud '%s'", self.key.id,
+                        machine.cloud.id, machine.machine_id)
+
+            return key_assoc
+
+        key_assoc = KeyAssociation(keypair=self.key, last_used=0,
+                                   ssh_user=username, sudo=False,
+                                   port=port)
+        machine.key_associations.append(key_assoc)
+        machine.save()
+        trigger_session_update(self.key.owner, ['keys'])
+
         return key_assoc
 
     def disassociate(self, machine):
@@ -141,9 +143,9 @@ class BaseKeyController(object):
         log.info("Disassociating key of machine '%s' " % machine.machine_id)
 
         # removing key association
-        for assoc in machine.key_associations:
-            if assoc.keypair == self.key:
-                break
-        machine.key_associations.remove(assoc)
-        machine.save()
-        trigger_session_update(self.key.owner, ['keys'])
+        key_assoc = machine.key_associations.filter(keypair=self.key)
+        if key_assoc:
+            machine.key_associations.remove(key_assoc)
+            machine.save()
+            trigger_session_update(self.key.owner, ['keys'])
+
