@@ -283,7 +283,14 @@ class LibvirtMainController(BaseMainController):
         # changing the cloud's host.
         # FIXME: Add type field to differentiate between actual vm's and the
         # host.
-        machine = Machine(cloud=self.cloud, machine_id=self.cloud.host).save()
+
+        try:
+            machine = Machine.objects.get(cloud=self.cloud,
+                                          machine_id=self.cloud.host)
+        except me.DoesNotExist:
+            machine = Machine.objects.get(cloud=self.cloud,
+                                          machine_id=self.cloud.host).save()
+
         machine.ctl.associate_key(self.cloud.key, username=self.cloud.username,
                                   port=self.cloud.port)
 
