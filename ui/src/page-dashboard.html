@@ -305,7 +305,9 @@
                             </a>
                         </div>
                         <paper-material class="graphs" hidden="[[!model.monitoring.machines.length]]">
-                            <mist-monitoring monitoring="[[model.monitoring]]" replace-targets="[[replaceTargets]]"></mist-monitoring>
+                            <template is="dom-if" if="[[viewingDashboard]]" restamp>
+                                <mist-monitoring monitoring="[[model.monitoring]]" replace-targets="[[replaceTargets]]"></mist-monitoring>
+                            </template>
                         </paper-material>
                     </div>
                     <div class="left">
@@ -375,6 +377,10 @@
             },
             matrix: {
                 type: Array
+            },
+            viewingDashboard: {
+                type: Boolean,
+                value: true
             }
         },
         observers: [

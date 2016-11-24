@@ -104,7 +104,7 @@
           <paper-spinner active></paper-spinner>
         </div>
         <iron-pages id="iron-pages" role="main" selected="[[page]]" attr-for-selected="name" smallscreen$="{{smallscreen}}">
-          <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]" is-over-using="[[model.isOverUsing]]"></page-dashboard>
+          <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]" is-over-using="[[model.isOverUsing]]" viewing-dashboard="[[computeIsViewing('dashboard', page)]]"></page-dashboard>
           <page-clouds name="clouds" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-clouds>
           <page-machines name="machines" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-machines>
           <page-images name="images" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-images>
@@ -241,6 +241,9 @@
         }
       },
 
+      computeIsViewing: function(page){
+        return this.page == page;
+      },
 
       updateSearchQuery: function(e){
           this.set('q', e.detail);
