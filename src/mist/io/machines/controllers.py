@@ -52,4 +52,5 @@ class MachineController(object):
 
     def associate_key(self, key, username=None, port=22, no_connect=False):
         """Associate an sshkey with a machine"""
-        return key.ctl.associate(self.machine, username=username, port=port)
+        return key.ctl.associate(self.machine, username=username,
+                                 port=port, no_connect=no_connect)
