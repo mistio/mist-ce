@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../bower_components/Sortable/Sortable.html">
+<!-- <link rel="import" href="../../bower_components/Sortable/Sortable.html"> -->
+<link rel="import" href="../../bower_components/polymer-sortablejs/polymer-sortablejs.html" />
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
@@ -188,7 +189,7 @@
             }
         }
         </style>
-        <div id="rules">
+        <sortable-js id="rules">
             <div class="rule head">
                 <span class="index">ord.</span>
                 <span>operator</span>
@@ -244,7 +245,7 @@
                     </span>
 	            </div>
 	        </template>
-        </div>
+        </sortable-js>
         <div class="rules">
             <div class="rule add">
                 <span class="index">
@@ -360,7 +361,6 @@
                 var sortable = Sortable.create(el, {
                     filter: '.head'
                 });
-
             },
             _computeCommonPermissions: function(model) {
                 var commonPermissions = this.model.permissions['cloud'],
