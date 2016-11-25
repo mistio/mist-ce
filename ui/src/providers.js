@@ -476,7 +476,7 @@ PROVIDERS.push({
         errorMessage: "Please enter organization",
         helptext: 'The name of your organization'
     }, {
-        name: "indonesianRegion",
+        name: "host",
         label: "Region",
         type: "dropdown",
         value: "my.idcloudonline.com",
