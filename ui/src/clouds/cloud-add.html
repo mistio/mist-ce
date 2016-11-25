@@ -132,7 +132,8 @@
                 },
                 observers: [
                     '_providerChanged(selectedProvider, providers)',
-                    '_keysChanged(keys.*, providerFields)'
+                    '_keysChanged(keys.*, providerFields)',
+                    '_providerFieldsChanged(providerFields)'
                 ],
                 listeners: {
                     'iron-select' : '_updateCloudTitle'
@@ -156,7 +157,6 @@
                         .filter(function(fields) {
                             return fields.val == selectedProvider;
                         });
-                    console.warn('providerFields', providerFields);
                     var providerFields = selectedProviderDetails.length ? selectedProviderDetails.shift().options : [];
                     this.set('providerFields', [{
                           name: "provider",
@@ -164,6 +164,7 @@
                           show: false,
                           value: selectedProvider
                     }].concat(providerFields));
+                    console.warn('providerFields', providerFields);
                     
                     this.fillInKnownData(selectedProvider, this.clouds);
                 },
@@ -178,7 +179,7 @@
                     this.set('providerFields.' + index + '.value', '');
                 },
                 _providerReset: function() {
-                    this.set('selectedProvider', false)
+                    this.set('selectedProvider', false);
                 },
                 _resetForm: function(e) {
                     // Reset Form Fields
@@ -246,6 +247,18 @@
                         return f.name == name;
                     });
                     return index;
+                },
+                _providerFieldsChanged: function(providerFields){
+                    // reset form validation
+                    this.providerFields.forEach(function(el, index){
+                        this.set('providerFields.' + index + '.value', el.defaultValue);
+                        this.set('providerFields.' + index + '.show', el.show);
+                        console.log(index, el.name, el.show)
+                        var input = this.querySelector('#' + el.name);
+                        if (input) {
+                            input.invalid = false;
+                        }
+                    }, this);
                 }
             });
         })();

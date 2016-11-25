@@ -388,11 +388,10 @@ class MainConnection(MistConnection):
                         if not ips:
                             continue
 
-                    has_key = False
-                    keypairs = Keypair.objects(owner=self.owner)
                     machine_obj = Machine.objects(cloud=cloud,
                                                   machine_id=machine["id"],
-                                                  key_associations__not__size=0).first()
+                                                  key_associations__not__size=0
+                                                  ).first()
                     if machine_obj:
                         cached = tasks.ProbeSSH().smart_delay(
                             self.owner.id, cloud_id, machine['id'], ips[0]

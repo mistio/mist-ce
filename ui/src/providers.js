@@ -476,7 +476,7 @@ PROVIDERS.push({
         errorMessage: "Please enter organization",
         helptext: 'The name of your organization'
     }, {
-        name: "indonesianRegion",
+        name: "host",
         label: "Region",
         type: "dropdown",
         value: "my.idcloudonline.com",
@@ -985,7 +985,7 @@ PROVIDERS.push({
         type: "ssh_key",
         value: "",
         defaultValue: "",
-        show: true,
+        show: false,
         required: false,
         options: [],
         showIf: {
@@ -998,7 +998,7 @@ PROVIDERS.push({
         type: "text",
         value: "root",
         defaultValue: "root",
-        show: true,
+        show: false,
         required: false,
         errorMessage: "Please enter user",
         showIf: {
@@ -1011,7 +1011,7 @@ PROVIDERS.push({
         type: "text",
         value: 22,
         defaultValue: 22,
-        show: true,
+        show: false,
         required: false,
         errorMessage: "Please enter port",
         showIf: {
@@ -1025,7 +1025,7 @@ PROVIDERS.push({
         value: 3389,
         defaultValue: 3389,
         errorMessage: "Please enter remote desktop's port",
-        show: true,
+        show: false,
         required: true,
         showIf: {
             fieldName: "operating_system",
