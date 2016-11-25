@@ -74,11 +74,11 @@ class BaseDNSController(BaseController):
         zones = self._list_zones__fetch_zones()
 
         # Format zone information.
-        return [{'id': zone.id,
-                 'domain': zone.domain,
-                 'type': zone.type,
-                 'ttl': zone.ttl,
-                 'extra': zone.extra} for zone in zones]
+        return [{"id": zone.id,
+                 "domain": zone.domain,
+                 "type": zone.type,
+                 "ttl": zone.ttl,
+                 "extra": zone.extra} for zone in zones]
 
     def _list_zones__fetch_zones(self):
         """
@@ -109,16 +109,16 @@ class BaseDNSController(BaseController):
         """
         Public method to return a list of  records under a specific zone.
         """
-        # Fetch zones, usually from libcloud connection.
+        # Fetch records, from libcloud connection.
         records = self._list_records__fetch_records(zone_id)
 
         # Format zone information.
-        return [{'id': record.id,
-                 'name': record.name,
-                 'type': record.type,
-                 'data': record.data,
-                 'ttl': record.ttl,
-                 'extra': record.extra} for record in records]
+        return [{"id": record.id,
+                 "name": record.name,
+                 "type": record.type,
+                 "data": record.data,
+                 "ttl": record.ttl,
+                 "extra": record.extra} for record in records]
 
     def _list_records__fetch_records(self, zone_id):
         """
@@ -241,9 +241,7 @@ class BaseDNSController(BaseController):
         this.
         ----
         """
-        if not re.match(".*\.$", name):
-            name += "."
-        data, extra = self._create_record__prepare_args(data, ttl)
+        name, data, extra = self._create_record__prepare_args(name, data, ttl)
         try:
             zone = self.connection.get_zone(zone_id)
             record = zone.create_record(name, type, data, extra)
@@ -265,7 +263,7 @@ class BaseDNSController(BaseController):
             log.exception("Error while running create_record on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
-    def _create_record__prepare_args(self, data, ttl):
+    def _create_record__prepare_args(self, name, data, ttl):
         """
         This is a private
         ---

@@ -22,6 +22,7 @@ controller, using the `ctl` abbreviation, like this:
 
 """
 
+import re
 import logging
 
 from libcloud.dns.types import Provider
@@ -40,13 +41,13 @@ class AmazonDNSController(BaseDNSController):
         return get_driver(Provider.ROUTE53)(self.cloud.apikey,
                                             self.cloud.apisecret)
 
-    def _create_record__prepare_args(self, data, ttl):
+    def _create_record__prepare_args(self, name, data, ttl):
         """
         This is a private
         ---
         """
         extra = {'ttl':ttl}
-        return data, extra
+        return name, data, extra
 
 
 class GoogleDNSController(BaseDNSController):
@@ -58,12 +59,14 @@ class GoogleDNSController(BaseDNSController):
                                            self.cloud.private_key,
                                            project=self.cloud.project_id)
 
-    def _create_record__prepare_args(self, data, ttl):
+    def _create_record__prepare_args(self, name, data, ttl):
         """
         This is a private
         ---
         """
+        if not re.match(".*\.$", name):
+            name += "."
         extra = None
         record_data = {'ttl':ttl, 'rrdatas':[]}
         record_data['rrdatas'].append(data)
-        return record_data, extra
+        return name, record_data, extra
