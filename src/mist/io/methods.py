@@ -161,19 +161,6 @@ def delete_cloud(owner, cloud_id):
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
-    machines = Machine.objects(cloud=cloud)
-    for machine in machines:
-        tags = Tag.objects(owner=owner, resource=machine)
-        for tag in tags:
-            try:
-                tag.delete()
-            except:
-                 pass
-        try:
-            machine.delete()
-        except:
-            pass
-
     cloud.delete()
     log.info("Succesfully deleted cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
