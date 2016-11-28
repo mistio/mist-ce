@@ -307,7 +307,7 @@ def add_cloud(request):
         from mist.core.tag.methods import add_tags_to_resource
         add_tags_to_resource(owner, cloud, cloud_tags.items())
 
-    c_count = Cloud.objects(owner=owner).count()
+    c_count = Cloud.objects(owner=owner, deleted=None).count()
     ret = cloud.as_dict()
     ret['index'] = c_count - 1
     if monitoring:
@@ -331,7 +331,8 @@ def delete_cloud(request):
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     try:
-        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+        cloud = Cloud.objects.get(owner=auth_context.owner,
+                                  id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
     auth_context.check_perm('cloud', 'remove', cloud_id)
@@ -358,7 +359,8 @@ def rename_cloud(request):
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     try:
-        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+        cloud = Cloud.objects.get(owner=auth_context.owner,
+                                  id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
@@ -388,7 +390,8 @@ def update_cloud(request):
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     try:
-        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+        cloud = Cloud.objects.get(owner=auth_context.owner,
+                                  id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
@@ -435,7 +438,8 @@ def toggle_cloud(request):
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     try:
-        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+        cloud = Cloud.objects.get(owner=auth_context.owner,
+                                  id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
@@ -497,14 +501,14 @@ def add_key(request):
     key_tags = auth_context.check_perm("key", "add", None)
     key_name = methods.add_key(auth_context.owner, key_name, private_key, certificate=certificate)
 
-    key = Keypair.objects.get(owner=auth_context.owner, name=key_name)
+    key = Keypair.objects.get(owner=auth_context.owner, name=key_name, deleted=None)
 
     if key_tags:
         from mist.core.tag.methods import add_tags_to_resource
         add_tags_to_resource(auth_context.owner, key, key_tags.items())
     # since its a new key machines fields should be an empty list
 
-    clouds = Cloud.objects(owner=auth_context.owner)
+    clouds = Cloud.objects(owner=auth_context.owner, deleted=None)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=key)
 
@@ -540,7 +544,8 @@ def delete_key(request):
         raise KeyParameterMissingError()
 
     try:
-        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner,
+                                  id=key_id, deleted=None)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -580,7 +585,8 @@ def delete_keys(request):
     report = {}
     for key_id in key_ids:
         try:
-            key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+            key = Keypair.objects.get(owner=auth_context.owner,
+                                      id=key_id, deleted=None)
         except me.DoesNotExist:
             report[key_id] = 'not_found'
             continue
@@ -628,7 +634,8 @@ def edit_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner,
+                                  id=key_id, deleted=None)
     except me.DoesNotExist:
         raise NotFoundError('Key with that id does not exist')
     auth_context.check_perm('key', 'edit', key.id)
@@ -654,7 +661,8 @@ def set_default_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner,
+                                  id=key_id, deleted=None)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -687,7 +695,8 @@ def get_private_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner,
+                                  id=key_id, deleted=None)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -716,7 +725,8 @@ def get_public_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+        key = Keypair.objects.get(owner=auth_context.owner,
+                                  id=key_id, deleted=None)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -789,7 +799,7 @@ def associate_key(request):
         raise RequiredParameterMissingError('host')
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
-    key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
+    key = Keypair.objects.get(owner=auth_context.owner, id=key_id, deleted=None)
     auth_context.check_perm('key', 'read_private', key.id)
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
@@ -800,7 +810,7 @@ def associate_key(request):
 
     methods.associate_key(auth_context.owner, key_id, cloud_id, machine_id, host,
                           username=ssh_user, port=ssh_port)
-    clouds = Cloud.objects(owner=auth_context.owner)
+    clouds = Cloud.objects(owner=auth_context.owner, deleted=None)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=key)
 
@@ -856,8 +866,8 @@ def disassociate_key(request):
 
     methods.disassociate_key(auth_context.owner, key_id,
                              cloud_id, machine_id, host)
-    key = Keypair.objects.get(owner=auth_context.owner, id=key_id)
-    clouds = Cloud.objects(owner=auth_context.owner)
+    key = Keypair.objects.get(owner=auth_context.owner, id=key_id, deleted=None)
+    clouds = Cloud.objects(owner=auth_context.owner, deleted=None)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=key)
 

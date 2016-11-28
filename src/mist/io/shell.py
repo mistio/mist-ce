@@ -241,13 +241,13 @@ class ParamikoShell(object):
         log.info("autoconfiguring Shell for machine %s:%s",
                  cloud_id, machine_id)
 
-        cloud = Cloud.objects.get(owner=user, id=cloud_id)
+        cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
         try:
             machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
         except me.DoesNotExist:
             machine = Machine(cloud=cloud, machine_id=machine_id)
         if key_id:
-            keys = [Keypair.objects.get(owner=user, id=key_id)]
+            keys = [Keypair.objects.get(owner=user, id=key_id, deleted=None)]
         else:
             keys = [key_assoc.keypair
                     for key_assoc in machine.key_associations
@@ -452,7 +452,7 @@ class DockerShell(DockerWebSocket):
             self.host, docker_port = config.DOCKER_IP, config.DOCKER_PORT
             return docker_port, event['logs'][0]['container_id']
 
-        cloud = Cloud.objects.get(owner=user, id=cloud_id)
+        cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
         self.host, docker_port = dnat(user, self.host, cloud.port)
         return docker_port, cloud
 

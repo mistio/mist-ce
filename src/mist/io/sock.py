@@ -269,7 +269,7 @@ class MainConnection(MistConnection):
     def list_clouds(self):
         self.send('list_clouds',
                   core_methods.filter_list_clouds(self.auth_context))
-        clouds = Cloud.objects(owner=self.owner, enabled=True)
+        clouds = Cloud.objects(owner=self.owner, enabled=True, deleted=None)
         log.info(clouds)
         for key, task in (('list_machines', tasks.ListMachines()),
                           ('list_images', tasks.ListImages()),
@@ -347,7 +347,8 @@ class MainConnection(MistConnection):
                     self.send(routing_key, {'cloud_id': cloud_id,
                                             'machines': filtered_machines})
                 # update cloud machine count in multi-user setups
-                cloud = Cloud.objects.get(owner=self.owner, id=cloud_id)
+                cloud = Cloud.objects.get(owner=self.owner, id=cloud_id,
+                                          deleted=None)
                 try:
                     if len(machines) != cloud.machine_count:
                         tasks.update_machine_count.delay(self.owner.id,
@@ -381,7 +382,7 @@ class MainConnection(MistConnection):
                             continue
 
                     has_key = False
-                    keypairs = Keypair.objects(owner=self.owner)
+                    keypairs = Keypair.objects(owner=self.owner, deleted=None)
                     machine_obj = Machine.objects(cloud=cloud,
                                                   machine_id=machine["id"],
                                                   key_associations__not__size=0).first()

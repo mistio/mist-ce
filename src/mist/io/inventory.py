@@ -23,7 +23,7 @@ class MistInventory(object):
         self.hosts = {}
         self.keys = {}
         if not machines:
-            clouds = Cloud.objects(owner=self.user)
+            clouds = Cloud.objects(owner=self.user, deleted=None)
             machines = [(machine.cloud.id, machine.machine_id)
                         for machine in Machine.objects(cloud__in=clouds)]
         for bid, mid in machines:
@@ -35,7 +35,8 @@ class MistInventory(object):
                 continue
             ip_addr, port = dnat(self.user, ip_addr, port)
             if key_id not in self.keys:
-                keypair = Keypair.objects.get(owner=self.user, name=key_id)
+                keypair = Keypair.objects.get(owner=self.user, name=key_id,
+                                              deleted=None)
                 self.keys[key_id] = keypair.private
                 if keypair.certificate:
                     # if signed ssh key, provide the key appending a -cert.pub
@@ -97,7 +98,7 @@ class MistInventory(object):
         raise Exception('Machine not found in list_machines')
 
     def find_ssh_settings(self, cloud_id, machine_id):
-        cloud = Cloud.objects.get(owner=self.user, id=cloud_id)
+        cloud = Cloud.objects.get(owner=self.user, id=cloud_id, deleted=None)
         machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
         if not machine.key_associations:
             raise Exception("Machine doesn't have SSH association")

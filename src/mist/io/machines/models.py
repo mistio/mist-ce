@@ -126,6 +126,11 @@ class Machine(me.Document):
     def owner(self):
         return self.cloud.owner
 
+    def clean(self):
+        for i in reversed(range(len(self.key_associations))):
+            if self.key_associations[i].keypair.deleted:
+                self.key_associations.pop(i)
+
     def delete(self):
         super(Machine, self).delete()
         mist.core.tag.models.Tag.objects(resource=self).delete()

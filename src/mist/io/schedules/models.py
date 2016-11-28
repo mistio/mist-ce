@@ -153,7 +153,7 @@ class Schedule(me.Document):
         'allow_inheritance': True,
         'indexes': [
             {
-                'fields': ['owner', 'name'],
+                'fields': ['owner', 'name', 'deleted'],
                 'sparse': False,
                 'unique': True,
                 'cls': False,
@@ -164,6 +164,7 @@ class Schedule(me.Document):
     id = me.StringField(primary_key=True, default=lambda: uuid4().hex)
     name = me.StringField(required=True)
     description = me.StringField()
+    deleted = me.DateTimeField()
     owner = me.ReferenceField(Owner, required=True)
 
     # celery periodic task specific fields
@@ -230,7 +231,7 @@ class Schedule(me.Document):
             raise RequiredParameterMissingError('name')
         if not owner or not isinstance(owner, Organization):
             raise BadRequestError('owner')
-        if Schedule.objects(owner=owner, name=name):
+        if Schedule.objects(owner=owner, name=name, deleted=None):
             raise ScheduleNameExistsError()
         schedule = cls(owner=owner, name=name)
         schedule.ctl.set_auth_context(auth_context)
@@ -300,6 +301,14 @@ class Schedule(me.Document):
                 raise me.ValidationError('Crontab entry is not valid:%s'
                                          % exc.message)
         super(Schedule, self).validate(clean=True)
+
+    def clean(self):
+        """Pre-save cleaning to ensure that a Schedule is disabled & expired
+        in case it has been marked as deleted."""
+        if self.deleted:
+            self.enabled = False
+            if not self.expires:
+                self.expires = self.deleted
 
     def delete(self):
         super(Schedule, self).delete()
