@@ -121,6 +121,10 @@ def add_cloud_v_2(owner, title, provider, params):
             no_ssh=not (machine.os_type == 'unix' and
                         machine.key_associations)
         )
+
+    # SEC
+    owner.mapper.update(cloud)
+
     log.info("Cloud with id '%s' added succesfully.", cloud.id)
     trigger_session_update(owner, ['clouds'])
     return ret
@@ -162,6 +166,7 @@ def delete_cloud(owner, cloud_id):
         raise NotFoundError('Cloud does not exist')
 
     cloud.delete()
+
     log.info("Succesfully deleted cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
 
@@ -193,6 +198,9 @@ def add_key(user, key_name, private_key, certificate=None):
     key.owner = user
     key.save()
 
+    # SEC
+    key.owner.mapper.update(key)
+
     log.info("Added key with name '%s'", key_name)
     trigger_session_update(user, ['keys'])
     return key_name
@@ -217,6 +225,7 @@ def delete_key(user, key_id):
     if default_key and other_key:
         other_key.default = True
         other_key.save()
+
     log.info("Deleted key with id '%s'.", key_id)
     trigger_session_update(user, ['keys'])
 
@@ -1421,7 +1430,9 @@ def list_clouds(user):
     from mist.core.tag.methods import get_tags_for_resource
     clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=user)]
     for cloud in clouds:
-        cloud['tags'] = get_tags_for_resource(user,  cloud)
+        # FIXME: cloud must be a mongoengine object FFS!
+        # Also, move into cloud model's as_dict method?
+        cloud['tags'] = get_tags_for_resource(user, cloud)
     return clouds
 
 
@@ -1431,9 +1442,10 @@ def list_keys(user):
     :return:
     """
     from mist.core.tag.methods import get_tags_for_resource
-    keys = Keypair.objects(owner=user).only("default", "name")
+    keys = Keypair.objects(owner=user)
     clouds = Cloud.objects(owner=user)
     key_objects = []
+    # FIXME: This must be taken care of in Keys.as_dict
     for key in keys:
         key_object = {}
         machines = Machine.objects(cloud__in=clouds,

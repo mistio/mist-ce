@@ -304,6 +304,7 @@ class Schedule(me.Document):
     def delete(self):
         super(Schedule, self).delete()
         Tag.objects(resource=self).delete()
+        self.owner.mapper.remove(self, actions=['read', 'read_logs'])
 
     def as_dict(self):
         # Return a dict as it will be returned to the API

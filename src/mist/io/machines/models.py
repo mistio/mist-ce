@@ -129,6 +129,7 @@ class Machine(me.Document):
     def delete(self):
         super(Machine, self).delete()
         mist.core.tag.models.Tag.objects(resource=self).delete()
+        self.owner.mapper.remove(self, actions=['read', 'read_logs'])
 
     def as_dict(self):
         # Return a dict as it will be returned to the API
