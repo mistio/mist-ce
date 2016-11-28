@@ -38,7 +38,7 @@
             border-bottom: 1px solid #eee;
         }
 
-        .list-item {            
+        .list-item {
             padding: 8px;
         }
 
@@ -145,7 +145,7 @@
                         </div>
                     </a>
                 </div>
-            </paper-material>            
+            </paper-material>
             <iron-ajax id="delInc" url="/api/v1/stories/[[selectedInc]]" contentType="application/json" handle-as="xml" method="DELETE" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
         </template>
     </template>
@@ -198,7 +198,7 @@ Polymer({
         return 'icons:check';
     },
     machineName: function(item, clouds) {
-        if (item.logs.length)
+        if (item.logs.length && item.cloud_id && item.machine_id)
             return this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id] ? item.logs[0].machine_name : item.logs[0].machine_name +': Machine is missing';
         return this.model.clouds[item.cloud_id].machines[item.machine_id].name;
     },
