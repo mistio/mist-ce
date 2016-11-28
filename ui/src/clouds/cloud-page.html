@@ -1,10 +1,11 @@
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
-
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../element-for-in/element-for-in.html">
 <link rel="import" href="../tags/tags-list.html">
 <link rel="import" href="../item-list/item-actions.html">
+<link rel="import" href="../helpers/dialog-element.html">
 
 <link rel="import" href="cloud-info.html">
 <link rel="import" href="cloud-edit.html">
@@ -212,7 +213,7 @@
                         </paper-toggle-button>
                     </div>
                     <paper-button id="edit-tags" on-tap="_editTags" class="simple">tags</paper-button>
-                    <!-- <paper-button on-tap="_starcloud" class="simple">                        
+                    <!-- <paper-button on-tap="_starcloud" class="simple">
                     </paper-button> -->
                 </div>
             </paper-material>
@@ -249,7 +250,7 @@
                 <h3>Delete Cloud: [[cloud.title]]</h3>
                 <p>Deleting clouds can not be undone. Alternatively you can disable the cloud temporarily by using the option on the top.</p>
                 <div class="button">
-                    <paper-button id="delete-cloud" on-tap="_deleteCloud" class="red">Delete Cloud</paper-button>
+                    <paper-button id="delete-cloud" on-tap="_deleteCloudConfirmation" class="red">Delete Cloud</paper-button>
                 </div>
             </paper-material>
             <!-- <div class="absolute-bottom-right">
@@ -262,6 +263,7 @@
         <iron-ajax id="cloudStateAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="POST" on-response="_handleCloudStateAjaxResponse" on-error="_handleCloudStateAjaxError"></iron-ajax>
         <tags-list model="[[model]]"></tags-list>
         <paper-toast></paper-toast>
+        <dialog-element></dialog-element>
     </template>
     <script>
         (function() {
@@ -287,7 +289,10 @@
                         type: Boolean,
                         computed: '_computeIsloading(cloud)',
                         value: true
-                    }
+                    },
+                },
+                listeners: {
+                    'confirmation': '_deleteCloud'
                 },
                 ready: function() {
                 },
@@ -312,15 +317,38 @@
                         return '../assets/providers/provider-' + provider + '.png';
                     }
                 },
+                _showDialog: function(info) {
+                    var dialog = this.querySelector('dialog-element');
+                    for (var i in info) {
+                        dialog[i] = info[i];
+                    }
+                    dialog._openDialog();
+                },
+                _deleteCloudConfirmation:function(){
+                  this._showDialog({
+                      title: 'Delete '+this.cloud.title+'?',
+                      body: "Deleting a cloud can not be undone. You are about to delete cloud '" + this.cloud.title + "'.",
+                      danger: true,
+                      reason: "cloud.delete"
+                  });
+                },
                  _deleteCloud: function(e){
-                    this.$.cloudDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
-                    this.$.cloudDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.cloudDeleteAjaxRequest.generateRequest();
+                   var reason = e.detail.reason,
+                       response = e.detail.response;
+
+                   if (response.confirmed && reason == "cloud.delete") {
+                      this.$.cloudDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                      this.$.cloudDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                      this.$.cloudDeleteAjaxRequest.generateRequest();
+                   }
                 },
                 _handleCloudDeletionAjaxResponse: function(e){
+                    var title = '';
+                    if (this.cloud && this.cloud.title)
+                        title = this.cloud.title;
                     document.querySelector('paper-header-panel').scroller.scrollTop = 0;
                     document.querySelector('app-location').set('path', '/');
-                    var msg = 'Cloud ' + this.cloud.title + ' was deleted';
+                    var msg = 'Cloud ' + title + ' was deleted';
                     this._showToast(msg);
                 },
                 _handleCloudDeletionAjaxError: function(e){

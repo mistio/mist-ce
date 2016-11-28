@@ -196,7 +196,7 @@
             overflow: hidden;
         }
         #content.onb-true {
-            background: url('/assets/onboarding/mount.svg') center bottom transparent no-repeat;
+            background: url('/assets/onboarding/mount.svg') center bottom #eee no-repeat;
             padding-bottom: 0;
             min-height: 100vh;
             margin-right: -24px;
@@ -247,8 +247,8 @@
         </style>
         <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
             <div class="notice">
-                <p><strong>Note:</strong> Hello! We are providing an early preview of the new Mist.io UI. A part of the functionality is under heavy development and, as a result, not yet fully functional. We would appreciate your feedback! Send suggestions to <a href="mailto:info@mist.io">info@mist.io</a>.
-                <a href="javascript:void(0)" on-tap="_toggleUI" class="flex">Return to old UI</a>
+                <p><strong>Note:</strong> Welcome to the new Mist.io UI! Bits of functionality are still under development and, as a result, not yet fully functional. We would appreciate your feedback! Send suggestions to <a href="mailto:info@mist.io">info@mist.io</a>.
+                <a href="javascript:void(0)" on-tap="_toggleUI" class="flex">Return to legacy UI</a>
                 </p>
             </div>
             <plan-overusage is-over-using="[[model.isOverUsing]]"></plan-overusage>
@@ -416,7 +416,7 @@
             }];
             this.dashboard = {
                 "id": 1,
-                "refresh": "0",
+                "refresh": "10sec",
                 "rows": [{
                     "panels": [{
                         "aliasColors": {},
@@ -431,7 +431,7 @@
                         "machineArray": [],
                         "timeFrom": null,
                         "timeShift": null,
-                        "title": "Load_on_all_monitored_machines",
+                        "title": "Load on all monitored machines",
                         "type": "graph",
                         "x-axis": true,
                         "y-axis": true
@@ -445,37 +445,18 @@
                     "now": true,
                     "refresh_intervals": [],
                     "time_options": [
-                        "5m",
-                        "15m",
+                        "10m",
                         "1h",
                         "6h",
-                        "12h",
                         "24h",
-                        "2d",
                         "7d",
                         "30d"
                     ]
                 },
                 "timezone": "browser"
             };
-            var machinearray = [];
-            console.log(this.model.monitoring);
-            this.model.monitoring.machines.forEach(function(entry) {
-                machinearray.push(entry);
-            });
-            console.log(machinearray);
-            this.dashboard.rows[0].panels[0].machineArray = machinearray;
-            // var that = this;
-            // setInterval(function(){ // FIXME: find a better way to fix broken chart width when coming from another page
-            //     if (that.querySelector('dashboard-panel'))
-            //         that.querySelector('dashboard-panel').resize();
-            // }, 5000, this);
-            /*this.async(function() {
-                this.importHref(this.resolveUrl('/elements/logs/log-list.html'),
-                                null,
-                                null,
-                                true)},
-                500);*/
+
+            this.dashboard.rows[0].panels[0].machineArray = this.model.monitoring.machines;
         },
         isOnline: function(cloud) {
             return cloud.state == 'online' && 'online';

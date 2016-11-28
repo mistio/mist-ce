@@ -3,6 +3,8 @@
 <link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/pushstate-anchor/pushstate-anchor.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 
 <link rel="import" href="app-sidebar/app-sidebar.html">
 <link rel="import" href="teams/team-add.html">
@@ -171,6 +173,15 @@
             margin: 10% auto;
             display: block;
         }
+        #recommendationsDialog {
+            width: 400px;
+        }
+        #recommendationsDialog a.blue-link {
+            color: var(--blue-color) !important;
+        }
+        #recommendationsDialog iron-icon.orange {
+            color: #F57F17;
+        }
         </style>
 
         <div id="content">
@@ -210,6 +221,20 @@
             </div>
             <team-add id="isTeamsPage" organization="[[model.org]]"></team-add>
         </template>
+
+        <paper-dialog id="recommendationsDialog" with-backdrop>
+            <h2>Recommendation</h2>
+            <p>
+                <iron-icon icon="icons:report-problem" class="orange"></iron-icon>
+                Your machine is vulnerable to Dirty COW. <br/><a href="https://dirtycow.ninja/" target="new" class="regular blue-link">Learn more.</a>
+            </p>
+            <p class="recommendation-text"></p>
+            <p>We recommend you follow the <a href="https://dirtycow.ninja/" target="new" class="regular blue-link">guide</a> and update your server kernel. You can use mist.io shell to do it now.</p>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button class="blue" dialog-confirm on-tap="_shell">open machine shell</paper-button>
+            </div>
+        </dialog-dialog>
 
     </template>
 </dom-module>
@@ -263,12 +288,16 @@
             isTeams: {
                 type: Boolean,
                 computed: 'computeIsTeams(section)'
-            }
+            },
+            itemOfRecommendation: Object
         },
 
         observers: [
             'sortingObserver(items.*, sortBy, sortOrder, section.q.*)',
         ],
+        listeners: {
+            'open-recommendation-dialog': 'openRecommendationsDialog'
+        },
         ready: function() {
 
         },
@@ -378,7 +407,7 @@
             return function(a, b) {
                 // console.log('comparison', a[property], b[property]);
                 // string compare on fields other than members machines and cost, image ids, default
-                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size', 'created', 'stack state' ].indexOf(property) == -1) {
+                if (['members', 'machines', 'cost', 'image', 'default', 'cloud', 'private', 'size', 'created', 'stack state', 'state' ].indexOf(property) == -1) {
                     //if both properties exist
                     if(JSON.stringify(a[property]) && JSON.stringify(b[property])) {
                         if (JSON.stringify(a[property]).toLowerCase() < JSON.stringify(b[property]).toLowerCase()) {
@@ -414,10 +443,10 @@
                     //if both properties exist
                     if (a.extra.cost_per_month && b.extra.cost_per_month){
                         if (parseInt(a.extra.cost_per_month) < parseInt(b.extra.cost_per_month)) {
-                            return -1 * order;
+                            return 1 * order;
                         }
                         if (parseInt(a.extra.cost_per_month) > parseInt(b.extra.cost_per_month)) {
-                            return 1 * order;
+                            return -1 * order;
                         }
                         return 0;
                     }
@@ -537,8 +566,62 @@
                             return -1
                     }
                 }
+                //compare state of machines
+                else if (property == 'state'){
+                    //if both properties exist
+                    var aW = this._getMachineWeight(a, this.model),
+                        bW = this._getMachineWeight(b, this.model);
+                    if (aW > bW) {
+                        return -1 * order;
+                    }
+                    if (aW < bW) {
+                        return 1 * order;
+                    }
+                    return 0;
+                }
 
-            };
+            }.bind(this);
+        },
+
+        _getMachineWeight: function(machine, model){
+            var weight = 0;
+            var machineHasIncidents = this._machineHasIncidents(machine, model.incidentsArray),
+                machineHasMonitor = this._machineHasMonitoring(machine, model.monitoring),
+                machineHasrecommendations = this._machineHasrecommendations(machine, model.probes),
+                machineHasProbe = this._machineHasProbe(machine, model.probes);
+                machineState = this._machineState(machine);
+            weight = machineHasIncidents + machineHasMonitor + machineHasrecommendations + machineHasProbe + machineState;
+            return weight;
+        },
+
+        _machineHasIncidents: function(machine, incidents){
+            var machineIncidents = incidents.filter(function(inc){
+                return inc.machine_id == machine.id
+            });
+            return machineIncidents ? machineIncidents.length * 1000 : 0;
+        },
+
+        _machineHasMonitoring: function(machine, monitoring){
+            return monitoring && monitoring.monitored_machines && monitoring.monitored_machines[machine.uuid] ? 100 : 0;
+        },
+
+        _machineHasrecommendations: function(machine, probes){
+            return probes && probes[machine.uuid] && probes[machine.uuid].dirty_cow ? 10 : 0;
+        },
+
+        _machineHasProbe: function(machine, probes){
+            return probes && probes[machine.uuid] && probes[machine.uuid].loadloadavg ? probes[machine.uuid].loadloadavg[0]+probes[machine.uuid].loadloadavg[1]+probes[machine.uuid].loadloadavg[2] : 1;
+        },
+
+        _machineState: function(machine){
+            if (machine.state == 'running')
+                return 5;
+            if (machine.state == 'stopped')
+                return 2;
+            if (machine.state == 'terminated')
+                return 1;
+            if (machine.state == 'unknown')
+                return 0;
         },
 
         _sectionLink: function(name) {
@@ -583,6 +666,28 @@
         clearSearch: function(e){
             this.set('section.q', "");
             document.querySelector('top-search').query = "";
+        },
+        openRecommendationsDialog: function(e){
+            var probe;
+            if (e.detail['item-type'] != "machines")
+                probe  = this.model.probes[e.detail.item.id];
+            else
+                probe  = this.model.probes[e.detail.item.uuid];
+            var text = 'Kernel '+probe.kernel + ' OS '+ probe.os +' '+ probe.os_version;
+            this.querySelector('.recommendation-text').textContent = text;
+            this.$.recommendationsDialog.open();
+
+            this.set('itemOfRecommendation', e.detail.item);
+        },
+        _shell: function(event){
+            var e = Polymer.dom(event);
+            var action = {
+                'name': 'shell',
+                'icon': 'vaadin-icons:terminal',
+                'confirm': false,
+                'multi': true
+            };
+            this.querySelector('item-actions')._performAction(action, [this.itemOfRecommendation]);
         }
     });
 })();

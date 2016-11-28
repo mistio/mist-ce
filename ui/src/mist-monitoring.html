@@ -45,6 +45,10 @@
                 opacity: 0.54;
                 font-size: 0.9em;
             }
+            div#errormsgArea {
+                display: block;
+                clear: both;
+            }
         </style>
         <h2 style$="color:#fff;background-color: [[section.color]];">Monitoring</h2>
         <div class="monitoringArea">
@@ -90,9 +94,9 @@
                         </div>
                     </div>
                     <!-- monitoring is activated. we expect to have data -->
-                    <div hidden$="[[!isActivated]]">
+                    <template is="dom-if" if="[[isActivated]]">
                         <polyana-dashboard dashboard="[[dashboard]]" datasources="[[datasources]]"></polyana-dashboard>
-                    </div>
+                    </template>
                 </div>
 
                 <div id="errormsgArea">
@@ -106,7 +110,7 @@
 
 
                 <!-- the machine is considered monitored -->
-                <div hidden$="[[!isMonitored]]">
+                <div hidden$="[[!isMonitored]]" class="monitored">
                     <!-- instalation succeeded but is not yet activated ie. we have no data yet-->
                     <div hidden$="[[!waitingData]]">
                         <p>Waiting for data</p>
@@ -205,7 +209,7 @@
         	}
         },
         _computeIsRunning: function(resource) {
-            return this.resource.state == "running";
+            return this.resource && this.resource.state && this.resource.state == "running" ? true : false ;
         },
         _computeWaitingData: function(resource, monitoring){
             if (!this.resource || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || !this.monitoring.monitored_machines[resource.uuid].installation_status){
@@ -281,7 +285,7 @@
             }
         },
         _computeIsActivated(resource, monitoring){
-            if (!this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || !this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at)
+            if (!this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || (!this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at && !this.waitingData))
                 return false;
             else
                 return true;

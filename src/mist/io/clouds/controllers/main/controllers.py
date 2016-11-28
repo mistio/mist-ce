@@ -212,6 +212,11 @@ class IndonesianVCloudMainController(VCloudMainController):
     provider = 'indonesian_vcloud'
     ComputeController = compute_ctls.VCloudComputeController
 
+    def _add__preparse_kwargs(self, kwargs):
+        if kwargs.get('host') not in ('my.idcloudonline.com',
+                                      'compute.idcloudonline.com'):
+            kwargs['host'] = 'my.idcloudonline.com'
+
     def _update__preparse_kwargs(self, kwargs):
         host = kwargs.get('host', self.cloud.host) or 'my.idcloudonline.com'
         if host not in ('my.idcloudonline.com', 'compute.idcloudonline.com'):
@@ -279,7 +284,7 @@ class LibvirtMainController(BaseMainController):
         super(LibvirtMainController, self).add(
             fail_on_error=fail_on_error,
             fail_on_invalid_params=fail_on_invalid_params,
-            **kwargs
+            add=True, **kwargs
         )
         if self.cloud.key is not None:
             # FIXME
@@ -289,11 +294,17 @@ class LibvirtMainController(BaseMainController):
                           username=self.cloud.username, port=self.cloud.port)
 
     def update(self, fail_on_error=True, fail_on_invalid_params=True,
-               **kwargs):
+               add=False, **kwargs):
         # FIXME: Add update support, need to clean up kvm 'host' from libcloud,
         # and especially stop using cloud.host as the machine id ffs.
-        raise BadRequestError("Update action is not currently support for "
-                              "Libvirt/KVM clouds.")
+        if not add:
+            raise BadRequestError("Update action is not currently support for "
+                                  "Libvirt/KVM clouds.")
+        super(LibvirtMainController, self).update(
+            fail_on_error=fail_on_error,
+            fail_on_invalid_params=fail_on_invalid_params,
+            **kwargs
+        )
 
 
 class OtherMainController(BaseMainController):

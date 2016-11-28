@@ -167,7 +167,6 @@
                 },
                 ready: function() {
                     this.querySelector('custom-validator').validate = this.isUniqueValidator.bind(this);
-                    // this.set('origin',this.getURLParameter('origin'));
                     this.set('origin', document.querySelector('app-location').queryParams.origin)
                 },
                 listeners: {
@@ -234,14 +233,19 @@
                 },
                 _handleKeyAddAjaxResponse: function(e) {
                     this.set('sendingData', false);
-                    console.log(e);
+                    var keyID = JSON.parse(e.detail.xhr.response).id;
                     if (!this.origin) {
-                        var keyID = JSON.parse(e.detail.xhr.response).id;
                         document.querySelector('app-location').path = '/keys/' + keyID;
                     }
                     else {
-                        document.querySelector('app-location').path = this.origin;
-                        document.querySelector('app-location').queryParams = {};
+                        //if origin machines/machine_id reopen associate key dialog
+                        if (this.origin.startsWith('/machines/')){
+                            this.fire('open-and-select', {key:keyID})
+                        }
+                        else if (this.origin.startsWith('/stacks/')){
+                            this.fire('update-keys', {key:keyID})
+                        }
+                        history.back();
                     }
 
                     this.debounce('formReset', function() {
@@ -260,6 +264,14 @@
                     this.set('key.publicKey', '');
                     this.set('key.privateKey', '');
                     this.set('showPublicKey', false);
+
+                    //reset form validation
+                    ['name','publicKey','privateKey'].forEach(function(el){
+                        var input = this.querySelector('#' + el);
+                        if (input) {
+                            input.invalid = false;
+                        }
+                    },this)
                 },
                 _generateKey: function(e) {
                     this.$.keyGenerateAjaxRequest.headers["Content-Type"] = 'application/json';
@@ -283,9 +295,6 @@
                 _handleKeyGenerateAjaxError: function(e) {
                     this.set('sendingData', false);                    
                 },
-                getURLParameter: function(name) {
-                    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
-                }
             });
         })();
     </script>

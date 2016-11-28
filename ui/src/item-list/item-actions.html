@@ -33,6 +33,7 @@
             #select-action paper-listbox {
                 margin-top: 0;
                 margin-bottom: 0;
+                padding: 0;
             }
             #select-multi-action-dropdown paper-listbox ::content iron-icon,
             #select-action paper-listbox ::content iron-icon {
@@ -91,7 +92,7 @@
             }
             tags-list,
             associate-key,
-            run-script-on-machine, 
+            run-script-on-machine,
             machine-edit {
                 position: absolute;
             }
@@ -254,12 +255,6 @@ ACTIONS = {
     'name': 'destroy',
     'icon': 'delete',
     'confirm': true,
-    'multi': true
-  },
-  'probe': {
-    'name': 'probe',
-    'icon': 'icons:compare-arrows',
-    'confirm': false,
     'multi': true
   },
   'star': {
@@ -477,11 +472,19 @@ Polymer({
         // returns the index of the item in the items list based on the itemUid
 
         var chunks = itemUid.split(':'),
-            itemId = chunks[2];
+            itemId = chunks[2],
             cloudId = chunks[1];
 
+        // there are items whose ides contain ':', like imahes sha256:e02e811..
+        // we reconstruct the id if chunk's length is bigger than expected
+        if (chunks.length > 3) {
+            for (var i=3; i<chunks.length; i++){
+                itemId += ':'+chunks[i];
+            }
+        }
+
         for (var i = 0; i < this.items.length; i++) {
-            if (this.items[i].id == itemId && (!cloudId || cloudId == this.items[i].cloud.id))
+            if (this.items && this.items[i] && this.items[i].id == itemId && (!cloudId || cloudId == this.items[i].cloud.id))
                 return i;
         }
         return -1;
@@ -511,7 +514,6 @@ Polymer({
               // if not monitoring then enable monitoring
               ret.push('associate-key');
               ret.push('shell');
-              ret.push('probe');
               if (item.keys.length) {
                   ret.push('run-script');
               }
@@ -549,15 +551,15 @@ Polymer({
             }
             ret.push('delete');
         } else if (item.type == 'script') {
-            ret.push('run');
+            // ret.push('run');
             ret.push('delete');
         } else if (item.type == 'network') {
             ret.push('delete');
         } else if (item.type == 'tunnel') {
-            if(item.active)
-                ret.push('disable');
-            if(!item.active)
-                ret.push('enable');
+            // if(item.active)
+            //     ret.push('disable');
+            // if(!item.active)
+            //     ret.push('enable');
             ret.push('delete');
         } else if (item.type == 'template') {
             ret.push('delete');

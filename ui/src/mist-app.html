@@ -15,6 +15,7 @@
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/iron-media-query/iron-media-query.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 
 <script type="text/javascript" src="../bower_components/swiftSet/swiftSet.js" inline></script>
 
@@ -120,8 +121,9 @@
 
           <page-incidents name="incidents" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-incidents>
 
-          <page-my-account name="my-account" is-over-using="[[model.isOverUsing]]" user="[[model.user]]" org="[[model.org]]" machines="[[model.machinesArray]]"></page-my-account>
+          <page-my-account name="my-account" is-over-using="[[model.isOverUsing]]" user="[[model.user]]" org="[[model.org]]" machines="[[model.machinesArray]]" tokens="[[model.tokens]]" sessions="[[model.sessions]]"></page-my-account>
         </iron-pages>
+        <paper-toast id="mist-toast"></paper-toast>
     </paper-header-panel>
 
     <mist-socket model="{{model}}" onboarding="{{onboarding}}"></mist-socket>
@@ -188,7 +190,9 @@
           'page-meta': 'updateTitle',
           'toast': 'showToast',
           'subscribeLogEvents': 'subscribeLogEvents',
-          'search': 'updateSearchQuery'
+          'search': 'updateSearchQuery',
+          'open-and-select' : 'openAndSelect',
+          'update-keys': 'stackUpdateKeys',
       },
 
       observers: [
@@ -197,6 +201,17 @@
 
       ready: function(){
 
+      },
+
+      openAndSelect: function(e){
+        console.log('KEY HEARD', e.detail.key);
+        document.addEventListener('open-and-select', function(e) {
+            this.querySelector('machine-page item-actions associate-key').openAndSelect(e);
+        }.bind(this));
+      },
+
+      stackUpdateKeys: function(e){
+          this.querySelector('stack-create').updateKeys(e);
       },
 
       _style: function(page, sections) {
@@ -254,7 +269,8 @@
             pending: {
                 clouds: true,
                 monitoring: true
-            }
+            },
+            probes: {}
         };
         this.model.permissions = {
             'cloud': [
@@ -321,14 +337,14 @@
                 'edit_tags',
                 'read_logs',
             ],
-            'team': [
-                'add',
-                'read',
-                'edit',
-                'remove',
-                'edit_tags',
-                'read_logs',
-            ],
+            // 'team': [
+            //     'add',
+            //     'read',
+            //     'edit',
+            //     'remove',
+            //     'edit_tags',
+            //     'read_logs',
+            // ],
         };
 
         for(i = 1; i<= this.model.teamsArray.length; i++){

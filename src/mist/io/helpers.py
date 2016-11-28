@@ -22,6 +22,8 @@ from amqp import Message
 from amqp.connection import Connection
 from amqp.exceptions import NotFound as AmqpNotFound
 
+from distutils.version import LooseVersion
+
 from mist.io.exceptions import MistError
 import mist.core.user.models
 
@@ -141,6 +143,97 @@ def parse_ping(stdout):
     # parsing failed. good job..
     log.error("Ping parsing failed for stdout '%s'", stdout)
     return {}
+
+
+def parse_os_release(os_release):
+    """
+    Extract os name and version from the output of `cat /etc/*release`
+    """
+    os = ''
+    os_version = ''
+    os_release = os_release.replace('"', '')
+    lines = os_release.split("\n")
+
+    # Find ID which corresponds to the OS's name
+    re_id = r'^ID=(.*)'
+    # Find VERSION_ID which is the specific version (e.g. 7 in Debian 7)
+    re_version = r'^VERSION_ID=(.*)'
+
+    for line in lines:
+        match_id = re.match(re_id, line)
+        if match_id:
+            os = match_id.group(1)
+
+        match_version = re.match(re_version, line)
+        if match_version:
+            os_version = match_version.group(1)
+
+    return os, os_version
+
+
+def dirty_cow(os, os_version, kernel_version):
+    """
+    Compares the current version to the vulnerable ones and returns
+    True if vulnerable, False if safe, None if not matched with
+    anything.
+    """
+    min_patched_version = "3.2.0"
+
+    vulnerables = {
+        "ubuntu":
+        {
+            "16.10": "4.8.0-26.28",
+            "16.04": "4.4.0-45.66",
+            "14.04": "3.13.0-100.147",
+            "12.04": "3.2.0-113.155"
+        },
+        "debian":
+        {
+            "7": "3.2.82-1",
+            "8": "3.16.36-1+deb8u2"
+        },
+        "centos":
+        {
+            "6": "3.10.58-rt62.60.el6rt",
+            "7": "3.10.0-327.36.1.rt56.237.el7"
+        },
+        "rhel":
+        {
+            "6": "3.10.58-rt62.60.el6rt",
+            "6.8": "3.10.58-rt62.60.el6rt",
+            "7": "3.10.0-327.36.1.rt56.237.el7",
+            "7.2": "3.10.0-327.36.1.rt56.237.el7"
+        },
+    }
+
+    # If version is lower that min_patched_version it is most probably vulnerable
+    if LooseVersion(kernel_version) < LooseVersion(min_patched_version):
+        return True
+
+    # If version is greater/equal to 4.9 it is patched
+    if LooseVersion(kernel_version) >= LooseVersion('4.9.0'):
+        return False
+
+    os = os.lower()
+
+    # In case of CoreOS, where we have no discrete VERSION_ID
+    if os == 'coreos':
+        if LooseVersion(kernel_version) <= LooseVersion('4.7.0'):
+            return True
+        else:
+            return False
+
+    if os not in vulnerables.keys():
+        return None
+
+    if os_version not in vulnerables[os].keys():
+        return None
+
+    vuln_version = vulnerables[os][os_version]
+    if LooseVersion(kernel_version) <= LooseVersion(vuln_version):
+        return True
+    else:
+        return False
 
 
 def amqp_publish(exchange, routing_key, data,
@@ -463,4 +556,3 @@ def random_string(length=5, punc=False):
     _chars = string.letters + string.digits
     _chars += string.punctuation if punc else ''
     return ''.join(random.choice(_chars) for _ in range(length))
-

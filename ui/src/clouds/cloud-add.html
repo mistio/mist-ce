@@ -105,10 +105,6 @@
                         type: String,
                         computed: '_getHeaderStyle(section)'
                     },
-                    cloud: {
-                        type: Object,
-                        value: {}
-                    },
                     selectedProvider: {
                         type: String,
                         value: null,
@@ -136,7 +132,8 @@
                 },
                 observers: [
                     '_providerChanged(selectedProvider, providers)',
-                    '_keysChanged(keys.*, providerFields)'
+                    '_keysChanged(keys.*, providerFields)',
+                    '_providerFieldsChanged(providerFields)'
                 ],
                 listeners: {
                     'iron-select' : '_updateCloudTitle'
@@ -145,21 +142,14 @@
 
                 },
                 _cloudAddAjaxResponse: function(response) {
+                    this._providerReset();
                     document.querySelector('app-location').set('path', '/');
                 },
                 _cloudAddAjaxError: function(response) {
                     console.error('add-cloud error', response);
                 },
-                _openDocs: function(href) {
-                    document.location = href;
-                },
                 _computeProviderLogo: function(className) {
                     return '../assets/providers/' + className + '.png';
-                },
-                _computeFieldType: function(field, value, show) {
-                    if (!(field.showIf && !field.show)) {
-                        return field.type == value;
-                    }
                 },
                 _providerChanged: function(selectedProvider, providers) {
                     this._resetForm();
@@ -167,7 +157,6 @@
                         .filter(function(fields) {
                             return fields.val == selectedProvider;
                         });
-                    console.warn('providerFields', providerFields);
                     var providerFields = selectedProviderDetails.length ? selectedProviderDetails.shift().options : [];
                     this.set('providerFields', [{
                           name: "provider",
@@ -175,6 +164,7 @@
                           show: false,
                           value: selectedProvider
                     }].concat(providerFields));
+                    console.warn('providerFields', providerFields);
                     
                     this.fillInKnownData(selectedProvider, this.clouds);
                 },
@@ -189,23 +179,9 @@
                     this.set('providerFields.' + index + '.value', '');
                 },
                 _providerReset: function() {
-                    this.set('provider', null);
-                },
-                _submitForm: function(e) {
-                    console.log(this.cloud);
-                    this.$.cloudAddAjaxRequest.body = this.cloud;
-                    this.$.cloudAddAjaxRequest.headers["Content-Type"] = 'application/json';
-                    this.$.cloudAddAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
-                    this.$.cloudAddAjaxRequest.generateRequest();
-                    this.set('sendingData', true);
-                },
-                _addCloudResponse: function(e) {
-                    this.set('sendingData', false);
+                    this.set('selectedProvider', false);
                 },
                 _resetForm: function(e) {
-                    // Reset cloud
-                    this.set('cloud', {});
-
                     // Reset Form Fields
                     this.providerFields.forEach(function(el, index) {
                         if (el.showIf) {
@@ -271,6 +247,18 @@
                         return f.name == name;
                     });
                     return index;
+                },
+                _providerFieldsChanged: function(providerFields){
+                    // reset form validation
+                    this.providerFields.forEach(function(el, index){
+                        this.set('providerFields.' + index + '.value', el.defaultValue);
+                        this.set('providerFields.' + index + '.show', el.show);
+                        console.log(index, el.name, el.show)
+                        var input = this.querySelector('#' + el.name);
+                        if (input) {
+                            input.invalid = false;
+                        }
+                    }, this);
                 }
             });
         })();

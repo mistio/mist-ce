@@ -111,7 +111,8 @@ Polymer({
     },
     listeners: {
         'iron-select' : 'computedSelectedKeyId',
-        'change': 'updateInputs'
+        'change': 'updateInputs',
+        // 'open-and-select' : 'openAndSelect'
     },
     ready: function(){
     },
@@ -141,7 +142,23 @@ Polymer({
             col.removeAttribute('open');
         }
     },
-    _addKey: function(){
+    openAndSelect: function(e){
+        console.log('openAndSelect', e);
+
+        //reset
+        var col = this.querySelector('.collapsible');
+        var trigger = this.querySelector('.trigger');
+        if (col.getAttribute('open')) {
+            trigger.removeAttribute('open');
+            col.removeAttribute('open');
+        }
+        //select
+        this.set('selected', e.detail.key);
+        this.set('selectedKeyId', e.detail.key);
+
+        this.$.dialogModal.open();
+    },
+    _addKey: function(e){
         this.$.dialogModal.close();
         //set attribute origin
         var origin = window.location.pathname;
