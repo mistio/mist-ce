@@ -171,7 +171,7 @@ class BaseDNSController(BaseController):
                         record_id, zone_id)
             raise RecordNotFoundError(exc=exc)
         except Exception as exc:
-            log.exception("Error while running delete_record on %s", 
+            log.exception("Error while running delete_record on %s",
                           self.cloud)
             raise CloudUnavailableError(exc=exc)
 
@@ -261,7 +261,7 @@ class BaseDNSController(BaseController):
             log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
             raise ZoneNotFoundError(exc=exc)
         except Exception as exc:
-            log.exception("Error while running create_record on %s", 
+            log.exception("Error while running create_record on %s",
                           self.cloud)
             raise CloudUnavailableError(exc=exc)
 
