@@ -135,18 +135,18 @@ class BaseDNSController(BaseController):
                      len(records), self.cloud)
             return records
         except InvalidCredsError as exc:
-            log.warning("Invalid creds on running list_zones on %s: %s",
+            log.warning("Invalid creds on running list_recordss on %s: %s",
                         self.cloud, exc)
             raise CloudUnauthorizedError()
         except ssl.SSLError as exc:
-            log.error("SSLError on running list_zones on %s: %s",
+            log.error("SSLError on running list_recordss on %s: %s",
                       self.cloud, exc)
             raise CloudUnavailableError(exc=exc)
         except ZoneDoesNotExistError as exc:
             log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
             raise ZoneNotFoundError(exc=exc)
         except Exception as exc:
-            log.exception("Error while running list_zones on %s", self.cloud)
+            log.exception("Error while running list_records on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
     def delete_record(self, zone_id, record_id):
@@ -171,7 +171,8 @@ class BaseDNSController(BaseController):
                         record_id, zone_id)
             raise RecordNotFoundError(exc=exc)
         except Exception as exc:
-            log.exception("Error while running create_record on %s", self.cloud)
+            log.exception("Error while running delete_record on %s", 
+                          self.cloud)
             raise CloudUnavailableError(exc=exc)
 
     def delete_zone(self, zone_id):
@@ -190,7 +191,7 @@ class BaseDNSController(BaseController):
             log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
             raise ZoneNotFoundError(exc=exc)
         except Exception as exc:
-            log.exception("Error while running create_record on %s", self.cloud)
+            log.exception("Error while running delete_zone on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
     def create_zone(self, domain, type='master', ttl=None, extra=None):
@@ -215,15 +216,15 @@ class BaseDNSController(BaseController):
                      zone.domain, self.cloud)
             return zone.id
         except InvalidCredsError as exc:
-            log.warning("Invalid creds on running create_record on %s: %s",
+            log.warning("Invalid creds on running create_zone on %s: %s",
                         self.cloud, exc)
             raise CloudUnauthorizedError()
         except ssl.SSLError as exc:
-            log.error("SSLError on running create_record on %s: %s",
+            log.error("SSLError on running create_zone on %s: %s",
                       self.cloud, exc)
             raise CloudUnavailableError(exc=exc)
         except Exception as exc:
-            log.exception("Error while running create_record on %s", self.cloud)
+            log.exception("Error while running create_zone on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
     def create_record(self, zone_id, name, type, data, ttl):
@@ -260,7 +261,8 @@ class BaseDNSController(BaseController):
             log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
             raise ZoneNotFoundError(exc=exc)
         except Exception as exc:
-            log.exception("Error while running create_record on %s", self.cloud)
+            log.exception("Error while running create_record on %s", 
+                          self.cloud)
             raise CloudUnavailableError(exc=exc)
 
     def _create_record__prepare_args(self, name, data, ttl):

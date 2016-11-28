@@ -32,6 +32,7 @@ from mist.io.clouds.controllers.dns.base import BaseDNSController
 
 log = logging.getLogger(__name__)
 
+
 class AmazonDNSController(BaseDNSController):
     """
     Amazon Route53 specific overrides.
@@ -46,7 +47,7 @@ class AmazonDNSController(BaseDNSController):
         This is a private
         ---
         """
-        extra = {'ttl':ttl}
+        extra = {'ttl': ttl}
         return name, data, extra
 
 
@@ -67,6 +68,6 @@ class GoogleDNSController(BaseDNSController):
         if not re.match(".*\.$", name):
             name += "."
         extra = None
-        record_data = {'ttl':ttl, 'rrdatas':[]}
+        record_data = {'ttl': ttl, 'rrdatas': []}
         record_data['rrdatas'].append(data)
         return name, record_data, extra
