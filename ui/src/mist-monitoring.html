@@ -91,7 +91,9 @@
             }
         </style>
         <template is="dom-if" if="[[!resource.id]]" restamp>
-            <polyana-dashboard uri="/api/v1/dashboard" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+            <template is="dom-if" if="[[!hidden]]" restamp>
+                <polyana-dashboard uri="/api/v1/dashboard" datasources="[[datasources]]" replace-targets="[[replaceTargets]]"></polyana-dashboard>
+            </template>
         </template>
         <template is="dom-if" if="[[resource.id]]" restamp>
             <div class="monitoring-head horizontal layout" style$="color:#fff;background-color: [[section.color]];" >
