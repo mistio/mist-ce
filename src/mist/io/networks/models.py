@@ -8,7 +8,6 @@ import mist.io.exceptions
 from mist.io.networks.controllers import NetworkController, SubnetController
 
 
-
 log = logging.getLogger(__name__)
 
 
@@ -79,7 +78,8 @@ class Network(me.Document):
         netdict = {'name': self.title,
                    'id': self.id,
                    'description': self.description,
-                   'network_id': self.network_id}
+                   'network_id': self.network_id,
+                   'cloud': self.cloud}
 
         netdict.update({key: getattr(self, key) for key in self._network_specific_fields})
 
@@ -124,9 +124,7 @@ class Subnet(me.Document):
     id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
     subnet_id = me.StringField(required=True)
     title = me.StringField(required=True)
-    cloud = me.ReferenceField(Cloud, required=True)
     cidr = me.StringField(required=True)
-    gateway_ip = me.StringField()  # Cannot be required, some drivers do not provide it
     network = me.ReferenceField('Network', required=True, reverse_delete_rule=me.CASCADE)
     description = me.StringField()
 
@@ -139,7 +137,7 @@ class Subnet(me.Document):
         'collection': 'subnets',
         'indexes': [
             {
-                'fields': ['cloud', 'subnet_id'],
+                'fields': ['network', 'subnet_id'],
                 'sparse': False,
                 'unique': True,
                 'cls': False,
@@ -157,16 +155,15 @@ class Subnet(me.Document):
                                         if field not in Subnet._fields]
 
     @classmethod
-    def add(cls, title, network, cloud, description='', object_id='', create_on_cloud=True, **kwargs):
+    def add(cls, title, network, description='', object_id='', create_on_cloud=True, **kwargs):
 
         if not title:
             raise mist.io.exceptions.RequiredParameterMissingError('title')
-        if not cloud:
-            raise mist.io.exceptions.RequiredParameterMissingError('cloud')
+        if not network:
+            raise mist.io.exceptions.RequiredParameterMissingError('network')
 
         subnet = cls(title=title,
                      network=network,
-                     cloud=cloud,
                      description=description)
 
         if object_id:
@@ -180,7 +177,9 @@ class Subnet(me.Document):
         netdict = {'name': self.title,
                    'id': self.id,
                    'description': self.description,
-                   'subnet_id': self.subnet_id}
+                   'subnet_id': self.subnet_id,
+                   'cidr': self.cidr,
+                   'network': self.network}
 
         netdict.update({key: getattr(self, key) for key in self._subnet_specific_fields})
 
@@ -211,6 +210,7 @@ class GoogleSubnet(Subnet):
     provider = 'gce'
 
     region = me.StringField(required=True)
+    gateway_ip = me.StringField()
 
 
 class OpenStackSubnet(Subnet):
@@ -219,6 +219,7 @@ class OpenStackSubnet(Subnet):
     enable_dhcp = me.BooleanField()
     dns_nameservers = me.ListField()
     allocation_pools = me.ListField()
+    gateway_ip = me.StringField()
 
 
 _populate_class_mapping(NETWORKS, 'Network', Network)

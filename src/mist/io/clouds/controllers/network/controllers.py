@@ -43,7 +43,7 @@ class AmazonNetworkController(BaseNetworkController):
         subnet_doc.extra = libcloud_subnet.extra
 
     def _list_subnets__parse_args(self, kwargs):
-        for_network = kwargs.pop('for_network', None)
+        for_network = kwargs.pop('network', None)
         if for_network:
             kwargs['filters'] = {'vpc-id': for_network.network_id}
 
@@ -130,7 +130,7 @@ class GoogleNetworkController(BaseNetworkController):
 
         from mist.io.networks.models import Subnet
         from mist.io.networks.models import SUBNETS
-        for_network = kwargs.pop('for_network', None)
+        for_network = kwargs.pop('network', None)
         libcloud_subnets = self.ctl.compute.connection.ex_list_subnetworks(**kwargs)
 
         subnet_listing = []
@@ -147,7 +147,6 @@ class GoogleNetworkController(BaseNetworkController):
                 else:
                     subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
                                                             network=db_subnet.network,
-                                                            cloud=self.cloud,
                                                             description=db_subnet.description,
                                                             object_id=db_subnet.id,
                                                             create_on_cloud=False)
@@ -260,7 +259,7 @@ class OpenStackNetworkController(BaseNetworkController):
 
         from mist.io.networks.models import Subnet
         from mist.io.networks.models import SUBNETS
-        for_network = kwargs.pop('for_network', None)
+        for_network = kwargs.pop('network', None)
         libcloud_subnets = self.ctl.compute.connection.ex_list_subnets(**kwargs)
 
         subnet_listing = []
@@ -271,13 +270,11 @@ class OpenStackNetworkController(BaseNetworkController):
                 except Subnet.DoesNotExist:
                     subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
                                                             network=for_network,
-                                                            cloud=self.cloud,
                                                             create_on_cloud=False)
 
                 else:
                     subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
                                                             network=db_subnet.network,
-                                                            cloud=self.cloud,
                                                             description=db_subnet.description,
                                                             object_id=db_subnet.id,
                                                             create_on_cloud=False)

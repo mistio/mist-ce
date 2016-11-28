@@ -90,14 +90,13 @@ class BaseNetworkController(BaseController):
         return
 
     @catch_common_exceptions
-    def list_networks(self, **kwargs):
+    def list_networks(self):
         """List all Networks present on the cloud. Also syncs the state of the Network and Subnet documents on the DB
         with their state on the Cloud API."""
 
         from mist.io.networks.models import Network, NETWORKS
 
-        self._list_networks__parse_args(kwargs)
-        libcloud_networks = self.ctl.compute.connection.ex_list_networks(**kwargs)
+        libcloud_networks = self.ctl.compute.connection.ex_list_networks()
         network_listing = []
 
         # Sync the DB state to the API state
@@ -136,9 +135,6 @@ class BaseNetworkController(BaseController):
 
         return network_listing
 
-    def _list_networks__parse_args(self, kwargs):
-        return
-
     @catch_common_exceptions
     def list_subnets(self, **kwargs):
         """List all Subnets for a particular network present on the cloud."""
@@ -156,14 +152,13 @@ class BaseNetworkController(BaseController):
                 db_subnet = Subnet.objects.get(subnet_id=subnet.id)
             except Subnet.DoesNotExist:
                 subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
-                                                        network=kwargs.get('for_network'),
+                                                        network=kwargs.get('network'),
                                                         cloud=self.cloud,
                                                         create_on_cloud=False)
 
             else:
                 subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
                                                         network=db_subnet.network,
-                                                        cloud=self.cloud,
                                                         description=db_subnet.description,
                                                         object_id=db_subnet.id,
                                                         create_on_cloud=False)

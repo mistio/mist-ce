@@ -1495,25 +1495,23 @@ def list_networks(user, cloud_id):
 
     # TODO: Backwards-compatible network privacy detection, to be replaced
     for net in networks:
-        if 'router_external' in net.keys() and not net.get('router_external'):
+        if not net.get('router_external'):
             ret['private'].append(net)
         else:
             ret['public'].append(net)
     return ret
 
 
-def list_subnets(user, cloud_id, for_network=None):
+def list_subnets(cloud, network=None):
     """List subnets for a cloud.
+
     Currently EC2, Openstack and GCE clouds are supported. For other providers
     this returns an empty list.
 
+    If a network DB object is passed to the network parameter, only subnets that belong
+    to this particular network will be returned.
     """
-
-    try:
-        cloud = Cloud.objects.get(owner=user, id=cloud_id)
-    except Cloud.DoesNotExist:
-        raise CloudNotFoundError
-    return cloud.ctl.network.list_subnets(for_network=for_network)
+    return cloud.ctl.network.list_subnets(network=network)
 
 
 def list_projects(user, cloud_id):
@@ -1562,7 +1560,6 @@ def create_network(owner, cloud, network, subnet, router):
 
     # TODO: Split this up after network, subnet and router creation are separated in the frontend
 
-
     created_network = NETWORKS[cloud.ctl.provider].add(network.pop('name'),
                                                        cloud,
                                                        network.pop('description', ''),
@@ -1573,7 +1570,6 @@ def create_network(owner, cloud, network, subnet, router):
         try:
             created_subnet = SUBNETS[cloud.ctl.provider].add(subnet.pop('name'),
                                                              created_network,
-                                                             cloud,
                                                              subnet.pop('description', ''),
                                                              **subnet)
         except Exception as e:
@@ -1597,7 +1593,6 @@ def create_subnet(owner, cloud, network, subnet):
     """
     created_subnet = SUBNETS[cloud.ctl.provider].add(subnet.pop('name'),
                                                      network,
-                                                     cloud,
                                                      subnet.pop('description', ''),
                                                      **subnet)
     # Schedule a UI update

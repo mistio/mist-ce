@@ -1498,7 +1498,20 @@ def list_subnets(request):
     network_id = request.matchdict.get('network')
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
-    subnets = methods.list_subnets(auth_context.owner, cloud_id, for_network=network_id)
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+
+    network_doc = None
+    if network_id:
+        try:
+            network_doc = Network.objects.get(owner=auth_context.owner, id=network_id)
+        except Network.DoesNotExist:
+            raise NetworkNotFoundError
+
+    subnets = methods.list_subnets(cloud, network=network_doc)
 
     return subnets
 
@@ -1569,8 +1582,10 @@ def create_subnet(request):
     cloud_id = request.matchdict['cloud']
     network_id = request.matchdict['network']
 
+    params = params_from_request(request)
+
     try:
-        subnet = request.json_body.get('subnet')
+        subnet = params.get('subnet')
     except KeyError:
         raise RequiredParameterMissingError('subnet')
 
