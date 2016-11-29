@@ -781,60 +781,73 @@ MACHINE_CREATE_FIELDS.push({
 //     }]
 // });
 
-// // VCLOUD
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'vcloud',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "VMWare vCloud",
-//         defaultValue: "VMWare vCloud",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "username",
-//         label: "Username *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter username",
-//         helptext: 'The username you use to login to vCloud Director'
-//     }, {
-//         name: "password",
-//         label: "Password *",
-//         type: "password",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter password",
-//         helptext: 'The password you use to login to vCloud Director'
-//     }, {
-//         name: "organization",
-//         label: "Organization *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter organization"
-//     }, {
-//         name: "host",
-//         label: "Hostname *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter hostname",
-//         helptext: 'The URL or IP vCloud listens to',
-//         helpHref: 'http://docs.mist.io/article/31-adding-vmware-vcloud'
-//     }]
-// });
+// VCLOUD
+MACHINE_CREATE_FIELDS.push({
+    provider: 'vcloud',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "networks",
+        label: "Networks *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        options: []
+    }, {
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: '',
+    }]
+});
 
 // // VSPHERE
 // MACHINE_CREATE_FIELDS.push({
