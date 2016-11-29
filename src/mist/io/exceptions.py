@@ -154,6 +154,20 @@ class KeyExistsError(ConflictError):
     msg = "Key name exists"
 
 
+class NetworkExistsError(ConflictError):
+    msg = "Network already exists"
+
+
+class SubnetExistsError(ConflictError):
+    msg = "Subnet already exists"
+
+
+#  Rate Limit Error (translated as 429 in views)
+class RateLimitError(MistError):
+    msg = "Rate Limit Error"
+    http_code = 429
+
+
 # INTERNAL ERROR (translated as 500 in views)
 class InternalServerError(MistError):
     msg = "Internal Server Error"
@@ -172,28 +186,39 @@ class NetworkCreationError(InternalServerError):
     msg = "Network creation failed"
 
 
+class NetworkListingError(InternalServerError):
+    msg = "Error while getting a network listing"
+
+
 class NetworkDeletionError(InternalServerError):
     msg = "Network deletion failed"
-
-
-class NetworkExistsError(ConflictError):
-    msg = "Network already exists"
 
 
 class SubnetCreationError(InternalServerError):
     msg = "Subnet creation failed"
 
 
+class SubnetListingError(InternalServerError):
+    msg = "Error while getting a subnet listing"
+
+
 class SubnetDeletionError(InternalServerError):
     msg = "Subnet deletion failed"
 
 
-class SubnetExistsError(ConflictError):
-    msg = "Subnet already exists"
-
-
 class SSLError(MistError):
     msg = "SSL certificate verification error"
+
+
+#  BAD GATEWAY (translated as 502 in views)
+class BadGatewayError(MistError):
+    """Used to notify about failures in upstream services according to RFC 2616"""
+    msg = "Bad Gateway"
+    http_code = 502
+
+
+class MalformedResponseError(BadGatewayError):
+    msg = "Malformed response received from upstream service"
 
 
 # SERVICE UNAVAILABLE (translated as 503 in views)

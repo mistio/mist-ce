@@ -9,15 +9,15 @@ class NetworkController(object):
         return self.network.cloud.ctl.network.delete_network(self.network)
 
     def list_subnets(self):
-        return self.network.cloud.ctl.network.list_subnets(network=self.network)
+        return self.network.cloud.ctl.network.list_subnets(self.network)
 
 
 class SubnetController(object):
     def __init__(self, subnet):
         self.subnet = subnet
 
-    def create_subnet(self, **subnet_args):
-        return self.subnet.cloud.ctl.network.create_subnet(self.subnet, **subnet_args)
+    def create_subnet(self, network, **subnet_args):
+        return self.subnet.network.cloud.ctl.network.create_subnet(self.subnet, network, **subnet_args)
 
     def delete_subnet(self):
-        return self.subnet.cloud.ctl.network.delete_subnet(self.subnet)
+        return self.subnet.network.cloud.ctl.network.delete_subnet(self.subnet)

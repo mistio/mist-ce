@@ -73,7 +73,6 @@ from mist.io.networks.models import NETWORKS, SUBNETS, Network, Subnet
 from mist.io.schedules.models import Schedule
 from mist.core.cloud.models import Machine
 
-
 from mist.core.vpn.methods import destination_nat as dnat
 from mist.core.vpn.methods import super_ping
 from mist.core.vpn.methods import to_tunnel
@@ -1492,6 +1491,7 @@ def list_networks(user, cloud_id):
         raise CloudNotFoundError
 
     networks = cloud.ctl.network.list_networks()
+    print networks
 
     # TODO: Backwards-compatible network privacy detection, to be replaced
     for net in networks:
@@ -1551,54 +1551,44 @@ def associate_ip(user, cloud_id, network_id, ip, machine_id=None, assign=True):
     return conn.ex_associate_ip(ip, server=machine_id, assign=assign)
 
 
-def create_network(owner, cloud, network, subnet, router):
+def create_network(owner, cloud, network):
     """
     Creates a new network. If subnet dict is specified, after creating the network
     it will use the new network's id to create a subnet.
 
     """
 
-    # TODO: Split this up after network, subnet and router creation are separated in the frontend
+    # Create a DB document for the new network
+    new_network = NETWORKS[cloud.ctl.provider].add(title=network.get('name'),
+                                                   cloud=cloud,
+                                                   description=network.get('description'))
 
-    created_network = NETWORKS[cloud.ctl.provider].add(network.pop('name'),
-                                                       cloud,
-                                                       network.pop('description', ''),
-                                                       **network)
-    network_dict = created_network.as_dict()
-
-    if subnet:
-        try:
-            created_subnet = SUBNETS[cloud.ctl.provider].add(subnet.pop('name'),
-                                                             created_network,
-                                                             subnet.pop('description', ''),
-                                                             **subnet)
-        except Exception as e:
-            # Clean up the network if subnet creation fails
-            # This behavior is expected by the frontend
-            created_network.ctl.delete_network()
-            raise e
-
-        network_dict['subnet'] = created_subnet.as_dict()
+    # Create the new network using the cloud provider's API
+    new_network.ctl.create_network(**network)
 
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])
 
-    return network_dict
+    return new_network
 
 
 def create_subnet(owner, cloud, network, subnet):
     """
-        Creates a new subnet attached to the specified network.
+    Creates a new subnet attached to the specified network.
 
     """
-    created_subnet = SUBNETS[cloud.ctl.provider].add(subnet.pop('name'),
-                                                     network,
-                                                     subnet.pop('description', ''),
-                                                     **subnet)
+    # Create a DB document for the new subnet
+    new_subnet = SUBNETS[cloud.ctl.provider].add(title=subnet.get('name'),
+                                                 network=network,
+                                                 description=subnet.get('description'))
+
+    # Create the new network using the cloud provider's API
+    new_subnet.ctl.create_subnet(network, **subnet)
+
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])
 
-    return created_subnet.as_dict()
+    return new_subnet
 
 
 def delete_network(owner, network):
@@ -1615,7 +1605,7 @@ def delete_subnet(owner, subnet):
     """
     Delete a subnet.
     """
-    subnet.ctl.delete_network()
+    subnet.ctl.delete_subnet()
 
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])
@@ -1934,30 +1924,30 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
 
     # run SSH commands
     command = (
-       "echo \""
-       "sudo -n uptime 2>&1|"
-       "grep load|"
-       "wc -l && "
-       "echo -------- && "
-       "uptime && "
-       "echo -------- && "
-       "if [ -f /proc/uptime ]; then cat /proc/uptime; "
-       "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;"
-       "fi; "
-       "echo -------- && "
-       "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
-       "else sysctl hw.ncpu | awk '{print $2}';"
-       "fi;"
-       "echo -------- && "
-       "/sbin/ifconfig;"
-       "echo -------- &&"
-       "/bin/df -Pah;"
-       "echo -------- &&"
-       "uname -r ;"
-       "echo -------- &&"
-       "cat /etc/*release;"
-       "echo --------"
-       "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
+        "echo \""
+        "sudo -n uptime 2>&1|"
+        "grep load|"
+        "wc -l && "
+        "echo -------- && "
+        "uptime && "
+        "echo -------- && "
+        "if [ -f /proc/uptime ]; then cat /proc/uptime; "
+        "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;"
+        "fi; "
+        "echo -------- && "
+        "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
+        "else sysctl hw.ncpu | awk '{print $2}';"
+        "fi;"
+        "echo -------- && "
+        "/sbin/ifconfig;"
+        "echo -------- &&"
+        "/bin/df -Pah;"
+        "echo -------- &&"
+        "uname -r ;"
+        "echo -------- &&"
+        "cat /etc/*release;"
+        "echo --------"
+        "\"|sh"  # In case there is a default shell other than bash/sh (e.g. csh)
     )
 
     if key_id:
@@ -2547,7 +2537,7 @@ def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
 
 def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
     return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s -e COLLECTD_PORT=%s mist/collectd" % (
-    uuid, password, monitor, port)
+        uuid, password, monitor, port)
 
 
 def machine_name_validator(provider, name):

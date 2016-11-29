@@ -1,14 +1,11 @@
 import uuid
-import logging
 
 import mongoengine as me
 
 from mist.io.clouds.models import Cloud
 import mist.io.exceptions
+import mist.io.clouds.controllers.network.controllers
 from mist.io.networks.controllers import NetworkController, SubnetController
-
-
-log = logging.getLogger(__name__)
 
 
 NETWORKS = {}
@@ -21,7 +18,7 @@ def _populate_class_mapping(mapping, class_suffix, base_class):
         if key.endswith(class_suffix) and key != class_suffix:
             value = globals()[key]
             if issubclass(value, base_class) and value is not base_class:
-                mapping[value.provider] = value
+                mapping[value._controller_cls.provider] = value
 
 
 class Network(me.Document):
@@ -56,10 +53,10 @@ class Network(me.Document):
         self._network_specific_fields = [field for field in type(self)._fields if field not in Network._fields]
 
     @classmethod
-    def add(cls, title, cloud, description='', object_id='', create_on_cloud=True, **kwargs):
+    def add(cls, title, cloud, description='', object_id=''):
 
         if not title:
-            raise mist.io.exceptions.RequiredParameterMissingError('title')
+            raise mist.io.exceptions.RequiredParameterMissingError('name')
         if not cloud:
             raise mist.io.exceptions.RequiredParameterMissingError('cloud')
 
@@ -70,8 +67,6 @@ class Network(me.Document):
         if object_id:
             network.id = object_id
 
-        if create_on_cloud:
-            network.ctl.create_network(**kwargs)
         return network
 
     def as_dict(self):
@@ -79,7 +74,7 @@ class Network(me.Document):
                    'id': self.id,
                    'description': self.description,
                    'network_id': self.network_id,
-                   'cloud': self.cloud}
+                   'cloud': self.cloud.id}
 
         netdict.update({key: getattr(self, key) for key in self._network_specific_fields})
 
@@ -100,37 +95,35 @@ class Network(me.Document):
 
 
 class AmazonNetwork(Network):
-    provider = 'ec2'
-
     state = me.StringField()
     cidr = me.StringField()
 
+    _controller_cls = mist.io.clouds.controllers.network.controllers.AmazonNetworkController
+
 
 class GoogleNetwork(Network):
-    provider = 'gce'
-
     mode = me.StringField()
     cidr = me.StringField()
     gateway_ip = me.StringField()
 
+    _controller_cls = mist.io.clouds.controllers.network.controllers.GoogleNetworkController
+
 
 class OpenStackNetwork(Network):
-    provider = 'openstack'
-
     admin_state_up = me.BooleanField()
+
+    _controller_cls = mist.io.clouds.controllers.network.controllers.OpenStackNetworkController
 
 
 class Subnet(me.Document):
     id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
     subnet_id = me.StringField(required=True)
     title = me.StringField(required=True)
-    cidr = me.StringField(required=True)
+    cidr = me.StringField()
     network = me.ReferenceField('Network', required=True, reverse_delete_rule=me.CASCADE)
     description = me.StringField()
 
     extra = me.DictField()
-
-    _controller_cls = None
 
     meta = {
         'allow_inheritance': True,
@@ -155,10 +148,11 @@ class Subnet(me.Document):
                                         if field not in Subnet._fields]
 
     @classmethod
-    def add(cls, title, network, description='', object_id='', create_on_cloud=True, **kwargs):
+    def add(cls, title, network, description='', object_id=''):
 
         if not title:
-            raise mist.io.exceptions.RequiredParameterMissingError('title')
+            raise mist.io.exceptions.RequiredParameterMissingError('name')
+
         if not network:
             raise mist.io.exceptions.RequiredParameterMissingError('network')
 
@@ -169,8 +163,6 @@ class Subnet(me.Document):
         if object_id:
             subnet.id = object_id
 
-        if create_on_cloud:
-            subnet.ctl.create_subnet(**kwargs)
         return subnet
 
     def as_dict(self):
@@ -178,8 +170,9 @@ class Subnet(me.Document):
                    'id': self.id,
                    'description': self.description,
                    'subnet_id': self.subnet_id,
+                   'cloud': self.network.cloud.id,
                    'cidr': self.cidr,
-                   'network': self.network}
+                   'network': self.network.id}
 
         netdict.update({key: getattr(self, key) for key in self._subnet_specific_fields})
 
@@ -200,26 +193,29 @@ class Subnet(me.Document):
 
 
 class AmazonSubnet(Subnet):
-    provider = 'ec2'
 
     available_ips = me.IntField()
     zone = me.StringField()
+    gateway_ip = me.StringField()
+
+    _controller_cls = mist.io.clouds.controllers.network.controllers.AmazonNetworkController
 
 
 class GoogleSubnet(Subnet):
-    provider = 'gce'
 
-    region = me.StringField(required=True)
+    region = me.StringField()
     gateway_ip = me.StringField()
+
+    _controller_cls = mist.io.clouds.controllers.network.controllers.GoogleNetworkController
 
 
 class OpenStackSubnet(Subnet):
-    provider = 'openstack'
 
     enable_dhcp = me.BooleanField()
     dns_nameservers = me.ListField()
     allocation_pools = me.ListField()
-    gateway_ip = me.StringField()
+
+    _controller_cls = mist.io.clouds.controllers.network.controllers.OpenStackNetworkController
 
 
 _populate_class_mapping(NETWORKS, 'Network', Network)

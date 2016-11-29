@@ -1475,7 +1475,6 @@ def list_networks(request):
 
 
 @view_config(route_name='api_v1_subnets', request_method='GET', renderer='json')
-@view_config(route_name='api_v1_subnets_on_network', request_method='GET', renderer='json')
 def list_subnets(request):
     """
     List subnets of a cloud
@@ -1489,13 +1488,13 @@ def list_subnets(request):
       type: string
     network_id:
       in: path
-      required: false
-      description: If provided, only networks belonging ot this subnet will be returned
+      required: true
+      description: The DB ID of the network whose subnets will be returned
       type: string
     """
 
     cloud_id = request.matchdict['cloud']
-    network_id = request.matchdict.get('network')
+    network_id = request.matchdict['network']
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
 
@@ -1504,12 +1503,10 @@ def list_subnets(request):
     except Cloud.DoesNotExist:
         raise CloudNotFoundError
 
-    network_doc = None
-    if network_id:
-        try:
-            network_doc = Network.objects.get(owner=auth_context.owner, id=network_id)
-        except Network.DoesNotExist:
-            raise NetworkNotFoundError
+    try:
+        network_doc = Network.objects.get(owner=auth_context.owner, id=network_id)
+    except Network.DoesNotExist:
+        raise NetworkNotFoundError
 
     subnets = methods.list_subnets(cloud, network=network_doc)
 
@@ -1533,8 +1530,6 @@ def create_network(request):
     network:
       required: true
       type: dict
-    router:
-      type: dict
     subnet:
       type: dict
     """
@@ -1546,7 +1541,6 @@ def create_network(request):
         raise RequiredParameterMissingError(e)
 
     subnet = request.json_body.get('subnet', None)
-    router = request.json_body.get('router', None)
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "create_resources", cloud_id)
 
@@ -1555,11 +1549,23 @@ def create_network(request):
     except Cloud.DoesNotExist:
         raise CloudNotFoundError
 
-    return methods.create_network(auth_context.owner, cloud,
-                                  network, subnet, router)
+    network_doc = methods.create_network(auth_context.owner, cloud, network)
+    network_dict = network_doc.as_dict()
+
+    # Bundling Subnet creation in this call because it is required for backwards compatibility with the UI
+    if subnet:
+        try:
+            subnet_doc = methods.create_subnet(auth_context.owner, cloud, network_doc, subnet)
+        except Exception as exc:
+            # Cleaning up the network object in case subnet creation fails for any reason
+            network_doc.ctl.delete_network()
+            raise exc
+        network_dict['subnet'] = subnet_doc.as_dict()
+
+    return network_doc.as_dict()
 
 
-@view_config(route_name='api_v1_subnets_on_network', request_method='POST', renderer='json')
+@view_config(route_name='api_v1_subnets', request_method='POST', renderer='json')
 def create_subnet(request):
     """
     Create subnet on a given network on a cloud.
@@ -1601,10 +1607,13 @@ def create_subnet(request):
     except Network.DoesNotExist:
         raise NetworkNotFoundError
 
-    return methods.create_subnet(auth_context.owner, cloud, network, subnet)
+    subnet_doc = methods.create_subnet(auth_context.owner, cloud, network, subnet)
+
+    return subnet_doc.as_dict()
 
 
 @view_config(route_name='api_v1_network', request_method='DELETE')
+@view_config(route_name='network', request_method='DELETE')
 def delete_network(request):
     """
     Delete a network
@@ -1641,6 +1650,7 @@ def delete_network(request):
 
 
 @view_config(route_name='api_v1_subnet', request_method='DELETE')
+@view_config(route_name='subnet', request_method='DELETE')
 def delete_subnet(request):
     """
     Delete a subnet
