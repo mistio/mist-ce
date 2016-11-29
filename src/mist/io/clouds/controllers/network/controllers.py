@@ -17,7 +17,7 @@ class AmazonNetworkController(BaseNetworkController):
 
     def _create_network__parse_args(self, kwargs):
         for required_key in ['cidr', 'name']:
-            if required_key not in kwargs:
+            if not kwargs.get(required_key):
                 raise mist.io.exceptions.RequiredParameterMissingError(required_key)
         rename_kwargs(kwargs, 'cidr', 'cidr_block')
         kwargs.pop('description', None)
@@ -32,7 +32,7 @@ class AmazonNetworkController(BaseNetworkController):
 
     def _create_subnet__parse_args(self, network, kwargs):
         for required_key in ['cidr', 'availability_zone']:
-            if required_key not in kwargs:
+            if not kwargs.get(required_key):
                 raise mist.io.exceptions.RequiredParameterMissingError(required_key)
         kwargs['vpc_id'] = network.network_id
         rename_kwargs(kwargs, 'cidr', 'cidr_block')
@@ -68,7 +68,7 @@ class GoogleNetworkController(BaseNetworkController):
     provider = 'gce'
 
     def _create_network__parse_args(self, kwargs):
-        if 'name' not in kwargs:
+        if not kwargs.get('name'):
             raise mist.io.exceptions.RequiredParameterMissingError('name')
 
         kwargs['mode'] = kwargs.get('mode', 'legacy')
@@ -88,7 +88,7 @@ class GoogleNetworkController(BaseNetworkController):
 
     def _create_subnet__parse_args(self, network, kwargs):
         for required_key in ['cidr', 'region', 'name']:
-            if required_key not in kwargs:
+            if not kwargs.get(required_key):
                 raise mist.io.exceptions.RequiredParameterMissingError(required_key)
         kwargs['network'] = network.title
 
@@ -220,7 +220,7 @@ class OpenStackNetworkController(BaseNetworkController):
     provider = 'openstack'
 
     def _create_network__parse_args(self, kwargs):
-        if 'name' not in kwargs:
+        if not kwargs.get('name'):
             raise mist.io.exceptions.RequiredParameterMissingError('name')
         kwargs['admin_state_up'] = kwargs.get('admin_state_up', True)
         kwargs['shared'] = kwargs.get('shared', False)
@@ -233,7 +233,7 @@ class OpenStackNetworkController(BaseNetworkController):
         network_doc.extra = libcloud_network.extra
 
     def _create_subnet__parse_args(self, network, kwargs):
-        if 'name' not in kwargs:
+        if not kwargs.get('name'):
             raise mist.io.exceptions.RequiredParameterMissingError('name')
         kwargs['network_id'] = network.network_id
         kwargs['allocation_pools'] = kwargs.get('allocation_pools', [])
