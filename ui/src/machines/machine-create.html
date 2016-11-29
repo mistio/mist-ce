@@ -195,6 +195,9 @@
                         }, this);
                     }
                 },
+                _machineAddAjaxResponse: function(e){
+                     document.querySelector('app-location').set('path', '/machines');
+                },
                 _goBack: function(){
                     history.back();
                 }
