@@ -184,6 +184,10 @@
                             if (f.name.endsWith("key")) {
                                 f.options = this.model.keysArray;
                             }
+                            // for openstack this sould be multi selection
+                            if (f.name.endsWith("networks")) {
+                                f.options = this.model.clouds[cloudId].networksArray;
+                            }
 
                             if (f.options && f.options.length == 1){
                                 if (f.type == "dropdown")

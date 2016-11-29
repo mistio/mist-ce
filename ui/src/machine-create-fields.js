@@ -226,7 +226,6 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-
     }, {
         name: "key",
         label: "Key *",
@@ -573,102 +572,132 @@ MACHINE_CREATE_FIELDS.push({
 //     }]
 // });
 
-// // OPENSTACK
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'openstack',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "OpenStack",
-//         defaultValue: "OpenStack",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "username",
-//         label: "Username *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter username"
-//     }, {
-//         name: "password",
-//         label: "Password *",
-//         type: "password",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter password"
-//     }, {
-//         name: "auth_url",
-//         label: "Auth Url *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter url",
-//         helptext: 'Your OpenStack Auth URL',
-//         helpHref: 'http://docs.mist.io/article/27-adding-openstack'
-//     }, {
-//         name: "tenant_name",
-//         label: "Tenant Name *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter tenant name"
-//     }, {
-//         name: "region",
-//         label: "Region",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: false
-//     }]
-// });
+// OPENSTACK
+MACHINE_CREATE_FIELDS.push({
+    provider: 'openstack',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "networks",
+        label: "Networks *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        options: []
+    }, {
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: '',
+    }]
+});
 
-// // PACKET
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'packet',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "Packet",
-//         defaultValue: "Packet",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "apikey",
-//         label: "API Key *",
-//         type: "password",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter API Key",
-//         helptext: 'You can find your API Token on the Packet portal',
-//         helpHref: 'http://docs.mist.io/article/100-adding-packet'
-//     }, {
-//         name: "project_id",
-//         label: "Project",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: false,
-//         errorMessage: "Please enter title",
-//         helptext: 'Optionally specify the project name'
-//     }]
-// });
+// PACKET
+MACHINE_CREATE_FIELDS.push({
+    provider: 'packet',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: '',
+    }]
+});
 
 // // RACKSPACE
 // MACHINE_CREATE_FIELDS.push({
