@@ -81,7 +81,7 @@
                     <p>Depending on the cloud there maybe needed different machine parameters. Choose a provider for the coresponding fields to appear.</p>
                 </div>
                 <div hidden$=[[!selectedCloud]]>
-                    <app-form fields="{{machineFields}}" method="POST" url="/api/v1/clouds/[[selectedCloud]]/machines" on-response="_machineAddAjaxResponse" on-error="_machineAddAjaxError" btncontent="Create Machine"></app-form>
+                    <app-form form="{{form}}" fields="{{machineFields}}" method="POST" url="/api/v1/clouds/[[selectedCloud]]/machines" on-response="_machineAddAjaxResponse" on-error="_machineAddAjaxError" btncontent="Create Machine"></app-form>
                 </div>
             </paper-material>
         </div>
@@ -110,7 +110,7 @@
                     '_cloudChanged(selectedCloud, machinesFields)'
                 ],
                 listeners: {
-                    // 'change': '_updateFields',
+                    // 'change': '_updatePayload',
                     // 'iron-select': '_updateFields',
                 },
                 _computeProviderLogo: function(className) {
@@ -127,7 +127,7 @@
                 },
                 _cloudChanged: function(selectedCloud, machinesFields) {
                     console.log('_cloudChanged',selectedCloud, machinesFields);
-                    //this._resetForm();
+                    // this._resetForm();
                     // console.log('_cloudChanged',this.selectedCloud);
                     if (selectedCloud){
                         var cloudName =  this.model.clouds[selectedCloud].provider.split('_')[0];
@@ -170,18 +170,19 @@
                     console.log('_updateFields', this.selectedCloud)
                     if (this.selectedCloud) {
                         var cloudId = this.selectedCloud;
+                        console.log('cloudId', cloudId);
                         this.machineFields.forEach(function(f, index) {
-                            if (f.name.startsWith("location")) {
+                            if (f.name.endsWith("location")) {
                                 f.options = this.model.clouds[cloudId].locationsArray;
                             }
-                            if (f.name.startsWith("image")) {
+                            if (f.name.endsWith("image")) {
                                 f.options = this.model.clouds[cloudId].imagesArray;
                             }
-                            if (f.name.startsWith("size")) {
+                            if (f.name.endsWith("size")) {
                                 f.options = this.model.clouds[cloudId].sizesArray;
                             }
-                            if (f.name.startsWith("key")) {
-                                f.options = this.model.clouds[cloudId].keysArray;
+                            if (f.name.endsWith("key")) {
+                                f.options = this.model.keysArray;
                             }
 
                             if (f.options && f.options.length == 1){

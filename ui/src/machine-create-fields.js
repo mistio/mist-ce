@@ -226,6 +226,16 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
+
+    }, {
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
     }, {
         name: "ports",
         label: "Ports *",
@@ -239,8 +249,8 @@ MACHINE_CREATE_FIELDS.push({
         name: "monitoring",
         label: "Enable monitoring",
         type: "toggle",
-        value: "",
-        defaultValue: "",
+        value: "true",
+        defaultValue: "true",
         show: true,
         required: false,
         helptext: '',
@@ -259,7 +269,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true
     },{
-        name: "mist_image",
+        name: "image",
         label: "Image *",
         type: "mist_dropdown",
         value: "",
@@ -268,18 +278,27 @@ MACHINE_CREATE_FIELDS.push({
         required: true,
         options: []
     }, {
-        name: "mist_size",
+        name: "size",
         label: "Size *",
-        type: "dropdown",
+        type: "mist_dropdown",
         value: "",
         defaultValue: "",
         show: true,
         required: true,
         options: []
     }, {
-        name: "mist_location",
+        name: "location",
         label: "Location *",
         type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    }, {
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
         value: "",
         defaultValue: "",
         show: true,
@@ -298,8 +317,8 @@ MACHINE_CREATE_FIELDS.push({
         name: "monitoring",
         label: "Enable monitoring",
         type: "toggle",
-        value: "",
-        defaultValue: "",
+        value: "true",
+        defaultValue: "true",
         show: true,
         required: false,
         helptext: '',
