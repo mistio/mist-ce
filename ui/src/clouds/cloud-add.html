@@ -132,8 +132,7 @@
                 },
                 observers: [
                     '_providerChanged(selectedProvider, providers)',
-                    '_keysChanged(keys.*, providerFields)',
-                    '_providerFieldsChanged(providerFields)'
+                    '_keysChanged(keys.*, providerFields)'
                 ],
                 listeners: {
                     'iron-select' : '_updateCloudTitle'
@@ -164,7 +163,15 @@
                           show: false,
                           value: selectedProvider
                     }].concat(providerFields));
-                    console.warn('providerFields', providerFields);
+
+                    // replaces _providerFieldsChanged observer and skips provider reset 
+                    // while reseting the other fields
+                    this.providerFields.forEach(function(el, index){
+                        if (el.name != "provider") {
+                            this.set('providerFields.' + index + '.show', el.show);
+                            this._resetField(el, index);
+                        }
+                    }, this);
                     
                     this.fillInKnownData(selectedProvider, this.clouds);
                 },
@@ -248,18 +255,6 @@
                     });
                     return index;
                 },
-                _providerFieldsChanged: function(providerFields){
-                    // reset form validation
-                    this.providerFields.forEach(function(el, index){
-                        this.set('providerFields.' + index + '.value', el.defaultValue);
-                        this.set('providerFields.' + index + '.show', el.show);
-                        console.log(index, el.name, el.show)
-                        var input = this.querySelector('#' + el.name);
-                        if (input) {
-                            input.invalid = false;
-                        }
-                    }, this);
-                }
             });
         })();
     </script>

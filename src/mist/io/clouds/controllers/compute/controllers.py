@@ -334,9 +334,9 @@ class AzureComputeController(BaseComputeController):
     def _list_images__fetch_images(self, search=None):
         images = self.connection.list_images()
         images = [image for image in images
-                  if 'RightImage' not in image.name
-                  and 'Barracude' not in image.name
-                  and 'BizTalk' not in image.name]
+                  if 'RightImage' not in image.name and
+                  'Barracude' not in image.name and
+                  'BizTalk' not in image.name]
         # There are many builds for some images eg Ubuntu.
         # All have the same name!
         images_dict = {}

@@ -1,0 +1,413 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../bower_components/paper-menu/paper-submenu.html">
+<link rel="import" href="../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<!-- <link rel="import" href="../bower_components/juicy-ace-editor/juicy-ace-editor.html"> -->
+<link rel="import" href="../bower_components/iron-behaviors/iron-control-state.html">
+<link rel="import" href="../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<dom-module id="add-graph">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="shared-styles">
+          :host {
+            display: block;
+            position: relative;
+          }
+          #selectTarget {
+            position: absolute !important;
+            min-width: 300px;
+          }
+          paper-header-panel {
+            background-color: #03a9f4;
+          }
+          .progress {
+            margin: 32px 0 0 0;
+            width: 100%;
+          }
+          paper-textarea#juicyScript {
+            width: 500px;
+          }
+          paper-textarea#juicyScript ::content paper-input-container #inner-editor {
+            font-family: monospace !important;
+          }
+          paper-textarea#juicyScript ::content .floated-label-placeholder {
+            display: none; 
+          }
+          paper-progress {
+            width: 100%;
+            margin-left: -24px;
+          }
+          paper-progress#progresserror ::content #primaryProgress {
+            background-color: var(--red-color);
+          }
+          hr {
+            margin-left: -24px;
+            margin-right: 24px;
+          }
+          h2 {
+            padding: 0 24px;
+          }
+          div > h2 {
+            padding: 24px 0;
+          }
+          div > h2.textarea-h2 {
+            padding-bottom: 0; 
+          }
+          .errormsg-container {
+            color: var(--red-color);
+          }
+          .errormsg-container iron-icon {
+            color: inherit;
+          }
+          .add-button {
+            background-color: #f1f1f1;
+            float: right;
+            display: block;
+            text-align: right;
+            margin-top: 4px;
+          }
+          .add-button iron-icon {
+            color: inherit;
+            opacity: 0.32;
+          }
+          paper-dialog-scrollable {
+            padding: 0 !important;
+          }
+          paper-dialog-scrollable ::content paper-item {
+            padding-left: 10px !important;
+            position: relative;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+          }
+          paper-dialog-scrollable ::content .expand-more {
+            position: absolute;
+            right: 4px;
+          }
+          paper-dialog-scrollable ::content paper-menu:not(.main) {
+            padding: 0 0 0 16px;
+          }
+          .loader {
+            margin: 8px;
+            display: block;
+            text-align: center;
+          }
+          .loader paper-spinner {
+            padding: 8px
+          }
+          #customButton {
+            width: 100%;
+          }
+
+        </style>
+
+        <paper-button on-tap="openDialog" class="add-button"><iron-icon icon="icons:add-circle"></iron-icon></iron-icon> Add Graph</paper-button>
+        <paper-dialog id="selectTarget" horizontal-align="right" vertical-align="bottom">
+            <h2>Select target for graph</h2>
+            <paper-dialog-scrollable>
+                <paper-menu class="main">
+                    <paper-button id="customButton" on-tap="_showCustomGraphDialog" class="blue">Custom</paper-button>
+                </paper-menu>
+                <div class="loader" hidden$="{{!loadingMetrics}}">Loading custom server metrics <br/>
+                    <paper-spinner active="{{loadingMetrics}}"></paper-spinner>
+                </div>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <paper-dialog id="customOptions" with-backdrop>
+          <h2>Custom graph</h2>
+          <paper-dialog-scrollable>
+            <div id="sshKeyMissing" hidden="{{sshKeyExists}}">
+              <span>You need to have an associated SSH key to add custom graphs</span>
+              <paper-button id="addKey" on-tap="_openAddKeyPanel">Add Key</paper-button>
+            </div>
+            <div>
+                <paper-input id="name" value="{{metric.name}}" label="Name" placeholder="e.g my metric" disabled$="[[!sshKeyExists]]"></paper-input>
+                <paper-input id="unit" value="{{metric.unit}}" label="Unit" placeholder="e.g bytes (optional)" disabled$="[[!sshKeyExists]]"></paper-input>
+            </div>
+            <div>
+                <h2 class$="sshKey-[[sshKeyExists]] textarea-h2">Python script</h2>
+                <paper-textarea id="juicyScript" value="{{metricScript}}" noLabelFloat hidden$=[[!sshKeyExists]]></paper-textarea>
+            </div>
+            <div>
+                <h2 class$="sshKey-[[sshKeyExists]]">Advance settings</h2>
+                <paper-checkbox id="derivative" disabled$="[[!sshKeyExists]]">Calculate derivative</paper-checkbox>
+            </div>
+          </paper-dialog-scrollable>
+          <div class="progress">
+              <paper-progress id="progress" indeterminate hidden$="[[!sendingData]]"></paper-progress>
+              <paper-progress id="progresserror" value="100" hidden$="[[!formError]]"></paper-progress>
+              <hr class="appform"/>
+              <p class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></p>
+          </div>
+            <div class="buttons">
+              <paper-button dialog-dismiss>Cancel</paper-button>
+              <paper-button id="submit" align="center" on-tap="_generateCustomgraphrequest" disabled="[[!formReady]]" class="blue"> Add custom graph</paper-button>
+          </div>
+        </paper-dialog>
+
+        <iron-ajax id="postCustomgraph" url="[[uri]]"  handle-as="xml" method="POST" contentType="application/json" on-response="_customgraphResponse" on-error="_handleError"></iron-ajax>
+        <iron-ajax
+          id="associateMetric"
+          handle-as="xml"
+          method="PUT"
+          contentType="application/json"
+          loading="{{loadingMetrics}}"
+          on-response="_handleAssociateResponse"
+          on-error="_handleAssociateError">
+        </iron-ajax>
+        <iron-ajax
+          id="metrics"
+          url="[[_computeMetricsUri(cloudId, machine.id)]]"
+          handle-as="json" method="GET"
+          contentType="application/json"
+          loading="{{loadingMetrics}}"
+          on-response="_handleMetricResponse"
+          on-error="_handleMetricError">
+        </iron-ajax>
+    </template>
+    <script>
+        Polymer({
+            is: "add-graph",
+            properties: {
+                panel: {
+                    type: Object,
+                },
+                data: {
+                    type: Object
+                },
+                machine: Object,
+                cloudId: String,
+                responseMetrics: {
+                    type: Array,
+                    value: null
+                },
+                target: {
+                    type: String
+                },
+                hide: {
+                    type: Boolean,
+                    value: true // init the value to true so it will be hidden on page load
+                },
+                metricScript:{
+                  type:String,
+                },
+                formReady: {
+                  type: Boolean,
+                  value: false,
+                  computed: 'computeFormReady(metric.*)'
+                },
+                sendingData: {
+                    type: Boolean,
+                    value: false
+                },
+                formError: {
+                    type: Boolean,
+                    value: false
+                },
+                machineKeys:{
+                  type:Array,
+                  value:[]
+                },
+                sshKeyExists:{
+                  type:Boolean,
+                  computed: "computeSshKeyExists(machineKeys)",
+                  value:true
+                },
+                uri:String,
+                metric: {
+                  type:Object,
+                  value:function(){
+                    return{
+                      name: null,
+                      unit: null,
+                      type: "gauge",
+                      script: "import random \n \ndef read(): \n    # return random value \n    return random.random() \n",
+                      pluginId: null
+                    }
+                  }
+                }
+            },
+            observers:[
+              '_computeplugidId(metric.name)',
+            ],
+            listeners: {
+              'keyup':'_scriptValue',
+              'panelAdded': '_associateMetric'
+            },
+            _scriptValue:function(e){
+              if(e.target.id=="juicyScript"){
+                this.set("metric.script", e.target.value.trim());
+              }
+            },
+            _customgraphResponse: function (data){
+                this.set('sendingData', false);
+                this.set('formError', false);
+                console.log("CUSTOM GRAPH",data.detail.response);
+                this.fire('update-dashboard');
+                this.$.customOptions.close();
+                this.$.selectTarget.close();
+            },
+            _handleError: function(e,d) {
+                this.set('sendingData', false);
+                this.set('formError', true);
+                this.$.errormsg.textContent = e.detail.error.message;
+            },
+            _computeplugidId: function(name) {
+                if (!this.metric.name) return;
+                var newPluginId = this.metric.name
+                    .toLowerCase() // Remove upper case letters
+                    .replace(/[^\w]/g, '_') // keep only alphanumeric and _ chars
+                    .replace(/__*/g, '_') // don't allow double underscores
+                    .replace(/^_/, '') // trim heading underscore
+                    .replace(/_$/, ''); // trim trailing underscore
+                this.set('metric.pluginId', newPluginId);
+                this.set('metric.name',name);
+            },
+            _computeMetricsUri: function(cloudId, machineId) {
+                return "/api/v1/clouds/" + cloudId + "/machines/" + machineId + "/metrics";
+            },
+            _computeUrl: function(cloudId,machineId,pluginId) {
+                this.uri= '/api/v1/clouds/' + cloudId +
+                    '/machines/' + machineId +
+                    '/plugins/' + pluginId;
+            },
+            openDialog: function() {
+                if(!this.responseMetrics)
+                    this.querySelector("#metrics").generateRequest();
+                this.querySelector("#selectTarget").open();
+            },
+            computeFormReady: function(metric){
+              return metric.base.name != '' && metric.base.name != null && typeof metric.base.name !=="undefined" && metric.base.script != '' && typeof metric.base.script!=="undefined" ;
+            },
+            _handleMetricResponse: function(data) {
+                console.log('_handleMetricResponse', data);
+                var output={};
+
+                Object.keys(data.detail.response).forEach(function(i){
+                  var res=output ;
+                  var splitArray=i.split(".")
+                  for(var p=0; p<splitArray.length; p++){
+                    if (!res[splitArray[p]]){
+                      res[splitArray[p]] = {};
+                    }
+                   if (p==splitArray.length-1){
+                     res[splitArray[p]] = data.detail.response[i].id;
+                   }
+                    res = res[splitArray[p]];
+                  }
+                });
+                this.set('responseMetrics',output);
+                this._createMenus(output,null);
+            },
+            _showCustomGraphDialog: function(){
+              var dialog = this.querySelector('#customOptions');
+              dialog.open();
+              this.querySelector('#juicyScript').value=this.metric.script;
+            },
+            computeSshKeyExists:function(keys){
+              return keys.length > 0;
+            },
+            _openAddKeyPanel:function(){
+              this.querySelector('#customOptions').close();
+              this.querySelector('#selectTarget').close();
+              this.fire("open-and-select");
+            },
+            _createMenus: function(input,parent){
+              if(parent==null){
+                var menu=this.querySelector('paper-menu');
+              }
+              else{
+                var par=parent.querySelector('iron-collapse')
+                var menu=document.createElement('paper-menu');
+                Polymer.dom(par).appendChild(menu);
+              }
+              Object.keys(input).forEach(function(i){
+                var sub=document.createElement('paper-submenu');
+                var item=document.createElement('paper-item');
+                Polymer.dom(item).textContent=i;
+                // TODO
+                // item.disabled = this.checkIfInGraph(i);
+                sub.id=i;
+                Polymer.dom(sub.querySelector('div')).appendChild(item);
+                //sub.querySelector('iron-collapse').appendChild("to menou ");  tis epiloges (item) mesa sto div tou menou opws apo panw
+                Polymer.dom(menu.querySelector('div')).appendChild(sub);
+                if(typeof input[i]!='string'){
+                  var icon=document.createElement('iron-icon');
+                  icon.icon="icons:expand-more";
+                  Polymer.dom(item).appendChild(icon);
+                  icon.classList.add("expand-more");
+                  this._createMenus(input[i],sub);
+                }
+                else{
+                  item.onclick= function(){
+                    this.fire('panelAdded', {metric:input[i]});
+                    this._exit('selectTarget');
+                  }.bind(this)
+                }
+              },this);
+            },
+            checkIfInGraph: function(i){
+              var isIn = this.dashboard.rows.forEach(function(r){
+                  return r.panels.forEach(function(p){
+                    return p.targets.find(function(t){
+                      return i.indexOf(t.target)!=1;
+                    });
+                  });
+              });
+              return isIn ? true : false;
+            },
+            _associateMetric: function(e){
+              var metric = e.detail.metric;
+              var payload = {
+                metric_id: metric
+              };
+              this.$.associateMetric.url = "/api/v1/clouds/"+this.cloudId+"/machines/"+this.machine.id+"/metrics";
+              this.$.associateMetric.headers["Csrf-Token"] = CSRF_TOKEN;
+              this.$.associateMetric.params = payload;
+              this.$.associateMetric.generateRequest();
+            },
+            _handleAssociateResponse: function () {
+              this.fire('update-dashboard');
+            },
+            _exit: function(who) {
+              if(who==null){
+                var dialog = this.querySelector('paper-dialog');
+              }else{
+                var dialog=this.querySelector('#'+who);
+              }
+              dialog.close();
+            },
+            _generateCustomgraphrequest(){
+              this.set('formError', false);
+              this._computeUrl(this.cloudId, this.machine.id, this.metric.pluginId);
+              this.metric.script=this.querySelector('#juicyScript').value;
+              if(this.querySelector('#derivative').checked){
+                this.metric.type="derive";
+              }
+              else{
+                this.metric.type="gauge"
+              }
+              var payload=  {
+                   "plugin_type"   : "python",
+                   "name"          : this.metric.name,
+                   "unit"          : this.metric.unit,
+                   "value_type"    : this.metric.type,
+                   "read_function" : this.metric.script,
+                   "host"          : this.machine.public_ips[0]
+               };
+              this.querySelector('#postCustomgraph').contentType="application/json"
+              this.querySelector('#postCustomgraph').headers["Csrf-Token"] = CSRF_TOKEN;
+              this.querySelector('#postCustomgraph').body =payload;
+              this.querySelector('#postCustomgraph').generateRequest();
+              this.set('sendingData', true);
+            }
+        });
+    </script>
+</dom-module>
