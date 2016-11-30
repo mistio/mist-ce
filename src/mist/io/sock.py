@@ -1,6 +1,5 @@
 """mist.io.socket.
 
-
 Here we define the sockjs Connection and handlers.
 
 When a user loads mist.io or comes back online, their browser will request a
@@ -22,7 +21,7 @@ from mist.io.sockjs_mux import MultiplexConnection
 try:
     from mist.io import config as ioconfig
     from mist.core import config
-    from mist.core.methods import get_stats
+    from mist.core.methods import get_stats, get_load
     from mist.io.clouds.models import Cloud
     from mist.io.machines.models import Machine
     from mist.io.keys.models import Key
@@ -34,7 +33,7 @@ except ImportError:
 
 from mist.core.auth.methods import auth_context_from_session_id
 
-from mist.io.exceptions import BadRequestError, UnauthorizedError
+from mist.io.exceptions import BadRequestError, UnauthorizedError, MistError
 from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
@@ -316,12 +315,20 @@ class MainConnection(MistConnection):
             }
             if error:
                 ret['error'] = error
+            log.error(ret)
             self.send('stats', ret)
 
         try:
-            get_stats(self.owner, cloud_id, machine_id, start, stop, step,
-                      metrics=metrics, callback=callback, tornado_async=True)
-        except BadRequestError as exc:
+            if not cloud_id and not machine_id and (
+                not metrics or metrics == ['load.shortterm']
+            ):
+                get_load(self.owner, start, stop, step,
+                         tornado_callback=callback)
+            else:
+                get_stats(self.owner, cloud_id, machine_id, start, stop, step,
+                          metrics=metrics, callback=callback,
+                          tornado_async=True)
+        except MistError as exc:
             callback([], str(exc))
         except Exception as exc:
             log.error("Exception in get_stats: %r", exc)
@@ -380,11 +387,10 @@ class MainConnection(MistConnection):
                         if not ips:
                             continue
 
-                    has_key = False
-                    keypairs = Key.objects(owner=self.owner)
                     machine_obj = Machine.objects(cloud=cloud,
                                                   machine_id=machine["id"],
-                                                  key_associations__not__size=0).first()
+                                                  key_associations__not__size=0
+                                                  ).first()
                     if machine_obj:
                         cached = tasks.ProbeSSH().smart_delay(
                             self.owner.id, cloud_id, machine['id'], ips[0]

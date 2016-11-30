@@ -37,7 +37,10 @@
           return path == '/+create';
       },
       _isDetailsPageActive: function(path) {
-          return path && path != '/+create';
+          if (path && path != '/+create') 
+            return true;
+          else 
+            return false;
       },
       _isListActive: function(path) {
           return !path;
