@@ -81,7 +81,7 @@
                     <p>Depending on the cloud there maybe needed different machine parameters. Choose a provider for the coresponding fields to appear.</p>
                 </div>
                 <div hidden$=[[!selectedCloud]]>
-                    <app-form form="{{form}}" fields="{{machineFields}}" method="POST" url="/api/v1/clouds/[[selectedCloud]]/machines" on-response="_machineAddAjaxResponse" on-error="_machineAddAjaxError" btncontent="Create Machine"></app-form>
+                    <app-form form="{{form}}" fields="{{machineFields}}" method="POST" url="/api/v1/clouds/[[selectedCloud]]/machines" on-response="_machineAddAjaxResponse" on-error="_machineAddAjaxError" btncontent="Launch"></app-form>
                 </div>
             </paper-material>
         </div>
@@ -107,7 +107,8 @@
                     machinesFields: Array
                 },
                 observers: [
-                    '_cloudChanged(selectedCloud, machinesFields)'
+                    '_cloudChanged(selectedCloud, machinesFields)',
+                    '_machineFieldsChanged(model, selectedCloud, machineFields.*)'
                 ],
                 listeners: {
                     // 'change': '_updatePayload',
@@ -198,6 +199,61 @@
 
                         }, this);
                     }
+                },
+                _machineFieldsChanged: function(model, selectedCloud, changeRecord){
+                    // if is docker & ports changed, transform ports to docker_exposed_ports & docker_port_bindings
+                    if (this.model.clouds[this.selectedCloud].provider == "docker" && changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'ports'){
+                        this._mapPortsToDockerPorts(changeRecord.value);
+                    }
+                },
+                _mapPortsToDockerPorts: function(input){
+                    var inputs = input.split('\n');
+                    var docker_exposed_ports = {};
+                    var docker_port_bindings = {};
+                    console.log('inputs', inputs);
+                    for (var i = 0; i < inputs.length; i++) {
+                        var ports = inputs[i].split(':');
+
+                        var p1 = ports[0], 
+                            p2 = ports[1]; 
+
+                        //sanitize
+                        if (p1)
+                            p1 = p1.trim();
+                        if (p2)
+                            p2 = p2.trim();
+
+                        //update docker_exposed_ports
+                        //update docker_port_bindings
+                        if (p1 && p1.length && p2 && p2.length ) {
+                            if (p1.indexOf('/') == -1) {
+                                docker_exposed_ports[p1+'/tcp'] = {};
+                                docker_port_bindings[p1+'/tcp'] = {"HostPort" : p2}
+                            }
+                            else {
+                                docker_exposed_ports[p1] = {};
+                                docker_port_bindings[p1] = {"HostPort" : p2}
+                            }
+                        }
+                    }
+
+                    // save in fields
+                    var indDep = this._fieldIndexByName('docker_exposed_ports');
+                    var indDpb = this._fieldIndexByName('docker_port_bindings');
+
+                    if (indDep)
+                        this.set('machineFields.'+indDep+'.value', docker_exposed_ports);
+                    if (indDpb)
+                        this.set('machineFields.'+indDpb+'.value', docker_port_bindings);
+
+                },
+                _fieldIndexByName: function(name){
+                    var index;
+                    var passField = this.machineFields.find(function(f, ind){
+                        index = ind;
+                        return f.name == name;
+                    });
+                    return index;
                 },
                 _machineAddAjaxResponse: function(e){
                      document.querySelector('app-location').set('path', '/machines');

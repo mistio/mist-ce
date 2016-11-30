@@ -236,6 +236,42 @@ MACHINE_CREATE_FIELDS.push({
         required: true,
         options: []
     }, {
+        name: "docker_env",
+        label: "Docker Env",
+        type: "textarea",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: "",
+    }, {
+        name: "docker_command",
+        label: "Docker Command",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: ""
+    }, {
+        name: "docker_port_bindings",
+        label: "Docker Port Bindings",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: false,
+        required: false,
+        helptext: ""
+    }, {
+        name: "docker_exposed_ports",
+        label: "Docker Exposed Ports",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: false,
+        required: false,
+        helptext: ""
+    }, {
         name: "ports",
         label: "Ports *",
         type: "textarea",
@@ -252,7 +288,7 @@ MACHINE_CREATE_FIELDS.push({
         defaultValue: "true",
         show: true,
         required: false,
-        helptext: '',
+        helptext: ''
     }]
 });
 
