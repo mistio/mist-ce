@@ -233,6 +233,7 @@ class Script(me.Document):
     def __str__(self):
         return 'Script %s (%s) of %s' % (self.name, self.id, self.owner)
 
+
 class AnsibleScript(Script):
 
     _controller_cls = controllers.AnsibleScriptController
@@ -242,7 +243,10 @@ class ExecutableScript(Script):
 
     _controller_cls = controllers.ExecutableScriptController
 
-# class CollectdScript(Script):
-#
-#     # extra params, currently used only for collectd_python_plugin
-#     extra = me.DictField()
+
+class CollectdScript(Script):
+
+    # extra params, currently used only for collectd_python_plugin
+    extra = me.DictField()
+
+    _controller_cls = controllers.CollectdScriptController
