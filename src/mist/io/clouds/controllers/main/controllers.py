@@ -40,10 +40,10 @@ from mist.io.exceptions import RequiredParameterMissingError
 
 from mist.io.helpers import sanitize_host, check_host
 
-from mist.core.keypair.models import Keypair
+from mist.io.keys.models import Key
 from mist.core.vpn.methods import to_tunnel
 
-from mist.io.clouds.utils import rename_kwargs
+from mist.io.helpers import rename_kwargs
 from mist.io.clouds.controllers.main.base import BaseMainController
 from mist.io.clouds.controllers.compute import controllers as compute_ctls
 
@@ -210,6 +210,11 @@ class IndonesianVCloudMainController(VCloudMainController):
     provider = 'indonesian_vcloud'
     ComputeController = compute_ctls.VCloudComputeController
 
+    def _add__preparse_kwargs(self, kwargs):
+        if kwargs.get('host') not in ('my.idcloudonline.com',
+                                      'compute.idcloudonline.com'):
+            kwargs['host'] = 'my.idcloudonline.com'
+
     def _update__preparse_kwargs(self, kwargs):
         host = kwargs.get('host', self.cloud.host) or 'my.idcloudonline.com'
         if host not in ('my.idcloudonline.com', 'compute.idcloudonline.com'):
@@ -267,11 +272,11 @@ class LibvirtMainController(BaseMainController):
             check_host(kwargs['host'])
         if kwargs.get('key'):
             try:
-                kwargs['key'] = Keypair.objects.get(owner=self.cloud.owner,
-                                                    id=kwargs['key'],
-                                                    deleted=None)
-            except Keypair.DoesNotExist:
-                raise NotFoundError("Keypair does not exist.")
+                kwargs['key'] = Key.objects.get(owner=self.cloud.owner,
+                                                id=kwargs['key'],
+                                                deleted=None)
+            except Key.DoesNotExist:
+                raise NotFoundError("Key does not exist.")
 
     def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
         """This is a hack to associate a key with the VM hosting this cloud"""
@@ -280,12 +285,22 @@ class LibvirtMainController(BaseMainController):
             fail_on_invalid_params=fail_on_invalid_params,
             add=True, **kwargs
         )
-        if self.cloud.key is not None:
-            # FIXME
-            from mist.io.methods import associate_key
-            associate_key(self.cloud.owner, self.cloud.key.id, self.cloud.id,
-                          self.cloud.host,  # hypervisor id is the hostname
-                          username=self.cloud.username, port=self.cloud.port)
+        # FIXME: Resolve cyclic dependency issues
+        from mist.io.machines.models import Machine
+        # FIXME: Don't use self.cloud.host as machine_id, this prevents us from
+        # changing the cloud's host.
+        # FIXME: Add type field to differentiate between actual vm's and the
+        # host.
+
+        try:
+            machine = Machine.objects.get(cloud=self.cloud,
+                                          machine_id=self.cloud.host)
+        except me.DoesNotExist:
+            machine = Machine.objects(cloud=self.cloud,
+                                      machine_id=self.cloud.host).save()
+
+        machine.ctl.associate_key(self.cloud.key, username=self.cloud.username,
+                                  port=self.cloud.port)
 
     def update(self, fail_on_error=True, fail_on_invalid_params=True,
                add=False, **kwargs):
@@ -413,8 +428,8 @@ class OtherMainController(BaseMainController):
         except (ValueError, TypeError):
             rdp_port = 3389
         if ssh_key:
-            ssh_key = Keypair.objects.get(owner=self.cloud.owner, id=ssh_key,
-                                          deleted=None)
+            ssh_key = Key.objects.get(owner=self.cloud.owner, id=ssh_key,
+                                      deleted=None)
 
         # Create and save machine entry to database.
         machine = Machine(

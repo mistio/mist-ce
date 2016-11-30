@@ -22,9 +22,9 @@ from pyramid.renderers import render_to_response
 # try:
 from mist.core.helpers import view_config
 from mist.core.auth.methods import user_from_request
-from mist.core.keypair.models import Keypair
+from mist.io.keys.models import Key, SSHKey, SignedSSHKey
 from mist.io.clouds.models import Cloud
-from mist.core.cloud.models import Machine, KeyAssociation
+from mist.io.machines.models import Machine
 from mist.core.exceptions import PolicyUnauthorizedError
 from mist.core import config
 import mist.core.methods
@@ -493,15 +493,21 @@ def add_key(request):
 
     """
     params = params_from_request(request)
-    key_name = params.get('name', '')
-    private_key = params.get('priv', '')
-    certificate = params.get('certificate', '')
-
+    key_name = params.pop('name', None)
+    private_key = params.get('priv', None)
+    certificate = params.get('certificate', None)
     auth_context = auth_context_from_request(request)
     key_tags = auth_context.check_perm("key", "add", None)
-    key_name = methods.add_key(auth_context.owner, key_name, private_key, certificate=certificate)
 
-    key = Keypair.objects.get(owner=auth_context.owner, name=key_name, deleted=None)
+    if not key_name:
+        raise BadRequestError("Key name is not provided")
+    if not private_key:
+        raise RequiredParameterMissingError("Private key is not provided")
+
+    if certificate:
+        key = SignedSSHKey.add(auth_context.owner, key_name, **params)
+    else:
+        key = SSHKey.add(auth_context.owner, key_name, **params)
 
     if key_tags:
         from mist.core.tag.methods import add_tags_to_resource
@@ -544,8 +550,8 @@ def delete_key(request):
         raise KeyParameterMissingError()
 
     try:
-        key = Keypair.objects.get(owner=auth_context.owner,
-                                  id=key_id, deleted=None)
+        key = Key.objects.get(owner=auth_context.owner, id=key_id,
+                              deleted=None)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -585,8 +591,8 @@ def delete_keys(request):
     report = {}
     for key_id in key_ids:
         try:
-            key = Keypair.objects.get(owner=auth_context.owner,
-                                      id=key_id, deleted=None)
+            key = Key.objects.get(owner=auth_context.owner,
+                                  id=key_id, deleted=None)
         except me.DoesNotExist:
             report[key_id] = 'not_found'
             continue
@@ -634,12 +640,13 @@ def edit_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner,
-                                  id=key_id, deleted=None)
+        key = Key.objects.get(owner=auth_context.owner,
+                              id=key_id, deleted=None)
     except me.DoesNotExist:
         raise NotFoundError('Key with that id does not exist')
     auth_context.check_perm('key', 'edit', key.id)
-    methods.edit_key(auth_context.owner, new_name, key_id)
+    key.ctl.rename(new_name)
+
     return {'new_name': new_name}
 
 
@@ -661,14 +668,14 @@ def set_default_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner,
-                                  id=key_id, deleted=None)
+        key = Key.objects.get(owner=auth_context.owner,
+                              id=key_id, deleted=None)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
     auth_context.check_perm('key', 'edit', key.id)
 
-    methods.set_default_key(auth_context.owner, key_id)
+    key.ctl.set_default()
     return OK
 
 
@@ -695,8 +702,8 @@ def get_private_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner,
-                                  id=key_id, deleted=None)
+        key = SSHKey.objects.get(owner=auth_context.owner,
+                                 id=key_id, deleted=None)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -725,8 +732,8 @@ def get_public_key(request):
 
     auth_context = auth_context_from_request(request)
     try:
-        key = Keypair.objects.get(owner=auth_context.owner,
-                                  id=key_id, deleted=None)
+        key = SSHKey.objects.get(owner=auth_context.owner,
+                                 id=key_id, deleted=None)
     except me.DoesNotExist:
         raise NotFoundError('Key id does not exist')
 
@@ -742,8 +749,8 @@ def generate_keypair(request):
     Generate key pair
     ---
     """
-    key = Keypair()
-    key.generate()
+    key = SSHKey()
+    key.ctl.generate()
     return {'priv': key.private, 'public': key.public}
 
 
@@ -773,8 +780,6 @@ def associate_key(request):
       in: path
       required: true
       type: string
-    host:
-      type: string
     port:
       default: 22
       type: integer
@@ -791,32 +796,24 @@ def associate_key(request):
         ssh_port = int(request.json_body.get('port', 22))
     except:
         ssh_port = 22
-    try:
-        host = request.json_body.get('host')
-    except:
-        host = None
-    if not host:
-        raise RequiredParameterMissingError('host')
+
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
-    key = Keypair.objects.get(owner=auth_context.owner, id=key_id, deleted=None)
+    key = Key.objects.get(owner=auth_context.owner, id=key_id, deleted=None)
     auth_context.check_perm('key', 'read_private', key.id)
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-        machine_uuid = machine.id
     except me.DoesNotExist:
-        machine_uuid = ""
-    auth_context.check_perm("machine", "associate_key", machine_uuid)
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
 
-    methods.associate_key(auth_context.owner, key_id, cloud_id, machine_id, host,
-                          username=ssh_user, port=ssh_port)
+    auth_context.check_perm("machine", "associate_key", machine.id)
+
+    key.ctl.associate(machine, username=ssh_user, port=ssh_port)
     clouds = Cloud.objects(owner=auth_context.owner, deleted=None)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=key)
 
     assoc_machines = transform_key_machine_associations(machines, key)
-    # FIX filter machines based on auth_context
-    trigger_session_update(auth_context, ['keys'])
     return assoc_machines
 
 
@@ -844,36 +841,26 @@ def disassociate_key(request):
       in: path
       required: true
       type: string
-    host:
-      type: string
     """
     key_id = request.matchdict['key']
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
-    try:
-        host = request.json_body.get('host')
-    except:
-        host = None
 
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-        machine_uuid = machine.id
     except me.DoesNotExist:
-        machine_uuid = ""
-    auth_context.check_perm("machine", "disassociate_key", machine_uuid)
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
+    auth_context.check_perm("machine", "disassociate_key", machine.id)
 
-    methods.disassociate_key(auth_context.owner, key_id,
-                             cloud_id, machine_id, host)
-    key = Keypair.objects.get(owner=auth_context.owner, id=key_id, deleted=None)
+    key = Key.objects.get(owner=auth_context.owner, id=key_id, deleted=None)
+    key.ctl.disassociate(machine)
     clouds = Cloud.objects(owner=auth_context.owner, deleted=None)
     machines = Machine.objects(cloud__in=clouds,
                                key_associations__keypair__exact=key)
 
     assoc_machines = transform_key_machine_associations(machines, key)
-    # FIX filter machines based on auth_context
-
     return assoc_machines
 
 

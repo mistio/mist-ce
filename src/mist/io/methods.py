@@ -44,8 +44,7 @@ import ansible.constants
 # try:
 # from mist.core.user.models import User
 from mist.core.tag.models import Tag
-from mist.core.cloud.models import KeyAssociation, CloudSize, CloudImage
-from mist.core.keypair.models import Keypair
+from mist.io.keys.models import Key
 from mist.core import config
 # except ImportError:
 #     print "Seems to be on IO version"
@@ -71,7 +70,7 @@ import mist.io.inventory
 
 from mist.io.clouds.models import Cloud
 from mist.io.schedules.models import Schedule
-from mist.core.cloud.models import Machine
+from mist.io.machines.models import Machine
 
 from mist.core.vpn.methods import destination_nat as dnat
 from mist.core.vpn.methods import super_ping
@@ -170,41 +169,6 @@ def delete_cloud(owner, cloud_id):
     trigger_session_update(owner, ['clouds'])
 
 
-def add_key(user, key_name, private_key, certificate=None):
-    """Adds a new key by name and returns the new key_name."""
-
-    log.info("Adding key with name '%s'.", key_name)
-
-    if not key_name:
-        raise KeyParameterMissingError(key_name)
-    if not private_key:
-        raise RequiredParameterMissingError("Private key is not provided")
-    key = Keypair.objects(owner=user, name=key_name, deleted=None)
-    if key:
-        raise KeyExistsError(key_name)
-
-    key = Keypair()
-    key.private = private_key
-    key.name = key_name
-    if certificate and certificate.startswith('ssh-rsa-cert-v01@openssh.com'):
-        key.certificate = certificate
-    key.construct_public_from_private()
-    if not Keypair.objects(owner=user, default=True, deleted=None):
-        key.default = True
-
-    if not key.isvalid():
-        raise KeyValidationError()
-    key.owner = user
-    key.save()
-
-    # SEC
-    key.owner.mapper.update(key)
-
-    log.info("Added key with name '%s'", key_name)
-    trigger_session_update(user, ['keys'])
-    return key_name
-
-
 def delete_key(user, key_id):
     """Deletes given key.
     If key was default, then it checks if there are still keys left
@@ -215,210 +179,15 @@ def delete_key(user, key_id):
     :return:
     """
     log.info("Deleting key with id '%s'.", key_id)
-    key = Keypair.objects.get(owner=user, id=key_id, deleted=None)
-    key.update(set__deleted=datetime.utc())
+    key = Key.objects.get(owner=user, id=key_id, deleted=None)
     default_key = key.default
-    # if key.default:
-    #     default_key = key.default
-    other_key = Keypair.objects(owner=user, id__ne=key_id, deleted=None).first()
+    key.update(set__deleted=datetime.utcnow())
+    other_key = Key.objects(owner=user, id__ne=key_id, deleted=None).first()
     if default_key and other_key:
         other_key.default = True
         other_key.save()
 
     log.info("Deleted key with id '%s'.", key_id)
-    trigger_session_update(user, ['keys'])
-
-
-def set_default_key(user, key_id):
-    """Sets a new default key
-    :param user:
-    :param key_id:
-    :return:
-    """
-
-    log.info("Setting key with id '%s' as default.", key_id)
-
-    default_key = Keypair.objects(owner=user, default=True, deleted=None).first()
-    if default_key:
-        default_key.default = False
-        default_key.save()
-
-    key = Keypair.objects.get(owner=user, id=key_id, deleted=None)
-    key.default = True
-    key.save()
-
-    log.info("Successfully set key with id '%s' as default.", key_id)
-    trigger_session_update(user, ['keys'])
-
-
-def edit_key(user, new_name, key_id):
-    """Edit name of an existing key.
-    Means rename key.
-    :param user:
-    :param new_name: the new key's name
-    :param key_id: the key's id
-    :return:
-    """
-    if not new_name:
-        raise KeyParameterMissingError("new name")
-
-    key = Keypair.objects.get(owner=user, id=key_id, deleted=None)
-
-    log.info("Renaming key '%s' to '%s'.", key.name, new_name)
-
-    if key.name == new_name:
-        log.warning("Same name provided. No reason to edit this key")
-        return
-
-    key.name = new_name
-    key.save()
-    log.info("Renamed key '%s' to '%s'.", key.name, new_name)
-    trigger_session_update(user, ['keys'])
-
-
-def associate_key(user, key_id, cloud_id, machine_id,
-                  host='', username=None, port=22):
-    """Associates a key with a machine.
-
-    If host is set it will also attempt to actually deploy it to the
-    machine. To do that it requires another key (existing_key) that can
-    connect to the machine.
-    :param user:
-    :param key_id:
-    :param cloud_id:
-    :param machine_id:
-    :param host:
-    :param username:
-    :param port:
-    :return:
-    """
-
-    log.info("Associating key %s to host %s", key_id, host)
-    if not host:
-        log.info("Host not given so will only create association without "
-                 "actually deploying the key to the server.")
-
-    key = Keypair.objects.get(owner=user, id=key_id, deleted=None)
-    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
-    associated = False
-    if Machine.objects(cloud=cloud, key_associations__keypair__exact=key,
-                       machine_id=machine_id):
-        log.warning("Key '%s' already associated with machine '%s' "
-                    "in cloud '%s'", key_id, cloud_id, machine_id)
-        associated = True
-
-    # check if key already associated
-    # if not already associated, create the association
-    # this is only needed if association doesn't exist and host is not provided
-    # associations will otherwise be created by shell.autoconfigure upon
-    # succesful connection
-    if isinstance(port, basestring):
-        if port.isdigit():
-            port = int(port)
-        else:
-            port = 22
-    elif isinstance(port, int):
-        port = port
-    else:
-        port = 22
-
-    if not host:
-        if not associated:
-            try:
-                machine = Machine.objects.get(cloud=cloud,
-                                              machine_id=machine_id)
-            except me.DoesNotExist:
-                machine = Machine(cloud=cloud, machine_id=machine_id)
-            key_assoc = KeyAssociation(keypair=key, last_used=0,
-                                       ssh_user=username, sudo=False,
-                                       port=port)
-            machine.key_associations.append(key_assoc)
-            machine.save()
-            trigger_session_update(user, ['keys'])
-        return
-
-    # if host is specified, try to actually deploy
-    log.info("Deploying key to machine.")
-    filename = '~/.ssh/authorized_keys'
-    grep_output = '`grep \'%s\' %s`' % (key.public, filename)
-    new_line_check_cmd = (
-        'if [ "$(tail -c1 %(file)s; echo x)" != "\\nx" ];'
-        ' then echo "" >> %(file)s; fi' % {'file': filename}
-    )
-    append_cmd = ('if [ -z "%s" ]; then echo "%s" >> %s; fi'
-                  % (grep_output, key.public, filename))
-    command = new_line_check_cmd + " ; " + append_cmd
-    log.debug("command = %s", command)
-
-    try:
-        # deploy key
-        ssh_command(user, cloud_id, machine_id, host,
-                    command, username=username, port=port)
-    except MachineUnauthorizedError:
-        # couldn't deploy key
-        try:
-            # maybe key was already deployed?
-            ssh_command(user, cloud_id, machine_id, host, 'uptime',
-                        key_id=key_id, username=username, port=port)
-            log.info("Key was already deployed, local association created.")
-        except MachineUnauthorizedError:
-            # oh screw this
-            raise MachineUnauthorizedError(
-                "Couldn't connect to deploy new SSH key."
-            )
-    else:
-        # deployment probably succeeded
-        # attempt to connect with new key
-        # if it fails to connect it'll raise exception
-        # there is no need to manually set the association in keypair.machines
-        # that is automatically handled by Shell, if it is configured by
-        # shell.autoconfigure (which ssh_command does)
-        ssh_command(user, cloud_id, machine_id, host, 'uptime',
-                    key_id=key_id, username=username, port=port)
-        log.info("Key associated and deployed successfully.")
-
-
-def disassociate_key(user, key_id, cloud_id, machine_id, host=None):
-    """Disassociates a key from a machine.
-    If host is set it will also attempt to actually remove it from
-    the machine.
-
-    :param user:
-    :param key_id:
-    :param cloud_id:
-    :param machine_id:
-    :param host:
-    :return:
-    """
-
-    log.info("Disassociating key, undeploy = %s" % host)
-    key = Keypair.objects.get(owner=user, id=key_id, deleted=None)
-    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
-    machine = Machine.objects.get(cloud=cloud,
-                                  key_associations__keypair__exact=key,
-                                  machine_id=machine_id)
-    # key not associated
-    if not machine:
-        raise BadRequestError("Key '%s' is not associated with "
-                              "machine '%s'" % (key_id, machine_id))
-
-    if host:
-        log.info("Trying to actually remove key from authorized_keys.")
-        command = 'grep -v "' + key.public +\
-                  '" ~/.ssh/authorized_keys ' +\
-                  '> ~/.ssh/authorized_keys.tmp ; ' +\
-                  'mv ~/.ssh/authorized_keys.tmp ~/.ssh/authorized_keys ' +\
-                  '&& chmod go-w ~/.ssh/authorized_keys'
-        try:
-            ssh_command(user, cloud_id, machine_id, host, command)
-        except:
-            pass
-    # removing key association
-    for assoc in machine.key_associations:
-        if assoc.keypair == key:
-            break
-    machine.key_associations.remove(assoc)
-    machine.save()
     trigger_session_update(user, ['keys'])
 
 
@@ -487,12 +256,12 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     machine_name = machine_name_validator(conn.type, machine_name)
     key = None
     if key_id:
-        key = Keypair.objects.get(owner=user, id=key_id, deleted=None)
+        key = Key.objects.get(owner=user, id=key_id, deleted=None)
 
     # if key_id not provided, search for default key
     if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
         if not key_id:
-            key = Keypair.objects.get(owner=user, default=True, deleted=None)
+            key = Key.objects.get(owner=user, default=True, deleted=None)
             key_id = key.name
     if key:
         private_key = key.private
@@ -611,12 +380,11 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     else:
         raise BadRequestError("Provider unknown.")
 
-    if conn.type == Provider.AZURE:
-        #we have the username
-        associate_key(user, key_id, cloud_id, node.id,
-                      username=node.extra.get('username'), port=ssh_port)
-    elif key_id:
-        associate_key(user, key_id, cloud_id, node.id, port=ssh_port)
+    if key is not None:
+        machine = Machine(cloud=cloud, machine_id=node.id).save()
+        username = node.extra.get('username', 'root')
+        machine.ctl.associate_key(key, username=username,
+                                  port=ssh_port, no_connect=True)
     # Call post_deploy_steps for every provider
     if conn.type == Provider.AZURE:
         # for Azure, connect with the generated password, deploy the ssh key
@@ -1442,7 +1210,7 @@ def list_keys(user):
     :return:
     """
     from mist.core.tag.methods import get_tags_for_resource
-    keys = Keypair.objects(owner=user, deleted=None)
+    keys = Key.objects(owner=user, deleted=None)
     clouds = Cloud.objects(owner=user, deleted=None)
     key_objects = []
     # FIXME: This must be taken care of in Keys.as_dict

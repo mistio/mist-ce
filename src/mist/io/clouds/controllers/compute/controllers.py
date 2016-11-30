@@ -334,9 +334,9 @@ class AzureComputeController(BaseComputeController):
     def _list_images__fetch_images(self, search=None):
         images = self.connection.list_images()
         images = [image for image in images
-                  if 'RightImage' not in image.name
-                  and 'Barracude' not in image.name
-                  and 'BizTalk' not in image.name]
+                  if 'RightImage' not in image.name and
+                  'Barracude' not in image.name and
+                  'BizTalk' not in image.name]
         # There are many builds for some images eg Ubuntu.
         # All have the same name!
         images_dict = {}
@@ -490,21 +490,50 @@ class GoogleComputeController(BaseComputeController):
         if machine_libcloud.state == NodeState.TERMINATED:
             return 0, 0
         # https://cloud.google.com/compute/pricing
-        size = machine_libcloud.extra.get('machineType')
-        # eg europe-west1-d
-        location = machine_libcloud.extra.get('location').split('-')[0]
+        size = machine_libcloud.extra.get('machineType').split('/')[-1]
+        location = machine_libcloud.extra.get('location')
+        # Get the location, locations currently are
+        # europe us asia-east asia-northeast
+        # all with different pricing
+        if 'asia-northeast' in location:
+            # eg asia-northeast1-a
+            location = 'asia_northeast'
+        elif 'asia-east' in location:
+            # eg asia-east1-a
+            location = 'asia_east1-a'
+        else:
+            # eg europe-west1-d
+            location = location.split('-')[0]
         driver_name = 'google_' + location
         price = get_size_price(driver_type='compute', driver_name=driver_name,
                                size_id=size)
+
         if not price:
-            return 0, 0
+            if size.startswith('custom'):
+                cpu_price = 'custom_vcpu'
+                ram_price = 'custom_ram'
+                if 'preemptible' in size:
+                    cpu_price = 'custom_vcpu_preemptible'
+                    ram_price = 'custom_ram_preemptible'
+
+                cpu_price = get_size_price(driver_type='compute',
+                                           driver_name=driver_name,
+                                           size_id=cpu_price)
+                ram_price = get_size_price(driver_type='compute',
+                                           driver_name=driver_name,
+                                           size_id=ram_price)
+                # Example custom-4-16384
+                try:
+                    cpu = int(size.split('-')[1])
+                    ram = int(size.split('-')[2]) / 1024
+                    price = cpu * cpu_price + ram * ram_price
+                except:
+                    log.exception("Couldn't parse custom size %s for cloud %s",
+                                  size, self.cloud)
+                    return 0, 0
+            else:
+                return 0, 0
         os_type = machine_libcloud.extra.get('os_type')
-        if 'sles' in machine_libcloud.image:
-            os_type = 'sles'
-        if 'rhel' in machine_libcloud.image:
-            os_type = 'rhel'
-        if 'win' in machine_libcloud.image:
-            os_type = 'win'
         os_cost_per_hour = 0
         if os_type == 'sles':
             if size in ('f1-micro', 'g1-small'):
