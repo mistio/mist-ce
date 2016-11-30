@@ -127,9 +127,6 @@
                     }
                 },
                 _cloudChanged: function(selectedCloud, machinesFields) {
-                    console.log('_cloudChanged',selectedCloud, machinesFields);
-                    // this._resetForm();
-                    // console.log('_cloudChanged',this.selectedCloud);
                     if (selectedCloud){
                         var cloudName =  this.model.clouds[selectedCloud].provider.split('_')[0];
                         console.log('cloud name', cloudName)
@@ -146,15 +143,11 @@
                     this._updateFields();
                 },
                 _resetForm: function() {
-                    // Reset cloud
-                    this.set('cloud', {});
-
                     // Reset Form Fields
                     this.machineFields.forEach(function(el, index) {
                         if (el.showIf) {
                             this.set('machineFields.' + index + '.show', false);
                         }
-
                         // Reset Form Fields Validation
                         this._resetField(el, index);
                     }, this);
@@ -203,16 +196,19 @@
                 _machineFieldsChanged: function(model, selectedCloud, changeRecord){
                     // if is docker & ports changed, transform ports to docker_exposed_ports & docker_port_bindings
                     if (this.model.clouds[this.selectedCloud].provider == "docker" && changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'ports'){
+                        // TODO: remove _mapPortsToDockerPorts, when backend is ready to accept docker_port_bindings as string
+                        // Then also, replace field ports with docker_port_bindings as a textarea and remove docker_exposed_ports and ports altogether in machine-create-fields.js
                         this._mapPortsToDockerPorts(changeRecord.value);
                     }
+
                 },
                 _mapPortsToDockerPorts: function(input){
-                    var inputs = input.split('\n');
+                    var lines = input.split('\n');
                     var docker_exposed_ports = {};
                     var docker_port_bindings = {};
-                    console.log('inputs', inputs);
-                    for (var i = 0; i < inputs.length; i++) {
-                        var ports = inputs[i].split(':');
+
+                    for (var i = 0; i < lines.length; i++) {
+                        var ports = lines[i].split(':');
 
                         var p1 = ports[0], 
                             p2 = ports[1]; 
@@ -232,7 +228,7 @@
                             }
                             else {
                                 docker_exposed_ports[p1] = {};
-                                docker_port_bindings[p1] = {"HostPort" : p2}
+                                docker_port_bindings[p1] = [{"HostPort" : p2}]
                             }
                         }
                     }
