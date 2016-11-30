@@ -1,6 +1,5 @@
 """mist.io.socket.
 
-
 Here we define the sockjs Connection and handlers.
 
 When a user loads mist.io or comes back online, their browser will request a
@@ -26,8 +25,8 @@ try:
     from mist.core import config
     from mist.core.methods import get_stats, get_load
     from mist.io.clouds.models import Cloud
-    from mist.core.cloud.models import Machine
-    from mist.core.keypair.models import Keypair
+    from mist.io.machines.models import Machine
+    from mist.io.keys.models import Key
     multi_user = True
 except ImportError:
     from mist.io import config
