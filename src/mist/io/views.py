@@ -1633,7 +1633,6 @@ def delete_network(request):
     network_id = request.matchdict['network']
 
     auth_context = auth_context_from_request(request)
-    auth_context.check_perm("cloud", "create_resources", cloud_id)
 
     try:
         cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
@@ -1679,7 +1678,6 @@ def delete_subnet(request):
     except Subnet.DoesNotExist:
         raise SubnetNotFoundError
 
-    auth_context.check_perm("cloud", "create_resources", cloud_id)
     methods.delete_subnet(auth_context.owner, subnet)
 
     return OK
