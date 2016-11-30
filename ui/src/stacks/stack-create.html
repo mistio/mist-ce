@@ -167,6 +167,7 @@
             listeners: {
                 'change': '_updateFields',
                 'iron-select': '_updateFields',
+                'update-keys': 'updateKeys'
             },
             ready: function() {},
             _fromTemplate: function(params, templates) {
@@ -479,6 +480,21 @@
 
                     this.set('fields.' + ind + '.value', this.yaml_inputs);
                 }
+            },
+
+            updateKeys: function(e){
+                console.log('_updateKeys', e);
+                this.async(function(){
+                    console.log(this.template);
+                    if (this.fields)
+                        this.fields.forEach(function(f, index) {
+                        // make key dropdown && select newly created key
+                        if (f.name.startsWith('mist_key')) {
+                            f.options = this.model.keysArray;
+                            this.set('fields.'+index+'.value', e.detail.key);
+                        }
+                    }, this);
+                }.bind(this), 1000);
             },
 
             _handleRequest: function(e) {
