@@ -5,7 +5,7 @@ import uuid
 import yaml
 import pytest
 import mist.io.clouds.models as models
-from mist.core.keypair.models import Keypair
+from mist.io.keys.models import SSHKey
 from mist.core.user.models import Organization, User
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -90,12 +90,12 @@ def org(request):
 def key(request, org):
     """Fixture to create an SSH Keypair with proper cleanup"""
 
-    key = Keypair()
-    key.generate()
+    key = SSHKey()
+    key.ctl.generate()
     name = uuid.uuid4().hex
     print "Creating key '%s'." % name
-    key = Keypair(name=name, public=key.public, private=key.private, owner=org)
-    key.save()
+    kwargs = {'public': key.public, 'private': key.private}
+    key = SSHKey.add(org, name, **kwargs)
 
     def fin():
         """Finalizer to clean up organization after tests"""
