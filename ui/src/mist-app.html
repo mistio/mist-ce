@@ -104,7 +104,7 @@
           <paper-spinner active></paper-spinner>
         </div>
         <iron-pages id="iron-pages" role="main" selected="[[page]]" attr-for-selected="name" smallscreen$="{{smallscreen}}">
-          <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]" is-over-using="[[model.isOverUsing]]"></page-dashboard>
+          <page-dashboard name="dashboard" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]" is-over-using="[[model.isOverUsing]]" viewing-dashboard="[[computeIsViewing('dashboard', page)]]"></page-dashboard>
           <page-clouds name="clouds" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-clouds>
           <page-machines name="machines" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-machines>
           <page-images name="images" route="{{subroute}}" q="[[q]]" model="[[model]]" sections="[[sections]]" onboarding="[[onboarding]]"></page-images>
@@ -191,7 +191,8 @@
           'toast': 'showToast',
           'subscribeLogEvents': 'subscribeLogEvents',
           'search': 'updateSearchQuery',
-          'open-and-select' : 'openAndSelect'
+          'open-and-select' : 'openAndSelect',
+          'update-keys': 'stackUpdateKeys',
       },
 
       observers: [
@@ -207,6 +208,10 @@
         document.addEventListener('open-and-select', function(e) {
             this.querySelector('machine-page item-actions associate-key').openAndSelect(e);
         }.bind(this));
+      },
+
+      stackUpdateKeys: function(e){
+          this.querySelector('stack-create').updateKeys(e);
       },
 
       _style: function(page, sections) {
@@ -241,6 +246,9 @@
         }
       },
 
+      computeIsViewing: function(page){
+        return this.page == page;
+      },
 
       updateSearchQuery: function(e){
           this.set('q', e.detail);

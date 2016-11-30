@@ -156,7 +156,6 @@
                         .filter(function(fields) {
                             return fields.val == selectedProvider;
                         });
-                    console.warn('providerFields', providerFields);
                     var providerFields = selectedProviderDetails.length ? selectedProviderDetails.shift().options : [];
                     this.set('providerFields', [{
                           name: "provider",
@@ -164,6 +163,15 @@
                           show: false,
                           value: selectedProvider
                     }].concat(providerFields));
+
+                    // replaces _providerFieldsChanged observer and skips provider reset 
+                    // while reseting the other fields
+                    this.providerFields.forEach(function(el, index){
+                        if (el.name != "provider") {
+                            this.set('providerFields.' + index + '.show', el.show);
+                            this._resetField(el, index);
+                        }
+                    }, this);
                     
                     this.fillInKnownData(selectedProvider, this.clouds);
                 },
@@ -178,7 +186,7 @@
                     this.set('providerFields.' + index + '.value', '');
                 },
                 _providerReset: function() {
-                    this.set('selectedProvider', false)
+                    this.set('selectedProvider', false);
                 },
                 _resetForm: function(e) {
                     // Reset Form Fields
@@ -246,7 +254,7 @@
                         return f.name == name;
                     });
                     return index;
-                }
+                },
             });
         })();
     </script>
