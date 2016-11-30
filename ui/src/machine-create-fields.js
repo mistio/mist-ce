@@ -217,7 +217,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "size",
         label: "Size *",
         type: "mist_dropdown",
@@ -226,7 +226,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "key",
         label: "Key *",
         type: "ssh_key",
@@ -235,7 +235,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "docker_env",
         label: "Docker Env",
         type: "textarea",
@@ -244,7 +244,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: false,
         helptext: "",
-    }, {
+    },{
         name: "docker_command",
         label: "Docker Command",
         type: "text",
@@ -253,7 +253,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: false,
         helptext: ""
-    }, {
+    },{
         name: "docker_port_bindings",
         label: "Docker Port Bindings",
         type: "text",
@@ -262,7 +262,7 @@ MACHINE_CREATE_FIELDS.push({
         show: false,
         required: false,
         helptext: ""
-    }, {
+    },{
         name: "docker_exposed_ports",
         label: "Docker Exposed Ports",
         type: "text",
@@ -271,7 +271,7 @@ MACHINE_CREATE_FIELDS.push({
         show: false,
         required: false,
         helptext: ""
-    }, {
+    },{
         name: "ports",
         label: "Ports *",
         type: "textarea",
@@ -280,13 +280,22 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: false,
         helptext: 'e.g. 80:80'
-    }, {
+    },{
         name: "monitoring",
         label: "Enable monitoring",
         type: "toggle",
         value: "true",
         defaultValue: "true",
         show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
         required: false,
         helptext: ''
     }]
@@ -312,7 +321,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "size",
         label: "Size *",
         type: "mist_dropdown",
@@ -321,7 +330,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "location",
         label: "Location *",
         type: "mist_dropdown",
@@ -330,7 +339,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "key",
         label: "Key *",
         type: "ssh_key",
@@ -339,7 +348,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "cloud_init",
         label: "Cloud Init *",
         type: "textarea",
@@ -347,8 +356,8 @@ MACHINE_CREATE_FIELDS.push({
         defaultValue: "",
         show: true,
         required: false,
-        helptext: '',
-    }, {
+        helptext: ''
+    },{
         name: "monitoring",
         label: "Enable monitoring",
         type: "toggle",
@@ -356,7 +365,16 @@ MACHINE_CREATE_FIELDS.push({
         defaultValue: "true",
         show: true,
         required: false,
-        helptext: '',
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
     }]
 });
 
@@ -573,40 +591,73 @@ MACHINE_CREATE_FIELDS.push({
 //     }]
 // });
 
-// // NEPHOSCALE
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'nephoscale',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "NephoScale",
-//         defaultValue: "NephoScale",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "username",
-//         label: "Username *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter username",
-//         helptext: 'The username you use to connect to the NephoScale portal'
-//     }, {
-//         name: "password",
-//         label: "Password *",
-//         type: "password",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter password",
-//         helptext: 'The password you use to connect to the NephoScale portal'
-//     }]
-// });
+// NEPHOSCALE
+MACHINE_CREATE_FIELDS.push({
+    provider: 'nephoscale',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
+    }]
+});
 
 // OPENSTACK
 MACHINE_CREATE_FIELDS.push({
@@ -628,7 +679,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "size",
         label: "Size *",
         type: "mist_dropdown",
@@ -637,7 +688,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "location",
         label: "Location *",
         type: "mist_dropdown",
@@ -646,7 +697,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "key",
         label: "Key *",
         type: "ssh_key",
@@ -655,7 +706,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "networks",
         label: "Networks *",
         type: "mist_dropdown",
@@ -664,7 +715,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: false,
         options: []
-    }, {
+    },{
         name: "monitoring",
         label: "Enable monitoring",
         type: "toggle",
@@ -673,6 +724,24 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: false,
         helptext: '',
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: '',
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
     }]
 });
 
@@ -696,7 +765,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "size",
         label: "Size *",
         type: "mist_dropdown",
@@ -705,7 +774,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "location",
         label: "Location *",
         type: "mist_dropdown",
@@ -714,7 +783,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "key",
         label: "Key *",
         type: "ssh_key",
@@ -723,7 +792,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "monitoring",
         label: "Enable monitoring",
         type: "toggle",
@@ -731,91 +800,154 @@ MACHINE_CREATE_FIELDS.push({
         defaultValue: "true",
         show: true,
         required: false,
-        helptext: '',
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
     }]
 });
 
-// // RACKSPACE
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'rackspace',
-//     fields: [{
-//         name: "region",
-//         label: "Region *",
-//         type: "dropdown",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         // SUPPORTED_PROVIDERS[9].regions.map(function(i){return {val:i.id, title: i.location}})
-//         options: [{"val":"dfw","title":"Dallas"},{"val":"ord","title":"Chicago"},{"val":"iad","title":"N. Virginia"},{"val":"lon","title":"London"},{"val":"syd","title":"Sydney"},{"val":"hkg","title":"Hong Kong"},{"val":"rackspace_first_gen:us","title":"US-First Gen"},{"val":"rackspace_first_gen:uk","title":"UK-First Gen"}]
-//     }, {
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "Rackspace",
-//         defaultValue: "Rackspace",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "username",
-//         label: "Username *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title",
-//         helptext: 'The username you use to connect to the RackSpace portal'
-//     }, {
-//         name: "apikey",
-//         label: "API Key *",
-//         type: "password",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter API Key",
-//         helptext: 'You can find your API key on your RackSpace portal',
-//         helpHref: 'http://docs.mist.io/article/29-adding-rackspace'
-//     }]
-// });
+// RACKSPACE
+MACHINE_CREATE_FIELDS.push({
+    provider: 'rackspace',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
+    }]
+});
 
-// // SOFTLAYER
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'softlayer',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "SoftLayer",
-//         defaultValue: "SoftLayer",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "username",
-//         label: "Username *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter username",
-//         helptext: 'The username you use to connect to the SoftLayer portal'
-//     }, {
-//         name: "apikey",
-//         label: "API Key *",
-//         type: "password",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter API Key",
-//         helptext: 'You can find your API key on your SoftLayer portal',
-//         helpHref: 'http://docs.mist.io/article/30-adding-softlayer'
-//     }]
-// });
+// SOFTLAYER
+MACHINE_CREATE_FIELDS.push({
+    provider: 'softlayer',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
+    }]
+});
 
 // VCLOUD
 MACHINE_CREATE_FIELDS.push({
@@ -837,7 +969,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "size",
         label: "Size *",
         type: "mist_dropdown",
@@ -846,7 +978,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "location",
         label: "Location *",
         type: "mist_dropdown",
@@ -855,7 +987,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "key",
         label: "Key *",
         type: "ssh_key",
@@ -864,7 +996,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: true,
         options: []
-    }, {
+    },{
         name: "networks",
         label: "Networks *",
         type: "mist_dropdown",
@@ -873,7 +1005,7 @@ MACHINE_CREATE_FIELDS.push({
         show: true,
         required: false,
         options: []
-    }, {
+    },{
         name: "monitoring",
         label: "Enable monitoring",
         type: "toggle",
@@ -881,7 +1013,16 @@ MACHINE_CREATE_FIELDS.push({
         defaultValue: "true",
         show: true,
         required: false,
-        helptext: '',
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
     }]
 });
 
@@ -929,31 +1070,73 @@ MACHINE_CREATE_FIELDS.push({
 //     }]
 // });
 
-// // VULTR
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'vultr',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "Vultr",
-//         defaultValue: "Vultr",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "apikey",
-//         label: "API Key *",
-//         type: "password",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter API Key",
-//         helptext: 'You can find your API Token on the Vultr portal',
-//         helpHref: 'http://docs.mist.io/article/72-adding-vultr'
-//     }]
-// });
+// VULTR
+MACHINE_CREATE_FIELDS.push({
+    provider: 'vultr',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
+    }]
+});
 
 // // OTHER SERVER
 // MACHINE_CREATE_FIELDS.push({

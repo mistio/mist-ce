@@ -81,7 +81,7 @@
                     <p>Depending on the cloud there maybe needed different machine parameters. Choose a provider for the coresponding fields to appear.</p>
                 </div>
                 <div hidden$=[[!selectedCloud]]>
-                    <app-form form="{{form}}" fields="{{machineFields}}" method="POST" url="/api/v1/clouds/[[selectedCloud]]/machines" on-response="_machineAddAjaxResponse" on-error="_machineAddAjaxError" btncontent="Launch"></app-form>
+                    <app-form form="{{form}}" fields="{{machineFields}}" method="POST" url="/api/v1/clouds/[[selectedCloud]]/machines" on-response="_machineCreateResponse" on-error="_machineCreateError" btncontent="Launch"></app-form>
                 </div>
             </paper-material>
         </div>
@@ -252,7 +252,11 @@
                     return index;
                 },
                 _machineAddAjaxResponse: function(e){
-                     document.querySelector('app-location').set('path', '/machines');
+                    console.log('creation resp', e);
+                    document.querySelector('app-location').set('path', '/machines');
+                },
+                _machineCreateError: function(e){
+                    console.log('creation failed', e)
                 },
                 _goBack: function(){
                     history.back();
