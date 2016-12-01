@@ -24,7 +24,7 @@ class BaseScriptController(object):
         """
         self.script = script
 
-    def add(self, fail_on_invalid_params=True, **kwargs):
+    def add(self, fail_on_invalid_params=False, **kwargs):
 
         """Add an entry to the database
 
@@ -58,22 +58,25 @@ class BaseScriptController(object):
             raise BadRequestError("Param 'location_type' must be in "
                                   "('url', 'github', 'inline').")
 
-        # errors = {}
-        # for key in kwargs:
-        #     if key not in self.script._script_specific_fields:
-        #         error = "Invalid parameter %s=%r." % (key, kwargs[key])
-        #         if fail_on_invalid_params:
-        #             errors[key] = error
-        #         else:
-        #             log.warning(error)
-        #             kwargs.pop(key)
-        #
-        # if errors:
-        #     log.error("Error adding %s: %s", self.script, errors)
-        #     raise BadRequestError({
-        #         'msg': "Invalid parameters %s." % errors.keys(),
-        #         'errors': errors,
-        #     })
+        # specific check
+        self._preparse_file()
+
+        errors = {}
+        for key in kwargs.keys():
+            if key not in self.script._script_specific_fields:
+                error = "Invalid parameter %s=%r." % (key, kwargs[key])
+                if fail_on_invalid_params:
+                    errors[key] = error
+                else:
+                    log.warning(error)
+                    kwargs.pop(key)
+
+        if errors:
+            log.error("Error adding %s: %s", self.script, errors)
+            raise BadRequestError({
+                'msg': "Invalid parameters %s." % errors.keys(),
+                'errors': errors,
+            })
 
         for key, value in kwargs.iteritems():
             setattr(self.script, key, value)
