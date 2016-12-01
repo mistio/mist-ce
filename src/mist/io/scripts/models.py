@@ -246,7 +246,8 @@ class ExecutableScript(Script):
 
 class CollectdScript(Script):
 
-    # extra params, currently used only for collectd_python_plugin
+    # extra , currently used only for collectd_python_plugin
+    # ex. a dict with value_type='gauge', value_unit=''
     extra = me.DictField()
 
     _controller_cls = controllers.CollectdScriptController

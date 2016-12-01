@@ -34,7 +34,7 @@ class ExecutableScriptController(BaseScriptController):
 
 class CollectdScriptController(ExecutableScriptController):
 
-    def deploy_and_assoc_python_plugin_from_script(self, machine):
+    def deploy_and_assoc_python_plugin_from_script(self, machine, host):
         from mist.core.methods import assoc_metric, update_metric
         from mist.io.methods import deploy_python_plugin
         from mist.io.scripts.models import CollectdScript
@@ -52,7 +52,7 @@ class CollectdScriptController(ExecutableScriptController):
         ret = deploy_python_plugin(
             self.script.owner, machine.cloud.id, machine.machine_id, plugin_id,
             self.script.extra.get('value_type', 'gauge'), self.script.script,
-            machine.hostname
+            host
         )
         metric_id = ret['metric_id']
         update_metric(self.script.owner, metric_id=metric_id,

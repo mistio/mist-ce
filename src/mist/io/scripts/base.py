@@ -54,6 +54,9 @@ class BaseScriptController(object):
             script_entry = kwargs.pop('script')
             self.script.location = scripts.UrlLocation(
                 url=script_entry, entrypoint=entrypoint)
+        else:
+            raise BadRequestError("Param 'location_type' must be in "
+                                  "('url', 'github', 'inline').")
 
         # errors = {}
         # for key in kwargs:
@@ -112,7 +115,7 @@ class BaseScriptController(object):
             return self.script.location.source_code
         else:
             # FIXME this is a duplicate part, also exists in tasks,run_script
-            # maybe to create a ssmall function for both
+            # maybe to create a small function for both
             url = ''
             if isinstance(self.script.location, GithubLocation):
                 clean_url = self.script.location.repo.replace(
