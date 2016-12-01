@@ -98,7 +98,7 @@ class BaseScriptController(object):
             raise RequiredParameterMissingError("new_name")
         if self.script.name == name:
             log.warning("Same name provided. No reason to edit this script")
-            return # fixme
+            return  # fixme
 
         self.script.name = name
         self.script.description = description

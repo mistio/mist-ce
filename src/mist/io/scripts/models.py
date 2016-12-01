@@ -30,27 +30,27 @@ class InlineLocation(Location):
 
 
 class GithubLocation(Location):
-     repo = me.StringField(required=True)
-     entrypoint = me.StringField()
+    repo = me.StringField(required=True)
+    entrypoint = me.StringField()
 
-     def clean(self):
-         script_url = urlparse(self.repo)
-         if len(script_url.path[1:].split('/')) != 2:
-             raise BadRequestError(
-                 "'repo' must be in "
-                 "the form of either 'https://github.com/owner/repo' or "
-                 "simply 'owner/repo'."
-             )
+    def clean(self):
+        script_url = urlparse(self.repo)
+        if len(script_url.path[1:].split('/')) != 2:
+            raise BadRequestError(
+                "'repo' must be in "
+                "the form of either 'https://github.com/owner/repo' or "
+                "simply 'owner/repo'."
+            )
 
-     def __unicode__(self):
-         if self.entrypoint:
+    def __unicode__(self):
+        if self.entrypoint:
             return 'Script is in repo {0.repo} ' \
                    'and entrypoint {0.entrypoint}'.format(self)
-         else:
-             return 'Script is in repo {0.repo}'.format(self)
+        else:
+            return 'Script is in repo {0.repo}'.format(self)
 
-     def __str__(self):
-         return 'github'
+    def __str__(self):
+        return 'github'
 
 
 class UrlLocation(Location):
@@ -59,7 +59,7 @@ class UrlLocation(Location):
 
     def clean(self):
         if not (self.url.startswith('http://') or
-                    self.url.startswith('https://')):
+                self.url.startswith('https://')):
             raise BadRequestError("When 'location_type' is 'url', 'script' "
                                   "must be a valid url starting with "
                                   "'http://' or 'https://'.")
@@ -188,7 +188,6 @@ class Script(me.Document):
             return self.location.repo
         elif isinstance(self.location, UrlLocation):
             return self.location.url
-
 
     # def get_jobs(self):
     #     """Get jobs related to script."""
