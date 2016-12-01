@@ -1,8 +1,8 @@
 <script src="../bower_components/sockjs-client/dist/sockjs.min.js"></script>
 <script>
     CSRF_TOKEN = '';
-    STRIPE_PUBLIC_APIKEY = ''
     DEBUG_SOCKET = false;
+    STRIPE_PUBLIC_APIKEY = ''
     Polymer({
         is: 'mist-socket',
         url: '/socket',
@@ -196,20 +196,12 @@
                         document.location.pathname = '/';
                     },
                     stats: function(data) {
+                      // console.log(that.openRequests)
                         if (!that.openRequests[data.request_id])
                             console.warn('cannot find open request', data.request_id)
                         else {
                             that.openRequests[data.request_id](data);
-                            that.openRequests[data.request_id] = null;
-                            var found = false;
-                            that.openRequests.forEach(function(entry) {
-                                if (entry != null) {
-                                    found = true;
-                                }
-                            });
-                            if (!found) {
-                                that.openRequests = [];
-                            }
+                            delete that.openRequests[data.request_id];
                         }
                     }
                 },
@@ -261,22 +253,30 @@
                 }
             };
         },
-        // _handleStats:function(data){
-        //   console.log("hey",data);
-        // },
+
         heartbeat: function() {
             console.debug('got heartbeat');
             this.send('h'); // reply with empty frame
         },
 
         getStats: function(data, callback) {
-            var reqId = Math.floor(100 * Math.random());
+            var reqId =this.generateGuid();// Math.floor(10000 * Math.random());
             data[5] = reqId;
-            this.send('msg', 'main', 'stats', data);
             this.openRequests[reqId] = callback;
+            this.send('msg', 'main', 'stats', data);
         },
-        send: function(type, namespace, body, params) {
 
+        generateGuid:function(){
+          function s4() {
+              return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+            }
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+              s4() + '-' + s4() + s4() + s4();
+        },
+
+        send: function(type, namespace, body, params) {
             if (namespace == undefined)
                 namespace = 'main';
 
@@ -451,7 +451,7 @@
             this.set('model.user', data);
             CSRF_TOKEN = data.csrf_token;
             STRIPE_PUBLIC_APIKEY = data.stripe_public_apikey;
-        },
+          },
 
         _updateOrg: function(data) {
             this.set('onboarding.isLoadingTeams', false);
@@ -659,18 +659,18 @@
         _updateIsOverusing: function(user, org, machines){
             // console.log('_updateIsOverusing', user, machines);
             if (user && machines){
-                var isOverUsing = false;
-                // user has free plan and more than 5 machines
-                if ((!org.current_plan || !org.current_plan.title) && machines.length > 5)
-                    isOverUsing = true;
-                // user has a paid plan and more than allowed machines
-                else if (org.current_plan && org.current_plan.title && machines.length > org.current_plan.machine_limit)
-                    isOverUsing = true;
-                else
-                    isOverUsing = false;
+               var isOverUsing = false;
+               // user has free plan and more than 5 machines
+               if ((!org.current_plan || !org.current_plan.title) && machines.length > 5)
+                   isOverUsing = true;
+               // user has a paid plan and more than allowed machines
+               else if (org.current_plan && org.current_plan.title && machines.length > org.current_plan.machine_limit)
+                   isOverUsing = true;
+               else
+                   isOverUsing = false;
 
-                this.set('model.isOverUsing', isOverUsing);
-            }
+               this.set('model.isOverUsing', isOverUsing);
+           }
         },
 
         _probe: function(data) {

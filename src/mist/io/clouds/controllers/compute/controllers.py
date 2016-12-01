@@ -334,9 +334,9 @@ class AzureComputeController(BaseComputeController):
     def _list_images__fetch_images(self, search=None):
         images = self.connection.list_images()
         images = [image for image in images
-                  if 'RightImage' not in image.name
-                  and 'Barracude' not in image.name
-                  and 'BizTalk' not in image.name]
+                  if 'RightImage' not in image.name and
+                  'Barracude' not in image.name and
+                  'BizTalk' not in image.name]
         # There are many builds for some images eg Ubuntu.
         # All have the same name!
         images_dict = {}
@@ -502,7 +502,7 @@ class GoogleComputeController(BaseComputeController):
             # eg asia-east1-a
             location = 'asia_east1-a'
         else:
-        # eg europe-west1-d
+            # eg europe-west1-d
             location = location.split('-')[0]
         driver_name = 'google_' + location
         price = get_size_price(driver_type='compute', driver_name=driver_name,

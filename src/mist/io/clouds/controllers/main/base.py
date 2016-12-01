@@ -26,7 +26,7 @@ from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.io.clouds.controllers.compute.base import BaseComputeController
-from mist.io.clouds.utils import rename_kwargs
+from mist.io.helpers import rename_kwargs
 
 # from mist.core.cloud.models import Machine
 
@@ -156,7 +156,7 @@ class BaseMainController(object):
             # FIXME: Move this to top of the file once Machine model is
             # migrated.  The import statement is currently here to avoid
             # circular import issues.
-            from mist.core.cloud.models import Machine
+            from mist.io.machines.models import Machine
             # Remove any machines created from check_connection performing a
             # list_machines.
             Machine.objects(cloud=self.cloud).delete()

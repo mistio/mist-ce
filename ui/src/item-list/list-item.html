@@ -483,15 +483,14 @@ Polymer({
             var icon = document.createElement('iron-icon');
             icon.classList.add('recommendations');
             icon.setAttribute('icon', icontext);
-            icon.setAttribute('data-attr', 'recommendations');
+            icon.setAttribute('data-dialog', 'recommendations');
             Polymer.dom(parent).appendChild(icon);
         }
     },
 
     _showRecommendationDialog: function(event){
         var e = Polymer.dom(event);
-        // console.log(e, event)
-        if (e.event.srcElement.dataset.attr == "recommendations")
+        if (event.target.dataset.dialog == "recommendations")
             this.fire("open-recommendation-dialog", {'item-type': this.section.id, 'item': this.item, 'event': e})
     },
 

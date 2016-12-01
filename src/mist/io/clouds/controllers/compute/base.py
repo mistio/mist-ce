@@ -135,7 +135,7 @@ class BaseComputeController(BaseController):
         # FIXME: Move this to top of the file once Machine model is migrated.
         # The import statement is currently here to avoid circular import
         # issues.
-        from mist.core.cloud.models import Machine
+        from mist.io.machines.models import Machine
 
         # Try to query list of machines from provider API.
         try:
@@ -197,6 +197,14 @@ class BaseComputeController(BaseController):
                     extra[key] = str(val)
 
             machine.extra = extra
+
+            if machine.extra.get('dns_name'):
+                machine.hostname = machine.extra['dns_name']
+            else:
+                for ip in machine.public_ips + machine.private_ips:
+                    if ':' not in ip:
+                        machine.hostname = ip
+                        break
 
             # Get machine tags from db
             tags = {tag.key: tag.value for tag in Tag.objects(
