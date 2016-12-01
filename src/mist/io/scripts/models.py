@@ -137,7 +137,7 @@ class Script(me.Document):
 
     deleted = me.BooleanField(default=False)
 
-    # _private_fields = ()
+    _class_fields = ('id', 'name', 'owner', '_cls')
     _controller_cls = None
 
     def __init__(self, *args, **kwargs):
@@ -159,7 +159,7 @@ class Script(me.Document):
         self.ctl = self._controller_cls(self)
         # Calculate and store script type specific fields.
         self._script_specific_fields = [field for field in type(self)._fields
-                                        if field not in Script._fields]
+                                        if field not in Script._class_fields]
 
     @classmethod
     def add(cls, owner, name, id='', **kwargs):
