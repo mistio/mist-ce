@@ -4,9 +4,10 @@ import logging
 import requests
 import mongoengine as me
 from mist.core import config
+from mist.io.exceptions import BadRequestError
 from mist.io.helpers import trigger_session_update
 from mist.core.exceptions import ScriptNameExistsError
-from mist.io.exceptions import BadRequestError
+from mist.io.exceptions import RequiredParameterMissingError
 
 log = logging.getLogger(__name__)
 
@@ -32,27 +33,6 @@ class BaseScriptController(object):
         `self.script`. The `self.script` is not yet saved.
         """
         import mist.io.scripts.models as scripts
-        # rename_kwargs
-
-        # errors = {}
-        # for key in kwargs:
-        #     if key not in self.script._script_specific_fields:
-        #         error = "Invalid parameter %s=%r." % (key, kwargs[key])
-        #         if fail_on_invalid_params:
-        #             errors[key] = error
-        #         else:
-        #             log.warning(error)
-        #             kwargs.pop(key)
-        #
-        # if errors:
-        #     log.error("Error adding %s: %s", self.script, errors)
-        #     raise BadRequestError({
-        #         'msg': "Invalid parameters %s." % errors.keys(),
-        #         'errors': errors,
-        #     })
-
-        # for key, value in kwargs.iteritems():
-        #     setattr(self.script, key, value)
 
         # set location
         location_type = kwargs.pop('location_type')
@@ -75,6 +55,23 @@ class BaseScriptController(object):
             self.script.location = scripts.UrlLocation(
                 url=script_entry, entrypoint=entrypoint)
 
+        # errors = {}
+        # for key in kwargs:
+        #     if key not in self.script._script_specific_fields:
+        #         error = "Invalid parameter %s=%r." % (key, kwargs[key])
+        #         if fail_on_invalid_params:
+        #             errors[key] = error
+        #         else:
+        #             log.warning(error)
+        #             kwargs.pop(key)
+        #
+        # if errors:
+        #     log.error("Error adding %s: %s", self.script, errors)
+        #     raise BadRequestError({
+        #         'msg': "Invalid parameters %s." % errors.keys(),
+        #         'errors': errors,
+        #     })
+
         for key, value in kwargs.iteritems():
             setattr(self.script, key, value)
 
@@ -94,24 +91,28 @@ class BaseScriptController(object):
         """Edit name or description of an existing script"""
         log.info("Edit script '%s''.", self.script.name)
 
+        if not name:
+            raise RequiredParameterMissingError("new_name")
         if self.script.name == name:
             log.warning("Same name provided. No reason to edit this script")
-            return # fixme iam not sure, maybe if name
+            return # fixme
 
         self.script.name = name
         self.script.description = description
         self.script.save()
-        log.info("Edit script '%s'successfully", self.script.name)
+        log.info("Edit script '%s' to '%s'.", self.script.id, name)
         trigger_session_update(self.script.owner, ['scripts'])
 
     def get_file(self):
-        """Returns the file or archive"""
+        """Returns a file or archive"""
         from mist.io.scripts.models import InlineLocation, GithubLocation
         self._preparse_file()
 
         if isinstance(self.script.location, InlineLocation):
             return self.script.location.source_code
         else:
+            # FIXME this is a duplicate part, also exists in tasks,run_script
+            # maybe to create a ssmall function for both
             url = ''
             if isinstance(self.script.location, GithubLocation):
                 clean_url = self.script.location.repo.replace(
@@ -139,14 +140,14 @@ class BaseScriptController(object):
     def _preparse_file(self):
         return
 
-    def run_script(self, owner, machine,  env=None,
+    def run_script(self, machine,  env=None,
                    params=None, su=False, job_id=None):
         import mist.core.tasks
         """Calls the actual run_script"""
         job_id = job_id or uuid.uuid4().hex
-        # TODO don't pass th script instance, not good practice for tasks
-        mist.core.tasks.run_script.delay(owner.id, self.script.id,
-                                         machine.cloud.id, machine.id,
+
+        mist.core.tasks.run_script.delay(self.script.owner.id, self.script.id,
+                                         machine.cloud.id, machine.machine_id,
                                          params=params, su=su, env=env,
                                          job_id=job_id)
         return job_id
