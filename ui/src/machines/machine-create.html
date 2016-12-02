@@ -287,7 +287,9 @@
                 },
                 _machineCreateResponse: function(e){
                     console.log('creation resp', e);
+                    var response = JSON.parse(e.detail.xhr.response);
                     document.querySelector('app-location').set('path', '/machines');
+                    document.querySelector('page-machines').set('jobId', response.job_id)
                 },
                 _machineCreateError: function(e){
                     console.log('creation failed', e)

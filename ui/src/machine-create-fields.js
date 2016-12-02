@@ -104,7 +104,7 @@ MACHINE_CREATE_FIELDS.push({
         value: "",
         defaultValue: "",
         show: false,
-        required: true
+        required: false
     },{
         name: "location_name",
         label: "Location name",
@@ -112,7 +112,7 @@ MACHINE_CREATE_FIELDS.push({
         value: "",
         defaultValue: "",
         show: false,
-        required: true
+        required: false
     }]
 });
 
@@ -144,7 +144,7 @@ MACHINE_CREATE_FIELDS.push({
         value: "",
         defaultValue: "",
         show: false,
-        required: true
+        required: false
     },{
         name: "location_name",
         label: "Location name",
@@ -152,7 +152,7 @@ MACHINE_CREATE_FIELDS.push({
         value: "",
         defaultValue: "",
         show: false,
-        required: true
+        required: false
     }]
 });
 
