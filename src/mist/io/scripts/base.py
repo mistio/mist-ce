@@ -46,15 +46,15 @@ class BaseScriptController(object):
         entrypoint = kwargs.pop('entrypoint')
 
         if location_type == 'inline':
-            script_entry = kwargs.pop('script')
+            script_entry = kwargs.pop('script', '')
             self.script.location = scripts.InlineLocation(
                 source_code=script_entry)
         elif location_type == 'github':
-            script_entry = kwargs.pop('script')
+            script_entry = kwargs.pop('script', '')
             self.script.location = scripts.GithubLocation(
                 repo=script_entry, entrypoint=entrypoint)
         elif location_type == 'url':
-            script_entry = kwargs.pop('script')
+            script_entry = kwargs.pop('script', '')
             self.script.location = scripts.UrlLocation(
                 url=script_entry, entrypoint=entrypoint)
         else:
