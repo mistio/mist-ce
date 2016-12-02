@@ -34,6 +34,9 @@ class BaseScriptController(object):
         """
         import mist.io.scripts.models as scripts
 
+        # set description
+        self.script.description = kwargs.pop('description')
+
         # set location
         location_type = kwargs.pop('location_type')
         if location_type not in ['inline', 'url', 'github', None]:
