@@ -167,14 +167,14 @@ class Machine(me.Document):
         return self.cloud.owner
 
     def clean(self):
-        for i in reversed(range(len(self.key_associations))):
-            if self.key_associations[i].keypair.deleted:
-                self.key_associations.pop(i)
+        for assoc in self.key_associations:
+            if assoc.keypair.deleted:
+                assoc.delete()
 
     def delete(self):
         super(Machine, self).delete()
         mist.core.tag.models.Tag.objects(resource=self).delete()
-        self.owner.mapper.remove(self, actions=['read', 'read_logs'])
+        self.owner.mapper.remove(self)
 
     def as_dict(self):
         # Return a dict as it will be returned to the API

@@ -307,13 +307,11 @@ class Schedule(me.Document):
         in case it has been marked as deleted."""
         if self.deleted:
             self.enabled = False
-            if not self.expires:
-                self.expires = self.deleted
 
     def delete(self):
         super(Schedule, self).delete()
         Tag.objects(resource=self).delete()
-        self.owner.mapper.remove(self, actions=['read', 'read_logs'])
+        self.owner.mapper.remove(self)
 
     def as_dict(self):
         # Return a dict as it will be returned to the API

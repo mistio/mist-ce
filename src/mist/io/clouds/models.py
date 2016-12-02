@@ -161,7 +161,7 @@ class Cloud(me.Document):
     def delete(self):
         super(Cloud, self).delete()
         Tag.objects(resource=self).delete()
-        self.owner.mapper.remove(self, actions=['read', 'read_logs'])
+        self.owner.mapper.remove(self)
 
     def as_dict(self):
         cdict = {
