@@ -342,7 +342,7 @@
                             Dirty COW check passed.
                         </span>
                         <span class$="dc-[[probeObj.dirty_cow]]" hidden$="[[!probeObj.dirty_cow]]">
-                            <iron-icon hidden$="[[!probeObj.dirty_cow]]" icon="icons:report-problem"></iron-icon> [[dirtyCowAlert]]
+                            <iron-icon hidden$="[[!probeObj.dirty_cow]]" icon="icons:report-problem" on-tap="_showRecommendationDialog"></iron-icon> [[dirtyCowAlert]]
                         </span>
                         <!-- <a href="/link-to-blog" target="new" class="regular" hidden$="[[!probeObj.dirty_cow]]">read more...</a> -->
                     </div>
@@ -426,7 +426,7 @@
                                 <td>Filesystem Info</td>
                                 <td>
                                     <div class="probe-df">
-<pre><code>[[probeObj.df]]</code></pre>
+                                        <pre><code>[[probeObj.df]]</code></pre>
                                     </div>
                                 </td>
                             </tr>
@@ -652,9 +652,10 @@ Polymer({
         this.set('hideAssociatedKeys', true);
         this.set('isPendingKeyRequest', false);
     },
-    attached: function() {
-
+    _showRecommendationDialog: function(){
+        this.fire("open-recommendation-dialog", {'item-type': 'machines', 'item': this.machine, 'event': null});
     },
+
     isInPageChanged: function(machine, isInPage){
         // console.log('machine', machine);
         // if (!this.machine)

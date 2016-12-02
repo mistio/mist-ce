@@ -221,8 +221,7 @@
             </div>
             <team-add id="isTeamsPage" organization="[[model.org]]"></team-add>
         </template>
-
-        <paper-dialog id="recommendationsDialog" with-backdrop>
+        <!-- <paper-dialog id="recommendationsDialog" with-backdrop>
             <h2>Recommendation</h2>
             <p>
                 <iron-icon icon="icons:report-problem" class="orange"></iron-icon>
@@ -234,7 +233,7 @@
                 <paper-button dialog-dismiss>Cancel</paper-button>
                 <paper-button class="blue" dialog-confirm on-tap="_shell">open machine shell</paper-button>
             </div>
-        </dialog-dialog>
+        </paper-dialog> -->
 
     </template>
 </dom-module>
@@ -295,9 +294,9 @@
         observers: [
             'sortingObserver(items.*, sortBy, sortOrder, section.q.*)',
         ],
-        listeners: {
-            'open-recommendation-dialog': 'openRecommendationsDialog'
-        },
+        // listeners: {
+        //     'open-recommendation-dialog': 'openRecommendationsDialog'
+        // },
         ready: function() {
 
         },
@@ -667,28 +666,28 @@
             this.set('section.q', "");
             document.querySelector('top-search').query = "";
         },
-        openRecommendationsDialog: function(e){
-            var probe;
-            if (e.detail['item-type'] != "machines")
-                probe  = this.model.probes[e.detail.item.id];
-            else
-                probe  = this.model.probes[e.detail.item.uuid];
-            var text = 'Kernel '+probe.kernel + ' OS '+ probe.os +' '+ probe.os_version;
-            this.querySelector('.recommendation-text').textContent = text;
-            this.$.recommendationsDialog.open();
-
-            this.set('itemOfRecommendation', e.detail.item);
-        },
-        _shell: function(event){
-            var e = Polymer.dom(event);
-            var action = {
-                'name': 'shell',
-                'icon': 'vaadin-icons:terminal',
-                'confirm': false,
-                'multi': true
-            };
-            this.querySelector('item-actions')._performAction(action, [this.itemOfRecommendation]);
-        }
+        // openRecommendationsDialog: function(e){
+        //     var probe;
+        //     if (e.detail['item-type'] != "machines")
+        //         probe  = this.model.probes[e.detail.item.id];
+        //     else
+        //         probe  = this.model.probes[e.detail.item.uuid];
+        //     var text = 'Kernel '+probe.kernel + ' OS '+ probe.os +' '+ probe.os_version;
+        //     this.querySelector('.recommendation-text').textContent = text;
+        //     this.$.recommendationsDialog.open();
+        //
+        //     this.set('itemOfRecommendation', e.detail.item);
+        // },
+        // _shell: function(event){
+        //     var e = Polymer.dom(event);
+        //     var action = {
+        //         'name': 'shell',
+        //         'icon': 'vaadin-icons:terminal',
+        //         'confirm': false,
+        //         'multi': true
+        //     };
+        //     this.querySelector('item-actions')._performAction(action, [this.itemOfRecommendation]);
+        // }
     });
 })();
 </script>

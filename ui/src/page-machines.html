@@ -19,8 +19,20 @@
     <page-items name="machines" class="keys" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
     <machine-create model="[[model]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isAddPageActive(route.path)]]></machine-create>
     <machine-page model="[[model]]" machine="[[_getMachine(data.machine, model.machines)]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isDetailsPageActive(route.path)]]></machine-page>
+    <paper-dialog id="recommendationsDialog" with-backdrop>
+        <h2>Recommendation</h2>
+        <p>
+            <iron-icon icon="icons:report-problem" class="orange"></iron-icon>
+            Your machine is vulnerable to Dirty COW. <br/><a href="https://dirtycow.ninja/" target="new" class="regular blue-link">Learn more.</a>
+        </p>
+        <p class="recommendation-text"></p>
+        <p>We recommend you follow the <a href="https://dirtycow.ninja/" target="new" class="regular blue-link">guide</a> and update your server kernel. You can use mist.io shell to do it now.</p>
+        <div class="buttons">
+            <paper-button dialog-dismiss>Cancel</paper-button>
+            <paper-button class="blue" dialog-confirm on-tap="_shell">open machine shell</paper-button>
+        </div>
+    </paper-dialog>
   </template>
-
   <script>
     Polymer({
 
@@ -30,16 +42,19 @@
         model: Object,
         sections: Array,
         onboarding: Object,
-        data: Object
+        data: Object,
+        itemOfRecommendation:Object
       },
-
+      listeners: {
+          'open-recommendation-dialog': 'openRecommendationsDialog'
+      },
       _isAddPageActive: function(path) {
           return path == '/+create';
       },
       _isDetailsPageActive: function(path) {
-          if (path && path != '/+create') 
+          if (path && path != '/+create')
             return true;
-          else 
+          else
             return false;
       },
       _isListActive: function(path) {
@@ -48,8 +63,30 @@
       _getMachine: function(id) {
         if (id && this.model && this.model.machines && this.model.machines[id])
           return this.model.machines[id];
-      }
+      },
+      openRecommendationsDialog: function(e){
+          console.log("i am listening", e);
+          var probe;
+          if (e.detail['item-type'] != "machines")
+              probe  = this.model.probes[e.detail.item.id];
+          else
+              probe  = this.model.probes[e.detail.item.uuid];
+          var text = 'Kernel '+probe.kernel + ' OS '+ probe.os +' '+ probe.os_version;
+          this.querySelector('.recommendation-text').textContent = text;
+          this.$.recommendationsDialog.open();
 
+          this.set('itemOfRecommendation', e.detail.item);
+      }
+      _shell: function(event){
+          var e = Polymer.dom(event);
+          var action = {
+              'name': 'shell',
+              'icon': 'vaadin-icons:terminal',
+              'confirm': false,
+              'multi': true
+          };
+          this.querySelector('item-actions')._performAction(action, [this.itemOfRecommendation]);
+      }
     });
   </script>
 </dom-module>
