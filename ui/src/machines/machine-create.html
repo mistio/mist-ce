@@ -68,7 +68,7 @@
                 <div class="grid-row">
                     <paper-dropdown-menu class="dropdown-block l6 xs12 dropdown-with-logos" label="Choose Cloud" horizontal-align="left">
                         <paper-menu attr-for-selected="value" selected="{{selectedCloud}}" class="dropdown-content">
-                            <template is="dom-repeat" items="[[model.cloudsArray]]" as="provider">
+                            <template is="dom-repeat" items="[[providers]]" as="provider">
                                 <paper-item value="[[provider.id]]"><img src="[[_computeProviderLogo(provider.provider)]]" width="24px" disabled$="{{!_isOnline(provider.id, model.clouds)}}">[[provider.title]]</paper-item>
                             </template>
                         </paper-menu>
@@ -104,7 +104,12 @@
                         type: Array,
                         value: []
                     },
-                    machinesFields: Array
+                    machinesFields: Array,
+                    providers: {
+                        type: Array,
+                        value: [],
+                        computed: "_computeProviders(model, model.cloudsArray)"
+                    }
                 },
                 observers: [
                     '_cloudChanged(selectedCloud, machinesFields)',
@@ -137,8 +142,8 @@
                     else {
                         machineFields = []
                     }
-                    console.log('machineFields', machineFields)
-                    this.set('machineFields', machineFields.fields);
+                    // if (machineFields.length > 0)
+                    this.set('machineFields', machineFields.fields || []);
 
                     this._updateFields();
                 },
@@ -194,13 +199,24 @@
                     }
                 },
                 _machineFieldsChanged: function(model, selectedCloud, changeRecord){
-                    // if is docker & ports changed, transform ports to docker_exposed_ports & docker_port_bindings
-                    if (this.model.clouds[this.selectedCloud].provider == "docker" && changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'ports'){
-                        // TODO: remove _mapPortsToDockerPorts, when backend is ready to accept docker_port_bindings as string
-                        // Then also, replace field ports with docker_port_bindings as a textarea and remove docker_exposed_ports and ports altogether in machine-create-fields.js
-                        this._mapPortsToDockerPorts(changeRecord.value);
-                    }
+                    if (this.selectedCloud){
+                        // if is docker & ports changed, transform ports to docker_exposed_ports & docker_port_bindings
+                        if (this.model.clouds[this.selectedCloud].provider == "docker" && changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'ports'){
+                            // TODO: remove _mapPortsToDockerPorts, when backend is ready to accept docker_port_bindings as string
+                            // Then also, replace field ports with docker_port_bindings as a textarea and remove docker_exposed_ports and ports altogether in machine-create-fields.js
+                            this._mapPortsToDockerPorts(changeRecord.value);
+                        }
 
+                        // if is gce/linode and image changed, include image extar in payload
+                        if ((this.model.clouds[this.selectedCloud].provider == "linode" || this.model.clouds[this.selectedCloud].provider == "gce" ) && changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'image'){
+                            this._includeImageExtra(changeRecord.value);
+                        }
+
+                        // if is gce/linode and image changed, include location name in payload
+                        if ((this.model.clouds[this.selectedCloud].provider == "linode" || this.model.clouds[this.selectedCloud].provider == "gce" ) && changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'location'){
+                            this._includeLocationName(changeRecord.value);
+                        }
+                    }
                 },
                 _mapPortsToDockerPorts: function(input){
                     var lines = input.split('\n');
@@ -243,6 +259,24 @@
                         this.set('machineFields.'+indDpb+'.value', docker_port_bindings);
 
                 },
+                _includeImageExtra: function(image){
+                    console.log('_includeImageExtra',image);
+                    if (image) {
+                        // save in fields
+                        var indImEx = this._fieldIndexByName('image_extra');
+                        if (indImEx) 
+                            this.set('machineFields.'+indImEx+'.value', this.model.clouds[this.selectedCloud].images[image].extra);
+                    }
+                },
+                _includeLocationName: function(location){
+                    console.log('_includeLocationName',image);
+                    if (location) {
+                        // save in fields
+                        var indLocName = this._fieldIndexByName('location_name');
+                        if (indLocName) 
+                            this.set('machineFields.'+indLocName+'.value', this.model.clouds[this.selectedCloud].locations[location].name);
+                    }
+                },
                 _fieldIndexByName: function(name){
                     var index;
                     var passField = this.machineFields.find(function(f, ind){
@@ -257,6 +291,12 @@
                 },
                 _machineCreateError: function(e){
                     console.log('creation failed', e)
+                },
+                _computeProviders: function(model, clouds){
+                    //exclude bare metals from provider dropdown list
+                    return this.model.cloudsArray.filter(function(c){
+                        return c.provider != "bare_metal"
+                    });
                 },
                 _goBack: function(){
                     history.back();

@@ -940,15 +940,17 @@ Polymer({
 
     },
     _computeMachineImage: function(item){
-        if (item.image && typeOf(item.image) != "object"){
+        if (item && item.image && typeOf(item.image) != "object"){
             return item.image;
         }
-        else if (item.extra.image && item.extra.image.distribution && item.extra.image.name) {
+        else if (item && item.extra.image && item.extra.image.distribution && item.extra.image.name) {
             return item.extra.image.distribution + " " +item.extra.image.name;
         }
-        else if (item.extra && (item.extra['image_id'] || item.imageId || item.extra.image)){
+        else if (item && item.extra && (item.extra['image_id'] || item.imageId || item.extra.image)){
             return item.extra['image_id'] || item.imageId || item.extra.image.slug || item.extra.image.name || 'not found';
         }
+        else
+            return "not found";
     }
 });
 </script>

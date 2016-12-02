@@ -1,174 +1,176 @@
 var MACHINE_CREATE_FIELDS = []
 
-// // AZURE
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'azure',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "Azure",
-//         defaultValue: "Azure",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "subscription_id",
-//         label: "Subscription ID *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter subscription id",
-//         helptext: "You can find your subscriptionID on the Azure portal",
-//         helpHref: "http://docs.mist.io/article/18-adding-microsoft-azure"
-//     }, {
-//         name: "certificate",
-//         label: "Certificate *",
-//         type: "textarea",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         buttonText: "Add Certificate",
-//         buttonFilledText: "Certificate",
-//         helptext: "Your Azure certificate PEM file",
-//         helpHref: "http://docs.mist.io/article/18-adding-microsoft-azure"
-//     }]
-// });
+// AZURE
+MACHINE_CREATE_FIELDS.push({
+    provider: 'azure',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "azure_port_bindings",
+        label: "Azure Port Bindings",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: false,
+        required: false,
+        helptext: ""
+    },{
+        name: "ports",
+        label: "Ports *",
+        type: "textarea",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: 'e.g. 80:80'
+    },{
+        name: "cloud_init",
+        label: "Cloud Init *",
+        type: "textarea",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
+    }]
+});
 
-// // AZURE ARM
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'azure_arm',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "Azure ARM",
-//         defaultValue: "Azure ARM",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "tenant_id",
-//         label: "Tenant ID *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter tenant id",
-//         helptext: "You can find your tenant ID on the Azure portal",
-//         helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
-//     }, {
-//         name: "subscription_id",
-//         label: "Subscription ID *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter subscription id",
-//         helptext: "You can find your subscriptionID on the Azure portal",
-//         helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
-//     }, {
-//         name: "key",
-//         label: "Client key *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter client key",
-//         helptext: "You can find your client key on the Azure portal",
-//         helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
-//     }, {
-//         name: "secret",
-//         label: "Client secret *",
-//         type: "password",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter client secret",
-//         helptext: "You can find your client secret on the Azure portal",
-//         helpHref: "http://docs.mist.io/article/110-adding-azure-arm"
-//     }]
-// });
-
-
-// // COREOS
-// MACHINE_CREATE_FIELDS.push(
-//     {
-//         provider: 'coreos',
-//         fields: [{
-//             name: "title",
-//             label: "Title *",
-//             type: "text",
-//             value: "CoreOS",
-//             defaultValue: "CoreOS",
-//             show: true,
-//             required: true,
-//             errorMessage: "Please enter title"
-//         }, {
-//             name: "machine_ip",
-//             label: "Hostname *",
-//             type: "text",
-//             value: "",
-//             defaultValue: "",
-//             placeholder: "DNS or IP",
-//             show: true,
-//             required: true,
-//             errorMessage: "Please enter hostname"
-//         }, {
-//             name: "machine_key",
-//             label: "SSH Key",
-//             type: "dropdown",
-//             value: "",
-//             defaultValue: "",
-//             show: true,
-//             required: false,
-//             options: []
-//         }, {
-//             name: "machine_user",
-//             label: "User",
-//             type: "text",
-//             value: "root",
-//             defaultValue: "root",
-//             show: true,
-//             required: false,
-//             showIf: {
-//                 fieldName: "machine_key",
-//                 fieldExists: true
-//             }
-//         }, {
-//             name: "machine_port",
-//             label: "Port",
-//             type: "text",
-//             value: 22,
-//             defaultValue: 22,
-//             show: true,
-//             required: false,
-//             showIf: {
-//                 fieldName: "machine_key",
-//                 fieldExists: true
-//             }
-//         }, {
-//             name: "monitoring",
-//             label: "Enable monitoring",
-//             type: "switch",
-//             value: true,
-//             defaultValue: true,
-//             show: true,
-//             required: false,
-//             showIf: {
-//                 fieldName: "machine_key",
-//                 fieldExists: true
-//             }
-//         }]
-//     }
-// );
+// AZURE ARM
+MACHINE_CREATE_FIELDS.push({
+    provider: 'azure_arm',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "cloud_init",
+        label: "Cloud Init *",
+        type: "textarea",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
+    }]
+});
 
 
 // DIGITALOCEAN
@@ -429,42 +431,89 @@ MACHINE_CREATE_FIELDS.push({
     }]
 });
 
-// // GCE
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'gce',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "GCE",
-//         defaultValue: "GCE",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "project_id",
-//         label: "Project ID *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter project's ID",
-//         helptext: 'You can find your project ID on your GCE portal',
-//         helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
-//     }, {
-//         name: "private_key",
-//         label: "Private Key *",
-//         type: "textarea",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter private key",
-//         helptext: 'You can create a new key on your GCE portal',
-//         helpHref: 'http://docs.mist.io/article/21-adding-google-compute-engine'
-//     }]
-// });
+// GCE
+MACHINE_CREATE_FIELDS.push({
+    provider: 'gce',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "image_extra",
+        label: "Image extra",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: false,
+        required: true
+    },{
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location_name",
+        label: "Location name",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: false,
+        required: true
+    },{
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
+    }]
+});
 
 // HOSTVIRTUAL
 MACHINE_CREATE_FIELDS.push({
@@ -543,64 +592,80 @@ MACHINE_CREATE_FIELDS.push({
     }]
 });
 
-// // INDONESIAN CLOUD
+// INDONESIAN CLOUD
 // MACHINE_CREATE_FIELDS.push({
 //     provider: 'indonesian_vcloud',
 //     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "Indonesian Cloud",
-//         defaultValue: "Indonesian Cloud",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "username",
-//         label: "Username *",
+//         name: "name",
+//         label: "Machine Name *",
 //         type: "text",
 //         value: "",
 //         defaultValue: "",
 //         show: true,
-//         required: true,
-//         errorMessage: "Please enter username",
-//         helptext: 'The username you use to login Indonesian Cloud\'s portal'
-//     }, {
-//         name: "password",
-//         label: "Password *",
-//         type: "password",
+//         required: true
+//     },{
+//         name: "image",
+//         label: "Image *",
+//         type: "mist_dropdown",
 //         value: "",
 //         defaultValue: "",
 //         show: true,
 //         required: true,
-//         errorMessage: "Please enter password",
-//         helptext: 'The password you use to login Indonesian Cloud\'s portal',
-//         helpHref: 'http://docs.mist.io/article/23-adding-indonesian-cloud'
-//     }, {
-//         name: "organization",
-//         label: "Organization *",
-//         type: "text",
+//         options: []
+//     },{
+//         name: "size",
+//         label: "Size *",
+//         type: "mist_dropdown",
 //         value: "",
 //         defaultValue: "",
 //         show: true,
 //         required: true,
-//         errorMessage: "Please enter organization",
-//         helptext: 'The name of your organization'
-//     }, {
-//         name: "indonesianRegion",
-//         label: "Region",
-//         type: "dropdown",
-//         value: "my.idcloudonline.com",
-//         defaultValue: "my.idcloudonline.com",
-//         options: [{
-//             val: "my.idcloudonline.com",
-//             title: "my.idcloudonline.com"
-//         }, {
-//             val: "compute.idcloudonline.com",
-//             title: "compute.idcloudonline.com"
-//         }],
+//         options: []
+//     },{
+//         name: "location",
+//         label: "Location *",
+//         type: "mist_dropdown",
+//         value: "",
+//         defaultValue: "",
 //         show: true,
-//         required: false
+//         required: true,
+//         options: []
+//     },{
+//         name: "key",
+//         label: "Key *",
+//         type: "ssh_key",
+//         value: "",
+//         defaultValue: "",
+//         show: true,
+//         required: true,
+//         options: []
+//     },{
+//         name: "cloud_init",
+//         label: "Cloud Init *",
+//         type: "textarea",
+//         value: "",
+//         defaultValue: "",
+//         show: true,
+//         required: false,
+//         helptext: ''
+//     },{
+//         name: "monitoring",
+//         label: "Enable monitoring",
+//         type: "toggle",
+//         value: "true",
+//         defaultValue: "true",
+//         show: true,
+//         required: false,
+//         helptext: ''
+//     },{
+//         name: "async",
+//         label: "Async request",
+//         type: "toggle",
+//         value: "true",
+//         defaultValue: "true",
+//         show: false,
+//         required: false,
+//         helptext: ''
 //     }]
 // });
 
@@ -667,31 +732,98 @@ MACHINE_CREATE_FIELDS.push({
 //     }]
 // });
 
-// // LINODE
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'linode',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "Linode",
-//         defaultValue: "Linode",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "apikey",
-//         label: "API Key *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter API Key",
-//         helptext: 'You can create an API key on your Linode portal',
-//         helpHref: 'http://docs.mist.io/article/25-adding-linode'
-//     }]
-// });
+// LINODE
+MACHINE_CREATE_FIELDS.push({
+    provider: 'linode',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "image_extra",
+        label: "Image extra",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: false,
+        required: true
+    },{
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location_name",
+        label: "Location name",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: false,
+        required: true
+    },{
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "cloud_init",
+        label: "Cloud Init *",
+        type: "textarea",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
+    }]
+});
 
 // NEPHOSCALE
 MACHINE_CREATE_FIELDS.push({
@@ -1240,101 +1372,3 @@ MACHINE_CREATE_FIELDS.push({
     }]
 });
 
-// // OTHER SERVER
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'bare_metal',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "machine_ip",
-//         label: "Hostname",
-//         type: "text",
-//         placeholder: 'DNS or IP',
-//         show: true,
-//         required: false,
-//         helptext: 'The URL or IP adress that your server listens to',
-//         helpHref: 'http://docs.mist.io/article/28-adding-other-servers'
-//     }, {
-//         name: "operating_system",
-//         label: "Operating System",
-//         type: "dropdown",
-//         value: "unix",
-//         defaultValue: "unix",
-//         show: true,
-//         required: false,
-//         options: [{
-//             title: "Unix",
-//             val: "unix"
-//         }, {
-//             title: "Windows",
-//             val: "windows"
-//         }]
-//     }, {
-//         name: "machine_key",
-//         label: "SSH Key",
-//         type: "ssh_key",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: false,
-//         options: [],
-//         showIf: {
-//             fieldName: "operating_system",
-//             fieldValues: ["unix"]
-//         }
-//     }, {
-//         name: "machine_user",
-//         label: "User",
-//         type: "text",
-//         value: "root",
-//         defaultValue: "root",
-//         show: true,
-//         required: false,
-//         errorMessage: "Please enter user",
-//         showIf: {
-//             fieldName: "machine_key",
-//             fieldExists: true
-//         }
-//     }, {
-//         name: "machine_port",
-//         label: "Port",
-//         type: "text",
-//         value: 22,
-//         defaultValue: 22,
-//         show: true,
-//         required: false,
-//         errorMessage: "Please enter port",
-//         showIf: {
-//             fieldName: "machine_key",
-//             fieldExists: true
-//         }
-//     }, {
-//         name: "remote_desktop_port",
-//         label: "Remote Desktop Port",
-//         type: "text",
-//         value: 3389,
-//         defaultValue: 3389,
-//         errorMessage: "Please enter remote desktop's port",
-//         show: true,
-//         required: true,
-//         showIf: {
-//             fieldName: "operating_system",
-//             fieldValues: ["windows"]
-//         }
-//     }, {
-//         name: "monitoring",
-//         label: "Enable monitoring",
-//         type: "toggle",
-//         value: true,
-//         defaultValue: true,
-//         show: true,
-//         required: false
-//     }]
-// });
