@@ -288,15 +288,15 @@ class MainConnection(MistConnection):
                   core_methods.filter_list_clouds(self.auth_context))
         clouds = Cloud.objects(owner=self.owner, enabled=True)
         log.info(clouds)
-        tasks = []
+        periodic_tasks = []
         if not config.ACTIVATE_POLLER:
-            tasks.append(('list_machines', tasks.ListMachines()))
-        tasks.extend([('list_images', tasks.ListImages()),
-                      ('list_sizes', tasks.ListSizes()),
-                      ('list_networks', tasks.ListNetworks()),
-                      ('list_locations', tasks.ListLocations()),
-                      ('list_projects', tasks.ListProjects())])
-        for key, task in tasks:
+            periodic_tasks.append(('list_machines', tasks.ListMachines()))
+        periodic_tasks.extend([('list_images', tasks.ListImages()),
+                               ('list_sizes', tasks.ListSizes()),
+                               ('list_networks', tasks.ListNetworks()),
+                               ('list_locations', tasks.ListLocations()),
+                               ('list_projects', tasks.ListProjects())])
+        for key, task in periodic_tasks:
             for cloud in clouds:
                 cached = task.smart_delay(self.owner.id, cloud.id)
                 if cached is not None:
