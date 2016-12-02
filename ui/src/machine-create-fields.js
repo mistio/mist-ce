@@ -171,31 +171,82 @@ var MACHINE_CREATE_FIELDS = []
 // );
 
 
-// // DIGITALOCEAN
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'digitalocean',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "Digital Ocean",
-//         defaultValue: "Digital Ocean",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "token",
-//         label: "Token *",
-//         type: "password",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter token",
-//         helptext: 'You can find your API Token on the Digital Ocean portal',
-//         helpHref: 'http://docs.mist.io/article/19-adding-digital-ocean'
-//     }]
-// });
+// DIGITALOCEAN
+MACHINE_CREATE_FIELDS.push({
+    provider: 'digitalocean',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "cloud_init",
+        label: "Cloud Init *",
+        type: "textarea",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
+    }]
+});
 
 // DOCKER
 MACHINE_CREATE_FIELDS.push({
@@ -415,31 +466,82 @@ MACHINE_CREATE_FIELDS.push({
 //     }]
 // });
 
-// // HOSTVIRTUAL
-// MACHINE_CREATE_FIELDS.push({
-//     provider: 'hostvirtual',
-//     fields: [{
-//         name: "title",
-//         label: "Title *",
-//         type: "text",
-//         value: "HostVirtual",
-//         defaultValue: "HostVirtual",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter title"
-//     }, {
-//         name: "apikey",
-//         label: "API Key *",
-//         type: "password",
-//         value: "",
-//         defaultValue: "",
-//         show: true,
-//         required: true,
-//         errorMessage: "Please enter API Key",
-//         helptext: 'You can find your API Token on the HostVirtual portal',
-//         helpHref: 'http://docs.mist.io/article/22-adding-hostvirtual'
-//     }]
-// });
+// HOSTVIRTUAL
+MACHINE_CREATE_FIELDS.push({
+    provider: 'hostvirtual',
+    fields: [{
+        name: "name",
+        label: "Machine Name *",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true
+    },{
+        name: "image",
+        label: "Image *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "size",
+        label: "Size *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "location",
+        label: "Location *",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "key",
+        label: "Key *",
+        type: "ssh_key",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: true,
+        options: []
+    },{
+        name: "cloud_init",
+        label: "Cloud Init *",
+        type: "textarea",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "monitoring",
+        label: "Enable monitoring",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: true,
+        required: false,
+        helptext: ''
+    },{
+        name: "async",
+        label: "Async request",
+        type: "toggle",
+        value: "true",
+        defaultValue: "true",
+        show: false,
+        required: false,
+        helptext: ''
+    }]
+});
 
 // // INDONESIAN CLOUD
 // MACHINE_CREATE_FIELDS.push({
