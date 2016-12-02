@@ -43,7 +43,7 @@ class BaseScriptController(object):
             raise BadRequestError('location type must be one of these '
                                   '(inline, github, url)]')
 
-        entrypoint = kwargs.pop('entrypoint')
+        entrypoint = kwargs.pop('entrypoint', '')
 
         if location_type == 'inline':
             script_entry = kwargs.pop('script', '')
