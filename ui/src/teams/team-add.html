@@ -2,7 +2,6 @@
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-input/paper-textarea.html">
-<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="team-add">
@@ -44,7 +43,6 @@
         </paper-dialog>
 
         <iron-ajax id="teamAddAjaxRequest" url="/api/v1/org/[[organization.id]]/teams" method="POST" on-response="_handleTeamAddAjaxResponse" on-error="_handleTeamAddAjaxError"></iron-ajax>
-        <paper-toast></paper-toast>
 
     </template>
 
@@ -127,7 +125,7 @@
                     if (this.referral && this.referral=="onb") {
                         this.fire("new-team-added", e.detail.response);
                     }
-                    var toast = this.querySelector('paper-toast');
+                    var toast = document.querySelector('paper-toast#mist-toast');
                     toast.text = 'New team '+ e.detail.response.name + ' added succesfully.';
                     toast.show();
 
