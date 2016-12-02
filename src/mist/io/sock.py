@@ -237,7 +237,7 @@ class MainConnection(MistConnection):
             if self.closed:
                 break
             log.info("Updating poller for %s", self)
-            for cloud in Cloud.objects(owner=self.owner):
+            for cloud in Cloud.objects(owner=self.owner, deleted=None):
                 ListMachinesPollingSchedule.add(cloud=cloud,
                                                 interval=10, ttl=300)
             yield tornado.gen.sleep(240)
