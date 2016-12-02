@@ -226,7 +226,7 @@ class Script(me.Document):
 
         sdict.update({key: getattr(self, key)
                       for key in self._script_specific_fields})
-        #  if key not in self._private_fields})
+
         return sdict
 
     def __str__(self):
