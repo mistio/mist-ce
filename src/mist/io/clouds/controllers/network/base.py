@@ -63,9 +63,6 @@ class BaseNetworkController(BaseController):
     def _create_network__parse_args(self, kwargs):
         return
 
-    def _create_network__parse_libcloud_object(self, network_doc, libcloud_network):
-        return
-
     def create_subnet(self, subnet_doc, parent_network, **kwargs):
         """Creates a new subnet."""
 
@@ -102,16 +99,15 @@ class BaseNetworkController(BaseController):
         # Syncing Networks
         for network in libcloud_networks:
             try:
-                db_network = Network.objects.get(cloud=self.cloud, network_id=network.id)
+                network_doc = Network.objects.get(cloud=self.cloud, network_id=network.id)
             except Network.DoesNotExist:
-                network_doc = NETWORKS[self.provider].add(title=network.name,
-                                                          cloud=self.cloud)
-            else:
-                network_doc = NETWORKS[self.provider].add(title=network.name,
-                                                          cloud=self.cloud,
-                                                          description=db_network.description,
-                                                          object_id=db_network.id)
+                network_doc = NETWORKS[self.provider](cloud=self.cloud,
+                                                      network_id=network.id)
+
             self._list_networks__parse_libcloud_object(network_doc, network)
+
+            network_doc.title = network.name
+            network_doc.extra = network.extra
 
             # Save the new network document
             try:
@@ -124,10 +120,8 @@ class BaseNetworkController(BaseController):
                 raise mist.io.exceptions.NetworkExistsError()
 
             # Syncing Subnets
-            subnets_in_current_network = network_doc.ctl.list_subnets()
-
             network_entry = network_doc.as_dict()
-            network_entry['subnets'] = subnets_in_current_network
+            network_entry['subnets'] = network_doc.ctl.list_subnets()
             network_listing.append(network_entry)
 
         return network_listing
@@ -151,18 +145,15 @@ class BaseNetworkController(BaseController):
         for subnet in libcloud_subnets:
 
             try:
-                db_subnet = Subnet.objects.get(subnet_id=subnet.id)
+                subnet_doc = Subnet.objects.get(network=network, subnet_id=subnet.id)
             except Subnet.DoesNotExist:
-                subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
-                                                        network=network)
-
-            else:
-                subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
-                                                        network=db_subnet.network,
-                                                        description=db_subnet.description,
-                                                        object_id=db_subnet.id)
+                subnet_doc = SUBNETS[self.provider](network=network, subnet_id=subnet.id)
 
             self._list_subnets__parse_libcloud_object(subnet_doc, subnet)
+
+            subnet_doc.title = subnet.name
+            subnet_doc.extra = subnet.extra
+
             try:
                 subnet_doc.save()
             except mongoengine.errors.ValidationError as exc:
@@ -187,8 +178,7 @@ class BaseNetworkController(BaseController):
 
         from mist.io.networks.models import Subnet
 
-        associated_subnets = Subnet.objects(network=network)
-        for subnet in associated_subnets:
+        for subnet in Subnet.objects(network=network):
             subnet.ctl.delete_subnet()
 
         self._delete_network__parse_args(network, kwargs)

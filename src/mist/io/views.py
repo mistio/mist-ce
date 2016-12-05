@@ -105,7 +105,6 @@ def exception_handler_mist(exc, request):
 @view_config(route_name='key', request_method='GET')
 @view_config(route_name='networks', request_method='GET')
 @view_config(route_name='network', request_method='GET')
-
 def home(request):
     """Home page view"""
     params = params_from_request(request)
@@ -1514,7 +1513,6 @@ def list_subnets(request):
 
 
 @view_config(route_name='api_v1_networks', request_method='POST', renderer='json')
-@view_config(route_name='networks', request_method='POST', renderer='json')
 def create_network(request):
     """
     Create network on a cloud
@@ -1613,7 +1611,6 @@ def create_subnet(request):
 
 
 @view_config(route_name='api_v1_network', request_method='DELETE')
-@view_config(route_name='network', request_method='DELETE')
 def delete_network(request):
     """
     Delete a network
@@ -1649,7 +1646,6 @@ def delete_network(request):
 
 
 @view_config(route_name='api_v1_subnet', request_method='DELETE')
-@view_config(route_name='subnet', request_method='DELETE')
 def delete_subnet(request):
     """
     Delete a subnet

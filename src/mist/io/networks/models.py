@@ -7,7 +7,6 @@ import mist.io.exceptions
 import mist.io.clouds.controllers.network.controllers
 from mist.io.networks.controllers import NetworkController, SubnetController
 
-
 NETWORKS = {}
 SUBNETS = {}
 
@@ -53,21 +52,27 @@ class Network(me.Document):
         self._network_specific_fields = [field for field in type(self)._fields if field not in Network._fields]
 
     @classmethod
-    def add(cls, title, cloud, description='', object_id=''):
+    def add(cls, **kwargs):
 
+        title = kwargs.get('name')
         if not title:
             raise mist.io.exceptions.RequiredParameterMissingError('name')
+
+        cloud = kwargs.pop('cloud', None)
         if not cloud:
             raise mist.io.exceptions.RequiredParameterMissingError('cloud')
 
-        network = cls(title=title,
-                      cloud=cloud,
-                      description=description)
+        network_doc = cls(title=title,
+                          cloud=cloud,
+                          description=kwargs.get('description'))
 
+        object_id = kwargs.get('object_id')
         if object_id:
-            network.id = object_id
+            network_doc.id = object_id
 
-        return network
+        network_doc.ctl.create_network(**kwargs)
+
+        return network_doc
 
     def as_dict(self):
         netdict = {'name': self.title,
@@ -148,22 +153,27 @@ class Subnet(me.Document):
                                         if field not in Subnet._fields]
 
     @classmethod
-    def add(cls, title, network, description='', object_id=''):
+    def add(cls, **kwargs):
 
+        title = kwargs.get('name')
         if not title:
             raise mist.io.exceptions.RequiredParameterMissingError('name')
 
+        network = kwargs.get('network')
         if not network:
             raise mist.io.exceptions.RequiredParameterMissingError('network')
 
-        subnet = cls(title=title,
-                     network=network,
-                     description=description)
+        subnet_doc = cls(title=title,
+                         network=network,
+                         description=kwargs.get('description'))
 
+        object_id = kwargs.get('object_id')
         if object_id:
-            subnet.id = object_id
+            subnet_doc.id = object_id
 
-        return subnet
+        subnet_doc.ctl.create_subnet(**kwargs)
+
+        return subnet_doc
 
     def as_dict(self):
         netdict = {'name': self.title,
@@ -193,7 +203,6 @@ class Subnet(me.Document):
 
 
 class AmazonSubnet(Subnet):
-
     available_ips = me.IntField()
     zone = me.StringField()
     gateway_ip = me.StringField()
@@ -202,7 +211,6 @@ class AmazonSubnet(Subnet):
 
 
 class GoogleSubnet(Subnet):
-
     region = me.StringField()
     gateway_ip = me.StringField()
 
@@ -210,7 +218,6 @@ class GoogleSubnet(Subnet):
 
 
 class OpenStackSubnet(Subnet):
-
     enable_dhcp = me.BooleanField()
     dns_nameservers = me.ListField()
     allocation_pools = me.ListField()

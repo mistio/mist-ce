@@ -16,19 +16,16 @@ class AmazonNetworkController(BaseNetworkController):
     provider = 'ec2'
 
     def _create_network__parse_args(self, kwargs):
-        for required_key in ['cidr', 'name']:
-            if not kwargs.get(required_key):
-                raise mist.io.exceptions.RequiredParameterMissingError(required_key)
+        if not kwargs.get('cidr'):
+            raise mist.io.exceptions.RequiredParameterMissingError('cidr')
         rename_kwargs(kwargs, 'cidr', 'cidr_block')
         kwargs.pop('description', None)
 
     @staticmethod
     def _list_networks__parse_libcloud_object(network_doc, libcloud_network):
-        network_doc.network_id = libcloud_network.id
         network_doc.cidr = libcloud_network.cidr_block
         network_doc.is_default = libcloud_network.extra.pop('is_default')
         network_doc.state = libcloud_network.extra.pop('state')
-        network_doc.extra = libcloud_network.extra
 
     def _create_subnet__parse_args(self, network, kwargs):
         for required_key in ['cidr', 'availability_zone']:
@@ -44,7 +41,6 @@ class AmazonNetworkController(BaseNetworkController):
         subnet_doc.subnet_id = libcloud_subnet.id
         subnet_doc.available_ips = libcloud_subnet.extra.pop('available_ips')
         subnet_doc.zone = libcloud_subnet.extra.pop('zone')
-        subnet_doc.extra = libcloud_subnet.extra
 
     def _list_subnets__parse_args(self, network, kwargs):
         kwargs['filters'] = {'vpc-id': network.network_id}
@@ -68,9 +64,6 @@ class GoogleNetworkController(BaseNetworkController):
     provider = 'gce'
 
     def _create_network__parse_args(self, kwargs):
-        if not kwargs.get('name'):
-            raise mist.io.exceptions.RequiredParameterMissingError('name')
-
         kwargs['mode'] = kwargs.get('mode', 'legacy')
         if kwargs['mode'] == 'legacy':
             if 'cidr' not in kwargs:
@@ -80,11 +73,10 @@ class GoogleNetworkController(BaseNetworkController):
 
     @staticmethod
     def _list_networks__parse_libcloud_object(network_doc, libcloud_network):
-        network_doc.network_id = libcloud_network.id
         network_doc.cidr = libcloud_network.cidr
         network_doc.gateway_ip = libcloud_network.extra.pop('gatewayIPv4')
         network_doc.mode = libcloud_network.mode
-        network_doc.extra = libcloud_network.extra
+        network_doc.description = libcloud_network.extra['description']
 
     def _create_subnet__parse_args(self, network, kwargs):
         for required_key in ['cidr', 'region', 'name']:
@@ -94,11 +86,10 @@ class GoogleNetworkController(BaseNetworkController):
 
     @staticmethod
     def _list_subnets__parse_libcloud_object(subnet_doc, libcloud_subnet):
-        subnet_doc.subnet_id = libcloud_subnet.id
         subnet_doc.cidr = libcloud_subnet.cidr
         subnet_doc.gateway_ip = libcloud_subnet.extra.pop('gatewayAddress')
         subnet_doc.region = libcloud_subnet.region.name
-        subnet_doc.extra = libcloud_subnet.extra
+        subnet_doc.description = libcloud_subnet.extra['description']
 
     def create_subnet(self, subnet_doc, parent_network, **kwargs):
         """Creates a new subnet.
@@ -136,18 +127,15 @@ class GoogleNetworkController(BaseNetworkController):
         for subnet in libcloud_subnets:
             if subnet.network.id == network.network_id:
                 try:
-                    db_subnet = Subnet.objects.get(subnet_id=subnet.id)
+                    subnet_doc = Subnet.objects.get(network=network, subnet_id=subnet.id)
                 except Subnet.DoesNotExist:
-                    subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
-                                                            network=network)
-
-                else:
-                    subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
-                                                            network=db_subnet.network,
-                                                            description=db_subnet.description,
-                                                            object_id=db_subnet.id)
+                    subnet_doc = SUBNETS[self.provider](network=network, subnet_id=subnet.id)
 
                 self._list_subnets__parse_libcloud_object(subnet_doc, subnet)
+
+                subnet_doc.title = subnet.name
+                subnet_doc.extra = subnet.extra
+
                 try:
                     subnet_doc.save()
                 except mongoengine.errors.ValidationError as exc:
@@ -220,17 +208,14 @@ class OpenStackNetworkController(BaseNetworkController):
     provider = 'openstack'
 
     def _create_network__parse_args(self, kwargs):
-        if not kwargs.get('name'):
-            raise mist.io.exceptions.RequiredParameterMissingError('name')
         kwargs['admin_state_up'] = kwargs.get('admin_state_up', True)
         kwargs['shared'] = kwargs.get('shared', False)
         kwargs.pop('description', None)
 
     @staticmethod
     def _list_networks__parse_libcloud_object(network_doc, libcloud_network):
-        network_doc.network_id = libcloud_network.id
-        network_doc.admin_state_up = libcloud_network.extra.pop('admin_state_up')
-        network_doc.extra = libcloud_network.extra
+        network_doc.admin_state_up = libcloud_network.extra.get('admin_state_up')
+        network_doc.description = libcloud_network.extra.get('description')
 
     def _create_subnet__parse_args(self, network, kwargs):
         if not kwargs.get('name'):
@@ -244,13 +229,12 @@ class OpenStackNetworkController(BaseNetworkController):
 
     @staticmethod
     def _list_subnets__parse_libcloud_object(subnet_doc, libcloud_subnet):
-        subnet_doc.subnet_id = libcloud_subnet.id
         subnet_doc.cidr = libcloud_subnet.cidr
         subnet_doc.gateway_ip = libcloud_subnet.gateway_ip
         subnet_doc.enable_dhcp = libcloud_subnet.enable_dhcp
         subnet_doc.dns_nameservers = libcloud_subnet.dns_nameservers
         subnet_doc.allocation_pools = libcloud_subnet.allocation_pools
-        subnet_doc.extra = libcloud_subnet.extra
+
 
     def list_subnets(self, network, **kwargs):
         """List all Subnets for a particular network present on the cloud.
@@ -268,18 +252,15 @@ class OpenStackNetworkController(BaseNetworkController):
         for subnet in libcloud_subnets:
             if subnet.network_id == network.network_id:
                 try:
-                    db_subnet = Subnet.objects.get(subnet_id=subnet.id)
+                    subnet_doc = Subnet.objects.get(network=network, subnet_id=subnet.id)
                 except Subnet.DoesNotExist:
-                    subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
-                                                            network=network)
-
-                else:
-                    subnet_doc = SUBNETS[self.provider].add(title=subnet.name,
-                                                            network=db_subnet.network,
-                                                            description=db_subnet.description,
-                                                            object_id=db_subnet.id)
+                    subnet_doc = SUBNETS[self.provider](network=network, subnet_id=subnet.id)
 
                 self._list_subnets__parse_libcloud_object(subnet_doc, subnet)
+
+                subnet_doc.title = subnet.name
+                subnet_doc.extra = subnet.extra
+
                 try:
                     subnet_doc.save()
                 except mongoengine.errors.ValidationError as exc:

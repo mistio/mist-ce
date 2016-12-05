@@ -1557,14 +1557,8 @@ def create_network(owner, cloud, network):
     it will use the new network's id to create a subnet.
 
     """
-
-    # Create a DB document for the new network
-    new_network = NETWORKS[cloud.ctl.provider].add(title=network.get('name'),
-                                                   cloud=cloud,
-                                                   description=network.get('description'))
-
-    # Create the new network using the cloud provider's API
-    new_network.ctl.create_network(**network)
+    # Create a DB document for the new network and call libcloud to declare it on the cloud
+    new_network = NETWORKS[cloud.ctl.provider].add(cloud=cloud, **network)
 
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])
@@ -1578,12 +1572,7 @@ def create_subnet(owner, cloud, network, subnet):
 
     """
     # Create a DB document for the new subnet
-    new_subnet = SUBNETS[cloud.ctl.provider].add(title=subnet.get('name'),
-                                                 network=network,
-                                                 description=subnet.get('description'))
-
-    # Create the new network using the cloud provider's API
-    new_subnet.ctl.create_subnet(network, **subnet)
+    new_subnet = SUBNETS[cloud.ctl.provider].add(network=network, **subnet)
 
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])
