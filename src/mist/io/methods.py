@@ -1328,7 +1328,7 @@ def create_network(owner, cloud, network):
     it will use the new network's id to create a subnet.
 
     """
-    # Create a DB document for the new network and call libcloud to declare it on the cloud
+    # Create a DB document for the new network and call libcloud to declare it on the cloud provider
     new_network = NETWORKS[cloud.ctl.provider].add(cloud=cloud, **network)
 
     # Schedule a UI update
@@ -1342,7 +1342,7 @@ def create_subnet(owner, cloud, network, subnet):
     Creates a new subnet attached to the specified network.
 
     """
-    # Create a DB document for the new subnet
+    # Create a DB document for the new subnet and call libcloud to declare it on the cloud provider
     new_subnet = SUBNETS[cloud.ctl.provider].add(network=network, **subnet)
 
     # Schedule a UI update
