@@ -4,7 +4,7 @@ import time
 import mongoengine.errors
 
 from mist.io.clouds.controllers.network.base import BaseNetworkController, perform_libcloud_request
-from mist.io.clouds.utils import rename_kwargs
+from mist.io.helpers import rename_kwargs
 import mist.io.exceptions
 
 from libcloud.common.google import ResourceInUseError, LibcloudError
