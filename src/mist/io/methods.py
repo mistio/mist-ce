@@ -389,6 +389,8 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         raise BadRequestError("Provider unknown.")
 
     if key is not None:
+        # we did this change because there was race condition with
+        # list_machines
         try:
             machine = Machine(cloud=cloud, machine_id=node.id).save()
         except NotUniqueError:
