@@ -4,7 +4,7 @@ from uuid import uuid4
 import celery.schedules
 import mongoengine as me
 from mist.core.tag.models import Tag
-from mist.core.cloud.models import Machine
+from mist.io.machines.models import Machine
 from mist.io.exceptions import BadRequestError
 from mist.core.user.models import Owner, Organization
 from celerybeatmongo.schedulers import MongoScheduler

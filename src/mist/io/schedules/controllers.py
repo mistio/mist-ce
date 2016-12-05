@@ -1,5 +1,5 @@
 import mongoengine as me
-from mist.core.cloud.models import Machine
+from mist.io.machines.models import Machine
 from mist.io.exceptions import NotFoundError
 from mist.io.schedules.base import BaseController
 

@@ -5,7 +5,7 @@ import uuid
 import mongoengine as me
 
 from mist.core.tag.models import Tag
-from mist.core.keypair.models import Keypair
+from mist.io.keys.models import Key
 from mist.core.user.models import Organization
 
 from mist.io.clouds.controllers.main import controllers
@@ -353,7 +353,7 @@ class LibvirtCloud(Cloud):
     host = me.StringField(required=True)
     username = me.StringField(default='root')
     port = me.IntField(required=True, default=22)
-    key = me.ReferenceField(Keypair, required=False)
+    key = me.ReferenceField(Key, required=False)
     images_location = me.StringField(default="/var/lib/libvirt/images")
 
     _controller_cls = controllers.LibvirtMainController
