@@ -500,7 +500,7 @@ class GoogleComputeController(BaseComputeController):
             location = 'asia_northeast'
         elif 'asia-east' in location:
             # eg asia-east1-a
-            location = 'asia_east1-a'
+            location = 'asia_east'
         else:
             # eg europe-west1-d
             location = location.split('-')[0]
