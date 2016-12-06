@@ -1575,9 +1575,8 @@ def create_subnet(request):
 
     params = params_from_request(request)
 
-    try:
-        subnet = params.get('subnet')
-    except KeyError:
+    subnet = params.get('subnet')
+    if not subnet:
         raise RequiredParameterMissingError('subnet')
 
     auth_context = auth_context_from_request(request)
@@ -1648,7 +1647,8 @@ def delete_subnet(request):
       type: string
     """
     cloud_id = request.matchdict['cloud']
-    subnet_id = request.matchdict['subnet_id']
+    subnet_id = request.matchdict['subnet']
+    network_id = request.matchdict['network']
 
     auth_context = auth_context_from_request(request)
 
@@ -1656,8 +1656,14 @@ def delete_subnet(request):
         cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
     except Cloud.DoesNotExist:
         raise CloudNotFoundError
+
     try:
-        subnet = Subnet.objects.get(id=subnet_id, cloud=cloud)
+        network = Network.objects.get(id=network_id, cloud=cloud)
+    except Network.DoesNotExist:
+        raise NetworkNotFoundError
+
+    try:
+        subnet = Subnet.objects.get(id=subnet_id, network=network)
     except Subnet.DoesNotExist:
         raise SubnetNotFoundError
 

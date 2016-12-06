@@ -52,21 +52,17 @@ class Network(me.Document):
         self._network_specific_fields = [field for field in type(self)._fields if field not in Network._fields]
 
     @classmethod
-    def add(cls, **kwargs):
+    def add(cls, cloud, title, description='', object_id='', **kwargs):
 
-        title = kwargs.get('name')
         if not title:
-            raise mist.io.exceptions.RequiredParameterMissingError('name')
-
-        cloud = kwargs.pop('cloud', None)
+            raise mist.io.exceptions.RequiredParameterMissingError('title')
         if not cloud:
             raise mist.io.exceptions.RequiredParameterMissingError('cloud')
 
         network_doc = cls(title=title,
                           cloud=cloud,
-                          description=kwargs.get('description'))
+                          description=description)
 
-        object_id = kwargs.get('object_id')
         if object_id:
             network_doc.id = object_id
 
@@ -153,21 +149,17 @@ class Subnet(me.Document):
                                         if field not in Subnet._fields]
 
     @classmethod
-    def add(cls, **kwargs):
+    def add(cls, title, network, description='', object_id='', **kwargs):
 
-        title = kwargs.get('name')
         if not title:
-            raise mist.io.exceptions.RequiredParameterMissingError('name')
-
-        network = kwargs.get('network')
+            raise mist.io.exceptions.RequiredParameterMissingError('title')
         if not network:
             raise mist.io.exceptions.RequiredParameterMissingError('network')
 
-        subnet_doc = cls(title=title,
-                         network=network,
-                         description=kwargs.get('description'))
+        subnet = cls(title=title,
+                     network=network,
+                     description=description)
 
-        object_id = kwargs.get('object_id')
         if object_id:
             subnet_doc.id = object_id
 

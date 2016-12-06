@@ -38,7 +38,6 @@ class AmazonNetworkController(BaseNetworkController):
     @staticmethod
     def _list_subnets__parse_libcloud_object(subnet_doc, libcloud_subnet):
         subnet_doc.cidr = libcloud_subnet.extra.pop('cidr_block')
-        subnet_doc.subnet_id = libcloud_subnet.id
         subnet_doc.available_ips = libcloud_subnet.extra.pop('available_ips')
         subnet_doc.zone = libcloud_subnet.extra.pop('zone')
 

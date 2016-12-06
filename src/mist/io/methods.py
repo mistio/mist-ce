@@ -1262,7 +1262,6 @@ def list_networks(user, cloud_id):
         raise CloudNotFoundError
 
     networks = cloud.ctl.network.list_networks()
-    print networks
 
     # TODO: Backwards-compatible network privacy detection, to be replaced
     for net in networks:
@@ -1273,7 +1272,7 @@ def list_networks(user, cloud_id):
     return ret
 
 
-def list_subnets(cloud, network=None):
+def list_subnets(cloud, network):
     """List subnets for a cloud.
 
     Currently EC2, Openstack and GCE clouds are supported. For other providers
