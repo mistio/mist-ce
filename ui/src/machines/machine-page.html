@@ -304,6 +304,14 @@
                     display: inline-block !important;
                 }
             }
+            .m-info-head {
+                text-transform: uppercase;
+                font-weight: bold;
+                font-size: 0.8em;
+                display: inline-block;
+                width: 80px;
+                opacity: 0.54;
+            }
         </style>
 
         <div id="content">
@@ -326,11 +334,15 @@
             </paper-material>
             <div class="columns">
                 <paper-material id="leftcolumn" class="left">
-                    <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
-                    <span hidden$="[[!machine.extra.image]]" class="break">Image: [[_computeMachineImage(machine)]]</span>
-                    <span hidden$="[[!_computeMachineSize(machine)]]" class="break">Size: [[_computeMachineSize(machine)]]</span>
-                    <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
-                    <div hidden$="[[!probeData]]"> Probe Data:
+                    <span hidden$="[[!machine.cloud.title]]"><span class="m-info-head">Cloud:</span> 
+                        [[machine.cloud.title]]</span>
+                    <span hidden$="[[!machine.extra.image]]" class="break"><span class="m-info-head">Image:</span> 
+                        [[_computeMachineImage(machine)]]</span>
+                    <span hidden$="[[!_computeMachineSize(machine)]]" class="break"><span class="m-info-head">Size:</span>
+                        [[_computeMachineSize(machine)]]</span>
+                    <span hidden$="[[!machine.extra.created]]"><span class="m-info-head">Created:</span> 
+                        [[machine.extra.created]]</span>
+                    <div hidden$="[[!probeData]]"> <span class="m-info-head">Probe Data:</span>
                         <span class$="probe-data [[itemProbeClasses(machine, model.probes)]]"> </span>
                         <span hidden$="[[!probeData]]"> [[probeData]] </span> <br/>
                         <span hidden$="[[!lastProbe]]"> [[lastProbe]] </span>
