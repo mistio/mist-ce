@@ -415,7 +415,7 @@ Polymer({
                 return item.extra.maxCpu + 'cpu, ' + item.extra.maxMemory + 'M ram';
             if (item.extra && item.extra.PLANID) {
                 var cloud = document.querySelector('mist-app').model.clouds[item.cloud.id];
-                return (cloud && cloud.sizes) ? cloud.sizes[item.extra.PLANID] : item.extra.PLANID;
+                return (cloud && cloud.sizes) ? cloud.sizes[item.extra.PLANID].ram + " ram " + cloud.sizes[item.extra.PLANID].name  : item.extra.PLANID
             }
             if (item.extra && item.extra.service_type)
                 return item.extra.service_type;
