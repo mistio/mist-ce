@@ -26,13 +26,9 @@ from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.io.clouds.controllers.compute.base import BaseComputeController
-<<<<<<< HEAD
-from mist.io.clouds.controllers.dns.base import BaseDNSController
-
-from mist.io.clouds.utils import rename_kwargs
-=======
 from mist.io.helpers import rename_kwargs
->>>>>>> 533b201e835071a0c979ecf66a5ba7a6113bd890
+
+from mist.io.clouds.controllers.dns.base import BaseDNSController
 
 # from mist.core.cloud.models import Machine
 
