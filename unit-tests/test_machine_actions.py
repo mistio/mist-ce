@@ -7,7 +7,6 @@ import random
 import string
 from time import time
 from time import sleep
-from mist.core.keypair.models import Keypair
 from mist.io.methods import create_machine, destroy_machine
 
 

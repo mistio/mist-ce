@@ -1,6 +1,5 @@
 """mist.io.socket.
 
-
 Here we define the sockjs Connection and handlers.
 
 When a user loads mist.io or comes back online, their browser will request a
@@ -16,6 +15,8 @@ import traceback
 import datetime
 import netaddr
 
+import tornado.gen
+
 from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
 
@@ -24,8 +25,8 @@ try:
     from mist.core import config
     from mist.core.methods import get_stats, get_load
     from mist.io.clouds.models import Cloud
-    from mist.core.cloud.models import Machine
-    from mist.core.keypair.models import Keypair
+    from mist.io.machines.models import Machine
+    from mist.io.keys.models import Key
     multi_user = True
 except ImportError:
     from mist.io import config
@@ -44,6 +45,8 @@ from mist.core.rbac import methods as rbac_methods
 
 from mist.io import tasks
 from mist.io.hub.tornado_shell_client import ShellHubClient
+
+from mist.io.poller.models import ListMachinesPollingSchedule
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -225,6 +228,20 @@ class MainConnection(MistConnection):
         self.list_tunnels()
         self.list_clouds()
         self.check_monitoring()
+        if config.ACTIVATE_POLLER:
+            self.update_poller()
+
+    @tornado.gen.coroutine
+    def update_poller(self):
+        """Every 4 minutes, tell poller to continue for next 5 minutes"""
+        while True:
+            if self.closed:
+                break
+            log.info("Updating poller for %s", self)
+            for cloud in Cloud.objects(owner=self.owner):
+                ListMachinesPollingSchedule.add(cloud=cloud,
+                                                interval=10, ttl=300)
+            yield tornado.gen.sleep(240)
 
     def update_user(self):
         self.send('user', core_methods.get_user_data(self.auth_context))
@@ -271,14 +288,15 @@ class MainConnection(MistConnection):
                   core_methods.filter_list_clouds(self.auth_context))
         clouds = Cloud.objects(owner=self.owner, enabled=True)
         log.info(clouds)
-        for key, task in (('list_machines', tasks.ListMachines()),
-                          ('list_images', tasks.ListImages()),
-                          ('list_sizes', tasks.ListSizes()),
-                          ('list_networks', tasks.ListNetworks()),
-                          ('list_locations', tasks.ListLocations()),
-                          ('list_projects', tasks.ListProjects()),
-                          ):
-
+        periodic_tasks = []
+        if not config.ACTIVATE_POLLER:
+            periodic_tasks.append(('list_machines', tasks.ListMachines()))
+        periodic_tasks.extend([('list_images', tasks.ListImages()),
+                               ('list_sizes', tasks.ListSizes()),
+                               ('list_networks', tasks.ListNetworks()),
+                               ('list_locations', tasks.ListLocations()),
+                               ('list_projects', tasks.ListProjects())])
+        for key, task in periodic_tasks:
             for cloud in clouds:
                 cached = task.smart_delay(self.owner.id, cloud.id)
                 if cached is not None:
