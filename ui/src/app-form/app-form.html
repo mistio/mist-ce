@@ -87,7 +87,7 @@
             .errormsg-container iron-icon {
                 color: inherit;
             }
-            .key-icon {
+            .field-icon {
                 color: rgba(0,0,0,0.32);
                 margin-right: 4px;
             }
@@ -133,9 +133,9 @@
                                 <template is="dom-repeat" items="{{field.options}}" as="option">
                                     <paper-item value="[[option.id]]" disabled$="[[option.disabled]]">
                                         <template is="dom-if" if="[[option.icon]]">
-                                            <iron-icon class="key-icon" icon="[[option.icon]]"></iron-icon>
+                                            <iron-icon class="field-icon" icon="[[option.icon]]"></iron-icon>
                                         </template>
-                                        [[showOption(option)]]
+                                        <span class="flex">[[showOption(option)]]</span>
                                     </paper-item>
                                 </template>
                             </paper-menu>

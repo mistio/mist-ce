@@ -176,9 +176,18 @@
                             }
                             if (f.name.endsWith("image")) {
                                 f.options = this.model.clouds[cloudId].imagesArray.sort(function(ima, imb){
-                                    if (ima.star)
-                                        return 1;
+                                    if (ima.star){
+                                        return -1;
+                                    }
                                 });
+                                for (var i = 0; i < f.options.length; i++) {
+                                    if (f.options[i].star){
+                                        f.options[i].icon = 'icons:star';
+                                    }
+                                    else {
+                                        break;
+                                    }
+                                }
                             }
                             if (f.name.endsWith("size")) {
                                 f.options = this.model.clouds[cloudId].sizesArray;
