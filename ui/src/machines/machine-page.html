@@ -328,6 +328,7 @@
                 <paper-material id="leftcolumn" class="left">
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
                     <span hidden$="[[!machine.extra.image]]" class="break">Image: [[_computeMachineImage(machine)]]</span>
+                    <span hidden$="[[!_computeMachineSize(machine)]]" class="break">Size: [[_computeMachineSize(machine)]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
                     <div hidden$="[[!probeData]]"> Probe Data:
                         <span class$="probe-data [[itemProbeClasses(machine, model.probes)]]"> </span>
@@ -951,6 +952,33 @@ Polymer({
         }
         else
             return "not found";
+    },
+    _computeMachineSize: function(item) {
+        // field could be in the 'extra' section, but should not be an object
+        var ret = item['size'];
+        
+        if (ret && typeof(ret) != 'object')
+            return ret;
+        if (!ret && item.extra && item.extra['size'] && typeof(item.extra['size']) != 'object')
+            ret = item.extra['size'];
+        if (item.extra && item.extra.size && item.extra.size.vcpus)
+            return item.extra.size.vcpus + 'vcpu, ' + item.extra.size.memory + 'M ram';;
+        if (item.extra && item.extra.size && typeof(item.extra.size) == 'string')
+            return item.extra.size;
+        if (item.extra && item.extra.instance_type)
+            return item.extra.instance_type;
+        if (item.extra && item.extra.instance_size)
+            return item.extra.instance_size;
+        if (item.extra && item.extra.maxCpu && item.extra.maxMemory)
+            return item.extra.maxCpu + 'cpu, ' + item.extra.maxMemory + 'M ram';
+        if (item.extra && item.extra.PLANID) {
+            var cloud = document.querySelector('mist-app').model.clouds[item.cloud.id];
+            return (cloud && cloud.sizes) ? cloud.sizes[item.extra.PLANID].ram + " ram " + cloud.sizes[item.extra.PLANID].name : item.extra.PLANID
+        }
+        if (item.extra && item.extra.service_type)
+            return item.extra.service_type;
+
+        return 'size information unavailable'
     }
 });
 </script>
