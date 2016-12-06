@@ -198,9 +198,9 @@ Polymer({
         return 'icons:check';
     },
     machineName: function(item, clouds) {
-        if (item.logs.length && item.cloud_id && item.machine_id)
+        if (this.model && this.model.clouds && item.logs.length && item.cloud_id && item.machine_id)
             return this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id] ? item.logs[0].machine_name : item.logs[0].machine_name +': Machine is missing';
-        return this.model.clouds[item.cloud_id].machines[item.machine_id].name;
+        return this.model.clouds[item.cloud_id].machines[item.machine_id].name || 'Machine is missing';
     },
     machineUri: function(item, clouds) {
         // give machine url only if machine axists

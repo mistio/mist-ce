@@ -199,7 +199,7 @@
                 </span>
                 <div class="title flex">
                     <h2>
-                        [[cloud.title]]
+                        [[cloudTitle]]
                     </h2>
                     <div class="subtitle">
                         <span class="capitalize" hidden$="[[!cloud.enabled]]">[[cloud.state]]</span><span hidden$="[[!cloud.enabled]]">, enabled.</span><span class="capitalize" hidden$="[[cloud.enabled]]">disabled</span>
@@ -285,6 +285,10 @@
                     cloud: {
                         type: Object
                     },
+                    cloudTitle: {
+                        type: String,
+                        computed: '_computeCloudTitle(cloud)'
+                    },
                     isLoading: {
                         type: Boolean,
                         computed: '_computeIsloading(cloud)',
@@ -295,6 +299,9 @@
                     'confirmation': '_deleteCloud'
                 },
                 ready: function() {
+                },
+                _computeCloudTitle: function(cloud) {
+                    return cloud.title;
                 },
                 _editTags: function() {
                     var el = this.querySelector('tags-list'),

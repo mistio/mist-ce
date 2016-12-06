@@ -382,7 +382,11 @@ Polymer({
         // extra.image_id on ec2,
         // item.extra.image.name or item.extra.image.slug in digital ocean,
         // item.imageId in openstack
+        // item.extra.image.distribution && item.extra.image.name in digital ocean
         // TODO: complete the above list
+        if (field == 'image' && item.extra && item.extra.image && item.extra.image.distribution && item.extra.image.name) {
+            return item.extra.image.distribution + " " +item.extra.image.name;
+        }
         if (field == 'image' && !ret && item.extra && (item.extra[field+'_id'] || item.imageId || item.extra.image)){
             return item.extra[field+'_id'] || item.imageId || item.extra.image.slug || item.extra.image.name || 'not found';
         }
