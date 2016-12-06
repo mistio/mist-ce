@@ -175,7 +175,10 @@
                                 f.options = this.model.clouds[cloudId].locationsArray;
                             }
                             if (f.name.endsWith("image")) {
-                                f.options = this.model.clouds[cloudId].imagesArray;
+                                f.options = this.model.clouds[cloudId].imagesArray.sort(function(ima, imb){
+                                    if (ima.star)
+                                        return 1;
+                                });
                             }
                             if (f.name.endsWith("size")) {
                                 f.options = this.model.clouds[cloudId].sizesArray;
