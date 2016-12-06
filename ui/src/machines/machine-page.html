@@ -21,6 +21,9 @@
             :host {
                 display: block;
             }
+            a:hover {
+                cursor:pointer;
+            }
             .columns {
                 @apply(--layout-horizontal);
                 flex: 1 100%;
@@ -307,6 +310,7 @@
         </style>
 
         <div id="content">
+                                      <a style="color:blue;" on-tap="_showRecommendationDialog">Show recommendations...</a>
             <div class="is-loading" hidden$="[[!isLoading]]">
                 <paper-spinner active hidden$="[[!isLoading]]"></paper-spinner>
             </div>
@@ -343,6 +347,7 @@
                         </span>
                         <span class$="dc-[[probeObj.dirty_cow]]" hidden$="[[!probeObj.dirty_cow]]">
                             <iron-icon hidden$="[[!probeObj.dirty_cow]]" icon="icons:report-problem" on-tap="_showRecommendationDialog"></iron-icon> [[dirtyCowAlert]]
+                            <a style="color:blue;" on-tap="_showRecommendationDialog">Show recommendations...</a>
                         </span>
                         <!-- <a href="/link-to-blog" target="new" class="regular" hidden$="[[!probeObj.dirty_cow]]">read more...</a> -->
                     </div>

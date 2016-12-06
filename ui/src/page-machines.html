@@ -11,6 +11,15 @@
       :host {
         display: block;
       }
+      #recommendationsDialog {
+          width: 400px;
+      }
+      #recommendationsDialog a.blue-link {
+          color: var(--blue-color) !important;
+      }
+      #recommendationsDialog iron-icon.orange {
+          color: #F57F17;
+      }
     </style>
     <app-route route="{{route}}"
                 pattern="/:machine"
@@ -65,7 +74,6 @@
           return this.model.machines[id];
       },
       openRecommendationsDialog: function(e){
-          console.log("i am listening", e);
           var probe;
           if (e.detail['item-type'] != "machines")
               probe  = this.model.probes[e.detail.item.id];
@@ -76,7 +84,7 @@
           this.$.recommendationsDialog.open();
 
           this.set('itemOfRecommendation', e.detail.item);
-      }
+      },
       _shell: function(event){
           var e = Polymer.dom(event);
           var action = {
