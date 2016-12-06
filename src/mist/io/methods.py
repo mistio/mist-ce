@@ -1327,14 +1327,14 @@ def associate_ip(user, cloud_id, network_id, ip, machine_id=None, assign=True):
     return conn.ex_associate_ip(ip, server=machine_id, assign=assign)
 
 
-def create_network(owner, cloud, network):
+def create_network(owner, cloud, network_params):
     """
     Creates a new network. If subnet dict is specified, after creating the network
     it will use the new network's id to create a subnet.
 
     """
     # Create a DB document for the new network and call libcloud to declare it on the cloud provider
-    new_network = NETWORKS[cloud.ctl.provider].add(cloud=cloud, **network)
+    new_network = NETWORKS[cloud.ctl.provider].add(cloud=cloud, **network_params)
 
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])
@@ -1342,13 +1342,13 @@ def create_network(owner, cloud, network):
     return new_network
 
 
-def create_subnet(owner, cloud, network, subnet):
+def create_subnet(owner, cloud, network, subnet_params):
     """
     Creates a new subnet attached to the specified network.
 
     """
     # Create a DB document for the new subnet and call libcloud to declare it on the cloud provider
-    new_subnet = SUBNETS[cloud.ctl.provider].add(network=network, **subnet)
+    new_subnet = SUBNETS[cloud.ctl.provider].add(network=network, **subnet_params)
 
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])

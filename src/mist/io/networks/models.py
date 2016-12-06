@@ -52,23 +52,25 @@ class Network(me.Document):
         self._network_specific_fields = [field for field in type(self)._fields if field not in Network._fields]
 
     @classmethod
-    def add(cls, cloud, title, description='', object_id='', **kwargs):
+    def add(cls, name='', cloud=None, description='', object_id='', **kwargs):
 
-        if not title:
-            raise mist.io.exceptions.RequiredParameterMissingError('title')
+        if not name:
+            raise mist.io.exceptions.RequiredParameterMissingError('name')
         if not cloud:
             raise mist.io.exceptions.RequiredParameterMissingError('cloud')
 
-        network_doc = cls(title=title,
+        network = cls(title=name,
                           cloud=cloud,
                           description=description)
 
         if object_id:
-            network_doc.id = object_id
+            network.id = object_id
 
-        network_doc.ctl.create_network(**kwargs)
+        network.ctl.create_network(name=name,
+                                   description=description,
+                                   **kwargs)
 
-        return network_doc
+        return network
 
     def as_dict(self):
         netdict = {'name': self.title,
@@ -83,11 +85,11 @@ class Network(me.Document):
 
     def __repr__(self):
         return '<Network id:{id}, Title:{title}, Description={description}, Cloud:{cloud},' \
-               'Cloud API id:{cloud_id}>'.format(id=self.id,
+               'Cloud API id:{network_id}>'.format(id=self.id,
                                                  title=self.title,
                                                  description=self.description,
                                                  cloud=self.cloud,
-                                                 cloud_id=self.network_id)
+                                                 network_id=self.network_id)
 
     def __str__(self):
         return '{class_name} {title} ({id})'.format(class_name=self.__class__.__name__,
@@ -149,23 +151,25 @@ class Subnet(me.Document):
                                         if field not in Subnet._fields]
 
     @classmethod
-    def add(cls, title, network, description='', object_id='', **kwargs):
+    def add(cls, name='', network=None, description='', object_id='', **kwargs):
 
-        if not title:
-            raise mist.io.exceptions.RequiredParameterMissingError('title')
+        if not name:
+            raise mist.io.exceptions.RequiredParameterMissingError('name')
         if not network:
             raise mist.io.exceptions.RequiredParameterMissingError('network')
 
-        subnet = cls(title=title,
+        subnet = cls(title=name,
                      network=network,
                      description=description)
 
         if object_id:
-            subnet_doc.id = object_id
+            subnet.id = object_id
 
-        subnet_doc.ctl.create_subnet(**kwargs)
+        subnet.ctl.create_subnet(name=name,
+                                 description=description,
+                                 **kwargs)
 
-        return subnet_doc
+        return subnet
 
     def as_dict(self):
         netdict = {'name': self.title,
@@ -181,11 +185,11 @@ class Subnet(me.Document):
         return netdict
 
     def __repr__(self):
-        return '<Subnet id:{id}, Title:{title}  Description={description}, Cloud API id:{cloud_id},' \
+        return '<Subnet id:{id}, Title:{title}  Description={description}, Cloud API id:{subnet_id},' \
                ' of Network:{parent_network}>'.format(id=self.id,
                                                       title=self.title,
                                                       description=self.description,
-                                                      cloud_id=self.subnet_id,
+                                                      subnet_id=self.subnet_id,
                                                       parent_network=self.network)
 
     def __str__(self):

@@ -16,8 +16,9 @@ class SubnetController(object):
     def __init__(self, subnet):
         self.subnet = subnet
 
-    def create_subnet(self, network, **subnet_args):
-        return self.subnet.network.cloud.ctl.network.create_subnet(self.subnet, network, **subnet_args)
+    def create_subnet(self, **subnet_args):
+
+        return self.subnet.network.cloud.ctl.network.create_subnet(self.subnet, **subnet_args)
 
     def delete_subnet(self):
         return self.subnet.network.cloud.ctl.network.delete_subnet(self.subnet)
