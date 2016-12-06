@@ -1,4 +1,5 @@
 <link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="machines/machine-create.html">
 <link rel="import" href="machines/machine-page.html">
@@ -15,7 +16,15 @@
       }
       .logs {
         max-width: 1450px;
-        margin-bottom: 24px auto;
+        margin: 8px auto;
+        line-height: 28px;
+      }
+      paper-spinner {
+        margin: 4px;
+      }
+      .logs > * {
+        vertical-align: middle;
+        display: inline-block;
       }
       .error iron-icon {
         opacity: 0.32;
@@ -28,8 +37,12 @@
     <app-route route="{{route}}"
                 pattern="/:machine"
                 data="{{data}}"></app-route>
-    <p class="logs" hidden$="[[!jobId]]">Creating machine: {{removeUnderscore(logItem.action)}} <span class="error" hidden$="[[!logItem.error]]">[[logItem.error]] <iron-icon icon="close" on-tap="clearLog"></iron-icon></span>
-    </p>
+    <div class="logs" hidden$="[[!jobId]]">
+        <paper-spinner active$="[[!logItem.error]]" hidden$="[[logItem.error]]"></paper-spinner> 
+        <p> Creating machine: {{removeUnderscore(logItem.action)}} 
+            <span class="error" hidden$="[[!logItem.error]]">[[logItem.error]] <iron-icon icon="close" on-tap="clearLog"></iron-icon></span>
+        </p>
+    </div>
     <page-items name="machines" class="keys" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
     <machine-create model="[[model]]" machines-fields="[[machinesFields]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isAddPageActive(route.path)]]></machine-create>
     <machine-page model="[[model]]" machine="[[_getMachine(data.machine, model.machines)]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isDetailsPageActive(route.path)]]></machine-page>
