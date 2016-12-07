@@ -51,6 +51,9 @@ class BaseNetworkController(BaseController):
     def create_network(self, network, **kwargs):
         """Create a new network."""
 
+        kwargs['name'] = network.title
+        kwargs['description'] = network.description
+
         self._create_network__parse_args(kwargs)
 
         libcloud_network = self.ctl.compute.connection.ex_create_network(**kwargs)
@@ -72,6 +75,9 @@ class BaseNetworkController(BaseController):
     @LibcloudExceptionHandler(mist.io.exceptions.SubnetCreationError)
     def create_subnet(self, subnet, **kwargs):
         """Creates a new subnet."""
+
+        kwargs['name'] = subnet.title
+        kwargs['description'] = subnet.description
 
         self._create_subnet__parse_args(subnet.network, kwargs)
         libcloud_subnet = self.ctl.compute.connection.ex_create_subnet(**kwargs)
@@ -95,6 +101,7 @@ class BaseNetworkController(BaseController):
         """List all Networks present on the cloud. Also syncs the state of the Network and Subnet documents on the DB
         with their state on the Cloud API."""
 
+        # FIXME: Move these imports to the top of the file when circular import issues are resolved
         from mist.io.networks.models import Network, NETWORKS
 
         libcloud_networks = self.ctl.compute.connection.ex_list_networks()
@@ -124,10 +131,7 @@ class BaseNetworkController(BaseController):
                 log.error("Network %s not unique error: %s", network.title, exc)
                 raise mist.io.exceptions.NetworkExistsError()
 
-            # Syncing Subnets
-            network_entry = network.as_dict()
-            network_entry['subnets'] = network.ctl.list_subnets()
-            network_listing.append(network_entry)
+            network_listing.append(network)
 
         return network_listing
 
@@ -139,8 +143,8 @@ class BaseNetworkController(BaseController):
     def list_subnets(self, network, **kwargs):
         """List all Subnets for a particular network present on the cloud."""
 
-        from mist.io.networks.models import Subnet
-        from mist.io.networks.models import SUBNETS
+        # FIXME: Move these imports to the top of the file when circular import issues are resolved
+        from mist.io.networks.models import Subnet, SUBNETS
 
         self._list_subnets__parse_args(network, kwargs)
         libcloud_subnets = self.ctl.compute.connection.ex_list_subnets(**kwargs)
@@ -166,7 +170,8 @@ class BaseNetworkController(BaseController):
             except mongoengine.errors.NotUniqueError as exc:
                 log.error("Subnet %s not unique error: %s", subnet.title, exc)
                 raise mist.io.exceptions.SubnetExistsError(exc.message)
-            subnet_listing.append(subnet.as_dict())
+
+            subnet_listing.append(subnet)
 
         return subnet_listing
 

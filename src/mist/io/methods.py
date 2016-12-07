@@ -1269,12 +1269,16 @@ def list_networks(user, cloud_id):
 
     networks = cloud.ctl.network.list_networks()
 
+    for network in networks:
+
+        network_dict = network.as_dict()
+        network_dict['subnets'] = [subnet.as_dict() for subnet in network.ctl.list_subnets()]
+
     # TODO: Backwards-compatible network privacy detection, to be replaced
-    for net in networks:
-        if not net.get('router_external'):
-            ret['private'].append(net)
+        if not network_dict.get('router_external'):
+            ret['private'].append(network_dict)
         else:
-            ret['public'].append(net)
+            ret['public'].append(network_dict)
     return ret
 
 

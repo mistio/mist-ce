@@ -23,7 +23,7 @@ def _populate_class_mapping(mapping, class_suffix, base_class):
 class Network(me.Document):
     id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
     network_id = me.StringField(required=True)
-    title = me.StringField(required=True)
+    title = me.StringField()
     cloud = me.ReferenceField(Cloud, required=True)
     description = me.StringField()
 
@@ -52,23 +52,16 @@ class Network(me.Document):
         self._network_specific_fields = [field for field in type(self)._fields if field not in Network._fields]
 
     @classmethod
-    def add(cls, name='', cloud=None, description='', object_id='', **kwargs):
-
-        if not name:
-            raise mist.io.exceptions.RequiredParameterMissingError('name')
-        if not cloud:
-            raise mist.io.exceptions.RequiredParameterMissingError('cloud')
+    def add(cls, cloud,  name='', description='', object_id='', **kwargs):
 
         network = cls(title=name,
-                          cloud=cloud,
-                          description=description)
+                      cloud=cloud,
+                      description=description)
 
         if object_id:
             network.id = object_id
 
-        network.ctl.create_network(name=name,
-                                   description=description,
-                                   **kwargs)
+        network.ctl.create_network(**kwargs)
 
         return network
 
@@ -100,6 +93,7 @@ class Network(me.Document):
 class AmazonNetwork(Network):
     state = me.StringField()
     cidr = me.StringField()
+    instance_tenancy = me.StringField(choices=('default', 'private'))
 
     _controller_cls = mist.io.clouds.controllers.network.controllers.AmazonNetworkController
 
@@ -121,7 +115,7 @@ class OpenStackNetwork(Network):
 class Subnet(me.Document):
     id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
     subnet_id = me.StringField(required=True)
-    title = me.StringField(required=True)
+    title = me.StringField()
     cidr = me.StringField()
     network = me.ReferenceField('Network', required=True, reverse_delete_rule=me.CASCADE)
     description = me.StringField()
@@ -151,12 +145,7 @@ class Subnet(me.Document):
                                         if field not in Subnet._fields]
 
     @classmethod
-    def add(cls, name='', network=None, description='', object_id='', **kwargs):
-
-        if not name:
-            raise mist.io.exceptions.RequiredParameterMissingError('name')
-        if not network:
-            raise mist.io.exceptions.RequiredParameterMissingError('network')
+    def add(cls, network,  name='', description='', object_id='', **kwargs):
 
         subnet = cls(title=name,
                      network=network,
@@ -165,9 +154,7 @@ class Subnet(me.Document):
         if object_id:
             subnet.id = object_id
 
-        subnet.ctl.create_subnet(name=name,
-                                 description=description,
-                                 **kwargs)
+        subnet.ctl.create_subnet(**kwargs)
 
         return subnet
 

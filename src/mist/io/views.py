@@ -1520,12 +1520,13 @@ def create_network(request):
     """
     cloud_id = request.matchdict['cloud']
 
-    try:
-        network_params = request.json_body.get('network')
-    except Exception as e:
-        raise RequiredParameterMissingError(e)
+    params = params_from_request(request)
+    network_params = params.get('network')
+    subnet_params = params.get('subnet')
 
-    subnet_params = request.json_body.get('subnet', None)
+    if not network_params:
+        raise RequiredParameterMissingError('network')
+
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "create_resources", cloud_id)
 
@@ -1574,10 +1575,7 @@ def create_subnet(request):
     network_id = request.matchdict['network']
 
     params = params_from_request(request)
-
     subnet = params.get('subnet')
-    if not subnet:
-        raise RequiredParameterMissingError('subnet')
 
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "create_resources", cloud_id)

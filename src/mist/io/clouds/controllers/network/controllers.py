@@ -18,14 +18,18 @@ class AmazonNetworkController(BaseNetworkController):
     def _create_network__parse_args(self, kwargs):
         if not kwargs.get('cidr'):
             raise mist.io.exceptions.RequiredParameterMissingError('cidr')
+        if 'instance_tenancy' in kwargs and kwargs.get('instance_tenancy') not in ['default', 'private']:
+            raise mist.io.exceptions.BadRequestError('instance_tenancy')
         rename_kwargs(kwargs, 'cidr', 'cidr_block')
         kwargs.pop('description', None)
 
     @staticmethod
     def _list_networks__parse_libcloud_object(network, libcloud_network):
+        network.title = libcloud_network.name
         network.cidr = libcloud_network.cidr_block
         network.is_default = libcloud_network.extra.pop('is_default')
         network.state = libcloud_network.extra.pop('state')
+        network.instance_tenancy = libcloud_network.extra.pop('instance_tenancy')
 
     def _create_subnet__parse_args(self, network, kwargs):
         for required_key in ['cidr', 'availability_zone']:
@@ -37,6 +41,7 @@ class AmazonNetworkController(BaseNetworkController):
 
     @staticmethod
     def _list_subnets__parse_libcloud_object(subnet, libcloud_subnet):
+        subnet.title = libcloud_subnet.name
         subnet.cidr = libcloud_subnet.extra.pop('cidr_block')
         subnet.available_ips = libcloud_subnet.extra.pop('available_ips')
         subnet.zone = libcloud_subnet.extra.pop('zone')
@@ -63,6 +68,8 @@ class GoogleNetworkController(BaseNetworkController):
     provider = 'gce'
 
     def _create_network__parse_args(self, kwargs):
+        if 'name' not in kwargs:
+            raise mist.io.exceptions.RequiredParameterMissingError('name')
         kwargs['mode'] = kwargs.get('mode', 'legacy')
         if kwargs['mode'] == 'legacy':
             if 'cidr' not in kwargs:
@@ -72,12 +79,15 @@ class GoogleNetworkController(BaseNetworkController):
 
     @staticmethod
     def _list_networks__parse_libcloud_object(network, libcloud_network):
+        network.title = libcloud_network.name
         network.cidr = libcloud_network.cidr
         network.gateway_ip = libcloud_network.extra.pop('gatewayIPv4')
         network.mode = libcloud_network.mode
         network.description = libcloud_network.extra['description']
 
     def _create_subnet__parse_args(self, network, kwargs):
+        if 'name' not in kwargs:
+            raise mist.io.exceptions.RequiredParameterMissingError('name')
         for required_key in ['cidr', 'region', 'name']:
             if not kwargs.get(required_key):
                 raise mist.io.exceptions.RequiredParameterMissingError(required_key)
@@ -85,6 +95,7 @@ class GoogleNetworkController(BaseNetworkController):
 
     @staticmethod
     def _list_subnets__parse_libcloud_object(subnet, libcloud_subnet):
+        subnet.title = libcloud_subnet.name
         subnet.cidr = libcloud_subnet.cidr
         subnet.gateway_ip = libcloud_subnet.extra.pop('gatewayAddress')
         subnet.region = libcloud_subnet.region.name
@@ -94,6 +105,9 @@ class GoogleNetworkController(BaseNetworkController):
     def create_subnet(self, subnet, **kwargs):
         """Creates a new subnet.
         Overridden because of different libcloud method name."""
+
+        kwargs['name'] = subnet.title
+        kwargs['description'] = subnet.description
 
         self._create_subnet__parse_args(subnet.network, kwargs)
         libcloud_subnet = self.ctl.compute.connection.ex_create_subnetwork(**kwargs)
@@ -141,7 +155,7 @@ class GoogleNetworkController(BaseNetworkController):
                 except mongoengine.errors.NotUniqueError as exc:
                     log.error("Subnet %s not unique error: %s", subnet.title, exc)
                     raise mist.io.exceptions.SubnetExistsError(exc.message)
-                subnet_listing.append(subnet.as_dict())
+                subnet_listing.append(subnet)
 
         return subnet_listing
 
@@ -201,16 +215,20 @@ class OpenStackNetworkController(BaseNetworkController):
     provider = 'openstack'
 
     def _create_network__parse_args(self, kwargs):
+        if 'name' not in kwargs:
+            raise mist.io.exceptions.RequiredParameterMissingError('name')
         kwargs['admin_state_up'] = kwargs.get('admin_state_up', True)
         kwargs['shared'] = kwargs.get('shared', False)
         kwargs.pop('description', None)
 
     @staticmethod
     def _list_networks__parse_libcloud_object(network, libcloud_network):
+        network.title = libcloud_network.name
         network.admin_state_up = libcloud_network.extra.get('admin_state_up')
-        network.description = libcloud_network.extra.get('description')
 
     def _create_subnet__parse_args(self, network, kwargs):
+        if 'name' not in kwargs:
+            raise mist.io.exceptions.RequiredParameterMissingError('name')
         kwargs['network_id'] = network.network_id
         kwargs['allocation_pools'] = kwargs.get('allocation_pools', [])
         kwargs['gateway_ip'] = kwargs.get('gateway_ip', None)
@@ -220,6 +238,7 @@ class OpenStackNetworkController(BaseNetworkController):
 
     @staticmethod
     def _list_subnets__parse_libcloud_object(subnet, libcloud_subnet):
+        subnet.title = libcloud_subnet.name
         subnet.cidr = libcloud_subnet.cidr
         subnet.gateway_ip = libcloud_subnet.gateway_ip
         subnet.enable_dhcp = libcloud_subnet.enable_dhcp
@@ -258,7 +277,7 @@ class OpenStackNetworkController(BaseNetworkController):
                 except mongoengine.errors.NotUniqueError as exc:
                     log.error("Subnet %s not unique error: %s", subnet.title, exc)
                     raise mist.io.exceptions.SubnetExistsError(exc.message)
-                subnet_listing.append(subnet.as_dict())
+                subnet_listing.append(subnet)
 
         return subnet_listing
 
