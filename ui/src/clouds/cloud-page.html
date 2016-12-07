@@ -303,11 +303,14 @@
                     el.items = items;
                     el._openDialog();
                 },
-                _showToast: function(msg) {
+                _showToast: function(msg,time) {
                     //var toast = this.querySelector('paper-toast');
                     var toast = document.querySelector('paper-toast#mist-toast');
                     toast.text = msg;
+                    if(time != null)
+                      toast.duration = time;
                     toast.show();
+
                 },
                 _computeIsloading: function(cloud) {
                     return !this.cloud ? true : false;
@@ -374,7 +377,7 @@
                 _handleCloudStateAjaxError:function(e){
                   this.querySelector('#enable-disable-cloud').checked=this.cloud.enabled;
                   var msg=e.detail.request.xhr.response;
-                  this._showToast(msg);
+                  this._showToast(msg,10000);
                 }
             });
         })();
