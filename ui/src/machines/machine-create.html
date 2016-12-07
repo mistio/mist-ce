@@ -216,6 +216,11 @@
                         if ((this.model.clouds[this.selectedCloud].provider == "linode" || this.model.clouds[this.selectedCloud].provider == "gce" ) && changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'location'){
                             this._includeLocationName(changeRecord.value);
                         }
+
+                        // if is docker change required values
+                        if (this.model.clouds[this.selectedCloud].provider == "docker"){
+                            this._updateFieldsForDocker();
+                        }
                     }
                 },
                 _mapPortsToDockerPorts: function(input){
@@ -276,6 +281,20 @@
                         if (indLocName) 
                             this.set('machineFields.'+indLocName+'.value', this.model.clouds[this.selectedCloud].locations[location].name);
                     }
+                },
+                _updateFieldsForDocker: function(){
+                    console.log('_updateFieldsForDocker');
+                    var sizeInd = this._fieldIndexByName('size');
+                    var locInd = this._fieldIndexByName('location');
+                    var monInd = this._fieldIndexByName('monitoring');
+
+                    console.log('indexes', sizeInd, locInd, monInd);
+
+                    this.set('fields.'+ sizeInd +'.required', false)
+                    this.set('fields.'+ locInd +'.required', false)
+
+                    // disable monitoring by default
+                    this.set('fields.'+ monInd +'.value', false)
                 },
                 _fieldIndexByName: function(name){
                     var index;
