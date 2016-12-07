@@ -19,7 +19,7 @@
             cloud:  Object,
             fields: {
                     type: Array,
-                    computed: "_computeFields(cloud.*, cloud.provider)",
+                    computed: "_computeFields(cloud)",
                     notify: true
             },
             providers: {
@@ -28,9 +28,9 @@
             }
         },
         observers: [
-            '_fillInCreds(cloud, cloud.provider, fields.*)'
+            '_fillInCreds(cloud)'
         ],
-        _computeFields: function(cloud, cloudprovider){
+        _computeFields: function(cloud){
             var providerFields = this.providers.filter(function(fields) {
                 return fields.val == this.cloud.provider;
             }, this);
@@ -51,8 +51,10 @@
             }
             return fields;
         },
-        _fillInCreds: function(cloud, provider, fields){
-            if (provider){
+        _fillInCreds: function(cloud){
+            if (cloud){
+                //reset form 
+                this.querySelector('app-form').form = {};
                 // if there is an apikey we can fill in
                 var apikey = this.cloud.apikey;
                 var index = this._fieldIndexByName('apikey', this.fields);
