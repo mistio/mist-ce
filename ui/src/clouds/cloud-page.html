@@ -207,7 +207,7 @@
                 </div>
                 <div class="item-actions">
                     <div class="head-toggle">
-                        <paper-toggle-button id="enable-disable-cloud" checked$="[[cloud.enabled]]" on-tap="_changeState">
+                        <paper-toggle-button id="enable-disable-cloud" checked$="[[cloud.enabled]]" on-tap="_changeState" disabled$="{{loading}}">
                             <span hidden$="[[!cloud.enabled]]">ENABLED</span>
                             <span hidden$="[[cloud.enabled]]">DISABLED</span>
                         </paper-toggle-button>
@@ -260,9 +260,9 @@
         </div>
         <iron-ajax id="cloudStarAjaxRequest" url="/api/v1/clouds/{{cloud.cloud.id}}/clouds/{{cloud.id}}" method="POST" on-response="_handlecloudStarAjaxResponse" on-error="_handlecloudStarAjaxError"></iron-ajax>
         <iron-ajax id="cloudDeleteAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="DELETE" on-response="_handleCloudDeletionAjaxResponse" on-error="_handleCloudDeletionAjaxError"></iron-ajax>
-        <iron-ajax id="cloudStateAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="POST" on-response="_handleCloudStateAjaxResponse" on-error="_handleCloudStateAjaxError"></iron-ajax>
+        <iron-ajax id="cloudStateAjaxRequest" loading="{{loading}}" handle-as="xml" url="/api/v1/clouds/[[cloud.id]]" method="POST" on-response="_handleCloudStateAjaxResponse" on-error="_handleCloudStateAjaxError"></iron-ajax>
         <tags-list model="[[model]]"></tags-list>
-        <paper-toast></paper-toast>
+        <!-- <paper-toast></paper-toast> -->
         <dialog-element></dialog-element>
     </template>
     <script>
@@ -311,10 +311,11 @@
                     el.items = items;
                     el._openDialog();
                 },
-                _showToast: function(msg) {
-                    var toast = this.querySelector('paper-toast');
-                    toast.text = msg;
-                    toast.show();
+                _showToast: function(msg,time) {
+                    var toast = document.querySelector('paper-toast#mist-toast');
+                    if(time == null)
+                        time=3000;
+                    toast.show({text: msg, duration: time});
                 },
                 _computeIsloading: function(cloud) {
                     return !this.cloud ? true : false;
@@ -364,18 +365,25 @@
                     this._showToast(msg);
                 },
                 _changeState: function(e) {
+                    this.querySelector('#enable-disable-cloud').disabled=true;
                     this.$.cloudStateAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.cloudStateAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.cloudStateAjaxRequest.body = {
                         new_state: this.cloud.enabled? '0' : '1'
                     };
+                    console.log("request","/api/v1/clouds/"+this.cloud.id)
                     this.$.cloudStateAjaxRequest.generateRequest();
                 },
                 _handleCloudStateAjaxResponse: function(e) {
-                    var msg = !this.cloud.enabled ? 'Cloud ' + this.cloud.title + ' was enabled!' :
+                    var msg = this.cloud.enabled ? 'Cloud ' + this.cloud.title + ' was enabled!' :
                     'Cloud ' + this.cloud.title + ' was disabled!';
                     this._showToast(msg);
                 },
+                _handleCloudStateAjaxError:function(e){
+                  this.querySelector('#enable-disable-cloud').checked=this.cloud.enabled;
+                  var msg=e.detail.request.xhr.response;
+                  this._showToast(msg,10000);
+                }
             });
         })();
     </script>
