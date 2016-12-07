@@ -245,7 +245,6 @@ class ExecutableScript(Script):
 
 class CollectdScript(Script):
 
-    # extra , currently used only for collectd_python_plugin
     # ex. a dict with value_type='gauge', value_unit=''
     extra = me.DictField()
 
