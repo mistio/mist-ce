@@ -5,20 +5,43 @@
 
 <link rel="import" href="page-items.html">
 
+<script type="text/javascript" src="machine-create-fields.js" inline></script>
+
 <dom-module id="page-machines">
   <template>
     <style>
       :host {
         display: block;
       }
+      .logs {
+        background-color: #f1f1f1;
+        padding: 4px 16px;
+        border-radius: 3px;
+        margin-bottom: 24px;
+      }
+      .error iron-icon {
+        opacity: 0.32;
+        cursor: pointer;
+      }
+      .error {
+          color: var(--red-color);
+      }
     </style>
     <app-route route="{{route}}"
                 pattern="/:machine"
                 data="{{data}}"></app-route>
-
+    <p class="logs" hidden$="[[!jobId]]">Creating machine: {{removeUnderscore(logItem.action)}} <span class="error" hidden$="[[!logItem.error]]">[[logItem.error]] <iron-icon icon="close" on-tap="clearLog"></iron-icon></span>
+    </p>
     <page-items name="machines" class="keys" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
-    <machine-create model="[[model]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isAddPageActive(route.path)]]></machine-create>
+    <machine-create model="[[model]]" machines-fields="[[machinesFields]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isAddPageActive(route.path)]]></machine-create>
     <machine-page model="[[model]]" machine="[[_getMachine(data.machine, model.machines)]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isDetailsPageActive(route.path)]]></machine-page>
+
+    <iron-ajax
+            id="getJobLog" method="GET"
+            url="/api/v1/jobs/[[jobId]]"
+            handle-as="json"
+            on-response="handleGetJobLog"
+            on-error="handleGetJobLogError"></iron-ajax>
   </template>
 
   <script>
@@ -30,8 +53,29 @@
         model: Object,
         sections: Array,
         onboarding: Object,
-        data: Object
+        data: Object,
+        machinesFields: {
+            type: Array,
+            value: MACHINE_CREATE_FIELDS
+        },
+        jobId: {
+            type: String,
+            value: false
+        },
+        logItem:  {
+            type: Object,
+            value: false
+        },
+        intervalID: {
+          type: String
+        }
       },
+
+      observers: [
+          '_jobIdChanged(jobId)',
+          '_pathChanged(path)',
+          'stopPolling(logItem)'
+      ],
 
       _isAddPageActive: function(path) {
           return path == '/+create';
@@ -43,13 +87,59 @@
             return false;
       },
       _isListActive: function(path) {
+          if (path) 
+              this.stopPolling();
           return !path;
       },
       _getMachine: function(id) {
-        if (id && this.model && this.model.machines && this.model.machines[id])
-          return this.model.machines[id];
-      }
+          if (id && this.model && this.model.machines && this.model.machines[id])
+            return this.model.machines[id];
+      },
+      _jobIdChanged: function(jobid){
+          if (!jobid) {
+              this.resetPolling();
+          }
+          else {
+              this.startPolling(jobid);
+          }
+      },
+      startPolling: function(jobid){
+          this.intervalID = setInterval(function() {
+              this.$.getJobLog.generateRequest();
+          }.bind(this), 1000);
 
+          console.log('startpolling');
+      },
+      stopPolling: function(logItems){
+          if (this.logItem && this.logItem.action.endsWith('finished')){
+              //let log finished show
+              if (!this.logItem.error)
+                this.async(function(){
+                  this.resetPolling(this.logItem.error);
+                }.bind(this), 1000);
+          }
+      },
+      resetPolling: function(error){
+          if (!error) {
+              this.set('logItem', '');
+          }
+          this.set('jobId', false);
+          window.clearInterval(this.intervalID);
+          this.set('intervalID', false);
+      },
+      handleGetJobLog: function(e){
+          console.log('handleGetJobLog',e);
+          //save last log in logItem
+          this.set('logItem', e.detail.response.logs[e.detail.response.logs.length-1]);
+      },
+      removeUnderscore: function(action){
+          if (action)
+              return action.replace(/_/g, " ");
+      },
+      clearLog: function(e){
+          this.resetPolling();
+          this.set('logItem', '');
+      }
     });
   </script>
 </dom-module>

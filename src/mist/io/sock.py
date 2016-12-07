@@ -228,7 +228,8 @@ class MainConnection(MistConnection):
         self.list_tunnels()
         self.list_clouds()
         self.check_monitoring()
-        self.update_poller()
+        if config.ACTIVATE_POLLER:
+            self.update_poller()
 
     @tornado.gen.coroutine
     def update_poller(self):
@@ -287,13 +288,15 @@ class MainConnection(MistConnection):
                   core_methods.filter_list_clouds(self.auth_context))
         clouds = Cloud.objects(owner=self.owner, enabled=True)
         log.info(clouds)
-        for key, task in (('list_images', tasks.ListImages()),
-                          ('list_sizes', tasks.ListSizes()),
-                          ('list_networks', tasks.ListNetworks()),
-                          ('list_locations', tasks.ListLocations()),
-                          ('list_projects', tasks.ListProjects()),
-                          ):
-
+        periodic_tasks = []
+        if not config.ACTIVATE_POLLER:
+            periodic_tasks.append(('list_machines', tasks.ListMachines()))
+        periodic_tasks.extend([('list_images', tasks.ListImages()),
+                               ('list_sizes', tasks.ListSizes()),
+                               ('list_networks', tasks.ListNetworks()),
+                               ('list_locations', tasks.ListLocations()),
+                               ('list_projects', tasks.ListProjects())])
+        for key, task in periodic_tasks:
             for cloud in clouds:
                 cached = task.smart_delay(self.owner.id, cloud.id)
                 if cached is not None:
