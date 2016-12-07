@@ -311,11 +311,9 @@
                     el._openDialog();
                 },
                 _showToast: function(msg,time) {
-                    //var toast = this.querySelector('paper-toast');
                     var toast = document.querySelector('paper-toast#mist-toast');
-                    //toast.text = msg;
                     if(time == null)
-                      time=3000;
+                        time=3000;
                     toast.show({text: msg, duration: time});
                 },
                 _computeIsloading: function(cloud) {
