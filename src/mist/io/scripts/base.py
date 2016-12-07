@@ -137,14 +137,16 @@ class BaseScriptController(object):
                                     allow_redirects=False)
                 if resp.ok and resp.is_redirect and 'location' in resp.headers:
                     url = resp.headers['location']
-                # TODO RAISE
+                else:
+                    log.error('%d: Could not retrieve your file: %s',
+                              resp.status_code, resp.content)
             else:
                 url = self.script.location.url
             # Download a file over HTTP
             log.debug("Downloading %s.", url)
-            name, headers = urllib.urlretrieve(url)
-            log.debug("Downloaded to %s.", name)
-            return file
+            name, headers = urllib.urlretrieve(url)  # TODO
+            log.debug("Downloaded to %s.", name)     # maybe return file_type
+            return name
 
     def _preparse_file(self):
         return
