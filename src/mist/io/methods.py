@@ -1291,7 +1291,9 @@ def list_subnets(cloud, network):
     If a network DB object is passed to the network parameter, only subnets that belong
     to this particular network will be returned.
     """
-    return cloud.ctl.network.list_subnets(network=network)
+
+    subnets = cloud.ctl.network.list_subnets(network=network)
+    return [subnet.as_dict() for subnet in subnets]
 
 
 def list_projects(user, cloud_id):

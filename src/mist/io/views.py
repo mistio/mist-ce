@@ -1490,7 +1490,7 @@ def list_subnets(request):
         raise CloudNotFoundError
 
     try:
-        network = Network.objects.get(owner=auth_context.owner, id=network_id)
+        network = Network.objects.get(cloud=cloud, id=network_id)
     except Network.DoesNotExist:
         raise NetworkNotFoundError
 
