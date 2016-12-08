@@ -226,6 +226,12 @@
                             this._includeLocationName(changeRecord.value);
                         }
 
+                        // if its ec2 and image changes update size to match the virtualization_type
+                        if (this.model.clouds[this.selectedCloud].provider == "ec2" && changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'image'){
+                            this._updateEc2Sizes(this.get(changeRecord.path.replace('.value','')).value);
+                        }
+
+                        // let either script or script_id to pass in the from payload
                         if (changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'radio'){
                             this._toggleScriptFields(this.get(changeRecord.path.replace('.value','')).value);
                         }
@@ -303,6 +309,17 @@
                     this.set('machineFields.'+ monInd +'.value', false);
                     console.log('_updateFieldsForDocker', this.get('machineFields.'+ monInd));
                 },
+                _updateEc2Sizes: function(imageid) {
+                    var virtualization_type = this.model.images[imageid].extra.virtualization_type;
+
+                    var sizeInd = this._fieldIndexByName('size');
+                    var sizesOptions = this.model.clouds[this.selectedCloud].sizesArray.filter(function(s){
+                        return s.extra.virtualizationTypes.indexOf(virtualization_type) > -1
+                    });
+                    this.set('machineFields.' + sizeInd + '.options', sizesOptions);
+
+                    console.log('_updateEc2Sizes', virtualization_type , this.model.clouds[this.selectedCloud].sizesArray.length, sizesOptions)
+                },
                 _toggleScriptFields: function(scripttype){
                     var inlineInd = this._fieldIndexByName('script');
                     var selectInd = this._fieldIndexByName('script_id');
@@ -337,9 +354,9 @@
                     console.log('creation failed', e)
                 },
                 _computeProviders: function(model, clouds){
-                    //exclude bare metals from provider dropdown list
+                    //exclude bare metals and other from provider dropdown list
                     return this.model.cloudsArray.filter(function(c){
-                        return c.provider != "bare_metal"
+                        return  ["bare_metal", "vsphere", "indonesian_vcloud", "azure_arm"].indexOf(c.provider) == -1;
                     });
                 },
                 _goBack: function(){
