@@ -273,7 +273,7 @@
                 },
 
                 _handleAjaxResponse: function(e) {
-                    document.querySelector('paper-toast#mist-toast').show({text: 'Changes saved succesfully!'})
+                    this.fire('toast',{msg:"Changes saved succesfully!",duration:3000});
                 },
 
                 _handleAjaxError: function() {

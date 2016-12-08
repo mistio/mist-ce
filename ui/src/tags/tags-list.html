@@ -53,7 +53,7 @@
             }
             #progress {
                 margin-bottom: 16px;
-                margin-top: 0;                
+                margin-top: 0;
                 border-bottom: 1px solid #ddd;
             }
             #errormsg {
@@ -95,7 +95,6 @@
                 <paper-button class="pull-right blue-link" dialog-dismiss>Cancel</paper-button>
             </div>
         </paper-dialog>
-        <paper-toast></paper-toast>
         <iron-ajax id="tagsAjaxRequest" url="/api/v1/tags" method="POST" on-response="_handleTagsAjaxResponse" on-error="_handleTagsAjaxError"></iron-ajax>
     </template>
 
@@ -195,8 +194,8 @@
                         var itemType = item.split(":")[0],
                             itemCloudId = item.split(":")[1],
                             itemId = item.split(":")[2],
-                            itemObj = {}; 
-                            
+                            itemObj = {};
+
                         if (['machine', 'image', 'network'].indexOf(itemType) != -1 && itemCloudId)
                             itemObj = this.model.clouds[itemCloudId][itemType+'s'][itemId];
                         else {
@@ -204,7 +203,7 @@
                         }
                         if (itemObj) {
 
-                            if (!itemObj.tags) 
+                            if (!itemObj.tags)
                                 itemObj.tags = [];
                             // TO FIX: network tags should not be type 'object', but Array of objects
                             // only networks return their tags in such format. Below code patches it.
@@ -281,7 +280,7 @@
                         }),
                         payload = [],
                         deltags = [];
-                    
+
                     if (this.tagsToDelete.length > 0) {
                         deltags = this.tagsToDelete.filter(function(tag){
                             return tag.key != "";
@@ -293,7 +292,7 @@
                             itemCloudId = item.split(":")[1],
                             itemId = item.split(":")[2],
                             itemObj;
-                        
+
                         if (['machine', 'image', 'network'].indexOf(itemType) != -1 && itemCloudId)
                             itemObj = this.model.clouds[itemCloudId][itemType+'s'][itemId];
                         else {
@@ -321,7 +320,7 @@
                 },
                 _handleTagsAjaxResponse: function(e) {
                     this._closeDialog();
-                    this._showToast('Tags were updated!');
+                    this.fire('toast',{msg:'Tags were updated!',duration:3000});
                 },
                 _handleTagsAjaxError: function(e){
                     console.log(e.detail.error.message);
@@ -329,11 +328,6 @@
                     this.set('hasError', true);
                     this.$.errormsg.textContent = e.detail.error.message;
                 },
-                _showToast: function(msg) {
-                    var toast = this.querySelector('paper-toast');
-                    toast.text = msg;
-                    toast.show();
-                }
             });
         })();
     </script>

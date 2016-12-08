@@ -196,7 +196,6 @@
         </div>
         <iron-ajax id="imageStarAjaxRequest" url="/api/v1/clouds/{{image.cloud.id}}/images/{{image.id}}" method="POST" on-response="_handleImageStarAjaxResponse" on-error="_handleImageStarAjaxError"></iron-ajax>
         <tags-list model="[[model]]"></tags-list>
-        <paper-toast></paper-toast>
     </template>
     <script>
         (function() {
@@ -274,13 +273,9 @@
                     // "There was a problem starring image IMAGE_NAME. It can not yet appear as an option when creating machines"
                     // or
                     // "There was a problem unstarring image IMAGE_NAME. It will still appear as an option when creating machines"
-                    this._showToast('There was a problem unstarring image ' + this.image.name + '. It will still appear as an option when creating machines');
+                    this.fire('toast',{msg:'There was a problem unstarring image ' + this.image.name + '. It will still appear as an option when creating machines',duration:5000});
                 },
-                _showToast: function(msg) {
-                    var toast = this.querySelector('paper-toast');
-                    toast.text = msg;
-                    toast.show();
-                },
+
                 _computeIsloading: function(image) {
                     return !this.image ? true : false;
                 }

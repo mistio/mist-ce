@@ -3,7 +3,6 @@
 <link rel="import" href="../../bower_components/polymer-sortablejs/polymer-sortablejs.html" />
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
@@ -281,7 +280,6 @@
         </div>
         <iron-ajax id="postPolicy" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/policy" contentType="application/json" handle-as="xml" method="PUT" on-request="_handlePostPolicy" on-response="_handleResponse" on-error="_handleError"></iron-ajax>
 
-        <paper-toast></paper-toast>
     </template>
 </dom-module>
 <script type="text/javascript" src="../../bower_components/swiftSet/swiftSet.js"></script>
@@ -582,9 +580,7 @@
                 this.set('formReady', false);
             },
             _handleResponse: function(e) {
-                var toast = this.querySelector('paper-toast');
-                    toast.text = 'Team policy updated successfully.';
-                    toast.show();
+                this.fire('toast',{msg:'Team policy updated successfully.',duration:3000});
                 this.set('sendingData', false);
                 this.set('formReady', false);
             },

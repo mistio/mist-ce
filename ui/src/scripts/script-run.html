@@ -3,7 +3,6 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
 <link rel="import" href="../app-icons/app-icons.html">
 <link rel="import" href="../app-form/app-form.html">
@@ -70,7 +69,6 @@
                 <app-form fields="[[fields]]" url="/api/v1/scripts/[[script.id]]" on-response="_runScriptResponse" btncontent="run"></app-form>
             </paper-material>
         </div>
-        <paper-toast id="run-script-toast"></paper-toast>
     </template>
 
     <script>
@@ -198,7 +196,7 @@
                     return machine.keys.length>0?true:false;
                 },
                 _cloudsChanged: function(fieldsLength, clouds, machines, keys) {
-                    
+
                     this.set('fields.0.options', this.model.machinesArray);
 
                     if (this.fields) {
@@ -213,17 +211,11 @@
                     }
                 },
                 _runScriptResponse: function(e) {
-                    var msg = 'Run script request was successfull. Redirecting to script...';
-                    this._showToast(msg);
+                    this.fire('toast',{msg:'Run script request was successfull. Redirecting to script...',duration:3000});
                     this.async(function(){
                         document.querySelector('app-location').set('path', '/scripts/'+this.script.id);
                     }, 3300)
                 },
-                _showToast: function(msg) {
-                    var toast = this.querySelector('paper-toast#run-script-toast');
-                    toast.text = msg;
-                    toast.show();
-                }
             });
         })();
     </script>

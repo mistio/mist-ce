@@ -195,6 +195,10 @@
       observers: [
         '_routePageChanged(routeData.page, subroute.path)'
       ],
+      showToast:function(e){
+        var toast=this.querySelector('paper-toast#mist-toast')
+        toast.show({text:e.detail.msg,duration:e.detail.duration});
+      },
 
       ready: function(){
 
@@ -337,14 +341,24 @@
                 'edit_tags',
                 'read_logs',
             ],
-            // 'team': [
+            'tunnel': [
+                'add',
+                'remove',
+                'edit',
+                'read',
+                'edit_tags',
+                'read_logs',
+            ],
+            //TODO
+            // 'schedule': [
             //     'add',
             //     'read',
             //     'edit',
+            //     'run',
             //     'remove',
             //     'edit_tags',
             //     'read_logs',
-            // ],
+            // ]
         };
 
         for(i = 1; i<= this.model.teamsArray.length; i++){

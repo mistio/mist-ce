@@ -2,7 +2,6 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
@@ -96,10 +95,6 @@
             machine-edit {
                 position: absolute;
             }
-            paper-toast#item-actions-toast {
-                margin-top: 24px !important;
-                padding: 16px 24px !important;
-            }
         </style>
         <content>
           <iron-media-query query="(max-width: 1200px)" query-matches="{{lessactions}}"></iron-media-query>
@@ -170,7 +165,6 @@
           <associate-key id="associatekeydialog" items="[[selectedItemsOfCurrentSection]]" model="[[model]]"></associate-key>
           <machine-edit id="renamedialog" items="[[selectedItemsOfCurrentSection]]" model="[[model]]"></machine-edit>
         </content>
-        <paper-toast id="item-actions-toast"></paper-toast>
     </template>
 </dom-module>
 
@@ -782,28 +776,23 @@ Polymer({
     },
     _feedbackOnScript: function(e){
         if (e.detail.response) {
-            this._showToast('Script run request succeded. Script '+this.computeModel().scripts[e.detail.scriptId].name+' has been queued for execution');
+            this.fire('toast',{msg:'Script run request succeded. Script '+this.computeModel().scripts[e.detail.scriptId].name+' has been queued for execution',duration:5000});
         }
         if (e.detail.error) {
-            this._showToast(e.detail.errormsg);
+            this.fire('toast',{msg:e.detail.errormsg,duration:3000});
         }
     },
     _feedbackOnRename: function(e){
         console.log("_feedbackOnRename")
         if (e.detail.request) {
-            this._showToast('Rename request sent. Waiting for machine to respond');
+            this.fire('toast',{msg:'Rename request sent. Waiting for machine to respond',duration:3000});
         }
         if (e.detail.response) {
-            this._showToast('Renaming was successful.');
+            this.fire('toast',{msg:'Renaming was successful.',duration:3000});
         }
         if (e.detail.error) {
-            this._showToast(e.detail.errormsg);
+            this.fire('toast',{msg:e.detail.errormsg,duration:3000});
         }
     },
-    _showToast: function(msg) {
-            var toast = this.querySelector('#item-actions-toast');
-            toast.text = msg;
-            toast.show();
-        },
 });
 </script>

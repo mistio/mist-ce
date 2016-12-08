@@ -1,7 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
-<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
@@ -274,7 +273,6 @@
         <iron-ajax id="deleteMember" url="/api/v1/org/[[model.org.id]]/teams/[[team.id]]/members/[[memberToDelete]]" method="DELETE" on-response="_deleteMemberResponse" on-error="_deleteMemberError"></iron-ajax>
 
         <dialog-element></dialog-element>
-        <paper-toast></paper-toast>
     </template>
     <script>
         (function() {
@@ -442,9 +440,7 @@
                 },
                 _deleteMemberResponse: function(){
                     this.set('memberToDelete', null);
-                    var toast = this.querySelector('paper-toast');
-                    toast.text = "Member deleted succesfully";
-                    toast.show();
+                    this.fire('toast',{msg:"Member deleted succesfully",duration:3000});
                 },
                 _showDialog: function(info) {
                     var dialog = this.querySelector('dialog-element');

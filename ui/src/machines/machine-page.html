@@ -1,6 +1,5 @@
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
@@ -458,7 +457,6 @@
 
         <machine-edit machine="[[machine]]"></machine-edit>
         <tags-list model="[[model]]"></tags-list>
-        <paper-toast></paper-toast>
     </template>
 </dom-module>
 <script>
@@ -797,11 +795,6 @@ Polymer({
         }
         dialog._openDialog();
     },
-    _showToast: function(msg) {
-        var toast = this.querySelector('paper-toast');
-        toast.text = msg;
-        toast.show();
-    },
     isState: function(machine) {
         if (machine)
             return machine.state == machine.extra.status;
@@ -833,12 +826,12 @@ Polymer({
     },
     _disassociateKeyResponse: function(e) {
         this.set('isPendingKeyRequest', false);
-        document.querySelector('paper-toast#mist-toast').show({text: 'Key was removed from machine!'})
+        this.fire('toast',{msg:'Key was removed from machine!',duration:3000});
     },
     _disassociateKeyError: function(e) {
         this.set('isPendingKeyRequest', false);
         console.log(e)
-        document.querySelector('paper-toast#mist-toast').show({text: e.detail.request.xhr.responseText})
+        this.fire('toast',{msg:e.detail.request.xhr.responseText,duration:3000});
     },
     _machineActionConfirmation: function(e){
         if (e.detail.reason == "disassociate.key") {
@@ -853,27 +846,27 @@ Polymer({
             this.set('isPendingKeyRequest', false);
         } else if (e.detail.error) {
             this.set('isPendingKeyRequest', false);
-            this._showToast(e.detail.errormsg);
+            this.fire('toast',{msg:e.detail.errormsg,duration:3000});
         }
     },
     _feedbackOnScript: function(e) {
         if (e.detail.response) {
-            this._showToast('Script run request succeded. Script ' + this.model.scripts[e.detail.scriptId].name + ' has been queued for execution');
+            this.fire('toast',{msg:'Script run request succeded. Script ' + this.model.scripts[e.detail.scriptId].name + ' has been queued for execution',duration:5000});
         }
         if (e.detail.error) {
-            this._showToast(e.detail.errormsg);
+            this.fire('toast',{msg:e.detail.errormsg,duration:3000});
         }
     },
     _feedbackOnRename: function(e) {
         // console.log("_feedbackOnRename")
         if (e.detail.request) {
-            this._showToast('Rename request sent. Waiting for machine to respond');
+            this.fire('toast',{msg:'Rename request sent. Waiting for machine to respond',duration:3000});
         }
         if (e.detail.response) {
-            this._showToast('Renaming was successful.');
+            this.fire('toast',{msg:'Renaming was successful.',duration:3000});
         }
         if (e.detail.error) {
-            this._showToast(e.detail.errormsg);
+            this.fire('toast',{msg:e.detail.errormsg,duration:3000});
         }
     },
     _computeProbeData: function(machine, probes){

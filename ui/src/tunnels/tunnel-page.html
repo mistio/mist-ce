@@ -3,7 +3,6 @@
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../helpers/dialog-element.html">
@@ -244,7 +243,6 @@ Script:</code></pre>
         <iron-ajax id="commandAjaxRequest" url="/api/v1/tunnels/[[tunnel.id]]/command" method="GET" on-response="_handleCommandAjaxRequest" handle-as="xml" on-error="_handleCommandAjaxError"></iron-ajax>
         <dialog-element></dialog-element>
         <tags-list model="[[model]]"></tags-list>
-        <paper-toast></paper-toast>
     </template>
     <script>
     (function() {
@@ -341,9 +339,7 @@ Script:</code></pre>
                 document.querySelector('app-location').set('path', '/tunnels');
             },
             _handleTunnelDeleteAjaxError: function(e) {
-                var toast = this.querySelector('paper-toast');
-                toast.text = "There was a problem deleting the tunnel";
-                toast.show();
+                this.fire('toast',{msg:"There was a problem deleting the tunnel",duration:3000});
             },
             // script
             _requestScript: function(){
@@ -395,23 +391,14 @@ Script:</code></pre>
                 var el = this.$.tunnelscript;
                 this.setSelection(el);
                 var successful = document.execCommand('copy');
-                var msg = successful ? 'The script was copied to clipboard!' : 'There was an error copying to clipboard!';
-
-                this._showToast(msg);
+                this.fire('toast',{msg:successful ? 'The script was copied to clipboard!' : 'There was an error copying to clipboard!',duration:3000});
             },
             copyCurl: function(e) {
                 this.clearSelection();
                 var el = this.$.tunnelcommand;
                 this.setSelection(el);
                 var successful = document.execCommand('copy');
-                var msg = successful ? 'The command was copied to clipboard!' : 'There was an error copying to clipboard!';
-
-                this._showToast(msg);
-            },
-            _showToast: function(msg) {
-                var toast = this.querySelector('paper-toast');
-                toast.text = msg;
-                toast.show();
+                this.fire('toast',{msg:successful ? 'The command was copied to clipboard!' : 'There was an error copying to clipboard!',duration:3000});
             },
             _enableTunnel: function(){
 

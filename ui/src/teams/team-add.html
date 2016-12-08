@@ -125,9 +125,7 @@
                     if (this.referral && this.referral=="onb") {
                         this.fire("new-team-added", e.detail.response);
                     }
-                    var toast = document.querySelector('paper-toast#mist-toast');
-                    toast.text = 'New team '+ e.detail.response.name + ' added succesfully.';
-                    toast.show();
+                    this.fire('toast',{msg:'New team '+ e.detail.response.name + ' added succesfully.',duration:3000});
 
                     this._formReset();
                     this.set('referral', null);
