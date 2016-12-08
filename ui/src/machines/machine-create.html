@@ -297,6 +297,7 @@
                 _updateFieldsForDocker: function(){
                     var sizeInd = this._fieldIndexByName('size');
                     var locInd = this._fieldIndexByName('location');
+                    var keyInd = this._fieldIndexByName('key');
                     var monInd = this._fieldIndexByName('monitoring');
 
                     console.log('indexes', sizeInd, locInd, monInd);
@@ -304,6 +305,11 @@
                     //hide size and location
                     this.set('machineFields.'+ sizeInd +'.show', false);
                     this.set('machineFields.'+ locInd +'.show', false);
+
+                    // optional key
+                    this.set('machineFields.'+ keyInd +'.required', false);
+                    this.set('machineFields.'+ keyInd +'.label', 'Key');
+                    this.set('machineFields.'+ keyInd +'.helptext', "Optional. Keys are valid only for Mist.io images");
 
                     // disable monitoring by default
                     this.set('machineFields.'+ monInd +'.value', false);
