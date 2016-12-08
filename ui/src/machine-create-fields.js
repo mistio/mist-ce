@@ -272,7 +272,7 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         options: []
     });
 
-    //add cloud init only to providers that accept and we support
+    //add cloud init field only to providers that accept and we support
     if (['azure', 'digitalocean', 'ec2', 'gce', 'packet', 'rackspace', 'libvirt'].indexOf(p.provider) != -1) {
         p.fields.push({
             name: "cloud_init",
@@ -282,7 +282,7 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
             defaultValue: "",
             show: true,
             required: false,
-            helptext: ""
+            helptext: "Start your Cloud Init script with #!/bin/bash or use a valid yaml configuration file starting with #cloud-config"
         });
     }
 
