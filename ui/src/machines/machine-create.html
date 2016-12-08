@@ -183,6 +183,11 @@
                             if (f.name.endsWith("key")) {
                                 f.options = this.model.keysArray;
                             }
+
+                            if (f.name.startsWith("script")) {
+                                f.options = this.model.scriptsArray;
+                            }
+
                             // for openstack this sould be multi selection
                             if (f.name.endsWith("networks")) {
                                 f.options = this.model.clouds[cloudId].networksArray;
@@ -265,7 +270,6 @@
 
                 },
                 _includeImageExtra: function(image){
-                    console.log('_includeImageExtra',image);
                     if (image) {
                         // save in fields
                         var indImEx = this._fieldIndexByName('image_extra');
@@ -274,7 +278,6 @@
                     }
                 },
                 _includeLocationName: function(location){
-                    console.log('_includeLocationName',image);
                     if (location) {
                         // save in fields
                         var indLocName = this._fieldIndexByName('location_name');
@@ -290,11 +293,12 @@
 
                     console.log('indexes', sizeInd, locInd, monInd);
 
-                    this.set('fields.'+ sizeInd +'.required', false)
-                    this.set('fields.'+ locInd +'.required', false)
+                    //hide size and location
+                    this.set('machineFields.'+ sizeInd +'.show', false);
+                    this.set('machineFields.'+ locInd +'.show', false);
 
                     // disable monitoring by default
-                    this.set('fields.'+ monInd +'.value', false)
+                    this.set('machineFields.'+ monInd +'.value', false);
                 },
                 _fieldIndexByName: function(name){
                     var index;
