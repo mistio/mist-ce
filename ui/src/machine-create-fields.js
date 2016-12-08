@@ -273,7 +273,7 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
     });
 
     //add cloud init only to providers that accept and we support
-    if (['azure', 'digitalocean', 'ec2', 'gce', 'packet', 'rackspace', 'libvirt'].indexOf(p.provider) == -1) {
+    if (['azure', 'digitalocean', 'ec2', 'gce', 'packet', 'rackspace', 'libvirt'].indexOf(p.provider) != -1) {
         p.fields.push({
             name: "cloud_init",
             label: "Cloud Init",
