@@ -413,15 +413,15 @@
                         }, this);
 
                         var valid = fields.base.every(function(el, index) {
-                           if (el.type == "ip_textarea") {
-                             return el.show && el.required ? this.validatecidr(el.value, index) : true;
-                           }
-                           else if (el.name == "admin_state_up") {
-                             return true;
-                           }
-                           else {
-                             return el.show && el.required ? el.value : true;
-                           }
+                            if (el.type == "ip_textarea") {
+                                return el.show && el.required ? this.validatecidr(el.value, index) : true;
+                            }
+                            else if (el.name == "admin_state_up") {
+                                return true;
+                            }
+                            else {
+                                return el.show && el.required ? el.value : true;
+                            }
                         }, this);
 
                         this.set('form', form);
