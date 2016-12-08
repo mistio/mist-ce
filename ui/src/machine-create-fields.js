@@ -232,7 +232,8 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         value: "",
         defaultValue: "",
         show: true,
-        required: true
+        required: true,
+        helptext: "Fill in the machine's name",
     },{
         name: "image",
         label: "Image *",
@@ -271,23 +272,28 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         options: []
     });
 
+    //add cloud init only to providers that accept and we support
+    if (['azure', 'digitalocean', 'ec2', 'gce', 'packet', 'rackspace', 'libvirt'].indexOf(p.provider) == -1) {
+        p.fields.push({
+            name: "cloud_init",
+            label: "Cloud Init",
+            type: "textarea",
+            value: "",
+            defaultValue: "",
+            show: true,
+            required: false,
+            helptext: ""
+        });
+    }
+
     //add common post provision fields
     p.fields.push({
-        name: "cloud_init",
-        label: "Cloud Init",
-        type: "textarea",
-        value: "",
-        defaultValue: "",
-        show: true,
-        required: false,
-        helptext: ""
-    },{
         name: "radio",
         label: "Script Inline or Select",
         type: "radio",
         value: "inline",
         defaultValue: "inline",
-        helptext: "Edit a script to run after provision or choose one from your existing ones.",
+        helptext: "Edit a script to run or choose one from your existing ones.",
         show: true,
         required: false,
         options: [{
@@ -305,7 +311,7 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         defaultValue: "",
         show: true,
         required: false,
-        helptext: "",
+        helptext: "The inline script will run after provisioning",
         showIf: {
             fieldName: "radio",
             fieldValues: ["inline"]
@@ -318,7 +324,7 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         defaultValue: "",
         show: true,
         required: false,
-        helptext: "",
+        helptext: "The selected script will run after provisioning",
         showIf: {
             fieldName: "radio",
             fieldValues: ["select"]
