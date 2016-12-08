@@ -20,7 +20,7 @@ MACHINE_CREATE_FIELDS.push({
         defaultValue: "",
         show: true,
         required: false,
-        helptext: 'e.g. 80:80'
+        helptext: 'e.g. http tcp 80:80, smtp tcp 25:25, https tcp 443:443'
     }]
 });
 
@@ -78,7 +78,7 @@ MACHINE_CREATE_FIELDS.push({
         helptext: ""
     },{
         name: "ports",
-        label: "Ports *",
+        label: "Ports",
         type: "textarea",
         value: "",
         defaultValue: "",
@@ -274,13 +274,68 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
     //add common post provision fields
     p.fields.push({
         name: "cloud_init",
-        label: "Cloud Init Script *",
+        label: "Cloud Init",
         type: "textarea",
         value: "",
         defaultValue: "",
         show: true,
         required: false,
-        helptext: ''
+        helptext: ""
+    },{
+        name: "radio",
+        label: "Script Inline or Select",
+        type: "radio",
+        value: "inline",
+        defaultValue: "inline",
+        helptext: "Edit a script to run after provision or choose one from your existing ones.",
+        show: true,
+        required: false,
+        options: [{
+            title: "Inline Script",
+            val: "inline"
+        }, {
+            title: "Select Existing",
+            val: "select"
+        }]
+    },{
+        name: "script",
+        label: "Inline Script",
+        type: "textarea",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: "",
+        showIf: {
+            fieldName: "radio",
+            fieldValues: ["inline"]
+        }
+    },{
+        name: "script_id",
+        label: "Script",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: "",
+        showIf: {
+            fieldName: "radio",
+            fieldValues: ["select"]
+        }
+    },{
+        name: "script_params",
+        label: "Optional Script Params",
+        type: "textarea",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: "",
+        showIf: {
+            fieldName: "radio",
+            fieldValues: ["select"]
+        }
     },{
         name: "monitoring",
         label: "Enable monitoring",
@@ -289,7 +344,7 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         defaultValue: "true",
         show: true,
         required: false,
-        helptext: ''
+        helptext: ""
     },{
         name: "async",
         label: "Async request",
@@ -298,6 +353,6 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         defaultValue: "true",
         show: false,
         required: false,
-        helptext: ''
+        helptext: ""
     });
 });
