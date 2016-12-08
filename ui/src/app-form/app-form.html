@@ -424,7 +424,7 @@
                                 return true;
                             }
                             else if (el.name == "cloud_init") {
-                                return el.value.startsWith("#!bin bash") || el.value.startsWith("#cloud-config") || el.value.trim() == "";
+                                return el.value.startsWith("#!/bin/bash") || el.value.startsWith("#cloud-config") || el.value.trim() == "";
                             }
                             else {
                                 return el.show && el.required ? el.value : true;
