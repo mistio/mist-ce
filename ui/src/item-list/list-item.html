@@ -495,7 +495,7 @@ Polymer({
     _showRecommendationDialog: function(event){
         var e = Polymer.dom(event);
         if (event.target.dataset.dialog == "recommendations")
-            this.fire("open-recommendation-dialog", {'item-type': this.section.id, 'item': this.item, 'event': e})
+            this.fire("open-recommendation-dialog", {'item-type': this.section.id, 'item': this.item, 'caller': 'list_machines'})
     },
 
     _itemTagsArray: function(tagsobject) {

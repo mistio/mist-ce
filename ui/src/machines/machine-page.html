@@ -657,7 +657,7 @@ Polymer({
         this.set('isPendingKeyRequest', false);
     },
     _showRecommendationDialog: function(){
-        this.fire("open-recommendation-dialog", {'item-type': 'machines', 'item': this.machine, 'event': null});
+        this.fire("open-recommendation-dialog", {'item-type': 'machines', 'item': this.machine, 'caller': "machine_page"});
     },
 
     isInPageChanged: function(machine, isInPage){
