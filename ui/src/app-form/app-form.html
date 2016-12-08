@@ -406,6 +406,10 @@
                                 }
                             }, this);
 
+                            if (el.excludeFromPayload && this.get('form.' + el.name)) {
+                                delete this.form[el.name]
+                            }
+
                             if (el.placeholderIf) {
                                 dependency = form[el.placeholderIf.fieldName];
                                 this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);

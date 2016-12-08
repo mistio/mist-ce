@@ -296,6 +296,7 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         helptext: "Edit a script to run or choose one from your existing ones.",
         show: true,
         required: false,
+        exclude: true,
         options: [{
             title: "Inline Script",
             val: "inline"
@@ -311,6 +312,7 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         defaultValue: "",
         show: true,
         required: false,
+        exclude: true,
         helptext: "The inline script will run after provisioning",
         showIf: {
             fieldName: "radio",
@@ -324,6 +326,7 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         defaultValue: "",
         show: true,
         required: false,
+        exclude: true,
         helptext: "The selected script will run after provisioning",
         showIf: {
             fieldName: "radio",
@@ -346,7 +349,7 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         name: "monitoring",
         label: "Enable monitoring",
         type: "toggle",
-        value: "true",
+        value: true,
         defaultValue: "true",
         show: true,
         required: false,

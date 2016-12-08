@@ -226,6 +226,9 @@
                             this._includeLocationName(changeRecord.value);
                         }
 
+                        if (changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'radio'){
+                            this._toggleScriptFields(this.get(changeRecord.path.replace('.value','')).value);
+                        }
                     }
                 },
                 _mapPortsToDockerPorts: function(input){
@@ -299,6 +302,22 @@
                     // disable monitoring by default
                     this.set('machineFields.'+ monInd +'.value', false);
                     console.log('_updateFieldsForDocker', this.get('machineFields.'+ monInd));
+                },
+                _toggleScriptFields: function(scripttype){
+                    var inlineInd = this._fieldIndexByName('script');
+                    var selectInd = this._fieldIndexByName('script_id');
+
+                    //if one, exclude the other
+                    if (scripttype == "inline"){
+                        this.set('machineFields.'+ inlineInd +'.excludeFromPayload', false);
+                        this.set('machineFields.'+ selectInd +'.excludeFromPayload', true);
+                    }
+                    else if (scripttype == "select"){
+                        this.set('machineFields.'+ selectInd +'.excludeFromPayload', false);
+                        this.set('machineFields.'+ inlineInd +'.excludeFromPayload', true);
+                    }
+
+                    console.log('_toggleScriptFields',this.get('machineFields.'+ inlineInd), this.get('machineFields.'+ selectInd))
                 },
                 _fieldIndexByName: function(name){
                     var index;
