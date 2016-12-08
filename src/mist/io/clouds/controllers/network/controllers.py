@@ -66,10 +66,12 @@ class AmazonNetworkController(BaseNetworkController):
 
 class GoogleNetworkController(BaseNetworkController):
     provider = 'gce'
+    # GCE requires networking asset names to match this Regex
+    gce_asset_name_regex = re.compile('^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$')
 
     def _create_network__parse_args(self, kwargs):
-        # GCE requires network names to match this Regex
-        if not re.match('(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)', kwargs.get('name', '')):
+
+        if not re.match(self.gce_asset_name_regex, kwargs.get('name', '')):
             raise mist.io.exceptions.InvalidParameterValue('name')
         # valid modes are legacy = No subnets, auto = Auto subnet creation, custom = Manual Subnet Creation
         kwargs['mode'] = kwargs.get('mode', 'legacy')
@@ -90,7 +92,7 @@ class GoogleNetworkController(BaseNetworkController):
 
     def _create_subnet__parse_args(self, network, kwargs):
         # GCE requires subnet names to match this Regex
-        if not re.match('(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)', kwargs.get('name', '')):
+        if not re.match(self.gce_asset_name_regex, kwargs.get('name', '')):
             raise mist.io.exceptions.InvalidParameterValue('name')
         if not valid_cidr(kwargs.get('cidr')):
             raise mist.io.exceptions.InvalidParameterValue('cidr')
@@ -149,8 +151,9 @@ class GoogleNetworkController(BaseNetworkController):
                 self._list_subnets__parse_libcloud_object(subnet, libcloud_subnet)
 
                 subnet.title = libcloud_subnet.name
+                if libcloud_subnet.extra.get('description'):
+                    subnet.description = libcloud_subnet.extra.pop('description')
                 subnet.extra = libcloud_subnet.extra
-                subnet.description = libcloud_subnet.extra.pop('description', None)
 
                 try:
                     subnet.save()
@@ -177,18 +180,20 @@ class GoogleNetworkController(BaseNetworkController):
 
         self._delete_network__parse_args(network, kwargs)
 
-        # For custom networks, subnet deletion calls are asynchronous and a network cannot be deleted
-        # before all of its subnets are gone. The network deletion call may not succeed immediately
-        for _ in range(10):
-            try:
-                self.ctl.compute.connection.ex_destroy_network(**kwargs)
-            except ResourceInUseError:
-                time.sleep(1)
-            else:
-                break
-        # If all attempts are exhausted, raise an exception
-        else:
-            raise mist.io.exceptions.NetworkDeletionError('Failed to delete network {}'.format(network.title))
+        self.ctl.compute.connection.ex_destroy_network(**kwargs)
+
+        # # For custom networks, subnet deletion calls are asynchronous and a network cannot be deleted
+        # # before all of its subnets are gone. The network deletion call may not succeed immediately
+        # for _ in range(10):
+        #     try:
+        #
+        #     except ResourceInUseError:
+        #         time.sleep(1)
+        #     else:
+        #         break
+        # # If all attempts are exhausted, raise an exception
+        # else:
+        #     raise mist.io.exceptions.NetworkDeletionError('Failed to delete network {}'.format(network.title))
         network.delete()
 
     def _delete_network__parse_args(self, network, kwargs):
@@ -199,15 +204,13 @@ class GoogleNetworkController(BaseNetworkController):
         """Delete a Subnet."""
 
         self._delete_subnet__parse_args(subnet, kwargs)
-        try:
-            self.ctl.compute.connection.ex_destroy_subnetwork(**kwargs)
-        except Exception as e:
-            raise mist.io.exceptions.SubnetDeletionError("Got error %s" % str(e))
+        self.ctl.compute.connection.ex_destroy_subnetwork(**kwargs)
+
         subnet.delete()
 
     def _delete_subnet__parse_args(self, subnet, kwargs):
-        kwargs['name'] = subnet.title
-        kwargs['region'] = subnet.region
+        # Libcloud expects either the subnet's name or the actual subnet object in the 'name' kwarg
+        kwargs['name'] = self._get_libcloud_network(subnet)
 
     def _get_libcloud_network(self, network):
         return self.ctl.compute.connection.ex_get_network(network.title)
@@ -271,8 +274,9 @@ class OpenStackNetworkController(BaseNetworkController):
                 self._list_subnets__parse_libcloud_object(subnet, libcloud_subnet)
 
                 subnet.title = libcloud_subnet.name
+                if libcloud_subnet.extra.get('description'):
+                    subnet.description = libcloud_subnet.extra.pop('description')
                 subnet.extra = libcloud_subnet.extra
-                subnet.description = libcloud_subnet.extra.pop('description', None)
 
                 try:
                     subnet.save()

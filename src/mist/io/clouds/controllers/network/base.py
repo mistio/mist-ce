@@ -119,8 +119,9 @@ class BaseNetworkController(BaseController):
             self._list_networks__parse_libcloud_object(network, libcloud_network)
 
             network.title = libcloud_network.name
+            if libcloud_network.extra.get('description'):
+                network.description = libcloud_network.extra.pop('description')
             network.extra = libcloud_network.extra
-            network.description = libcloud_network.extra.pop('description', None)
 
             # Save the new network document
             try:
@@ -161,7 +162,8 @@ class BaseNetworkController(BaseController):
             self._list_subnets__parse_libcloud_object(subnet, libcloud_subnet)
 
             subnet.title = libcloud_subnet.name
-            subnet.description = libcloud_subnet.extra.pop('description', None)
+            if libcloud_subnet.extra.get('description'):
+                subnet.description = libcloud_subnet.extra.pop('description')
             subnet.extra = libcloud_subnet.extra
 
             try:
