@@ -166,7 +166,6 @@
                     }
                 },
                 _updateFields: function(){
-                    console.log('_updateFields', this.selectedCloud)
                     if (this.selectedCloud) {
                         var cloudId = this.selectedCloud;
                         console.log('cloudId', cloudId);
@@ -201,6 +200,11 @@
                             }
 
                         }, this);
+
+                        // if is docker, change required values
+                        if (this.model.clouds[this.selectedCloud].provider == "docker"){
+                            this._updateFieldsForDocker();
+                        }
                     }
                 },
                 _machineFieldsChanged: function(model, selectedCloud, changeRecord){
@@ -222,10 +226,6 @@
                             this._includeLocationName(changeRecord.value);
                         }
 
-                        // if is docker change required values
-                        if (this.model.clouds[this.selectedCloud].provider == "docker"){
-                            this._updateFieldsForDocker();
-                        }
                     }
                 },
                 _mapPortsToDockerPorts: function(input){
@@ -286,7 +286,6 @@
                     }
                 },
                 _updateFieldsForDocker: function(){
-                    console.log('_updateFieldsForDocker');
                     var sizeInd = this._fieldIndexByName('size');
                     var locInd = this._fieldIndexByName('location');
                     var monInd = this._fieldIndexByName('monitoring');
@@ -299,6 +298,7 @@
 
                     // disable monitoring by default
                     this.set('machineFields.'+ monInd +'.value', false);
+                    console.log('_updateFieldsForDocker', this.get('machineFields.'+ monInd));
                 },
                 _fieldIndexByName: function(name){
                     var index;
