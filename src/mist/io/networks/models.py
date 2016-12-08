@@ -108,6 +108,7 @@ class GoogleNetwork(Network):
 
 class OpenStackNetwork(Network):
     admin_state_up = me.BooleanField()
+    shared = me.BooleanField
 
     _controller_cls = mist.io.clouds.controllers.network.controllers.OpenStackNetworkController
 
@@ -188,7 +189,6 @@ class Subnet(me.Document):
 class AmazonSubnet(Subnet):
     available_ips = me.IntField()
     zone = me.StringField()
-    gateway_ip = me.StringField()
 
     _controller_cls = mist.io.clouds.controllers.network.controllers.AmazonNetworkController
 
@@ -204,6 +204,7 @@ class OpenStackSubnet(Subnet):
     enable_dhcp = me.BooleanField()
     dns_nameservers = me.ListField()
     allocation_pools = me.ListField()
+    gateway_ip = me.StringField()
 
     _controller_cls = mist.io.clouds.controllers.network.controllers.OpenStackNetworkController
 

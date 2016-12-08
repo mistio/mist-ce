@@ -120,6 +120,7 @@ class BaseNetworkController(BaseController):
 
             network.title = libcloud_network.name
             network.extra = libcloud_network.extra
+            network.description = libcloud_network.extra.pop('description', None)
 
             # Save the new network document
             try:
@@ -160,6 +161,7 @@ class BaseNetworkController(BaseController):
             self._list_subnets__parse_libcloud_object(subnet, libcloud_subnet)
 
             subnet.title = libcloud_subnet.name
+            subnet.description = libcloud_subnet.extra.pop('description', None)
             subnet.extra = libcloud_subnet.extra
 
             try:

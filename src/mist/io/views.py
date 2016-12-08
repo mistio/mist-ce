@@ -1451,7 +1451,6 @@ def list_networks(request):
       required: true
       type: string
     """
-
     cloud_id = request.matchdict['cloud']
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
