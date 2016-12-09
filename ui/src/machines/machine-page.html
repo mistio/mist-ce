@@ -327,7 +327,7 @@
             <div class="columns">
                 <paper-material id="leftcolumn" class="left">
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
-                    <span hidden$="[[!machine.extra.image]]" class="break">Image: [[machine.extra.image]]</span>
+                    <span hidden$="[[!machine.extra.image]]" class="break">Image: [[_computeMachineImage(machine)]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
                     <div hidden$="[[!probeData]]"> Probe Data:
                         <span class$="probe-data [[itemProbeClasses(machine, model.probes)]]"> </span>
@@ -938,6 +938,19 @@ Polymer({
         else
             return "";
 
+    },
+    _computeMachineImage: function(item){
+        if (item && item.image && typeOf(item.image) != "object"){
+            return item.image;
+        }
+        else if (item && item.extra.image && item.extra.image.distribution && item.extra.image.name) {
+            return item.extra.image.distribution + " " +item.extra.image.name;
+        }
+        else if (item && item.extra && (item.extra['image_id'] || item.imageId || item.extra.image)){
+            return item.extra['image_id'] || item.imageId || item.extra.image.slug || item.extra.image.name || 'not found';
+        }
+        else
+            return "not found";
     }
 });
 </script>
