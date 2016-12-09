@@ -133,7 +133,8 @@ MACHINE_CREATE_FIELDS.push({
     provider: 'libvirt',
     fields: [{
         name: "libvirt_image_path",
-        type: "text",
+        type: "mist_dropdown",
+        add: true,
         label: "Image",
         value: "",
         defaultValue: "",
@@ -217,10 +218,19 @@ MACHINE_CREATE_FIELDS.push({
     fields: []
 });
 
-// SOFTLAYER //softlayer_backend_vlan_id
+// SOFTLAYER
 MACHINE_CREATE_FIELDS.push({
     provider: 'softlayer',
-    fields: []
+    fields: [{
+        name: "softlayer_backend_vlan_id",
+        label: "Backend VLAN ID",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: "Optional."
+    }]
 });
 
 // VCLOUD
@@ -261,7 +271,7 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         defaultValue: "",
         show: true,
         required: true,
-        helptext: "Fill in the machine's name",
+        helptext: "Fill in the machine's name"
     },{
         name: "image",
         label: "Image *",

@@ -50,6 +50,26 @@
             paper-dropdown-menu ::content .dropdown-content {
                 max-height: 400px !important;
             }
+            :host app-form::content paper-radio-group {
+                margin-top: 24px;
+            }
+            app-form::content paper-radio-group {
+                margin-top: 36px;
+            }
+            app-form::content .helptext-radio {
+                margin-top: 36px;
+            }
+            paper-dialog#addKvmImage {
+                width: 260px;
+            }
+            paper-dialog#addKvmImage > paper-input {
+                margin-top: 0;
+                margin-bottom: 20px;
+            }
+            paper-dialog#addKvmImage .btn-group {
+                display: flex;
+                justify-content: flex-end;
+            }
         </style>
 
         <div id="content">
@@ -85,6 +105,15 @@
                 </div>
             </paper-material>
         </div>
+
+        <paper-dialog id="addKvmImage" with-backdrop>
+            <h2>Create Image</h2>
+            <paper-input label="Image's path" value="{{newImage}}"></paper-input>
+            <div class="btn-group">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button class="blue" on-tap="saveNewImage">Save</paper-button>
+            </div>
+        </paper-dialog>
     </template>
 
     <script>
@@ -109,7 +138,8 @@
                         type: Array,
                         value: [],
                         computed: "_computeProviders(model, model.cloudsArray)"
-                    }
+                    },
+                    newImage: String
                 },
                 observers: [
                     '_cloudChanged(selectedCloud, machinesFields)',
@@ -118,6 +148,7 @@
                 listeners: {
                     // 'change': '_updatePayload',
                     // 'iron-select': '_updateFields',
+                    'add-input': 'openNewImageDialog'
                 },
                 _computeProviderLogo: function(className) {
                     var identifier = className.split('_')[0];
@@ -207,7 +238,7 @@
                         }
 
                         // if is kvm, change helptexts
-                        if (this.model.clouds[this.selectedCloud].provider == "docker"){
+                        if (this.model.clouds[this.selectedCloud].provider == "libvirt"){
                             this._updateFieldsForKvm();
                         }
                     }
@@ -323,7 +354,6 @@
 
                     // disable monitoring by default
                     this.set('machineFields.'+ monInd +'.value', false);
-                    console.log('_updateFieldsForDocker', this.get('machineFields.'+ monInd));
                 },
                 _updateFieldsForKvm: function(){
                     var imaInd = this._fieldIndexByName('image');
@@ -350,7 +380,8 @@
                     var pathInd = this._fieldIndexByName('libvirt_disk_path');
 
                     //fill in disk path using images_location and machine name
-                    this.set('machineFields.'+ pathInd +'.value', this.model.clouds[this.selectedCloud].images_location +"/"+ machinename +".img");
+                    if (machinename.trim().length)
+                    this.set('machineFields.'+ pathInd +'.value', this.model.clouds[this.selectedCloud].images_location +"/"+ machinename.trim() +".img");
                 },
                 _updateEc2Sizes: function(imageid) {
                     var virtualization_type = this.model.images[imageid].extra.virtualization_type;
@@ -401,6 +432,16 @@
                     return this.model.cloudsArray.filter(function(c){
                         return  ["bare_metal", "vsphere", "indonesian_vcloud", "azure_arm"].indexOf(c.provider) == -1;
                     });
+                },
+                openNewImageDialog: function(e){
+                    this.querySelector("paper-dialog#addKvmImage").open();
+                },
+                saveNewImage: function(e){
+                    var imaInd = this._fieldIndexByName('image');
+                    this.push('machineFields.'+ imaInd +'.options', {name: this.newImage, id: this.newImage});
+                    this.set('machineFields.'+ imaInd +'.value', this.newImage);
+
+                    this.querySelector("paper-dialog#addKvmImage").close();
                 },
                 _goBack: function(){
                     history.back();

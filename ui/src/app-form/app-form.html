@@ -138,6 +138,7 @@
                                         [[showOption(option)]]
                                     </paper-item>
                                 </template>
+                                <paper-button on-tap="_addInput" class="blue">Add [[field.name]]</paper-button>
                             </paper-menu>
                         </paper-dropdown-menu>
                     </template>
@@ -558,6 +559,9 @@
                     // document.querySelector('app-location').set('path', '/keys/+add?origin=' + origin);
                     document.querySelector('app-location').set('path', '/keys/+add');
                     document.querySelector('app-location').set('queryParams', qParams);
+                },
+                _addInput: function(e) {
+                    this.fire('add-input', {event: e});
                 }
             });
         })();
