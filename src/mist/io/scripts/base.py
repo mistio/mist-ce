@@ -32,6 +32,7 @@ class BaseScriptController(object):
         a script. Fields `owner` and `name` are already populated in
         `self.script`. The `self.script` is not yet saved.
         """
+
         import mist.io.scripts.models as scripts
 
         # set description
@@ -96,7 +97,7 @@ class BaseScriptController(object):
         log.info("Added script with name '%s'", self.script.name)
         trigger_session_update(self.script.owner, ['scripts'])
 
-    def edit(self, name, description):
+    def edit(self, name, description=None):
         """Edit name or description of an existing script"""
         log.info("Edit script '%s''.", self.script.name)
 
