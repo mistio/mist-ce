@@ -7,6 +7,7 @@ import pytest
 import mist.io.clouds.models as models
 from mist.io.keys.models import SSHKey
 from mist.core.user.models import Organization, User
+from mist.io.tasks import app, create_machine_async
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -59,6 +60,45 @@ CLOUD_NAMES = [cdict['name'] for cdict in CLOUDS]
 CREDS = {cdict['name']:cdict.get('creds') for cdict in CLOUDS}
 
 
+@pytest.fixture
+def load_scripts_from_config():
+    """Loads scripts configuration from unit_tests/scripts.yaml
+
+    The YAML configuration file of scripts is expected to be in the
+    following format:
+
+        - name: script_type
+            fields:
+              description:
+              location_type:
+              exec_type:
+              script:
+              entrypoint:
+    """
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                        'scripts.yaml')
+    print "Loading scripts from: %s." % path
+    with open(path) as fobj:
+        scripts = yaml.load(fobj)
+    if not isinstance(scripts, list):
+        raise TypeError("Configuration is '%s' is expected to be a list, "
+                        "not %s." % path, type(scripts))
+
+    for sdict in scripts:
+        if not isinstance(sdict, dict):
+            raise TypeError("Script configuration is not a dict: %r" % sdict)
+        name = sdict.get('name')
+        if not name:
+            raise ValueError("Script configuration doesn't specify "
+                             "'name': %s" % sdict)
+
+    print "Loaded %d scripts." % len(scripts)
+    return scripts
+
+SCRIPTS = load_scripts_from_config()
+SCRIPTS_NAMES = [sdict['name'] for sdict in SCRIPTS]
+
+
 @pytest.fixture(scope='module')
 def org(request):
     """Fixture to create an organization with proper clean up"""
@@ -105,6 +145,46 @@ def key(request, org):
     request.addfinalizer(fin)
 
     return key
+
+
+@pytest.fixture(scope='module', params=SCRIPTS, ids=SCRIPTS_NAMES)
+def script(request, org):
+    """Fixture to create an ExecutableScript Script"""
+    from mist.io.scripts.models import ExecutableScript, AnsibleScript
+
+    sdict = request.param
+    name = sdict['name']
+    exec_type = sdict.get('fields').pop('exec_type')
+    if exec_type =='executable':
+        cls = ExecutableScript
+    else:
+        cls = AnsibleScript
+    print "Creating script '%s'." % name
+    script = cls.add(org, name, **sdict['fields'])
+
+    def fin():
+        """Finalizer to clean up script after tests"""
+        print "Deleting script '%s'." % name
+        script.delete()
+
+    request.addfinalizer(fin)
+
+    return script
+
+
+@pytest.fixture
+def docker_cloud(request, org):
+    """Fixture to create a docker cloud and proper cleanup"""
+    cloud = models.DockerCloud(owner=org, title='DockerTest', port='2379',
+                               host='172.17.0.1')
+    cloud.save()
+
+    def fin():
+        cloud.delete()
+
+    request.addfinalizer(fin)
+
+    return cloud
 
 
 @pytest.fixture(scope='module', params=CLOUDS, ids=CLOUD_NAMES)
