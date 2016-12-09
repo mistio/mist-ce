@@ -327,16 +327,7 @@
                 },
                 resources: {
                     type: Array,
-                    value: [
-                        "ALL",
-                        "CLOUD",
-                        "MACHINE",
-                        "SCRIPT",
-                        "KEY",
-                        "TUNNEL",
-                        "TEMPLATE",
-                        "STACK",
-                    ]
+                    computed: "_getResources(model)"
                 },
                 commonPermissions: {
                     type: Array,
@@ -354,6 +345,14 @@
                 'update-rtags': '_updateRtags',
                 'update-rid': '_updateRid'
 
+            },
+            _getResources: function(){
+                var ret=[];
+                ret.push("ALL");
+                for (var perm in this.model.permissions) {
+                    ret.push(perm.toUpperCase());
+                }
+                return ret;
             },
             attached: function() {
                 var el = document.getElementById('rules');
@@ -525,9 +524,6 @@
                 console.log('_changeOperator',e);
             },
             _resetForm: function() {
-                // var initial = this.team.policy.rules;
-                // var newArr = initial.slice(0);
-                // this.set("rules", newArr);
                 var newArr = [];
                 this.team.policy.rules.forEach(function(rule, i){
                     var cleanCopy = {};
@@ -542,7 +538,6 @@
                             var obj = {};
                             for(var q in rule[p]) {
                                 var initialq = q;
-                                // var key = initial.slice(0);
                                 var val = null;
                                 if (rule[p][q] != null){
                                     var initialv = rule[p][q];
@@ -632,7 +627,6 @@
                 }
                 this.set('formReady', true);
 
-                // console.log(this.rules[0], this.team.policy.rules[0] );
             }
 
         });
