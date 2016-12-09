@@ -205,6 +205,11 @@
                         if (this.model.clouds[this.selectedCloud].provider == "docker"){
                             this._updateFieldsForDocker();
                         }
+
+                        // if is kvm, change helptexts
+                        if (this.model.clouds[this.selectedCloud].provider == "docker"){
+                            this._updateFieldsForKvm();
+                        }
                     }
                 },
                 _machineFieldsChanged: function(model, selectedCloud, changeRecord){
@@ -229,6 +234,11 @@
                         // if its ec2 and image changes update size to match the virtualization_type
                         if (this.model.clouds[this.selectedCloud].provider == "ec2" && changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'image'){
                             this._updateEc2Sizes(this.get(changeRecord.path.replace('.value','')).value);
+                        }
+
+                        // if its kvm
+                        if (this.model.clouds[this.selectedCloud].provider == 'libvirt' && changeRecord.path.endsWith('.value')  && this.get(changeRecord.path.replace('.value','')).name == 'name') {
+                            this._updateKvmDiskPath(this.get(changeRecord.path.replace('.value','')).value);
                         }
 
                         // let either script or script_id to pass in the from payload
@@ -314,6 +324,33 @@
                     // disable monitoring by default
                     this.set('machineFields.'+ monInd +'.value', false);
                     console.log('_updateFieldsForDocker', this.get('machineFields.'+ monInd));
+                },
+                _updateFieldsForKvm: function(){
+                    var imaInd = this._fieldIndexByName('image');
+                    var locInd = this._fieldIndexByName('location');
+                    var keyInd = this._fieldIndexByName('key');
+                    var pathInd = this._fieldIndexByName('libvirt_disk_path');
+
+                    //hide default image and location field
+                    this.set('machineFields.'+ imaInd +'.show', false);
+                    this.set('machineFields.'+ imaInd +'.required', false);
+                    this.set('machineFields.'+ imaInd +'.excludeFromPayload', true);
+                    this.set('machineFields.'+ locInd +'.show', false);
+                    this.set('machineFields.'+ locInd +'.required', false);
+                    this.set('machineFields.'+ locInd +'.excludeFromPayload', true);
+
+                    //change key helptexts
+                    this.set('machineFields.'+ keyInd +'.helptext', "Αn ssh key to deploy if using a cloudinit based Linux image");
+                    this.set('machineFields.'+ keyInd +'.helpHref', "http://docs.mist.io/article/99-managing-kvm-with-mist-io");
+
+                    //fill in disk path using images_location
+                    this.set('machineFields.'+ pathInd +'.value', this.model.clouds[this.selectedCloud].images_location);
+                },
+                _updateKvmDiskPath: function(machinename){
+                    var pathInd = this._fieldIndexByName('libvirt_disk_path');
+
+                    //fill in disk path using images_location and machine name
+                    this.set('machineFields.'+ pathInd +'.value', this.model.clouds[this.selectedCloud].images_location +"/"+ machinename +".img");
                 },
                 _updateEc2Sizes: function(imageid) {
                     var virtualization_type = this.model.images[imageid].extra.virtualization_type;

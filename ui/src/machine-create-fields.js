@@ -131,7 +131,35 @@ MACHINE_CREATE_FIELDS.push({
 // KVM
 MACHINE_CREATE_FIELDS.push({
     provider: 'libvirt',
-    fields: []
+    fields: [{
+        name: "libvirt_image_path",
+        type: "text",
+        label: "Image",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+    },{
+        name: "libvirt_disk_path",
+        type: "text",
+        label: "Path to create VM's disk",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: "Where the VM disk file will be created",
+        helpHref: "http://docs.mist.io/article/99-managing-kvm-with-mist-io"
+    },{
+        name: "libvirt_disk_size",
+        type: "text",
+        label: "Disc size (GB)",
+        value: "4",
+        defaultValue: "4",
+        show: true,
+        required: false,
+        helptext: "The VM's size will be the size of the image plus the number in GBs provided here",
+        helpHref: "http://docs.mist.io/article/99-managing-kvm-with-mist-io"
+    }]
 });
 
 // LINODE
@@ -189,7 +217,7 @@ MACHINE_CREATE_FIELDS.push({
     fields: []
 });
 
-// SOFTLAYER
+// SOFTLAYER //softlayer_backend_vlan_id
 MACHINE_CREATE_FIELDS.push({
     provider: 'softlayer',
     fields: []
