@@ -108,7 +108,7 @@ class GoogleNetwork(Network):
 
 class OpenStackNetwork(Network):
     admin_state_up = me.BooleanField()
-    shared = me.BooleanField
+    shared = me.BooleanField()
 
     _controller_cls = mist.io.clouds.controllers.network.controllers.OpenStackNetworkController
 

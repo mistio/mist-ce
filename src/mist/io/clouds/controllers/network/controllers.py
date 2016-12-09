@@ -13,8 +13,8 @@ log = logging.getLogger(__name__)
 
 class AmazonNetworkController(BaseNetworkController):
     provider = 'ec2'
-    create_network_allowed_keys = ['name', 'cidr_block', 'instance_tenancy']
-    create_subnet_allowed_keys = ['vpc_id', 'cidr_block', 'availability_zone', 'name']
+    create_network_allowed_keys = ('name', 'cidr_block', 'instance_tenancy')
+    create_subnet_allowed_keys = ('vpc_id', 'cidr_block', 'availability_zone', 'name')
 
     def _create_network__parse_args(self, kwargs):
         if not valid_cidr(kwargs.get('cidr')):
@@ -69,8 +69,8 @@ class GoogleNetworkController(BaseNetworkController):
     provider = 'gce'
     # GCE requires networking asset names to match this Regex
     gce_asset_name_regex = re.compile('^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$')
-    create_network_allowed_keys = ['name', 'mode', 'cidr', 'description']
-    create_subnet_allowed_keys = ['name', 'cidr', 'network', 'region', 'description']
+    create_network_allowed_keys = ('name', 'mode', 'cidr', 'description')
+    create_subnet_allowed_keys = ('name', 'cidr', 'network', 'region', 'description')
 
     def _create_network__parse_args(self, kwargs):
 
@@ -222,8 +222,9 @@ class GoogleNetworkController(BaseNetworkController):
 
 class OpenStackNetworkController(BaseNetworkController):
     provider = 'openstack'
-    create_network_allowed_keys = ['name', 'admin_state_up', 'shared']
-    create_subnet_allowed_keys = ['name', 'network_id', 'allocation_pools', 'gateway_ip', 'ip_version', 'enable_dhcp']
+    create_network_allowed_keys = ('name', 'admin_state_up', 'shared')
+    create_subnet_allowed_keys = ('name', 'cidr', 'network_id', 'allocation_pools',
+                                  'gateway_ip', 'ip_version', 'enable_dhcp')
 
     def _create_network__parse_args(self, kwargs):
         if not kwargs.get('name'):
@@ -241,6 +242,8 @@ class OpenStackNetworkController(BaseNetworkController):
     def _create_subnet__parse_args(self, network, kwargs):
         if not kwargs.get('name'):
             raise mist.io.exceptions.RequiredParameterMissingError('name')
+        if not valid_cidr(kwargs.get('cidr')):
+            raise mist.io.exceptions.InvalidParameterValue('cidr')
         kwargs['network_id'] = network.network_id
         kwargs['allocation_pools'] = kwargs.get('allocation_pools', [])
         kwargs['gateway_ip'] = kwargs.get('gateway_ip', None)
