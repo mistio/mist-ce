@@ -301,7 +301,8 @@
                 ready: function() {
                 },
                 _computeCloudTitle: function(cloud) {
-                    return cloud.title;
+                    if (cloud)
+                        return cloud.title;
                 },
                 _editTags: function() {
                     var el = this.querySelector('tags-list'),
