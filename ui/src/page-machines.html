@@ -144,7 +144,6 @@
                 if (this.caller == 'machine_page')
                     itemtoquery += '#actions_machine';
                 this.querySelector(itemtoquery)._performAction(action, [this.itemOfRecommendation]);
-                this.listeningMachine = false;
             },
             _jobIdChanged: function(jobid) {
                 if (!jobid) {
