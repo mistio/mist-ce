@@ -1,5 +1,4 @@
 import logging
-import time
 import re
 
 import mongoengine.errors
@@ -9,13 +8,13 @@ from mist.io.helpers import rename_kwargs
 from mist.io.clouds.utils import valid_cidr
 import mist.io.exceptions
 
-from libcloud.common.google import ResourceInUseError
-
 log = logging.getLogger(__name__)
 
 
 class AmazonNetworkController(BaseNetworkController):
     provider = 'ec2'
+    create_network_allowed_keys = ['name', 'cidr_block', 'instance_tenancy']
+    create_subnet_allowed_keys = ['vpc_id', 'cidr_block', 'availability_zone', 'name']
 
     def _create_network__parse_args(self, kwargs):
         if not valid_cidr(kwargs.get('cidr')):
@@ -23,7 +22,8 @@ class AmazonNetworkController(BaseNetworkController):
         if 'instance_tenancy' in kwargs and kwargs.get('instance_tenancy') not in ['default', 'private']:
             raise mist.io.exceptions.BadRequestError('instance_tenancy')
         rename_kwargs(kwargs, 'cidr', 'cidr_block')
-        kwargs.pop('description', None)
+
+        [kwargs.pop(key) for key in kwargs.keys() if key not in self.create_network_allowed_keys]
 
     @staticmethod
     def _list_networks__parse_libcloud_object(network, libcloud_network):
@@ -38,7 +38,8 @@ class AmazonNetworkController(BaseNetworkController):
             raise mist.io.exceptions.RequiredParameterMissingError('availability_zone')
         kwargs['vpc_id'] = network.network_id
         rename_kwargs(kwargs, 'cidr', 'cidr_block')
-        kwargs.pop('description', None)
+
+        [kwargs.pop(key) for key in kwargs.keys() if key not in self.create_subnet_allowed_keys]
 
     @staticmethod
     def _list_subnets__parse_libcloud_object(subnet, libcloud_subnet):
@@ -68,6 +69,8 @@ class GoogleNetworkController(BaseNetworkController):
     provider = 'gce'
     # GCE requires networking asset names to match this Regex
     gce_asset_name_regex = re.compile('^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$')
+    create_network_allowed_keys = ['name', 'mode', 'cidr', 'description']
+    create_subnet_allowed_keys = ['name', 'cidr', 'network', 'region', 'description']
 
     def _create_network__parse_args(self, kwargs):
 
@@ -82,6 +85,8 @@ class GoogleNetworkController(BaseNetworkController):
         else:
             # libcloud forbids passing a CIDR param for auto and custom modes
             kwargs['cidr'] = None
+
+        [kwargs.pop(key) for key in kwargs.keys() if key not in self.create_network_allowed_keys]
 
     @staticmethod
     def _list_networks__parse_libcloud_object(network, libcloud_network):
@@ -100,6 +105,8 @@ class GoogleNetworkController(BaseNetworkController):
             raise mist.io.exceptions.RequiredParameterMissingError('region')
         kwargs['network'] = network.title
 
+        [kwargs.pop(key) for key in kwargs.keys() if key not in self.create_subnet_allowed_keys]
+
     @staticmethod
     def _list_subnets__parse_libcloud_object(subnet, libcloud_subnet):
         subnet.cidr = libcloud_subnet.cidr
@@ -117,6 +124,11 @@ class GoogleNetworkController(BaseNetworkController):
 
         self._create_subnet__parse_args(subnet.network, kwargs)
         libcloud_subnet = self.ctl.compute.connection.ex_create_subnetwork(**kwargs)
+
+        """ The region attribute is needed for libcloud API calls on the subnet object, including the
+        ex_destroy_subnetwork call, so we cannot safely  wait for list_networks to populate its value."""
+        subnet.region = libcloud_subnet.region.name
+
         try:
             subnet.subnet_id = libcloud_subnet.id
             subnet.save()
@@ -174,26 +186,15 @@ class GoogleNetworkController(BaseNetworkController):
 
         from mist.io.networks.models import Subnet
 
-        associated_subnets = Subnet.objects(network=network)
-        for subnet in associated_subnets:
-            subnet.ctl.delete_subnet()
+        if network.mode == 'custom':
+            associated_subnets = Subnet.objects(network=network)
+            for subnet in associated_subnets:
+                subnet.ctl.delete_subnet()
 
         self._delete_network__parse_args(network, kwargs)
 
         self.ctl.compute.connection.ex_destroy_network(**kwargs)
 
-        # # For custom networks, subnet deletion calls are asynchronous and a network cannot be deleted
-        # # before all of its subnets are gone. The network deletion call may not succeed immediately
-        # for _ in range(10):
-        #     try:
-        #
-        #     except ResourceInUseError:
-        #         time.sleep(1)
-        #     else:
-        #         break
-        # # If all attempts are exhausted, raise an exception
-        # else:
-        #     raise mist.io.exceptions.NetworkDeletionError('Failed to delete network {}'.format(network.title))
         network.delete()
 
     def _delete_network__parse_args(self, network, kwargs):
@@ -209,8 +210,8 @@ class GoogleNetworkController(BaseNetworkController):
         subnet.delete()
 
     def _delete_subnet__parse_args(self, subnet, kwargs):
-        # Libcloud expects either the subnet's name or the actual subnet object in the 'name' kwarg
-        kwargs['name'] = self._get_libcloud_network(subnet)
+        kwargs['name'] = subnet.title
+        kwargs['region'] = subnet.region
 
     def _get_libcloud_network(self, network):
         return self.ctl.compute.connection.ex_get_network(network.title)
@@ -221,13 +222,16 @@ class GoogleNetworkController(BaseNetworkController):
 
 class OpenStackNetworkController(BaseNetworkController):
     provider = 'openstack'
+    create_network_allowed_keys = ['name', 'admin_state_up', 'shared']
+    create_subnet_allowed_keys = ['name', 'network_id', 'allocation_pools', 'gateway_ip', 'ip_version', 'enable_dhcp']
 
     def _create_network__parse_args(self, kwargs):
         if not kwargs.get('name'):
             raise mist.io.exceptions.RequiredParameterMissingError('name')
         kwargs['admin_state_up'] = kwargs.get('admin_state_up', True)
         kwargs['shared'] = kwargs.get('shared', False)
-        kwargs.pop('description', None)
+
+        [kwargs.pop(key) for key in kwargs.keys() if key not in self.create_network_allowed_keys]
 
     @staticmethod
     def _list_networks__parse_libcloud_object(network, libcloud_network):
@@ -242,7 +246,8 @@ class OpenStackNetworkController(BaseNetworkController):
         kwargs['gateway_ip'] = kwargs.get('gateway_ip', None)
         kwargs['ip_version'] = kwargs.get('ip_version', '4')
         kwargs['enable_dhcp'] = kwargs.get('enable_dhcp', True)
-        kwargs.pop('description', None)
+
+        [kwargs.pop(key) for key in kwargs.keys() if key not in self.create_subnet_allowed_keys]
 
     @staticmethod
     def _list_subnets__parse_libcloud_object(subnet, libcloud_subnet):
