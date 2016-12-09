@@ -358,9 +358,9 @@
             },
             _getResources: function(){
                 var ret=[];
-                ret.push("All");
+                ret.push("ALL");
                 for (var perm in this.model.permissions) {
-                    ret.push(perm);
+                    ret.push(perm.toUpperCase());
                 }
                 return ret;
             },
