@@ -50,6 +50,26 @@
             paper-dropdown-menu ::content .dropdown-content {
                 max-height: 400px !important;
             }
+            :host app-form::content paper-radio-group {
+                margin-top: 24px;
+            }
+            app-form::content paper-radio-group {
+                margin-top: 36px;
+            }
+            app-form::content .helptext-radio {
+                margin-top: 36px;
+            }
+            paper-dialog#addKvmImage {
+                width: 260px;
+            }
+            paper-dialog#addKvmImage > paper-input {
+                margin-top: 0;
+                margin-bottom: 20px;
+            }
+            paper-dialog#addKvmImage .btn-group {
+                display: flex;
+                justify-content: flex-end;
+            }
         </style>
 
         <div id="content">
@@ -85,6 +105,15 @@
                 </div>
             </paper-material>
         </div>
+
+        <paper-dialog id="addKvmImage" with-backdrop>
+            <h2>Create Image</h2>
+            <paper-input label="Image's path" value="{{newImage}}"></paper-input>
+            <div class="btn-group">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button class="blue" on-tap="saveNewImage">Save</paper-button>
+            </div>
+        </paper-dialog>
     </template>
 
     <script>
@@ -109,7 +138,8 @@
                         type: Array,
                         value: [],
                         computed: "_computeProviders(model, model.cloudsArray)"
-                    }
+                    },
+                    newImage: String
                 },
                 observers: [
                     '_cloudChanged(selectedCloud, machinesFields)',
@@ -118,6 +148,7 @@
                 listeners: {
                     // 'change': '_updatePayload',
                     // 'iron-select': '_updateFields',
+                    'add-input': 'openNewImageDialog'
                 },
                 _computeProviderLogo: function(className) {
                     var identifier = className.split('_')[0];
@@ -166,7 +197,6 @@
                     }
                 },
                 _updateFields: function(){
-                    console.log('_updateFields', this.selectedCloud)
                     if (this.selectedCloud) {
                         var cloudId = this.selectedCloud;
                         console.log('cloudId', cloudId);
@@ -183,6 +213,11 @@
                             if (f.name.endsWith("key")) {
                                 f.options = this.model.keysArray;
                             }
+
+                            if (f.name.startsWith("script")) {
+                                f.options = this.model.scriptsArray;
+                            }
+
                             // for openstack this sould be multi selection
                             if (f.name.endsWith("networks")) {
                                 f.options = this.model.clouds[cloudId].networksArray;
@@ -196,6 +231,16 @@
                             }
 
                         }, this);
+
+                        // if is docker, change required values
+                        if (this.model.clouds[this.selectedCloud].provider == "docker"){
+                            this._updateFieldsForDocker();
+                        }
+
+                        // if is kvm, change helptexts
+                        if (this.model.clouds[this.selectedCloud].provider == "libvirt"){
+                            this._updateFieldsForKvm();
+                        }
                     }
                 },
                 _machineFieldsChanged: function(model, selectedCloud, changeRecord){
@@ -215,6 +260,21 @@
                         // if is gce/linode and image changed, include location name in payload
                         if ((this.model.clouds[this.selectedCloud].provider == "linode" || this.model.clouds[this.selectedCloud].provider == "gce" ) && changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'location'){
                             this._includeLocationName(changeRecord.value);
+                        }
+
+                        // if its ec2 and image changes update size to match the virtualization_type
+                        if (this.model.clouds[this.selectedCloud].provider == "ec2" && changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'image'){
+                            this._updateEc2Sizes(this.get(changeRecord.path.replace('.value','')).value);
+                        }
+
+                        // if its kvm
+                        if (this.model.clouds[this.selectedCloud].provider == 'libvirt' && changeRecord.path.endsWith('.value')  && this.get(changeRecord.path.replace('.value','')).name == 'name') {
+                            this._updateKvmDiskPath(this.get(changeRecord.path.replace('.value','')).value);
+                        }
+
+                        // let either script or script_id to pass in the from payload
+                        if (changeRecord.path.endsWith('value') && this.get(changeRecord.path.replace('.value','')).name == 'radio'){
+                            this._toggleScriptFields(this.get(changeRecord.path.replace('.value','')).value);
                         }
                     }
                 },
@@ -260,7 +320,6 @@
 
                 },
                 _includeImageExtra: function(image){
-                    console.log('_includeImageExtra',image);
                     if (image) {
                         // save in fields
                         var indImEx = this._fieldIndexByName('image_extra');
@@ -269,13 +328,87 @@
                     }
                 },
                 _includeLocationName: function(location){
-                    console.log('_includeLocationName',image);
                     if (location) {
                         // save in fields
                         var indLocName = this._fieldIndexByName('location_name');
                         if (indLocName) 
                             this.set('machineFields.'+indLocName+'.value', this.model.clouds[this.selectedCloud].locations[location].name);
                     }
+                },
+                _updateFieldsForDocker: function(){
+                    var sizeInd = this._fieldIndexByName('size');
+                    var locInd = this._fieldIndexByName('location');
+                    var keyInd = this._fieldIndexByName('key');
+                    var monInd = this._fieldIndexByName('monitoring');
+
+                    console.log('indexes', sizeInd, locInd, monInd);
+
+                    //hide size and location
+                    this.set('machineFields.'+ sizeInd +'.show', false);
+                    this.set('machineFields.'+ locInd +'.show', false);
+
+                    // optional key
+                    this.set('machineFields.'+ keyInd +'.required', false);
+                    this.set('machineFields.'+ keyInd +'.label', 'Key');
+                    this.set('machineFields.'+ keyInd +'.helptext', "Optional. Keys are valid only for Mist.io images");
+
+                    // disable monitoring by default
+                    this.set('machineFields.'+ monInd +'.value', false);
+                },
+                _updateFieldsForKvm: function(){
+                    var imaInd = this._fieldIndexByName('image');
+                    var locInd = this._fieldIndexByName('location');
+                    var keyInd = this._fieldIndexByName('key');
+                    var pathInd = this._fieldIndexByName('libvirt_disk_path');
+
+                    //hide default image and location field
+                    this.set('machineFields.'+ imaInd +'.show', false);
+                    this.set('machineFields.'+ imaInd +'.required', false);
+                    this.set('machineFields.'+ imaInd +'.excludeFromPayload', true);
+                    this.set('machineFields.'+ locInd +'.show', false);
+                    this.set('machineFields.'+ locInd +'.required', false);
+                    this.set('machineFields.'+ locInd +'.excludeFromPayload', true);
+
+                    //change key helptexts
+                    this.set('machineFields.'+ keyInd +'.helptext', "Αn ssh key to deploy if using a cloudinit based Linux image");
+                    this.set('machineFields.'+ keyInd +'.helpHref', "http://docs.mist.io/article/99-managing-kvm-with-mist-io");
+
+                    //fill in disk path using images_location
+                    this.set('machineFields.'+ pathInd +'.value', this.model.clouds[this.selectedCloud].images_location);
+                },
+                _updateKvmDiskPath: function(machinename){
+                    var pathInd = this._fieldIndexByName('libvirt_disk_path');
+
+                    //fill in disk path using images_location and machine name
+                    if (machinename.trim().length)
+                    this.set('machineFields.'+ pathInd +'.value', this.model.clouds[this.selectedCloud].images_location +"/"+ machinename.trim() +".img");
+                },
+                _updateEc2Sizes: function(imageid) {
+                    var virtualization_type = this.model.images[imageid].extra.virtualization_type;
+
+                    var sizeInd = this._fieldIndexByName('size');
+                    var sizesOptions = this.model.clouds[this.selectedCloud].sizesArray.filter(function(s){
+                        return s.extra.virtualizationTypes.indexOf(virtualization_type) > -1
+                    });
+                    this.set('machineFields.' + sizeInd + '.options', sizesOptions);
+
+                    console.log('_updateEc2Sizes', virtualization_type , this.model.clouds[this.selectedCloud].sizesArray.length, sizesOptions)
+                },
+                _toggleScriptFields: function(scripttype){
+                    var inlineInd = this._fieldIndexByName('script');
+                    var selectInd = this._fieldIndexByName('script_id');
+
+                    //if one, exclude the other
+                    if (scripttype == "inline"){
+                        this.set('machineFields.'+ inlineInd +'.excludeFromPayload', false);
+                        this.set('machineFields.'+ selectInd +'.excludeFromPayload', true);
+                    }
+                    else if (scripttype == "select"){
+                        this.set('machineFields.'+ selectInd +'.excludeFromPayload', false);
+                        this.set('machineFields.'+ inlineInd +'.excludeFromPayload', true);
+                    }
+
+                    console.log('_toggleScriptFields',this.get('machineFields.'+ inlineInd), this.get('machineFields.'+ selectInd))
                 },
                 _fieldIndexByName: function(name){
                     var index;
@@ -295,10 +428,20 @@
                     console.log('creation failed', e)
                 },
                 _computeProviders: function(model, clouds){
-                    //exclude bare metals from provider dropdown list
+                    //exclude bare metals and other from provider dropdown list
                     return this.model.cloudsArray.filter(function(c){
-                        return c.provider != "bare_metal"
+                        return  ["bare_metal", "vsphere", "indonesian_vcloud", "azure_arm"].indexOf(c.provider) == -1;
                     });
+                },
+                openNewImageDialog: function(e){
+                    this.querySelector("paper-dialog#addKvmImage").open();
+                },
+                saveNewImage: function(e){
+                    var imaInd = this._fieldIndexByName('image');
+                    this.push('machineFields.'+ imaInd +'.options', {name: this.newImage, id: this.newImage});
+                    this.set('machineFields.'+ imaInd +'.value', this.newImage);
+
+                    this.querySelector("paper-dialog#addKvmImage").close();
                 },
                 _goBack: function(){
                     history.back();

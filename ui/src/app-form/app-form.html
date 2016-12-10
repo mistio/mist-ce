@@ -138,6 +138,7 @@
                                         [[showOption(option)]]
                                     </paper-item>
                                 </template>
+                                <paper-button on-tap="_addInput" class="blue">Add [[field.name]]</paper-button>
                             </paper-menu>
                         </paper-dropdown-menu>
                     </template>
@@ -406,6 +407,10 @@
                                 }
                             }, this);
 
+                            if (el.excludeFromPayload && this.get('form.' + el.name)) {
+                                delete this.form[el.name]
+                            }
+
                             if (el.placeholderIf) {
                                 dependency = form[el.placeholderIf.fieldName];
                                 this.set('fields.' + index + '.placeholder', el.placeholderIf.fieldOptions[dependency]);
@@ -413,15 +418,18 @@
                         }, this);
 
                         var valid = fields.base.every(function(el, index) {
-                           if (el.type == "ip_textarea") {
-                             return el.show && el.required ? this.validatecidr(el.value, index) : true;
-                           }
-                           else if (el.name == "admin_state_up") {
-                             return true;
-                           }
-                           else {
-                             return el.show && el.required ? el.value : true;
-                           }
+                            if (el.type == "ip_textarea") {
+                                return el.show && el.required ? this.validatecidr(el.value, index) : true;
+                            }
+                            else if (el.name == "admin_state_up") {
+                                return true;
+                            }
+                            else if (el.name == "cloud_init") {
+                                return el.value.startsWith("#!/bin/bash") || el.value.startsWith("#cloud-config") || el.value.trim() == "";
+                            }
+                            else {
+                                return el.show && el.required ? el.value : true;
+                            }
                         }, this);
 
                         this.set('form', form);
@@ -551,6 +559,9 @@
                     // document.querySelector('app-location').set('path', '/keys/+add?origin=' + origin);
                     document.querySelector('app-location').set('path', '/keys/+add');
                     document.querySelector('app-location').set('queryParams', qParams);
+                },
+                _addInput: function(e) {
+                    this.fire('add-input', {event: e});
                 }
             });
         })();
