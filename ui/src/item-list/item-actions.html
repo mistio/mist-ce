@@ -776,7 +776,8 @@ Polymer({
     },
     _feedbackOnScript: function(e){
         if (e.detail.response) {
-            this.fire('toast',{msg:'Script run request succeded. Script '+this.computeModel().scripts[e.detail.scriptId].name+' has been queued for execution',duration:5000});
+            var message='Script run request succeded. Script '+this.computeModel().scripts[e.detail.scriptId].name+' has been queued for execution';
+            this.fire('toast',{msg:message,duration:5000});
         }
         if (e.detail.error) {
             this.fire('toast',{msg:e.detail.errormsg,duration:3000});

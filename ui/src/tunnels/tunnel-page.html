@@ -391,14 +391,16 @@ Script:</code></pre>
                 var el = this.$.tunnelscript;
                 this.setSelection(el);
                 var successful = document.execCommand('copy');
-                this.fire('toast',{msg:successful ? 'The script was copied to clipboard!' : 'There was an error copying to clipboard!',duration:3000});
+                var message = successful ? 'The script was copied to clipboard!' : 'There was an error copying to clipboard!';
+                this.fire('toast',{msg:message,duration:3000});
             },
             copyCurl: function(e) {
                 this.clearSelection();
                 var el = this.$.tunnelcommand;
                 this.setSelection(el);
                 var successful = document.execCommand('copy');
-                this.fire('toast',{msg:successful ? 'The command was copied to clipboard!' : 'There was an error copying to clipboard!',duration:3000});
+                var message = successful ? 'The command was copied to clipboard!' : 'There was an error copying to clipboard!';
+                this.fire('toast',{msg: message,duration:3000});
             },
             _enableTunnel: function(){
 

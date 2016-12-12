@@ -168,7 +168,8 @@
                 _copyId: function() {
                     this.querySelector('#cloudId input').select();
                     document.execCommand('copy');
-                    this.fire('toast',{msg:'Cloud\'s ID was copied to clipboard!',duration:3000});
+                    var message='Cloud\'s ID was copied to clipboard!';
+                    this.fire('toast',{msg:message,duration:3000});
                 },
             });
         })();
