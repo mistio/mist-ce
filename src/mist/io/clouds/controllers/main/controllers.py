@@ -413,63 +413,76 @@ class OtherMainController(BaseMainController):
         # FIXME: Move ssh command to Machine controller once it is migrated.
         from mist.core.methods import ssh_command
 
-        # Sanitize inputs.
-        host = sanitize_host(host)
-        check_host(host)
-        try:
-            ssh_port = int(ssh_port)
-        except (ValueError, TypeError):
-            ssh_port = 22
-        try:
-            rdp_port = int(rdp_port)
-        except (ValueError, TypeError):
-            rdp_port = 3389
-        if ssh_key:
-            ssh_key = Key.objects.get(owner=self.cloud.owner, id=ssh_key)
-
-        # Create and save machine entry to database.
-        machine = Machine(
-            cloud=self.cloud,
-            name=name,
-            machine_id=uuid.uuid4().hex,
-            os_type=os_type,
-            ssh_port=ssh_port,
-            rdp_port=rdp_port
-        )
         if host:
+            # Sanitize inputs.
+            host = sanitize_host(host)
+            check_host(host)
+            try:
+                ssh_port = int(ssh_port)
+            except (ValueError, TypeError):
+                ssh_port = 22
+            try:
+                rdp_port = int(rdp_port)
+            except (ValueError, TypeError):
+                rdp_port = 3389
+            if ssh_key:
+                ssh_key = Key.objects.get(owner=self.cloud.owner, id=ssh_key)
+
+            # Create and save machine entry to database.
+            machine = Machine(
+                cloud=self.cloud,
+                name=name,
+                machine_id=uuid.uuid4().hex,
+                os_type=os_type,
+                ssh_port=ssh_port,
+                rdp_port=rdp_port
+            )
             if is_private_subnet(socket.gethostbyname(host)):
                 machine.private_ips = [host]
             else:
                 machine.hostname = host
                 machine.public_ips = [host]
-        machine.save()
+            machine.save()
 
-        # Attempt to connect.
-        if os_type == 'unix' and ssh_key:
-            if not ssh_user:
-                ssh_user = 'root'
-            # Try to connect. If it works, it will create the association.
-            try:
-                if not host:
-                    raise BadRequestError("You have specified an SSH key but "
-                                          "machine hostname is empty.")
-                to_tunnel(self.cloud.owner, host)  # May raise VPNTunnelError
-                ssh_command(
-                    self.cloud.owner, self.cloud.id, machine.machine_id, host,
-                    'uptime', key_id=ssh_key.id, username=ssh_user,
-                    port=ssh_port
-                )
-            except MachineUnauthorizedError as exc:
-                if fail_on_error:
-                    machine.delete()
-                raise CloudUnauthorizedError(exc)
-            except ServiceUnavailableError as exc:
-                if fail_on_error:
-                    machine.delete()
-                raise MistError("Couldn't connect to host '%s'." % host)
-            except:
-                if fail_on_error:
-                    machine.delete()
-                raise
+            # Attempt to connect.
+            if os_type == 'unix' and ssh_key:
+                if not ssh_user:
+                    ssh_user = 'root'
+                # Try to connect. If it works, it will create the association.
+                try:
+                    if not host:
+                        raise BadRequestError("You have specified an SSH key but "
+                                              "machine hostname is empty.")
+                    to_tunnel(self.cloud.owner, host)  # May raise VPNTunnelError
+                    ssh_command(
+                        self.cloud.owner, self.cloud.id, machine.machine_id, host,
+                        'uptime', key_id=ssh_key.id, username=ssh_user,
+                        port=ssh_port
+                    )
+                except MachineUnauthorizedError as exc:
+                    if fail_on_error:
+                        machine.delete()
+                    raise CloudUnauthorizedError(exc)
+                except ServiceUnavailableError as exc:
+                    if fail_on_error:
+                        machine.delete()
+                    raise MistError("Couldn't connect to host '%s'." % host)
+                except:
+                    if fail_on_error:
+                        machine.delete()
+                    raise
 
-        return machine
+            return machine
+        else:
+            # just create the Machine without ips associated
+            machine = Machine(
+                cloud=self.cloud,
+                name=name,
+                machine_id=uuid.uuid4().hex,
+                os_type=os_type,
+                ssh_port=ssh_port,
+                rdp_port=rdp_port
+            )
+            machine.save()
+            return machine
+
