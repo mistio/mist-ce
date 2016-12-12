@@ -1,9 +1,3 @@
 [submodule "tests"]
         path = tests
         url = ../../mistio/mist.tests.git
-[submodule "ui/polyana-dashboard"]
-	path = ui/mist_components/polyana-dashboard
-	url = ../polyana-dashboard.git
-[submodule "ui/timerange-picker"]
-	path = ui/mist_components/timerange-picker
-	url = ../timerange-picker.git
