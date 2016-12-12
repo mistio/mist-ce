@@ -1,5 +1,6 @@
 import logging
 import ssl
+import json
 
 import mongoengine.errors
 
@@ -9,6 +10,15 @@ from libcloud.common.exceptions import BaseHTTPError, RateLimitReachedError
 from mist.io.clouds.controllers.base import BaseController
 
 log = logging.getLogger(__name__)
+
+
+def fix_dict_encoding(dictionary):
+    for key, val in dictionary.iteritems():
+        try:
+            json.dumps(val)
+        except TypeError:
+            dictionary[key] = str(val)
+    return dictionary
 
 
 class LibcloudExceptionHandler(object):
@@ -75,8 +85,8 @@ class BaseNetworkController(BaseController):
     @LibcloudExceptionHandler(mist.io.exceptions.SubnetCreationError)
     def create_subnet(self, subnet, **kwargs):
         """Creates a new subnet."""
-
         kwargs['name'] = subnet.title
+        kwargs['cidr'] = subnet.cidr
         kwargs['description'] = subnet.description
 
         self._create_subnet__parse_args(subnet.network, kwargs)
@@ -119,9 +129,11 @@ class BaseNetworkController(BaseController):
             self._list_networks__parse_libcloud_object(network, libcloud_network)
 
             network.title = libcloud_network.name
+
+            libcloud_network.extra = fix_dict_encoding(libcloud_network.extra)
             if libcloud_network.extra.get('description'):
                 network.description = libcloud_network.extra.pop('description')
-            network.extra = libcloud_network.extra
+            network.extra = fix_dict_encoding(libcloud_network.extra)
 
             # Save the new network document
             try:
@@ -162,6 +174,8 @@ class BaseNetworkController(BaseController):
             self._list_subnets__parse_libcloud_object(subnet, libcloud_subnet)
 
             subnet.title = libcloud_subnet.name
+
+            libcloud_subnet.extra = fix_dict_encoding(libcloud_subnet.extra)
             if libcloud_subnet.extra.get('description'):
                 subnet.description = libcloud_subnet.extra.pop('description')
             subnet.extra = libcloud_subnet.extra
@@ -170,7 +184,7 @@ class BaseNetworkController(BaseController):
                 subnet.save()
             except mongoengine.errors.ValidationError as exc:
                 log.error("Error updating Subnet %s: %s", subnet.title, exc.to_dict())
-                raise mist.io.exceptions.NetworkCreationError(exc.message)
+                raise mist.io.exceptions.SubnetCreationError(exc.message)
             except mongoengine.errors.NotUniqueError as exc:
                 log.error("Subnet %s not unique error: %s", subnet.title, exc)
                 raise mist.io.exceptions.SubnetExistsError(exc.message)

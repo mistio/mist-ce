@@ -1,6 +1,7 @@
 import uuid
 
 import mongoengine as me
+import netaddr
 
 from mist.io.clouds.models import Cloud
 import mist.io.exceptions
@@ -22,7 +23,7 @@ def _populate_class_mapping(mapping, class_suffix, base_class):
 
 class Network(me.Document):
     id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
-    network_id = me.StringField(required=True)
+    network_id = me.StringField()
     title = me.StringField()
     cloud = me.ReferenceField(Cloud, required=True)
     description = me.StringField()
@@ -52,8 +53,7 @@ class Network(me.Document):
         self._network_specific_fields = [field for field in type(self)._fields if field not in Network._fields]
 
     @classmethod
-    def add(cls, cloud,  name='', description='', object_id='', **kwargs):
-
+    def add(cls, cloud, name='', description='', object_id='', **kwargs):
         network = cls(title=name,
                       cloud=cloud,
                       description=description)
@@ -61,28 +61,38 @@ class Network(me.Document):
         if object_id:
             network.id = object_id
 
+        for key, value in kwargs.iteritems():
+            if key not in network._network_specific_fields:
+                raise mist.io.exceptions.BadRequestError(key)
+            setattr(network, key, value)
+        # Perform early validation
+        try:
+            network.validate(clean=True)
+        except me.ValidationError as err:
+            raise mist.io.exceptions.BadRequestError(err)
         network.ctl.create_network(**kwargs)
 
         return network
 
     def as_dict(self):
-        netdict = {'name': self.title,
-                   'id': self.id,
-                   'description': self.description,
-                   'network_id': self.network_id,
-                   'cloud': self.cloud.id}
+        net_dict = {'name': self.title,
+                    'id': self.id,
+                    'description': self.description,
+                    'network_id': self.network_id,
+                    'cloud': self.cloud.id,
+                    'extra': self.extra}
 
-        netdict.update({key: getattr(self, key) for key in self._network_specific_fields})
+        net_dict.update({key: getattr(self, key) for key in self._network_specific_fields})
 
-        return netdict
+        return net_dict
 
     def __repr__(self):
         return '<Network id:{id}, Title:{title}, Description={description}, Cloud:{cloud},' \
                'Cloud API id:{network_id}>'.format(id=self.id,
-                                                 title=self.title,
-                                                 description=self.description,
-                                                 cloud=self.cloud,
-                                                 network_id=self.network_id)
+                                                   title=self.title,
+                                                   description=self.description,
+                                                   cloud=self.cloud,
+                                                   network_id=self.network_id)
 
     def __str__(self):
         return '{class_name} {title} ({id})'.format(class_name=self.__class__.__name__,
@@ -91,31 +101,54 @@ class Network(me.Document):
 
 
 class AmazonNetwork(Network):
-    state = me.StringField()
-    cidr = me.StringField()
-    instance_tenancy = me.StringField(choices=('default', 'private'))
+    cidr = me.StringField(required=True)
+    instance_tenancy = me.StringField(choices=('default', 'private'),
+                                      default='default')
 
     _controller_cls = mist.io.clouds.controllers.network.controllers.AmazonNetworkController
 
+    def clean(self):
+        try:
+            ip_glob = netaddr.cidr_to_glob(self.cidr)
+            netaddr.valid_glob(ip_glob)
+        except (TypeError, netaddr.AddrFormatError) as err:
+            raise me.ValidationError(err)
+
 
 class GoogleNetwork(Network):
-    mode = me.StringField()
+    title = me.StringField(regex='^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$')
+    mode = me.StringField(choices=('legacy', 'auto', 'custom'), default='legacy')
     cidr = me.StringField()
     gateway_ip = me.StringField()
+
+    @classmethod
+    def add(cls, cloud, name='', description='', object_id='', **kwargs):
+        if kwargs.get('mode') != 'legacy' and kwargs.get('cidr'):
+            raise me.ValidationError()
+
+        return super(GoogleNetwork, cls).add(cloud, name, description, object_id, **kwargs)
+
+    def clean(self):
+        if self.mode == 'legacy':
+            try:
+                ip_glob = netaddr.cidr_to_glob(self.cidr)
+                netaddr.valid_glob(ip_glob)
+            except (TypeError, netaddr.AddrFormatError) as err:
+                raise me.ValidationError(err)
 
     _controller_cls = mist.io.clouds.controllers.network.controllers.GoogleNetworkController
 
 
 class OpenStackNetwork(Network):
-    admin_state_up = me.BooleanField()
-    shared = me.BooleanField()
+    admin_state_up = me.BooleanField(default=True)
+    shared = me.BooleanField(default=False)
 
     _controller_cls = mist.io.clouds.controllers.network.controllers.OpenStackNetworkController
 
 
 class Subnet(me.Document):
     id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
-    subnet_id = me.StringField(required=True)
+    subnet_id = me.StringField()
     title = me.StringField()
     cidr = me.StringField()
     network = me.ReferenceField('Network', required=True, reverse_delete_rule=me.CASCADE)
@@ -146,31 +179,51 @@ class Subnet(me.Document):
                                         if field not in Subnet._fields]
 
     @classmethod
-    def add(cls, network,  name='', description='', object_id='', **kwargs):
+    def add(cls, network, cidr, name='', description='', object_id='', **kwargs):
 
         subnet = cls(title=name,
+                     cidr=cidr,
                      network=network,
                      description=description)
 
         if object_id:
             subnet.id = object_id
 
+        for key, value in kwargs.iteritems():
+            if key not in subnet._subnet_specific_fields:
+                raise mist.io.exceptions.BadRequestError(key)
+            setattr(subnet, key, value)
+
+        # Perform early validation
+        try:
+            subnet.validate(clean=True)
+        except me.ValidationError as err:
+            raise mist.io.exceptions.BadRequestError(err)
+
         subnet.ctl.create_subnet(**kwargs)
 
         return subnet
 
+    def clean(self):
+        if self.cidr:
+            try:
+                netaddr.cidr_to_glob(self.cidr)
+            except (TypeError, netaddr.AddrFormatError) as err:
+                raise me.ValidationError(err)
+
     def as_dict(self):
-        netdict = {'name': self.title,
-                   'id': self.id,
-                   'description': self.description,
-                   'subnet_id': self.subnet_id,
-                   'cloud': self.network.cloud.id,
-                   'cidr': self.cidr,
-                   'network': self.network.id}
+        subnet_dict = {'name': self.title,
+                       'id': self.id,
+                       'description': self.description,
+                       'subnet_id': self.subnet_id,
+                       'cloud': self.network.cloud.id,
+                       'cidr': self.cidr,
+                       'network': self.network.id,
+                       'extra': self.extra}
 
-        netdict.update({key: getattr(self, key) for key in self._subnet_specific_fields})
+        subnet_dict.update({key: getattr(self, key) for key in self._subnet_specific_fields})
 
-        return netdict
+        return subnet_dict
 
     def __repr__(self):
         return '<Subnet id:{id}, Title:{title}  Description={description}, Cloud API id:{subnet_id},' \
@@ -188,23 +241,25 @@ class Subnet(me.Document):
 
 class AmazonSubnet(Subnet):
     available_ips = me.IntField()
-    zone = me.StringField()
+    availability_zone = me.StringField(required=True)
 
     _controller_cls = mist.io.clouds.controllers.network.controllers.AmazonNetworkController
 
 
 class GoogleSubnet(Subnet):
-    region = me.StringField()
+    title = me.StringField(required=True, regex='^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$')
+    region = me.StringField(required=True)
     gateway_ip = me.StringField()
 
     _controller_cls = mist.io.clouds.controllers.network.controllers.GoogleNetworkController
 
 
 class OpenStackSubnet(Subnet):
-    enable_dhcp = me.BooleanField()
-    dns_nameservers = me.ListField()
-    allocation_pools = me.ListField()
+    enable_dhcp = me.BooleanField(default=False)
+    dns_nameservers = me.ListField(default=lambda: [])
+    allocation_pools = me.ListField(default=lambda: [])
     gateway_ip = me.StringField()
+    ip_version = me.IntField(default='4')
 
     _controller_cls = mist.io.clouds.controllers.network.controllers.OpenStackNetworkController
 

@@ -1,6 +1,4 @@
 import logging
-import netaddr
-
 
 log = logging.getLogger(__name__)
 
@@ -30,10 +28,3 @@ def tags_to_dict(tags):
                 tdict[tag['key']] = tag.get('value')
     return tdict
 
-
-def valid_cidr(cidr_string):
-    try:
-        ip_glob = netaddr.cidr_to_glob(cidr_string)
-        return netaddr.valid_glob(ip_glob)
-    except (TypeError, netaddr.AddrFormatError):
-        return False

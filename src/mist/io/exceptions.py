@@ -69,10 +69,6 @@ class KeyValidationError(BadRequestError):
     msg = "Invalid private key"
 
 
-class InvalidParameterValue(BadRequestError):
-    msg = "Invalid parameter value"
-
-
 # UNAUTHORIZED (translated as 401 in views)
 class UnauthorizedError(MistError):
     msg = "Not authorized"
