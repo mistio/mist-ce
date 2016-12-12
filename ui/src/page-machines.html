@@ -5,51 +5,190 @@
 
 <link rel="import" href="page-items.html">
 
+<script type="text/javascript" src="machine-create-fields.js" inline></script>
+
 <dom-module id="page-machines">
-  <template>
+    <template>
     <style>
       :host {
         display: block;
+      }
+      #recommendationsDialog {
+          width: 400px;
+      }
+      #recommendationsDialog a.blue-link {
+          color: var(--blue-color) !important;
+      }
+      #recommendationsDialog iron-icon.orange {
+          color: #F57F17;
+      }
+      .logs {
+        background-color: #f1f1f1;
+        padding: 4px 16px;
+        border-radius: 3px;
+        margin-bottom: 24px;
+      }
+      .error iron-icon {
+        opacity: 0.32;
+        cursor: pointer;
+      }
+      .error {
+          color: var(--red-color);
+
       }
     </style>
     <app-route route="{{route}}"
                 pattern="/:machine"
                 data="{{data}}"></app-route>
-
+    <p class="logs" hidden$="[[!jobId]]">Creating machine: {{removeUnderscore(logItem.action)}} <span class="error" hidden$="[[!logItem.error]]">[[logItem.error]] <iron-icon icon="close" on-tap="clearLog"></iron-icon></span>
+    </p>
     <page-items name="machines" class="keys" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]" onboarding="[[onboarding]]" hidden$=[[!_isListActive(route.path)]]></page-items>
-    <machine-create model="[[model]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isAddPageActive(route.path)]]></machine-create>
+    <machine-create model="[[model]]" machines-fields="[[machinesFields]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isAddPageActive(route.path)]]></machine-create>
     <machine-page model="[[model]]" machine="[[_getMachine(data.machine, model.machines)]]" sections="[[sections]]" section="[[sections.machines]]" hidden$=[[!_isDetailsPageActive(route.path)]]></machine-page>
-  </template>
+    <paper-dialog id="recommendationsDialog" with-backdrop caller="[[caller]]">
+        <h2>Recommendation</h2>
+        <p>
+            <iron-icon icon="icons:report-problem" class="orange"></iron-icon>
+            Your machine is vulnerable to Dirty COW. <br/><a href="https://dirtycow.ninja/" target="new" class="regular blue-link">Learn more.</a>
+        </p>
+        <p class="recommendation-text"></p>
+        <p>We recommend you follow the <a href="https://dirtycow.ninja/" target="new" class="regular blue-link">guide</a> and update your server kernel. You can use mist.io shell to do it now.</p>
+        <div class="buttons">
+            <paper-button dialog-dismiss>Cancel</paper-button>
+            <paper-button class="blue" dialog-confirm on-tap="_shell">open machine shell</paper-button>
+        </div>
+    </paper-dialog>
 
-  <script>
-    Polymer({
+    <iron-ajax
+            id="getJobLog" method="GET"
+            url="/api/v1/jobs/[[jobId]]"
+            handle-as="json"
+            on-response="handleGetJobLog"
+            on-error="handleGetJobLogError"></iron-ajax>
+    </template>
+    <script>
+        Polymer({
 
-      is: 'page-machines',
+            is: 'page-machines',
 
-      properties: {
-        model: Object,
-        sections: Array,
-        onboarding: Object,
-        data: Object
-      },
+            properties: {
+                model: Object,
+                sections: Array,
+                onboarding: Object,
+                data: Object,
+                itemOfRecommendation: Object,
+                machinesFields: {
+                    type: Array,
+                    value: MACHINE_CREATE_FIELDS
+                },
+                jobId: {
+                    type: String,
+                    value: false
+                },
+                logItem: {
+                    type: Object,
+                    value: false
+                },
+                intervalID: {
+                    type: String
+                },
+            },
+            listeners: {
+                'open-recommendation-dialog': 'openRecommendationsDialog'
+            },
+            observers: [
+                '_jobIdChanged(jobId)',
+                '_pathChanged(path)',
+                'stopPolling(logItem)'
+            ],
 
-      _isAddPageActive: function(path) {
-          return path == '/+create';
-      },
-      _isDetailsPageActive: function(path) {
-          if (path && path != '/+create') 
-            return true;
-          else 
-            return false;
-      },
-      _isListActive: function(path) {
-          return !path;
-      },
-      _getMachine: function(id) {
-        if (id && this.model && this.model.machines && this.model.machines[id])
-          return this.model.machines[id];
-      }
+            _isAddPageActive: function(path) {
+                return path == '/+create';
+            },
+            _isDetailsPageActive: function(path) {
+                if (path && path != '/+create')
+                    return true;
+                else
+                    return false;
+            },
+            _isListActive: function(path) {
+                if (path)
+                    this.stopPolling();
+                return !path;
+            },
+            _getMachine: function(id) {
+                if (id && this.model && this.model.machines && this.model.machines[id])
+                    return this.model.machines[id];
+            },
+            openRecommendationsDialog: function(e) {
+                var probe;
+                if (e.detail['item-type'] != "machines")
+                    probe = this.model.probes[e.detail.item.id];
+                else
+                    probe = this.model.probes[e.detail.item.uuid];
+                var text = 'Kernel ' + probe.kernel + ' OS ' + probe.os + ' ' + probe.os_version;
+                this.querySelector('.recommendation-text').textContent = text;
+                this.$.recommendationsDialog.open();
+                this.caller = e.detail.caller;
+                this.set('itemOfRecommendation', e.detail.item);
+            },
+            _shell: function(event) {
+                var e = Polymer.dom(event);
+                var action = {
+                    'name': 'shell',
+                    'icon': 'vaadin-icons:terminal',
+                    'confirm': false,
+                    'multi': true
+                };
+                var itemtoquery = 'item-actions';
+                if (this.caller == 'machine_page')
+                    itemtoquery += '#actions_machine';
+                this.querySelector(itemtoquery)._performAction(action, [this.itemOfRecommendation]);
+            },
+            _jobIdChanged: function(jobid) {
+                if (!jobid) {
+                    this.resetPolling();
+                } else {
+                    this.startPolling(jobid);
+                }
+            },
+            startPolling: function(jobid) {
+                this.intervalID = setInterval(function() {
+                    this.$.getJobLog.generateRequest();
+                }.bind(this), 1000);
 
-    });
-  </script>
+                console.log('startpolling');
+            },
+            stopPolling: function(logItems) {
+                if (this.logItem && this.logItem.action.endsWith('finished')) {
+                    //let log finished show
+                    if (!this.logItem.error)
+                        this.async(function() {
+                            this.resetPolling(this.logItem.error);
+                        }.bind(this), 1000);
+                }
+            },
+            resetPolling: function(error) {
+                if (!error) {
+                    this.set('logItem', '');
+                }
+                this.set('jobId', false);
+                window.clearInterval(this.intervalID);
+                this.set('intervalID', false);
+            },
+            handleGetJobLog: function(e) {
+                console.log('handleGetJobLog', e);
+                //save last log in logItem
+                this.set('logItem', e.detail.response.logs[e.detail.response.logs.length - 1]);
+            },
+            removeUnderscore: function(action) {
+                if (action)
+                    return action.replace(/_/g, " ");
+            },
+            clearLog: function(e) {
+                this.resetPolling();
+                this.set('logItem', '');
+            }
+        });
+    </script>
 </dom-module>

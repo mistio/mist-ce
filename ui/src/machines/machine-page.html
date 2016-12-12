@@ -21,6 +21,9 @@
             :host {
                 display: block;
             }
+            a:hover {
+                cursor:pointer;
+            }
             .columns {
                 @apply(--layout-horizontal);
                 flex: 1 100%;
@@ -321,13 +324,13 @@
                     </div>
                 </div>
                 <div class="machine-actions">
-                    <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" actions="[[actions]]" org="[[model.org]]" model="[[model]]"></item-actions>
+                    <item-actions id="actions_machine" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" actions="[[actions]]" org="[[model.org]]" model="[[model]]"></item-actions>
                 </div>
             </paper-material>
             <div class="columns">
                 <paper-material id="leftcolumn" class="left">
                     <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
-                    <span hidden$="[[!machine.extra.image]]" class="break">Image: [[machine.extra.image]]</span>
+                    <span hidden$="[[!machine.extra.image]]" class="break">Image: [[_computeMachineImage(machine)]]</span>
                     <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
                     <div hidden$="[[!probeData]]"> Probe Data:
                         <span class$="probe-data [[itemProbeClasses(machine, model.probes)]]"> </span>
@@ -342,7 +345,8 @@
                             Dirty COW check passed.
                         </span>
                         <span class$="dc-[[probeObj.dirty_cow]]" hidden$="[[!probeObj.dirty_cow]]">
-                            <iron-icon hidden$="[[!probeObj.dirty_cow]]" icon="icons:report-problem"></iron-icon> [[dirtyCowAlert]]
+                            <iron-icon hidden$="[[!probeObj.dirty_cow]]" icon="icons:report-problem" on-tap="_showRecommendationDialog"></iron-icon> [[dirtyCowAlert]]
+                            <a class="regular blue-link" on-tap="_showRecommendationDialog">Show recommendation.</a>
                         </span>
                         <!-- <a href="/link-to-blog" target="new" class="regular" hidden$="[[!probeObj.dirty_cow]]">read more...</a> -->
                     </div>
@@ -426,7 +430,7 @@
                                 <td>Filesystem Info</td>
                                 <td>
                                     <div class="probe-df">
-<pre><code>[[probeObj.df]]</code></pre>
+                                        <pre><code>[[probeObj.df]]</code></pre>
                                     </div>
                                 </td>
                             </tr>
@@ -652,9 +656,10 @@ Polymer({
         this.set('hideAssociatedKeys', true);
         this.set('isPendingKeyRequest', false);
     },
-    attached: function() {
-
+    _showRecommendationDialog: function(){
+        this.fire("open-recommendation-dialog", {'item-type': 'machines', 'item': this.machine, 'caller': "machine_page"});
     },
+
     isInPageChanged: function(machine, isInPage){
         // console.log('machine', machine);
         // if (!this.machine)
@@ -938,6 +943,19 @@ Polymer({
         else
             return "";
 
+    },
+    _computeMachineImage: function(item){
+        if (item && item.image && typeOf(item.image) != "object"){
+            return item.image;
+        }
+        else if (item && item.extra.image && item.extra.image.distribution && item.extra.image.name) {
+            return item.extra.image.distribution + " " +item.extra.image.name;
+        }
+        else if (item && item.extra && (item.extra['image_id'] || item.imageId || item.extra.image)){
+            return item.extra['image_id'] || item.imageId || item.extra.image.slug || item.extra.image.name || 'not found';
+        }
+        else
+            return "not found";
     }
 });
 </script>
