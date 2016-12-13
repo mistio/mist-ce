@@ -52,7 +52,7 @@
         }
 
         .field.recommendations {
-            min-width: 250px;      
+            min-width: 250px;
         }
         .recommendations.Dirty.COW.Update iron-icon {
             color: #F57F17;
@@ -200,8 +200,8 @@
         <iron-media-query query="(min-width: 641px) and (max-width: 1300px)" query-matches="{{mediumViewport}}"></iron-media-query>
         <content></content>
         <template is="dom-repeat" items="{{fields}}" as="field">        
-          <a href="{{_computeUri(uri, field, item, probes)}}" is="pushstate-anchor" ondragstart="return false" ondrop="return false" class$="field-link-[[index]]-[[field]]">            
-            <div class$="[[field]] field field[[index]] {{itemField(item, field, index)}}  {{itemProbeClasses(item, field, index, probes)}}"><span class$="field-icon [[field]]"></span>{{itemField(item, field, index)}}</div>
+          <a href$="[[_computeUri(uri, field, item, probes)]]" is="pushstate-anchor" ondragstart="return false" ondrop="return false" class$="field-link-[[index]]-[[field]]" title$="[[itemField(item, field, index)]]">            
+            <div class$="[[field]] field field[[index]] [[itemField(item, field, index)]]  [[itemProbeClasses(item, field, index, probes)]]"><span class$="field-icon [[field]]"></span>[[itemField(item, field, index)]]</div>
           </a>
         </template>
         <div class="field tags" hidden$="[[!item.tags.length]]">
@@ -357,7 +357,7 @@ Polymer({
         if (field == 'started_at' || field == 'finished_at') {
             if (ret)
                 return moment.utc(item[field] * 1000).fromNow();
-            else 
+            else
                 return "";
         }
 
@@ -415,7 +415,7 @@ Polymer({
                 return item.extra.maxCpu + 'cpu, ' + item.extra.maxMemory + 'M ram';
             if (item.extra && item.extra.PLANID) {
                 var cloud = document.querySelector('mist-app').model.clouds[item.cloud.id];
-                return (cloud && cloud.sizes) ? cloud.sizes[item.extra.PLANID] : item.extra.PLANID;
+                return (cloud && cloud.sizes) ? cloud.sizes[item.extra.PLANID].name  : item.extra.PLANID
             }
             if (item.extra && item.extra.service_type)
                 return item.extra.service_type;
@@ -424,13 +424,13 @@ Polymer({
         if (field == 'cloud_id') {
             if (document.querySelector('mist-app').model.clouds[item.cloud_id])
                 return document.querySelector('mist-app').model.clouds[ret].title;
-            else 
+            else
                 return 'missing cloud';
         }
         if (field == 'machine_id') {
             if (document.querySelector('mist-app').model.clouds[item.cloud_id].machines[item.machine_id])
                 return document.querySelector('mist-app').model.clouds[item.cloud_id].machines[item.machine_id].name;
-            else 
+            else
                 return 'missing machine';
         }
 
@@ -495,7 +495,7 @@ Polymer({
     _showRecommendationDialog: function(event){
         var e = Polymer.dom(event);
         if (event.target.dataset.dialog == "recommendations")
-            this.fire("open-recommendation-dialog", {'item-type': this.section.id, 'item': this.item, 'event': e})
+            this.fire("open-recommendation-dialog", {'item-type': this.section.id, 'item': this.item, 'caller': 'list_machines'})
     },
 
     _itemTagsArray: function(tagsobject) {

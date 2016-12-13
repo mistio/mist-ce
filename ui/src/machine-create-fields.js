@@ -20,7 +20,7 @@ MACHINE_CREATE_FIELDS.push({
         defaultValue: "",
         show: true,
         required: false,
-        helptext: 'e.g. 80:80'
+        helptext: 'e.g. http tcp 80:80, smtp tcp 25:25, https tcp 443:443'
     }]
 });
 
@@ -78,7 +78,7 @@ MACHINE_CREATE_FIELDS.push({
         helptext: ""
     },{
         name: "ports",
-        label: "Ports *",
+        label: "Ports",
         type: "textarea",
         value: "",
         defaultValue: "",
@@ -131,7 +131,27 @@ MACHINE_CREATE_FIELDS.push({
 // KVM
 MACHINE_CREATE_FIELDS.push({
     provider: 'libvirt',
-    fields: []
+    fields: [{
+        name: "libvirt_disk_path",
+        type: "text",
+        label: "Path to create VM's disk",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: "Where the VM disk file will be created",
+        helpHref: "http://docs.mist.io/article/99-managing-kvm-with-mist-io"
+    },{
+        name: "libvirt_disk_size",
+        type: "text",
+        label: "Disc size (GB)",
+        value: "4",
+        defaultValue: "4",
+        show: true,
+        required: false,
+        helptext: "The VM's size will be the size of the image plus the number in GBs provided here",
+        helpHref: "http://docs.mist.io/article/99-managing-kvm-with-mist-io"
+    }]
 });
 
 // LINODE
@@ -192,7 +212,16 @@ MACHINE_CREATE_FIELDS.push({
 // SOFTLAYER
 MACHINE_CREATE_FIELDS.push({
     provider: 'softlayer',
-    fields: []
+    fields: [{
+        name: "softlayer_backend_vlan_id",
+        label: "Backend VLAN ID",
+        type: "text",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: "Optional."
+    }]
 });
 
 // VCLOUD
@@ -232,7 +261,8 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         value: "",
         defaultValue: "",
         show: true,
-        required: true
+        required: true,
+        helptext: "Fill in the machine's name"
     },{
         name: "image",
         label: "Image *",
@@ -271,25 +301,85 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         options: []
     });
 
+    //add cloud init field only to providers that accept and we support
+    if (['azure', 'digitalocean', 'ec2', 'gce', 'packet', 'rackspace', 'libvirt'].indexOf(p.provider) != -1) {
+        p.fields.push({
+            name: "cloud_init",
+            label: "Cloud Init",
+            type: "textarea",
+            value: "",
+            defaultValue: "",
+            show: true,
+            required: false,
+            helptext: "Start your Cloud Init script with #!/bin/bash or use a valid yaml configuration file starting with #cloud-config"
+        });
+    }
+
     //add common post provision fields
     p.fields.push({
-        name: "cloud_init",
-        label: "Cloud Init Script *",
+        name: "radio",
+        label: "Script Inline or Select",
+        type: "radio",
+        value: "inline",
+        defaultValue: "inline",
+        helptext: "Edit a script to run or choose one from your existing ones.",
+        show: true,
+        required: false,
+        options: [{
+            title: "Inline Script",
+            val: "inline"
+        }, {
+            title: "Select Existing",
+            val: "select"
+        }]
+    },{
+        name: "script",
+        label: "Inline Script",
         type: "textarea",
         value: "",
         defaultValue: "",
         show: true,
         required: false,
-        helptext: ''
+        helptext: "The inline script will run after provisioning",
+        showIf: {
+            fieldName: "radio",
+            fieldValues: ["inline"]
+        }
+    },{
+        name: "script_id",
+        label: "Script",
+        type: "mist_dropdown",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: "The selected script will run after provisioning",
+        showIf: {
+            fieldName: "radio",
+            fieldValues: ["select"]
+        }
+    },{
+        name: "script_params",
+        label: "Optional Script Params",
+        type: "textarea",
+        value: "",
+        defaultValue: "",
+        show: true,
+        required: false,
+        helptext: "",
+        showIf: {
+            fieldName: "radio",
+            fieldValues: ["select"]
+        }
     },{
         name: "monitoring",
         label: "Enable monitoring",
         type: "toggle",
-        value: "true",
+        value: true,
         defaultValue: "true",
         show: true,
         required: false,
-        helptext: ''
+        helptext: ""
     },{
         name: "async",
         label: "Async request",
@@ -298,6 +388,6 @@ MACHINE_CREATE_FIELDS.forEach(function(p){
         defaultValue: "true",
         show: false,
         required: false,
-        helptext: ''
+        helptext: ""
     });
 });

@@ -27,7 +27,6 @@
     "swiftSet": "jabney/swiftSet#^0.9.15",
     "polyana-dashboard": "mistio/polyana-dashboard#^0.1.5",
     "paper-datatable": "^0.9.8",
-    "vaadin-grid": "^1.2.0",
     "vaadin-combo-box": "^1.1.1",
     "vaadin-icons": "^1.0.2",
     "yaml.js": "jeremyfa/yaml.js#^0.2.8",
@@ -50,7 +49,6 @@
     "paper-item": "^1.2.1",
     "iron-list": "^1.3.3",
     "paper-icon-button": "~1.1.3",
-    "vaadin-grid": "~1.2.0",
     "timerange-picker": "*",
     "Chart.js": "^2.0.0"
   }

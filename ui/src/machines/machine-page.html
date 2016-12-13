@@ -21,6 +21,9 @@
             :host {
                 display: block;
             }
+            a:hover {
+                cursor:pointer;
+            }
             .columns {
                 @apply(--layout-horizontal);
                 flex: 1 100%;
@@ -206,6 +209,10 @@
             item-actions ::content .item-actions {
                 margin-left: 0 !important;
             }
+            span[class*="dc-"] {
+                padding-top: 16px;
+                display: inline-block;
+            }
             .dc-true {
                 color: #F57F17;
             }
@@ -214,6 +221,8 @@
             }
             .dc-false {
                 color: var(--green-color);
+                font-size: 0.9em;
+                font-weight: 500;
             }
             .probe-df {
                 height: 240px;
@@ -304,6 +313,14 @@
                     display: inline-block !important;
                 }
             }
+            .m-info-head {
+                text-transform: uppercase;
+                font-weight: bold;
+                font-size: 0.8em;
+                display: inline-block;
+                width: 80px;
+                opacity: 0.54;
+            }
         </style>
 
         <div id="content">
@@ -321,15 +338,20 @@
                     </div>
                 </div>
                 <div class="machine-actions">
-                    <item-actions id="actions" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" actions="[[actions]]" org="[[model.org]]" model="[[model]]"></item-actions>
+                    <item-actions id="actions_machine" items="[[itemInArray]]" selected-items="[[itemUid]]" selected-item="[[machine]]" section="[[section]]" actions="[[actions]]" org="[[model.org]]" model="[[model]]"></item-actions>
                 </div>
             </paper-material>
             <div class="columns">
                 <paper-material id="leftcolumn" class="left">
-                    <span hidden$="[[!machine.cloud.title]]">Cloud: [[machine.cloud.title]]</span>
-                    <span hidden$="[[!machine.extra.image]]" class="break">Image: [[_computeMachineImage(machine)]]</span>
-                    <span hidden$="[[!machine.extra.created]]">Created: [[machine.extra.created]]</span>
-                    <div hidden$="[[!probeData]]"> Probe Data:
+                    <span hidden$="[[!machine.cloud.title]]"><span class="m-info-head">Cloud:</span> 
+                        [[machine.cloud.title]]</span>
+                    <span hidden$="[[!machine.extra.image]]" class="break"><span class="m-info-head">Image:</span> 
+                        [[_computeMachineImage(machine)]]</span>
+                    <span hidden$="[[!_computeMachineSize(machine)]]" class="break"><span class="m-info-head">Size:</span>
+                        [[_computeMachineSize(machine)]]</span>
+                    <span hidden$="[[!machine.extra.created]]"><span class="m-info-head">Created:</span> 
+                        [[machine.extra.created]]</span>
+                    <div hidden$="[[!probeData]]"> <span class="m-info-head">Probe Data:</span>
                         <span class$="probe-data [[itemProbeClasses(machine, model.probes)]]"> </span>
                         <span hidden$="[[!probeData]]"> [[probeData]] </span> <br/>
                         <span hidden$="[[!lastProbe]]"> [[lastProbe]] </span>
@@ -342,7 +364,8 @@
                             Dirty COW check passed.
                         </span>
                         <span class$="dc-[[probeObj.dirty_cow]]" hidden$="[[!probeObj.dirty_cow]]">
-                            <iron-icon hidden$="[[!probeObj.dirty_cow]]" icon="icons:report-problem"></iron-icon> [[dirtyCowAlert]]
+                            <iron-icon hidden$="[[!probeObj.dirty_cow]]" icon="icons:report-problem" on-tap="_showRecommendationDialog"></iron-icon> [[dirtyCowAlert]]
+                            <a class="regular blue-link" on-tap="_showRecommendationDialog">Show recommendation.</a>
                         </span>
                         <!-- <a href="/link-to-blog" target="new" class="regular" hidden$="[[!probeObj.dirty_cow]]">read more...</a> -->
                     </div>
@@ -382,6 +405,7 @@
                 <mist-rules
                     id="monitoringRules"
                     builtin-metrics="[[model.monitoring.builtin_metrics]]"
+                    custom-metrics="[[model.monitoring.custom_metrics]]"
                     incidents="[[model.incidentsArray]]"
                     rules="[[model.monitoring.rules]]"
                     resource="[[machine]]"
@@ -426,7 +450,7 @@
                                 <td>Filesystem Info</td>
                                 <td>
                                     <div class="probe-df">
-<pre><code>[[probeObj.df]]</code></pre>
+                                        <pre><code>[[probeObj.df]]</code></pre>
                                     </div>
                                 </td>
                             </tr>
@@ -652,9 +676,10 @@ Polymer({
         this.set('hideAssociatedKeys', true);
         this.set('isPendingKeyRequest', false);
     },
-    attached: function() {
-
+    _showRecommendationDialog: function(){
+        this.fire("open-recommendation-dialog", {'item-type': 'machines', 'item': this.machine, 'caller': "machine_page"});
     },
+
     isInPageChanged: function(machine, isInPage){
         // console.log('machine', machine);
         // if (!this.machine)
@@ -951,6 +976,33 @@ Polymer({
         }
         else
             return "not found";
+    },
+    _computeMachineSize: function(item) {
+        // field could be in the 'extra' section, but should not be an object
+        if (item) {
+            var ret = item['size'];
+            
+            if (ret && typeof(ret) != 'object')
+                return ret;
+            if (!ret && item.extra && item.extra['size'] && typeof(item.extra['size']) != 'object')
+                ret = item.extra['size'];
+            if (item.extra && item.extra.size && item.extra.size.vcpus)
+                return item.extra.size.vcpus + 'vcpu, ' + item.extra.size.memory + 'M ram';;
+            if (item.extra && item.extra.size && typeof(item.extra.size) == 'string')
+                return item.extra.size;
+            if (item.extra && item.extra.instance_type)
+                return item.extra.instance_type;
+            if (item.extra && item.extra.instance_size)
+                return item.extra.instance_size;
+            if (item.extra && item.extra.maxCpu && item.extra.maxMemory)
+                return item.extra.maxCpu + 'cpu, ' + item.extra.maxMemory + 'M ram';
+            if (item.extra && item.extra.PLANID) {
+                var cloud = document.querySelector('mist-app').model.clouds[item.cloud.id];
+                return (cloud && cloud.sizes) ? cloud.sizes[item.extra.PLANID].name + ": " + cloud.sizes[item.extra.PLANID].ram + " ram, " + cloud.sizes[item.extra.PLANID].disk + " disk, " + cloud.sizes[item.extra.PLANID].bandwidth + " bandwidth": item.extra.PLANID
+            }
+            if (item.extra && item.extra.service_type)
+                return item.extra.service_type;
+        }
     }
 });
 </script>

@@ -1,34 +1,147 @@
 <link rel="import" href="../../bower_components/vaadin-grid/vaadin-grid.html">
 <link rel="import" href="../../bower_components/vaadin-combo-box/vaadin-combo-box.html">
-<script src="../../bower_components/yaml.js/dist/yaml.min.js"></script>
 
 <dom-module id="log-list">
     <template>
       <style>
           :host {
-            overflow: hidden;
-            height: 602px;
+              overflow: hidden;
+              height: 662px;
           }
+
+          /* Let's get this party started */
+          vaadin-grid .details table::-webkit-scrollbar {
+              width: 6px;
+              height: 6px;
+          }
+
+          /* Track */
+          vaadin-grid .details table::-webkit-scrollbar-track {
+              border-radius: 5px;
+          }
+
+          /* Handle */
+          vaadin-grid .details table::-webkit-scrollbar-thumb {
+              -webkit-border-radius: 10px;
+              border-radius: 10px;
+              background: rgba(0, 0, 0, 0.5);
+          }
+          vaadin-grid .details table::-webkit-scrollbar-thumb:window-inactive {
+              background: rgba(0, 0, 0, 0.5);
+          }
+
           vaadin-combo-box {
-            padding: 8px;
+              padding: 8px;
           }
           .head {
-            padding: 0 16px 16px 24px;
-            align-items: flex-end;
+              padding: 0 16px 16px 24px;
+              align-items: flex-end;
           }
           vaadin-combo-box {
-            padding-top: 0;
+              padding-top: 0;
           }
           vaadin-grid {
-            border-top: 1px solid #ddd;
+              border-top: 1px solid #ddd;
+              min-height: 788px;
+              font-size: 12px;
+          }
+
+          paper-icon-button {
+              width: 30px;
+              height: 30px;
+          }
+
+          vaadin-grid .details {
+              display: block;
+              font-family: monospace;
+              overflow: scroll;
+              height: 266px;
+              margin: 0 16px;
+          }
+
+          vaadin-grid .details table {
+              position: inherit;
+              padding-left: 0px;
+              overflow: scroll;
+              border-spacing: 0px;
+          }
+          vaadin-grid .details table tbody {
+              border-top: 1px solid #dbdbdb;
+              border-bottom: 1px solid #dbdbdb;
+              margin-top: 2px;
+              margin-bottom: 2px;
+          }
+          vaadin-grid .details table tr.keys {
+              display: none;
+          }
+          vaadin-grid .details td.key {
+              font-weight: bold;
+              min-width: 155px;
+              border-right: 1px solid #dbdbdb;
+              padding: 3px 16px 3px 30px
+          }
+
+          vaadin-grid .details td.value {
+              padding-left: 8px;
+              white-space: pre-wrap;
+          }
+
+          vaadin-grid table > thead > tr > th {
+              background-color: #F2F2F2 !important;
+          }
+
+          tr[odd] td {
+            background-color: #fafafa;
           }
       </style>
       <paper-material>
         <div class="head layout horizontal">
           <h3 class="flex">LOGS</h3>
-          <vaadin-combo-box class="flex" label="Filter logs" items="[[logFilterSuggestions]]" allow-custom-value on-value-change="_updateFilter"></vaadin-combo-box>
+          <vaadin-combo-box class="flex" label="Filter logs" value="{{filterText}}" items="[[logFilterSuggestions]]" allow-custom-value></vaadin-combo-box>
         </div>
-        <vaadin-grid size="10">
+        <vaadin-grid id="grid" items="[[filteredItems]]" on-cell-click="_onCellClick">
+          <vaadin-grid-column-group frozen>
+            <template class="row-details">
+              <div class="details">
+                <table>
+                  <tbody>
+                    <template is="dom-repeat" items="{{item.keys}}" as="i">
+                      <tr class$="[[i.key]]">
+                        <td class="key">[[i.key]]</td>
+                        <td class="value">[[i.value]]</td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </template>
+            <vaadin-grid-column width="20px" flex="1">
+              <template>
+                <paper-icon-button icon="icons:arrow-drop-down" toggles active="{{expanded}}" style$="[[_computeIconStyle(expanded)]]"></paper-icon-button>
+              </template>
+            </vaadin-grid-column>
+            <vaadin-grid-column flex="3">
+              <template class="header">Time</template>
+              <template>[[_computeRelativeTime(item.time)]]</template>
+            </vaadin-grid-column>
+            <vaadin-grid-column width="20px" flex="1">
+              <template class="header"></template>
+              <template><iron-icon icon="error" hidden$=[[!item.error]]></template>
+            </vaadin-grid-column>
+          </vaadin-grid-column-group>
+
+          <vaadin-grid-column flex="2">
+            <template class="header">Type</template>
+            <template>[[item.type]]</template>
+          </vaadin-grid-column>
+          <vaadin-grid-column flex="2">
+            <template class="header">Action</template>
+            <template>[[item.action]]</template>
+          </vaadin-grid-column>
+          <vaadin-grid-column flex="2">
+            <template class="header">By</template>
+            <template>[[item.email]]</template>
+          </vaadin-grid-column>
         </vaadin-grid>
       </paper-material>
     </template>
@@ -46,7 +159,7 @@ Polymer({
 
         filteredItems: {
             type: Array,
-            value: []
+            computed: '_filterItems(items.*, filterMap)'
         },
 
         stop: {
@@ -59,8 +172,23 @@ Polymer({
             value: 50
         },
 
-        filter: {
+        filterText: {
+            type: String
+        },
+
+        resourceFilter: {
             type: Object,
+            value: function() {
+                return {};
+            }
+        },
+
+        hasReachedEnd: false,
+
+        filterMap: {
+            type: Object,
+            computed: '_computeFilterMap(filterText, resourceFilter)',
+            observer: '_updateLogFilter'
         },
 
         logFilterSuggestions: {
@@ -71,170 +199,186 @@ Polymer({
         queryFinished: {
           type: Boolean,
           value: false
-        }
+        },
+
+        elementReady: false,
+
+        wait: false
     },
 
+    //listeners: { 'filter-changed': '_updateLogFilter'},
+
     ready: function() {
-        var socket = document.querySelector('mist-socket'), that = this, requestPending = false;
+        var socket = document.querySelector('mist-socket'), that = this;
         if (!socket || !socket.get('initialized')) {
-            setTimeout(function() {
-              that.ready();
+            this.async(function() {
+              this.ready();
             }, 1000);
             console.debug('postpone log-list init until socket is ready');
             return
         }
-        this.grid = this.querySelector('vaadin-grid');
-        this.grid.items = function(params, callback) {
-            that.filteredItems = that.items.filter(that._filter.bind(that));
-            if (params.index + params.count < that.get('filteredItems.length')) {
-                callback(that.get('filteredItems').slice(params.index, params.index + params.count), that.filteredItems.length);
-            } else if (!requestPending && !that.queryFinished) {
-                var pending = false;
-                // Fetch the JSON data from a URL
-                var xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function() {
-                    requestPending = false;
-                    if (xhr.readyState == XMLHttpRequest.DONE) {
-                        if (xhr.status == 200) {
-                            var entries = JSON.parse(xhr.responseText);
-                            if (!entries.length) {
-                              that.set('queryFinished', true);
-                              console.log("queryFinished");
-                            }
-                            console.log(entries.length, params.count);
-                            for (i=0; i < entries.length; i++)
-                                that.push('items', entries[i]);
-                            that.filteredItems = that.items.filter(that._filter.bind(that));
-                            that.grid.setAttribute("size",that.items.length);
-                            callback(that.filteredItems.slice(params.index, params.index + params.count), that.filteredItems.length);
-                            if (that.items.length) {
-                                var stop = Math.floor(that.items[that.items.length-1].time);
-                                that.set('stop', stop);
-                            }
-                            that._updateColumns(items);
-                        }
-                    }
+        this.elementReady = true;
+        this.$.grid.size = 10;
+        this._updateLogFilter(this.filterMap);
+        this.listen(this.querySelector('vaadin-grid-table'), 'wheel', '_onWheel');
+    },
+
+    _onWheel: function(e){
+        if (this.hasReachedEnd)
+            return;
+        var t = this.querySelector('vaadin-grid-table');
+        if (t._scrollBottom / t._scrollHeight > 0.75) {
+            this._requestData();
+        }
+    },
+
+    _requestData: function() {
+        if (this.$.grid.loading) { // defer request if previous request pending
+            if (!this.hasReachedEnd)
+                this.async(function(){this._requestData}, 200);
+            return;
+        }
+        var url = '/api/v1/logs?';
+
+        for (f in this.filterMap)
+            url += f + '=' + this.filterMap[f] + '&'
+
+        var stop = this.items.length ? Math.floor(this.items[this.items.length-1].time) : 0;
+        if (stop)
+            url += 'stop=' + stop + '&'
+        url += "limit=" + this.limit;
+
+        var xhr = new XMLHttpRequest(), that = this;
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                //var scroller = that.$.grid.querySelector('vaadin-grid-table-outer-scroller'), position = scroller.scrollTop;
+                if (response.length){
+                    that.push.apply(that, ['items'].concat(response.map(function(i){
+                        i.keys = that._computeItemKeys(i);
+                        return i;
+                    })));
+                    if (that.items.length < that.limit && !that.hasReachedEnd)
+                        that.async(function(){that._requestData()}, 100);
+                } else {
+                    that.hasReachedEnd = true;
                 }
-                xhr.open("GET", '/api/v1/logs?stop=' + that.get('stop') + "&limit=" + that.get('limit'), true);
-                xhr.send();
-                requestPending = true;
-            };
+                that.$.grid.loading = false;
+            }
         };
+        this.$.grid.loading = true;
+        xhr.open("GET", url, true);
+        xhr.send();
+    },
 
-        this.grid.columns = [
-          {name: 'action', },
-          {name: 'type'},
-          {name: 'time', renderer:
-              function(cell) {
-                  //var item = that.items.find(function(p){ return p.time==cell.data});
-                  //var ind = that.items.indexOf(item);
-                  var dt = new Date(cell.data * 1000);
-                  cell.element.innerHTML = /*ind + ' : ' + cell.data + ' : ' + */ dt.getTimeFromNow();
-                  //console.info(dt, dt.getTimeFromNow());
-              }
-          }
-        ];
-        // Add a row details generator
-        this.grid.rowDetailsGenerator = function(rowIndex) {
-          var elem = document.createElement('div');
-          elem.setAttribute('class', 'logdetailswrapper');
-
-          that.grid.getItem(rowIndex, function(error, item) {
-              if (!error) {
-                  // Start with the special fields
-                  var rows = "<tr><td>Date</td><td>" + item.time + "</td></tr>";
-                  var keys = Object.keys(item);
-                  for (var i=0;i<keys.length;i++) {
-                        // Display non special fields only
-                        if (['time','$H'].indexOf(keys[i]) > -1)
-                            continue
-                      rows += "<tr><td>" + keys[i] + "</td><td>" + YAML.dump(item[keys[i]]) + "</td>";
-                  }
-                  elem.innerHTML = "<table style='width: 100%'>" + rows + "</table>";
-              }
-          });
-
-          return elem;
-        };
-
-        var detailsOpenIndex = -1;
-
-        // Show details for the selected row
-        this.grid.addEventListener('selected-items-changed', function() {
-          that.grid.setRowDetailsVisible(detailsOpenIndex, false);
-          var selected = that.grid.selection.selected();
-          if (selected.length == 1) {
-            that.grid.setRowDetailsVisible(selected[0], true);
-            detailsOpenIndex = selected[0];
-          }
+    _computeItemKeys: function(item){
+        return Object.keys(item).map(function(k) {
+          return {key: k, value: JSON.stringify(item[k])}
         });
+    },
 
-        var combobox = this.querySelector('vaadin-combo-box');
-        combobox.addEventListener('value-changed', this._updateRemoteFilter);
-        combobox.addEventListener('keydown', this._updateLocalFilter);
+    _computeFilterMap: function(filterText, resourceFilter) {
+        var ret = Object.create(resourceFilter), terms = filterText.split(' ');
 
-        setInterval(function() {that.grid.refreshItems()}, 10000);
+        for (var i = 0; i < terms.length; i++) {
+            if (terms[i].indexOf(':') > -1) {
+                var kv = terms[i].split(':');
+                ret[kv[0]] = kv[1];
+                terms.splice(i, 1);
+            } else if (terms[i] == "error") {
+                ret["error"] = true;
+                terms.splice(i, 1);
+            }
+        }
 
-      },
+        ret['_'] = terms.join(' ').trim();
+        console.debug('grid filterMap computed', ret);
+        return ret;
+    },
 
-      eventReceived: function(entry) {
-          this.unshift('items', entry);
-          this.grid.refreshItems();
-          this._updateColumns([entry]);
-      },
+    _computeRelativeTime: function(timestamp) {
+        return moment(timestamp * 1000).fromNow();
+    },
 
-      _updateColumns: function(items) {
-          var Set = swiftSet.Set;
-          var allKeys = new Set(), allTypes = new Set(), allActions = new Set();
-          for (var i=0;i<items.length;i++) {
-              allKeys.addItems(Object.keys(items[i]));
-              allTypes.add('type:' + items[i].type);
-              allActions.add('action:' + items[i].action);
-          }
+    _getItemValue: function(item, key) {
+        return item[key];
+    },
 
-          var existingColumns = new Set();
-          for (var i=0;i<this.grid.columns.length;i++) {
-              existingColumns.add(this.grid.columns[i].name);
-          }
+    eventReceived: function(entry) {
+        entry.keys = this._computeItemKeys(entry);
+        this.unshift('items', entry);
+    },
 
-          var keyItems = allKeys.items()
-          for (var i=0;i<keyItems.length;i++)
-              if (!existingColumns.has(keyItems[i]))
-                  this.grid.addColumn({name: keyItems[i], hidden: true, hidable: true})
+    _computeIconStyle: function(expanded) {
+        if (!expanded) return "transform: rotate(270deg)";
+    },
 
-          var logFilterSuggestions = new Set(this.get('logFilterSuggestions')).union(allActions);
+    _onCellClick: function(e) {
+        var item = e.detail.model.item;
+        console.warn('cellClick', e);
+        /*
+        if (this.$.grid.expandedItems.indexOf(item) == -1) {
+            console.warn('expand', item);
+            item.keys = Object.keys(item).forEach(function(k) {
+                return {key: k, value: item[k]}
+            });
+            this.$.grid.expandItem(item);
+        } else {
+            console.warn('collapse', item, e);
+            //this.$.grid.collapseItem(item);
+        }*/
+    },
 
-          this.set('logFilterSuggestions', logFilterSuggestions);
-      },
+    _onDetailsTap: function(e) {
+        console.log('tap', e);
+    },
 
-      _updateRemoteFilter: function(data) {
-          var value = this.querySelector('input').value;
+    _updateColumns: function(items) {
+        var Set = swiftSet.Set;
+        var allKeys = new Set(), allTypes = new Set(), allActions = new Set();
+        for (var i=0;i<items.length;i++) {
+            allKeys.addItems(Object.keys(items[i]));
+            allTypes.add('type:' + items[i].type);
+            allActions.add('action:' + items[i].action);
+        }
 
-          console.warn('_updateRemoteFilter', data);
-      },
+        var existingColumns = new Set();
+        for (var i=0;i<this.$.grid.columns.length;i++) {
+            existingColumns.add(this.$.grid.columns[i].name);
+        }
 
-      _updateLocalFilter: function(data) {
-          var value = this.querySelector('input').value;
-          if (this.grid)
-              this.grid.refreshItems();
-          console.warn('_updateLocalFilter', data, this);
-      },
+        var keyItems = allKeys.items()
+        for (var i=0;i<keyItems.length;i++)
+            if (!existingColumns.has(keyItems[i]))
+                this.$.grid.addColumn({name: keyItems[i], hidden: true, hidable: true})
 
-      _filter(item) {
-          var filterString = this.querySelector('input').value,
-              filterArray = filterString.split(' ');
-              for (var i=0;i<filterArray.length;i++){
-                  if (filterArray[i].indexOf(':')>-1){
-                      var filterMap = filterArray[i].split(':');
-                      if (item[filterMap[0]] && item[filterMap[0]].indexOf(filterMap[1]) == -1)
-                          return false
-                  } else {
-                      if (JSON.stringify(item).indexOf(filterArray[i]) == -1)
-                          return false
-                  }
-              }
-          return true
-      }
+        var logFilterSuggestions = new Set(this.get('logFilterSuggestions')).union(allActions);
+
+        this.set('logFilterSuggestions', logFilterSuggestions);
+    },
+
+    _updateLogFilter: function(data) {
+        if (!this.elementReady) {
+            console.debug('grid not yet ready');
+            return;
+        }
+        console.debug('grid _updateLogFilter', data, this.filterText);
+        this.set('items', []);
+        this.hasReachedEnd = false;
+        this.$.grid.$.scroller._resetScrollPosition(0);
+        this._requestData();
+    },
+
+    _filterItems: function(items, filterMap) {
+        var ret = this.items.filter(function(item){
+            var terms = filterMap['_'] ? filterMap['_'].split(' ') : [];
+            for (var i = 0; i < terms.length; i++)
+                if (terms[i].length && JSON.stringify(item).indexOf(terms[i]) == -1)
+                    return false;
+            return true;
+        });
+        return ret;
+    },
 });
 
 var TIME_MAP = {
@@ -247,40 +391,4 @@ var TIME_MAP = {
     YEAR: 12 * 30 * 24 * 60 * 60 * 1000,
 };
 
-Date.prototype.getTimeFromNow = function () {
-    var now = new Date();
-    var diff = now - this;
-    var ret = '';
-
-    if (diff < 10 * TIME_MAP.SECOND)
-        ret = 'Now';
-
-    else if (diff < TIME_MAP.MINUTE)
-        ret = parseInt(diff / TIME_MAP.SECOND) + ' sec';
-
-    else if (diff < TIME_MAP.HOUR)
-        ret = parseInt(diff / TIME_MAP.MINUTE) + ' min';
-
-    else if (diff < TIME_MAP.DAY)
-        ret = parseInt(diff / TIME_MAP.HOUR) + ' hour';
-
-    else if (diff < 2 * TIME_MAP.DAY)
-        ret = 'Yesterday';
-
-    else if (diff < TIME_MAP.YEAR)
-        ret = this.getMonthName(true) +  ' ' + this.getDate();
-
-    if (ret.indexOf('sec') > -1 ||
-        ret.indexOf('min') > -1 ||
-        ret.indexOf('hour') > -1) {
-
-        // Add 's' for plural
-        if (ret.split(' ')[0] != '1')
-            ret = ret + 's';
-
-        ret = ret + ' ago';
-    }
-
-    return ret;
-}
 </script>

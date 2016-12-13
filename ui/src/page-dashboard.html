@@ -245,6 +245,21 @@
             margin: 10% auto;
             display: block;
         }
+        .disable-monitoring {
+            font-size: 0.9em;
+        }
+        .viewMore[closed="true"]{
+            height: 0;
+        }
+        .viewMore[closed="false"]{
+            height: auto;
+        }
+        #viewMore {
+            opacity: 0.54;
+        }
+        .monitoring-on-missing-machines {
+            padding-bottom: 16px;
+        }
         </style>
         <div id="content" class$="flex-horizontal-wide onb-[[!showDashboard]]" main>
             <div class="notice">
@@ -308,6 +323,15 @@
                         <paper-material class="graphs" hidden="[[!model.monitoring.machines.length]]">
                             <template is="dom-if" if="[[viewingDashboard]]" restamp>
                                 <mist-monitoring monitoring="[[model.monitoring]]" replace-targets="[[replaceTargets]]"></mist-monitoring>
+                                <div hidden$="[[!hasMissingMonitored.length]]" class="monitoring-on-missing-machines">
+                                    <p> It seems you have monitoring enabled on missing machines. <paper-button on-tap="_disableMonitoringOnNonExisting" class="disable-monitoring">disable monitoring on [[model.monitoring.machines.length]] missing machines</paper-button>
+                                    </p>
+                                    <div id="viewMore" class="disable-monitoring">Missing machines<br/>
+                                        <template is="dom-repeat" items="[[hasMissingMonitored]]">
+                                            <div>[[index]]. Cloud: [[_computeName(item.0)]], Machine ID: [[item.1]]</div>
+                                        </template>
+                                    </div>
+                                </div>
                             </template>
                         </paper-material>
                     </div>
@@ -336,6 +360,8 @@
                 <paper-spinner active></paper-spinner>
             </div>
         </div>
+
+        <iron-ajax id="monitoringRequest" method="POST" on-response="_monitoringResponse" on-error="_monitoringError" on-request="_monitoringRequest" handle-as="xml"></iron-ajax>
     </template>
 </dom-module>
 <script>
@@ -382,6 +408,11 @@
             viewingDashboard: {
                 type: Boolean,
                 value: true
+            },
+            hasMissingMonitored: {
+                type: Array,
+                computed: "_computeHasMissingMonitored(model.clouds.*, model.monitoring.*)",
+                value: []
             }
         },
         observers: [
@@ -552,6 +583,38 @@
 
             }
             return show;
+        },
+        _computeHasMissingMonitored: function(clouds, monitoring){
+            var hasNonExisting;
+            if (this.model && this.model.clouds && this.model.monitoring && this.model.monitoring.machines) {
+                hasNonExisting = this.model.monitoring.machines.filter(function(m){
+                    console.log(this.model.clouds[m[0]])
+                    return !this.model.clouds[m[0]] || !this.model.clouds[m[0]].machines || !this.model.clouds[m[0]].machines[m[1]];
+                }, this);
+            }
+            console.log('hasNonExisting', hasNonExisting);
+            return hasNonExisting;
+        },
+        _disableMonitoringOnNonExisting: function(e){
+            this.model.monitoring.machines.forEach(function(m){
+                var cloud = m[0], 
+                    machine = m[1];
+                if (!this.model.clouds[cloud] || !this.model.clouds[cloud].machines || !this.model.clouds[cloud].machines[machine])
+                    this._disableMonitoring(m);
+            }, this);
+        },
+        _disableMonitoring: function(m){
+            var payload = {};
+            payload.action = "disable";
+            this.$.monitoringRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+            this.$.monitoringRequest.url = "/api/v1/clouds/"+m[0]+"/machines/"+m[1]+"/monitoring"
+            this.$.monitoringRequest.params = payload;
+            this.$.monitoringRequest.generateRequest();
+        },
+        _computeName: function(item) {
+            if (this.model && this.model.clouds && this.model.clouds[item])
+                return this.model.clouds[item].title;
+            return item;
         }
     });
 </script>

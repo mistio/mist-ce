@@ -173,15 +173,6 @@
             margin: 10% auto;
             display: block;
         }
-        #recommendationsDialog {
-            width: 400px;
-        }
-        #recommendationsDialog a.blue-link {
-            color: var(--blue-color) !important;
-        }
-        #recommendationsDialog iron-icon.orange {
-            color: #F57F17;
-        }
         </style>
 
         <div id="content">
@@ -205,10 +196,7 @@
             <div class="is-loading" hidden$="[[!isLoading]]">
                 <paper-spinner active></paper-spinner>
             </div>
-
-
         </div>
-
         <template is="dom-if" if="[[!isTeams]]">
             <div class="absolute-bottom-right">
                 <paper-fab id="notTeams" icon="add" on-tap="_fabAction" hidden$="[[!section.add]]"></paper-fab>
@@ -221,21 +209,6 @@
             </div>
             <team-add id="isTeamsPage" organization="[[model.org]]"></team-add>
         </template>
-
-        <paper-dialog id="recommendationsDialog" with-backdrop>
-            <h2>Recommendation</h2>
-            <p>
-                <iron-icon icon="icons:report-problem" class="orange"></iron-icon>
-                Your machine is vulnerable to Dirty COW. <br/><a href="https://dirtycow.ninja/" target="new" class="regular blue-link">Learn more.</a>
-            </p>
-            <p class="recommendation-text"></p>
-            <p>We recommend you follow the <a href="https://dirtycow.ninja/" target="new" class="regular blue-link">guide</a> and update your server kernel. You can use mist.io shell to do it now.</p>
-            <div class="buttons">
-                <paper-button dialog-dismiss>Cancel</paper-button>
-                <paper-button class="blue" dialog-confirm on-tap="_shell">open machine shell</paper-button>
-            </div>
-        </dialog-dialog>
-
     </template>
 </dom-module>
 <script>
@@ -295,9 +268,6 @@
         observers: [
             'sortingObserver(items.*, sortBy, sortOrder, section.q.*)',
         ],
-        listeners: {
-            'open-recommendation-dialog': 'openRecommendationsDialog'
-        },
         ready: function() {
 
         },
@@ -458,21 +428,24 @@
                             return -1
                     }
                 }
-                // compare images id
+                // compare images
                 else if (property == 'image'){
                     //if both properties exist
-                    if (a.extra.image_id && b.extra.image_id){
-                        if (a.extra.image_id < b.extra.image_id) {
+                    var ima = this._computeMachineImage(a),
+                        imb = this._computeMachineImage(b);
+
+                    if (ima && imb){
+                        if (ima < imb) {
                             return -1 * order;
                         }
-                        if (a.extra.image_id > b.extra.image_id) {
+                        if (ima > imb) {
                             return 1 * order;
                         }
                         return 0;
                     }
                     //if some property misses, move it down
                     else {
-                        if (!a.extra.image_id)
+                        if (!ima)
                             return 1;
                         else
                             return -1
@@ -480,16 +453,23 @@
                 }
                 // compare sizes by name
                 else if (property == 'size'){
-                    var ta = a[property] || a.extra.instance_type || extra.instance_size || item.extra.maxCpu+item.extra.maxMemory || a.extra.PLANID || item.extra.maxCpu+item.extra.maxMemory,
-                        tb = b[property] || b.extra.instance_type || extra.instance_size || item.extra.maxCpu+item.extra.maxMemory || b.extra.PLANID || item.extra.maxCpu+item.extra.maxMemory;
+                    var ta = this._computeMachineSize(a),
+                        tb = this._computeMachineSize(b);
                     // console.log('comparison', ta, tb);
-                    if (ta < tb) {
-                        return -1 * order;
+                    if (ta && tb) {
+                        if (ta < tb) {
+                            return -1 * order;
+                        }
+                        if (ta > tb) {
+                            return 1 * order;
+                        }
+                        return 0;
                     }
-                    if (ta > tb) {
-                        return 1 * order;
+                    else {
+                        if (!ta)
+                            return 1;
+                        return -1;
                     }
-                    return 0;
                 }
                 // compare clouds by title
                 else if (property == 'cloud'){
@@ -688,6 +668,44 @@
                 'multi': true
             };
             this.querySelector('item-actions')._performAction(action, [this.itemOfRecommendation]);
+        },
+        _computeMachineSize: function(item) {
+            // field could be in the 'extra' section, but should not be an object
+            var ret = item['size'];
+            
+            if (ret && typeof(ret) != 'object')
+                return ret;
+            if (!ret && item.extra && item.extra['size'] && typeof(item.extra['size']) != 'object')
+                ret = item.extra['size'];
+            if (item.extra && item.extra.size && item.extra.size.vcpus)
+                return item.extra.size.vcpus + 'vcpu, ' + item.extra.size.memory + 'M ram';;
+            if (item.extra && item.extra.size && typeof(item.extra.size) == 'string')
+                return item.extra.size;
+            if (item.extra && item.extra.instance_type)
+                return item.extra.instance_type;
+            if (item.extra && item.extra.instance_size)
+                return item.extra.instance_size;
+            if (item.extra && item.extra.maxCpu && item.extra.maxMemory)
+                return item.extra.maxCpu + 'cpu, ' + item.extra.maxMemory + 'M ram';
+            if (item.extra && item.extra.PLANID) {
+                var cloud = document.querySelector('mist-app').model.clouds[item.cloud.id];
+                return (cloud && cloud.sizes) ? cloud.sizes[item.extra.PLANID].ram + " ram " + cloud.sizes[item.extra.PLANID].name : item.extra.PLANID
+            }
+            if (item.extra && item.extra.service_type)
+                return item.extra.service_type;
+        },
+        _computeMachineImage: function(item){
+            var field = 'image';
+            var ret = item['image'];
+            if (ret && typeof(ret) != 'object'){
+                return ret;
+            }
+            if (item.extra && item.extra.image && item.extra.image.distribution && item.extra.image.name) {
+                return item.extra.image.distribution + " " +item.extra.image.name;
+            }
+            if (!ret && item.extra && (item.extra[field+'_id'] || item.imageId || item.extra.image)){
+                return item.extra[field+'_id'] || item.imageId || item.extra.image.slug || item.extra.image.name || 'not found';
+            }
         }
     });
 })();

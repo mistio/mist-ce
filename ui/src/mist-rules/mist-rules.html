@@ -189,6 +189,11 @@
                     notify: true,
                     value: {}
                 },
+                customMetrics:{
+                    type: Object,
+                    notify: true,
+                    value: {}
+                },
                 availableMetrics: {
                     type: Array,
                     computed: "_computeMetrics(builtinMetrics)"
@@ -277,6 +282,15 @@
                 var metrics = [];
                 for (var p in this.builtinMetrics){
                     metrics.push(this.builtinMetrics[p])
+                }
+                if (this.customMetrics) {
+                    for (var q in this.customMetrics){
+                        var machineHasCustomMetric = this.customMetrics[q].machines.find(function(m){
+                            return m[0] == this.machine.cloud.id && m[1] == this.machine.id;
+                        })
+                        if (machineHasCustomMetric) 
+                            metrics.push(this.customMetrics[q])
+                    }
                 }
                 return metrics;
             },

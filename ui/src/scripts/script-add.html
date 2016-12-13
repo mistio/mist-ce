@@ -239,6 +239,22 @@
                     // this.set('fields.6.placeholder',placeholder);
                     this.set('fields.6.value', placeholder);
                 }
+
+                if (e.target.id == "location_type"){
+                    var l_type = this.fields.find(function(f){return f.name == "location_type"});
+                    // reset unneeded values to empty
+                    if (l_type.value != "url"){
+                        this.set('fields.4.value', "");
+                        this.set('fields.7.value', "");
+                    }
+                    if (l_type.value != "github"){
+                        this.set('fields.5.value', "");
+                        this.set('fields.7.value', "");
+                    }
+                    if (l_type.value != "inline"){
+                        this.set('fields.6.value', "");
+                    }
+                }
             },
             _addScriptAjaxRequest: function() {
             },
