@@ -129,5 +129,5 @@ class BareMetalDriver(object):
         if not hostname:
             return 256
         ping = super_ping(owner=user, host=hostname, pkts=1)
-        response = 0 if int(ping['packets_rx']) > 0 else 256
+        response = 0 if int(ping.get('packets_rx', 0)) > 0 else 256
         return response
