@@ -26,5 +26,9 @@ sphinx-bootstrap-theme==0.4.7
 sphinx-rtd-theme==0.1.8
 sphinxcontrib-httpdomain==1.4.0
 websocket-client==0.29.0
+<<<<<<< HEAD
 iso8601
 tornado-profile
+=======
+splinter==0.7.3
+>>>>>>> ee67564c3190129b61e407ce716a10429dd9fd61
