@@ -50,7 +50,7 @@ class BaseComputeController(BaseController):
     technology specific cloud controllers.
 
     Subclasses are meant to extend or override methods of this base class to
-    account for differencies between different cloud types.
+    account for differences between different cloud types.
 
     Care should be taken when considering to add new methods to a subclass.
     All controllers should have the same interface, to the degree this is

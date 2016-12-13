@@ -1441,7 +1441,7 @@ def list_locations(request):
 @view_config(route_name='api_v1_networks', request_method='GET', renderer='json')
 def list_networks(request):
     """
-    List networks of a cloud
+    List networks of a cloud.
     Currently supports the EC2, GCE and OpenStack clouds.
     For other providers this returns an empty list.
     READ permission required on cloud.
@@ -1503,7 +1503,7 @@ def create_network(request):
     """
     Create network on a cloud
     Creates a new network. If subnet dict is specified, after creating the net-
-    work it will use the new network's id to create a subnet
+    work it will use the new network's id to create a subnet.
     CREATE_RESOURCES permission required on cloud.
     ---
     cloud_id:
@@ -1596,15 +1596,14 @@ def create_subnet(request):
 @view_config(route_name='api_v1_network', request_method='DELETE')
 def delete_network(request):
     """
-    Delete a network
-    Delete a network
+    Delete a network.
     CREATE_RESOURCES permission required on cloud.
     ---
     cloud_id:
       in: path
       required: true
       type: string
-    network:
+    network_id:
       in: path
       required: true
       type: string
@@ -1631,10 +1630,14 @@ def delete_network(request):
 @view_config(route_name='api_v1_subnet', request_method='DELETE')
 def delete_subnet(request):
     """
-    Delete a subnet
+    Delete a subnet.
     CREATE_RESOURCES permission required on cloud.
     ---
     cloud_id:
+      in: path
+      required: true
+      type: string
+    network_id:
       in: path
       required: true
       type: string
