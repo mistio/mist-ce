@@ -1,7 +1,9 @@
 import uuid
+import datetime
 import urllib
 import logging
 import requests
+import StringIO
 import mongoengine as me
 from mist.core import config
 from mist.io.exceptions import BadRequestError
@@ -40,8 +42,8 @@ class BaseScriptController(object):
 
         # set location
         location_type = kwargs.pop('location_type')
-        if location_type not in ['inline', 'url', 'github', None]:
-            raise BadRequestError('location type must be one of these '
+        if location_type not in ['inline', 'url', 'github']:
+            raise BadRequestError('location type must be one of these: '
                                   '(inline, github, url)]')
 
         entrypoint = kwargs.pop('entrypoint', '')
@@ -97,69 +99,104 @@ class BaseScriptController(object):
         log.info("Added script with name '%s'", self.script.name)
         trigger_session_update(self.script.owner, ['scripts'])
 
-    def edit(self, name, description=None):
+    def edit(self, name=None, description=None):
         """Edit name or description of an existing script"""
         log.info("Edit script '%s''.", self.script.name)
 
-        if not name:
-            raise RequiredParameterMissingError("new_name")
-        if self.script.name == name:
+        if name and name == self.script.name:
             log.warning("Same name provided. No reason to edit this script")
-            return  # fixme
-
-        self.script.name = name
-        self.script.description = description
+            return
+        if name:
+            self.script.name = name
+        if description:
+            self.script.description = description
         self.script.save()
-        log.info("Edit script '%s' to '%s'.", self.script.id, name)
+        log.info("Edit script: '%s'.", self.script.id)
         trigger_session_update(self.script.owner, ['scripts'])
 
-    def get_file(self):
-        """Returns a file or archive"""
-        from mist.io.scripts.models import InlineLocation, GithubLocation
-        self._preparse_file()
+    # TODO add delete method in controller and not in model
+    # def delete(self, expire=False):
+    #     """ Delete a script
+    #
+    #     By default the corresponding mongodb document is not actually
+    #     deleted, but rather marked as deleted.
+    #
+    #     :param expire: if True, the document is expires from the collection.
+    #     """
+    #
+    #     self.script.update(set__deleted=datetime.datetime.utcnow())
+    #     if expire:
+    #         self.script.delete()
+    #     trigger_session_update(self.script.owner, ['scripts'])
 
-        if isinstance(self.script.location, InlineLocation):
+    def _url(self):
+        url = ''
+        if self.script.location.type == 'github':
+            clean_url = self.script.location.repo.replace(
+                'https://github.com/', '')
+            path = 'https://api.github.com/repos/%s/tarball' % clean_url
+
+            token = config.GITHUB_BOT_TOKEN
+            if token:
+                headers = {'Authorization': 'token %s' % token}
+            else:
+                headers = {}
+            resp = requests.get(path, headers=headers,
+                                allow_redirects=False)
+            if resp.ok and resp.is_redirect and 'location' in resp.headers:
+                url = resp.headers['location']
+            else:
+                log.error('%d: Could not retrieve your file: %s',
+                          resp.status_code, resp.content)
+                raise BadRequestError('%d: Could not retrieve your file: %s'
+                                      % (resp.status_code, resp.content))
+        else:
+            url = self.script.location.url
+        return url
+
+    def get_file(self):
+        """Returns a file or archive."""
+
+        if self.script.location.type == 'inline':
             return self.script.location.source_code
         else:
-            # FIXME this is a duplicate part, also exists in tasks,run_script
-            # maybe to create a small function for both
-            url = ''
-            if isinstance(self.script.location, GithubLocation):
-                clean_url = self.script.location.repo.replace(
-                    'https://github.com/', '')
-                path = 'https://api.github.com/repos/%s/tarball' % clean_url
-
-                token = config.GITHUB_BOT_TOKEN
-                if token:
-                    headers = {'Authorization': 'token %s' % token}
-                else:
-                    headers = {}
-                resp = requests.get(path, headers=headers,
-                                    allow_redirects=False)
-                if resp.ok and resp.is_redirect and 'location' in resp.headers:
-                    url = resp.headers['location']
-                else:
-                    log.error('%d: Could not retrieve your file: %s',
-                              resp.status_code, resp.content)
-            else:
-                url = self.script.location.url
+            url = self._url()
             # Download a file over HTTP
             log.debug("Downloading %s.", url)
-            name, headers = urllib.urlretrieve(url)  # TODO
+            name, headers = urllib.urlretrieve(url)  # TODO check if succeeds
+            # raise error
+
             log.debug("Downloaded to %s.", name)     # maybe return file_type
             return name
+
+    def run_script(self, shell, params=None, job_id=None):
+        if self.script.location.type == 'inline':
+            path = "/tmp/mist_script_%s" % job_id
+            source = self.script.location.source_code
+            # if isinstance(self.script, CollectdScript):
+            #     # wrap collectd python plugin so that it can run as script
+            #     if not source.startswith('#!'):
+            #         source = '#!/usr/bin/env python\n\n' + source
+            #     source += '\n\nprint read()\n'
+            #     if not source.startswith('#!'):
+            #         source = '#!/usr/bin/env python\n\n' + source
+            #     source += '\n\nprint read()\n'
+            sftp = shell.ssh.open_sftp()
+            sftp.putfo(StringIO.StringIO(source), path)
+        else:
+            path = self._url()
+
+        wparams = "-v"
+        # if self.script.exec_type == 'ansible':
+        #     wparams += " -a"
+        #     params = '"%s"' % params.replace('"', r'\"')
+        if params:
+            wparams += " -p '%s'" % params
+        if not self.script.location.type == 'inline':
+            wparams += " -f %s" % self.script.location.entrypoint
+        wparams += " %s" % path
+        return path, params, wparams
 
     def _preparse_file(self):
         return
 
-    def run_script(self, machine,  env=None,
-                   params=None, su=False, job_id=None):
-        import mist.core.tasks
-        """Calls the actual run_script"""
-        job_id = job_id or uuid.uuid4().hex
-
-        mist.core.tasks.run_script.delay(self.script.owner.id, self.script.id,
-                                         machine.cloud.id, machine.machine_id,
-                                         params=params, su=su, env=env,
-                                         job_id=job_id)
-        return job_id
