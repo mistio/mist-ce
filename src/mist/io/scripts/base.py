@@ -154,7 +154,8 @@ class BaseScriptController(object):
             url = self.script.location.url
         return url
 
-    def get_file(self):
+    def get_file(self, request):
+        from pyramid.response import Response, FileResponse
         """Returns a file or archive."""
 
         if self.script.location.type == 'inline':
@@ -163,11 +164,42 @@ class BaseScriptController(object):
             url = self._url()
             # Download a file over HTTP
             log.debug("Downloading %s.", url)
-            name, headers = urllib.urlretrieve(url)  # TODO check if succeeds
-            # raise error
-
-            log.debug("Downloaded to %s.", name)     # maybe return file_type
-            return name
+            # name, headers = urllib.urlretrieve(url)  # TODO check if succeeds
+            # # raise error
+            # log.debug("Downloaded to %s.", name)     # maybe return file_type
+            # return name
+            try:
+                r = requests.get(url)
+                r.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                raise BadRequestError(err.msg)
+            if r.ok:
+                if 'gzip' in r.headers.get('content_type'):
+                    import tarfile
+                    t = tarfile.TarFile(StringIO.StringIO(r.content))
+                    # z.extractall()
+                    response = FileResponse(t, request=request,
+                                            content_type='application/gzip',
+                                            content_encoding='gzip',
+                                            pragma='no-cache',
+                                            )
+                    response.headers['Content-Disposition'] = (
+                        'attachment; filename="script.tar.gz"')
+                elif 'zip' in r.headers.get('content_type'):
+                    import zipfile
+                    z = zipfile.ZipFile(StringIO.StringIO(r.content))
+                    # z.extractall()
+                    response = FileResponse(z, request=request,
+                                            content_type='application/zip',
+                                            content_encoding='zip',
+                                            pragma='no-cache',
+                                            )
+                    response.headers['Content-Disposition'] = (
+                        'attachment; filename="script.zip"')
+                else:
+                    return Response(r.content)
+            else:
+                return Response("Unable to find: {}".format(request.path_info))
 
     def run_script(self, shell, params=None, job_id=None):
         if self.script.location.type == 'inline':
