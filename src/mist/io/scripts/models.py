@@ -188,6 +188,15 @@ class Script(me.Document):
         script.ctl.add(**kwargs)
         return script
 
+    @property
+    def script(self):
+        if isinstance(self.location, InlineLocation):
+            return self.location.source_code
+        elif isinstance(self.location, GithubLocation):
+            return self.location.repo
+        elif isinstance(self.location, UrlLocation):
+            return self.location.url
+
     # def get_jobs(self):
     #     """Get jobs related to script."""
     #     conn = MongoClient(config.MONGO_URI)
@@ -212,7 +221,7 @@ class Script(me.Document):
             'id': str(self.id),
             'name': self.name,
             'description': self.description,
-            'location_type': str(self.location),
+            'location_type': self.location.type,
             'entrypoint': entrypoint,
             'script': self.script,
             'exec_type': self.exec_type,
