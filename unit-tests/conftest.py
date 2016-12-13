@@ -7,9 +7,9 @@ import pytest
 import mist.io.clouds.models as models
 from mist.io.keys.models import SSHKey
 from mist.core.user.models import Organization, User
-from mist.io.tasks import app, create_machine_async
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 @pytest.fixture
 def load_clouds_from_config():
@@ -155,7 +155,7 @@ def script(request, org):
     sdict = request.param
     name = sdict['name']
     exec_type = sdict.get('fields').pop('exec_type')
-    if exec_type =='executable':
+    if exec_type == 'executable':
         cls = ExecutableScript
     else:
         cls = AnsibleScript
