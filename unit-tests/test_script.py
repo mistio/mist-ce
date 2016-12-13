@@ -17,5 +17,3 @@ def test_get_file(script):
     result = script.ctl.get_file()
     assert result, "Something bad happened"
     print "The file is: %s" % result
-
-
