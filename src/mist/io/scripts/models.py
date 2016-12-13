@@ -3,7 +3,7 @@ from uuid import uuid4
 import mongoengine as me
 import mist.core.tag.models
 from urlparse import urlparse
-from mist.core.user.models import Owner
+from mist.core.user.models import Organization
 from mist.io.exceptions import BadRequestError
 from mist.io.scripts.base import BaseScriptController
 from mist.io.exceptions import RequiredParameterMissingError
@@ -18,18 +18,23 @@ class Location(me.EmbeddedDocument):
     """
     meta = {'allow_inheritance': True}
 
+    def as_dict(self):
+        NotImplementedError()
+
 
 class InlineLocation(Location):
+    type = 'inline'
     source_code = me.StringField(required=True)
+
+    def as_dict(self):
+        return {'source_code': self.source_code}
 
     def __unicode__(self):
         return 'Script is {0.source_code}'.format(self)
 
-    def __str__(self):
-        return 'inline'
-
 
 class GithubLocation(Location):
+    type = 'github'
     repo = me.StringField(required=True)
     entrypoint = me.StringField()
 
@@ -42,6 +47,10 @@ class GithubLocation(Location):
                 "simply 'owner/repo'."
             )
 
+    def as_dict(self):
+        return {'repo': self.repo,
+                'entrypoint': self.entrypoint or ''}
+
     def __unicode__(self):
         if self.entrypoint:
             return 'Script is in repo {0.repo} ' \
@@ -49,11 +58,9 @@ class GithubLocation(Location):
         else:
             return 'Script is in repo {0.repo}'.format(self)
 
-    def __str__(self):
-        return 'github'
-
 
 class UrlLocation(Location):
+    type = 'url'
     url = me.StringField(required=True)  # TODO maybe URLField
     entrypoint = me.StringField()
 
@@ -64,15 +71,16 @@ class UrlLocation(Location):
                                   "must be a valid url starting with "
                                   "'http://' or 'https://'.")
 
+    def as_dict(self):
+        return {'url': self.url,
+                'entrypoint': self.entrypoint or ''}
+
     def __unicode__(self):
         if self.entrypoint:
             return 'Script is in url {0.repo} and ' \
                    'entrypoint {0.entrypoint}'.format(self)
         else:
             return 'Script is in repo {0.repo}'.format(self)
-
-    def __str__(self):
-        return 'url'
 
 
 class Script(me.Document):
@@ -119,7 +127,7 @@ class Script(me.Document):
         'collection': 'scripts',
         'indexes': [
             {
-                'fields': ['owner', 'name'],
+                'fields': ['owner', 'name'],  # 'deleted' # TODO after mappings
                 'sparse': False,
                 'unique': True,
                 'cls': False,
@@ -132,12 +140,12 @@ class Script(me.Document):
 
     name = me.StringField(required=True)
     description = me.StringField()
-    owner = me.ReferenceField(Owner, required=True)
+    owner = me.ReferenceField(Organization, required=True)
     location = me.EmbeddedDocumentField(Location, required=True)
 
     deleted = me.BooleanField(default=False)
+    # deleted = me.DateTimeField() # TODO after mappings
 
-    # _class_fields = ('id', 'name', 'owner', '_cls')
     _controller_cls = None
 
     def __init__(self, *args, **kwargs):
@@ -172,22 +180,13 @@ class Script(me.Document):
         """
         if not name:
             raise RequiredParameterMissingError('name')
-        if not owner or not isinstance(owner, Owner):
+        if not owner or not isinstance(owner, Organization):
             raise BadRequestError('owner')
         script = cls(owner=owner, name=name)
         if id:
             script.id = id
         script.ctl.add(**kwargs)
         return script
-
-    @property
-    def script(self):
-        if isinstance(self.location, InlineLocation):
-            return self.location.source_code
-        elif isinstance(self.location, GithubLocation):
-            return self.location.repo
-        elif isinstance(self.location, UrlLocation):
-            return self.location.url
 
     # def get_jobs(self):
     #     """Get jobs related to script."""
@@ -200,32 +199,40 @@ class Script(me.Document):
         super(Script, self).delete()
         mist.core.tag.models.Tag.objects(resource=self).delete()
 
-    def as_dict(self):  # ToDO to_json
-        """Data representation for api calls."""
+    def as_dict_old(self):  # ToDO to_json
+        """Data representation for api calls.
+           Use this for backwards compatibility"""
+
         if isinstance(self.location, InlineLocation):
             entrypoint = ''
         else:
             entrypoint = self.location.entrypoint or ''
 
-        # TODO this exists only for the ui, it sucks
-        exec_type = ''
-        if isinstance(self, AnsibleScript):
-            exec_type = 'ansible'
-        elif isinstance(self, ExecutableScript):
-            exec_type = 'executable'
-
         sdict = {
-            "id": str(self.id),
-            "name": self.name,
-            "description": self.description,
-            "location_type": str(self.location),
-            "entrypoint": entrypoint,
-            "script": self.script,
-            "exec_type": exec_type
+            'id': str(self.id),
+            'name': self.name,
+            'description': self.description,
+            'location_type': str(self.location),
+            'entrypoint': entrypoint,
+            'script': self.script,
+            'exec_type': self.exec_type,
         }
 
         sdict.update({key: getattr(self, key)
                       for key in self._script_specific_fields})
+
+        return sdict
+
+    def as_dict(self):
+        """Data representation for api calls."""
+
+        sdict = {
+            'id': str(self.id),
+            'name': self.name,
+            'description': self.description,
+            'exec_type': self.exec_type,
+            'location': self.location.as_dict(),
+        }
 
         return sdict
 
@@ -235,16 +242,21 @@ class Script(me.Document):
 
 class AnsibleScript(Script):
 
+    exec_type = 'ansible'
+
     _controller_cls = controllers.AnsibleScriptController
 
 
 class ExecutableScript(Script):
+
+    exec_type = 'executable'
 
     _controller_cls = controllers.ExecutableScriptController
 
 
 class CollectdScript(Script):
 
+    exec_type = 'executable'
     # ex. a dict with value_type='gauge', value_unit=''
     extra = me.DictField()
 
