@@ -1,0 +1,9 @@
+[submodule "mist_components/timerange-picker"]
+	path = mist_components/timerange-picker
+	url = ../timerange-picker.git
+[submodule "mist_components/polyana-dashboard"]
+        path = mist_components/polyana-dashboard
+        url = ../polyana-dashboard.git
+[submodule "mist_components/vaadin-grid"]
+        path = mist_components/vaadin-grid
+        url = https://github.com/mistio/vaadin-grid.git
