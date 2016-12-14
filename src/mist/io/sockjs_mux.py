@@ -22,14 +22,24 @@ class ChannelSession(session.BaseSession):
     def on_message(self, msg):
         msg_parts = msg.split(',', 1)
         handler = 'on_%s' % msg_parts[0]
-        args = msg_parts[1] if len(msg_parts) > 1 else ()
+        margs = msg_parts[1] if len(msg_parts) > 1 else ()
         try:
-            args = json.loads(args)
+            margs = json.loads(margs)
         except:
-            log.warning("Couldn't json parse args: %r", args)
+            log.warning("Couldn't json parse args: %r", margs)
         if hasattr(self.conn, handler):
-            log.info("Calling %s with args %s", handler, args)
-            getattr(self.conn, handler)(*args)
+            log.info("Calling %s with args %s", handler, margs)
+            if type(margs) is unicode:
+                margs = [margs]
+            try:
+                iter(margs)
+            except TypeError:
+                margs = [margs]
+
+            try:
+                getattr(self.conn, handler)(*margs)
+            except Exception as e:
+                log.error(e)
         else:
             log.warning("Couldn't find handler '%s', will call on_message(%s)",
                         handler, msg)
