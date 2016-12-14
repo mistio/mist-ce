@@ -29,7 +29,7 @@ class ChannelSession(session.BaseSession):
             log.warning("Couldn't json parse args: %r", margs)
         if hasattr(self.conn, handler):
             log.info("Calling %s with args %s", handler, margs)
-            if type(margs) is unicode:
+            if type(margs) in (unicode, str):
                 margs = [margs]
             try:
                 iter(margs)
