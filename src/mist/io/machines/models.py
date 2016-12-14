@@ -87,7 +87,7 @@ class Monitoring(me.EmbeddedDocument):
 
     def as_dict(self):
         status = self.installation_status
-        
+
         return {
             'hasmonitoring': self.hasmonitoring,
             'monitor_server': core_config.COLLECTD_HOST,
