@@ -42,13 +42,13 @@ class AmazonNetworkController(BaseNetworkController):
 
     def _get_libcloud_network(self, network):
         list_networks_params = {'network_ids': [network.network_id]}
-        networks = self.compute_connection.ex_list_networks(
+        networks = self.ctl.compute.connection.ex_list_networks(
             **list_networks_params)
         return networks[0] if networks else None
 
     def _get_libcloud_subnet(self, subnet):
         list_subnets_params = {'subnet_ids': [subnet.subnet_id]}
-        subnets = self.compute_connection.ex_list_subnets(
+        subnets = self.ctl.compute.connection.ex_list_subnets(
             **list_subnets_params)
         return subnets[0] if subnets else None
 
@@ -66,7 +66,7 @@ class GoogleNetworkController(BaseNetworkController):
         kwargs['network'] = network.title
 
     def _create_subnet__create_libcloud_subnet(self, subnet, kwargs):
-        libcloud_subnet = self.compute_connection.ex_create_subnetwork(
+        libcloud_subnet = self.ctl.compute.connection.ex_create_subnetwork(
             **kwargs)
         # The region attribute is needed for libcloud API calls on the
         # subnet object, including the ex_destroy_subnetwork call,
@@ -88,7 +88,7 @@ class GoogleNetworkController(BaseNetworkController):
         subnet.region = libcloud_subnet.region.name
 
     def _list_subnets__fetch_subnets(self, network, kwargs):
-        libcloud_subnets = self.compute_connection.ex_list_subnetworks(
+        libcloud_subnets = self.ctl.compute.connection.ex_list_subnetworks(
             **kwargs)
         return [libcloud_subnet for libcloud_subnet in libcloud_subnets
                 if libcloud_subnet.network.id == network.network_id]
@@ -103,7 +103,7 @@ class GoogleNetworkController(BaseNetworkController):
             for subnet in associated_subnets:
                 subnet.ctl.delete_subnet()
 
-        self.compute_connection.ex_destroy_network(**kwargs)
+        self.ctl.compute.connection.ex_destroy_network(**kwargs)
 
     def _delete_network__parse_args(self, network, kwargs):
         kwargs['network'] = self._get_libcloud_network(network)
@@ -113,14 +113,15 @@ class GoogleNetworkController(BaseNetworkController):
         kwargs['region'] = subnet.region
 
     def _delete_subnet__delete_libcloud_subnet(self, network, kwargs):
-        self.compute_connection.ex_destroy_subnetwork(**kwargs)
+        self.ctl.compute.connection.ex_destroy_subnetwork(**kwargs)
 
     def _get_libcloud_network(self, network):
-        return self.compute_connection.ex_get_network(network.title)
+        return self.ctl.compute.connection.ex_get_network(network.title)
 
     def _get_libcloud_subnet(self, subnet):
-        return self.compute_connection.ex_get_subnetwork(name=subnet.title,
-                                                         region=subnet.region)
+        get_subnet_args = {'name': subnet.title,
+                           'region': subnet.region}
+        return self.ctl.compute.connection.ex_get_subnetwork(**get_subnet_args)
 
 
 class OpenStackNetworkController(BaseNetworkController):
@@ -135,7 +136,8 @@ class OpenStackNetworkController(BaseNetworkController):
         kwargs['network_id'] = network.network_id
 
     def _list_subnets__fetch_subnets(self, network, kwargs):
-        libcloud_subnets = self.compute_connection.ex_list_subnets(**kwargs)
+        libcloud_subnets = self.ctl.compute.connection.ex_list_subnets(
+            **kwargs)
         return [libcloud_subnet for libcloud_subnet in libcloud_subnets
                 if libcloud_subnet.network_id == network.network_id]
 
@@ -154,14 +156,14 @@ class OpenStackNetworkController(BaseNetworkController):
         kwargs['subnet_id'] = subnet.subnet_id
 
     def _get_libcloud_network(self, network):
-        networks = self.compute_connection.ex_list_networks()
+        networks = self.ctl.compute.connection.ex_list_networks()
         for net in networks:
             if net.network_id == network.network_id:
                 return net
         return None
 
     def _get_libcloud_subnet(self, subnet):
-        subnets = self.compute_connection.ex_list_subnets()
+        subnets = self.ctl.compute.connection.ex_list_subnets()
         for sub in subnets:
             if sub.subnet_id == subnet.subnet_id:
                 return sub
