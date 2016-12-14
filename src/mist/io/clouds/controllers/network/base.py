@@ -1,10 +1,11 @@
 """Definition of network subcontroller classes.
 
-This currently contains only BaseNetworkController. It contains all functionality
-concerning the management of networks and related objects that is common between
-all cloud providers.
+This currently contains only BaseNetworkController. It contains all
+functionality concerning the management of networks and related objects that
+is common between all cloud providers.
 
-Cloud specific subcontrollers are in `mist.io.clouds.controllers.network.controllers`.
+Cloud specific subcontrollers are in
+`mist.io.clouds.controllers.network.controllers`.
 
 """
 
@@ -59,22 +60,27 @@ class BaseNetworkController(BaseController):
     process of `self.create_network` to parse the arguments given to
     self.create_network into the format requited by libcloud.
 
-    For each different cloud type, a subclass needs to be defined.
-    To provide cloud specific processing, hook the code on the appropriate private
-     method. Each method defined here documents its intended purpose and use.
+    For each different cloud type, a subclass needs to be defined. To
+    provide cloud specific processing, hook the code on the appropriate
+    private method. Each method defined here documents its intended purpose
+    and use.
     """
+
+    def __init__(self, main_ctl):
+
+        super(BaseNetworkController, self).__init__(main_ctl)
+        self.compute_connection = self.ctl.compute.connection
 
     @LibcloudExceptionHandler(mist.io.exceptions.NetworkCreationError)
     def create_network(self, network, **kwargs):
-        """Create a new network. This method receives a Network DB object from Network.add()
-         and performs the following steps, using its associated private methods:
-        It populates all its cloud-specific fields.
-        It performs early validation on the Network object using all the constraints
-            specified in the corresponding Network subclass.
-        It creates the parameter structure required by the libcloud call that handles
-        network creation.
-        It performs the libcloud call.
-        It validates the network object and saves it to the database.
+        """Create a new network. This method receives a Network DB object
+        from Network.add() and performs the following steps, using its
+        associated private methods: It populates all its cloud-specific
+        fields. It performs early validation on the Network object using all
+        the constraints specified in the corresponding Network subclass. It
+        creates the parameter structure required by the libcloud call that
+        handles network creation. It performs the libcloud call. It
+        validates the network object and saves it to the database.
 
         Subclasses SHOULD NOT override or extend this method.
 
@@ -105,27 +111,28 @@ class BaseNetworkController(BaseController):
             raise mist.io.exceptions.BadRequestError(err)
 
         kwargs['name'] = network.title
-        if hasattr(network, 'cidr'):
-            kwargs['cidr'] = network.cidr
 
         self._create_network__parse_args(kwargs)
 
-        libcloud_network = self.ctl.compute.connection.ex_create_network(**kwargs)
+        libcloud_net = self.compute_connection.ex_create_network(**kwargs)
         try:
-            network.network_id = libcloud_network.id
+            network.network_id = libcloud_net.id
             network.save()
         except mongoengine.errors.ValidationError as exc:
-            log.error("Error saving Network %s: %s", network.title, exc.to_dict())
+            log.error("Error saving Network %s: %s", network.title,
+                      exc.to_dict())
             raise mist.io.exceptions.NetworkCreationError(exc.message)
         except mongoengine.errors.NotUniqueError as exc:
-            log.error("Network %s not unique error: %s", network.title, exc)
+            log.error("Network %s not unique error: %s", network.title,
+                      exc)
             raise mist.io.exceptions.NetworkExistsError()
 
         return network
 
     def _create_network__parse_args(self, network_args):
-        """This method creates the parameter structure required by the libcloud call that handles
-        network creation based on the kwargs passed to create_network.
+        """This method creates the parameter structure required by the
+        libcloud call that handles network creation based on the kwargs
+        passed to create_network.
 
         network_args: All cloud-specific parameters for network creation.
         """
@@ -133,15 +140,14 @@ class BaseNetworkController(BaseController):
 
     @LibcloudExceptionHandler(mist.io.exceptions.SubnetCreationError)
     def create_subnet(self, subnet, **kwargs):
-        """Create a new subnet. This method receives a Subnet DB object from Subnet.add()
-         and performs the following steps, using its associated private methods:
-        It populates all its cloud-specific fields.
-        It performs early validation on the Subnet object using all the constraints
-            specified in the corresponding Subnet subclass.
-        It creates the parameter structure required by the libcloud call that handles
-            subnet creation.
-        It performs the libcloud call.
-        It validates the subnet object and saves it to the database.
+        """Create a new subnet. This method receives a Subnet DB object from
+        Subnet.add() and performs the following steps, using its associated
+        private methods: It populates all its cloud-specific fields. It
+        performs early validation on the Subnet object using all the
+        constraints specified in the corresponding Subnet subclass. It
+        creates the parameter structure required by the libcloud call that
+        handles subnet creation. It performs the libcloud call. It validates
+        the subnet object and saves it to the database.
 
         Subclasses SHOULD NOT override or extend this method.
 
@@ -175,12 +181,14 @@ class BaseNetworkController(BaseController):
         kwargs['cidr'] = subnet.cidr
 
         self._create_subnet__parse_args(subnet.network, kwargs)
-        libcloud_subnet = self._create_subnet__create_libcloud_subnet(subnet, kwargs)
+        libcloud_subnet = self._create_subnet__create_libcloud_subnet(subnet,
+                                                                      kwargs)
         try:
             subnet.subnet_id = libcloud_subnet.id
             subnet.save()
         except mongoengine.errors.ValidationError as exc:
-            log.error("Error saving Subnet %s: %s", subnet.title, exc.to_dict())
+            log.error("Error saving Subnet %s: %s", subnet.title,
+                      exc.to_dict())
             raise mist.io.exceptions.NetworkCreationError(exc.message)
         except mongoengine.errors.NotUniqueError as exc:
             log.error("Subnet %s not unique error: %s", subnet.title, exc)
@@ -189,8 +197,9 @@ class BaseNetworkController(BaseController):
         return subnet
 
     def _create_subnet__parse_args(self, subnet_args, parent_network):
-        """This method creates the parameter structure required by the libcloud call that handles
-            subnet creation based on the kwargs passed to create_subnet.
+        """This method creates the parameter structure required by the
+        libcloud call that handles subnet creation based on the kwargs
+        passed to create_subnet.
 
             subnet_args: All cloud-specific parameters for subnet creation.
             parent_network: The network Mongoengine object for the network this
@@ -199,20 +208,22 @@ class BaseNetworkController(BaseController):
         return
 
     def _create_subnet__create_libcloud_subnet(self, subnet, kwargs):
-        """This method performs the libcloud call that handles subnet creation. This part of the process
-            was split into a private method because the naming convention used for this call in libcloud
-            is inconsistent and some clouds require specialized parsing of its response.
+        """This method performs the libcloud call that handles subnet
+        creation. This part of the process was split into a private method
+        because the naming convention used for this call in libcloud is
+        inconsistent and some clouds require specialized parsing of its
+        response.
 
             subnet: A Subnet mongoengine model. The model may not have yet
                 been saved in the database.
             kwargs: All cloud-specific parameters for subnet creation.
             """
-        return self.ctl.compute.connection.ex_create_subnet(**kwargs)
+        return self.compute_connection.ex_create_subnet(**kwargs)
 
     @LibcloudExceptionHandler(mist.io.exceptions.NetworkListingError)
     def list_networks(self):
-        """Lists all Networks present on the cloud. Also syncs the state of the Network documents
-         on the DB with their state on the Cloud API.
+        """Lists all Networks present on the cloud. Also syncs the state of
+        the Network documents on the DB with their state on the Cloud API.
 
          Subclasses SHOULD NOT override or extend this method.
 
@@ -226,34 +237,39 @@ class BaseNetworkController(BaseController):
         Subclasses that require special handling should override this, by
         default, dummy method."""
 
-        # FIXME: Move these imports to the top of the file when circular import issues are resolved
+        # FIXME: Move these imports to the top of the file when circular
+        # import issues are resolved
         from mist.io.networks.models import Network, NETWORKS
 
-        libcloud_networks = self.ctl.compute.connection.ex_list_networks()
+        libcloud_networks = self.compute_connection.ex_list_networks()
         network_listing = []
 
         # Sync the DB state to the API state
         # Syncing Networks
-        for libcloud_network in libcloud_networks:
+        for libcloud_net in libcloud_networks:
             try:
-                network = Network.objects.get(cloud=self.cloud, network_id=libcloud_network.id)
+                network = Network.objects.get(cloud=self.cloud,
+                                              network_id=libcloud_net.id)
             except Network.DoesNotExist:
                 network = NETWORKS[self.provider](cloud=self.cloud,
-                                                  network_id=libcloud_network.id)
+                                                  network_id=libcloud_net.id)
 
-            self._list_networks__parse_libcloud_object(network, libcloud_network)
+            self._list_networks__parse_libcloud_object(network,
+                                                       libcloud_net)
 
-            network.title = libcloud_network.name
-            network.extra = fix_dict_encoding(libcloud_network.extra)
+            network.title = libcloud_net.name
+            network.extra = fix_dict_encoding(libcloud_net.extra)
 
             # Save the new network document
             try:
                 network.save()
             except mongoengine.errors.ValidationError as exc:
-                log.error("Error updating Network %s: %s", network.title, exc.to_dict())
+                log.error("Error updating Network %s: %s", network.title,
+                          exc.to_dict())
                 raise mist.io.exceptions.NetworkCreationError(exc.message)
             except mongoengine.errors.NotUniqueError as exc:
-                log.error("Network %s not unique error: %s", network.title, exc)
+                log.error("Network %s not unique error: %s", network.title,
+                          exc)
                 raise mist.io.exceptions.NetworkExistsError()
 
             network_listing.append(network)
@@ -262,16 +278,17 @@ class BaseNetworkController(BaseController):
 
     @staticmethod
     def _list_networks__parse_libcloud_object(network, libcloud_network):
-        """This method creates the parameter structure required by the libcloud call that handles
-            subnet creation based on the kwargs passed to create_subnet.
+        """This method creates the parameter structure required by the
+        libcloud call that handles subnet creation based on the kwargs
+        passed to create_subnet.
 
             network: A Network mongoengine model. The model may not have yet
-                been saved in the database.
-            libcloud_network: All LibcloudNetwork object returned by the list_networks call."""
+            been saved in the database. libcloud_network: All
+            LibcloudNetwork object returned by the list_networks call. """
         return
 
     @LibcloudExceptionHandler(mist.io.exceptions.SubnetListingError)
-    def list_subnets(self, network):
+    def list_subnets(self, network, **kwargs):
         """Lists all Subnets attached to a network present on the cloud.
         Also syncs the state of the Subnet documents on the DB with their state
         on the Cloud API.
@@ -292,20 +309,23 @@ class BaseNetworkController(BaseController):
         network will be returned.
             """
 
-        # FIXME: Move these imports to the top of the file when circular import issues are resolved
+        # FIXME: Move these imports to the top of the file when circular
+        # import issues are resolved
         from mist.io.networks.models import Subnet, SUBNETS
 
-        list_subnets_args = {}
-        self._list_subnets__parse_args(network, list_subnets_args)
-        libcloud_subnets = self._list_subnets__fetch_subnets(network, list_subnets_args)
+        self._list_subnets__parse_args(network, kwargs)
+        libcloud_subnets = self._list_subnets__fetch_subnets(network,
+                                                             kwargs)
 
         subnet_listing = []
         for libcloud_subnet in libcloud_subnets:
 
             try:
-                subnet = Subnet.objects.get(network=network, subnet_id=libcloud_subnet.id)
+                subnet = Subnet.objects.get(network=network,
+                                            subnet_id=libcloud_subnet.id)
             except Subnet.DoesNotExist:
-                subnet = SUBNETS[self.provider](network=network, subnet_id=libcloud_subnet.id)
+                subnet = SUBNETS[self.provider](network=network,
+                                                subnet_id=libcloud_subnet.id)
 
             self._list_subnets__parse_libcloud_object(subnet, libcloud_subnet)
 
@@ -315,7 +335,8 @@ class BaseNetworkController(BaseController):
             try:
                 subnet.save()
             except mongoengine.errors.ValidationError as exc:
-                log.error("Error updating Subnet %s: %s", subnet.title, exc.to_dict())
+                log.error("Error updating Subnet %s: %s", subnet.title,
+                          exc.to_dict())
                 raise mist.io.exceptions.SubnetCreationError(exc.message)
             except mongoengine.errors.NotUniqueError as exc:
                 log.error("Subnet %s not unique error: %s", subnet.title, exc)
@@ -326,42 +347,44 @@ class BaseNetworkController(BaseController):
         return subnet_listing
 
     def _list_subnets__parse_args(self, network, kwargs):
-        """This method creates the parameter structure required by the libcloud call that
-        returns subnet listings. It is used when Cloud APIs support filtering  the result of
-         the list_subnet call based on some parameter.
+        """This method creates the parameter structure required by the
+        libcloud call that returns subnet listings. It is used when Cloud
+        APIs support filtering  the result of the list_subnet call based on
+        some parameter.
 
-            network: A Network mongoengine model.
-            kwargs: A dictionary containing all the arguments to be passed to the
-                list_subnets call. This will be modified by this method based on the
-                network object.
-            """
+            network: A Network mongoengine model. kwargs: A dictionary
+            containing all the arguments to be passed to the list_subnets
+            call. This will be modified by this method based on the network
+            object.
+        """
         return
 
     @staticmethod
     def _list_subnets__parse_libcloud_object(subnet, libcloud_subnet):
-        """This method creates the parameter structure required by the libcloud call that handles
-            subnet creation based on the kwargs passed to create_subnet.
+        """This method creates the parameter structure required by the
+        libcloud call that handles subnet creation based on the kwargs
+        passed to create_subnet.
 
             network: A Network mongoengine model. The model may not have yet
-                been saved in the database.
-            libcloud_network: All LibcloudNetwork object returned by the list_networks call."""
+            been saved in the database. libcloud_network: All
+            LibcloudNetwork object returned by the list_networks call. """
         return
 
     def _list_subnets__fetch_subnets(self, network, kwargs):
-        """This method performs the libcloud call returns a subnet listing. This part of the process
-            was split into a private method because the naming convention used for this call in libcloud
-            is inconsistent and some clouds require specialized parsing of its response.
+        """This method performs the libcloud call returns a subnet listing.
+        This part of the process was split into a private method because the
+        naming convention used for this call in libcloud is inconsistent and
+        some clouds require specialized parsing of its response.
 
             network: A Network mongoengine model. The model may not have yet
-                been saved in the database.
-            kwargs: All cloud-specific parameters for ths subnet listing call.
-                These are usually generated by _list_subnets__parse_libcloud_object
-            """
-        self._list_subnets__parse_args(network, kwargs)
-        return self.ctl.compute.connection.ex_list_subnets(**kwargs)
+            been saved in the database. kwargs: All cloud-specific
+            parameters for ths subnet listing call. These are usually
+            generated by _list_subnets__parse_libcloud_object
+        """
+        return self.compute_connection.ex_list_subnets(**kwargs)
 
     @LibcloudExceptionHandler(mist.io.exceptions.NetworkDeletionError)
-    def delete_network(self, network):
+    def delete_network(self, network, **kwargs):
         """Deletes a network.
 
         Subclasses SHOULD NOT override or extend this method.
@@ -379,41 +402,41 @@ class BaseNetworkController(BaseController):
         network: A Network mongoengine model.
         """
 
-        # FIXME: Move these imports to the top of the file when circular import issues are resolved
+        # FIXME: Move these imports to the top of the file when circular
+        # import issues are resolved
         from mist.io.networks.models import Subnet
 
         for subnet in Subnet.objects(network=network):
             subnet.ctl.delete_subnet()
 
-        delete_network_args = {}
-
-        self._delete_network__parse_args(network, delete_network_args)
-        self._delete_network__delete_libcloud_network(network, delete_network_args)
+        self._delete_network__parse_args(network, kwargs)
+        self._delete_network__delete_libcloud_network(network, kwargs)
 
         network.delete()
 
     def _delete_network__parse_args(self, network, kwargs):
-        """This method creates the parameter structure required by the libcloud call that
-        deletes networks.
+        """This method creates the parameter structure required by the
+        libcloud call that deletes networks.
 
-        network: A Network mongoengine model.
-        kwargs: A dictionary containing all the arguments to be passed to the
-            delete_network call. This will be modified by this method based on the
-            network object.
-            """
+        network: A Network mongoengine model. kwargs: A dictionary
+        containing all the arguments to be passed to the delete_network
+        call. This will be modified by this method based on the network
+        object.
+        """
         return
 
     def _delete_network__delete_libcloud_network(self, network, kwargs):
-        """This method performs the libcloud call deletes a network. This part of the process
-            was split into a private method because the naming convention used for this call in libcloud
-            is inconsistent and some clouds require specialized parsing of its response.
+        """This method performs the libcloud call deletes a network. This
+        part of the process was split into a private method because the
+        naming convention used for this call in libcloud is inconsistent and
+        some clouds require specialized parsing of its response.
 
-            network: A Network mongoengine model.
-            kwargs: A dictionary containing all the arguments to be passed to the
-                delete_network call. This will be modified by this method based on the
-                network object.
-                """
-        self.ctl.compute.connection.ex_delete_network(**kwargs)
+            network: A Network mongoengine model. kwargs: A dictionary
+            containing all the arguments to be passed to the delete_network
+            call. This will be modified by this method based on the network
+            object.
+        """
+        self.compute_connection.ex_delete_network(**kwargs)
 
     @LibcloudExceptionHandler(mist.io.exceptions.SubnetDeletionError)
     def delete_subnet(self, subnet):
@@ -440,32 +463,33 @@ class BaseNetworkController(BaseController):
         subnet.delete()
 
     def _delete_subnet__parse_args(self, subnet, kwargs):
-        """This method creates the parameter structure required by the libcloud call that
-                deletes subnets.
+        """This method creates the parameter structure required by the
+        libcloud call that deletes subnets.
 
-        subnet: A Subnet mongoengine model.
-        kwargs: A dictionary containing all the arguments to be passed to the
-            delete_subnet call. This will be modified by this method based on the
-            network object.
-            """
+        subnet: A Subnet mongoengine model. kwargs: A dictionary containing
+        all the arguments to be passed to the delete_subnet call. This will
+        be modified by this method based on the network object.
+        """
         return
 
     def _delete_subnet__delete_libcloud_subnet(self, network, kwargs):
-        """This method performs the libcloud call deletes a subnet. This part of the process
-            was split into a private method because the naming convention used for this call in libcloud
-            is inconsistent and some clouds require specialized parsing of its response.
+        """This method performs the libcloud call deletes a subnet. This
+        part of the process was split into a private method because the
+        naming convention used for this call in libcloud is inconsistent and
+        some clouds require specialized parsing of its response.
 
-            subnet: A Subnet mongoengine model.
-            kwargs: A dictionary containing all the arguments to be passed to the
-                delete_subnet call. This will be modified by this method based on the
-                subnet object.
-            """
-        self.ctl.compute.connection.ex_delete_subnet(**kwargs)
+            subnet: A Subnet mongoengine model. kwargs: A dictionary
+            containing all the arguments to be passed to the delete_subnet
+            call. This will be modified by this method based on the subnet
+            object.
+        """
+        self.compute_connection.ex_delete_subnet(**kwargs)
 
     def _get_libcloud_network(self, network):
-        """This method receives a Network mongoengine model and queries libcloud to
-        return the corresponding LibcloudNetwork object. This is intended to be used as
-        a helper method, especially for delete_network calls.
+        """This method receives a Network mongoengine model and queries
+        libcloud to return the corresponding LibcloudNetwork object. This is
+        intended to be used as a helper method, especially for
+        delete_network calls.
 
         Subclasses may override this method if needed.
 
@@ -474,9 +498,10 @@ class BaseNetworkController(BaseController):
         return
 
     def _get_libcloud_subnet(self, network):
-        """This method receives a Subnet mongoengine model and queries libcloud to
-        return the corresponding LibcloudSubnet object. This is intended to be used as
-        a helper method, especially for delete_subnet calls.
+        """This method receives a Subnet mongoengine model and queries
+        libcloud to return the corresponding LibcloudSubnet object. This is
+        intended to be used as a helper method, especially for delete_subnet
+        calls.
 
         Subclasses may override this method if needed.
 
