@@ -2,10 +2,11 @@ import logging
 import json
 import ssl
 
-from libcloud.common.types import LibcloudError, InvalidCredsError, MalformedResponseError
+from libcloud.common.types import LibcloudError, InvalidCredsError, \
+    MalformedResponseError
 from libcloud.common.exceptions import BaseHTTPError, RateLimitReachedError
-import mist.io.exceptions
-
+from mist.io.exceptions import CloudUnauthorizedError, CloudUnavailableError, \
+    RateLimitError, BadRequestError
 
 log = logging.getLogger(__name__)
 
@@ -55,19 +56,22 @@ class LibcloudExceptionHandler(object):
                 return func(*args, **kwargs)
             except InvalidCredsError as exc:
                 log.error("Invalid creds on running %: %s", func.__name__, exc)
-                raise mist.io.exceptions.CloudUnauthorizedError(exc=exc, msg=exc.message)
+                raise CloudUnauthorizedError(exc=exc, msg=exc.message)
             except ssl.SSLError as exc:
                 log.error("SSLError on running %s: %s", func.__name__, exc)
-                raise mist.io.exceptions.CloudUnavailableError(exc=exc, msg=exc.message)
+                raise CloudUnavailableError(exc=exc, msg=exc.message)
             except MalformedResponseError as exc:
                 log.error("MalformedResponseError on running %s: %s", exc)
-                raise mist.io.exceptions.MalformedResponseError(exc=exc, msg=exc.message)
+                raise MalformedResponseError(exc=exc, msg=exc.message)
             except RateLimitReachedError as exc:
-                log.error("Rate limit error on running %s: %s", func.__name__, exc)
-                raise mist.io.exceptions.RateLimitError(exc=exc, msg=exc.message)
-            except BaseHTTPError as exc:  # Libcloud errors caused by invalid parameters are raised as this type
+                log.error("Rate limit error on running %s: %s", func.__name__,
+                          exc)
+                raise RateLimitError(exc=exc, msg=exc.message)
+            # Libcloud errors caused by invalid parameters are raised as this
+            except BaseHTTPError as exc:
                 log.error("Bad request on running %s: %s", func.__name__, exc)
-                raise mist.io.exceptions.BadRequestError(exc=exc, msg=exc.message)
+                raise BadRequestError(exc=exc,
+                                      msg=exc.message)
             except LibcloudError as exc:
                 log.error("Error on running %s: %s", func.__name__, exc)
                 raise self.exception_class(exc=exc, msg=exc.message)
