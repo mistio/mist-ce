@@ -6,6 +6,7 @@ import requests
 import StringIO
 import mongoengine as me
 from mist.core import config
+from pyramid.response import Response
 from mist.io.exceptions import BadRequestError
 from mist.io.helpers import trigger_session_update
 from mist.core.exceptions import ScriptNameExistsError
@@ -154,8 +155,7 @@ class BaseScriptController(object):
             url = self.script.location.url
         return url
 
-    def get_file(self, request):
-        from pyramid.response import Response, FileResponse
+    def get_file(self):
         """Returns a file or archive."""
 
         if self.script.location.type == 'inline':
@@ -173,33 +173,30 @@ class BaseScriptController(object):
                 r.raise_for_status()
             except requests.exceptions.HTTPError as err:
                 raise BadRequestError(err.msg)
-            if r.ok:
-                if 'gzip' in r.headers.get('content_type'):
-                    import tarfile
-                    t = tarfile.TarFile(StringIO.StringIO(r.content))
-                    # z.extractall()
-                    response = FileResponse(t, request=request,
-                                            content_type='application/gzip',
-                                            content_encoding='gzip',
-                                            pragma='no-cache',
-                                            )
-                    response.headers['Content-Disposition'] = (
-                        'attachment; filename="script.tar.gz"')
-                elif 'zip' in r.headers.get('content_type'):
-                    import zipfile
-                    z = zipfile.ZipFile(StringIO.StringIO(r.content))
-                    # z.extractall()
-                    response = FileResponse(z, request=request,
-                                            content_type='application/zip',
-                                            content_encoding='zip',
-                                            pragma='no-cache',
-                                            )
-                    response.headers['Content-Disposition'] = (
-                        'attachment; filename="script.zip"')
+
+            if 'gzip' in r.headers['Content-Type']:
+                if r.headers.get('content-disposition', ''):
+                    filename = r.headers.get(
+                        'content-disposition').split("=",1)[1]
                 else:
-                    return Response(r.content)
+                    filename = "script.tar.gz"
+
+                return Response(content_type=r.headers['Content-Type'],
+                                content_disposition='attachment; '
+                                                    'filename=%s' %
+                                                    filename,
+                                charset='utf8',
+                                pragma='no-cache',
+                                body=r.content)
             else:
-                return Response("Unable to find: {}".format(request.path_info))
+                return Response(content_type=r.headers['Content-Type'],
+                                content_disposition='attachment; '
+                                                    'filename="script.gzip"',
+                                charset='utf8',
+                                pragma='no-cache',
+                                body=r.content)
+            # else:
+            #     return Response(r.content)
 
     def run_script(self, shell, params=None, job_id=None):
         if self.script.location.type == 'inline':
@@ -219,12 +216,9 @@ class BaseScriptController(object):
             path = self._url()
 
         wparams = "-v"
-        # if self.script.exec_type == 'ansible':
-        #     wparams += " -a"
-        #     params = '"%s"' % params.replace('"', r'\"')
         if params:
             wparams += " -p '%s'" % params
-        if not self.script.location.type == 'inline':
+        if self.script.location.entrypoint:
             wparams += " -f %s" % self.script.location.entrypoint
         wparams += " %s" % path
         return path, params, wparams
