@@ -144,7 +144,7 @@ class Script(me.Document):
     location = me.EmbeddedDocumentField(Location, required=True)
 
     deleted = me.BooleanField(default=False)
-    # deleted = me.DateTimeField() # TODO after mappings
+    # deleted = me.DateTimeField() # FIXME after mappings
 
     _controller_cls = None
 
@@ -189,7 +189,7 @@ class Script(me.Document):
         return script
 
     @property
-    def script(self):
+    def script(self):  # TODO only for as_dict_old, replace with location.type
         if isinstance(self.location, InlineLocation):
             return self.location.source_code
         elif isinstance(self.location, GithubLocation):
@@ -208,11 +208,11 @@ class Script(me.Document):
         super(Script, self).delete()
         mist.core.tag.models.Tag.objects(resource=self).delete()
 
-    def as_dict_old(self):  # ToDO to_json
+    def as_dict_old(self):
         """Data representation for api calls.
            Use this for backwards compatibility"""
 
-        if isinstance(self.location, InlineLocation):
+        if isinstance(self.location, InlineLocation): # TODO replace with type
             entrypoint = ''
         else:
             entrypoint = self.location.entrypoint or ''
