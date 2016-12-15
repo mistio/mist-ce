@@ -588,11 +588,11 @@
             var hasNonExisting;
             if (this.model && this.model.clouds && this.model.monitoring && this.model.monitoring.machines) {
                 hasNonExisting = this.model.monitoring.machines.filter(function(m){
-                    console.log(this.model.clouds[m[0]])
+                    // console.log(this.model.clouds[m[0]])
                     return !this.model.clouds[m[0]] || !this.model.clouds[m[0]].machines || !this.model.clouds[m[0]].machines[m[1]];
                 }, this);
             }
-            console.log('hasNonExisting', hasNonExisting);
+            // console.log('hasNonExisting', hasNonExisting);
             return hasNonExisting;
         },
         _disableMonitoringOnNonExisting: function(e){

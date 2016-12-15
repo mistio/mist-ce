@@ -116,7 +116,7 @@
                 <iron-icon id="alert" icon="icons:warning" hidden$="{{!ruleCreatesIncident(rule,incidents)}}"></iron-icon>
                 If 
                 <span class="strong">
-                	[[computeName(rule.metric, builtinMetrics)]] [[computeOperator(rule.operator)]] [[rule.value]][[computeUnits(rule.metric, builtinMetrics)]] 
+                	[[computeName(rule.metric, builtinMetrics, customMetrics)]] [[computeOperator(rule.operator)]] [[rule.value]][[computeUnits(rule.metric, builtinMetrics, customMetrics)]] 
                 </span>
                 for [[computeAggregate(rule.aggregate)]] value 
                 <span hidden$="[[!rule.aggregate]]">
@@ -211,14 +211,19 @@
                 },
                 resource: Object,  // machine, cloud or other later
                 rule: Object,
-                builtinMetrics: {
+                builtinMetrics:{
+                    type: Object,
+                    notify: true,
+                    value: {}
+                },
+                customMetrics:{
                     type: Object,
                     notify: true,
                     value: {}
                 },
                 availableMetrics: {
                     type: Array,
-                    computed: "_computeMetrics(builtinMetrics.*, resource)"
+                    computed: "_computeMetrics(resource, builtinMetrics, customMetrics)"
                 },
                 newRule: {
                     type: Object,
@@ -278,11 +283,17 @@
             	}
             	return newRule;
             },
-            computeUnits: function(metric, builtinMetrics) {
-                return this.builtinMetrics[metric] ? this.builtinMetrics[metric].unit : 'unit';
+            computeUnits: function(metric, builtinMetrics, customMetrics) {
+                var ref;
+                if (this.builtinMetrics || this.customMetrics)
+                    ref =  this.builtinMetrics[metric] || this.customMetrics[metric];
+                return ref && ref.unit ? ref.unit : '';
             },
-            computeName: function(metric, builtinMetrics) {
-                return this.builtinMetrics[metric]? this.builtinMetrics[metric].name : 'name';
+            computeName: function(metric, builtinMetrics, customMetrics) {
+                var ref;
+                if (this.builtinMetrics || this.customMetrics)
+                    ref =  this.builtinMetrics[metric] || this.customMetrics[metric];
+                return ref && ref.name ? ref.name : '';
             },
             computeTime: function(time){
                 return time/60 + 1;
@@ -306,10 +317,19 @@
                 });
                 return !find ? false : true;
             },
-            _computeMetrics: function(metrics){
+            _computeMetrics: function(resource, builtinMetrics, customMetrics){
                 var metrics = [];
                 for (var p in this.builtinMetrics){
                     metrics.push(this.builtinMetrics[p])
+                }
+                if (this.customMetrics) {
+                    for (var q in this.customMetrics){
+                        var machineHasCustomMetric = this.customMetrics[q].machines.find(function(m){
+                            return m[0] == this.resource.cloud.id && m[1] == this.resource.id;
+                        }, this)
+                        if (machineHasCustomMetric) 
+                            metrics.push(this.customMetrics[q])
+                    }
                 }
                 return metrics;
             },

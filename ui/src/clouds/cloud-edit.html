@@ -32,7 +32,8 @@
         ],
         _computeFields: function(cloud){
             var providerFields = this.providers.filter(function(fields) {
-                return fields.val == this.cloud.provider;
+                if (this.cloud && this.cloud.provider)
+                    return fields.val == this.cloud.provider;
             }, this);
             // don't allow title and region in the fields
             var fields = providerFields[0].options.filter(function(f){

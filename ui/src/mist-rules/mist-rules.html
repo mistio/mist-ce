@@ -89,7 +89,7 @@
         </style>
         <paper-material elevation="0">
             <template is="dom-repeat" items="{{items}}">
-                <rules-item builtin-metrics="[[builtinMetrics]]" rule="[[item]]" incidents="[[incidents]]" resource="[[resource]]"></rules-item>
+                <rules-item builtin-metrics="[[builtinMetrics]]" custom-metrics="[[customMetrics]]" rule="[[item]]" incidents="[[incidents]]" resource="[[resource]]"></rules-item>
             </template>
             
             <paper-button toggles active="{{editNew}}" hidden$="{{editNew}}"><iron-icon icon="icons:add-circle"></iron-icon> add new rule</paper-button>
@@ -117,7 +117,7 @@
 
                     <paper-input id="metricValue" value="{{newRule.value}}" auto-validate></paper-input>
 
-                    {{computeUnits(newMetric, builtinMetrics)}}
+                    {{computeUnits(newMetric, builtinMetrics, customMetrics)}}
 
                     for 
 
@@ -196,7 +196,7 @@
                 },
                 availableMetrics: {
                     type: Array,
-                    computed: "_computeMetrics(builtinMetrics)"
+                    computed: "_computeMetrics(resource, builtinMetrics, customMetrics)"
                 },
                 newRule: Object,
                 editNew: {
@@ -250,11 +250,11 @@
                 }
                 return rulesArray.reverse();
             },
-            computeUnits: function(metric) {
-                return this.builtinMetrics[metric] ? this.builtinMetrics[metric].unit : 'unit';
-            },
-            computeName: function(metric) {
-                return this.builtinMetrics[metric]? this.builtinMetrics[metric].name : 'name';
+            computeUnits: function(metric, builtinMetrics, customMetrics) {
+                var ref;
+                if (this.builtinMetrics || this.customMetrics)
+                    ref =  this.builtinMetrics[metric] || this.customMetrics[metric];
+                return ref && ref.unit ? ref.unit : '';
             },
             computeTime: function(time){
                 return time/60 + 1;
@@ -278,7 +278,7 @@
                 });
                 return !find ? false : true;
             },
-            _computeMetrics: function(machine){
+            _computeMetrics: function(resource, builtinMetrics, customMetrics){
                 var metrics = [];
                 for (var p in this.builtinMetrics){
                     metrics.push(this.builtinMetrics[p])
@@ -286,8 +286,8 @@
                 if (this.customMetrics) {
                     for (var q in this.customMetrics){
                         var machineHasCustomMetric = this.customMetrics[q].machines.find(function(m){
-                            return m[0] == this.machine.cloud.id && m[1] == this.machine.id;
-                        })
+                            return m[0] == this.resource.cloud.id && m[1] == this.resource.id;
+                        }, this)
                         if (machineHasCustomMetric) 
                             metrics.push(this.customMetrics[q])
                     }

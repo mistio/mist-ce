@@ -117,7 +117,7 @@
                         <!-- Only red incidents sould count and show. keep it temp/ly due to lacj of data -->
                         <!-- [[incidentColor(item)]] -->
                         <div class="list layout horizontal wrap">
-                            <a class="list-item red flexchild layout horizontal" href$="[[machineUri(item,model.clouds)]]">
+                            <a class="list-item red flexchild layout horizontal" href$="[[machineUri(item,model)]]">
                                 <div class="flexchild expression">
                                     <iron-icon icon="[[sections.machines.icon]]"></iron-icon>
                                     <span class="machine flexchild">[[machineName(item, model.clouds)]]</span>: <span class="rule-condition">[[ruleCondition(item)]]</span>
@@ -204,7 +204,7 @@ Polymer({
     },
     machineUri: function(item, clouds) {
         // give machine url only if machine axists
-        if (this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines[item.machine_id]){
+        if (this.model && this.model.clouds && this.model.clouds[item.cloud_id] && this.model.clouds[item.cloud_id].machines && this.model.clouds[item.cloud_id].machines[item.machine_id]){
             return '/machines/'  + this.model.clouds[item.cloud_id].machines[item.machine_id].uuid;
         }
         else {

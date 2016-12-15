@@ -163,7 +163,7 @@
                 .wide {
                     display: inline;
                 }
-            }            
+            }
         </style>
         <div id="content">
             <div class="is-loading" hidden$="[[!isLoading]]">
@@ -249,14 +249,13 @@
                 </paper-material>
             </div>
         </div>
-        
+
         <iron-ajax id="keyPublicRequest" url="/api/v1/keys/[[key.id]]/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyPrivateRequest" url="/api/v1/keys/[[key.id]]/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
         <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/[[key.id]]" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
         <iron-ajax id="keyDeleteAjaxRequest" url="/api/v1/keys/[[key.id]]" method="DELETE" on-response="_handleKeyDeleteAjaxResponse" on-error="_handleKeyDeleteAjaxError"></iron-ajax>
         <key-edit key="[[key]]"></key-edit>
         <dialog-element></dialog-element>
-        <paper-toast></paper-toast>
         <tags-list model="[[model]]"></tags-list>
     </template>
     <script>
@@ -355,7 +354,7 @@
                         var item = itemUid(key, this.section);
                         arr.push(item);
                         return arr;
-                    } 
+                    }
                 },
                 _computeKeyMachines: function(key) {
                     if (key)
@@ -393,16 +392,16 @@
                     var el = this.$.keyPublic;
                     this.setSelection(el);
                     var successful = document.execCommand('copy');
-                    var msg = successful ? 'The Public Key was copied to clipboard!' : 'There was an error copying to clipboard!';
-                    this._showToast(msg);
+                    var message = successful ? 'The Public Key was copied to clipboard!' : 'There was an error copying to clipboard!';
+                    this.fire('toast',{msg:message,duration:3000});
                 },
                 copyPrivateKey: function() {
                     this.clearSelection();
                     var el = this.$.keyPrivate;
                     this.setSelection(el);
                     var successful = document.execCommand('copy');
-                    var msg = successful ? 'The Private Key was copied to clipboard!' : 'There was an error copying to clipboard!';
-                    this._showToast(msg);
+                    var message = successful ? 'The Private Key was copied to clipboard!' : 'There was an error copying to clipboard!';
+                    this.fire('toast',{msg:message,duration:3000});
                 },
                 handlePublicResponse: function(data) {
                     //console.log(data);
@@ -432,7 +431,7 @@
                     this.$.keyMakeDefaultAjaxRequest.generateRequest();
                 },
                 _handleKeyMakeDefaultAjaxResponse: function(e) {
-                    this._showToast(this.key.name + ' has become your default Key!');
+                    this.fire('toast',{msg:this.key.name + ' has become your default Key!',duration:3000});
                 },
                 _editTags: function() {
                     var el = this.querySelector('tags-list'),
@@ -469,11 +468,6 @@
                         dialog[i] = info[i];
                     }
                     dialog._openDialog();
-                },
-                _showToast: function(msg) {
-                    var toast = this.querySelector('paper-toast');
-                    toast.text = msg;
-                    toast.show();
                 },
                 _computeIsloading: function(key) {
                     return !key ? true : false;

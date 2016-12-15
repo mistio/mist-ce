@@ -223,8 +223,9 @@
                     }
                 },
                 _handleCancelAjaxResponse: function(e){
-                    document.querySelector('paper-toast#mist-toast').show({text: 'You cancelled your plan. '})
+                    this.fire('toast',{msg:'You cancelled your plan. ',duration:3000});
                 },
+
                 _handleCancelAjaxError: function(e){
                     this.fire('error-on-cancel-plan',{error: e.detail.request.xhr.responseText});
                 },

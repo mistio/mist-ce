@@ -3,7 +3,6 @@
 <link rel="import" href="../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../bower_components/polyana-dashboard/polyana-dashboard.html">
 
@@ -268,7 +267,7 @@
             },
             isActivated: {
                 type: Boolean,
-                computed: '_computeIsActivated(resource, monitoring.monitored_machines.*, hidden)'
+                computed: '_computeIsActivated(resource, monitoring.*, hidden)'
             },
             script: {
                 type: String,
@@ -357,7 +356,8 @@
             this.querySelector('polyana-dashboard')._updateDashboard(e);
         },
         _computeDashboardUri: function(resource) {
-            return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/dashboard';
+            if (resource && resource.cloud)
+                return '/api/v1/clouds/' + resource.cloud.id + '/machines/' + resource.id + '/dashboard';
         },
         _computeIsMonitored: function(resource, monitoring){
             if (this.resource && this.monitoring && this.monitoring.monitored_machines[this.resource.uuid])
@@ -505,6 +505,7 @@
             }
         },
         _computeIsActivated(resource, monitoring, hidden){
+            console.log('_computeIsActivated', resource, monitoring, hidden)
             this.set("failed", false);
             if (this.hidden || !this.isMonitored || !this.monitoring || !this.monitoring.monitored_machines || !this.monitoring.monitored_machines[resource.uuid] || (!this.monitoring.monitored_machines[resource.uuid].installation_status.activated_at && !this.waitingData))
                 return false;

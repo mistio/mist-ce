@@ -63,9 +63,6 @@
                 background-color: yellow;
                 color: black;
             }*/
-            paper-toast {
-                z-index: 999;
-            }
         </style>
 
         <div class="cloud-block">
@@ -85,9 +82,9 @@
             </div>
         </div>
 
-        <iron-ajax id="cloudEditAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="PUT" on-response="_handleCloudEditAjaxResponse" on-error="_handleCloudEditAjaxError"></iron-ajax>        
+        <iron-ajax id="cloudEditAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="PUT" on-response="_handleCloudEditAjaxResponse" on-error="_handleCloudEditAjaxError"></iron-ajax>
         <iron-ajax id="cloudDeleteAjaxRequest" url="/api/v1/clouds/[[cloud.id]]" method="DELETE" on-response="_handleCloudDeletionAjaxResponse" on-error="_handleCloudDeletionAjaxError"></iron-ajax>
-        <paper-toast></paper-toast>
+
     </template>
 
     <script>
@@ -171,13 +168,8 @@
                 _copyId: function() {
                     this.querySelector('#cloudId input').select();
                     document.execCommand('copy');
-                    this._showToast('Cloud\'s ID was copied to clipboard!');
+                    this.fire('toast',{msg:'Cloud\'s ID was copied to clipboard!',duration:3000});
                 },
-                _showToast: function(msg) {
-                    var toast = this.querySelector('paper-toast');
-                    toast.text = msg;
-                    toast.show();
-                }
             });
         })();
     </script>

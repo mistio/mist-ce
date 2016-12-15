@@ -199,7 +199,10 @@
       ready: function(){
 
       },
-
+      showToast:function(e){
+        var toast=this.querySelector('paper-toast#mist-toast')
+        toast.show({text:e.detail.msg,duration:e.detail.duration});
+      },
       openAndSelect: function(e){
         console.log('KEY HEARD', e.detail.key);
         document.addEventListener('open-and-select', function(e) {
@@ -337,6 +340,14 @@
                 'edit_tags',
                 'read_logs',
             ],
+            'tunnel': [
+                'add',
+                'remove',
+                'edit',
+                'read',
+                'edit_tags',
+                'read_logs',
+            ]
             // 'team': [
             //     'add',
             //     'read',

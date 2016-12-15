@@ -21,6 +21,30 @@
                 display: block;
                 float: left;
             }
+            .progress {
+                margin: 8px 0 0 0;
+                width: 100%;
+                display: block;
+            }
+            paper-progress {
+                width: 100%;
+            }
+            paper-progress#progresserror ::content #primaryProgress {
+                background-color: var(--red-color);
+            }
+            .errormsg-container {
+                color: var(--red-color);
+                padding-top: 8px;
+            }
+            .errormsg-container iron-icon {
+                color: inherit;
+            }
+            .btn-group {
+                margin-top: 12px;
+            }
+            .last {
+                margin-bottom: 24px !important;
+            }
         </style>
 
         <paper-dialog id="teamAddModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
@@ -32,17 +56,22 @@
                 <p>
                     <paper-textarea id="description" label="Description (optional)" rows="3" max-rows="5" error-message="Please enter team's description" value="{{newTeam.description}}"></paper-textarea>
                 </p>
-                <p>
+                <p class="last">
                     <paper-toggle-button id="visible" label="Visible" checked="{{newTeam.visible}}"></paper-toggle-button> Visible to members not in the team.
                 </p>
+                <div class="progress">
+                    <paper-progress id="progress" indeterminate hidden$="[[!sendingData]]"></paper-progress>
+                    <paper-progress id="progresserror" value="100" hidden$="[[!formError]]"></paper-progress>
+                    <div class="errormsg-container" hidden$="[[!formError]]"><iron-icon icon="icons:error-outline"></iron-icon><span id="errormsg"></span></div>
+                </div>
                 <div class="clearfix btn-group">
-                    <paper-button class="blue-link" dialog-dismiss>Cancel</paper-button>
+                    <paper-button class="blue-link" dialog-dismiss on-tap="_clearError">Cancel</paper-button>
                     <paper-button class="blue" disabled$="[[!formReady]]" on-tap="_submitForm">Add</paper-button>
                 </div>
             </paper-dialog-scrollable>
         </paper-dialog>
 
-        <iron-ajax id="teamAddAjaxRequest" url="/api/v1/org/[[organization.id]]/teams" method="POST" on-response="_handleTeamAddAjaxResponse" on-error="_handleTeamAddAjaxError"></iron-ajax>
+        <iron-ajax id="teamAddAjaxRequest" url="/api/v1/org/[[organization.id]]/teams" method="POST" on-response="_handleTeamAddAjaxResponse" on-error="_handleTeamAddAjaxError" handle-as='xml'></iron-ajax>
 
     </template>
 
@@ -73,6 +102,10 @@
                         type: Boolean,
                         computed: '_computeFormReady(newTeam.name, sendingData)'
                     },
+                    formError: {
+                        type: Boolean,
+                        value: false
+                    },
                     referral: {
                         type: String,
                         value: null
@@ -81,9 +114,16 @@
                 listeners: {
                     'iron-overlay-closed': '_modalClosed'
                 },
+                _clearError:function(){
+                    if(this.formError){
+                        this.set('formError', false);
+                    }
+                },
                 _computeFormReady: function(name, sendingData) {
                     var formReady = false;
-
+                    if(this.formError){
+                        this.set('formError', false);
+                    }
                     if (name) {
                         formReady = true;
                     }
@@ -107,6 +147,8 @@
                     this.querySelector('paper-dialog').close();
                 },
                 _submitForm: function() {
+                    this.set('sendingData', true);
+                    this.set('formError', false);
                     this.$.teamAddAjaxRequest.headers["Content-Type"] = 'application/json';
                     this.$.teamAddAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
                     this.$.teamAddAjaxRequest.body = {
@@ -116,7 +158,7 @@
                     };
                     this.$.teamAddAjaxRequest.generateRequest();
 
-                    this.set('sendingData', true);
+
                 },
                 _handleTeamAddAjaxResponse: function(e) {
                     this.set('sendingData', false);
@@ -125,15 +167,17 @@
                     if (this.referral && this.referral=="onb") {
                         this.fire("new-team-added", e.detail.response);
                     }
-                    var toast = document.querySelector('paper-toast#mist-toast');
-                    toast.text = 'New team '+ e.detail.response.name + ' added succesfully.';
-                    toast.show();
+                    this.fire('toast',{msg:'New team '+ e.detail.response.name + ' added succesfully.',duration:3000});
 
                     this._formReset();
                     this.set('referral', null);
                 },
-                _handleTeamAddAjaxError: function(){
+                _handleTeamAddAjaxError: function(e){
                     this.set('sendingData', false);
+                    this.set('formError', true);
+                    console.log(e)
+                    this.$.errormsg.textContent = e.detail.request.xhr.responseText;
+
                 },
                 _modalClosed: function(e) {
                     if (e.srcElement.id == 'teamAddModal') {
