@@ -1333,8 +1333,10 @@ def create_network(owner, cloud, network_params):
     Creates a new network on the specified cloud.
     Network_params is a dict containing all the necessary values that describe a network.
     """
-    # Create a DB document for the new network and call libcloud to declare it on the cloud provider
-    new_network = NETWORKS[cloud.ctl.provider].add(cloud=cloud, **network_params)
+    # Create a DB document for the new network and call libcloud
+    #  to declare it on the cloud provider
+    new_network = NETWORKS[cloud.ctl.provider].add(cloud=cloud,
+                                                   **network_params)
 
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])
@@ -1347,8 +1349,10 @@ def create_subnet(owner, cloud, network, subnet_params):
     Create a new subnet attached to the specified network ont he given cloud.
     Subnet_params is a dict containing all the necessary values that describe a subnet.
     """
-    # Create a DB document for the new subnet and call libcloud to declare it on the cloud provider
-    new_subnet = SUBNETS[cloud.ctl.provider].add(network=network, **subnet_params)
+    # Create a DB document for the new subnet and call libcloud
+    #  to declare it on the cloud provider
+    new_subnet = SUBNETS[cloud.ctl.provider].add(network=network,
+                                                 **subnet_params)
 
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])

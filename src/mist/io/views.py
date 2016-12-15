@@ -1537,12 +1537,14 @@ def create_network(request):
     network = methods.create_network(auth_context.owner, cloud, network_params)
     network_dict = network.as_dict()
 
-    # Bundling Subnet creation in this call because it is required for backwards compatibility with the current UI
+    # Bundling Subnet creation in this call because it is required
+    #  for backwards compatibility with the current UI
     if subnet_params:
         try:
             subnet = methods.create_subnet(auth_context.owner, cloud, network, subnet_params)
         except Exception as exc:
-            # Cleaning up the network object in case subnet creation fails for any reason
+            # Cleaning up the network object in case subnet creation
+            #  fails for any reason
             network.ctl.delete_network()
             raise exc
         network_dict['subnet'] = subnet.as_dict()
@@ -1574,7 +1576,6 @@ def create_subnet(request):
     network_id = request.matchdict['network']
 
     params = params_from_request(request)
-    subnet = params.get('subnet')
 
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "create_resources", cloud_id)
@@ -1588,7 +1589,7 @@ def create_subnet(request):
     except Network.DoesNotExist:
         raise NetworkNotFoundError
 
-    subnet = methods.create_subnet(auth_context.owner, cloud, network, subnet)
+    subnet = methods.create_subnet(auth_context.owner, cloud, network, params)
 
     return subnet.as_dict()
 

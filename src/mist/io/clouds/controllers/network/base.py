@@ -66,10 +66,6 @@ class BaseNetworkController(BaseController):
     and use.
     """
 
-    def __init__(self, main_ctl):
-
-        super(BaseNetworkController, self).__init__(main_ctl)
-
     @LibcloudExceptionHandler(mist.io.exceptions.NetworkCreationError)
     def create_network(self, network, **kwargs):
         """Create a new network. This method receives a Network DB object
@@ -294,11 +290,13 @@ class BaseNetworkController(BaseController):
 
          Subclasses SHOULD NOT override or extend this method.
 
-        There is instead a private method that is called from this method,
+        There are instead a number of methods that are called from this method,
         to allow subclasses to modify the data according to the specific of
-        their cloud type. This method currently is:
+        their cloud type. These methods currently are:
 
-            `self._list_networks__parse_libcloud_object`
+            `self._list_subnets__parse_args`
+            `self._list_subnets__parse_libcloud_object`
+            `self._list_subnets__fetch_subnets`
 
         More private methods may be added in the future.
         Subclasses that require special handling should override this, by
@@ -438,7 +436,7 @@ class BaseNetworkController(BaseController):
         self.ctl.compute.connection.ex_delete_network(**kwargs)
 
     @LibcloudExceptionHandler(mist.io.exceptions.SubnetDeletionError)
-    def delete_subnet(self, subnet):
+    def delete_subnet(self, subnet, **kwargs):
         """Deletes a subnet.
 
         Subclasses SHOULD NOT override or extend this method.
@@ -455,9 +453,8 @@ class BaseNetworkController(BaseController):
 
         subnet: A Subnet mongoengine model.
         """
-        list_subnets_args = {}
-        self._delete_subnet__parse_args(subnet, list_subnets_args)
-        self._delete_subnet__delete_libcloud_subnet(subnet, list_subnets_args)
+        self._delete_subnet__parse_args(subnet, kwargs)
+        self._delete_subnet__delete_libcloud_subnet(subnet, kwargs)
 
         subnet.delete()
 

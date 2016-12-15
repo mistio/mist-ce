@@ -2,11 +2,11 @@ import logging
 import json
 import ssl
 
-from libcloud.common.types import LibcloudError, InvalidCredsError, \
-    MalformedResponseError
+from libcloud.common.types import LibcloudError, InvalidCredsError
+from libcloud.common.types import MalformedResponseError
 from libcloud.common.exceptions import BaseHTTPError, RateLimitReachedError
-from mist.io.exceptions import CloudUnauthorizedError, CloudUnavailableError, \
-    RateLimitError, BadRequestError
+from mist.io.exceptions import CloudUnauthorizedError, CloudUnavailableError
+from mist.io.exceptions import RateLimitError, BadRequestError
 
 log = logging.getLogger(__name__)
 
@@ -62,12 +62,13 @@ class LibcloudExceptionHandler(object):
                 raise CloudUnavailableError(exc=exc, msg=exc.message)
             except MalformedResponseError as exc:
                 log.error("MalformedResponseError on running %s: %s", exc)
-                raise MalformedResponseError(exc=exc, msg=exc.message)
+                raise exc
             except RateLimitReachedError as exc:
                 log.error("Rate limit error on running %s: %s", func.__name__,
                           exc)
                 raise RateLimitError(exc=exc, msg=exc.message)
             # Libcloud errors caused by invalid parameters are raised as this
+            # exception class
             except BaseHTTPError as exc:
                 log.error("Bad request on running %s: %s", func.__name__, exc)
                 raise BadRequestError(exc=exc,
