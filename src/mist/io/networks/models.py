@@ -144,7 +144,7 @@ class GoogleNetwork(Network):
         been selected. Otherwise, a value of None must be passed to libcloud
         for the network creation call to succeed. """
         if self.mode == 'legacy':
-            super(self, GoogleNetwork).clean()
+            super(GoogleNetwork, self).clean()
         else:
             if self.cidr is not None:
                 raise me.ValidationError('CIDR cannot be set for modes other '
@@ -279,7 +279,7 @@ class OpenStackSubnet(Subnet):
     dns_nameservers = me.ListField(default=lambda: [])
     allocation_pools = me.ListField(default=lambda: [])
     gateway_ip = me.StringField()
-    ip_version = me.IntField(default='4')
+    ip_version = me.IntField(default=4)
 
     _controller_cls = net_controllers.OpenStackNetworkController
 

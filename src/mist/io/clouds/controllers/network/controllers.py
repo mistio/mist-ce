@@ -57,7 +57,6 @@ class GoogleNetworkController(BaseNetworkController):
     provider = 'gce'
 
     def _create_network__parse_args(self, network_args):
-        rename_kwargs(network_args, 'cidr', 'cidr_block')
         # If the network doesn't use 'legacy' mode, the cidr arg
         # must be present with a value of None
         network_args['cidr'] = network_args.get('cidr')
