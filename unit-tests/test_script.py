@@ -8,7 +8,13 @@ def test_edit(script):
     name = script.name + '_edited'
     print "edit script with name %s" % name
     script.ctl.edit(name)
-    print "succeeded %s" % script.name
+    assert name == script.name, "Edit name failed!"
+    print "edit name succeeded %s" % script.name
+
+    description = 'my description for script'
+    script.ctl.edit(description=description)
+    assert description == script.description, "Edit description failed!"
+    print "edit description succeeded"
 
 
 def test_get_file(script):
@@ -16,4 +22,4 @@ def test_get_file(script):
     print "test get_file"
     result = script.ctl.get_file()
     assert result, "Something bad happened"
-    print "The file is: %s" % result
+    print "get_file succeeded"
