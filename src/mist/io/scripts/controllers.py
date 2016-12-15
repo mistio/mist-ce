@@ -20,7 +20,8 @@ class AnsibleScriptController(BaseScriptController):
                 raise ScriptFormatError()
 
     def run_script(self, shell, params=None, job_id=None):
-        params = '"%s"' % params.replace('"', r'\"')
+        if params:
+            params = '"%s"' % params.replace('"', r'\"')
         path, params, wparams = super(
             AnsibleScriptController, self).run_script(shell, params=params,
                                                       job_id=job_id)
@@ -41,17 +42,17 @@ class ExecutableScriptController(BaseScriptController):
 class CollectdScriptController(BaseScriptController):
 
     def run_script(self, shell, params=None, job_id=None):
-        # FIXME i don't like this, why not to put this into run_script
-        # with a simple 'if'. do we need print read()?
         if self.script.location.type == 'inline':
             # wrap collectd python plugin so that it can run as script
             source_code = self.script.location.source_code
-            if not self.script.location.source_code.startswith('!#'):
-                self.script.location.source_code = \
-                    '#!/usr/bin/env python\n\n' + source_code
+            hashbang = '#!/usr/bin/env python\n\n'
+            if not source_code.startswith('!#'):
+                self.script.location.source_code = hashbang + source_code
             # self.script.location.source_code += '\n\nprint read()\n' FIXME
+            # do we need print read()?
         path, params, wparams = super(CollectdScriptController,
-                                      self).run_script(shell, params=params,
+                                      self).run_script(shell,
+                                                       params=params,
                                                        job_id=job_id)
         return path, params, wparams
 
