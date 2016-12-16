@@ -180,7 +180,7 @@ class Script(me.Document):
         """
         if not name:
             raise RequiredParameterMissingError('name')
-        if not owner or not isinstance(owner, Organization):
+        if not owner or not isinstance(owner, Owner):
             raise BadRequestError('owner')
         script = cls(owner=owner, name=name)
         if id:
