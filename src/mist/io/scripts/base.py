@@ -1,6 +1,3 @@
-import uuid
-import datetime
-import urllib
 import logging
 import requests
 import StringIO
@@ -10,7 +7,6 @@ from pyramid.response import Response
 from mist.io.exceptions import BadRequestError
 from mist.io.helpers import trigger_session_update
 from mist.core.exceptions import ScriptNameExistsError
-from mist.io.exceptions import RequiredParameterMissingError
 
 log = logging.getLogger(__name__)
 
@@ -225,4 +221,3 @@ class BaseScriptController(object):
 
     def _preparse_file(self):
         return
-
