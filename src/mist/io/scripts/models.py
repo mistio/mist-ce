@@ -140,7 +140,7 @@ class Script(me.Document):
 
     name = me.StringField(required=True)
     description = me.StringField()
-    owner = me.ReferenceField(Owner, required=True) # TODO Org when port users
+    owner = me.ReferenceField(Owner, required=True)  # TODO Org when port users
     location = me.EmbeddedDocumentField(Location, required=True)
 
     deleted = me.BooleanField(default=False)
@@ -212,7 +212,7 @@ class Script(me.Document):
         """Data representation for api calls.
            Use this for backwards compatibility"""
 
-        if isinstance(self.location, InlineLocation): # TODO replace with type
+        if not self.location.type == 'inline':
             entrypoint = ''
         else:
             entrypoint = self.location.entrypoint or ''
