@@ -173,7 +173,7 @@ class BaseScriptController(object):
             if 'gzip' in r.headers['Content-Type']:
                 if r.headers.get('content-disposition', ''):
                     filename = r.headers.get(
-                        'content-disposition').split("=",1)[1]
+                        'content-disposition').split("=", 1)[1]
                 else:
                     filename = "script.tar.gz"
 
