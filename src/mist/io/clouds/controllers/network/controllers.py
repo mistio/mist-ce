@@ -93,15 +93,6 @@ class GoogleNetworkController(BaseNetworkController):
                 if libcloud_subnet.network.id == network.network_id]
 
     def _delete_network__delete_libcloud_network(self, network, kwargs):
-        # FIXME: Move these imports to the top of the file when circular
-        # import issues are resolved
-        from mist.io.networks.models import Subnet
-
-        if network.mode == 'custom':
-            associated_subnets = Subnet.objects(network=network)
-            for subnet in associated_subnets:
-                subnet.ctl.delete_subnet()
-
         self.ctl.compute.connection.ex_destroy_network(**kwargs)
 
     def _delete_network__parse_args(self, network, kwargs):
@@ -159,11 +150,9 @@ class OpenStackNetworkController(BaseNetworkController):
         for net in networks:
             if net.network_id == network.network_id:
                 return net
-        return None
 
     def _get_libcloud_subnet(self, subnet):
         subnets = self.ctl.compute.connection.ex_list_subnets()
         for sub in subnets:
             if sub.subnet_id == subnet.subnet_id:
                 return sub
-        return None
