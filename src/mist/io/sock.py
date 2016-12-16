@@ -36,6 +36,7 @@ except ImportError:
 from mist.core.auth.methods import auth_context_from_session_id
 
 from mist.io.exceptions import BadRequestError, UnauthorizedError, MistError
+from mist.core.exceptions import PolicyUnauthorizedError
 from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
@@ -141,6 +142,16 @@ class ShellConnection(MistConnection):
     def on_shell_open(self, data):
         if self.ssh_info:
             self.close()
+        try:
+            if not data.get('job_id'):
+                self.auth_context.check_perm(
+                    'machine', 'open_shell', data['machine_id']
+                )
+        except PolicyUnauthorizedError as err:
+            self.emit_shell_data('%s' % err)
+            self.close()
+            return
+
         self.ssh_info = {
             'job_id': data.get('job_id', ''),
             'cloud_id': data.get('cloud_id', ''),
