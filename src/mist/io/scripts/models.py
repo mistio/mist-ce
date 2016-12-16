@@ -3,7 +3,7 @@ from uuid import uuid4
 import mongoengine as me
 import mist.core.tag.models
 from urlparse import urlparse
-from mist.core.user.models import Organization
+from mist.core.user.models import Owner
 from mist.io.exceptions import BadRequestError
 from mist.io.scripts.base import BaseScriptController
 from mist.io.exceptions import RequiredParameterMissingError
@@ -140,7 +140,7 @@ class Script(me.Document):
 
     name = me.StringField(required=True)
     description = me.StringField()
-    owner = me.ReferenceField(Organization, required=True)
+    owner = me.ReferenceField(Owner, required=True) # TODO Org when port users
     location = me.EmbeddedDocumentField(Location, required=True)
 
     deleted = me.BooleanField(default=False)
