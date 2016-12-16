@@ -214,8 +214,9 @@ class BaseScriptController(object):
         wparams = "-v"
         if params:
             wparams += " -p '%s'" % params
-        if self.script.location.entrypoint:
-            wparams += " -f %s" % self.script.location.entrypoint
+        if not self.script.location.type == 'inline':
+            if self.script.location.entrypoint:
+                wparams += " -f %s" % self.script.location.entrypoint
         wparams += " %s" % path
         return path, params, wparams
 
