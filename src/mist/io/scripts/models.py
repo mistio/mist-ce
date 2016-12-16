@@ -212,7 +212,7 @@ class Script(me.Document):
         """Data representation for api calls.
            Use this for backwards compatibility"""
 
-        if not self.location.type == 'inline':
+        if self.location.type == 'inline':
             entrypoint = ''
         else:
             entrypoint = self.location.entrypoint or ''
