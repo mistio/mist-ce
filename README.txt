@@ -21,7 +21,7 @@ To install the basic requirements in a **Debian** based distro do::
 
 In **Red Hat** based systems the following packages need to be installed::
 
-    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel python-zc-buildout
+    sudo yum install git python-virtualenv python-dev erlang pcre python-lxml gcc libxml2 libxml2-python libxml2-devel python-zc-buildout libyaml libyaml-devel
 
 If you run the command erl after that and it is not found, then package erlang might be missing from the official repos so it needs to be installed manually::
 
