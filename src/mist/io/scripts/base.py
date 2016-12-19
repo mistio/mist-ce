@@ -1,5 +1,6 @@
 import logging
 import requests
+import datetime
 import StringIO
 import mongoengine as me
 from mist.core import config
@@ -112,19 +113,19 @@ class BaseScriptController(object):
         trigger_session_update(self.script.owner, ['scripts'])
 
     # TODO add delete method in controller and not in model
-    # def delete(self, expire=False):
-    #     """ Delete a script
-    #
-    #     By default the corresponding mongodb document is not actually
-    #     deleted, but rather marked as deleted.
-    #
-    #     :param expire: if True, the document is expires from the collection.
-    #     """
-    #
-    #     self.script.update(set__deleted=datetime.datetime.utcnow())
-    #     if expire:
-    #         self.script.delete()
-    #     trigger_session_update(self.script.owner, ['scripts'])
+    def delete(self, expire=False):
+        """ Delete a script
+
+        By default the corresponding mongodb document is not actually
+        deleted, but rather marked as deleted.
+
+        :param expire: if True, the document is expires from the collection.
+        """
+
+        self.script.update(set__deleted=datetime.datetime.utcnow())
+        if expire:
+            self.script.delete()
+        trigger_session_update(self.script.owner, ['scripts'])
 
     def _url(self):
         url = ''
