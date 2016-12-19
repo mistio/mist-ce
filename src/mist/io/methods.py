@@ -390,7 +390,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         except NotUniqueError:
             machine = Machine.objects.get(cloud=cloud, machine_id=node.id)
 
-        username = node.extra.get('username', 'root')
+        username = node.extra.get('username', '')
         machine.ctl.associate_key(key, username=username,
                                   port=ssh_port, no_connect=True)
     # Call post_deploy_steps for every provider

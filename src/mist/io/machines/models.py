@@ -86,12 +86,14 @@ class Monitoring(me.EmbeddedDocument):
         }
 
     def as_dict(self):
+        status = self.installation_status
+
         return {
             'hasmonitoring': self.hasmonitoring,
             'monitor_server': core_config.COLLECTD_HOST,
             'collectd_password': self.collectd_password,
             'metrics': self.metrics,
-            'installation_status': self.installation_status.as_dict(),
+            'installation_status': status.as_dict() if status else '',
             'commands': self.get_commands(),
         }
 
@@ -205,7 +207,7 @@ class Machine(me.Document):
             'size': self.size,
             'state': self.state,
             'tags': tags,
-            'monitoring': self.monitoring.as_dict(),
+            'monitoring': self.monitoring.as_dict() if self.monitoring else '',
             'key_associations': self.key_associations,
             'cloud': self.cloud.id,
             'last_seen': str(self.last_seen or ''),

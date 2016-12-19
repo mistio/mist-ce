@@ -98,7 +98,7 @@ class BaseKeyController(object):
         log.info("Successfully set key with id '%s' as default.", self.key.id)
         trigger_session_update(self.key.owner, ['keys'])
 
-    def associate(self, machine, username='root', port=22, no_connect=False):
+    def associate(self, machine, username='', port=22, no_connect=False):
         """Associates a key with a machine."""
 
         from mist.io.machines.models import KeyAssociation
