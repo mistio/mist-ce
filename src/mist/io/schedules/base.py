@@ -102,7 +102,7 @@ class BaseController(object):
 
         if script_id:
             try:
-                Script.objects.get(owner=owner, id=script_id)
+                Script.objects.get(owner=owner, id=script_id, deleted=None)
             except me.DoesNotExist:
                 raise ScriptNotFoundError('Script with id %s does not '
                                           'exist' % script_id)
