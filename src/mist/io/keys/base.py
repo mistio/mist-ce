@@ -63,6 +63,10 @@ class BaseKeyController(object):
         except me.NotUniqueError as exc:
             log.error("Key %s not unique error: %s", self.key.name, exc)
             raise KeyExistsError()
+
+        # SEC
+        self.key.owner.mapper.update(self.key)
+
         log.info("Added key with name '%s'", self.key.name)
         trigger_session_update(self.key.owner, ['keys'])
 

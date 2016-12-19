@@ -120,6 +120,10 @@ def add_cloud_v_2(owner, title, provider, params):
             no_ssh=not (machine.os_type == 'unix' and
                         machine.key_associations)
         )
+
+    # SEC
+    owner.mapper.update(cloud)
+
     log.info("Cloud with id '%s' added succesfully.", cloud.id)
     trigger_session_update(owner, ['clouds'])
     return ret
@@ -129,7 +133,7 @@ def rename_cloud(owner, cloud_id, new_name):
     """Renames cloud with given cloud_id."""
 
     log.info("Renaming cloud: %s", cloud_id)
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
     cloud.ctl.rename(new_name)
     log.info("Succesfully renamed cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
@@ -156,24 +160,13 @@ def delete_cloud(owner, cloud_id):
                         "Error: %r", exc)
 
     try:
-        cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+        cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
+        # FIXME: Make sure that the cloud's machines are also deleted once the
+        # cloud document is expired. This must be implemented in the cloud ctl.
+        cloud.update(set__deleted=datetime.utcnow())
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
-    machines = Machine.objects(cloud=cloud)
-    for machine in machines:
-        tags = Tag.objects(owner=owner, resource=machine)
-        for tag in tags:
-            try:
-                tag.delete()
-            except:
-                 pass
-        try:
-            machine.delete()
-        except:
-            pass
-
-    cloud.delete()
     log.info("Succesfully deleted cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
 
@@ -188,13 +181,14 @@ def delete_key(user, key_id):
     :return:
     """
     log.info("Deleting key with id '%s'.", key_id)
-    key = Key.objects.get(owner=user, id=key_id)
+    key = Key.objects.get(owner=user, id=key_id, deleted=None)
     default_key = key.default
-    key.delete()
-    other_key = Key.objects(owner=user, id__ne=key_id).first()
+    key.update(set__deleted=datetime.utcnow())
+    other_key = Key.objects(owner=user, id__ne=key_id, deleted=None).first()
     if default_key and other_key:
         other_key.default = True
         other_key.save()
+
     log.info("Deleted key with id '%s'.", key_id)
     trigger_session_update(user, ['keys'])
 
@@ -210,8 +204,8 @@ def connect_provider(cloud):
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
-    machines = Cloud.objects.get(owner=user,
-                                 id=cloud_id).ctl.compute.list_machines()
+    machines = Cloud.objects.get(owner=user, id=cloud_id,
+                                 deleted=None).ctl.compute.list_machines()
     return [machine.as_dict_old() for machine in machines]
 
 
@@ -258,18 +252,18 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     # post_script_params: extra params, for post_script_id
 
     log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     machine_name = machine_name_validator(conn.type, machine_name)
     key = None
     if key_id:
-        key = Key.objects.get(owner=user, id=key_id)
+        key = Key.objects.get(owner=user, id=key_id, deleted=None)
 
     # if key_id not provided, search for default key
     if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
         if not key_id:
-            key = Key.objects.get(owner=user, default=True)
+            key = Key.objects.get(owner=user, default=True, deleted=None)
             key_id = key.name
     if key:
         private_key = key.private
@@ -1168,7 +1162,7 @@ def ssh_command(user, cloud_id, machine_id, host, command,
 
     """
     # check if cloud exists
-    Cloud.objects.get(owner=user, id=cloud_id)
+    Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
 
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id,
@@ -1180,13 +1174,13 @@ def ssh_command(user, cloud_id, machine_id, host, command,
 
 def list_images(user, cloud_id, term=None):
     """List images from each cloud"""
-    return Cloud.objects.get(owner=user,
-                             id=cloud_id).ctl.compute.list_images(term)
+    return Cloud.objects.get(owner=user, id=cloud_id,
+                             deleted=None).ctl.compute.list_images(term)
 
 
 def star_image(user, cloud_id, image_id):
     """Toggle image star (star/unstar)"""
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
 
     star = cloud.ctl.compute.image_is_starred(image_id)
     if star:
@@ -1209,9 +1203,12 @@ def star_image(user, cloud_id, image_id):
 def list_clouds(user):
     # FIXME: Move import to the top of the file.
     from mist.core.tag.methods import get_tags_for_resource
-    clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=user)]
+    clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=user,
+                                                         deleted=None)]
     for cloud in clouds:
-        cloud['tags'] = get_tags_for_resource(user,  cloud)
+        # FIXME: cloud must be a mongoengine object FFS!
+        # Also, move into cloud model's as_dict method?
+        cloud['tags'] = get_tags_for_resource(user, cloud)
     return clouds
 
 
@@ -1221,9 +1218,10 @@ def list_keys(user):
     :return:
     """
     from mist.core.tag.methods import get_tags_for_resource
-    keys = Key.objects(owner=user).only("default", "name")
-    clouds = Cloud.objects(owner=user)
+    keys = Key.objects(owner=user, deleted=None)
+    clouds = Cloud.objects(owner=user, deleted=None)
     key_objects = []
+    # FIXME: This must be taken care of in Keys.as_dict
     for key in keys:
         key_object = {}
         machines = Machine.objects(cloud__in=clouds,
@@ -1240,13 +1238,14 @@ def list_keys(user):
 
 def list_sizes(user, cloud_id):
     """List sizes (aka flavors) from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.compute.list_sizes()
+    return Cloud.objects.get(owner=user, id=cloud_id,
+                             deleted=None).ctl.compute.list_sizes()
 
 
 def list_locations(user, cloud_id):
     """List locations from each cloud"""
-    return Cloud.objects.get(owner=user,
-                             id=cloud_id).ctl.compute.list_locations()
+    return Cloud.objects.get(owner=user, id=cloud_id,
+                             deleted=None).ctl.compute.list_locations()
 
 
 def list_networks(user, cloud_id):
@@ -1255,7 +1254,7 @@ def list_networks(user, cloud_id):
     this returns an empty list
 
     """
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     ret = {}
@@ -1330,7 +1329,7 @@ def list_projects(user, cloud_id):
     Currently supported for Packet.net. For other providers
     this returns an empty list
     """
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     ret = {}
@@ -1470,7 +1469,7 @@ def openstack_router_to_dict(router):
 
 
 def associate_ip(user, cloud_id, network_id, ip, machine_id=None, assign=True):
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     if conn.type != Provider.NEPHOSCALE:
@@ -1485,7 +1484,7 @@ def create_network(owner, cloud_id, network, subnet, router):
     it will use the new network's id to create a subnet
 
     """
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
     if conn.type not in (Provider.OPENSTACK,):
         raise NetworkActionNotSupported()
@@ -1645,7 +1644,7 @@ def delete_network(owner, cloud_id, network_id):
     """
     Delete a neutron network
     """
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     if conn.type is Provider.OPENSTACK:
@@ -1675,7 +1674,7 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
 
     Tags is expected to be a list of key-value dicts
     """
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
 
     if not isinstance(cloud, (cloud_models.AmazonCloud,
                               cloud_models.GoogleCloud,
@@ -1774,7 +1773,7 @@ def delete_machine_tag(user, cloud_id, machine_id, tag):
 
     """
 
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
 
     if not tag:
         raise RequiredParameterMissingError("tag")
@@ -1872,7 +1871,7 @@ def enable_monitoring(user, cloud_id, machine_id,
                       name='', dns_name='', public_ips=None,
                       no_ssh=False, dry=False, deploy_async=True, **kwargs):
     """Enable monitoring for a machine."""
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
     payload = {
         'action': 'enable',
         'no_ssh': True,
@@ -2098,7 +2097,7 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
         cloud_id = kwargs['cloud_id']
         body += "Cloud:\n"
         try:
-            cloud = Cloud.objects.get(owner=user, id=cloud_id)
+            cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
             cloud_title = cloud.title
         except DoesNotExist:
             cloud_title = ''

@@ -211,7 +211,9 @@ class CloudPollingSchedule(PollingSchedule):
 
     @property
     def enabled(self):
-        return super(CloudPollingSchedule, self).enabled and self.cloud.enabled
+        return (super(CloudPollingSchedule, self).enabled
+                and self.cloud.enabled
+                and not self.cloud.deleted)
 
 
 class ListMachinesPollingSchedule(CloudPollingSchedule):
