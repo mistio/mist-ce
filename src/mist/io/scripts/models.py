@@ -127,7 +127,7 @@ class Script(me.Document):
         'collection': 'scripts',
         'indexes': [
             {
-                'fields': ['owner', 'name'],  # 'deleted' # TODO after mappings
+                'fields': ['owner', 'name', 'deleted'],
                 'sparse': False,
                 'unique': True,
                 'cls': False,
@@ -143,8 +143,7 @@ class Script(me.Document):
     owner = me.ReferenceField(Owner, required=True)  # TODO Org when port users
     location = me.EmbeddedDocumentField(Location, required=True)
 
-    deleted = me.BooleanField(default=False)
-    # deleted = me.DateTimeField() # FIXME after mappings
+    deleted = me.DateTimeField()
 
     _controller_cls = None
 
@@ -207,6 +206,7 @@ class Script(me.Document):
     def delete(self):
         super(Script, self).delete()
         mist.core.tag.models.Tag.objects(resource=self).delete()
+        self.owner.mapper.remove(self)
 
     def as_dict_old(self):
         """Data representation for api calls.
