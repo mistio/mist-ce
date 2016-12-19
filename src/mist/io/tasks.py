@@ -46,8 +46,6 @@ from mist.io.helpers import amqp_owner_listening
 from mist.io.helpers import amqp_log
 from mist.io.helpers import trigger_session_update
 
-from mist.io.methods import deploy_collectd
-
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -884,6 +882,9 @@ class Ping(UserTask):
 @app.task
 def deploy_collectd(owner, cloud_id, machine_id, extra_vars, job_id='',
                     plugins=None):
+    # FIXME
+    from mist.io.methods import deploy_collectd
+    
     if isinstance(owner, basestring) and '@' in owner:
         owner = User.objects.get(email=owner)
     else:
