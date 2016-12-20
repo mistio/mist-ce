@@ -13,8 +13,8 @@ import mist.io.scripts.controllers as controllers
 
 class Location(me.EmbeddedDocument):
     """Abstract Base class used as a common interface for location types.
-        There are three different types
-        for now: InLineLocation, GithubLocation, UrlLocation
+        There are three different types: InLineLocation, GithubLocation
+        and UrlLocation
     """
     meta = {'allow_inheritance': True}
 
@@ -65,6 +65,9 @@ class UrlLocation(Location):
     entrypoint = me.StringField()
 
     def clean(self):
+        script_url = urlparse(self.url)
+        if (script_url.scheme and script_url.netloc):
+            raise BadRequestError("This is not a valid url!")
         if not (self.url.startswith('http://') or
                 self.url.startswith('https://')):
             raise BadRequestError("When 'location_type' is 'url', 'script' "
@@ -107,7 +110,7 @@ class Script(me.Document):
         This will return an iterable of AnsibleScript instances.
 
         To create a new script, one should initialize a Script subclass like
-        AmazonScript. Initializing directly a Script instance won't have any
+        AnsibleScript. Initializing directly a Script instance won't have any
         fields or associated handler to work with.
 
         Each Script subclass should define a `_controller_cls` class attribute.
@@ -118,7 +121,7 @@ class Script(me.Document):
         gives access to the scripts controller.
         This way it is possible to do things like:
 
-            script = AnsibleScript.objects.get(id=key_id)
+            script = AnsibleScript.objects.get(id=script_id)
             script.ctl.get_file()
         """
 
@@ -189,11 +192,11 @@ class Script(me.Document):
 
     @property
     def script(self):  # TODO only for as_dict_old, replace with location.type
-        if isinstance(self.location, InlineLocation):
+        if self.location.type == 'inline':
             return self.location.source_code
-        elif isinstance(self.location, GithubLocation):
+        elif self.location.type == 'github':
             return self.location.repo
-        elif isinstance(self.location, UrlLocation):
+        elif self.location.type == 'url':
             return self.location.url
 
     # def get_jobs(self):

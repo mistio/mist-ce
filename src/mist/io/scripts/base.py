@@ -36,7 +36,7 @@ class BaseScriptController(object):
         import mist.io.scripts.models as scripts
 
         # set description
-        self.script.description = kwargs.pop('description')
+        self.script.description = kwargs.pop('description', '')
 
         # set location
         location_type = kwargs.pop('location_type')
@@ -47,15 +47,15 @@ class BaseScriptController(object):
         entrypoint = kwargs.pop('entrypoint', '')
 
         if location_type == 'inline':
-            script_entry = kwargs.pop('script') or ''
+            script_entry = kwargs.pop('script' '')
             self.script.location = scripts.InlineLocation(
                 source_code=script_entry)
         elif location_type == 'github':
-            script_entry = kwargs.pop('script') or ''
+            script_entry = kwargs.pop('script', '')
             self.script.location = scripts.GithubLocation(
                 repo=script_entry, entrypoint=entrypoint)
         elif location_type == 'url':
-            script_entry = kwargs.pop('script') or ''
+            script_entry = kwargs.pop('script', '')
             self.script.location = scripts.UrlLocation(
                 url=script_entry, entrypoint=entrypoint)
         else:
@@ -156,14 +156,11 @@ class BaseScriptController(object):
 
         if self.script.location.type == 'inline':
             return self.script.location.source_code
+            # return Response(self.script.location.source_code)
         else:
-            url = self._url()
             # Download a file over HTTP
+            url = self._url()
             log.debug("Downloading %s.", url)
-            # name, headers = urllib.urlretrieve(url)  # TODO check if succeeds
-            # # raise error
-            # log.debug("Downloaded to %s.", name)     # maybe return file_type
-            # return name
             try:
                 r = requests.get(url)
                 r.raise_for_status()
@@ -191,21 +188,11 @@ class BaseScriptController(object):
                                 charset='utf8',
                                 pragma='no-cache',
                                 body=r.content)
-            # else:
-            #     return Response(r.content)
 
     def run_script(self, shell, params=None, job_id=None):
         if self.script.location.type == 'inline':
             path = "/tmp/mist_script_%s" % job_id
             source = self.script.location.source_code
-            # if isinstance(self.script, CollectdScript):
-            #     # wrap collectd python plugin so that it can run as script
-            #     if not source.startswith('#!'):
-            #         source = '#!/usr/bin/env python\n\n' + source
-            #     source += '\n\nprint read()\n'
-            #     if not source.startswith('#!'):
-            #         source = '#!/usr/bin/env python\n\n' + source
-            #     source += '\n\nprint read()\n'
             sftp = shell.ssh.open_sftp()
             sftp.putfo(StringIO.StringIO(source), path)
         else:
