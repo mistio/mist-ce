@@ -112,7 +112,6 @@ class BaseScriptController(object):
         log.info("Edit script: '%s'.", self.script.id)
         trigger_session_update(self.script.owner, ['scripts'])
 
-    # TODO add delete method in controller and not in model
     def delete(self, expire=False):
         """ Delete a script
 
