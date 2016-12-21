@@ -290,6 +290,10 @@ class BaseComputeController(BaseController):
                         id__nin=[m.id for m in machines],
                         missing_since=None).update(missing_since=now)
 
+        # Update RBAC Mappings given the new list of nodes. Missing nodes are
+        # not removed.
+        self.cloud.owner.mapper.update(machines)
+
         return machines
 
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
