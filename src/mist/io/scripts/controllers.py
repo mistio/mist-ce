@@ -57,7 +57,7 @@ class CollectdScriptController(BaseScriptController):
             if not source_code.startswith('!#'):
                 self.script.location.source_code = hashbang + source_code
             self.script.location.source_code += '\n\nprint read()\n'
-            # do we need print read()?
+
         path, params, wparams = super(CollectdScriptController,
                                       self).run_script(shell,
                                                        params=params,
