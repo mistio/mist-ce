@@ -83,9 +83,6 @@ class PollingSchedule(me.Document):
     def clean(self):
         """Automatically set value of name and remove expired overrides"""
         self.name = self.get_name()
-        self.override_intervals = [override
-                                   for override in self.override_intervals
-                                   if not override.expired()]
 
     @property
     def task(self):
@@ -161,6 +158,12 @@ class PollingSchedule(me.Document):
         self.override_intervals.append(Interval(name=name, expires=expires,
                                                 every=interval))
 
+    def cleanup_expired_intervals(self):
+        """Remove override schedules that have expired"""
+        self.override_intervals = [override
+                                   for override in self.override_intervals
+                                   if not override.expired()]
+
     def set_default_interval(self, interval):
         """Set default interval
 
@@ -202,6 +205,7 @@ class CloudPollingSchedule(PollingSchedule):
         if interval is not None:
             schedule.add_interval(interval, ttl)
         schedule.run_immediately = True
+        schedule.cleanup_expired_intervals()
         schedule.save()
         return schedule
 
