@@ -37,10 +37,14 @@ class ExecutableScriptController(BaseScriptController):
 
     def _preparse_file(self):
         if self.script.location.type == 'inline':
-            if not self.script.location.source_code.startswith('#!'):
-                raise BadRequestError(
-                    "script' must start with a hashbang/shebang ('#!')."
-                )
+            if self.script.source_code:
+                if not self.script.location.source_code.startswith('#!'):
+                    raise BadRequestError(
+                        "'script' must start with a hashbang/shebang ('#!')."
+                    )
+            else:
+                raise BadRequestError("for inline script you must provide "
+                                      "source code")
 
 
 class CollectdScriptController(BaseScriptController):
