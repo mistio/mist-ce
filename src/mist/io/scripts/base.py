@@ -121,7 +121,8 @@ class BaseScriptController(object):
         :param expire: if True, the document is expires from the collection.
         """
 
-        self.script.update(set__deleted=datetime.datetime.utcnow())
+        self.script.deleted = datetime.datetime.utcnow()
+        self.script.save()
         if expire:
             self.script.delete()
         trigger_session_update(self.script.owner, ['scripts'])
