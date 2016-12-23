@@ -66,7 +66,7 @@ class UrlLocation(Location):
 
     def clean(self):
         script_url = urlparse(self.url)
-        if (script_url.scheme and script_url.netloc):
+        if not (script_url.scheme and script_url.netloc):
             raise BadRequestError("This is not a valid url!")
         if not (self.url.startswith('http://') or
                 self.url.startswith('https://')):
