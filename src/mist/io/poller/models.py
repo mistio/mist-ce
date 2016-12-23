@@ -10,7 +10,7 @@ from mist.core.user.models import Owner
 from mist.io.clouds.models import Cloud
 
 
-class Interval(me.EmbeddedDocument):
+class PollingInterval(me.EmbeddedDocument):
 
     name = me.StringField()  # optional field for labeling interval
     every = me.IntField(required=True)  # seconds
@@ -56,9 +56,10 @@ class PollingSchedule(me.Document):
 
     # Scheduling information. Don't edit them directly, just use the model
     # methods.
-    default_interval = me.EmbeddedDocumentField(Interval, required=True,
-                                                default=Interval(every=0))
-    override_intervals = me.EmbeddedDocumentListField(Interval)
+    default_interval = me.EmbeddedDocumentField(
+        PollingInterval, required=True, default=PollingInterval(every=0)
+    )
+    override_intervals = me.EmbeddedDocumentListField(PollingInterval)
 
     # Optional arguments.
     queue = me.StringField()
@@ -117,8 +118,8 @@ class PollingSchedule(me.Document):
     def interval(self):
         """Merge multiple intervals into one
 
-        Returns a dynamic Interval, with the highest frequency of any override
-        schedule or the default schedule.
+        Returns a dynamic PollingInterval, with the highest frequency of any
+        override schedule or the default schedule.
 
         """
         interval = self.default_interval
@@ -155,8 +156,9 @@ class PollingSchedule(me.Document):
         assert isinstance(interval, int) and interval > 0
         assert isinstance(ttl, int) and 0 < ttl < 3600
         expires = datetime.datetime.now() + datetime.timedelta(seconds=ttl)
-        self.override_intervals.append(Interval(name=name, expires=expires,
-                                                every=interval))
+        self.override_intervals.append(
+            PollingInterval(name=name, expires=expires, every=interval)
+        )
 
     def cleanup_expired_intervals(self):
         """Remove override schedules that have expired"""
@@ -171,7 +173,7 @@ class PollingSchedule(me.Document):
         override schedule with a smaller interval. The default interval never
         expires. To disable a task, simply set `enabled` equal to False.
         """
-        self.default_interval = Interval(name='default', every=interval)
+        self.default_interval = PollingInterval(name='default', every=interval)
 
     def __unicode__(self):
         return "%s %s" % (self.get_name(), self.interval or '(no interval)')
