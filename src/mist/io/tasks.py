@@ -909,7 +909,8 @@ def deploy_collectd(owner, cloud_id, machine_id, extra_vars, job_id='',
     if plugins and not error:
         for script_id in plugins:
             try:
-                script = Script.objects.get(owner=owner, id=script_id)
+                script = Script.objects.get(owner=owner, id=script_id,
+                                            deleted=None)
                 ret = script.ctl.deploy_and_assoc_python_plugin_from_script(
                     machine)
             except Exception as exc:
