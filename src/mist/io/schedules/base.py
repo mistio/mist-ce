@@ -8,7 +8,7 @@ import json
 import logging
 import datetime
 import mongoengine as me
-from mist.core.script.models import Script
+from mist.io.scripts.models import Script
 from mist.io.exceptions import MistError
 from mist.core.rbac.methods import AuthContext
 from mist.io.exceptions import InternalServerError
