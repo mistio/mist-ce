@@ -1,5 +1,5 @@
 try:
-    from mist.core.user.models import User
+    from mist.io.users.models import User
     from mist.io.clouds.models import Cloud
     from mist.io.machines.models import Machine, KeyAssociation
     from mist.io.keys.models import SSHKey, SignedSSHKey

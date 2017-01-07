@@ -41,8 +41,6 @@ import ansible.callbacks
 import ansible.utils
 import ansible.constants
 
-# try:
-# from mist.core.user.models import User
 from mist.core.tag.models import Tag
 from mist.io.keys.models import Key
 from mist.core import config

@@ -1,6 +1,6 @@
-from mist.core.user.models import User
-from mist.core.user.models import Promo
-from mist.core.user.models import Organization
+from mist.io.users.models import User
+from mist.io.users.models import Promo
+from mist.io.users.models import Organization
 
 from mongoengine import ValidationError
 from mongoengine import OperationError

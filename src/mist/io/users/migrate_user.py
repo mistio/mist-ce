@@ -1,6 +1,6 @@
 import mongoengine as me
 
-from mist.core.user.models import User, Organization
+from mist.io.users.models import User, Organization
 
 
 class MUser(me.Document):
