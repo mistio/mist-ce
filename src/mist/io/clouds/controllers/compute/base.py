@@ -158,6 +158,8 @@ class BaseComputeController(BaseController):
 
         # Process each machine in returned list.
         machines = []
+        # Store previously unseen machines separately.
+        new_machines = []
         for node in nodes:
 
             # Fetch machine mongoengine model from db, or initialize one.
@@ -165,8 +167,8 @@ class BaseComputeController(BaseController):
                 machine = Machine.objects.get(cloud=self.cloud,
                                               machine_id=node.id)
             except Machine.DoesNotExist:
-                machine = Machine(cloud=self.cloud,
-                                  machine_id=node.id).save()
+                machine = Machine(cloud=self.cloud, machine_id=node.id).save()
+                new_machines.append(machine)
 
             # Update machine_model's last_seen fields.
             machine.last_seen = now
@@ -290,9 +292,8 @@ class BaseComputeController(BaseController):
                         id__nin=[m.id for m in machines],
                         missing_since=None).update(missing_since=now)
 
-        # Update RBAC Mappings given the new list of nodes. Missing nodes are
-        # not removed.
-        self.cloud.owner.mapper.update(machines)
+        # Update RBAC Mappings given the list of nodes seen for the first time.
+        self.cloud.owner.mapper.update(new_machines)
 
         return machines
 
