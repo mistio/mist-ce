@@ -121,7 +121,7 @@
             assignURL: function() {
                 var backURL, currentHostname = window.location.hostname;
 
-                return backURL = Missing.hosts.indexOf(currentHostname) == -1 ? 'https://mist.io' : 'http://127.0.0.1:8000/';
+                return backURL = Missing.hosts.indexOf(currentHostname) == -1 ? 'https://mist.io' : 'http://localhost/';
             },
             handler: function() {
                 var url = Missing.assignURL();
