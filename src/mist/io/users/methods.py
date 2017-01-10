@@ -20,6 +20,7 @@ from time import time
 import logging
 log = logging.getLogger(__name__)
 
+
 def get_all_promos():
     return Promo.objects()
 
@@ -29,7 +30,7 @@ def get_all_users(mongo_uri=None):
 
 
 def get_users_count(mongo_uri=None, confirmed=False):
-    "return the number of all users, optionally confirmed only users"
+    # return the number of all users, optionally confirmed only users
     if confirmed:
         return User.objects(status="confirmed").count()
     else:
