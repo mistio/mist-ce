@@ -228,7 +228,7 @@ class ParamikoShell(object):
             yield line
             line = stdout.readline()
 
-    def autoconfigure(self, user, cloud_id, machine_id,
+    def autoconfigure(self, owner, cloud_id, machine_id,
                       key_id=None, username=None, password=None, port=22):
         """Autoconfigure SSH client.
 
@@ -243,13 +243,13 @@ class ParamikoShell(object):
         log.info("autoconfiguring Shell for machine %s:%s",
                  cloud_id, machine_id)
 
-        cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
+        cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
         try:
             machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
         except me.DoesNotExist:
             machine = Machine(cloud=cloud, machine_id=machine_id)
         if key_id:
-            keys = [Key.objects.get(owner=user, id=key_id, deleted=None)]
+            keys = [Key.objects.get(owner=owner, id=key_id, deleted=None)]
         else:
             keys = [key_assoc.keypair
                     for key_assoc in machine.key_associations
@@ -281,7 +281,7 @@ class ParamikoShell(object):
                         # store the original ssh port in case of NAT
                         # by the OpenVPN server
                         ssh_port = port
-                        self.host, port = dnat(user, ssh_host, port)
+                        self.host, port = dnat(owner, ssh_host, port)
                         log.info("ssh -i %s %s@%s:%s",
                                  key.name, ssh_user, self.host, port)
                         cert_file = ''
@@ -340,7 +340,7 @@ class ParamikoShell(object):
                     machine.save()
 
                     if trigger_session_update_flag:
-                        trigger_session_update(user.id, ['keys'])
+                        trigger_session_update(owner.id, ['keys'])
                     return key.name, ssh_user
 
         raise MachineUnauthorizedError("%s:%s" % (cloud_id, machine_id))
@@ -423,20 +423,20 @@ class DockerShell(DockerWebSocket):
         self.host = host
         super(DockerShell, self).__init__()
 
-    def autoconfigure(self, user, cloud_id, machine_id, **kwargs):
+    def autoconfigure(self, owner, cloud_id, machine_id, **kwargs):
         shell_type = 'logging' if kwargs.get('job_id', '') else 'interactive'
         config_method = '%s_shell' % shell_type
 
-        getattr(self, config_method)(user,
+        getattr(self, config_method)(owner,
                                      cloud_id=cloud_id, machine_id=machine_id,
                                      job_id=kwargs.get('job_id', ''))
         self.connect()
         # This is for compatibility purposes with the ParamikoShell
         return None, None
 
-    def interactive_shell(self, user, **kwargs):
+    def interactive_shell(self, owner, **kwargs):
         docker_port, cloud = \
-            self.get_docker_endpoint(user, cloud_id=kwargs['cloud_id'])
+            self.get_docker_endpoint(owner, cloud_id=kwargs['cloud_id'])
         log.info("Autoconfiguring DockerShell for machine %s:%s",
                  cloud.id, kwargs['machine_id'])
 
@@ -444,25 +444,25 @@ class DockerShell(DockerWebSocket):
         self.uri = self.build_uri(kwargs['machine_id'], docker_port, cloud=cloud,
                                   ssl_enabled=ssl_enabled)
 
-    def logging_shell(self, user, log_type='CFY', **kwargs):
+    def logging_shell(self, owner, log_type='CFY', **kwargs):
         docker_port, container_id = \
-            self.get_docker_endpoint(user, cloud_id=None, job_id=kwargs['job_id'])
+            self.get_docker_endpoint(owner, cloud_id=None, job_id=kwargs['job_id'])
         log.info('Autoconfiguring DockerShell to stream %s logs from ' \
-                 'container %s (User: %s)', log_type, container_id, user.id)
+                 'container %s (User: %s)', log_type, container_id, owner.id)
 
         # TODO: SSL for CFY container
         self.uri = self.build_uri(container_id, docker_port, allow_logs=1,
                                                              allow_stdin=0)
 
-    def get_docker_endpoint(self, user, cloud_id, job_id=None):
+    def get_docker_endpoint(self, owner, cloud_id, job_id=None):
         if job_id:
             event = get_story(job_id)
-            assert user.id == event['owner_id'], 'Owner ID mismatch!'
+            assert owner.id == event['owner_id'], 'Owner ID mismatch!'
             self.host, docker_port = config.DOCKER_IP, config.DOCKER_PORT
             return docker_port, event['logs'][0]['container_id']
 
-        cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
-        self.host, docker_port = dnat(user, self.host, cloud.port)
+        cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
+        self.host, docker_port = dnat(owner, self.host, cloud.port)
         return docker_port, cloud
 
     def build_uri(self, container_id, docker_port, cloud=None, ssl_enabled=False,
@@ -530,15 +530,15 @@ class Shell(object):
                                         password=password, cert_file=cert_file, port=port)
             self.ssh = self._shell.ssh
 
-    def autoconfigure(self, user, cloud_id, machine_id, key_id=None,
+    def autoconfigure(self, owner, cloud_id, machine_id, key_id=None,
                       username=None, password=None, port=22, **kwargs):
         if isinstance(self._shell, ParamikoShell):
             return self._shell.autoconfigure(
-                user, cloud_id, machine_id, key_id=key_id,
+                owner, cloud_id, machine_id, key_id=key_id,
                 username=username, password=password, port=port
             )
         elif isinstance(self._shell, DockerShell):
-            return self._shell.autoconfigure(user, cloud_id, machine_id, **kwargs)
+            return self._shell.autoconfigure(owner, cloud_id, machine_id, **kwargs)
 
     def connect(self, username, key=None, password=None, cert_file=None, port=22):
         if isinstance(self._shell, ParamikoShell):

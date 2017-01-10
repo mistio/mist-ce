@@ -83,7 +83,7 @@ class BareMetalDriver(object):
                     driver=self, extra=extra)
         return node
 
-    def check_host(self, user, hostname, ssh_port=22):
+    def check_host(self, owner, hostname, ssh_port=22):
         """Check if host is running.
 
         Initially attempt a connection to ssh port specified for host and
@@ -106,7 +106,7 @@ class BareMetalDriver(object):
             ports_list.insert(0, ssh_port, )
         for port in ports_list:
             try:
-                hostname, port = destination_nat(user, hostname, port)
+                hostname, port = destination_nat(owner, hostname, port)
                 s.connect((hostname, port))
                 s.shutdown(2)
                 state = NODE_STATE_MAP['on']
@@ -114,12 +114,12 @@ class BareMetalDriver(object):
             except:
                 pass
             if state == NODE_STATE_MAP['unknown']:
-                ping_response = self.ping_host(user, real_hostname)
+                ping_response = self.ping_host(owner, real_hostname)
                 if ping_response == 0:
                     state = NODE_STATE_MAP['on']
         return state
 
-    def ping_host(self, user, hostname):
+    def ping_host(self, owner, hostname):
         """Pings given host
 
         Use ping utility, since a python implementation would require root
@@ -128,6 +128,6 @@ class BareMetalDriver(object):
         """
         if not hostname:
             return 256
-        ping = super_ping(owner=user, host=hostname, pkts=1)
+        ping = super_ping(owner=owner, host=hostname, pkts=1)
         response = 0 if int(ping.get('packets_rx', 0)) > 0 else 256
         return response
