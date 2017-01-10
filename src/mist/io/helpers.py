@@ -8,11 +8,9 @@ import json
 import string
 import random
 import socket
-import logging
 import datetime
 import tempfile
 import functools
-from hashlib import sha1
 from contextlib import contextmanager
 
 import iso8601
@@ -295,9 +293,9 @@ def _amqp_owner_exchange(owner):
     return "owner_%s" % owner.id
 
 
-def amqp_publish_user(user, routing_key, data):
+def amqp_publish_user(owner, routing_key, data):
     try:
-        amqp_publish(_amqp_owner_exchange(user), routing_key, data)
+        amqp_publish(_amqp_owner_exchange(owner), routing_key, data)
     except AmqpNotFound:
         return False
     except Exception:
@@ -305,8 +303,8 @@ def amqp_publish_user(user, routing_key, data):
     return True
 
 
-def amqp_subscribe_user(user, queue, callback):
-    amqp_subscribe(_amqp_owner_exchange(user), callback, queue)
+def amqp_subscribe_user(owner, queue, callback):
+    amqp_subscribe(_amqp_owner_exchange(owner), callback, queue)
 
 
 def amqp_owner_listening(owner):
