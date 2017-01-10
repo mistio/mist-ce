@@ -202,7 +202,8 @@ class Rule(me.Document):
     # email to send the alerts. Can be a list of email addresses
 
     def clean(self):
-        # TODO: check if these are valid email addresses, to avoid possible spam
+        # TODO: check if these are valid email addresses,
+        # to avoid possible spam
         if self.emails:
             if isinstance(self.emails, basestring):
                 emails = []
@@ -269,7 +270,8 @@ class Owner(me.Document):
         return json.loads(self.to_json())
 
     def clean(self):
-        # TODO: check if these are valid email addresses, to avoid possible spam
+        # TODO: check if these are valid email addresses,
+        # to avoid possible spam
         if self.alerts_email:
             if isinstance(self.alerts_email, basestring):
                 emails = []
@@ -354,44 +356,6 @@ class User(Owner):
             self.password = new_hash
             self.save()
         return True
-
-    def cascade_save(self, *args, **kwargs):
-        """Recursively saves any references /
-           generic references on the document"""
-        _refs = kwargs.get('_refs', []) or []
-
-        ReferenceField = me.common._import_class('ReferenceField')
-        GenericReferenceField = me.common._import_class('GenericReferenceField')
-        MapField = me.common._import_class('MapField')
-        ListField = me.common._import_class('ListField')
-
-        for name, cls in self._fields.items():
-            if not isinstance(cls, (me.ReferenceField,
-                                    me.GenericReferenceField,
-                                    me.MapField, me.ListField)):
-                continue
-            if isinstance(cls, me.MapField):
-                refs = self._data.get(name).values()
-            if isinstance(cls, me.ListField):
-                refs = self._data.get(name)
-            if isinstance(cls, (me.ReferenceField,
-                                me.GenericReferenceField)):
-                refs = [self._data.get(name)]
-
-            for ref in refs:
-                if not ref or isinstance(ref, DBRef):
-                    continue
-
-                if not getattr(ref, '_changed_fields', True):
-                    continue
-
-                ref_id = "%s,%s" % (ref.__class__.__name__, str(ref._data))
-                if ref and ref_id not in _refs:
-                    _refs.append(ref_id)
-                    kwargs["_refs"] = _refs
-                    ref.save(**kwargs)
-                    ref._changed_fields = []
-        self.save()
 
     def __eq__(self, other):
         return self.id == other.id
@@ -531,7 +495,7 @@ class Team(me.EmbeddedDocument):
 
 
 class Organization(Owner):
-    name = me.StringField(required=True) #, unique=True)
+    name = me.StringField(required=True)
     members = me.ListField(me.ReferenceField(User), required=True)
     teams = me.EmbeddedDocumentListField(
         Team,
