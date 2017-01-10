@@ -5,25 +5,22 @@ SSH.
 
 """
 
-from time import time, sleep
+from time import sleep
 from StringIO import StringIO
 
 import paramiko
 import websocket
 import socket
-import uuid
 import thread
 import ssl
 import tempfile
 import mongoengine as me
 
-from mist.io.exceptions import CloudNotFoundError, KeyNotFoundError
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import ServiceUnavailableError
 
 from mist.io.helpers import trigger_session_update
-from mist.io.helpers import sanitize_host
 
 from mist.core.helpers import get_story
 
