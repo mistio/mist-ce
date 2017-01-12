@@ -42,7 +42,7 @@ from mist.io.exceptions import MachineNotFoundError
 from mist.core.vpn.methods import destination_nat as dnat
 
 from mist.io.bare_metal import BareMetalDriver
-from mist.io.misc.cloud import CloudImage, CloudSize
+from mist.io.misc.cloud import CloudImage
 
 from mist.io.clouds.controllers.main.base import BaseComputeController
 
