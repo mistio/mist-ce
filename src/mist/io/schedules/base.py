@@ -78,6 +78,8 @@ class BaseController(object):
             self.update(**kwargs)
         except (me.ValidationError, me.NotUniqueError) as exc:
             # Propagate original error.
+            log.error("Error adding %s: %s", self.schedule.name,
+                      exc.to_dict())
             raise
         log.info("Added schedule with name '%s'", self.schedule.name)
         self.schedule.owner.mapper.update(self.schedule)
