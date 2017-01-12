@@ -11,7 +11,6 @@ import mongoengine as me
 from mist.io.scripts.models import Script
 from mist.io.exceptions import MistError
 from mist.core.rbac.methods import AuthContext
-from mist.io.helpers import trigger_session_update
 from mist.io.exceptions import InternalServerError
 from mist.core.exceptions import BadRequestError
 from mist.core.exceptions import ScriptNotFoundError
@@ -77,10 +76,11 @@ class BaseController(object):
 
         try:
             self.update(**kwargs)
-        except me.ValidationError:
+        except (me.ValidationError, me.NotUniqueError) as exc:
             # Propagate original error.
             raise
-        return self.schedule.id
+        log.info("Added schedule with name '%s'", self.schedule.name)
+        self.schedule.owner.mapper.update(self.schedule)
 
     def update(self, **kwargs):
         """Edit an existing Schedule"""
@@ -198,16 +198,12 @@ class BaseController(object):
             log.error("Error updating %s: %s", self.schedule.name,
                       e.to_dict())
             raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
-        except me.NotUniqueError:
+        except me.NotUniqueError as exc:
+            log.error("Schedule %s not unique error: %s", self.schedule, exc)
             raise ScheduleNameExistsError()
         except me.OperationError:
             raise ScheduleOperationError()
-        log.info("Added schedule with name '%s'", self.schedule.name)
 
-        self.schedule.owner.mapper.update(self.schedule)
-        trigger_session_update(self.schedule.owner, ['schedules'])
-
-    # FIXME
     def _update__preparse_machines(self, auth_context, kwargs):
         """Preparse machines arguments to `self.uppdate`
 
