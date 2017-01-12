@@ -95,6 +95,8 @@ class BaseScriptController(object):
             log.error("Script %s not unique error: %s", self.script.name, exc)
             raise ScriptNameExistsError()
         log.info("Added script with name '%s'", self.script.name)
+
+        self.script.owner.mapper.update(self.script)
         trigger_session_update(self.script.owner, ['scripts'])
 
     def edit(self, name=None, description=None):
