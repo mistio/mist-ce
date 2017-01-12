@@ -11,6 +11,7 @@ import mongoengine as me
 from mist.io.scripts.models import Script
 from mist.io.exceptions import MistError
 from mist.core.rbac.methods import AuthContext
+from mist.io.helpers import trigger_session_update
 from mist.io.exceptions import InternalServerError
 from mist.core.exceptions import BadRequestError
 from mist.core.exceptions import ScriptNotFoundError
@@ -201,8 +202,10 @@ class BaseController(object):
             raise ScheduleNameExistsError()
         except me.OperationError:
             raise ScheduleOperationError()
+        log.info("Added schedule with name '%s'", self.schedule.name)
 
-        return self.schedule.id
+        self.schedule.owner.mapper.update(self.schedule)
+        trigger_session_update(self.schedule.owner, ['schedules'])
 
     # FIXME
     def _update__preparse_machines(self, auth_context, kwargs):
