@@ -317,7 +317,7 @@ class Schedule(me.Document):
         # Return a dict as it will be returned to the API
         sdict = {
             'id': self.id,
-            'schedule_name': self.name,
+            'name': self.name,
             'description': self.description or '',
             'schedule_type': unicode(self.schedule_type),
             'task_type': str(self.task_type),
@@ -327,9 +327,11 @@ class Schedule(me.Document):
             'last_run_at': str(self.last_run_at or ''),
             'total_run_count': self.total_run_count or 0,
         }
-
-        sdict.update({key: self.get_machines()
-                      for key in self._schedule_specific_fields})
+        if isinstance(self, ListOfMachinesSchedule):
+            machines_uuids = [machine.id for machine in self.machines]
+            sdict.update({'machine_uuids': machines_uuids})
+        else:
+            sdict.update({'machine_tags': self.tags})
 
         return sdict
 
