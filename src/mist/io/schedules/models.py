@@ -307,6 +307,8 @@ class Schedule(me.Document):
         in case it has been marked as deleted."""
         if self.deleted:
             self.enabled = False
+        if self.expires and self.expires < str(datetime.datetime.now()):
+            self.enabled = False
 
     def delete(self):
         super(Schedule, self).delete()
