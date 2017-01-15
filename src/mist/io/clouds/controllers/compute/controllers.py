@@ -21,7 +21,9 @@ accessed through a cloud model, using the `ctl` abbreviation, like this:
 
 
 import re
+import socket
 import logging
+import datetime
 import tempfile
 
 from xml.sax.saxutils import escape
@@ -40,8 +42,7 @@ from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import MachineNotFoundError
 
 from mist.core.vpn.methods import destination_nat as dnat
-
-from mist.io.bare_metal import BareMetalDriver
+from mist.core.vpn.methods import super_ping
 
 from mist.io.clouds.controllers.main.base import BaseComputeController
 
@@ -849,22 +850,62 @@ class LibvirtComputeController(BaseComputeController):
 class OtherComputeController(BaseComputeController):
 
     def _connect(self):
-        # FIXME: Move this to top of the file once Machine model is migrated.
-        # The import statement is currently here to avoid circular import
-        # issues.
-        from mist.io.machines.models import Machine
-        return BareMetalDriver(Machine.objects(cloud=self.cloud))
+        return None
 
-    def _list_machines__machine_actions(self, machine, machine_libcloud):
-        super(OtherComputeController, self)._list_machines__machine_actions(
-            machine, machine_libcloud
-        )
-        machine.actions.reboot = False
-        machine.actions.stop = False
-        machine.actions.destroy = False
-        # allow reboot action for bare metal with key associated
-        if machine.key_associations:
-            machine.actions.reboot = True
+    def list_machines(self):
+        # TODO: Resolve circular dependency issues and move import to top
+        from mist.io.machines.models import Machine
+        machines = Machine.objects(cloud=self.cloud)
+        for machine in machines:
+
+            state = NodeState.UNKNOWN
+            hostname = machine.hostname or (
+                machine.private_ips[0] if machine.private_ips else '')
+            print hostname
+            if hostname:
+                socket.setdefaulttimeout(5)
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                ports_list = [22, 80, 443, 3389]
+                for port in (machine.ssh_port, machine.rdp_port):
+                    if port and port not in ports_list:
+                        ports_list.insert(0, port)
+                for port in ports_list:
+                    log.info("Attempting to connect to %s:%d", hostname, port)
+                    try:
+                        s.connect(dnat(self.cloud.owner, hostname, port))
+                        s.shutdown(2)
+                    except:
+                        log.info("Failed to connect to %s:%d", hostname, port)
+                        continue
+                    log.info("Connected to %s:%d", hostname, port)
+                    state = NodeState.RUNNING
+                    break
+                else:
+                    ping_response = self.ping_host(self.cloud.owner, hostname)
+                    try:
+                        log.info("Pinging %s", hostname)
+                        ping = super_ping(owner=self.cloud.owner,
+                                          host=hostname, pkts=1)
+                        if int(ping.get('packets_rx', 0)) > 0:
+                            log.info("Successfully pinged %s", hostname)
+                            state = NodeState.RUNNING
+                    except:
+                        log.info("Failed to ping %s", hostname)
+                        pass
+
+            machine.state = config.STATES[state]
+            machine.last_seen = datetime.datetime.utcnow()
+            for action in ('start', 'stop', 'reboot', 'destroy', 'rename',
+                           'tag', 'resume', 'suspend', 'undefine'):
+                setattr(machine.actions, action, False)
+            # allow reboot action for bare metal with key associated
+            if machine.key_associations:
+                machine.actions.reboot = True
+            machine.save()
+        return machines
+
+    def _get_machine_libcloud(self, machine):
+        return None
 
     def _reboot_machine(self, machine, machine_libcloud):
         try:
@@ -872,12 +913,19 @@ class OtherComputeController(BaseComputeController):
                 hostname = machine.public_ips[0]
             else:
                 hostname = machine.private_ips[0]
-
             command = '$(command -v sudo) shutdown -r now'
             # TODO move it up
             from mist.core.methods import ssh_command
             ssh_command(self.cloud.owner, self.cloud.id,
                         machine.machine_id, hostname, command)
-            return True
-        except:
-            return False
+        except Exception as exc:
+            raise MistError("Couldn't reboot machine: %s" % exc)
+
+    def list_images(self, search=None):
+        return []
+
+    def list_sizes(self):
+        return []
+
+    def list_locations(self):
+        return []

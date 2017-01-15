@@ -53,7 +53,6 @@ from mist.core import config
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
-from mist.io.bare_metal import BareMetalDriver
 from mist.io.helpers import check_host, sanitize_host
 from mist.io.helpers import transform_key_machine_associations
 from mist.io.exceptions import *
