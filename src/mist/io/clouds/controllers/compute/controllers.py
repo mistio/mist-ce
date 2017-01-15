@@ -21,9 +21,7 @@ accessed through a cloud model, using the `ctl` abbreviation, like this:
 
 
 import re
-import socket
 import logging
-import datetime
 import tempfile
 
 from xml.sax.saxutils import escape
@@ -42,7 +40,6 @@ from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import MachineNotFoundError
 
 from mist.core.vpn.methods import destination_nat as dnat
-from mist.core.vpn.methods import super_ping
 
 from mist.io.clouds.controllers.main.base import BaseComputeController
 
@@ -852,60 +849,16 @@ class OtherComputeController(BaseComputeController):
     def _connect(self):
         return None
 
-    def list_machines(self):
-        # TODO: Resolve circular dependency issues and move import to top
-        from mist.io.machines.models import Machine
-        machines = Machine.objects(cloud=self.cloud)
-        for machine in machines:
-
-            state = NodeState.UNKNOWN
-            hostname = machine.hostname or (
-                machine.private_ips[0] if machine.private_ips else '')
-            print hostname
-            if hostname:
-                socket.setdefaulttimeout(5)
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                ports_list = [22, 80, 443, 3389]
-                for port in (machine.ssh_port, machine.rdp_port):
-                    if port and port not in ports_list:
-                        ports_list.insert(0, port)
-                for port in ports_list:
-                    log.info("Attempting to connect to %s:%d", hostname, port)
-                    try:
-                        s.connect(dnat(self.cloud.owner, hostname, port))
-                        s.shutdown(2)
-                    except:
-                        log.info("Failed to connect to %s:%d", hostname, port)
-                        continue
-                    log.info("Connected to %s:%d", hostname, port)
-                    state = NodeState.RUNNING
-                    break
-                else:
-                    ping_response = self.ping_host(self.cloud.owner, hostname)
-                    try:
-                        log.info("Pinging %s", hostname)
-                        ping = super_ping(owner=self.cloud.owner,
-                                          host=hostname, pkts=1)
-                        if int(ping.get('packets_rx', 0)) > 0:
-                            log.info("Successfully pinged %s", hostname)
-                            state = NodeState.RUNNING
-                    except:
-                        log.info("Failed to ping %s", hostname)
-                        pass
-
-            machine.state = config.STATES[state]
-            machine.last_seen = datetime.datetime.utcnow()
-            for action in ('start', 'stop', 'reboot', 'destroy', 'rename',
-                           'tag', 'resume', 'suspend', 'undefine'):
-                setattr(machine.actions, action, False)
-            # allow reboot action for bare metal with key associated
-            if machine.key_associations:
-                machine.actions.reboot = True
-            machine.save()
-        return machines
+    def _list_machines__fetch_machines(self):
+        return []
 
     def _get_machine_libcloud(self, machine):
         return None
+
+    def _list_machines__fetch_generic_machines(self):
+        # TODO: Resolve circular dependency issues and move import to top
+        from mist.io.machines.models import Machine
+        return Machine.objects(cloud=self.cloud)
 
     def _reboot_machine(self, machine, machine_libcloud):
         try:
