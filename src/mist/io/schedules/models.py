@@ -111,7 +111,7 @@ class ActionTask(BaseTaskType):
 
     @property
     def task(self):
-        return 'mist.core.tasks.group_machines_actions'
+        return 'mist.io.tasks.group_machines_actions'
 
     def __str__(self):
         return 'Action: %s' % self.action
@@ -126,7 +126,7 @@ class ScriptTask(BaseTaskType):
 
     @property
     def task(self):
-        return 'mist.core.tasks.group_run_script'
+        return 'mist.io.tasks.group_run_script'
 
     def __str__(self):
         return 'Run script: %s' % self.script_id
