@@ -38,7 +38,8 @@ from mist.core import config
 
 celery_cfg = 'mist.core.celery_config'
 
-from mist.core.helpers import log_event, send_email
+from mist.core.helpers import log_event
+from mist.core.helpers import send_email as helper_send_email
 from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_owner_listening
 from mist.io.helpers import amqp_log
@@ -965,7 +966,6 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
 
     job_id = job_id or uuid.uuid4().hex
 
-
     if owner.find("@") != -1:
         owner = Owner.objects.get(email=owner)
     else:
@@ -1031,8 +1031,8 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
 
 @app.task(bind=True, default_retry_delay=5, max_retries=3)
 def send_email(self, subject, body, recipients, sender=None, bcc=None):
-    if not send_email(subject, body, recipients, sender=sender,
-                      bcc=bcc, attempts=1):
+    if not helper_send_email(subject, body, recipients,
+                             sender=sender, bcc=bcc, attempts=1):
         raise self.retry()
     return True
 
