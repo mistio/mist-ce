@@ -1,6 +1,7 @@
 import logging
 import datetime
 
+from mist.io.helpers import amqp_publish
 from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_owner_listening
 
@@ -34,3 +35,11 @@ def list_machines(cloud_id):
                           data={'cloud_id': cloud.id,
                                 'machines': [machine.as_dict_old()
                                              for machine in machines]})
+
+    # Push historic information for inventory and cost reporting.
+    for machine in machines:
+        amqp_publish(exchange='machines_inventory', routing_key='',
+                     auto_delete=False,
+                     data={'owner_id': machine.cloud.owner.id,
+                           'machine_id': machine.id,
+                           'cost_per_month': machine.cost.monthly})
