@@ -2,12 +2,9 @@ import paramiko
 import json
 import uuid
 import re
-import time
+from time import time
 
 from libcloud.compute.types import NodeState
-
-from time import time
-from uuid import uuid4
 
 from base64 import b64encode
 
@@ -630,7 +627,7 @@ class UserTask(Task):
         if not seq_id:
             # this task is called externally, not a rerun, create a seq_id
             amqp_log("%s: fresh task submitted [%s]" % (id_str, seq_id))
-            seq_id = uuid4().hex
+            seq_id = uuid.uuid4().hex
         # actually run the task
         try:
             data = self.execute(*args, **kwargs)
@@ -1118,7 +1115,7 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
     }
 
     owner = Owner.objects.get(id=owner_id)
-    started_at = time.time()
+    started_at = time()
     try:
         cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
         machine = Machine.objects.get(cloud=cloud, machine_id=machine_id,
@@ -1184,7 +1181,7 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
                     log_event(action='Destroy succeeded', **log_dict)
     # TODO markos asked this
     log_dict['started_at'] = started_at
-    log_dict['finished_at'] = time.time()
+    log_dict['finished_at'] = time()
     title = "Execution of '%s' action " % action
     title += "failed" if log_dict.get('error') else "succeeded"
     notify_user(
@@ -1283,7 +1280,7 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
         'extra_output': '',
         'error': False,
     }
-    started_at = time.time()
+    started_at = time()
     machine_name = ''
 
     try:
@@ -1366,7 +1363,7 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
     else:
         log.info('Script succeeded: %s', ret)
     ret['started_at'] = started_at
-    ret['finished_at'] = time.time()
+    ret['finished_at'] = time()
     title = "Execution of '%s' script " % script.name
     title += "failed" if ret['error'] else "succeeded"
     notify_user(
