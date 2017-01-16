@@ -23,6 +23,7 @@ from pyramid.renderers import render_to_response
 from mist.core.helpers import view_config
 from mist.core.auth.methods import user_from_request
 from mist.io.keys.models import Key, SSHKey, SignedSSHKey
+from mist.io.scripts.models import CollectdScript
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.core.exceptions import PolicyUnauthorizedError
@@ -1900,9 +1901,6 @@ def deploy_plugin(request):
       in: path
       required: true
       type: string
-    host:
-      required: true
-      type: string
     name:
       required: true
       type: string
@@ -1926,22 +1924,36 @@ def deploy_plugin(request):
     plugin_id = request.matchdict['plugin']
     params = params_from_request(request)
     plugin_type = params.get('plugin_type')
-    host = params.get('host')
     auth_context = auth_context_from_request(request)
+    # SEC check permission READ on cloud
     auth_context.check_perm("cloud", "read", cloud_id)
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-        machine_uuid = machine.id
     except me.DoesNotExist:
-        machine_uuid = ""
-    auth_context.check_perm("machine", "edit_custom_metrics", machine_uuid)
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
+
+    # SEC check permission EDIT_CUSTOM_METRICS on machine
+    auth_context.check_perm("machine", "edit_custom_metrics", machine.id)
+
+    try:
+        Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except me.DoesNotExist:
+        raise NotFoundError('Cloud id %s does not exist' % cloud_id)
+
+    if not machine.monitoring.hasmonitoring:
+        raise ForbiddenError("Machine doesn't seem to have monitoring enabled")
+
+    # create a collectdScript
+    extra = {'value_type': params.get('value_type', 'gauge'),
+             'value_unit': ''}
+    name = plugin_id
+    kwargs = {'location_type': 'inline',
+              'script': params.get('read_function'),
+              'extra': extra}
+    script = CollectdScript.add(auth_context.owner, name, **kwargs)
+
     if plugin_type == 'python':
-        ret = methods.deploy_python_plugin(
-            auth_context.owner, cloud_id, machine_id, plugin_id,
-            value_type=params.get('value_type', 'gauge'),
-            read_function=params.get('read_function'),
-            host=host,
-        )
+        ret = script.ctl.deploy_python_plugin(machine)
         methods.update_metric(
             auth_context.owner,
             metric_id=ret['metric_id'],
