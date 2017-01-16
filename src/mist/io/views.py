@@ -932,7 +932,7 @@ def create_machine(request):
     image_extra:
       description: ' Needed only by Linode cloud'
       type: string
-    image_id:
+    image:
       description: ' Id of image to be used with the creation'
       required: true
       type: string
@@ -1006,15 +1006,12 @@ def create_machine(request):
     key_id = params.get('key')
     machine_name = params['name']
     location_id = params.get('location', None)
-    if params.get('provider') == 'libvirt':
-        image_id = params.get('image')
-        disk_size = int(params.get('libvirt_disk_size', 4))
-        disk_path = params.get('libvirt_disk_path', '')
-    else:
-        image_id = params.get('image')
-        if not image_id:
-            raise RequiredParameterMissingError("image_id")
-        disk_size = disk_path = None
+    image_id = params.get('image')
+    if not image_id:
+        raise RequiredParameterMissingError("image_id")
+    # this is used in libvirt
+    disk_size = int(params.get('libvirt_disk_size', 4))
+    disk_path = params.get('libvirt_disk_path', '')
     size_id = params['size']
     # deploy_script received as unicode, but ScriptDeployment wants str
     script = str(params.get('script', ''))
