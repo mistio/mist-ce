@@ -1534,11 +1534,14 @@ def create_network(request):
     network_params = params.get('network')
     subnet_params = params.get('subnet')
 
+    auth_context = auth_context_from_request(request)
+
     if not network_params:
         raise RequiredParameterMissingError('network')
 
-    auth_context = auth_context_from_request(request)
-    auth_context.check_perm("cloud", "create_resources", cloud_id)
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
 
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
@@ -1556,7 +1559,7 @@ def create_network(request):
         except Exception as exc:
             # Cleaning up the network object in case subnet creation
             #  fails for any reason
-            network.ctl.delete_network()
+            network.ctl.delete()
             raise exc
         network_dict['subnet'] = subnet.as_dict()
 
@@ -1589,7 +1592,10 @@ def create_subnet(request):
     params = params_from_request(request)
 
     auth_context = auth_context_from_request(request)
-    auth_context.check_perm("cloud", "create_resources", cloud_id)
+
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
 
     try:
         cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
@@ -1624,6 +1630,10 @@ def delete_network(request):
     network_id = request.matchdict['network']
 
     auth_context = auth_context_from_request(request)
+
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
 
     try:
         cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
@@ -1663,6 +1673,10 @@ def delete_subnet(request):
     network_id = request.matchdict['network']
 
     auth_context = auth_context_from_request(request)
+
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
 
     try:
         cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)

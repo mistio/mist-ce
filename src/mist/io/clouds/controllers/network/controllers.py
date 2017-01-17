@@ -1,158 +1,148 @@
 """Definition of cloud-specific network subcontroller classes.
 
-This file should only contain subclasses of BaseNetworkController.
+This file should only contain subclasses of `BaseNetworkController`.
 
 """
+
 import logging
 
-from mist.io.clouds.controllers.network.base import BaseNetworkController
 from mist.io.helpers import rename_kwargs
+
+from mist.io.exceptions import SubnetNotFoundError
+from mist.io.exceptions import NetworkNotFoundError
+
+from mist.io.clouds.controllers.network.base import BaseNetworkController
+
 
 log = logging.getLogger(__name__)
 
 
 class AmazonNetworkController(BaseNetworkController):
-    provider = 'ec2'
 
-    def _create_network__parse_args(self, network_args):
-        rename_kwargs(network_args, 'cidr', 'cidr_block')
-
-    @staticmethod
-    def _list_networks__parse_libcloud_object(network, libcloud_net):
-        network.cidr = libcloud_net.cidr_block
-        network.instance_tenancy = libcloud_net.extra.pop('instance_tenancy')
-
-    def _create_subnet__parse_args(self, network, kwargs):
-        kwargs['vpc_id'] = network.network_id
+    def _create_network__prepare_args(self, kwargs):
         rename_kwargs(kwargs, 'cidr', 'cidr_block')
 
-    @staticmethod
-    def _list_subnets__parse_libcloud_object(subnet, libcloud_subnet):
-        subnet.cidr = libcloud_subnet.extra.pop('cidr_block')
+    def _create_subnet__prepare_args(self, subnet, kwargs):
+        kwargs['vpc_id'] = subnet.network.network_id
+        rename_kwargs(kwargs, 'cidr', 'cidr_block')
+
+    def _list_networks__cidr_range(self, network, libcloud_network):
+        return libcloud_network.cidr_block
+
+    def _list_networks__postparse_network(self, network, libcloud_network):
+        tenancy = libcloud_network.extra.pop('instance_tenancy')
+        network.instance_tenancy = tenancy
+
+    def _list_subnets__fetch_subnets(self, network):
+        kwargs = {'filters': {'vpc-id': network.network_id}}
+        return self.ctl.compute.connection.ex_list_subnets(**kwargs)
+
+    def _list_subnets__cidr_range(self, subnet, libcloud_subnet):
+        return subnet.extra.pop('cidr_block')
+
+    def _list_subnets__postparse_subnet(self, subnet, libcloud_subnet):
         subnet.availability_zone = libcloud_subnet.extra.pop('zone')
 
-    def _list_subnets__parse_args(self, network, kwargs):
-        kwargs['filters'] = {'vpc-id': network.network_id}
+    def _delete_network(self, network, libcloud_network):
+        self.ctl.compute.connection.ex_delete_network(libcloud_network)
 
-    def _delete_network__parse_args(self, network, kwargs):
-        kwargs['vpc'] = self._get_libcloud_network(network)
-
-    def _delete_subnet__parse_args(self, subnet, kwargs):
-        kwargs['subnet'] = self._get_libcloud_subnet(subnet)
+    def _delete_subnet(self, subnet, libcloud_subnet):
+        self.ctl.compute.connection.ex_delete_subnet(libcloud_subnet)
 
     def _get_libcloud_network(self, network):
-        list_networks_params = {'network_ids': [network.network_id]}
-        networks = self.ctl.compute.connection.ex_list_networks(
-            **list_networks_params)
-        return networks[0] if networks else None
+        kwargs = {'network_ids': [network.network_id]}
+        networks = self.ctl.compute.connection.ex_list_networks(**kwargs)
+        if networks:
+            return networks[0]
+        raise NetworkNotFoundError('Network %s with network_id %s' %
+                                   (network.name, network.network_id))
 
     def _get_libcloud_subnet(self, subnet):
-        list_subnets_params = {'subnet_ids': [subnet.subnet_id]}
-        subnets = self.ctl.compute.connection.ex_list_subnets(
-            **list_subnets_params)
-        return subnets[0] if subnets else None
+        kwargs = {'subnet_ids': [subnet.subnet_id]}
+        subnets = self.ctl.compute.connection.ex_list_subnets(**kwargs)
+        if subnets:
+            return subnets[0]
+        raise SubnetNotFoundError('Subnet %s with subnet_id %s' %
+                                  (subnet.name, subnet.subnet_id))
 
 
 class GoogleNetworkController(BaseNetworkController):
-    provider = 'gce'
 
-    def _create_network__parse_args(self, network_args):
-        # If the network doesn't use 'legacy' mode, the cidr arg
-        # must be present with a value of None
-        network_args['cidr'] = network_args.get('cidr')
+    def _create_subnet__prepare_args(self, subnet, kwargs):
+        kwargs['network'] = subnet.network.name
 
-    def _create_subnet__parse_args(self, network, kwargs):
-        kwargs['network'] = network.title
+    def _create_subnet(self, kwargs):
+        return self.ctl.compute.connection.ex_create_subnetwork(**kwargs)
 
-    def _create_subnet__create_libcloud_subnet(self, subnet, kwargs):
-        libcloud_subnet = self.ctl.compute.connection.ex_create_subnetwork(
-            **kwargs)
-        # The region attribute is needed for libcloud API calls on the
-        # subnet object, including the ex_destroy_subnetwork call,
-        # so we cannot safely  wait for list_networks to populate its
-        # value."""
-        subnet.region = libcloud_subnet.region.name
-        return libcloud_subnet
+    def _list_networks__cidr_range(self, network, libcloud_network):
+        return libcloud_network.cidr
 
-    @staticmethod
-    def _list_networks__parse_libcloud_object(network, libcloud_network):
-        network.cidr = libcloud_network.cidr
-        network.gateway_ip = libcloud_network.extra.pop('gatewayIPv4')
+    def _list_networks__postparse_network(self, network, libcloud_network):
         network.mode = libcloud_network.mode
 
-    @staticmethod
-    def _list_subnets__parse_libcloud_object(subnet, libcloud_subnet):
-        subnet.cidr = libcloud_subnet.cidr
-        subnet.gateway_ip = libcloud_subnet.extra.pop('gatewayAddress')
-        subnet.region = libcloud_subnet.region.name
+    def _list_subnets__fetch_subnets(self, network):
+        kwargs = {
+            'filters': {'filter': 'network eq %s' % network.extra['selfLink']}
+        }
+        return self.ctl.compute.connection.ex_list_subnetworks(**kwargs)
 
-    def _list_subnets__fetch_subnets(self, network, kwargs):
-        libcloud_subnets = self.ctl.compute.connection.ex_list_subnetworks(
-            **kwargs)
-        return [libcloud_subnet for libcloud_subnet in libcloud_subnets
-                if libcloud_subnet.network.id == network.network_id]
-
-    def _delete_network__delete_libcloud_network(self, network, kwargs):
-        self.ctl.compute.connection.ex_destroy_network(**kwargs)
-
-    def _delete_network__parse_args(self, network, kwargs):
-        kwargs['network'] = self._get_libcloud_network(network)
-
-    def _delete_subnet__parse_args(self, subnet, kwargs):
-        kwargs['name'] = subnet.title
-        kwargs['region'] = subnet.region
-
-    def _delete_subnet__delete_libcloud_subnet(self, network, kwargs):
-        self.ctl.compute.connection.ex_destroy_subnetwork(**kwargs)
+    def _list_subnets__postparse_subnet(self, subnet, libcloud_subnet):
+        # Replace `GCERegion` object with the region's name.
+        if hasattr(libcloud_subnet, 'region'):
+            region = libcloud_subnet.region.name
+        else:
+            try:
+                region = subnet.extra['region']
+                region = region.split('regions/')[-1]
+            except (KeyError, IndexError):
+                region = ''
+                log.error('Failed to extract region name for %s', subnet)
+        if region:
+            subnet.region = region
 
     def _get_libcloud_network(self, network):
-        return self.ctl.compute.connection.ex_get_network(network.title)
+        return self.ctl.compute.connection.ex_get_network(network.name)
 
     def _get_libcloud_subnet(self, subnet):
-        get_subnet_args = {'name': subnet.title,
-                           'region': subnet.region}
-        return self.ctl.compute.connection.ex_get_subnetwork(**get_subnet_args)
+        kwargs = {'name': subnet.name,
+                  'region': subnet.region}
+        return self.ctl.compute.connection.ex_get_subnetwork(**kwargs)
 
 
 class OpenStackNetworkController(BaseNetworkController):
-    provider = 'openstack'
 
-    @staticmethod
-    def _list_networks__parse_libcloud_object(network, libcloud_network):
-        network.admin_state_up = libcloud_network.extra.get('admin_state_up')
-        network.shared = libcloud_network.extra.get('shared')
+    def _create_subnet__prepare_args(self, subnet, kwargs):
+        kwargs['network_id'] = subnet.network.network_id
 
-    def _create_subnet__parse_args(self, network, kwargs):
-        kwargs['network_id'] = network.network_id
+    def _list_networks__postparse_network(self, network, libcloud_network):
+        for field in network._network_specific_fields:
+            if hasattr(libcloud_network, field):
+                value = getattr(libcloud_network, field)
+            else:
+                try:
+                    value = network.extra.pop(field)
+                except KeyError:
+                    log.error('Failed to get value for "%s" for network '
+                              '"%s" (%s)', field, network.name, network.id)
+                    continue
+            setattr(network, field, value)
 
-    def _list_subnets__fetch_subnets(self, network, kwargs):
-        libcloud_subnets = self.ctl.compute.connection.ex_list_subnets(
-            **kwargs)
-        return [libcloud_subnet for libcloud_subnet in libcloud_subnets
-                if libcloud_subnet.network_id == network.network_id]
+    def _list_subnets__fetch_subnets(self, network):
+        kwargs = {'filters': {'network_id': network.network_id}}
+        return self.ctl.compute.connection.ex_list_subnets(**kwargs)
 
-    @staticmethod
-    def _list_subnets__parse_libcloud_object(subnet, libcloud_subnet):
-        subnet.cidr = libcloud_subnet.cidr
-        subnet.gateway_ip = libcloud_subnet.gateway_ip
-        subnet.enable_dhcp = libcloud_subnet.enable_dhcp
-        subnet.dns_nameservers = libcloud_subnet.dns_nameservers
-        subnet.allocation_pools = libcloud_subnet.allocation_pools
+    def _list_subnets__postparse_subnet(self, subnet, libcloud_subnet):
+        for field in subnet._subnet_specific_fields:
+            if hasattr(libcloud_subnet, field):
+                value = getattr(libcloud_subnet, field)
+            else:
+                log.error('Failed to get value for "%s" for subnet'
+                          ' "%s" (%s)', field, subnet.name, subnet.id)
+                continue
+            setattr(subnet, field, value)
 
-    def _delete_network__parse_args(self, network, kwargs):
-        kwargs['network_id'] = network.network_id
+    def _delete_network(self, network, libcloud_network):
+        self.ctl.compute.connection.ex_delete_network(libcloud_network.id)
 
-    def _delete_subnet__parse_args(self, subnet, kwargs):
-        kwargs['subnet_id'] = subnet.subnet_id
-
-    def _get_libcloud_network(self, network):
-        networks = self.ctl.compute.connection.ex_list_networks()
-        for net in networks:
-            if net.network_id == network.network_id:
-                return net
-
-    def _get_libcloud_subnet(self, subnet):
-        subnets = self.ctl.compute.connection.ex_list_subnets()
-        for sub in subnets:
-            if sub.subnet_id == subnet.subnet_id:
-                return sub
+    def _delete_subnet(self, subnet, libcloud_subnet):
+        self.ctl.compute.connection.ex_delete_subnet(libcloud_subnet.id)

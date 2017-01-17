@@ -1363,7 +1363,7 @@ def delete_network(owner, network):
     Delete a network.
     All subnets attached to the network will be deleted before the network itself.
     """
-    network.ctl.delete_network()
+    network.ctl.delete()
 
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])
@@ -1373,7 +1373,7 @@ def delete_subnet(owner, subnet):
     """
     Delete a subnet.
     """
-    subnet.ctl.delete_subnet()
+    subnet.ctl.delete()
 
     # Schedule a UI update
     trigger_session_update(owner, ['clouds'])

@@ -1,12 +1,13 @@
 import logging
-import json
 import ssl
 
 from libcloud.common.types import LibcloudError, InvalidCredsError
 from libcloud.common.types import MalformedResponseError
 from libcloud.common.exceptions import BaseHTTPError, RateLimitReachedError
+
 from mist.io.exceptions import CloudUnauthorizedError, CloudUnavailableError
 from mist.io.exceptions import RateLimitError, BadRequestError
+
 
 log = logging.getLogger(__name__)
 
@@ -35,15 +36,6 @@ def tags_to_dict(tags):
             elif 'key' in tag:
                 tdict[tag['key']] = tag.get('value')
     return tdict
-
-
-def fix_dict_encoding(dictionary):
-    for key, val in dictionary.iteritems():
-        try:
-            json.dumps(val)
-        except TypeError:
-            dictionary[key] = str(val)
-    return dictionary
 
 
 class LibcloudExceptionHandler(object):

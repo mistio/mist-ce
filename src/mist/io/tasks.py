@@ -722,7 +722,7 @@ class ListNetworks(UserTask):
     result_expires = 60 * 60 * 24
     result_fresh = 0
     polling = False
-    soft_time_limit = 30
+    soft_time_limit = 60  # 30
 
     def execute(self, owner_id, cloud_id):
         owner = Owner.objects.get(id=owner_id)
@@ -884,7 +884,7 @@ def deploy_collectd(owner, cloud_id, machine_id, extra_vars, job_id='',
                     plugins=None):
     # FIXME
     from mist.io.methods import deploy_collectd
-    
+
     if isinstance(owner, basestring) and '@' in owner:
         owner = User.objects.get(email=owner)
     else:
