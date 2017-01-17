@@ -249,7 +249,7 @@ class MainConnection(MistConnection):
             if self.closed:
                 break
             log.info("Updating poller for %s", self)
-            for cloud in Cloud.objects(owner=self.owner):
+            for cloud in Cloud.objects(owner=self.owner, deleted=None):
                 ListMachinesPollingSchedule.add(cloud=cloud,
                                                 interval=10, ttl=300)
             yield tornado.gen.sleep(240)
@@ -297,11 +297,25 @@ class MainConnection(MistConnection):
     def list_clouds(self):
         self.send('list_clouds',
                   core_methods.filter_list_clouds(self.auth_context))
-        clouds = Cloud.objects(owner=self.owner, enabled=True)
+        clouds = Cloud.objects(owner=self.owner, enabled=True, deleted=None)
         log.info(clouds)
         periodic_tasks = []
         if not config.ACTIVATE_POLLER:
             periodic_tasks.append(('list_machines', tasks.ListMachines()))
+        else:
+            for cloud in clouds:
+                after = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+                machines = Machine.objects(cloud=cloud, missing_since=None,
+                                           last_seen__gt=after)
+                machines = core_methods.filter_list_machines(
+                    self.auth_context, cloud_id=cloud.id,
+                    machines=[machine.as_dict_old() for machine in machines]
+                )
+                if machines:
+                    log.info("Emitting list_machines from poller's cache.")
+                    self.send('list_machines',
+                              {'cloud_id': cloud.id, 'machines': machines})
+
         periodic_tasks.extend([('list_images', tasks.ListImages()),
                                ('list_sizes', tasks.ListSizes()),
                                ('list_networks', tasks.ListNetworks()),
@@ -384,7 +398,8 @@ class MainConnection(MistConnection):
                     self.send(routing_key, {'cloud_id': cloud_id,
                                             'machines': filtered_machines})
                 # update cloud machine count in multi-user setups
-                cloud = Cloud.objects.get(owner=self.owner, id=cloud_id)
+                cloud = Cloud.objects.get(owner=self.owner, id=cloud_id,
+                                          deleted=None)
                 try:
                     if len(machines) != cloud.machine_count:
                         tasks.update_machine_count.delay(self.owner.id,

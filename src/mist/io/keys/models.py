@@ -58,7 +58,7 @@ class Key(me.Document):
         'collection': 'keys',
         'indexes': [
             {
-                'fields': ['owner', 'name'],
+                'fields': ['owner', 'name', 'deleted'],
                 'sparse': False,
                 'unique': True,
                 'cls': False,
@@ -71,6 +71,7 @@ class Key(me.Document):
     name = me.StringField(required=True)
     owner = me.ReferenceField(Owner)
     default = me.BooleanField(default=False)
+    deleted = me.DateTimeField()
 
     _private_fields = ()
     _controller_cls = None
@@ -123,6 +124,7 @@ class Key(me.Document):
     def delete(self):
         super(Key, self).delete()
         mist.core.tag.models.Tag.objects(resource=self).delete()
+        self.owner.mapper.remove(self)
 
     def as_dict(self):
         # Return a dict as it will be returned to the API

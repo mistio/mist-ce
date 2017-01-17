@@ -8,7 +8,7 @@ import json
 import logging
 import datetime
 import mongoengine as me
-from mist.core.script.models import Script
+from mist.io.scripts.models import Script
 from mist.io.exceptions import MistError
 from mist.core.rbac.methods import AuthContext
 from mist.io.exceptions import InternalServerError
@@ -82,11 +82,10 @@ class BaseController(object):
         return self.schedule.id
 
     def update(self, **kwargs):
+        """Edit an existing Schedule"""
 
         import mist.io.schedules.models as schedules
 
-        """Edit an existing Schedule
-        """
         if self.auth_context is not None:
             auth_context = self.auth_context
         else:
@@ -102,7 +101,7 @@ class BaseController(object):
 
         if script_id:
             try:
-                Script.objects.get(owner=owner, id=script_id)
+                Script.objects.get(owner=owner, id=script_id, deleted=None)
             except me.DoesNotExist:
                 raise ScriptNotFoundError('Script with id %s does not '
                                           'exist' % script_id)
@@ -113,6 +112,10 @@ class BaseController(object):
         for key, value in kwargs.iteritems():
             if key in self.schedule._fields.keys():
                 setattr(self.schedule, key, value)
+
+        # for ui compatibility
+        if self.schedule.expires == '':
+            self.schedule.expires = None
 
         # Schedule specific kwargs preparsing.
         try:
@@ -139,13 +142,13 @@ class BaseController(object):
         future_date = None
         if (schedule_type == 'crontab' or
                 isinstance(self.schedule.schedule_type, schedules.Crontab)):
-            future_date = kwargs.get('expires',
-                                     str(self.schedule.expires)) or ''
+            if self.schedule.expires:
+                future_date = str(self.schedule.expires)
 
         elif (schedule_type == 'interval' or
                 isinstance(self.schedule.schedule_type, schedules.Interval)):
-            future_date = kwargs.get('expires',
-                                     str(self.schedule.expires)) or ''
+            if self.schedule.expires:
+                future_date = str(self.schedule.expires)
 
         elif schedule_type == 'one_off':
             future_date = kwargs.get('schedule_entry', '')

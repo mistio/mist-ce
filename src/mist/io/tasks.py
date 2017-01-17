@@ -33,15 +33,18 @@ from mist.io.helpers import get_auth_header
 
 from mist.core.user.models import User, Owner, Organization
 from mist.io.clouds.models import Cloud
+from mist.io.machines.models import Machine
+from mist.io.scripts.models import Script
 
 from mist.core import config
 
 celery_cfg = 'mist.core.celery_config'
 
-
+from mist.core.helpers import log_event
 from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_owner_listening
 from mist.io.helpers import amqp_log
+from mist.io.helpers import trigger_session_update
 
 
 import logging
@@ -68,12 +71,12 @@ def update_machine_count(owner, cloud_id, machine_count):
         owner = User.objects.get(email=owner)
     else:
         owner = Owner.objects.get(id=owner)
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
     cloud.machine_count = machine_count
     cloud.save()
     # TODO machine count property function
     # TODO total machine count property function
-    clouds = Cloud.objects(owner=owner)
+    clouds = Cloud.objects(owner=owner, deleted=None)
 
     owner.total_machine_count = sum(
         [cloud.machine_count for cloud in clouds]
@@ -83,7 +86,7 @@ def update_machine_count(owner, cloud_id, machine_count):
     org_machine_count = 0
     orgs = Organization.objects(members=owner)
     for org in orgs:
-        org_clouds = Cloud.objects(owner=org)
+        org_clouds = Cloud.objects(owner=org, deleted=None)
         org.total_machine_count = sum(
             [cloud.machine_count for cloud in org_clouds]
         )
@@ -137,7 +140,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
         # find the node we're looking for and get its hostname
         node = None
         try:
-            cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+            cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
             conn = connect_provider(cloud)
             nodes = conn.list_nodes() # TODO: use cache
             for n in nodes:
@@ -184,7 +187,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                     'ssh_user': ssh_user,
                 }
             log_event(action='probe', result=result, **log_dict)
-            cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+            cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
             msg = "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title, cloud_id)
             msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name, node.id)
 
@@ -324,7 +327,7 @@ def openstack_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
         owner = Owner.objects.get(id=owner)
 
     try:
-        cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+        cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
         conn = connect_provider(cloud)
         nodes = conn.list_nodes()
         node = None
@@ -414,7 +417,7 @@ def azure_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
 
     try:
         # find the node we're looking for and get its hostname
-        cloud = Cloud.objects.get(id=cloud_id)
+        cloud = Cloud.objects.get(id=cloud_id, deleted=None)
         conn = connect_provider(cloud)
         nodes = conn.list_nodes()
         node = None
@@ -493,7 +496,7 @@ def rackspace_first_gen_post_create_steps(
         owner = Owner.objects.get(id=owner)
     try:
         # find the node we're looking for and get its hostname
-        cloud = Cloud.objects.get(id=cloud_id)
+        cloud = Cloud.objects.get(id=cloud_id, deleted=None)
         conn = connect_provider(cloud)
         nodes = conn.list_nodes()
         node = None
@@ -817,7 +820,7 @@ class ListMachines(UserTask):
         if len(errors) < 6:
             return self.result_fresh  # Retry when the result is no longer fresh
         owner = Owner.objects.get(id=owner_id)
-        cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+        cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
 
         if len(errors) == 6:  # If does not respond for a minute
             notify_user(owner, 'Cloud %s does not respond' % cloud.title,
@@ -877,13 +880,65 @@ class Ping(UserTask):
 
 
 @app.task
-def deploy_collectd(owner, cloud_id, machine_id, extra_vars):
-    import mist.io.methods
-    if owner.find("@") != -1:
+def deploy_collectd(owner, cloud_id, machine_id, extra_vars, job_id='',
+                    plugins=None):
+    # FIXME
+    from mist.io.methods import deploy_collectd
+    
+    if isinstance(owner, basestring) and '@' in owner:
         owner = User.objects.get(email=owner)
     else:
         owner = Owner.objects.get(id=owner)
-    mist.io.methods.deploy_collectd(owner, cloud_id, machine_id, extra_vars)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
+    machine.monitoring.installation_status.state = 'installing'
+    machine.save()
+
+    trigger_session_update(owner, ['monitoring'])
+
+    log_dict = {
+        'owner_id': owner.id,
+        'event_type': 'job',
+        'cloud_id': cloud_id,
+        'machine_id': machine_id,
+        'job_id': job_id or uuid.uuid4().hex,
+    }
+    log_event(action='deploy_collectd_started', **log_dict)
+    ret_dict = deploy_collectd(owner, cloud_id, machine_id, extra_vars)
+    error = False if ret_dict['success'] else (ret_dict['error_msg'] or True)
+    if plugins and not error:
+        for script_id in plugins:
+            try:
+                script = Script.objects.get(owner=owner, id=script_id,
+                                            deleted=None)
+                ret = script.ctl.deploy_and_assoc_python_plugin_from_script(
+                    machine)
+            except Exception as exc:
+                log_event(
+                    action='deploy_collectd_python_plugin',
+                    plugin_script_id=script_id, error=str(exc), **log_dict
+                )
+                if not error:
+                    error = "Deployment of '%s' plugin failed." % script_id
+            else:
+                log_event(
+                    action='deploy_collectd_python_plugin',
+                    plugin_script_id=script_id, metric_id=ret['metric_id'],
+                    stdout=ret['stdout'], **log_dict
+                )
+
+    log_event(action='deploy_collectd_finished', error=error,
+              stdout=ret_dict['stdout'], **log_dict)
+
+    if ret_dict['success']:
+        machine.monitoring.installation_status.state = 'succeeded'
+    else:
+        machine.monitoring.installation_status.state = 'failed'
+    machine.monitoring.installation_status.finished_at = time()
+    machine.monitoring.installation_status.stdout = ret_dict['stdout']
+    machine.monitoring.installation_status.error_msg = ret_dict['error_msg']
+    machine.save()
+    trigger_session_update(owner, ['monitoring'])
 
 
 @app.task
