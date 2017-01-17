@@ -64,7 +64,8 @@ class AmazonMainController(BaseMainController):
         apisecret = kwargs.get('apisecret')
         if apikey and apisecret == 'getsecretfromdb':
             cloud = type(self.cloud).objects(owner=self.cloud.owner,
-                                             apikey=apikey).first()
+                                             apikey=apikey,
+                                             deleted=None).first()
             if cloud is not None:
                 kwargs['apisecret'] = cloud.apisecret
 
@@ -103,7 +104,8 @@ class RackSpaceMainController(BaseMainController):
         apikey = kwargs.get('apikey')
         if apikey == 'getsecretfromdb':
             cloud = type(self.cloud).objects(owner=self.cloud.owner,
-                                             username=username).first()
+                                             username=username,
+                                             deleted=None).first()
             if cloud is not None:
                 kwargs['apikey'] = cloud.apikey
 
@@ -275,7 +277,8 @@ class LibvirtMainController(BaseMainController):
         if kwargs.get('key'):
             try:
                 kwargs['key'] = Key.objects.get(owner=self.cloud.owner,
-                                                id=kwargs['key'])
+                                                id=kwargs['key'],
+                                                deleted=None)
             except Key.DoesNotExist:
                 raise NotFoundError("Key does not exist.")
 
@@ -429,7 +432,8 @@ class OtherMainController(BaseMainController):
         except (ValueError, TypeError):
             rdp_port = 3389
         if ssh_key:
-            ssh_key = Key.objects.get(owner=self.cloud.owner, id=ssh_key)
+            ssh_key = Key.objects.get(owner=self.cloud.owner, id=ssh_key,
+                                      deleted=None)
 
         # Create and save machine entry to database.
         machine = Machine(

@@ -121,6 +121,10 @@ def add_cloud_v_2(owner, title, provider, params):
             no_ssh=not (machine.os_type == 'unix' and
                         machine.key_associations)
         )
+
+    # SEC
+    owner.mapper.update(cloud)
+
     log.info("Cloud with id '%s' added succesfully.", cloud.id)
     trigger_session_update(owner, ['clouds'])
     return ret
@@ -130,7 +134,7 @@ def rename_cloud(owner, cloud_id, new_name):
     """Renames cloud with given cloud_id."""
 
     log.info("Renaming cloud: %s", cloud_id)
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
     cloud.ctl.rename(new_name)
     log.info("Succesfully renamed cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
@@ -157,24 +161,13 @@ def delete_cloud(owner, cloud_id):
                         "Error: %r", exc)
 
     try:
-        cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+        cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
+        # FIXME: Make sure that the cloud's machines are also deleted once the
+        # cloud document is expired. This must be implemented in the cloud ctl.
+        cloud.update(set__deleted=datetime.utcnow())
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
-    machines = Machine.objects(cloud=cloud)
-    for machine in machines:
-        tags = Tag.objects(owner=owner, resource=machine)
-        for tag in tags:
-            try:
-                tag.delete()
-            except:
-                pass
-        try:
-            machine.delete()
-        except:
-            pass
-
-    cloud.delete()
     log.info("Succesfully deleted cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
 
@@ -189,13 +182,14 @@ def delete_key(user, key_id):
     :return:
     """
     log.info("Deleting key with id '%s'.", key_id)
-    key = Key.objects.get(owner=user, id=key_id)
+    key = Key.objects.get(owner=user, id=key_id, deleted=None)
     default_key = key.default
-    key.delete()
-    other_key = Key.objects(owner=user, id__ne=key_id).first()
+    key.update(set__deleted=datetime.utcnow())
+    other_key = Key.objects(owner=user, id__ne=key_id, deleted=None).first()
     if default_key and other_key:
         other_key.default = True
         other_key.save()
+
     log.info("Deleted key with id '%s'.", key_id)
     trigger_session_update(user, ['keys'])
 
@@ -211,8 +205,8 @@ def connect_provider(cloud):
 
 def list_machines(user, cloud_id):
     """List all machines in this cloud via API call to the provider."""
-    machines = Cloud.objects.get(owner=user,
-                                 id=cloud_id).ctl.compute.list_machines()
+    machines = Cloud.objects.get(owner=user, id=cloud_id,
+                                 deleted=None).ctl.compute.list_machines()
     return [machine.as_dict_old() for machine in machines]
 
 
@@ -258,18 +252,18 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     # post_script_params: extra params, for post_script_id
 
     log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     machine_name = machine_name_validator(conn.type, machine_name)
     key = None
     if key_id:
-        key = Key.objects.get(owner=user, id=key_id)
+        key = Key.objects.get(owner=user, id=key_id, deleted=None)
 
     # if key_id not provided, search for default key
     if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
         if not key_id:
-            key = Key.objects.get(owner=user, default=True)
+            key = Key.objects.get(owner=user, default=True, deleted=None)
             key_id = key.name
     if key:
         private_key = key.private
@@ -1170,7 +1164,7 @@ def ssh_command(user, cloud_id, machine_id, host, command,
 
     """
     # check if cloud exists
-    Cloud.objects.get(owner=user, id=cloud_id)
+    Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
 
     shell = Shell(host)
     key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id,
@@ -1182,13 +1176,13 @@ def ssh_command(user, cloud_id, machine_id, host, command,
 
 def list_images(user, cloud_id, term=None):
     """List images from each cloud"""
-    return Cloud.objects.get(owner=user,
-                             id=cloud_id).ctl.compute.list_images(term)
+    return Cloud.objects.get(owner=user, id=cloud_id,
+                             deleted=None).ctl.compute.list_images(term)
 
 
 def star_image(user, cloud_id, image_id):
     """Toggle image star (star/unstar)"""
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
 
     star = cloud.ctl.compute.image_is_starred(image_id)
     if star:
@@ -1211,8 +1205,11 @@ def star_image(user, cloud_id, image_id):
 def list_clouds(user):
     # FIXME: Move import to the top of the file.
     from mist.core.tag.methods import get_tags_for_resource
-    clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=user)]
+    clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=user,
+                                                         deleted=None)]
     for cloud in clouds:
+        # FIXME: cloud must be a mongoengine object FFS!
+        # Also, move into cloud model's as_dict method?
         cloud['tags'] = get_tags_for_resource(user, cloud)
     return clouds
 
@@ -1223,9 +1220,10 @@ def list_keys(user):
     :return:
     """
     from mist.core.tag.methods import get_tags_for_resource
-    keys = Key.objects(owner=user).only("default", "name")
-    clouds = Cloud.objects(owner=user)
+    keys = Key.objects(owner=user, deleted=None)
+    clouds = Cloud.objects(owner=user, deleted=None)
     key_objects = []
+    # FIXME: This must be taken care of in Keys.as_dict
     for key in keys:
         key_object = {}
         machines = Machine.objects(cloud__in=clouds,
@@ -1242,13 +1240,14 @@ def list_keys(user):
 
 def list_sizes(user, cloud_id):
     """List sizes (aka flavors) from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id).ctl.compute.list_sizes()
+    return Cloud.objects.get(owner=user, id=cloud_id,
+                             deleted=None).ctl.compute.list_sizes()
 
 
 def list_locations(user, cloud_id):
     """List locations from each cloud"""
-    return Cloud.objects.get(owner=user,
-                             id=cloud_id).ctl.compute.list_locations()
+    return Cloud.objects.get(owner=user, id=cloud_id,
+                             deleted=None).ctl.compute.list_locations()
 
 
 def list_networks(user, cloud_id):
@@ -1256,7 +1255,6 @@ def list_networks(user, cloud_id):
     Currently EC2, Openstack and GCE clouds are supported. For other providers
     this returns an empty list.
     """
-
     ret = {'public': [],
            'private': [],
            'routers': []}
@@ -1296,7 +1294,7 @@ def list_projects(user, cloud_id):
     Currently supported for Packet.net. For other providers
     this returns an empty list
     """
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     ret = {}
@@ -1319,7 +1317,7 @@ def list_projects(user, cloud_id):
 
 
 def associate_ip(user, cloud_id, network_id, ip, machine_id=None, assign=True):
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     if conn.type != Provider.NEPHOSCALE:
@@ -1392,7 +1390,7 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
 
     Tags is expected to be a list of key-value dicts
     """
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
 
     if not isinstance(cloud, (cloud_models.AmazonCloud,
                               cloud_models.GoogleCloud,
@@ -1491,7 +1489,7 @@ def delete_machine_tag(user, cloud_id, machine_id, tag):
 
     """
 
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
 
     if not tag:
         raise RequiredParameterMissingError("tag")
@@ -1589,7 +1587,7 @@ def enable_monitoring(user, cloud_id, machine_id,
                       name='', dns_name='', public_ips=None,
                       no_ssh=False, dry=False, deploy_async=True, **kwargs):
     """Enable monitoring for a machine."""
-    cloud = Cloud.objects.get(owner=user, id=cloud_id)
+    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
     payload = {
         'action': 'enable',
         'no_ssh': True,
@@ -1815,7 +1813,7 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
         cloud_id = kwargs['cloud_id']
         body += "Cloud:\n"
         try:
-            cloud = Cloud.objects.get(owner=user, id=cloud_id)
+            cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
             cloud_title = cloud.title
         except DoesNotExist:
             cloud_title = ''
@@ -1939,166 +1937,6 @@ def update_metric(user, metric_id, name=None, unit=None,
         log.error("Error updating metric %d:%s", resp.status_code, resp.text)
         raise BadRequestError(resp.text)
     trigger_session_update(user, [])
-
-
-def deploy_python_plugin(user, cloud_id, machine_id, plugin_id,
-                         value_type, read_function, host):
-    # Sanity checks
-    if not plugin_id:
-        raise RequiredParameterMissingError('plugin_id')
-    if not value_type:
-        raise RequiredParameterMissingError('value_type')
-    if not read_function:
-        raise RequiredParameterMissingError('read_function')
-    if not host:
-        raise RequiredParameterMissingError('host')
-    chars = [chr(ord('a') + i) for i in range(26)] + list('0123456789_')
-    for c in plugin_id:
-        if c not in chars:
-            raise BadRequestError("Invalid plugin_id '%s'.plugin_id can only "
-                                  "lower case chars, numeric digits and"
-                                  "underscores" % plugin_id)
-    if plugin_id.startswith('_') or plugin_id.endswith('_'):
-        raise BadRequestError("Invalid plugin_id '%s'. plugin_id can't start "
-                              "or end with an underscore." % plugin_id)
-    if value_type not in ('gauge', 'derive'):
-        raise BadRequestError("Invalid value_type '%s'. Must be 'gauge' or "
-                              "'derive'." % value_type)
-
-    # Initialize SSH connection
-    shell = Shell(host)
-    key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id)
-    sftp = shell.ssh.open_sftp()
-
-    tmp_dir = "/tmp/mist-python-plugin-%d" % random.randrange(2 ** 20)
-    retval, stdout = shell.command(
-        """
-sudo=$(command -v sudo)
-mkdir -p %s
-cd /opt/mistio-collectd/
-$sudo mkdir -p plugins/mist-python/
-$sudo chown -R root plugins/mist-python/
-""" % tmp_dir
-    )
-
-    # Test read function
-    test_code = """
-import time
-
-from %s_read import *
-
-for i in range(3):
-    val = read()
-    if val is not None and not isinstance(val, (int, float, long)):
-        raise Exception("read() must return a single int, float or long "
-                        "(or None to not submit any sample to collectd)")
-    time.sleep(1)
-print("READ FUNCTION TEST PASSED")
-    """ % plugin_id
-
-    sftp.putfo(StringIO(read_function), "%s/%s_read.py" % (tmp_dir, plugin_id))
-    sftp.putfo(StringIO(test_code), "%s/test.py" % tmp_dir)
-
-    retval, test_out = shell.command("$(command -v sudo) python %s/test.py" % tmp_dir)
-    stdout += test_out
-
-    if not test_out.strip().endswith("READ FUNCTION TEST PASSED"):
-        stdout += "\nERROR DEPLOYING PLUGIN\n"
-        raise BadRequestError(stdout)
-
-    # Generate plugin script
-    plugin = """# Generated by mist.io web ui
-
-import collectd
-
-%(read_function)s
-
-def read_callback():
-    val = read()
-    if val is None:
-        return
-    vl = collectd.Values(type="%(value_type)s")
-    vl.plugin = "mist.python"
-    vl.plugin_instance = "%(plugin_instance)s"
-    vl.dispatch(values=[val])
-
-collectd.register_read(read_callback)
-""" % {'read_function': read_function,
-       'value_type': value_type,
-       'plugin_instance': plugin_id}
-
-    sftp.putfo(StringIO(plugin), "%s/%s.py" % (tmp_dir, plugin_id))
-    retval, cmd_out = shell.command("""
-cd /opt/mistio-collectd/
-$(command -v sudo) mv %s/%s.py plugins/mist-python/
-$(command -v sudo) chown -R root plugins/mist-python/
-""" % (tmp_dir, plugin_id)
-                                    )
-
-    stdout += cmd_out
-
-    # Prepare collectd.conf
-    script = """
-sudo=$(command -v sudo)
-cd /opt/mistio-collectd/
-
-if ! grep '^Include.*plugins/mist-python' collectd.conf; then
-    echo "Adding Include line in collectd.conf for plugins/mist-python/include.conf"
-    $sudo su -c 'echo Include \\"/opt/mistio-collectd/plugins/mist-python/include.conf\\" >> collectd.conf'
-else
-    echo "plugins/mist-python/include.conf is already included in collectd.conf"
-fi
-if [ ! -f plugins/mist-python/include.conf ]; then
-    echo "Generating plugins/mist-python/include.conf"
-    $sudo su -c 'echo -e "# Do not edit this file, unless you are looking for trouble.\n\n<LoadPlugin python>\n    Globals true\n</LoadPlugin>\n\n\n<Plugin python>\n    ModulePath \\"/opt/mistio-collectd/plugins/mist-python/\\"\n    LogTraces true\n    Interactive false\n</Plugin>\n" > plugins/mist-python/include.conf'
-else
-    echo "plugins/mist-python/include.conf already exists, continuing"
-fi
-
-echo "Adding Import line for plugin in plugins/mist-python/include.conf"
-if ! grep '^ *Import %(plugin_id)s *$' plugins/mist-python/include.conf; then
-    $sudo cp plugins/mist-python/include.conf plugins/mist-python/include.conf.backup
-    $sudo sed -i 's/^<\/Plugin>$/    Import %(plugin_id)s\\n<\/Plugin>/' plugins/mist-python/include.conf
-    echo "Checking that python plugin is available"
-    if $sudo /usr/bin/collectd -C /opt/mistio-collectd/collectd.conf -t 2>&1 | grep 'Could not find plugin python'; then
-        echo "WARNING: collectd python plugin is not installed, will attempt to install it"
-        zypper in -y collectd-plugin-python
-        if $sudo /usr/bin/collectd -C /opt/mistio-collectd/collectd.conf -t 2>&1 | grep 'Could not find plugin python'; then
-            echo "Install collectd-plugin-python failed"
-            $sudo cp plugins/mist-python/include.conf.backup plugins/mist-python/include.conf
-            echo "ERROR DEPLOYING PLUGIN"
-        fi
-    fi
-    echo "Restarting collectd"
-    $sudo /opt/mistio-collectd/collectd.sh restart
-    sleep 2
-    if ! $sudo /opt/mistio-collectd/collectd.sh status; then
-        echo "Restarting collectd failed, restoring include.conf"
-        $sudo cp plugins/mist-python/include.conf.backup plugins/mist-python/include.conf
-        $sudo /opt/mistio-collectd/collectd.sh restart
-        echo "ERROR DEPLOYING PLUGIN"
-    fi
-else
-    echo "Plugin already imported in include.conf"
-fi
-$sudo rm -rf %(tmp_dir)s
-""" % {'plugin_id': plugin_id, 'tmp_dir': tmp_dir}
-
-    retval, cmd_out = shell.command(script)
-    stdout += cmd_out
-    if stdout.strip().endswith("ERROR DEPLOYING PLUGIN"):
-        raise BadRequestError(stdout)
-
-    shell.disconnect()
-
-    parts = ["mist", "python"]  # strip duplicates (bucky also does this)
-    for part in plugin_id.split("."):
-        if part != parts[-1]:
-            parts.append(part)
-    ## parts.append(value_type)  # not needed since MistPythonConverter in bucky
-    metric_id = ".".join(parts)
-
-    return {'metric_id': metric_id, 'stdout': stdout}
 
 
 def undeploy_python_plugin(user, cloud_id, machine_id, plugin_id, host):

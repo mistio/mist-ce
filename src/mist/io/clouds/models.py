@@ -82,6 +82,8 @@ class Cloud(me.Document):
     starred = me.ListField()
     unstarred = me.ListField()
 
+    deleted = me.DateTimeField()
+
     meta = {
         'allow_inheritance': True,
         'collection': 'clouds',  # collection 'cloud' is used by core's model
@@ -89,7 +91,7 @@ class Cloud(me.Document):
             'owner',
             # Following index ensures owner with title combos are unique
             {
-                'fields': ['owner', 'title'],
+                'fields': ['owner', 'title', 'deleted'],
                 'sparse': False,
                 'unique': True,
                 'cls': False,
@@ -148,7 +150,7 @@ class Cloud(me.Document):
             raise RequiredParameterMissingError('title')
         if not owner or not isinstance(owner, Organization):
             raise BadRequestError('owner')
-        if Cloud.objects(owner=owner, title=title):
+        if Cloud.objects(owner=owner, title=title, deleted=None):
             raise CloudExistsError()
         cloud = cls(owner=owner, title=title)
         if id:
@@ -159,6 +161,7 @@ class Cloud(me.Document):
     def delete(self):
         super(Cloud, self).delete()
         Tag.objects(resource=self).delete()
+        self.owner.mapper.remove(self)
 
     def as_dict(self):
         cdict = {
