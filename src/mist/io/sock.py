@@ -302,6 +302,20 @@ class MainConnection(MistConnection):
         periodic_tasks = []
         if not config.ACTIVATE_POLLER:
             periodic_tasks.append(('list_machines', tasks.ListMachines()))
+        else:
+            for cloud in clouds:
+                after = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+                machines = Machine.objects(cloud=cloud, missing_since=None,
+                                           last_seen__gt=after)
+                machines = core_methods.filter_list_machines(
+                    self.auth_context, cloud_id=cloud.id,
+                    machines=[machine.as_dict_old() for machine in machines]
+                )
+                if machines:
+                    log.info("Emitting list_machines from poller's cache.")
+                    self.send('list_machines',
+                              {'cloud_id': cloud.id, 'machines': machines})
+
         periodic_tasks.extend([('list_images', tasks.ListImages()),
                                ('list_sizes', tasks.ListSizes()),
                                ('list_networks', tasks.ListNetworks()),

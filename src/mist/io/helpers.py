@@ -235,11 +235,11 @@ def dirty_cow(os, os_version, kernel_version):
 
 
 def amqp_publish(exchange, routing_key, data,
-                 ex_type='fanout', ex_declare=False):
+                 ex_type='fanout', ex_declare=False, auto_delete=True):
     connection = Connection(config.AMQP_URI)
     channel = connection.channel()
     if ex_declare:
-        channel.exchange_declare(exchange=exchange, type=ex_type)
+        channel.exchange_declare(exchange=exchange, type=ex_type, auto_delete=auto_delete)
     msg = Message(json.dumps(data))
     channel.basic_publish(msg, exchange=exchange, routing_key=routing_key)
     channel.close()
