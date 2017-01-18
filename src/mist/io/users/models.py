@@ -9,7 +9,6 @@ from time import time
 from uuid import uuid4
 from datetime import date
 
-from bson.dbref import DBRef
 from passlib.context import CryptContext
 
 from social.backends.utils import get_backend
@@ -259,7 +258,7 @@ class Owner(me.Document):
     def get_id(self):
         # TODO: This must be deprecated
         if not self.id:
-            self.id = lambda:uuid.uuid4().hex
+            self.id = lambda: uuid.uuid4().hex
         return self.id
 
     def get_external_id(self, service):
