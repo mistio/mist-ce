@@ -204,12 +204,14 @@ class Rule(me.Document):
     def clean(self):
         # TODO: check if these are valid email addresses,
         # to avoid possible spam
+        banned_mails_providers = config.BANNED_EMAIL_PROVIDERS
+
         if self.emails:
             if isinstance(self.emails, basestring):
                 emails = []
                 for email in self.emails.split(','):
                     if re.match("[^@]+@[^@]+\.[^@]+", email):
-                        if email.split('@')[1] not in config.BANNED_EMAIL_PROVIDERS:
+                        if email.split('@')[1] not in banned_mails_providers:
                             emails.append(email.replace(' ', ''))
                 self.emails = emails
         super(Rule, self).clean()
