@@ -40,7 +40,7 @@ from mist.io.clouds.controllers.base import BaseController
 
 from mist.core.tag.models import Tag
 
-# from mist.core.cloud.models import Machine
+from mist.core.cloud.models import Machine
 
 
 log = logging.getLogger(__name__)
@@ -137,11 +137,6 @@ class BaseComputeController(BaseController):
         default, dummy methods.
 
         """
-
-        # FIXME: Move this to top of the file once Machine model is migrated.
-        # The import statement is currently here to avoid circular import
-        # issues.
-        from mist.io.machines.models import Machine
 
         # Try to query list of machines from provider API.
         try:
