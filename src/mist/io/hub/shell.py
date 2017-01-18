@@ -10,7 +10,7 @@ import mist.io.exceptions
 import mist.io.shell
 import mist.io.hub.main
 
-import mist.core.user.models
+import mist.io.users.models
 
 
 log = logging.getLogger(__name__)
@@ -28,7 +28,7 @@ class ShellHubWorker(mist.io.hub.main.HubWorker):
                           self.lbl, key)
                 self.stop()
         self.provider = ''
-        self.owner = mist.core.user.models.Owner(id=self.params['owner_id'])
+        self.owner = mist.io.users.models.Owner(id=self.params['owner_id'])
 
     def on_ready(self, msg=''):
         super(ShellHubWorker, self).on_ready(msg)
