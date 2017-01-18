@@ -3,4 +3,4 @@
         url = ../../mistio/mist.tests.git
 [submodule "ui"]
 	path = ui
-	url = git@gitlab.ops.mist.io:mistio/mist.ui.git
+	url = ../../mistio/mist.ui.git
