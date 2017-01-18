@@ -9,7 +9,6 @@ be performed inside the corresponding method functions.
 
 """
 
-import re
 import requests
 import json
 import uuid

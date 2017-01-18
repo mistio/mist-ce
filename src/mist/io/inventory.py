@@ -1,5 +1,5 @@
 try:
-    from mist.core.user.models import User
+    from mist.io.users.models import User
     from mist.io.clouds.models import Cloud
     from mist.io.machines.models import Machine, KeyAssociation
     from mist.io.keys.models import SSHKey, SignedSSHKey
@@ -12,8 +12,8 @@ import mist.io.methods
 
 
 class MistInventory(object):
-    def __init__(self, user, machines=None):
-        self.user = user
+    def __init__(self, owner, machines=None):
+        self.owner = owner
         self.hosts = {}
         self.keys = {}
         self._cache = {}
@@ -23,7 +23,7 @@ class MistInventory(object):
         self.hosts = {}
         self.keys = {}
         if not machines:
-            clouds = Cloud.objects(owner=self.user, deleted=None)
+            clouds = Cloud.objects(owner=self.owner, deleted=None)
             machines = [(machine.cloud.id, machine.machine_id)
                         for machine in Machine.objects(cloud__in=clouds)]
         for bid, mid in machines:
@@ -33,9 +33,9 @@ class MistInventory(object):
             except Exception as exc:
                 print exc
                 continue
-            ip_addr, port = dnat(self.user, ip_addr, port)
+            ip_addr, port = dnat(self.owner, ip_addr, port)
             if key_id not in self.keys:
-                keypair = SSHKey.objects.get(owner=self.user, name=key_id,
+                keypair = SSHKey.objects.get(owner=self.owner, name=key_id,
                                              deleted=None)
                 self.keys[key_id] = keypair.private
                 if isinstance(keypair, SignedSSHKey):
@@ -76,7 +76,7 @@ class MistInventory(object):
     def _list_machines(self, cloud_id):
         if cloud_id not in self._cache:
             print 'Actually doing list_machines for %s' % cloud_id
-            machines = mist.io.methods.list_machines(self.user, cloud_id)
+            machines = mist.io.methods.list_machines(self.owner, cloud_id)
             self._cache[cloud_id] = machines
         return self._cache[cloud_id]
 
@@ -98,7 +98,7 @@ class MistInventory(object):
         raise Exception('Machine not found in list_machines')
 
     def find_ssh_settings(self, cloud_id, machine_id):
-        cloud = Cloud.objects.get(owner=self.user, id=cloud_id, deleted=None)
+        cloud = Cloud.objects.get(owner=self.owner, id=cloud_id, deleted=None)
         machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
         if not machine.key_associations:
             raise Exception("Machine doesn't have SSH association")
