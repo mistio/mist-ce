@@ -135,9 +135,7 @@ def delete_cloud(owner, cloud_id):
 
     try:
         cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-        # FIXME: Make sure that the cloud's machines are also deleted once the
-        # cloud document is expired. This must be implemented in the cloud ctl.
-        cloud.update(set__deleted=datetime.utcnow())
+        cloud.ctl.delete()
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
