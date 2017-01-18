@@ -726,7 +726,7 @@ class DockerComputeController(BaseComputeController):
         try:
             # Find dockerhost from database.
             machine = Machine.objects.get(cloud=self.cloud,
-                                             machine_type='container-engine')
+                                          machine_type='container-engine')
         except Machine.DoesNotExist:
             try:
                 # Find dockerhost with previous format from database.
@@ -736,7 +736,7 @@ class DockerComputeController(BaseComputeController):
             except Machine.DoesNotExist:
                 # Create dockerrhost machine.
                 machine = Machine(cloud=self.cloud,
-                                  machine_type='container-engine').save()
+                                  machine_type='container-engine')
 
         # Update dockerhost machine model fields.
         changed = False
@@ -746,6 +746,9 @@ class DockerComputeController(BaseComputeController):
             if getattr(machine, attr) != val:
                 setattr(machine, attr, val)
                 changed = True
+        if not machine.machine_id:
+            machine.machine_id = machine.id
+            changed = True
         try:
             ip_addr = socket.gethostbyname(machine.hostname)
         except socket.gaierror:
