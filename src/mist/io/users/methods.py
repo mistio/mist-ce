@@ -1,5 +1,4 @@
 from mist.io.users.models import User
-from mist.io.users.models import Promo
 from mist.io.users.models import Organization
 
 from mongoengine import ValidationError
@@ -19,14 +18,6 @@ from time import time
 
 import logging
 log = logging.getLogger(__name__)
-
-
-def get_all_promos():
-    return Promo.objects()
-
-
-def get_all_users(mongo_uri=None):
-    return User.objects()
 
 
 def get_users_count(mongo_uri=None, confirmed=False):
