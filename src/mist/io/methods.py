@@ -1096,8 +1096,14 @@ def destroy_machine(user, cloud_id, machine_id):
     it doesn't undeploy the keypair. There is no need to do it because the
     machine will be destroyed.
     """
-
     log.info('Destroying machine %s in cloud %s' % (machine_id, cloud_id))
+
+    machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+
+    if not machine.monitoring.hasmonitoring:
+        machine.ctl.destroy()
+        return
+
     # if machine has monitoring, disable it. the way we disable depends on
     # whether this is a standalone io installation or not
     disable_monitoring_function = None
@@ -1120,8 +1126,6 @@ def destroy_machine(user, cloud_id, machine_id):
         except Exception as exc:
             log.warning("Didn't manage to disable monitoring, maybe the "
                         "machine never had monitoring enabled. Error: %r", exc)
-
-    machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
 
     machine.ctl.destroy()
 
