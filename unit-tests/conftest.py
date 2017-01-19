@@ -6,7 +6,7 @@ import yaml
 import pytest
 import mist.io.clouds.models as models
 from mist.io.keys.models import SSHKey
-from mist.core.user.models import Organization, User
+from mist.io.users.models import Organization, User
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
