@@ -15,6 +15,7 @@ Cloud specific main controllers are in
 """
 
 import logging
+import datetime
 
 import mongoengine as me
 
@@ -298,6 +299,22 @@ class BaseMainController(object):
     def disable(self):
         self.cloud.enabled = False
         self.cloud.save()
+
+    def delete(self, expire=False):
+        """Delete a Cloud.
+
+        By default the corresponding mongodb document is not actually deleted,
+        but rather marked as deleted.
+
+        :param expire: if True, the document is expired from its collection.
+        """
+        self.cloud.deleted = datetime.datetime.utcnow()
+        self.cloud.save()
+        if expire:
+            # FIXME: Circular dependency.
+            from mist.io.machines.models import Machine
+            Machine.objects(cloud=self.cloud).delete()
+            self.cloud.delete()
 
     def disconnect(self):
         self.compute.disconnect()
