@@ -29,6 +29,8 @@ from mist.io.exceptions import CloudUnauthorizedError
 from mist.io.clouds.controllers.compute.base import BaseComputeController
 from mist.io.helpers import rename_kwargs
 
+# from mist.core.cloud.models import Machine
+
 
 log = logging.getLogger(__name__)
 
