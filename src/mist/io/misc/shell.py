@@ -1,7 +1,7 @@
 """Shell related class"""
 
 import mongoengine as me
-from mist.core.user.models import Owner
+from mist.io.users.models import Owner
 
 
 class ShellCapture(me.Document):
