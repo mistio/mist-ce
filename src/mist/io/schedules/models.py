@@ -18,8 +18,8 @@ PERIODS = ('days', 'hours', 'minutes', 'seconds', 'microseconds')
 
 class BaseScheduleType(me.EmbeddedDocument):
     """Abstract Base class used as a common interface
-    for scheduler types. There are two different types
-    for now: Interval and Crontab
+    for scheduler types. There are three different types
+    for now: Interval, Crontab and OneOff
     """
     meta = {'allow_inheritance': True}
 
@@ -31,6 +31,7 @@ class BaseScheduleType(me.EmbeddedDocument):
 class Interval(BaseScheduleType):
     meta = {'allow_inheritance': True}
 
+    type = 'interval'
     every = me.IntField(min_value=0, default=0, required=True)
     period = me.StringField(choices=PERIODS)
 
@@ -49,8 +50,16 @@ class Interval(BaseScheduleType):
         return 'Interval every {0.every} {0.period}'.format(self)
 
 
+class OneOff(Interval):
+    type = 'one_off'
+    entry = me.DateTimeField(required=True)
+
+    def __unicode__(self):
+        return 'OneOff date to run {0.entry}'.format(self)
+
+
 class Crontab(BaseScheduleType):
-    meta = {'allow_inheritance': True}
+    type = 'crontab'
 
     minute = me.StringField(default='*', required=True)
     hour = me.StringField(default='*', required=True)
@@ -132,6 +141,61 @@ class ScriptTask(BaseTaskType):
         return 'Run script: %s' % self.script_id
 
 
+class BaseResourceForm(me.EmbeddedDocument):
+    """Abstract Base class used as a common interface
+        for scheduler's resource types. List of
+        machines_uuids or machines_tags"""
+
+    meta = {'allow_inheritance': True}
+
+    @property
+    def get_machines(self):
+        raise NotImplementedError()
+
+
+class ListOfMachinesSchedule(BaseResourceForm):
+    machines = me.ListField(me.ReferenceField(Machine, required=True,),
+                                              required=True)
+    # TODO
+    # machines_uuids
+    # reverse_delete_rule=me.PULL
+
+    @property
+    def get_machines(self):
+        cloud_machines_pairs = []
+        for machine in self.machines:
+            if machine.state != 'terminated':
+                machine_id = machine.machine_id
+                cloud_id = machine.cloud.id
+                cloud_machines_pairs.append((cloud_id, machine_id))
+
+        return cloud_machines_pairs
+
+    # def __str__(self):
+    #     return 'Machines: %s' % self.machines
+
+
+class TaggedMachinesSchedule(BaseResourceForm):
+    tags = me.ListField(required=True)
+
+    @property
+    def get_machines(self):
+        # all machines currently matching the tags
+        cloud_machines_pairs = []
+        for tag in self.tags:
+            machines_from_tags = Tag.objects(owner=self.owner,
+                                             resource_type='machines', key=tag)
+            for m in machines_from_tags:
+                machine_id = m.resource.machine_id
+                cloud_id = m.resource.cloud.id
+                cloud_machines_pairs.append((cloud_id, machine_id))
+
+        return cloud_machines_pairs
+
+    def __str__(self):
+        return 'Tags: %s' % self.tags
+
+
 class Schedule(me.Document):
     """Abstract base class for every schedule attr mongoengine model.
     This model is based on celery periodic task and creates defines the fields
@@ -176,6 +240,7 @@ class Schedule(me.Document):
     # mist specific fields
     schedule_type = me.EmbeddedDocumentField(BaseScheduleType, required=True)
     task_type = me.EmbeddedDocumentField(BaseTaskType, required=True)
+    resource_form = me.EmbeddedDocumentField(BaseResourceForm, required=True)
 
     # celerybeat-mongo specific fields
     expires = me.DateTimeField()
@@ -186,32 +251,14 @@ class Schedule(me.Document):
 
     no_changes = False
 
-    _controller_cls = None
+    # _controller_cls = None
 
     def __init__(self, *args, **kwargs):
         # FIXME
-        import mist.io.schedules.controllers as controllers
+        # import mist.io.schedules.controllers as controllers
+        import mist.io.schedules.base
         super(Schedule, self).__init__(*args, **kwargs)
-
-        # Set attribute `ctl` to an instance of the appropriate controller.
-        if self._controller_cls is None:
-            raise NotImplementedError(
-                "Can't initialize %s. Schedule is an abstract base class and "
-                "shouldn't be used to create cloud instances. All Schedule "
-                "subclasses should define a `_controller_cls` class attribute "
-                "pointing to a `BaseController` subclass." % self
-            )
-        elif not issubclass(self._controller_cls, controllers.BaseController):
-            raise TypeError(
-                "Can't initialize %s.  All Schedule subclasses should define a"
-                " `_controller_cls` class attribute pointing to a "
-                "`BaseController` subclass." % self
-            )
-        self.ctl = self._controller_cls(self)
-
-        # Calculate and store cloud type specific fields.
-        self._schedule_specific_fields = [field for field in type(self)._fields
-                                          if field not in Schedule._fields]
+        self.ctl = mist.io.schedules.base.BaseController(self)
 
     @classmethod
     def add(cls, auth_context, name, **kwargs):
@@ -244,7 +291,14 @@ class Schedule(me.Document):
         if self.schedule_type:
             return self.schedule_type.schedule
         else:
-            raise Exception("must define interval or crontab schedule")
+            raise Exception("must define interval, crontab, one_off schedule")
+
+    @property
+    def args(self):
+        m = self.resource_form.get_machines
+        fire_up = self.task_type.args
+
+        return [self.owner.id, fire_up, self.name, m]
 
     @property
     def kwargs(self):
@@ -261,9 +315,6 @@ class Schedule(me.Document):
         else:
             raise Exception("must define interval or crontab schedule")
         return fmt.format(self)
-
-    def get_machines(self):
-            raise NotImplementedError()
 
     def validate(self, clean=True):
 
@@ -307,8 +358,8 @@ class Schedule(me.Document):
         in case it has been marked as deleted."""
         if self.deleted:
             self.enabled = False
-        if self.expires and self.expires < str(datetime.datetime.now()):
-            self.enabled = False
+        if self.expires and self.expires < datetime.datetime.now():
+            self.enabled = False  # TODO property
 
     def delete(self):
         super(Schedule, self).delete()
@@ -329,69 +380,15 @@ class Schedule(me.Document):
             'last_run_at': str(self.last_run_at or ''),
             'total_run_count': self.total_run_count or 0,
         }
-        if isinstance(self, ListOfMachinesSchedule):
-            machines_uuids = [machine.id for machine in self.machines]
-            sdict.update({'machine_uuids': machines_uuids})
+
+        if isinstance(self.resource_form, ListOfMachinesSchedule):
+            machines_uuids = [machine.id for machine in
+                              self.resource_form.machines]
+            sdict.update({'machines_uuids': machines_uuids})
         else:
-            sdict.update({'machine_tags': self.tags})
+            sdict.update({'machines_tags': self.resource_form.tags})
 
         return sdict
-
-
-class ListOfMachinesSchedule(Schedule):
-    # FIXME
-    import mist.io.schedules.controllers as controllers
-
-    machines = me.ListField(me.ReferenceField(Machine, required=True,
-                            reverse_delete_rule=me.PULL), required=True)
-
-    _controller_cls = controllers.ListOfMachinesController
-
-    @property
-    def args(self):
-        m = self.get_machines()
-        fire_up = self.task_type.args
-
-        return [self.owner.id, fire_up, self.name, m]
-
-    def get_machines(self):
-        cloud_machines_pairs = []
-        for machine in self.machines:
-            if machine.state != 'terminated':
-                machine_id = machine.machine_id
-                cloud_id = machine.cloud.id
-                cloud_machines_pairs.append((cloud_id, machine_id))
-
-        return cloud_machines_pairs
-
-
-class TaggedMachinesSchedule(Schedule):
-    # FIXME
-    import mist.io.schedules.controllers as controllers
-
-    tags = me.ListField(required=True)
-    # owner = me.ReferenceField(Owner, required=True)
-    _controller_cls = controllers.TaggedMachinesController
-
-    @property
-    def args(self):
-        m = self.get_machines()
-        fire_up = self.task_type.args
-
-        return [self.owner.id, fire_up, self.name, m]
-
-    def get_machines(self):
-        # all machines currently matching the tags
-        cloud_machines_pairs = []
-        for tag in self.tags:
-            machines_from_tags = Tag.objects(owner=self.owner,
-                                             resource_type='machines', key=tag)
-            for m in machines_from_tags:
-                machine_id = m.resource.machine_id
-                cloud_id = m.resource.cloud.id
-                cloud_machines_pairs.append((cloud_id, machine_id))
-
-        return cloud_machines_pairs
 
 
 class UserScheduler(MongoScheduler):
