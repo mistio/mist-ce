@@ -28,7 +28,7 @@ from mist.io.exceptions import MistError, NotFoundError
 from mist.io.exceptions import ServiceUnavailableError, MachineNotFoundError
 from mist.io.shell import Shell
 
-from mist.core.user.models import User, Owner, Organization
+from mist.io.users.models import User, Owner, Organization
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.io.scripts.models import Script
