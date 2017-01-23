@@ -5,7 +5,6 @@ import mongoengine as me
 
 from mist.core import config as core_config
 import mist.core.tag.models
-from mist.io.clouds.models import Cloud
 from mist.io.keys.models import Key
 from mist.io.machines.controllers import MachineController
 
@@ -111,7 +110,7 @@ class Machine(me.Document):
 
     id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
 
-    cloud = me.ReferenceField(Cloud, required=True)
+    cloud = me.ReferenceField('Cloud', required=True)
     name = me.StringField()
 
     # Info gathered mostly by libcloud (or in some cases user input).
@@ -131,11 +130,15 @@ class Machine(me.Document):
     image_id = me.StringField()
     size = me.StringField()
     # libcloud.compute.types.NodeState
-    state = me.StringField(choices=('running', 'starting', 'rebooting',
+    state = me.StringField(default='unknown',
+                           choices=('running', 'starting', 'rebooting',
                                     'terminated', 'pending', 'unknown',
                                     'stopping', 'stopped', 'suspended',
-                                    'error', 'paused', 'reconfiguring')
-                           )
+                                    'error', 'paused', 'reconfiguring'))
+    machine_type = me.StringField(default='machine',
+                                  choices=('machine', 'vm', 'container',
+                                           'hypervisor', 'container-host'))
+    parent = me.ReferenceField('Machine', required=False)
 
     # We should think this through a bit.
     key_associations = me.EmbeddedDocumentListField(KeyAssociation)
@@ -212,7 +215,9 @@ class Machine(me.Document):
             'cloud': self.cloud.id,
             'last_seen': str(self.last_seen or ''),
             'missing_since': str(self.missing_since or ''),
-            'created': str(self.created or '')
+            'created': str(self.created or ''),
+            'machine_type': self.machine_type,
+            'parent_id': self.parent.id if self.parent is not None else '',
         }
 
     def as_dict_old(self):
@@ -250,7 +255,9 @@ class Machine(me.Document):
             'can_undefine': self.actions.undefine,
             'can_rename': self.actions.rename,
             'can_suspend': self.actions.suspend,
-            'can_resume': self.actions.resume
+            'can_resume': self.actions.resume,
+            'machine_type': self.machine_type,
+            'parent_id': self.parent.id if self.parent is not None else '',
         }
 
     def __str__(self):
