@@ -240,19 +240,23 @@ class MainConnection(MistConnection):
         self.list_clouds()
         self.check_monitoring()
         if config.ACTIVATE_POLLER:
-            self.update_poller()
+            self.periodic_update_poller()
 
     @tornado.gen.coroutine
-    def update_poller(self):
+    def periodic_update_poller(self):
         """Every 4 minutes, tell poller to continue for next 5 minutes"""
         while True:
             if self.closed:
                 break
-            log.info("Updating poller for %s", self)
-            for cloud in Cloud.objects(owner=self.owner, deleted=None):
-                ListMachinesPollingSchedule.add(cloud=cloud,
-                                                interval=10, ttl=300)
+            self.update_poller()
             yield tornado.gen.sleep(240)
+
+    def update_poller(self):
+        """Increase polling frequency for all clouds"""
+        log.info("Updating poller for %s", self)
+        for cloud in Cloud.objects(owner=self.owner, deleted=None):
+            ListMachinesPollingSchedule.add(cloud=cloud,
+                                            interval=10, ttl=300)
 
     def update_user(self):
         self.send('user', core_methods.get_user_data(self.auth_context))
@@ -295,6 +299,8 @@ class MainConnection(MistConnection):
                   core_methods.filter_list_vpn_tunnels(self.auth_context))
 
     def list_clouds(self):
+        if config.ACTIVATE_POLLER:
+            self.update_poller()
         self.send('list_clouds',
                   core_methods.filter_list_clouds(self.auth_context))
         clouds = Cloud.objects(owner=self.owner, enabled=True, deleted=None)
