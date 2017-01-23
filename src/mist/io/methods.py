@@ -1,39 +1,27 @@
 import os
+import re
 import shutil
 import random
-import socket
 import tempfile
 import json
 import base64
 import requests
-import subprocess
-import re
-import calendar
-import ssl
-import iso8601
 
 import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError, DoesNotExist
 
-from time import sleep, time, mktime
+from time import time
 from datetime import datetime
-from hashlib import sha256
-from StringIO import StringIO
 from tempfile import NamedTemporaryFile
-from xml.sax.saxutils import escape
 
-from libcloud.compute.providers import get_driver
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
 from libcloud.compute.base import NodeAuthSSHKey
-from libcloud.compute.deployment import MultiStepDeployment, ScriptDeployment
-from libcloud.compute.deployment import SSHKeyDeployment
 from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
 from libcloud.dns.types import Provider as DnsProvider
 from libcloud.dns.types import RecordType
 from libcloud.dns.providers import get_driver as get_dns_driver
-from libcloud.pricing import get_size_price
 
 import ansible.playbook
 import ansible.utils.template
@@ -41,22 +29,14 @@ import ansible.callbacks
 import ansible.utils
 import ansible.constants
 
-# try:
-# from mist.core.user.models import User
-from mist.core.tag.models import Tag
 from mist.io.keys.models import Key
 from mist.core import config
-# except ImportError:
-#     print "Seems to be on IO version"
-#     from mist.io import config, model
 
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
-from mist.io.helpers import check_host, sanitize_host
 from mist.io.helpers import transform_key_machine_associations
 from mist.io.exceptions import *
-
 
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import amqp_publish_user
@@ -68,14 +48,9 @@ import mist.io.tasks
 import mist.io.inventory
 
 from mist.io.clouds.models import Cloud
-from mist.io.schedules.models import Schedule
 from mist.io.machines.models import Machine
 
-from mist.core.vpn.methods import destination_nat as dnat
 from mist.core.vpn.methods import super_ping
-from mist.core.vpn.methods import to_tunnel
-
-from mist.core.exceptions import VPNTunnelError
 
 import mist.io.clouds.models as cloud_models
 
@@ -160,9 +135,7 @@ def delete_cloud(owner, cloud_id):
 
     try:
         cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-        # FIXME: Make sure that the cloud's machines are also deleted once the
-        # cloud document is expired. This must be implemented in the cloud ctl.
-        cloud.update(set__deleted=datetime.utcnow())
+        cloud.ctl.delete()
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
@@ -170,26 +143,26 @@ def delete_cloud(owner, cloud_id):
     trigger_session_update(owner, ['clouds'])
 
 
-def delete_key(user, key_id):
+def delete_key(owner, key_id):
     """Deletes given key.
     If key was default, then it checks if there are still keys left
     and assigns another one as default.
 
-    :param user:
+    :param owner:
     :param key_id:
     :return:
     """
     log.info("Deleting key with id '%s'.", key_id)
-    key = Key.objects.get(owner=user, id=key_id, deleted=None)
+    key = Key.objects.get(owner=owner, id=key_id, deleted=None)
     default_key = key.default
     key.update(set__deleted=datetime.utcnow())
-    other_key = Key.objects(owner=user, id__ne=key_id, deleted=None).first()
+    other_key = Key.objects(owner=owner, id__ne=key_id, deleted=None).first()
     if default_key and other_key:
         other_key.default = True
         other_key.save()
 
     log.info("Deleted key with id '%s'.", key_id)
-    trigger_session_update(user, ['keys'])
+    trigger_session_update(owner, ['keys'])
 
 
 def connect_provider(cloud):
@@ -201,14 +174,14 @@ def connect_provider(cloud):
     return cloud.ctl.compute.connect()
 
 
-def list_machines(user, cloud_id):
+def list_machines(owner, cloud_id):
     """List all machines in this cloud via API call to the provider."""
-    machines = Cloud.objects.get(owner=user, id=cloud_id,
+    machines = Cloud.objects.get(owner=owner, id=cloud_id,
                                  deleted=None).ctl.compute.list_machines()
     return [machine.as_dict_old() for machine in machines]
 
 
-def create_machine(user, cloud_id, key_id, machine_name, location_id,
+def create_machine(owner, cloud_id, key_id, machine_name, location_id,
                    image_id, size_id, image_extra, disk, image_name,
                    size_name, location_name, ips, monitoring, networks=[],
                    docker_env=[], docker_command=None, ssh_port=22, script='',
@@ -251,18 +224,18 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
     # post_script_params: extra params, for post_script_id
 
     log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
-    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     machine_name = machine_name_validator(conn.type, machine_name)
     key = None
     if key_id:
-        key = Key.objects.get(owner=user, id=key_id, deleted=None)
+        key = Key.objects.get(owner=owner, id=key_id, deleted=None)
 
     # if key_id not provided, search for default key
     if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
         if not key_id:
-            key = Key.objects.get(owner=user, default=True, deleted=None)
+            key = Key.objects.get(owner=owner, default=True, deleted=None)
             key_id = key.name
     if key:
         private_key = key.private
@@ -397,7 +370,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         # for Azure, connect with the generated password, deploy the ssh key
         # when this is ok, it calls post_deploy for script/monitoring
         mist.io.tasks.azure_post_create_steps.delay(
-            user.id, cloud_id, node.id, monitoring, key_id,
+            owner.id, cloud_id, node.id, monitoring, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script=script,
             script_id=script_id, script_params=script_params, job_id = job_id,
@@ -406,9 +379,9 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         )
     elif conn.type == Provider.OPENSTACK:
         if associate_floating_ip:
-            networks = list_networks(user, cloud_id)
+            networks = list_networks(owner, cloud_id)
             mist.io.tasks.openstack_post_create_steps.delay(
-                user.id, cloud_id, node.id, monitoring, key_id,
+                owner.id, cloud_id, node.id, monitoring, key_id,
                 node.extra.get('username'), node.extra.get('password'),
                 public_key, script=script, script_id=script_id, script_params=script_params,
                 job_id = job_id, hostname=hostname, plugins=plugins,
@@ -420,7 +393,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
         # created we have the generated password, so deploy the ssh key
         # when this is ok and call post_deploy for script/monitoring
         mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
-            user.id, cloud_id, node.id, monitoring, key_id,
+            owner.id, cloud_id, node.id, monitoring, key_id,
             node.extra.get('password'), public_key, script=script,
             script_id=script_id, script_params=script_params,
             job_id = job_id, hostname=hostname, plugins=plugins,
@@ -430,7 +403,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
 
     elif key_id:
         mist.io.tasks.post_deploy_steps.delay(
-            user.id, cloud_id, node.id, monitoring, script=script,
+            owner.id, cloud_id, node.id, monitoring, script=script,
             key_id=key_id, script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
@@ -439,7 +412,7 @@ def create_machine(user, cloud_id, key_id, machine_name, location_id,
 
     if tags:
         from mist.core.tag.methods import resolve_id_and_set_tags
-        resolve_id_and_set_tags(user, 'machine', node.id, tags,
+        resolve_id_and_set_tags(owner, 'machine', node.id, tags,
                                 cloud_id=cloud_id)
 
     ret = {'id': node.id,
@@ -689,7 +662,6 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
         server_key = conn.create_key_pair('mistio'+str(random.randint(1,100000)), key)
         server_key = server_key.id
 
-
     if '.' in machine_name:
         domain = '.'.join(machine_name.split('.')[1:])
         name = machine_name.split('.')[0]
@@ -720,6 +692,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
         except Exception as e:
             raise MachineCreationError("Softlayer, got exception %s" % e, e)
     return node
+
 
 def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env={}, docker_command=None,
                            tty_attach=True, docker_port_bindings={}, docker_exposed_ports={}):
@@ -752,6 +725,7 @@ def _create_machine_docker(conn, machine_name, image, script=None, public_key=No
         raise MachineCreationError("Docker, got exception %s" % e, e)
 
     return node
+
 
 def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
                                   machine_name, image, size, location, user_data):
@@ -987,7 +961,6 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
             except:
                 pass
 
-
     with get_temp_file(private_key) as tmp_key_path:
         try:
             node = conn.create_node(
@@ -1155,7 +1128,7 @@ def destroy_machine(user, cloud_id, machine_id):
     machine.ctl.destroy()
 
 
-def ssh_command(user, cloud_id, machine_id, host, command,
+def ssh_command(owner, cloud_id, machine_id, host, command,
                 key_id=None, username=None, password=None, port=22):
     """
     We initialize a Shell instant (for mist.io.shell).
@@ -1165,25 +1138,25 @@ def ssh_command(user, cloud_id, machine_id, host, command,
 
     """
     # check if cloud exists
-    Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
+    Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
 
     shell = Shell(host)
-    key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id,
+    key_id, ssh_user = shell.autoconfigure(owner, cloud_id, machine_id,
                                            key_id, username, password, port)
     retval, output = shell.command(command)
     shell.disconnect()
     return output
 
 
-def list_images(user, cloud_id, term=None):
+def list_images(owner, cloud_id, term=None):
     """List images from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id,
+    return Cloud.objects.get(owner=owner, id=cloud_id,
                              deleted=None).ctl.compute.list_images(term)
 
 
-def star_image(user, cloud_id, image_id):
+def star_image(owner, cloud_id, image_id):
     """Toggle image star (star/unstar)"""
-    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
 
     star = cloud.ctl.compute.image_is_starred(image_id)
     if star:
@@ -1198,31 +1171,31 @@ def star_image(user, cloud_id, image_id):
             cloud.unstarred.remove(image_id)
     cloud.save()
     task = mist.io.tasks.ListImages()
-    task.clear_cache(user.id, cloud_id)
-    task.delay(user.id, cloud_id)
+    task.clear_cache(owner.id, cloud_id)
+    task.delay(owner.id, cloud_id)
     return not star
 
 
-def list_clouds(user):
+def list_clouds(owner):
     # FIXME: Move import to the top of the file.
     from mist.core.tag.methods import get_tags_for_resource
-    clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=user,
+    clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=owner,
                                                          deleted=None)]
     for cloud in clouds:
         # FIXME: cloud must be a mongoengine object FFS!
         # Also, move into cloud model's as_dict method?
-        cloud['tags'] = get_tags_for_resource(user, cloud)
+        cloud['tags'] = get_tags_for_resource(owner, cloud)
     return clouds
 
 
-def list_keys(user):
-    """List user's keys
-    :param user:
+def list_keys(owner):
+    """List owner's keys
+    :param owner:
     :return:
     """
     from mist.core.tag.methods import get_tags_for_resource
-    keys = Key.objects(owner=user, deleted=None)
-    clouds = Cloud.objects(owner=user, deleted=None)
+    keys = Key.objects(owner=owner, deleted=None)
+    clouds = Cloud.objects(owner=owner, deleted=None)
     key_objects = []
     # FIXME: This must be taken care of in Keys.as_dict
     for key in keys:
@@ -1234,30 +1207,30 @@ def list_keys(user):
         key_object["isDefault"] = key.default
         key_object["machines"] = transform_key_machine_associations(machines,
                                                                     key)
-        key_object['tags'] = get_tags_for_resource(user, key)
+        key_object['tags'] = get_tags_for_resource(owner, key)
         key_objects.append(key_object)
     return key_objects
 
 
-def list_sizes(user, cloud_id):
+def list_sizes(owner, cloud_id):
     """List sizes (aka flavors) from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id,
+    return Cloud.objects.get(owner=owner, id=cloud_id,
                              deleted=None).ctl.compute.list_sizes()
 
 
-def list_locations(user, cloud_id):
+def list_locations(owner, cloud_id):
     """List locations from each cloud"""
-    return Cloud.objects.get(owner=user, id=cloud_id,
+    return Cloud.objects.get(owner=owner, id=cloud_id,
                              deleted=None).ctl.compute.list_locations()
 
 
-def list_networks(user, cloud_id):
+def list_networks(owner, cloud_id):
     """List networks from each cloud.
     Currently NephoScale and Openstack networks are supported. For other providers
     this returns an empty list
 
     """
-    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     ret = {}
@@ -1327,12 +1300,12 @@ def list_networks(user, cloud_id):
     return ret
 
 
-def list_projects(user, cloud_id):
+def list_projects(owner, cloud_id):
     """List projects for each account.
     Currently supported for Packet.net. For other providers
     this returns an empty list
     """
-    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     ret = {}
@@ -1471,8 +1444,8 @@ def openstack_router_to_dict(router):
     return ret
 
 
-def associate_ip(user, cloud_id, network_id, ip, machine_id=None, assign=True):
-    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
+def associate_ip(owner, cloud_id, network_id, ip, machine_id=None, assign=True):
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
 
     if conn.type != Provider.NEPHOSCALE:
@@ -1666,7 +1639,7 @@ def delete_network(owner, cloud_id, network_id):
         pass
 
 
-def set_machine_tags(user, cloud_id, machine_id, tags):
+def set_machine_tags(owner, cloud_id, machine_id, tags):
     """Sets metadata for a machine, given the cloud and machine id.
 
     Libcloud handles this differently for each provider. Linode and Rackspace,
@@ -1677,7 +1650,7 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
 
     Tags is expected to be a list of key-value dicts
     """
-    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
 
     if not isinstance(cloud, (cloud_models.AmazonCloud,
                               cloud_models.GoogleCloud,
@@ -1759,7 +1732,7 @@ def set_machine_tags(user, cloud_id, machine_id, tags):
                 raise InternalServerError("error creating tags", exc)
 
 
-def delete_machine_tag(user, cloud_id, machine_id, tag):
+def delete_machine_tag(owner, cloud_id, machine_id, tag):
     """Deletes metadata for a machine, given the machine id and the tag to be
     deleted.
 
@@ -1776,7 +1749,7 @@ def delete_machine_tag(user, cloud_id, machine_id, tag):
 
     """
 
-    cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
+    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
 
     if not tag:
         raise RequiredParameterMissingError("tag")
@@ -1954,15 +1927,15 @@ def disable_monitoring(user, cloud_id, machine_id, no_ssh=False):
 # TODO deprecate this!
 # We should decouple probe_ssh_only from ping.
 # Use them as two separate functions instead & through celery
-def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
+def probe(owner, cloud_id, machine_id, host, key_id='', ssh_user=''):
     """Ping and SSH to machine and collect various metrics."""
 
     if not host:
         raise RequiredParameterMissingError('host')
 
-    ping = super_ping(owner=user, host=host)
+    ping = super_ping(owner=owner, host=host)
     try:
-        ret = probe_ssh_only(user, cloud_id, machine_id, host,
+        ret = probe_ssh_only(owner, cloud_id, machine_id, host,
                              key_id=key_id, ssh_user=ssh_user)
     except Exception as exc:
         log.error(exc)
@@ -1973,7 +1946,7 @@ def probe(user, cloud_id, machine_id, host, key_id='', ssh_user=''):
     return ret
 
 
-def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
+def probe_ssh_only(owner, cloud_id, machine_id, host, key_id='', ssh_user='',
                    shell=None):
     """Ping and SSH to machine and collect various metrics."""
 
@@ -2009,7 +1982,7 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
         log.warn('probing with key %s' % key_id)
 
     if not shell:
-        cmd_output = ssh_command(user, cloud_id, machine_id,
+        cmd_output = ssh_command(owner, cloud_id, machine_id,
                                  host, command, key_id=key_id)
     else:
         retval, cmd_output = shell.command(command)
@@ -2055,8 +2028,8 @@ def probe_ssh_only(user, cloud_id, machine_id, host, key_id='', ssh_user='',
     }
 
 
-def ping(host, user=None):
-    return super_ping(user, host=host)
+def ping(host, owner=None):
+    return super_ping(owner, host=host)
 
 
 def find_public_ips(ips):
@@ -2071,7 +2044,7 @@ def find_public_ips(ips):
     return public_ips
 
 
-def notify_admin(title, message="", team = "all"):
+def notify_admin(title, message="", team="all"):
     """ This will only work on a multi-user setup configured to send emails """
     try:
         from mist.core.helpers import send_email
@@ -2082,8 +2055,8 @@ def notify_admin(title, message="", team = "all"):
         pass
 
 
-def notify_user(user, title, message="", email_notify=True, **kwargs):
-    # Notify connected user via amqp
+def notify_user(owner, title, message="", email_notify=True, **kwargs):
+    # Notify connected owner via amqp
     payload = {'title': title, 'message': message}
     payload.update(kwargs)
     if 'command' in kwargs:
@@ -2093,14 +2066,14 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
         if 'retval' in kwargs:
             output += 'returned with exit code %s.\n' % kwargs['retval']
         payload['output'] = output
-    amqp_publish_user(user, routing_key='notify', data=payload)
+    amqp_publish_user(owner, routing_key='notify', data=payload)
 
     body = message + '\n' if message else ''
     if 'cloud_id' in kwargs:
         cloud_id = kwargs['cloud_id']
         body += "Cloud:\n"
         try:
-            cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
+            cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
             cloud_title = cloud.title
         except DoesNotExist:
             cloud_title = ''
@@ -2137,10 +2110,10 @@ def notify_user(user, title, message="", email_notify=True, **kwargs):
     if 'output' in kwargs:
         body += "Output: %s\n" % kwargs['output'].decode('utf-8', 'ignore')
 
-    try: # Send email in multi-user env
+    try: # Send email in multi-owner env
         if email_notify:
             from mist.core.helpers import send_email
-            email = user.email if hasattr(user, 'email') else user.get_email()
+            email = owner.email if hasattr(owner, 'email') else owner.get_email()
             send_email("[mist.io] %s" % title, body.encode('utf-8', 'ignore'),
                        email)
     except ImportError:
@@ -2226,7 +2199,7 @@ def update_metric(user, metric_id, name=None, unit=None,
     trigger_session_update(user, [])
 
 
-def undeploy_python_plugin(user, cloud_id, machine_id, plugin_id, host):
+def undeploy_python_plugin(owner, cloud_id, machine_id, plugin_id, host):
 
     # Sanity checks
     if not plugin_id:
@@ -2236,7 +2209,7 @@ def undeploy_python_plugin(user, cloud_id, machine_id, plugin_id, host):
 
     # Iniatilize SSH connection
     shell = Shell(host)
-    key_id, ssh_user = shell.autoconfigure(user, cloud_id, machine_id)
+    key_id, ssh_user = shell.autoconfigure(owner, cloud_id, machine_id)
 
     # Prepare collectd.conf
     script = """
@@ -2280,7 +2253,7 @@ def get_stats(user, cloud_id, machine_id, start='', stop='', step='', metrics=''
         raise ServiceUnavailableError(resp.text)
 
 
-def run_playbook(user, cloud_id, machine_id, playbook_path, extra_vars=None,
+def run_playbook(owner, cloud_id, machine_id, playbook_path, extra_vars=None,
                  force_handlers=False, debug=False):
     if not extra_vars:
         extra_vars = None
@@ -2293,7 +2266,7 @@ def run_playbook(user, cloud_id, machine_id, playbook_path, extra_vars=None,
         'inventory': '',
         'stats': {},
     }
-    inventory = mist.io.inventory.MistInventory(user,
+    inventory = mist.io.inventory.MistInventory(owner,
                                                 [(cloud_id, machine_id)])
     if len(inventory.hosts) != 1:
         log.error("Expected 1 host, found %s", inventory.hosts)
@@ -2372,7 +2345,7 @@ def run_playbook(user, cloud_id, machine_id, playbook_path, extra_vars=None,
             shutil.rmtree(tmp_dir)
 
 
-def _notify_playbook_result(user, res, cloud_id=None, machine_id=None,
+def _notify_playbook_result(owner, res, cloud_id=None, machine_id=None,
                             extra_vars=None, label='Ansible playbook'):
     title = label + (' succeeded' if res['success'] else ' failed')
     kwargs = {
@@ -2383,30 +2356,30 @@ def _notify_playbook_result(user, res, cloud_id=None, machine_id=None,
     }
     if not res['success']:
         kwargs['output'] = res['stdout']
-    notify_user(user, title, **kwargs)
+    notify_user(owner, title, **kwargs)
 
 
-def deploy_collectd(user, cloud_id, machine_id, extra_vars):
+def deploy_collectd(owner, cloud_id, machine_id, extra_vars):
     ret_dict = run_playbook(
-        user, cloud_id, machine_id,
+        owner, cloud_id, machine_id,
         playbook_path='src/deploy_collectd/ansible/enable.yml',
         extra_vars=extra_vars,
         force_handlers=True,
         # debug=True,
     )
-    _notify_playbook_result(user, ret_dict, cloud_id, machine_id,
+    _notify_playbook_result(owner, ret_dict, cloud_id, machine_id,
                             label='Collectd deployment')
     return ret_dict
 
 
-def undeploy_collectd(user, cloud_id, machine_id):
+def undeploy_collectd(owner, cloud_id, machine_id):
     ret_dict = run_playbook(
-        user, cloud_id, machine_id,
+        owner, cloud_id, machine_id,
         playbook_path='src/deploy_collectd/ansible/disable.yml',
         force_handlers=True,
         # debug=True,
     )
-    _notify_playbook_result(user, ret_dict, cloud_id, machine_id,
+    _notify_playbook_result(owner, ret_dict, cloud_id, machine_id,
                             label='Collectd undeployment')
     return ret_dict
 
@@ -2482,7 +2455,7 @@ def machine_name_validator(provider, name):
     return name
 
 
-def create_dns_a_record(user, domain_name, ip_addr):
+def create_dns_a_record(owner, domain_name, ip_addr):
     """Will try to create DNS A record for specified domain name and IP addr.
 
     All clouds for which there is DNS support will be tried to see if the
@@ -2504,7 +2477,7 @@ def create_dns_a_record(user, domain_name, ip_addr):
 
     # iterate over all clouds that can also be used as DNS providers
     providers = {}
-    clouds = Cloud.objects(owner=user)
+    clouds = Cloud.objects(owner=owner)
     for cloud in clouds:
         if isinstance(cloud, cloud_models.AmazonCloud):
             provider = DnsProvider.ROUTE53
