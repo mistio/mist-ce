@@ -807,6 +807,11 @@ class DockerComputeController(BaseComputeController):
         self.connection.ex_start_node(machine_libcloud)
         self._action_change_port(machine, machine_libcloud)
 
+    def reboot_machine(self, machine):
+        if machine.machine_type == 'container-engine':
+            return self.reboot_machine_ssh(machine)
+        return super(DockerComputeController, self).reboot_machine(machine)
+
     def _reboot_machine(self,  machine, machine_libcloud):
         machine_libcloud.reboot()
         self._action_change_port(machine, machine_libcloud)
@@ -913,19 +918,8 @@ class OtherComputeController(BaseComputeController):
     def _list_machines__fetch_generic_machines(self):
         return Machine.objects(cloud=self.cloud)
 
-    def _reboot_machine(self, machine, machine_libcloud):
-        try:
-            if machine.public_ips:
-                hostname = machine.public_ips[0]
-            else:
-                hostname = machine.private_ips[0]
-            command = '$(command -v sudo) shutdown -r now'
-            # TODO move it up
-            from mist.core.methods import ssh_command
-            ssh_command(self.cloud.owner, self.cloud.id,
-                        machine.machine_id, hostname, command)
-        except Exception as exc:
-            raise MistError("Couldn't reboot machine: %s" % exc)
+    def reboot_machine(self, machine):
+        return self.reboot_machine_ssh(machine)
 
     def list_images(self, search=None):
         return []

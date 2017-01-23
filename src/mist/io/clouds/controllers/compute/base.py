@@ -773,6 +773,27 @@ class BaseComputeController(BaseController):
         """
         machine_libcloud.reboot()
 
+    def reboot_machine_ssh(self, machine):
+        """Reboot machine by running command over SSH"""
+        assert self.cloud == machine.cloud
+        log.debug("Rebooting (SSH) machine %s", machine)
+        try:
+            if machine.public_ips:
+                hostname = machine.public_ips[0]
+            else:
+                hostname = machine.private_ips[0]
+            command = '$(command -v sudo) shutdown -r now'
+            # TODO move it up
+            from mist.core.methods import ssh_command
+            ssh_command(self.cloud.owner, self.cloud.id,
+                        machine.machine_id, hostname, command)
+        except MistError as exc:
+            log.error("Could not reboot machine %s", machine)
+            raise
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
+
     def destroy_machine(self, machine):
         """Destroy machine
 
