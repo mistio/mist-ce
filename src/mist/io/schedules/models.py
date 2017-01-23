@@ -165,8 +165,8 @@ class BaseResourceForm(me.EmbeddedDocument):
 
 
 class ListOfMachinesSchedule(BaseResourceForm):
-    machines = me.ListField(me.ReferenceField(Machine, required=True,),
-                                              required=True)
+    machines = me.ListField(me.ReferenceField(Machine, required=True,), 
+                            required=True)
     # TODO
     # machines_uuids
     # reverse_delete_rule=me.PULL
