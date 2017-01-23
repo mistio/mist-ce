@@ -4,7 +4,6 @@ This currently contains only BaseController. It includes basic functionality
 for a given schedule.
 Cloud specific controllers are in `mist.io.schedules.controllers`.
 """
-import json
 import logging
 import datetime
 import mongoengine as me
@@ -112,7 +111,7 @@ class BaseController(object):
         if kwargs.get('expires'):
             try:
                 kwargs['expires'] = datetime.datetime.strptime(
-                                    kwargs['expires'],'%Y-%m-%d %H:%M:%S')
+                                    kwargs['expires'], '%Y-%m-%d %H:%M:%S')
             except ValueError:
                 raise BadRequestError('Expiration date value was not valid')
 
