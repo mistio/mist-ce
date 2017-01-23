@@ -40,7 +40,7 @@ from mist.io.clouds.controllers.base import BaseController
 
 from mist.core.tag.models import Tag
 
-from mist.core.cloud.models import Machine
+from mist.io.machines.models import Machine
 
 
 log = logging.getLogger(__name__)
