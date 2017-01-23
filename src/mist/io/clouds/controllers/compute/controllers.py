@@ -42,6 +42,7 @@ from mist.io.exceptions import MachineNotFoundError
 from mist.core.vpn.methods import destination_nat as dnat
 
 from mist.io.bare_metal import BareMetalDriver
+from mist.io.misc.cloud import CloudImage
 
 from mist.io.clouds.controllers.main.base import BaseComputeController
 
@@ -77,8 +78,6 @@ class AmazonComputeController(BaseComputeController):
 
         image_id = machine_libcloud.extra.get('image_id')
         try:
-            # FIXME: This is here to avoid circular imports.
-            from mist.core.cloud.models import CloudImage
             os_type = CloudImage.objects.get(
                 cloud_provider=machine_libcloud.driver.type, image_id=image_id
             ).os_type
@@ -116,8 +115,6 @@ class AmazonComputeController(BaseComputeController):
                     image.name = default_images[image.id]
             images += self.connection.list_images(ex_owner='self')
         else:
-            # FIXME: This is here to avoid circular imports.
-            from mist.core.cloud.models import CloudImage
             image_models = CloudImage.objects(
                 me.Q(cloud_provider=self.connection.type,
                      image_id__icontains=search) |
@@ -220,8 +217,6 @@ class RackSpaceComputeController(BaseComputeController):
         # out of the image id.
         instance_image = machine_libcloud.extra.get('imageId')
         try:
-            # FIXME: This is here to avoid circular imports.
-            from mist.core.cloud.models import CloudImage
             os_type = CloudImage.objects.get(
                 cloud_provider=machine_libcloud.driver.type,
                 image_id=instance_image
