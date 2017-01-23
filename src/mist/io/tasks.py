@@ -120,7 +120,6 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
     from mist.io.methods import create_dns_a_record
 
     from mist.core.methods import enable_monitoring
-    from mist.core.helpers import log_event
 
     job_id = job_id or uuid.uuid4().hex
     if owner.find("@") != -1:
@@ -1063,7 +1062,7 @@ def group_machines_actions(owner_id, action, name, cloud_machines_pairs):
         'description': schedule.description or '',
         'schedule_type': unicode(schedule.schedule_type or ''),
         'owner_id': owner_id,
-        'machines_match': schedule.get_machines(),
+        'machines_match': schedule.resource_form.get_machines,
         'machine_action': action,
         'expires': str(schedule.expires or ''),
         'enabled': schedule.enabled,
@@ -1133,8 +1132,7 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
         if action in ('start', 'stop', 'reboot', 'destroy'):
             # call list machines here cause we don't have another way
             # to update machine state if user isn't logged in
-            from mist.io.methods import list_machines, destroy_machine
-            from mist.io.methods import notify_admin, notify_user
+            from mist.io.methods import list_machines
             list_machines(owner, cloud_id)
 
             if action == 'start':
@@ -1143,37 +1141,31 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
                     machine.ctl.start()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Start failed',
-                                                **log_dict)
+                    log_event(action='Start failed', **log_dict)
                 else:
-                    log_event(action='Start succeeded'
-                                            , **log_dict)
+                    log_event(action='Start succeeded', **log_dict)
             elif action == 'stop':
                 log_event(action='Stop', **log_dict)
                 try:
                     machine.ctl.stop()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Stop failed',
-                                                **log_dict)
+                    log_event(action='Stop failed', **log_dict)
                 else:
-                    log_event(action='Stop succeeded',
-                                                **log_dict)
+                    log_event(action='Stop succeeded', **log_dict)
             elif action == 'reboot':
                 log_event(action='Reboot', **log_dict)
                 try:
                     machine.ctl.reboot()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Reboot failed',
-                                                **log_dict)
+                    log_event(action='Reboot failed', **log_dict)
                 else:
-                    log_event(action='Reboot succeeded',
-                                            **log_dict)
+                    log_event(action='Reboot succeeded', **log_dict)
             elif action == 'destroy':
                 log_event(action='Destroy', **log_dict)
                 try:
-                    destroy_machine(owner, cloud_id, machine_id)
+                    mist.io.methods.destroy_machine(owner, cloud_id, machine_id)
                 except Exception as exc:
                     log_dict['error'] = str(exc)
                     log_event(action='Destroy failed', **log_dict)
@@ -1184,7 +1176,7 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
     log_dict['finished_at'] = time()
     title = "Execution of '%s' action " % action
     title += "failed" if log_dict.get('error') else "succeeded"
-    notify_user(
+    mist.io.methods.notify_user(
         owner, title,
         cloud_id=cloud_id,
         machine_id=machine_id,
@@ -1218,7 +1210,7 @@ def group_run_script(owner_id, script_id, name, cloud_machines_pairs):
         'description': schedule.description or '',
         'schedule_type': unicode(schedule.schedule_type or ''),
         'owner_id': owner_id,
-        'machines_match': schedule.get_machines(),
+        'machines_match': schedule.resource_form.get_machines,
         'script_id': script_id,
         'expires': str(schedule.expires or ''),
         'enabled': schedule.enabled,
@@ -1251,9 +1243,6 @@ def group_run_script(owner_id, script_id, name, cloud_machines_pairs):
 def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
                key_id='', username='', password='', port=22, job_id='',
                action_prefix='', su=False, env=""):
-    import mist.io.shell
-    from mist.io.methods import list_machines, notify_admin, notify_user
-
     if not isinstance(owner, Owner):
         if isinstance(owner, basestring):
             if '@' in owner:
@@ -1288,7 +1277,7 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
         script = Script.objects.get(owner=owner, id=script_id, deleted=None)
 
         if not host:
-            for machine in list_machines(owner, cloud_id):
+            for machine in mist.io.methods.list_machines(owner, cloud_id):
                 if machine['id'] == machine_id:
                     ips = [ip for ip in machine['public_ips'] if ':' not in ip]
                     # get private IPs if no public IP is available
@@ -1305,7 +1294,7 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
         ret['key_id'], ret['ssh_user'] = shell.autoconfigure(
             owner, cloud_id, machine_id, username, password, port
         )
-
+        # FIXME wrap here script.run_script
         path, params, wparams = script.ctl.run_script(shell,
                                                       params=params,
                                                       job_id=ret.get('job_id'))
@@ -1366,7 +1355,7 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
     ret['finished_at'] = time()
     title = "Execution of '%s' script " % script.name
     title += "failed" if ret['error'] else "succeeded"
-    notify_user(
+    mist.io.methods.notify_user(
         owner, title,
         cloud_id=cloud_id,
         machine_id=machine_id,
@@ -1378,7 +1367,7 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
     )
     if ret['error']:
         title += " for user %s" % str(owner)
-        notify_admin(
-            title, "%s\n\n%s" % (ret['stdout'], ret['error']), team='dev'
+        mist.io.methods.notify_admin(
+            title, "%s\n\n%s" % (ret['stdout'], ret['error']), team = 'dev'
         )
     return ret
