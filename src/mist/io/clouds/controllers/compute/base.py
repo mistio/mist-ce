@@ -259,13 +259,12 @@ class BaseComputeController(BaseController):
                     cph, cpm = map(parse_num,
                                    self._list_machines__cost_machine(machine,
                                                                      node))
-                if cph or cpm:
-                    if not cph:
-                        cph = float(cpm) / month_days / 24
-                    elif not cpm:
-                        cpm = cph * 24 * month_days
-                    machine.cost.hourly = cph
-                    machine.cost.monthly = cpm
+                if not cph:
+                    cph = float(cpm) / month_days / 24
+                elif not cpm:
+                    cpm = cph * 24 * month_days
+                machine.cost.hourly = cph
+                machine.cost.monthly = cpm
 
             except Exception as exc:
                 log.exception("Error while calculating cost "
