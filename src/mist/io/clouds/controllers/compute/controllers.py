@@ -721,7 +721,7 @@ class DockerComputeController(BaseComputeController):
         try:
             # Find dockerhost from database.
             machine = Machine.objects.get(cloud=self.cloud,
-                                          machine_type='container-engine')
+                                          machine_type='container-host')
         except Machine.DoesNotExist:
             try:
                 # Find dockerhost with previous format from database.
@@ -731,13 +731,13 @@ class DockerComputeController(BaseComputeController):
             except Machine.DoesNotExist:
                 # Create dockerrhost machine.
                 machine = Machine(cloud=self.cloud,
-                                  machine_type='container-engine')
+                                  machine_type='container-host')
 
         # Update dockerhost machine model fields.
         changed = False
         for attr, val in {'name': self.cloud.title,
                           'hostname': self.cloud.host,
-                          'machine_type': 'container-engine'}.iteritems():
+                          'machine_type': 'container-host'}.iteritems():
             if getattr(machine, attr) != val:
                 setattr(machine, attr, val)
                 changed = True
@@ -789,7 +789,7 @@ class DockerComputeController(BaseComputeController):
         its port. Finally save the machine in db.
         """
         # this exist here cause of docker host implementation
-        if machine.machine_type == 'container-engine':
+        if machine.machine_type == 'container-host':
             return
 
         node_info = self.connection.inspect_node(machine_libcloud)
@@ -808,7 +808,7 @@ class DockerComputeController(BaseComputeController):
         self._action_change_port(machine, machine_libcloud)
 
     def reboot_machine(self, machine):
-        if machine.machine_type == 'container-engine':
+        if machine.machine_type == 'container-host':
             return self.reboot_machine_ssh(machine)
         return super(DockerComputeController, self).reboot_machine(machine)
 
