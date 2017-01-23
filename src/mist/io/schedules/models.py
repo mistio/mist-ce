@@ -49,6 +49,12 @@ class Interval(BaseScheduleType):
             return 'Interval every {0.period_singular}'.format(self)
         return 'Interval every {0.every} {0.period}'.format(self)
 
+    def as_dict(self):
+        return {
+            'every': self.every,
+            'period': self.period
+        }
+
 
 class OneOff(Interval):
     type = 'one_off'
@@ -56,6 +62,11 @@ class OneOff(Interval):
 
     def __unicode__(self):
         return 'OneOff date to run {0.entry}'.format(self)
+
+    def as_dict(self):
+        return {
+            'entry': str(self.entry)
+        }
 
 
 class Crontab(BaseScheduleType):
@@ -372,7 +383,9 @@ class Schedule(me.Document):
             'id': self.id,
             'name': self.name,
             'description': self.description or '',
-            'schedule_type': unicode(self.schedule_type),
+            'schedule': unicode(self.schedule_type),
+            'schedule_type': self.schedule_type.type,
+            'schedule_entry': self.schedule_type.as_dict(),
             'task_type': str(self.task_type),
             'expires': str(self.expires or ''),
             'enabled': self.enabled,
