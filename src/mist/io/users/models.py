@@ -378,7 +378,7 @@ class User(Owner):
             name = (self.first_name or '') + ' ' + (self.last_name or '')
             return name.strip() or self.email
 
-
+# TODO delete maybe also rename users to orgs
 class Promo(me.Document):
     code = me.StringField()
     url_token = me.StringField()
