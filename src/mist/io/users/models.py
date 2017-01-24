@@ -51,7 +51,7 @@ class HtmlSafeStrField(me.StringField):
         value = value.replace(">", "&gt;")
         return value
 
-
+# TODO remove these, but first delete feedback field from user
 class Feedback(me.EmbeddedDocument):
     company_name = me.StringField()
     country = me.StringField()
@@ -506,6 +506,9 @@ class Organization(Owner):
     promo_codes = me.ListField()
     selected_plan = me.StringField()
     enterprise_plan = me.DictField()
+
+    # add this field for migration purpose
+    migrated = me.BooleanField(default=False, null=False)
 
     @property
     def mapper(self):
