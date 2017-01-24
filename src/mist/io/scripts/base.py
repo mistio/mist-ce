@@ -94,6 +94,7 @@ class BaseScriptController(object):
         except me.NotUniqueError as exc:
             log.error("Script %s not unique error: %s", self.script.name, exc)
             raise ScriptNameExistsError()
+        self.script.owner.mapper.update(self.script)
         log.info("Added script with name '%s'", self.script.name)
         trigger_session_update(self.script.owner, ['scripts'])
 
@@ -109,6 +110,7 @@ class BaseScriptController(object):
         if description:
             self.script.description = description
         self.script.save()
+        self.script.owner.mapper.update(self.script)
         log.info("Edit script: '%s'.", self.script.id)
         trigger_session_update(self.script.owner, ['scripts'])
 
