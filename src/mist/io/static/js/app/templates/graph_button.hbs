@@ -1,8 +1,0 @@
-{{#if view.graph.isHidden}}
-<div class="graph-button graph-minimized" id={{view.buttonId}} draggable="true">
-    <a class="ui-btn ui-caps ui-shadow ui-btn-icon-right icon-graph-1"
-        {{action "graphButtonClicked" graph target=actionProxy}}>
-            {{unbound view.graph.title}}
-    </a>
-</div>
-{{/if}}

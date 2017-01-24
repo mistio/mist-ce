@@ -9,6 +9,7 @@ to db etc. Cloud specific controllers are in `mist.io.clouds.controllers`.
 import ssl
 import json
 import copy
+import socket
 import logging
 import datetime
 import calendar
@@ -32,11 +33,14 @@ from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.io.helpers import get_datetime
 
+from mist.core.vpn.methods import destination_nat as dnat
+from mist.core.vpn.methods import super_ping
+
 from mist.io.clouds.controllers.base import BaseController
 
 from mist.core.tag.models import Tag
 
-# from mist.core.cloud.models import Machine
+from mist.io.machines.models import Machine
 
 
 log = logging.getLogger(__name__)
@@ -123,23 +127,20 @@ class BaseComputeController(BaseController):
         to allow subclasses to modify the data according to the specific of
         their cloud type. These methods currently are:
 
+            `self._list_machines__fetch_machines`
             `self._list_machines__machine_actions`
             `self._list_machines__postparse_machine`
             `self._list_machines__cost_machine`
+            `self._list_machines__fetch_generic_machines`
 
         Subclasses that require special handling should override these, by
         default, dummy methods.
 
         """
 
-        # FIXME: Move this to top of the file once Machine model is migrated.
-        # The import statement is currently here to avoid circular import
-        # issues.
-        from mist.io.machines.models import Machine
-
         # Try to query list of machines from provider API.
         try:
-            nodes = self.connection.list_nodes()
+            nodes = self._list_machines__fetch_machines()
             log.info("List nodes returned %d results for %s.",
                      len(nodes), self.cloud)
         except InvalidCredsError as exc:
@@ -154,10 +155,10 @@ class BaseComputeController(BaseController):
             log.exception("Error while running list_nodes on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
+        machines = []
         now = datetime.datetime.utcnow()
 
         # Process each machine in returned list.
-        machines = []
         # Store previously unseen machines separately.
         new_machines = []
         for node in nodes:
@@ -258,13 +259,12 @@ class BaseComputeController(BaseController):
                     cph, cpm = map(parse_num,
                                    self._list_machines__cost_machine(machine,
                                                                      node))
-                if cph or cpm:
-                    if not cph:
-                        cph = float(cpm) / month_days / 24
-                    elif not cpm:
-                        cpm = cph * 24 * month_days
-                    machine.cost.hourly = cph
-                    machine.cost.monthly = cpm
+                if not cph:
+                    cph = float(cpm) / month_days / 24
+                elif not cpm:
+                    cpm = cph * 24 * month_days
+                machine.cost.hourly = cph
+                machine.cost.monthly = cpm
 
             except Exception as exc:
                 log.exception("Error while calculating cost "
@@ -287,6 +287,24 @@ class BaseComputeController(BaseController):
 
             machines.append(machine)
 
+        # Append generic-type machines, which aren't handled by libcloud.
+        for machine in self._list_machines__fetch_generic_machines():
+            machine.last_seen = now
+            machine.missing_since = None
+            if self.check_if_machine_accessible(machine):
+                machine.state = config.STATES[NodeState.RUNNING]
+            else:
+                machine.state = config.STATES[NodeState.UNKNOWN]
+            for action in ('start', 'stop', 'reboot', 'destroy', 'rename',
+                           'resume', 'suspend', 'undefine'):
+                setattr(machine.actions, action, False)
+            machine.actions.tag = True
+            # allow reboot action for bare metal with key associated
+            if machine.key_associations:
+                machine.actions.reboot = True
+            machine.save()
+            machines.append(machine)
+
         # Set last_seen on machine models we didn't see for the first time now.
         Machine.objects(cloud=self.cloud,
                         id__nin=[m.id for m in machines],
@@ -296,6 +314,10 @@ class BaseComputeController(BaseController):
         self.cloud.owner.mapper.update(new_machines)
 
         return machines
+
+    def _list_machines__fetch_machines(self):
+        """Perform the actual libcloud call to get list of nodes"""
+        return self.connection.list_nodes()
 
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return
@@ -383,6 +405,45 @@ class BaseComputeController(BaseController):
 
         """
         return 0, 0
+
+    def _list_machines__fetch_generic_machines(self):
+        """Return list of machine models that aren't handled by libcloud"""
+        return []
+
+    def check_if_machine_accessible(self, machine):
+        """Attempt to port knock and ping the machine"""
+        assert machine.cloud.id == self.cloud.id
+        hostname = machine.hostname or (
+            machine.private_ips[0] if machine.private_ips else '')
+        if not hostname:
+            return False
+        socket.setdefaulttimeout(5)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        ports_list = [22, 80, 443, 3389]
+        for port in (machine.ssh_port, machine.rdp_port):
+            if port and port not in ports_list:
+                ports_list.insert(0, port)
+        for port in ports_list:
+            log.info("Attempting to connect to %s:%d", hostname, port)
+            try:
+                s.connect(dnat(self.cloud.owner, hostname, port))
+                s.shutdown(2)
+            except:
+                log.info("Failed to connect to %s:%d", hostname, port)
+                continue
+            log.info("Connected to %s:%d", hostname, port)
+            return True
+        try:
+            log.info("Pinging %s", hostname)
+            ping = super_ping(owner=self.cloud.owner,
+                              host=hostname, pkts=1)
+            if int(ping.get('packets_rx', 0)) > 0:
+                log.info("Successfully pinged %s", hostname)
+                return True
+        except:
+            log.info("Failed to ping %s", hostname)
+            pass
+        return False
 
     def list_images(self, search=None):
         """Return list of images for cloud
@@ -710,6 +771,27 @@ class BaseComputeController(BaseController):
         is called by the public method `reboot_machine`.
         """
         machine_libcloud.reboot()
+
+    def reboot_machine_ssh(self, machine):
+        """Reboot machine by running command over SSH"""
+        assert self.cloud == machine.cloud
+        log.debug("Rebooting (SSH) machine %s", machine)
+        try:
+            if machine.public_ips:
+                hostname = machine.public_ips[0]
+            else:
+                hostname = machine.private_ips[0]
+            command = '$(command -v sudo) shutdown -r now'
+            # TODO move it up
+            from mist.core.methods import ssh_command
+            ssh_command(self.cloud.owner, self.cloud.id,
+                        machine.machine_id, hostname, command)
+        except MistError as exc:
+            log.error("Could not reboot machine %s", machine)
+            raise
+        except Exception as exc:
+            log.exception(exc)
+            raise InternalServerError(exc=exc)
 
     def destroy_machine(self, machine):
         """Destroy machine
