@@ -1,0 +1,32 @@
+{ "route53":
+    [
+        {
+            "domain": "test.io.",
+            "extra": {
+                "Comment": null,
+                "ResourceRecordSetCount": 2
+            },
+            "type": "master",
+            "id": "Z1P4B5JD5EISVP",
+            "ttl": null
+        }
+    ],
+    "google":
+        {
+            "domain": "test.io.",
+            "extra": {
+                "nameServers": [
+                    "ns-cloud-d1.googledomains.com.",
+                    "ns-cloud-d2.googledomains.com.",
+                    "ns-cloud-d3.googledomains.com.",
+                    "ns-cloud-d4.googledomains.com."
+                ],
+                "creationTime": "2016-10-30T17:43:20.443Z",
+                "description": "",
+                "id": "4801472337744143420"
+            },
+            "type": "master",
+            "id": "test-io",
+            "ttl": null
+        }
+}

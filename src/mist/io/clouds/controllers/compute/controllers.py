@@ -21,10 +21,13 @@ accessed through a cloud model, using the `ctl` abbreviation, like this:
 
 
 import re
+import socket
 import logging
 import tempfile
 
 from xml.sax.saxutils import escape
+
+import netaddr
 
 import mongoengine as me
 
@@ -39,9 +42,9 @@ from mist.io.exceptions import MistError
 from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import MachineNotFoundError
 
-from mist.core.vpn.methods import destination_nat as dnat
+from mist.io.machines.models import Machine
 
-from mist.io.bare_metal import BareMetalDriver
+from mist.core.vpn.methods import destination_nat as dnat
 from mist.io.misc.cloud import CloudImage
 
 from mist.io.clouds.controllers.main.base import BaseComputeController
@@ -669,6 +672,10 @@ class OpenStackComputeController(BaseComputeController):
 
 class DockerComputeController(BaseComputeController):
 
+    def __init__(self, *args, **kwargs):
+        super(DockerComputeController, self).__init__(*args, **kwargs)
+        self._dockerhost = None
+
     def _connect(self):
         host, port = dnat(self.cloud.owner, self.cloud.host, self.cloud.port)
 
@@ -686,11 +693,8 @@ class DockerComputeController(BaseComputeController):
                 ca_cert_temp_file.write(self.cloud.ca_cert_file)
                 ca_cert_temp_file.close()
                 ca_cert = ca_cert_temp_file.name
-            # FIXME: The docker_host logic should come out of libcloud into
-            # DockerComputeController.list_machines
             return get_driver(Provider.DOCKER)(host=host,
                                                port=port,
-                                               docker_host=self.cloud.host,
                                                key_file=key_temp_file.name,
                                                cert_file=cert_temp_file.name,
                                                ca_cert=ca_cert,
@@ -699,11 +703,65 @@ class DockerComputeController(BaseComputeController):
         # Username/Password authentication.
         return get_driver(Provider.DOCKER)(self.cloud.username,
                                            self.cloud.password,
-                                           host, port,
-                                           docker_host=self.cloud.host)
+                                           host, port)
 
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return machine_libcloud.created_at  # unix timestamp
+
+    def _list_machines__postparse_machine(self, machine, machine_libcloud):
+        machine.machine_type = 'container'
+        machine.parent = self.dockerhost
+
+    @property
+    def dockerhost(self):
+        """This is a helper method to get the machine representing the host"""
+        if self._dockerhost is not None:
+            return self._dockerhost
+
+        try:
+            # Find dockerhost from database.
+            machine = Machine.objects.get(cloud=self.cloud,
+                                          machine_type='container-host')
+        except Machine.DoesNotExist:
+            try:
+                # Find dockerhost with previous format from database.
+                machine = Machine.objects.get(
+                    cloud=self.cloud, **{'extra__tags.type': 'docker_host'}
+                )
+            except Machine.DoesNotExist:
+                # Create dockerrhost machine.
+                machine = Machine(cloud=self.cloud,
+                                  machine_type='container-host')
+
+        # Update dockerhost machine model fields.
+        changed = False
+        for attr, val in {'name': self.cloud.title,
+                          'hostname': self.cloud.host,
+                          'machine_type': 'container-host'}.iteritems():
+            if getattr(machine, attr) != val:
+                setattr(machine, attr, val)
+                changed = True
+        if not machine.machine_id:
+            machine.machine_id = machine.id
+            changed = True
+        try:
+            ip_addr = socket.gethostbyname(machine.hostname)
+        except socket.gaierror:
+            pass
+        else:
+            is_private = netaddr.IPAddress(ip_addr).is_private()
+            ips = machine.private_ips if is_private else machine.public_ips
+            if ip_addr not in ips:
+                ips.insert(0, ip_addr)
+                changed = True
+        if changed:
+            machine.save()
+
+        self._dockerhost = machine
+        return machine
+
+    def _list_machines__fetch_generic_machines(self):
+        return [self.dockerhost]
 
     def _list_images__fetch_images(self, search=None):
         # Fetch mist's recommended images
@@ -731,7 +789,7 @@ class DockerComputeController(BaseComputeController):
         its port. Finally save the machine in db.
         """
         # this exist here cause of docker host implementation
-        if machine_libcloud.extra.get('tags', {}).get('type') == 'docker_host':
+        if machine.machine_type == 'container-host':
             return
 
         node_info = self.connection.inspect_node(machine_libcloud)
@@ -748,6 +806,11 @@ class DockerComputeController(BaseComputeController):
     def _start_machine(self,  machine, machine_libcloud):
         self.connection.ex_start_node(machine_libcloud)
         self._action_change_port(machine, machine_libcloud)
+
+    def reboot_machine(self, machine):
+        if machine.machine_type == 'container-host':
+            return self.reboot_machine_ssh(machine)
+        return super(DockerComputeController, self).reboot_machine(machine)
 
     def _reboot_machine(self,  machine, machine_libcloud):
         machine_libcloud.reboot()
@@ -844,35 +907,25 @@ class LibvirtComputeController(BaseComputeController):
 class OtherComputeController(BaseComputeController):
 
     def _connect(self):
-        # FIXME: Move this to top of the file once Machine model is migrated.
-        # The import statement is currently here to avoid circular import
-        # issues.
-        from mist.io.machines.models import Machine
-        return BareMetalDriver(Machine.objects(cloud=self.cloud))
+        return None
 
-    def _list_machines__machine_actions(self, machine, machine_libcloud):
-        super(OtherComputeController, self)._list_machines__machine_actions(
-            machine, machine_libcloud
-        )
-        machine.actions.reboot = False
-        machine.actions.stop = False
-        machine.actions.destroy = False
-        # allow reboot action for bare metal with key associated
-        if machine.key_associations:
-            machine.actions.reboot = True
+    def _list_machines__fetch_machines(self):
+        return []
 
-    def _reboot_machine(self, machine, machine_libcloud):
-        try:
-            if machine.public_ips:
-                hostname = machine.public_ips[0]
-            else:
-                hostname = machine.private_ips[0]
+    def _get_machine_libcloud(self, machine):
+        return None
 
-            command = '$(command -v sudo) shutdown -r now'
-            # TODO move it up
-            from mist.core.methods import ssh_command
-            ssh_command(self.cloud.owner, self.cloud.id,
-                        machine.machine_id, hostname, command)
-            return True
-        except:
-            return False
+    def _list_machines__fetch_generic_machines(self):
+        return Machine.objects(cloud=self.cloud)
+
+    def reboot_machine(self, machine):
+        return self.reboot_machine_ssh(machine)
+
+    def list_images(self, search=None):
+        return []
+
+    def list_sizes(self):
+        return []
+
+    def list_locations(self):
+        return []

@@ -1,0 +1,265 @@
+{"route53":
+    [  
+    {  
+        "name":"",
+        "extra":{  
+            "_multi_value":true,
+            "_other_records":[  
+                {  
+                "type":"NS",
+                "data":"ns-666.awsdns-19.net.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                },
+                {  
+                "type":"NS",
+                "data":"ns-1191.awsdns-20.org.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                },
+                {  
+                "type":"NS",
+                "data":"ns-259.awsdns-32.com.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                }
+            ],
+            "ttl":172800
+        },
+        "type":"NS",
+        "ttl":172800,
+        "data":"ns-2039.awsdns-62.co.uk.",
+        "id":"NS:"
+    },
+    {  
+        "name":"",
+        "extra":{  
+            "_multi_value":true,
+            "_other_records":[  
+                {  
+                "type":"NS",
+                "data":"ns-2039.awsdns-62.co.uk.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                },
+                {  
+                "type":"NS",
+                "data":"ns-1191.awsdns-20.org.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                },
+                {  
+                "type":"NS",
+                "data":"ns-259.awsdns-32.com.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                }
+            ],
+            "ttl":172800
+        },
+        "type":"NS",
+        "ttl":172800,
+        "data":"ns-666.awsdns-19.net.",
+        "id":"NS:"
+    },
+    {  
+        "name":"",
+        "extra":{  
+            "_multi_value":true,
+            "_other_records":[  
+                {  
+                "type":"NS",
+                "data":"ns-2039.awsdns-62.co.uk.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                },
+                {  
+                "type":"NS",
+                "data":"ns-666.awsdns-19.net.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                },
+                {  
+                "type":"NS",
+                "data":"ns-259.awsdns-32.com.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                }
+            ],
+            "ttl":172800
+        },
+        "type":"NS",
+        "ttl":172800,
+        "data":"ns-1191.awsdns-20.org.",
+        "id":"NS:"
+    },
+    {  
+        "name":"",
+        "extra":{  
+            "_multi_value":true,
+            "_other_records":[  
+                {  
+                "type":"NS",
+                "data":"ns-2039.awsdns-62.co.uk.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                },
+                {  
+                "type":"NS",
+                "data":"ns-666.awsdns-19.net.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                },
+                {  
+                "type":"NS",
+                "data":"ns-1191.awsdns-20.org.",
+                "name":"",
+                "extra":{  
+                    "ttl":172800
+                }
+                }
+            ],
+            "ttl":172800
+        },
+        "type":"NS",
+        "ttl":172800,
+        "data":"ns-259.awsdns-32.com.",
+        "id":"NS:"
+    },
+    {  
+        "name":"",
+        "extra":{  
+            "_multi_value":false,
+            "ttl":900
+        },
+        "type":"SOA",
+        "ttl":900,
+        "data":"ns-2039.awsdns-62.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400",
+        "id":"SOA:"
+    }
+    ],
+    "google":
+        [
+        {
+            "name": "test.io.",
+            "extra": {},
+            "type": "NS",
+            "ttl": 21600,
+            "data": {
+                "rrdatas": [
+                    "ns-cloud-d1.googledomains.com.",
+                    "ns-cloud-d2.googledomains.com.",
+                    "ns-cloud-d3.googledomains.com.",
+                    "ns-cloud-d4.googledomains.com."
+                ],
+                "kind": "dns#resourceRecordSet",
+                "type": "NS",
+                "name": "test.io.",
+                "ttl": 21600
+            },
+            "id": "NS:test.io."
+        },
+        {
+            "name": "test.io.",
+            "extra": {},
+            "type": "SOA",
+            "ttl": 21600,
+            "data": {
+                "rrdatas": [
+                    "ns-cloud-d1.googledomains.com. cloud-dns-hostmaster.google.com. 1 21600 3600 259200 300"
+                ],
+                "kind": "dns#resourceRecordSet",
+                "type": "SOA",
+                "name": "test.io.",
+                "ttl": 21600
+            },
+            "id": "SOA:test.io."
+        },
+        {
+            "name": "blog.test.io.",
+            "extra": {},
+            "type": "A",
+            "ttl": 3600,
+            "data": {
+                "rrdatas": [
+                    "2.2.2.2"
+                ],
+                "kind": "dns#resourceRecordSet",
+                "type": "A",
+                "name": "blog.test.io.",
+                "ttl": 3600
+            },
+            "id": "A:blog.test.io."
+        },
+        {
+            "name": "blog123.test.io.",
+            "extra": {},
+            "type": "A",
+            "ttl": 0,
+            "data": {
+                "rrdatas": [
+                    "1.2.3.4"
+                ],
+                "kind": "dns#resourceRecordSet",
+                "type": "A",
+                "name": "blog123.test.io.",
+                "ttl": 0
+            },
+            "id": "A:blog123.test.io."
+        },
+        {
+            "name": "blog2.test.io.",
+            "extra": {},
+            "type": "A",
+            "ttl": 3600,
+            "data": {
+                "rrdatas": [
+                    "1.2.3.4"
+                ],
+                "kind": "dns#resourceRecordSet",
+                "type": "A",
+                "name": "blog2.test.io.",
+                "ttl": 3600
+            },
+            "id": "A:blog2.test.io."
+        },
+        {
+            "name": "mx.test.io.",
+            "extra": {},
+            "type": "A",
+            "ttl": 3600,
+            "data": {
+                "rrdatas": [
+                    "2.2.2.2"
+                ],
+                "kind": "dns#resourceRecordSet",
+                "type": "A",
+                "name": "mx.test.io.",
+                "ttl": 3600
+            },
+            "id": "A:mx.test.io."
+        }
+    ]
+}
