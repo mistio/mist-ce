@@ -255,7 +255,7 @@ class MainConnection(MistConnection):
         """Increase polling frequency for all clouds"""
         log.info("Updating poller for %s", self)
         for cloud in Cloud.objects(owner=self.owner, deleted=None):
-            ListMachinesPollingSchedule.add(cloud=cloud,
+            ListMachinesPollingSchedule.add(cloud=cloud, default=300,
                                             interval=10, ttl=300)
 
     def update_user(self):

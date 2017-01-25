@@ -38,8 +38,9 @@ def list_machines(cloud_id):
 
     # Push historic information for inventory and cost reporting.
     for machine in machines:
+        data = {'owner_id': machine.cloud.owner.id,
+                'machine_id': machine.id,
+                'cost_per_month': machine.cost.monthly}
+        log.info("Will push to elastic: %s", data)
         amqp_publish(exchange='machines_inventory', routing_key='',
-                     auto_delete=False,
-                     data={'owner_id': machine.cloud.owner.id,
-                           'machine_id': machine.id,
-                           'cost_per_month': machine.cost.monthly})
+                     auto_delete=False, data=data)
