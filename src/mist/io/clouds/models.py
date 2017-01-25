@@ -6,7 +6,7 @@ import mongoengine as me
 
 from mist.core.tag.models import Tag
 from mist.io.keys.models import Key
-from mist.core.user.models import Organization
+from mist.io.users.models import Organization
 
 from mist.io.clouds.controllers.main import controllers
 
