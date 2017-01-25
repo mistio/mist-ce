@@ -110,7 +110,6 @@ class BaseScriptController(object):
         if description:
             self.script.description = description
         self.script.save()
-        self.script.owner.mapper.update(self.script)
         log.info("Edit script: '%s'.", self.script.id)
         trigger_session_update(self.script.owner, ['scripts'])
 
