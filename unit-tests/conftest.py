@@ -238,3 +238,19 @@ def load_staging_l_images():
     with open(path) as fobj:
         return json.load(fobj)
 
+
+@pytest.fixture
+def load_staging_l_zones():
+    path = os.path.join(TEST_DIR, 'list_zones.json')
+    print "Reading zones from path '%s'." % path
+    with open(path) as fobj:
+        return json.load(fobj)
+
+
+@pytest.fixture
+def load_staging_l_records():
+    path = os.path.join(TEST_DIR, 'list_records.json')
+    print "Reading records from path '%s'." % path
+    with open(path) as fobj:
+        return json.load(fobj)
+
