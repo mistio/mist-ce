@@ -116,3 +116,12 @@ def add_routes(configurator):
     configurator.add_route('api_v1_rules', '/api/v1/rules')
     configurator.add_route('api_v1_rule', '/api/v1/rules/{rule}')
     configurator.add_route('api_v1_check_auth', '/api/v1/auth')
+
+    configurator.add_route('api_v1_zones',
+                           '/api/v1/clouds/{cloud}/dns/zones')
+    configurator.add_route('api_v1_zone',
+                           '/api/v1/clouds/{cloud}/dns/zones/{zone}')
+    configurator.add_route('api_v1_records',
+                           '/api/v1/clouds/{cloud}/dns/zones/{zone}/records')
+    configurator.add_route('api_v1_record',
+                           '/api/v1/clouds/{cloud}/dns/zones/{zone}/records/{record}')

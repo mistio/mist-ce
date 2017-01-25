@@ -184,3 +184,11 @@ class CloudUnavailableError(ServiceUnavailableError):
 
 class MachineUnavailableError(ServiceUnavailableError):
     msg = "Machine currently unavailable"
+
+
+class ZoneNotFoundError(NotFoundError):
+    msg = "No zone found for the provided id"
+
+
+class RecordNotFoundError(NotFoundError):
+    msg = "No record found for the provided id"
