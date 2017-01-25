@@ -378,58 +378,6 @@ class User(Owner):
             name = (self.first_name or '') + ' ' + (self.last_name or '')
             return name.strip() or self.email
 
-# TODO delete maybe also rename users to orgs
-# class Promo(me.Document):
-#     code = me.StringField()
-#     url_token = me.StringField()
-#     plans = me.ListField()
-#     # these must be renamed, eventually to orgs
-#     users = me.ListField()
-#     max_users = me.IntField()
-#     discount = me.IntField()
-#     duration = me.IntField()
-#     expiration = me.FloatField()
-#     stripe_coupon_id = me.StringField()
-#     send_to_purchase = me.BooleanField()
-#
-#     def describe(self):
-#         """Automatically creates a human readable description for promo."""
-#         discount = self.discount
-#         days = self.duration
-#         duration = "%d days" % days
-#         if days >= 30:
-#             months = round(float(days) / 30)
-#             duration = "%d month" % months
-#             if months > 1:
-#                 duration += 's'
-#             if not months % 12:
-#                 years = months / 12
-#                 duration = "%d year" % years
-#                 if years > 1:
-#                     duration += 's'
-#         return "%d%% off for %s" % (discount, duration)
-#
-#     def __str__(self):
-#         return self.describe()
-#
-#     def as_dict(self):
-#         return json.loads(self.to_json())
-#
-#     def api_view(self):
-#         return {
-#             'plans': self.plans,
-#             'title': self.code,
-#             'users': self.users,
-#             'maxUsers': self.max_users,
-#             'discount': self.discount,
-#             'duration': self.duration,
-#             'expiration': date.fromtimestamp(self.expiration).isoformat(),
-#             'urlToken': self.url_token,
-#             'description': self.describe(),
-#             'stripeCouponId': self.stripe_coupon_id,
-#             'sendToPurchase': self.send_to_purchase
-#         }
-
 
 class Team(me.EmbeddedDocument):
     id = me.StringField(default=lambda: uuid.uuid4().hex)
