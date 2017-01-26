@@ -67,6 +67,11 @@ class BaseController(object):
             raise BadRequestError(
                 "You must provide a list of machine ids or tags")
 
+        if kwargs.get('schedule_type') not in ['crontab',
+                                               'interval', 'one_off']:
+            raise BadRequestError('schedule type must be one of these '
+                                  '(crontab, interval, one_off)]')
+
         try:
             self.update(**kwargs)
         except (me.ValidationError, me.NotUniqueError) as exc:
@@ -143,11 +148,9 @@ class BaseController(object):
             self.schedule.task_type = schedules.ScriptTask(script_id=script_id)
 
         schedule_type = kwargs.get('schedule_type')
-        if schedule_type not in ['crontab', 'interval', 'one_off', None]:
-            raise BadRequestError('schedule type must be one of these '
-                                  '(crontab, interval, one_off)]')
 
-        if schedule_type == 'crontab':
+        if (schedule_type == 'crontab' or
+                isinstance(self.schedule.schedule_type, schedules.Crontab)):
             schedule_entry = kwargs.get('schedule_entry', {})
             for k in schedule_entry:
                 if k not in ['minute', 'hour', 'day_of_week', 'day_of_month',
@@ -155,15 +158,20 @@ class BaseController(object):
                     raise BadRequestError("Invalid key given: %s" % k)
             self.schedule.schedule_type = schedules.Crontab(**schedule_entry)
 
-        elif schedule_type == 'interval':
+        elif (schedule_type == 'interval' or
+                type(self.schedule.schedule_type) == schedules.Interval):
             schedule_entry = kwargs.get('schedule_entry', {})
-            for k in schedule_entry:
-                if k not in ['period', 'every']:
-                    raise BadRequestError("Invalid key given: %s" % k)
 
-            self.schedule.schedule_type = schedules.Interval(**schedule_entry)
+            if schedule_entry:
+                for k in schedule_entry:
+                    if k not in ['period', 'every']:
+                        raise BadRequestError("Invalid key given: %s" % k)
 
-        elif schedule_type == 'one_off':
+                self.schedule.schedule_type = schedules.Interval(
+                    **schedule_entry)
+
+        elif (schedule_type == 'one_off' or
+                type(self.schedule.schedule_type) == schedules.OneOff):
             # implements Interval under the hood
             future_date = kwargs.get('schedule_entry', '')
             if not future_date:
@@ -243,7 +251,6 @@ class BaseController(object):
 
                 machines_obj.append(machine)
 
-            # self.schedule.machines = machines_obj
             self.schedule.resource_form = schedules.ListOfMachinesSchedule(
                 machines=machines_obj)
 
@@ -256,8 +263,7 @@ class BaseController(object):
                 # SEC require permission RUN_SCRIPT on machine
                 auth_context.check_perm("machine", "run_script", None)
 
-            self.schedule.tags = machines_tags
             self.schedule.resource_form = schedules.TaggedMachinesSchedule(
-                tags=machines_tags)
+                tags=machines_tags, owner=auth_context.owner)
 
         return
