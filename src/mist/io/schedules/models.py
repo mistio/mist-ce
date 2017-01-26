@@ -188,6 +188,7 @@ class ListOfMachinesSchedule(BaseResourceForm):
 
 class TaggedMachinesSchedule(BaseResourceForm):
     tags = me.ListField(required=True)
+    owner = me.ReferenceField(Owner, required=True)
 
     @property
     def get_machines(self):
@@ -266,7 +267,6 @@ class Schedule(me.Document):
 
     def __init__(self, *args, **kwargs):
         # FIXME
-        # import mist.io.schedules.controllers as controllers
         import mist.io.schedules.base
         super(Schedule, self).__init__(*args, **kwargs)
         self.ctl = mist.io.schedules.base.BaseController(self)
