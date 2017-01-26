@@ -926,7 +926,7 @@ def create_machine(request):
     location_id = params.get('location', None)
     image_id = params.get('image')
     if not image_id:
-        raise RequiredParameterMissingError("image_id")
+        raise RequiredParameterMissingError("image")
     # this is used in libvirt
     disk_size = int(params.get('libvirt_disk_size', 4))
     disk_path = params.get('libvirt_disk_path', '')
