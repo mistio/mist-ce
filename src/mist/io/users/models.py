@@ -7,7 +7,6 @@ import mongoengine as me
 
 from time import time
 from uuid import uuid4
-from datetime import date
 
 from passlib.context import CryptContext
 
@@ -50,6 +49,7 @@ class HtmlSafeStrField(me.StringField):
         value = value.replace("<", "&lt;")
         value = value.replace(">", "&gt;")
         return value
+
 
 # TODO remove these, but first delete feedback field from user
 class Feedback(me.EmbeddedDocument):
