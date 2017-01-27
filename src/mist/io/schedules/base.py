@@ -264,6 +264,6 @@ class BaseController(object):
                 auth_context.check_perm("machine", "run_script", None)
 
             self.schedule.resource_form = schedules.TaggedMachinesSchedule(
-                tags=machines_tags, owner=auth_context.owner)
+                tags=machines_tags)
 
         return
