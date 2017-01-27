@@ -188,14 +188,13 @@ class ListOfMachinesSchedule(BaseResourceForm):
 
 class TaggedMachinesSchedule(BaseResourceForm):
     tags = me.ListField(required=True)
-    owner = me.ReferenceField(Owner, required=True)
 
     @property
     def get_machines(self):
         # all machines currently matching the tags
         cloud_machines_pairs = []
         for tag in self.tags:
-            machines_from_tags = Tag.objects(owner=self.owner,
+            machines_from_tags = Tag.objects(owner=self._instance.owner,
                                              resource_type='machines', key=tag)
             for m in machines_from_tags:
                 machine_id = m.resource.machine_id
@@ -259,7 +258,8 @@ class Schedule(me.Document):
     enabled = me.BooleanField(default=False)
     run_immediately = me.BooleanField()
     last_run_at = me.DateTimeField()
-    total_run_count = me.IntField(min_value=0)
+    total_run_count = me.IntField(min_value=0, default=0)
+    max_run_count = me.IntField(min_value=0, default=0)
 
     no_changes = False
 
