@@ -238,7 +238,7 @@ def add_cloud(request):
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
     if cloud_tags:
-        from mist.core.tag.methods import add_tags_to_resource
+        from mist.io.tag.methods import add_tags_to_resource
         add_tags_to_resource(owner, cloud, cloud_tags.items())
 
     c_count = Cloud.objects(owner=owner, deleted=None).count()
@@ -439,7 +439,7 @@ def add_key(request):
         key = SSHKey.add(auth_context.owner, key_name, **params)
 
     if key_tags:
-        from mist.core.tag.methods import add_tags_to_resource
+        from mist.io.tag.methods import add_tags_to_resource
         add_tags_to_resource(auth_context.owner, key, key_tags.items())
     # since its a new key machines fields should be an empty list
 

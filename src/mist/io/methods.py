@@ -411,7 +411,7 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
         )
 
     if tags:
-        from mist.core.tag.methods import resolve_id_and_set_tags
+        from mist.io.tag.methods import resolve_id_and_set_tags
         resolve_id_and_set_tags(owner, 'machine', node.id, tags,
                                 cloud_id=cloud_id)
 
@@ -1178,7 +1178,7 @@ def star_image(owner, cloud_id, image_id):
 
 def list_clouds(owner):
     # FIXME: Move import to the top of the file.
-    from mist.core.tag.methods import get_tags_for_resource
+    from mist.io.tag.methods import get_tags_for_resource
     clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=owner,
                                                          deleted=None)]
     for cloud in clouds:
@@ -1193,7 +1193,7 @@ def list_keys(owner):
     :param owner:
     :return:
     """
-    from mist.core.tag.methods import get_tags_for_resource
+    from mist.io.tag.methods import get_tags_for_resource
     keys = Key.objects(owner=owner, deleted=None)
     clouds = Cloud.objects(owner=owner, deleted=None)
     key_objects = []
