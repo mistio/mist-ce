@@ -7,7 +7,7 @@ from mist.core import config
 from pyramid.response import Response
 from mist.io.exceptions import BadRequestError
 from mist.io.helpers import trigger_session_update
-from mist.core.exceptions import ScriptNameExistsError
+from mist.io.exceptions import ScriptNameExistsError
 
 log = logging.getLogger(__name__)
 

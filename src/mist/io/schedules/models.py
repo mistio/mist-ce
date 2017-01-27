@@ -8,7 +8,7 @@ from mist.io.machines.models import Machine
 from mist.io.exceptions import BadRequestError
 from mist.io.users.models import Owner, Organization
 from celerybeatmongo.schedulers import MongoScheduler
-from mist.core.exceptions import ScheduleNameExistsError
+from mist.io.exceptions import ScheduleNameExistsError
 from mist.io.exceptions import RequiredParameterMissingError
 
 

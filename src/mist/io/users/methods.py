@@ -10,9 +10,9 @@ from mist.core.helpers import log_event
 
 from mist.core import config
 
-from mist.core.exceptions import BadRequestError
-from mist.core.exceptions import MethodNotAllowedError
-from mist.core.exceptions import OrganizationOperationError
+from mist.io.exceptions import BadRequestError
+from mist.io.exceptions import MethodNotAllowedError
+from mist.io.exceptions import OrganizationOperationError
 
 from time import time
 

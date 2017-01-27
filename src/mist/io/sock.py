@@ -36,7 +36,7 @@ except ImportError:
 from mist.core.auth.methods import auth_context_from_session_id
 
 from mist.io.exceptions import BadRequestError, UnauthorizedError, MistError
-from mist.core.exceptions import PolicyUnauthorizedError
+from mist.io.exceptions import PolicyUnauthorizedError
 from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
