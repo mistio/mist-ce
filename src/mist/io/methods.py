@@ -2047,7 +2047,7 @@ def find_public_ips(ips):
 def notify_admin(title, message="", team="all"):
     """ This will only work on a multi-user setup configured to send emails """
     try:
-        from mist.core.helpers import send_email
+        from mist.io.helpers import send_email
         send_email(title, message,
                    config.NOTIFICATION_EMAIL.get(team,
                                                  config.NOTIFICATION_EMAIL))
@@ -2112,7 +2112,7 @@ def notify_user(owner, title, message="", email_notify=True, **kwargs):
 
     try: # Send email in multi-owner env
         if email_notify:
-            from mist.core.helpers import send_email
+            from mist.io.helpers import send_email
             email = owner.email if hasattr(owner, 'email') else owner.get_email()
             send_email("[mist.io] %s" % title, body.encode('utf-8', 'ignore'),
                        email)

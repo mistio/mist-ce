@@ -38,8 +38,8 @@ from mist.core import config
 
 celery_cfg = 'mist.core.celery_config'
 
-from mist.core.helpers import log_event
-from mist.core.helpers import send_email as helper_send_email
+from mist.io.helpers import log_event
+from mist.io.helpers import send_email as helper_send_email
 from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_owner_listening
 from mist.io.helpers import amqp_log
@@ -120,7 +120,6 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
     from mist.io.methods import create_dns_a_record
 
     from mist.core.methods import enable_monitoring
-    from mist.core.helpers import log_event
 
     job_id = job_id or uuid.uuid4().hex
     if owner.find("@") != -1:

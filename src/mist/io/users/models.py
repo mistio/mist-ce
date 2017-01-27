@@ -98,13 +98,13 @@ class Plan(me.EmbeddedDocument):
         return json.loads(self.to_json())
 
     def __str__(self):
-        import mist.core.helpers
+        import mist.io.helpers
         return "\n".join([
             "title: %s (trial=%s, promo=%s)" % (self.title, self.isTrial,
                                                 self.promo_code),
             "machine_limit: %s" % self.machine_limit,
-            "started: %s" % mist.core.helpers.ts_to_str(self.started),
-            "expires: %s" % mist.core.helpers.ts_to_str(self.expiration),
+            "started: %s" % mist.io.helpers.ts_to_str(self.started),
+            "expires: %s" % mist.io.helpers.ts_to_str(self.expiration),
         ])
 
 
@@ -262,8 +262,8 @@ class Owner(me.Document):
         return self.id
 
     def get_external_id(self, service):
-        import mist.core.helpers
-        return mist.core.helpers.encrypt2(self.id, key_salt=service,
+        import mist.io.helpers
+        return mist.io.helpers.encrypt2(self.id, key_salt=service,
                                           no_iv=True)
 
     def as_dict(self):

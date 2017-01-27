@@ -20,7 +20,7 @@ from pyramid.response import Response
 from pyramid.renderers import render_to_response
 
 # try:
-from mist.core.helpers import view_config
+from mist.io.helpers import view_config
 from mist.core.auth.methods import user_from_request
 from mist.io.keys.models import Key, SSHKey, SignedSSHKey
 from mist.io.scripts.models import CollectdScript

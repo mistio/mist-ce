@@ -22,7 +22,7 @@ from mist.io.exceptions import ServiceUnavailableError
 
 from mist.io.helpers import trigger_session_update
 
-from mist.core.helpers import get_story
+from mist.io.helpers import get_story
 
 try:
     from mist.io.users.models import User
