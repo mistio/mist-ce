@@ -1,0 +1,1081 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
+<link rel="import" href="../app-togglable/app-togglable-list.html">
+<link rel="import" href="../app-form/app-form.html">
+<link rel="import" href="../element-for-in/element-for-in.html">
+
+<link rel="import" href="stack-machine-item.html">
+<link rel="import" href="stack-network-item.html">
+<link rel="import" href="stack-key-item.html">
+
+<dom-module id="stack-page">
+    <template>
+        <style is="custom-style" include="lists"></style>
+        <style is="custom-style" include="tags-and-labels"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                display: block;
+                padding: 24px;
+            }
+
+            paper-material.no-pad {
+                padding: 0;
+            }
+
+            paper-material.marg-b {
+                margin-bottom: 24px;
+            }
+
+            paper-material.marg-t {
+                margin-top: 24px;
+            }
+
+            paper-material.form-view {
+                padding: 20px;
+                margin: 36px;
+            }
+
+            paper-material.form-view,
+            .app-form-title,
+            app-form {
+                max-width: 900px;
+                box-sizing: border-box;
+            }
+
+            .app-form-title {
+                background-color: #eee;
+                font-size: 24px;
+                text-transform: capitalize;
+            }
+
+            paper-material.form-view h2 {
+                padding: 0;
+                line-height: 20px;
+            }
+
+            paper-menu-button paper-button {
+                display: block;
+            }
+
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+                align-content: stretch;
+                flex: 100%;
+            }
+
+            .flexchild {
+                @apply(--layout-flex);
+            }
+
+            .command-container {
+                background-color: #444;
+                color: #fff;
+                font-family: monospace;
+                padding: 10px;
+            }
+
+            a {
+                color: black;
+                text-decoration: none;
+            }
+
+            .paper-header [paper-drawer-toggle] {
+                margin-left: 10px;
+            }
+
+            .paper-header {
+                @apply(--layout-horizontal);
+            }
+
+            .paper-header {
+                height: 60px;
+                font-size: 24px;
+                line-height: 60px;
+                padding: 0 10px;
+                color: white;
+                transition: height 0.2s;
+                transition: font-size 0.2s;
+            }
+
+            .paper-header.tall {
+                height: 320px;
+                font-size: 16px;
+            }
+
+            .paper-header h2 {
+                margin-left: 20px;
+                @apply(--layout-flex);
+                text-transform: capitalize;
+            }
+
+            .paper-header .toggleViewButton {
+                --paper-icon-button-ink-color: transparent;
+            }
+
+            .paper-header .cartButton {
+                margin-right: 10px;
+            }
+
+            #content {
+                position: relative;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            paper-icon-button {
+                transition: all 200ms;
+            }
+
+            paper-icon-button.active-sort {
+                transform: rotate(180deg);
+            }
+
+            paper-icon-button.active-sort::content iron-icon {
+                color: #D48900 !important;
+            }
+
+            [size=xs] > * {
+                display: none;
+            }
+
+            [size=xs] app-sidebar {
+                min-width: 100%;
+                height: auto;
+            }
+
+            paper-icon-bottom.bottom {
+                padding-right: 8px;
+            }
+
+            .subhead {
+                box-sizing: border-box;
+                position: absolute;
+                width: 100%;
+                left: 0;
+                height: 57px;
+                bottom: -57px;
+                right: 0;
+                z-index: 9;
+                color: rgba(0, 0, 0, 0.87);
+            }
+
+            paper-tabs {
+                height: 57px !important;
+                text-transform: uppercase;
+            }
+
+            paper-tabs::content #selectionBar {
+                background-color: var(--mist-blue);
+            }
+
+            paper-tab::content paper-ripple {
+                color: #999;
+            }
+
+            #workflowBar {
+                padding: 0 0 0 60px;
+                line-height: 57px;
+            }
+
+            .content {
+                margin-top: 57px;
+                padding-bottom: 80px
+            }
+
+            paper-header-panel::content #dropShadow {
+                top: 55px;
+            }
+
+            paper-toolbar::content #bottomBar .right-actions {
+                transition: var(--paper-toolbar-transition, margin-right 0.18s ease-in);
+            }
+
+            paper-toolbar:not(.tall)::content #bottomBar .right-actions {
+                margin-right: 70px;
+            }
+
+            #workflows {
+                position: relative;
+                display: none;
+            }
+
+            #workflows.open {
+                display: block;
+            }
+
+            #closeworkflows {
+                position: absolute;
+                right: 16px;
+                top: 16px;
+                z-index: 9;
+            }
+
+            #workflows-panel {
+                @apply(--layout-horizontal);
+            }
+
+            #workflowsNavigation {
+                background-color: #f2f2f2;
+            }
+
+            #workflowsView {
+                display: flex;
+                flex: 100%;
+            }
+
+            .resource-head {
+                font-weight: 500;
+                padding: 8px 16px;
+                opacity: 0.87;
+                background-color: #fff;
+                border-bottom: 1px solid #ddd;
+                margin-bottom: 0;
+            }
+
+            .wf-header {
+                background-color: #616161;
+                color: #fff;
+                padding: 8px;
+                text-transform: uppercase;
+            }
+
+            .wf-item {
+                margin: 40px auto;
+                display: none;
+            }
+
+            .wf-item[show="true"] {
+                display: block;
+            }
+
+            @media (max-width: 1400px) {
+                .wf-item {
+                    margin: 0 auto;
+                }
+            }
+            /**[narrow] .wf-item {
+            display: block;
+        }*/
+
+        .resources-list {
+            margin-bottom: 0;
+        }
+
+        .resources-list h3 {
+            margin-top: 0;
+            background-color: #f2f2f2;
+        }
+
+        .section {
+            padding-top: 36px;
+        }
+
+
+        #workflows-navigation paper-item {
+            text-transform: capitalize;
+            padding: 16px;
+            font-weight: 500;
+        }
+
+        .grid-row .center {
+            text-align: center;
+        }
+        #quickActions.hidden {
+            width: 0;
+            padding: 0;
+            opacity: 0;
+            right: 0;
+        }
+
+        paper-fab {
+            transition: all 0.18s ease-in;
+        }
+
+        paper-fab.hidden {
+            width: 0;
+            height: 0;
+            padding: 0;
+        }
+        .no-data-message {
+            padding: 70px;
+        }
+        iron-pages {
+            margin-bottom: 68px;
+        }
+        h2.info-title {
+            font-size: 20px;
+            font-weight: 400;
+            line-height: 24px;
+            margin: 0;
+            padding: 8px 16px;
+            font-weight: 500;
+            background-color: #f2f2f2;
+            border-bottom: 1px solid #ddd;
+        }
+        #selectworkflow {
+            padding: 36px;
+        }
+        #selectworkflow.hidden {
+            display: none;
+        }
+        .parsing-loader {
+            text-align: center;
+            margin: 0 auto;
+            width: 70%;
+        }
+        .parsing-loader paper-progress {
+            width: 100%;
+        }
+        .parsing-loader.error paper-progress ::content #primaryProgress {
+            background-color: var(--red-color);
+        }
+        #stack_actions paper-button {
+            text-align: left !important;
+        }
+        .single-head paper-button {
+            line-height: 24px;
+        }
+        .delete, .retry {
+            cursor: pointer;
+        }
+        paper-spinner {
+            display: none;
+        }
+        paper-spinner[active] {
+            display: block;
+            position: absolute;
+            left: calc(50% - 28px);
+            top: 120px;
+            z-index: 999;
+            background-color: #fff;
+            padding: 8px;
+            border-radius: 50%;
+            @apply(--shadow-elevation-8dp);
+        }
+        paper-button[disabled] {
+            opacity: 0.87;
+        }
+        #deploynow.hidden {
+            display: none;
+        }
+        .blue-link {
+            color: var(--mist-blue);
+        }
+        .info-title-id {
+            color: rgba(0,0,0,0.54);
+            font-size: 0.9em;
+            padding-left: 8px;
+        }
+        /* TODO: better */
+        .tag {
+            padding: 0.5em;
+            display: inline;
+        }
+        </style>
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        [[stack.name]]
+                    </h2>
+                    <div class="subtitle">
+                        Created from <a class="regular" href$="/templates/[[template.id]]"> [[template.name]] <iron-icon icon="icons:link"></iron-icon></a>
+                        <span class="desc" hidden$="[[!template.description]]">([[template.description]])</span>
+                    </div>
+                </div>
+                <div class="item-actions">
+                    <!-- buttons to show normally-->
+                    <paper-button id="[[workflows.0.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.0.name]]</paper-button>
+                    <paper-button id="[[workflows.1.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflows.1.name]]</paper-button>
+                    <paper-menu-button horizontal-align="right">
+                        <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                        <paper-menu id="stack_actions" class="dropdown-content">
+                            <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                                <paper-button id="[[workflow.name]]" on-tap="_quickActionsNavigation" class="simple" disabled$="[[disabled]]">[[workflow.name]]</paper-button>
+                            </template>
+                        </paper-menu>
+                    </paper-menu-button>
+                    <paper-button on-tap="deployNowWork" class="simple white" style$="color: [[section.color]]" hidden$="[[ok]]" disabled$="[[disabled]]">Deploy
+                        <iron-icon style$="color: [[section.color]]" icon="av:play-arrow"></iron-icon>
+                    </paper-button>
+                    <paper-button on-tap="openWorkflows" class="simple white" style$="color: [[section.color]]" hidden$="[[hideWorkflows]]" disabled$="[[disabled]]">Workflows</paper-button>
+                </div>
+            </paper-material>
+
+            <!-- <paper-spinner id="spinner"></paper-spinner>-->
+
+            <paper-material>
+                <div class="flex-horizontal-with-ratios">
+                    <div class="page-block">
+                        <h3 class="smallcaps">Stack Description</h3>
+                        <p>[[stack.description]]</p>
+                    </div>
+                    <div class="page-block">
+                        <h3 class="smallcaps">Created</h3>
+                        <p>[[timestamp]]
+                        </p>
+                    </div>
+                    <div class="page-block" hidden="[[!stack.tags]]">
+                        <h3 class="smallcaps">Tags
+                            <template is="dom-if" if="[[stack.tags]]">
+                                <span class="id">([[stack.tags.length]])</span>
+                            </template>
+                            <template is="dom-if" if="[[!stack.tags]]">
+                                <span class="id">(0)</span>
+                            </template>
+                        </h3>
+                        <template is="dom-if" if="[[stack.tags]]">
+                            <template is="dom-repeat" items="[[stack.tags]]">
+                                <span class="id tag">[[item.key]] <span hidden="[[!item.value]]">= [[item.value]]</span></span>
+                                <span class="id tag">test = tag</span>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </paper-material>
+
+            <!-- If status undefined or ok -->
+            <paper-material id="deploynow" class="marg-b marg-t" hidden$="[[hideDeployNow]]">
+                <div class="parsing-loader">
+                    <h4>Stack is saved and ready to deploy</h4>
+                    <paper-button on-tap="deployNowWork">Deploy Now</paper-button>
+                </div>
+            </paper-material>
+
+            <!-- If stack status error-->
+            <template is="dom-if" if="[[error]]">
+                <paper-material>
+                    <div class="parsing-loader error">
+                        <h3>There seems to be an error</h3>
+                        <paper-progress id="stackpageprogress" value="100"></paper-progress>
+                        <h4>The process failed.<br/>
+                        <!-- <span class="retry regular blue-link" id="install" on-tap="doWorkflow">Try again </span>
+                        <p id="messages"></p> -->
+                        </h4>
+                    </div>
+                </paper-material>
+            </template>
+
+            <!-- If stack status start_creation-->
+            <template is="dom-if" if="[[start_creation]]">
+                <paper-material>
+                    <div class="parsing-loader">
+                        <h3>Creating stack [[stack.name]]</h3>
+                        <paper-progress id="stackpageprogress" value="30" indeterminate></paper-progress>
+                        <h4>This may take a while.</h4>
+                        <paper-button class="blue-link" on-tap="cancelWorkflow">Cancel</paper-button>
+                    </div>
+                </paper-material>
+            </template>
+
+            <template is="dom-if" if="[[workflow_started]]">
+                <paper-material>
+                    <div class="parsing-loader">
+                        <h3>Started workflow</h3>
+                        <paper-progress id="stackpageprogress" value="30" indeterminate></paper-progress>
+                        <paper-button class="blue-link" on-tap="cancelWorkflow">Cancel</paper-button>
+                    </div>
+                </paper-material>
+            </template>
+
+            <paper-material id="workflows" class="no-pad closed" hidden="[[hideWorkflows]]">
+                <paper-icon-button id="closeworkflows" icon="close" on-tap="_closeworkflows"></paper-icon-button>
+                <div id="workflows-panel">
+                    <div id="workflowsNavigation">
+                        <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                            <paper-item id$="[[workflow.name]]" on-tap="_workflowNavigation">[[workflow.name]]</paper-item>
+                        </template>
+                    </div>
+
+                    <div id="workflowsView" class="pad">
+                        <template is="dom-repeat" items="[[workflows]]" as="workflow">
+                            <div id$="[[workflow.name]]show" class="wf-item">
+
+                                <template is="dom-if" if=[[workflow.params.length]]>
+                                    <paper-material class="app-form-title">[[workflow.name]]</paper-material>
+                                    <paper-material>
+                                        <app-form model=[[model]] fields="[[workflow.params]]" workflow="[[workflow.name]]" url$="/api/v1/stacks/[[params.id]]" on-request="handleWorkflowRequest" on-response="handleWorkflowResponse" on-error="handleWorkflowError" btncontent="[[workflow.name]]">[[workflow.name]]</app-form>
+                                    </paper-material>
+                                </template>
+
+                                <template is="dom-if" if=[[!workflow.params.length]]>
+                                    <p class="text-center" hidden$="[[!workflow.description]]">[[workflow.description]]</p>
+                                    <p class="text-center">
+                                        <paper-button id="[[workflow.name]]" on-tap="doWorkflow" class="blue">[[workflow.name]]</paper-button>
+                                    </p>
+                                    <h5 class="text-center">*no paremetres required</h5>
+                                </template>
+
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </paper-material>
+
+            <template is="dom-if" if="[[ok]]">
+                <!-- If stack has resources -->
+                <div hidden$="[[!resourcelist]]">
+                    <h3 class="smallcaps">Resources list</h3>
+                    <template is="dom-if" if="[[listMachines.length]]">
+                        <paper-material class="no-pad resources-list">
+                            <h3 class="smallcaps resource-head">machines [[listMachines.length]]</h3>
+                            <template is="dom-repeat" items="[[listMachines]]" as="machine">
+                                <stack-machine-item model="[[model]]" machine="[[machine]]"></stack-machine-item>
+                            </template>
+                        </paper-material>
+                    </template>
+                    <template is="dom-if" if="[[networks.length]]">
+                        <paper-material class="no-pad resources-list">
+                            <h3 class="smallcaps resource-head">networks</h3>
+                            <template is="dom-repeat" items="[[networks]]" as="network">
+                                <stack-network-item model="[[model]]" network="[[network]]"></stack-network-item>
+                            </template>
+                        </paper-material>
+                    </template>
+                    <template is="dom-if" if="[[keys.length]]">
+                        <paper-material class="no-pad resources-list">
+                            <h3 class="smallcaps resource-head">keys [[keys.length]]</h3>
+                            <template is="dom-repeat" items="[[keys]]" as="key">
+                                <stack-key-item model="[[model]]" key="[[key]]"></stack-key-item>
+                            </template>
+                        </paper-material>
+                    </template>
+                </div>
+            </template>
+
+            <div id="state" class="page" hidden$="[[!hasNodeInstances]]">
+                <h3 class="smallcaps">Runtime properties</h3>
+                <template is="dom-repeat" items="[[stack.node_instances]]">
+                    <paper-material class="no-pad info-card">
+                        <h2 class="info-title">[[item.name]] <span class="info-title-id">id: [[item.id]]</span></h2>
+                        <element-for-in content="[[item.runtime_properties]]"></element-for-in>
+                        <element-for-in content="[[item]]"></element-for-in>
+                    </paper-material>
+                </template>
+
+                <!-- <template is="dom-if" if="[[stack.inputs]]">
+                    <h3 class="smallcaps">Stack Inputs </h3>
+                    <paper-material class="no-pad">
+                        <template is="dom-repeat" items="[[stack.inputs]]">
+                            <h2 class="info-title">[[item.name]]</h2>
+                            <element-for-in content="[[item]]"></element-for-in>
+                        </template>
+                    </paper-material>
+                </template> -->
+
+            </div>
+
+            <!-- test show properties -->
+            <!-- <div class="text-center">
+                <template is="dom-if" if=[[stack.deploy]]> deploy? true </template>
+                <template is="dom-if" if=[[!stack.deploy]]> deploy? false </template>
+                <p> jobId: {{stack.job_id}}</p>
+                <p> status: {{stack.status}}</p>
+            </div> -->
+            <!-- <paper-button on-tap="test">test</paper-button> -->
+            <div class="absolute-bottom-right">
+                <paper-fab id="install" icon="av:play-arrow" on-tap="_quickActionsNavigation" hidden$="[[ok]]" disabled$="[[disabled]]"></paper-fab>
+            </div>
+        </div>
+        <dialog-element></dialog-element>
+        <iron-ajax id="workflowRequest" method="POST" url="" on-response="handleWorkflowResponse" on-error="handleWorkflowError"></iron-ajax>
+        <iron-ajax id="cancelJob" method="DELETE" url="/api/v1/jobs/[[stack.job_id]]" on-response="handleCanceled" on-error=""></iron-ajax>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'stack-page',
+
+                properties: {
+                    model: {
+                        type: Object,
+                        notify: true
+                    },
+                    selected: {
+                        type: Number,
+                        value: 1,
+                        notify: true
+                    },
+                    disabled: {
+                        type: Boolean,
+                        computed: '_disabledButtons(stack)'
+                    },
+                    hideWorkflows: {
+                        type: Boolean,
+                        computed: '_hideWorkflows(stack)'
+                    },
+                    hideDeployNow: {
+                        type: Boolean,
+                        computed: '_hideDeployNow(stack)'
+                    },
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    params: {
+                        type: Object
+                    },
+                    stack: {
+                        type: Object,
+                        computed: '_computeStack(params, model.stacks.*)',
+                        notify: true
+                    },
+                    template: {
+                        type: Object,
+                        computed: '_computeTemplate(stack)'
+                    },
+                    machines: {
+                        type: Array,
+                        computed: '_machines(stack)',
+                    },
+                    // runtimeProperties: {
+                    //     type: Array,
+                    //     computed: '_runtimeProperties(stack)'
+                    // },
+                    hasNodeInstances: {
+                        type: Boolean,
+                        computed: '_computeHasNodeInstances(stack.node_instances.*)',
+                        notify: true
+                    },
+                    listMachines: {
+                        type: Array,
+                        computed: '_listMachines(stack.node_instances.*, model.machinesArray.*)',
+                        notify: true
+                    },
+                    networks: {
+                        type: Array,
+                        computed: '_listNetworks(stack.node_instances.*, model.networksArray.*)',
+                        notify: true
+                    },
+                    keys: {
+                        type: Array,
+                        computed: '_listKeys(stack.node_instances.*, model.keys.*)',
+                        notify: true
+                    },
+                    workflows: {
+                        type: Array,
+                        computed: '_computeWorkflows(template.workflows.*, model.templates)'
+                    },
+                    timestamp: {
+                        type: String,
+                        computed: '_getFormattedTimestamp(stack)'
+                    },
+                    vpHeight: String,
+                    payload: {
+                        type: Object,
+                        value: {}
+                    },
+                    resourcelist: {
+                        type: Boolean,
+                        computed: '_resourcelist(keys, networks, machines)',
+                        notify: true
+                    },
+                    start_creation: {
+                        type: Boolean,
+                        value: false,
+                        computed: 'is_start_creation(stack)'
+                    },
+                    error: {
+                        type: Boolean,
+                        value: false,
+                        computed: 'is_error(stack)'
+                    },
+                    workflow_started: {
+                        type: Boolean,
+                        value: false,
+                        computed: 'is_workflow_started(stack)'
+                    },
+                    ok: {
+                        type: Boolean,
+                        value: true,
+                        computed: 'is_ok(stack)'
+                    }
+                },
+                observers: [
+                    // '_runtimePropertiesChanged(stack.*,runtimeProperties.*)'
+                    // 'hasNodeInstancesChanged(stack)'
+                ],
+                listeners: {
+                    // 'confirmation': '_deleteStackResponse',
+                    // 'updateSelectedStack': '_updateStack',
+                    // 'stackChanged': '_stackChanged'
+                    // 'hasNodeInstancesChanged' : '_hasNodeInstancesChanged'
+                },
+                test: function() {
+                    var newmach = {
+                        mist_type: "machine",
+                        info: this.model.machinesArray[3]
+                    }
+                    this.stack.node_instances.push(newmach);
+                    console.log(newmach, this.stack.node_instances);
+                },
+                _computeStack: function(params) {
+                    var stack = {};
+                    if (params.id)
+                        stack = this.model.stacks[params.id];
+
+                    if (stack) {
+                        // REMEMBER TO REMOVE V
+                        // stack.status = 'ok';
+                        // stack.deploy = true;
+                        // stack.node_instances = [
+                        //     {
+                        //         mist_type: "machine",
+                        //         info: this.model.machinesArray[0]
+                        //     },{
+                        //         mist_type: "machine",
+                        //         info: this.model.machinesArray[1]
+                        //     },{
+                        //         mist_type: "keypair",
+                        //         info: this.model.keysArray[0]
+                        //     }
+                        // ];
+                        // REMEMBER TO REMOVE ^
+                        return stack;
+                    } else {
+                        return {
+                            name: "Stack is missing"
+                        }
+                    }
+                },
+                _computeHasNodeInstances: function(node_instances) {
+                    return node_instances.base && node_instances.base.length;
+                },
+                // _hasNodeInstancesChanged: function(){
+                //     console.log("_hasNodeInstancesChanged");
+                // },
+                is_start_creation: function(stack) {
+                    return stack.status == 'start_creation';
+                },
+                is_error: function(stack) {
+                    return stack.status == 'error';
+                },
+                is_workflow_started: function(stack) {
+                    return stack.status == 'workflow_started';
+                },
+                is_ok: function(stack) {
+                    return stack.status == 'ok';
+                },
+                _hideWorkflows: function(stack) {
+                    return !stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
+                },
+                _hideDeployNow: function(stack) {
+                    return stack.deploy || stack.status == 'workflow_started' || stack.status == 'start_creation';
+                },
+                _disabledButtons: function(stack) {
+                    return stack.status == 'workflow_started' || stack.status == 'start_creation';
+                },
+                _closeworkflows: function() {
+                    this.$.workflows.classList.remove('open');
+                },
+                openWorkflows: function() {
+                    this.$.workflows.classList.toggle('open');
+
+                    var pages = this.querySelector('#workflowsView').children;
+                    [].forEach.call(pages, function(p, index) {
+                        if (index != 0) {
+                            p.setAttribute("show", false);
+                        } else {
+                            p.setAttribute("show", true);
+                        }
+                    });
+                },
+                handleErrorsResponse: function(e) {
+                    console.log("handleErrorsResponse: ", e.detail);
+                    // get error
+                },
+                handleErrorsError: function(e) {
+                    console.log("handleErrorsResponse: ", e.detail);
+                    // could not do the request
+                    this.hasErrors = true;
+                },
+                _resourcelist: function(keys, networks, machines) {
+                    var sum = 0;
+                    if (keys)
+                        sum += keys.length;
+                    if (networks)
+                        sum += networks.length;
+                    if (machines)
+                        sum += machines.length;
+
+                    return sum > 0 ? true : false;
+                },
+                _computeTemplate: function(stack) {
+                    return this.model.templates[stack.template];
+                },
+                _computeJobID: function(stack) {
+                    return stack.job_id ? stack.job_id : false;
+                },
+                // _runtimeProperties: function(stack){
+                //     var rtp = [];
+                //     var state = stack.node_instances;
+                //     if(state) {
+                //         for (var i = 0; i < state.length; i++) {
+                //             var rtpObj = state[i].runtime_properties;
+                //             if (rtpObj) {
+                //                 rtpObj.name = state[i].name;
+                //                 rtp.push(rtpObj);
+                //             }
+                //         }
+                //     }
+                //     return rtp;
+                // },
+                // _runtimePropertiesChanged: function(stack,changerecord){
+                //     this.updateResources(this.runtimeProperties);
+                // },
+                _machines: function(stack) {
+                    return stack.machines;
+                },
+                _listMachines: function(nis) {
+                    var machines = [];
+                    if (nis) {
+                        nis.base.forEach(function(rtpy) {
+                            if (rtpy.runtime_properties.mist_type == 'machine') {
+                                console.log('thing', rtpy.runtime_properties)
+
+                                var mac = this.model.machinesArray.find(function(mach) {
+                                    return mach.uuid == rtpy.runtime_properties.info.uuid;
+                                });
+
+                                if (mac) {
+                                    machines.push(mac);
+                                } else {
+                                    var deadMachine = {
+                                        name: rtpy.runtime_properties.info.name,
+                                        state: 'missing',
+                                        cloud: {
+                                            provider: 'machine_id: ' + rtpy.runtime_properties.info.id
+                                        },
+                                        isDead: true
+                                    };
+                                    machines.push(deadMachine)
+                                }
+                            }
+                        }, this);
+                    }
+                    return machines;
+                },
+                _listNetworks: function(nis) {
+                    var networks = [];
+                    if (nis) {
+                        nis.base.forEach(function(rtpy) {
+                            if (rtpy.runtime_properties.mist_type == 'network') {
+                                var net = this.model.networksArray.find(function(net) {
+                                    return net.id == rtpy.runtime_properties.info.id
+                                }, this);
+                                if (net)
+                                    networks.push(net);
+                            }
+                        }, this);
+                    }
+                    return networks;
+                },
+                _listKeys: function(nis) {
+                    var keys = [];
+                    if (nis) {
+                        nis.base.forEach(function(rtpy) {
+                            if (rtpy.runtime_properties.mist_type == 'keypair') {
+                                var key = this.model.keys[rtpy.runtime_properties.mist_resource_id];
+
+                                if (key) {
+                                    keys.push(key);
+                                } else {
+                                    var deadKey = {
+                                        id: rtpy.key_id,
+                                        isDefault: false,
+                                        machines: [],
+                                        isDead: true
+                                    };
+                                    keys.push(deadKey);
+                                }
+
+                            }
+                        }, this);
+                    }
+                    return keys;
+                },
+                // updateLists: function (node_instances){
+                //     console.log("node_instances: ",node_instances);
+                //     var stack = this.stack;
+                //     this._listMachines(stack);
+                // },
+                _computeWorkflows: function(workflows, templates) {
+                    var workflows = workflows.base;
+                    workflows.forEach(function(wf){
+                        var yaml_inputs = '';
+                        if (wf.params.length > 0 ) {
+                            wf.params.forEach(function(wp){
+                                yaml_inputs += wp.name+': '+ wp.default + '\n';
+                                wp.showIf = {
+                                    fieldName: "yaml_or_form",
+                                    fieldValues: ["form"]
+                                }
+                                wp.defaultValue = wp.default;
+                            });
+                            var param1 = {
+                                name: "yaml_or_form",
+                                label: "YAML or form",
+                                type: "radio",
+                                value: "yaml",
+                                defaultValue: "yaml",
+                                helptext: "Choose the way you want to insert inputs",
+                                errorMessage: "Choose an input format",
+                                show: true,
+                                required: true,
+                                options: [{
+                                    title: "YAML",
+                                    val: "yaml"
+                                }, {
+                                    title: "Form",
+                                    val: "form"
+                                }]
+                            };
+                            var param2 = {
+                                name: "stackinputs",
+                                label: "Workflow Inputs YAML",
+                                type: "textarea",
+                                value: yaml_inputs,
+                                defaultValue: yaml_inputs,
+                                placeholder: "",
+                                helptext: "Enter the stack inputs in yaml format",
+                                errorMessage: "Please enter stacks's inputs",
+                                show: true,
+                                required: true,
+                                showIf: {
+                                    fieldName: "yaml_or_form",
+                                    fieldValues: ["yaml"]
+                                }
+                            };
+                            wf.params.unshift(param1,param2);
+                        }
+                    });
+                    return workflows;
+                },
+                _getFormattedTimestamp: function(stack) {
+                    return new Date(this.stack.created_at).toLocaleString('en-US', {
+                        timeZoneName: 'short'
+                    });
+                },
+                _showDialog: function(info) {
+                    var dialog = this.querySelector('dialog-element'),
+                        i;
+                    for (i in info) {
+                        dialog[i] = info[i];
+                    }
+                    dialog._openDialog();
+                },
+                _goBack: function() {
+                    history.back();
+                },
+                _workflowNavigation: function(e) {
+                    var action = e.target.id;
+                    this.$.workflows.classList.add('open');
+
+                    var pages = this.querySelector('#workflowsView').children;
+                    [].forEach.call(pages, function(p, index) {
+                        p.setAttribute("show", false);
+                    });
+
+                    var page = this.querySelector('#' + action + 'show');
+                    page.setAttribute("show", true);
+
+                },
+                _quickActionsNavigation: function(e) {
+                    this.selected = 1;
+                    this._workflowNavigation(e);
+                },
+                // updateResources: function(runtimeProperties){
+                //     var machines = [];
+                //     var keys = [];
+                //     this.async(function(){
+                //         if (runtimeProperties) {
+                //             runtimeProperties.forEach(function(rtpy) {
+                //                 if (rtpy.mist_type == 'machine'){
+                //                     var mac = this.model.machinesArray.find(function(mach){
+                //                         return mach.id == rtpy.machine_id
+                //                     }, this);
+                //                     if (mac)
+                //                         machines.push(mac);
+                //                 }
+                //                 else if (rtpy.mist_type == 'keypair') {
+                //                     var key = this.model.keysArray.find(function(key){
+                //                         return key.id == rtpy.key_id
+                //                     }, this);
+                //                     if (key)
+                //                         keys.push(key);
+                //                 }
+                //             }, this);
+                //         }
+                //         if(keys.length>0 || machines.length>0)
+                //             this.updateResourcelist('true');
+                //     });
+                // },
+                // updateResourcelist: function(val){
+                //     this.set("resourceList", true);
+                // },
+                doWorkflow: function(e) {
+                    var action = e.target.id;
+                    this.$.workflows.classList.add('open');
+
+                    var workflow = this.workflows.find(function(workflow) {
+                        return workflow.name == action;
+                    });
+                    this.$.workflowRequest.url = "/api/v1/stacks/" + this.stack.id;
+                    this.$.workflowRequest.headers = {
+                        "csrf-token": CSRF_TOKEN,
+                        "Content-Type": "application/json"
+                    };
+                    this.$.workflowRequest.body = {
+                        "workflow": action
+                    };
+                    if (action == 'install') {
+                        this.$.deploynow.classList.add('hidden');
+                        this.$.workflowRequest.body["inputs"] = this.stack.inputs;
+                    }
+                    this.$.workflowRequest.generateRequest();
+                },
+                deployNowWork: function(){
+                    var action = 'install';
+
+                    var workflow = this.workflows.find(function(workflow) {
+                        return workflow.name == action;
+                    });
+                    this.$.workflowRequest.url = "/api/v1/stacks/" + this.stack.id;
+                    this.$.workflowRequest.headers = {
+                        "csrf-token": CSRF_TOKEN,
+                        "Content-Type": "application/json"
+                    };
+
+                    this.$.workflowRequest.body = {
+                        "workflow": action,
+                        "inputs": this.stack.inputs.install
+                    };
+
+                    this.$.deploynow.classList.add('hidden');
+                    this.$.workflowRequest.generateRequest();
+                },
+                cancelWorkflow: function(e) {
+                    this.$.cancelJob.generateRequest();
+                },
+                handleCanceled: function(e) {},
+                handleWorkflowRequest: function(e) {},
+                handleWorkflowResponse: function(e) {},
+                handleWorkflowError: function(e) {}
+            });
+        })();
+    </script>
+</dom-module>

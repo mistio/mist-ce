@@ -67,6 +67,20 @@ define('app/templates/templates', ['ember'], function() {
         'text!app/templates/image.hbs',
         'text!app/templates/machine_run_script.hbs',
         'text!app/templates/machine_image_create.hbs',
+        'text!app/templates/teams.hbs',
+        'text!app/templates/team_list.hbs',
+        'text!app/templates/team_list_item.hbs',
+        'text!app/templates/team.hbs',
+        'text!app/templates/team_edit.hbs',
+        'text!app/templates/team_add.hbs',
+        'text!app/templates/member_item.hbs',
+        'text!app/templates/member_add.hbs',
+        'text!app/templates/organization_add.hbs',
+        'text!app/templates/organization_item.hbs',
+        'text!app/templates/policy_rule_item.hbs',
+        'text!app/templates/policy_rule_edit.hbs',
+        'text!app/templates/policy_operator_item.hbs',
+        'text!app/templates/policy_operator_edit.hbs'
       ], function () {
         Ember.TEMPLATES['application'] = Ember.Handlebars.compile(arguments[0]);
         Ember.TEMPLATES['cloud_add'] = Ember.Handlebars.compile(arguments[1]);
@@ -133,6 +147,20 @@ define('app/templates/templates', ['ember'], function() {
         Ember.TEMPLATES['image'] = Ember.Handlebars.compile(arguments[62]);
         Ember.TEMPLATES['machine_run_script'] = Ember.Handlebars.compile(arguments[63]);
         Ember.TEMPLATES['machine_image_create'] = Ember.Handlebars.compile(arguments[64]);
+        Ember.TEMPLATES['teams'] = Ember.Handlebars.compile(arguments[65]);
+        Ember.TEMPLATES['team_list'] = Ember.Handlebars.compile(arguments[66]);
+        Ember.TEMPLATES['team_list_item'] = Ember.Handlebars.compile(arguments[67]);
+        Ember.TEMPLATES['team'] = Ember.Handlebars.compile(arguments[68]);
+        Ember.TEMPLATES['team_edit'] = Ember.Handlebars.compile(arguments[69]);
+        Ember.TEMPLATES['team_add'] = Ember.Handlebars.compile(arguments[70]);
+        Ember.TEMPLATES['member_item'] = Ember.Handlebars.compile(arguments[71]);
+        Ember.TEMPLATES['member_add'] = Ember.Handlebars.compile(arguments[72]);
+        Ember.TEMPLATES['organization_add'] = Ember.Handlebars.compile(arguments[73]);
+        Ember.TEMPLATES['organization_item'] = Ember.Handlebars.compile(arguments[74]);
+        Ember.TEMPLATES['policy_rule_item'] = Ember.Handlebars.compile(arguments[75]);
+        Ember.TEMPLATES['policy_rule_edit'] = Ember.Handlebars.compile(arguments[76]);
+        Ember.TEMPLATES['policy_operator_item'] = Ember.Handlebars.compile(arguments[77]);
+        Ember.TEMPLATES['policy_operator_edit'] = Ember.Handlebars.compile(arguments[78]);
         callback();
         info('loaded raw templates');
       });

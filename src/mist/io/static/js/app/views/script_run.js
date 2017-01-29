@@ -3,7 +3,7 @@ define('app/views/script_run', ['app/views/popup'],
     //  Script Run View
     //
     //  @returns Class
-    function (PopupComponent) {
+    function(PopupComponent) {
 
         'use strict';
 
@@ -13,7 +13,7 @@ define('app/views/script_run', ['app/views/popup'],
             controllerName: 'scriptRunController',
             popupId: '#script-run',
 
-            isReady: function () {
+            isReady: function() {
                 return Mist.scriptRunController.scriptToRun.machine.id;
             }.property('Mist.scriptRunController.scriptToRun.machine'),
 
@@ -36,7 +36,7 @@ define('app/views/script_run', ['app/views/popup'],
             //
 
             actions: {
-                machineClicked: function (machine) {
+                machineClicked: function(machine) {
                     Mist.scriptRunController.get('scriptToRun').set('machine', machine);
                     $('#script-run-machine').collapsible('collapse');
                 },

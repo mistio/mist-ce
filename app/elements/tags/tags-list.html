@@ -1,0 +1,200 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+
+<link rel="import" href="tag-item.html">
+
+<dom-module id="tags-list">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                width: 100%;
+            }
+
+            .tag-list {
+                padding: 0 8px 24px 24px;
+            }
+
+            .bottom-actions {
+                padding-bottom: 2px;
+                margin-top: 16px;
+                overflow: hidden;
+                vertical-align: middle;
+                display: block;
+                width: 100%;
+            }
+
+            paper-dialog {
+                width: 450px;
+            }
+
+            paper-button {
+                display: inline;
+            }
+
+            .pull-right {
+                float: right;
+            }
+
+            .submit-btn.add {
+                line-height: 40px;
+                margin: 0;
+            }
+
+            .submit-btn.save {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+        </style>
+
+        <paper-dialog id="tagsModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Tags</h2>
+            <paper-icon-button icon="clear" class="close" dialog-dismiss></paper-icon-button>
+            <paper-dialog-scrollable>
+                <div class="tag-list">
+                    <template is="dom-repeat" items="[[tags]]" as="tag">
+                        <tag-item tag="[[tag]]" index=[[index]]></tag-item>
+                    </template>
+                </div>
+
+                <div class="clearfix bottom-actions xs12">
+                    <paper-button class="submit-btn add" on-tap="_addTag">
+                        <iron-icon icon="add"></iron-icon> Add Tag</paper-button>
+                    <paper-button class="submit-btn pull-right blue save" on-tap="_saveTags">Save Tags</paper-button>
+                </div>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+        <paper-toast></paper-toast>
+        <iron-ajax id="tagsAjaxRequest" url="/api/v1/tags" method="POST" on-response="_handleTagsAjaxResponse" on-error="_handleTagsAjaxError"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'tags-list',
+
+                properties: {
+                    resource: String,
+                    items: Array,
+                    tags: {
+                        type: Array,
+                        computed: '_computeTags(items)'
+                    },
+                    newItems: {
+                        type: Array,
+                        computed: '_computeNewItems(items, tags)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed',
+                    'tag-delete': '_tagDeleteHandler'
+                },
+                _openDialog: function(e) {
+                    this.querySelector('paper-dialog').open();
+                },
+                _closeDialog: function() {
+                    this.querySelector('paper-dialog').close();
+                },
+                _modalClosed: function(e) {
+                    if (e.srcElement.id == 'tagsModal') {
+                        console.log(e);
+                    }
+                },
+                _computeNewItems: function(items, tags) {
+                    var newItems = items.slice();
+
+                    newItems.forEach(function(item) {
+                        var newTags = item.tags
+                            .filter(function(tag, index) {
+                                return tags.indexOf(tag) == -1;
+                            });
+                        item.tags = newTags;
+                    });
+
+                    return newItems;
+                },
+                _computeTags: function(items) {
+                    var tags = this._computeCommonTags(items);
+
+                    if (!tags.length) {
+                        return [{
+                            key: '',
+                            value: ''
+                        }];
+                    }
+
+                    return tags;
+                },
+                _computeCommonTags: function(items) {
+                    var tags = [];
+
+                    items.forEach(function(item) {
+                        if (item.tags) {
+                            item.tags.forEach(function(tag) {
+                                if (tags.indexOf(tag) == -1) {
+                                    tags.push(tag);
+                                }
+                            });
+                        } else {
+                            item.tags = [];
+                        }
+                    });
+
+                    return tags;
+                },
+                _addTag: function() {
+                    var newTag = {
+                        key: '',
+                        value: ''
+                    };
+                    this.push('tags', newTag);
+                },
+                _tagDeleteHandler: function(e) {
+                    var tag = e.detail.tag,
+                        index = this.tags.indexOf(tag);
+                    this.splice('tags', index, 1);
+                },
+                _saveTags: function() {
+                    var newTags = this.tags.filter(function(tag) {
+                            return tag.key;
+                        }),
+                        payload = [];
+
+                    payload = this.newItems.map(function(item) {
+                        var newItem = {};
+
+                        newItem.resource = {
+                            type: this.resource,
+                            item_id: item.id,
+                            cloud_id: ['machine', 'image', 'network'].indexOf(this.resource) != -1 ? item.cloud.id : ''
+                        };
+                        newItem.tags = item.tags.concat(newTags);
+
+                        return newItem;
+                    }, this);
+                    console.log(payload);
+
+                    this.$.tagsAjaxRequest.body = payload;
+                    this.$.tagsAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.tagsAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.tagsAjaxRequest.generateRequest();
+                },
+                _handleTagsAjaxResponse: function(e) {
+                    this._closeDialog();
+                    this._showToast('Tags were updated!');
+                },
+                _showToast: function(msg) {
+                    var toast = this.querySelector('paper-toast');
+                    toast.text = msg;
+                    toast.show();
+                }
+            });
+        })();
+    </script>
+</dom-module>

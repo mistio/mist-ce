@@ -1,0 +1,92 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/pushstate-anchor/pushstate-anchor.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<link rel="import" href="../app-user-menu/app-user-menu.html">
+<!--link rel="import" href="../notifications-element/notifications-element.html"-->
+
+<link rel="import" href="top-search.html">
+
+<dom-module id="app-header">
+  <template>
+    <style is="custom-style">
+      :host {
+        background-color: #424242;
+      }
+      paper-toolbar ::content .title {
+        pointer-events: all !important;
+      }
+      paper-toolbar.dark {
+          --paper-toolbar-background: inherit;
+        color: #fff;
+      }
+      paper-icon-button ::content iron-icon {
+          color: inherit;
+      }
+      #header {
+        color: #fff;
+      }
+      .logo-and-title {
+        padding: 6px 0;
+        line-height: 36px;
+        }
+        a#logo-link {
+        line-height: 36px;
+        display: flex;
+      }
+        .logo {
+          cursor: pointer;
+        }
+        .logo:focus {
+          outline: none;
+        }
+        .page-title {
+          font-weight: 500;
+          font-size: 20px;
+          text-overflow: ellipsis;
+          border-left: 1px solid rgba(255,255,255,0.13);
+          padding-left: 24px;
+          margin-left: 24px;
+          white-space: nowrap;
+          width: 100px;
+          text-transform: capitalize;
+        }
+
+        .container {
+          position: relative;
+          margin-left: 32px;
+        }
+        .container > paper-badge {
+        --paper-badge-margin-left: -40px;
+        --paper-badge-margin-bottom: -16px;
+      }
+    </style>
+    <paper-toolbar id="header" class="dark">
+        <paper-icon-button icon="menu" paper-drawer-toggle on-tap="toggleSidebar" tabindex="0"></paper-icon-button>
+      <div class="logo-and-title layout horizontal">
+        <a id="logo-link" class="regular" href="/" is="pushstate-anchor"><img class="logo" src="/assets/logos/logo.svg" width="80" on-tap="goToDashboard" alt="Mist.io Logo" tabindex="2"></a>
+        <span class="page-title">[[title]]</span>
+      </div>
+        <span class="title layout horizontal">
+          <top-search tabindex="3"></top-search>
+      </span>
+      <div class="container" tabindex="4">
+        <!--notifications-element></notifications-element-->
+      </div>
+      <app-user-menu user="[[model.user]]" org="[[model.org]]" teams="[[model.teamsArray]]" tabindex="5"></app-user-menu>
+    </paper-toolbar>
+  </template>
+  <script>
+  Polymer({
+      is: 'app-header',
+      properties: {
+        title: String
+      },
+    toggleSidebar: function(){
+      this.fire('toggle-sidebar');
+      console.log("toggle-sidebar")
+    }
+    });
+  </script>
+</dom-module>

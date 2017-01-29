@@ -41,11 +41,11 @@
         <div class="ui-content ui-body-a" role="main">
 
             <!-- Key Name Field -->
-            <div id="key-add-id-container" class="form-field required {{if Mist.keyAddController.keyId 'filled' 'empty'}}">
+            <div id="key-add-id-container" class="form-field required {{if Mist.keyAddController.keyName 'filled' 'empty'}}">
                 <label for="key-add-id">Name</label>
 
                 {{view Mist.TextField id="key-add-id"
-                       value=Mist.keyAddController.keyId}}
+                       value=Mist.keyAddController.keyName}}
             </div>
 
 

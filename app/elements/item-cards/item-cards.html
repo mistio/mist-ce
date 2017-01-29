@@ -1,0 +1,113 @@
+<link rel="import" href="../item-card/item-card.html">
+<dom-module id="item-cards">
+    <style>
+    :host {
+        display: block;
+        max-width: 920px;
+    }
+
+    #cards {
+        @apply(--layout-horizontal);
+        @apply(--layout-wrap);
+        margin-right: -10px;
+    }
+    </style>
+    <template>
+        <div id="cards">
+        </div>
+    </template>
+</dom-module>
+<script>
+Polymer({
+    is: 'item-cards',
+
+    properties: {
+        sections: {
+            type: Array
+        },
+
+        items: {
+            type: Array
+        },
+
+        section: {
+            type: Object
+        }
+    },
+
+    observers: [
+        '_render(items, sections, isAttached)'
+    ],
+
+    _findAncestor: function(node, fn) {
+        while (node && fn.call(this, node)) {
+            node = node.parentNode;
+        }
+        return node;
+    },
+
+    _tap: function(e) {
+        var sourceEvent = e.detail.sourceEvent;
+        var A = this._findAncestor(e.target, function(node) {
+            return node != this && node.tagName !== 'A';
+        });
+
+        if (A && A.tagName === 'A' && A.href.indexOf(location.host) > 0) {
+            if (sourceEvent.ctrlKey || sourceEvent.metaKey) {
+                window.open(A.href);
+            } else {
+                this.fire('nav', {
+                    url: A.href
+                });
+            }
+            e.preventDefault();
+        }
+    },
+
+    _getColor: function(item) {
+        return this.section.color;
+    },
+
+    _getSectionSymbol: function(item) {
+        return this.section.symbol;
+    },
+
+    _render: function(items, sections) {
+        if (items) {
+            this.$.cards.innerHTML = '';
+
+            var head = 0;
+            var batchSize = 3;
+            var flush = function() {
+                if (head + batchSize >= items.length) {
+                    batchSize = items.length - head;
+                }
+
+                if (batchSize <= 0) {
+                    return false;
+                }
+                var el;
+                var firstHead = head;
+                var lastHead = firstHead + batchSize;
+
+                for (; head < lastHead; head++) {
+                    el = document.createElement('item-card');
+                    el.item = items[head];
+                    el.color = this.section.color;
+                    el.sectionSymbol = this.section.symbol;
+                    Polymer.dom(this.$.cards).appendChild(el);
+                }
+                return true;
+            };
+            var batch = function() {
+                if (flush.call(this)) {
+                    batchSize = 10;
+                    requestAnimationFrame(batch.bind(this));
+                }
+            };
+
+            batch.call(this);
+        }
+    }
+});
+</script>

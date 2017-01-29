@@ -1,0 +1,59 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<dom-module id="subscriptions-list">
+    <template>
+        <style is="custom-style" include="lists"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+            }
+
+            .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+            }
+
+            .flexchild {
+                @apply(--layout-flex);
+            }
+        </style>
+        <paper-card>
+          <h2>Subscription History</h2>
+            <div class="card-content">
+                <div class="info-list">
+                    <div class="info-head flex-horizontal-with-ratios">
+                        <div class="flexchild">Date</div>
+                        <div class="flexchild text-center">Plan</div>
+                        <div class="flexchild text-right">Action</div>
+                    </div>
+                    <div class="info-body">
+                        <template is="dom-repeat" items=[[user.user_plans]] as="subscription">
+                            <div class="row">
+                                <subscription-item subscription="[[subscription]]" index="[[index]]" count="[[subscriptions.length]]"></subscription-item>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </paper-card>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'subscriptions-list',
+
+                properties: {
+                  user: {
+                      type: Object,
+                      notify: true
+                  }
+                }
+            });
+        })();
+    </script>
+</dom-module>

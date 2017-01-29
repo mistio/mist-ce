@@ -1,0 +1,108 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="top-search">
+  <template>
+    <style is="custom-style">
+      :host * {
+        box-sizing: border-box;
+      }
+
+      :host {
+        max-width: 730px;
+        display: block;
+        align-items: center;
+        background-color: rgba(255,255,255,.15);
+        height: 48px;
+        border-radius: 4px;
+        width: 100%;
+      }
+
+      :host::content iron-icon {
+        margin-right: 15px;
+        cursor: pointer;
+      }
+
+      #search iron-icon {
+        margin-right: 0;
+        margin-left: 8px;
+        color: inherit;
+        align-self: center;
+      }
+
+      #search input {
+        font-size: 16px;
+        color: #fff;
+        width: 100%;
+        height: 48px;
+        line-height: 48px;
+        border: 0;
+        border-radius: 2px;
+        -webkit-appearance: none;
+        align-self: center;
+        display: block;
+        background-color: transparent;
+        padding-right: 8px;
+      }
+
+      #search input:focus {
+        outline: 0;
+      }
+
+      ::-webkit-input-placeholder {
+        color: #fff !important;
+      }
+    </style>
+    <div id="search" class="horizontal layout center">
+      <iron-icon icon="search"></iron-icon>
+      <form on-submit="performSearch" class="flex">
+          <input type="search" id="query" value="{{query::keyup}}" autocomplete="off" placeholder="Search" on-blur="clearSearch">
+      </form>
+    </div>
+  </template>
+  <script>
+  Polymer({
+    is: 'top-search',
+
+    properties: {
+      query: {
+        type: String,
+        notify: true
+      }
+    },
+
+    observers: [
+      '_queryChanged(query)'
+    ],
+
+    listeners: {
+      keyup: 'hotkeys'
+    },
+
+    clearSearch: function() {
+      //this.set('query', '');
+      this.showingSearch = false;
+    },
+
+    performSearch: function(e) {
+      e.preventDefault();
+      this.fire('nav', {
+        url: '?q=' + this.query
+      });
+    },
+
+    _queryChanged: function(q) {
+      if (q) {
+        this.async(function() {
+          this.$.query.focus();
+          // make sure to force the cursor to the end of the
+          // input. Only an issue in Firefox.
+          this.$.query.setSelectionRange(q.length, q.length);
+          console.log('fire in top searvh', q);
+          this.fire('search', q);
+        });
+      }
+    },
+  });
+  </script>
+</dom-module>

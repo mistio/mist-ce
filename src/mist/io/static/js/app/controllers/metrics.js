@@ -37,7 +37,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
 
                 var that = this;
                 this.set('addingMetric', true);
-                Mist.ajax.PUT('/metrics/' + metric.id, {
+                Mist.ajax.PUT('/api/v1/metrics/' + metric.id, {
                     'name': metric.name,
                     'unit': metric.unit,
                     'machine_id': machine_id,
@@ -58,7 +58,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             deleteMetric: function (metric, callback) {
                 var that = this;
                 this.set('deletingMetric', true);
-                Mist.ajax.DELETE('/metrics/' + metric.id, {
+                Mist.ajax.DELETE('/api/v1/metrics/' + metric.id, {
                 }).success(function() {
                     that._deleteMetric(metric);
                 }).error(function(message) {
@@ -74,7 +74,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
             disableMetric: function (metric, machine, callback) {
                 var machine_id = machine.id || null;
                 var cloud_id = machine.cloud ? machine.cloud.id : null;
-                var url = '/clouds/' + cloud_id +
+                var url = '/api/v1/clouds/' + cloud_id +
                         '/machines/' + machine_id +
                         '/plugins/' + metric.pluginId;
 
@@ -97,7 +97,7 @@ define('app/controllers/metrics', ['app/models/metric', 'ember'],
 
                 var machine_id = machine.id || null;
                 var cloud_id = machine.cloud ? machine.cloud.id : null;
-                var url = '/clouds/' + cloud_id +
+                var url = '/api/v1/clouds/' + cloud_id +
                         '/machines/' + machine_id +
                         '/metrics';
 

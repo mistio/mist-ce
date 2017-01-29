@@ -4,7 +4,7 @@ define('app/controllers/base_array', ['ember'],
     //
     //  @returns Class
     //
-    function () {
+    function() {
 
         'use strict';
 
@@ -23,7 +23,7 @@ define('app/controllers/base_array', ['ember'],
             //  Computed Properties
             //
 
-            selectedObjects: function () {
+            selectedObjects: function() {
                 return this.model.filterBy('selected', true);
             }.property('model.@each.selected'),
 
@@ -32,18 +32,21 @@ define('app/controllers/base_array', ['ember'],
             //  Public Methods
             //
 
-            setModel: function (model) {
+            setModel: function(model, reset) {
+                if (reset) {
+                    this.set("model", []);
+                }
                 model = !!model ? model : [];
                 this._passOnProperties(model);
                 this._updateModel(model);
                 this.set('loading', false);
             },
 
-            getObject: function (id) {
+            getObject: function(id) {
                 return this.model.findBy('id', id);
             },
 
-            objectExists: function (id) {
+            objectExists: function(id) {
                 return !!this.getObject(id);
             },
 
@@ -52,22 +55,22 @@ define('app/controllers/base_array', ['ember'],
             //  Private Methods
             //
 
-            _passOnProperties: function (model) {
-                this.get('passOnProperties').forEach(function (property) {
+            _passOnProperties: function(model) {
+                this.get('passOnProperties').forEach(function(property) {
                     model.setEach(property, this.get(property));
                 }, this);
             },
 
-            _updateModel: function (model) {
-                Ember.run(this, function () {
+            _updateModel: function(model) {
+                Ember.run(this, function() {
                     // Remove deleted objects
-                    this.model.forEach(function (object) {
+                    this.model.forEach(function(object) {
                         if (!model.findBy('id', object.id))
                             this._deleteObject(object);
                     }, this);
 
                     // Update existing objects or add new ones
-                    model.forEach(function (object) {
+                    model.forEach(function(object) {
                         if (this.objectExists(object.id)) {
                             this._updateObject(object);
                         } else {
@@ -81,8 +84,8 @@ define('app/controllers/base_array', ['ember'],
                 });
             },
 
-            _addObject: function (object) {
-                Ember.run(this, function () {
+            _addObject: function(object) {
+                Ember.run(this, function() {
                     if (!this.objectExists(object.id)) {
                         var newObject = this.get('baseModel').create(object);
                         this.model.pushObject(newObject);
@@ -93,8 +96,8 @@ define('app/controllers/base_array', ['ember'],
                 });
             },
 
-            _deleteObject: function (object) {
-                Ember.run(this, function () {
+            _deleteObject: function(object) {
+                Ember.run(this, function() {
                     this.model.removeObject(object);
                     this.trigger('onDelete', {
                         object: object
@@ -103,8 +106,8 @@ define('app/controllers/base_array', ['ember'],
             },
 
 
-            _updateObject: function (object) {
-                Ember.run(this, function () {
+            _updateObject: function(object) {
+                Ember.run(this, function() {
                     this.getObject(object.id).update(object);
                     this.trigger('onUpdate', {
                         object: object
@@ -120,8 +123,8 @@ define('app/controllers/base_array', ['ember'],
             //
 
 
-            selectedObserver: function () {
-                Ember.run.once(this, function () {
+            selectedObserver: function() {
+                Ember.run.once(this, function() {
                     this.trigger('onSelectedChange', {
                         objects: this.get('selectedObjects')
                     });

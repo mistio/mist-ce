@@ -1,0 +1,461 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/iron-routes/iron-routes.html">
+<link rel="import" href="../../bower_components/iron-media-query/iron-media-query.html">
+<link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+<link rel="import" href="../../styles/app-theme.html">
+<link rel="import" href="../../styles/shared-styles.html">
+
+<link rel="import" href="../app-styles/app-styles.html">
+<link rel="import" href="../app-socket/app-socket.html">
+<link rel="import" href="../app-icons/app-icons.html">
+
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+
+<link rel="import" href="../pages/page-dashboard.html">
+<link rel="import" href="../pages/page-items.html">
+
+<dom-module id="app-main">
+    <template>
+        <style>
+            paper-toast {
+                z-index: 5;
+            }
+
+            paper-header-panel {
+                background-color: #eee;
+            }
+
+            iron-pages {
+                padding: 24px 24px 0 24px;
+                margin-left: 210px;
+                overflow: hidden;
+                min-height: 85vh;
+                transition: margin-left 350ms ease-in-out;
+            }
+
+            iron-pages[smallscreen],
+            iron-pages.center {
+                margin-left: 0;
+            }
+
+            iron-pages[smallscreen]::content #content {
+                padding: 0;
+            }
+        </style>
+        <app-socket model="{{model}}" onboarding="{{onboarding}}" ></app-socket>
+        <iron-media-query query="(max-width: 860px)" query-matches="{{smallscreen}}"></iron-media-query>
+        <iron-routes for="app-main" selected="[[section]]">
+            <!-- dashboard -->
+            <iron-route path="/" title="dashboard" current="dashboard"></iron-route>
+            <iron-route path="/add-cloud" title="add cloud" href="../clouds/cloud-add.html" current="dashboard"></iron-route>
+            <iron-route path="/incidents" title="incidents" href="../pages/page-items.html" current="incidents"></iron-route>
+
+            <!-- machines -->
+            <iron-route path="/machines" title="machines" current="machines" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/machines/:uuid" title="machine" current="machines" href="../machines/machine-page.html"></iron-route>
+            <iron-route path="/create-machine" title="create machine" current="machines" href="../machines/machine-create.html"></iron-route>
+
+            <!-- images -->
+            <iron-route path="/images" title="images" current="images" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/images/:id" title="image" current="images" href="../images/image-page.html"></iron-route>
+
+            <!-- keys -->
+            <iron-route path="/keys" title="keys" current="keys" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/keys/:id" title="keys" current="keys" href="../keys/key-page.html"></iron-route>
+            <iron-route path="/add-key" title="add key" current="keys" href="../keys/key-add.html"></iron-route>
+
+            <!-- networks -->
+            <iron-route path="/networks" title="networks" current="networks" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/networks/:name" title="network" current="networks" href="../networks/network-page.html"></iron-route>
+            <iron-route path="/add-network" title="add network" current="networks" href="../networks/network-add.html"></iron-route>
+
+            <!-- templates -->
+            <iron-route path="/templates" title="templates" current="templates" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/templates/:id" title="template" current="templates" href="../templates/template-page.html"></iron-route>
+            <iron-route path="/add-template" title="add template" current="templates" href="../templates/template-add.html"></iron-route>
+
+            <!-- stacks -->
+            <iron-route path="/create-stack/:id" title="create stack" current="stacks" href="../stacks/stack-create.html"></iron-route>
+            <iron-route path="/stacks" title="stacks" current="stacks" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/stacks/:id" title="stack" current="stacks" href="../stacks/stack-page.html"></iron-route>
+
+            <!-- teams -->
+            <iron-route path="/teams" title="teams" current="teams" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/teams/:id" title="team" current="teams" href="../teams/team-page.html"></iron-route>
+            <iron-route path="/members/:id" title="member" current="teams" href="../teams/member-page.html"></iron-route>
+            <iron-route path="/add-members/:id" title="add member" current="teams" href="../teams/members-add.html"></iron-route>
+            <iron-route path="/members/:id/add-in-teams" title="add in teams" current="teams" href="../teams/member-add-in-teams.html"></iron-route>
+            <!-- <iron-route path="/teams/:id" title="script" href="../teams/team-page.html"></iron-route>
+            <iron-route path="/add-team" title="add script" href="../teams/team-add.html"></iron-route> -->
+
+            <!-- scripts -->
+            <iron-route path="/scripts" title="scripts" current="scripts" href="../pages/page-items.html"></iron-route>
+            <iron-route path="/scripts/:id" title="script" current="scripts" href="../scripts/script-page.html"></iron-route>
+            <iron-route path="/add-script" title="add script" current="scripts" href="../scripts/script-add.html"></iron-route>
+
+            <!-- other -->
+            <iron-route path="/my-account" title="account" current="account" href="../pages/page-account.html"></iron-route>
+            <iron-route path="*"></iron-route>
+        </iron-routes>
+
+        <paper-header-panel mode="standard" class="fit">
+            <app-sidebar id="sidebar" model="[[model]]" tag="[[tag]]" sections="[[sections]]" current="{{current}}" drawer smallscreen$="{{smallscreen}}"></app-sidebar>
+            <app-header model="[[model]]" title="{{title}}" class="paper-header" style$="[[style]]"></app-header>
+
+            <iron-pages id="app-main" main smallscreen$={{smallscreen}}>
+                <!-- dashboard -->
+                <page-dashboard model="[[model]]" sections="[[sections]]" section="[[sections.dashboard]]" onboarding="[[onboarding]]"></page-dashboard>
+                <cloud-add providers="[[providers]]" keys="[[model.keysArray]]" section="[[sections.clouds]]"></cloud-add>
+                <page-items q="[[q]]" class="incidents" model="[[model]]" items="[[model.incidents]]" sections="[[sections]]" section="[[sections.incidents]]"></page-items>
+                <!-- machines -->
+                <page-items q="[[q]]" class="machines" model="[[model]]" items="[[model.machinesArray]]" sections="[[sections]]" section="[[sections.machines]]"></page-items>
+                <machine-page params="[[params]]" model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-page>
+                <machine-create model="[[model]]" sections="[[sections]]" section="[[sections.machines]]"></machine-create>
+                <!-- images -->
+                <page-items q="[[q]]" class="images" model="[[model]]" items="[[model.imagesArray]]" sections="[[sections]]" section="[[sections.images]]"></page-items>
+                <image-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.images]]"></image-page>
+                <!-- keys -->
+                <page-items q="[[q]]" class="keys" model="[[model]]" sections="[[sections]]" section="[[sections.keys]]" items="[[model.keysArray]]"></page-items>
+                <key-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.keys]]"></key-page>
+                <key-add model="[[model]]" sections="[[sections]]" section="[[sections.keys]]"></key-add>
+                <!-- networks -->
+                <page-items q="[[q]]" class="networks" model="[[model]]" sections="[[sections]]" section="[[sections.networks]]" items="[[model.networksArray]]"></page-items>
+                <network-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.networks]]"></network-page>
+                <network-add model="[[model]]" clouds="[[model.cloudsArray]]" sections="[[sections]]" section="[[sections.networks]]"></network-add>
+                <!-- templates -->
+                <page-items q="[[q]]" class="templates" model="[[model]]" sections="[[sections]]" section="[[sections.templates]]" items="[[model.templatesArray]]"></page-items>
+                <template-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.templates]]"></template-page>
+                <template-add model="[[model]]" sections="[[sections]]" section="[[sections.templates]]"></template-add>
+                <!-- stacks -->
+                <stack-create model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" params="[[params]]" restamp="true"></stack-create>
+                <page-items q="[[q]]" class="stacks" model="[[model]]" sections="[[sections]]" section="[[sections.stacks]]" items="[[model.stacksArray]]"></page-items>
+                <stack-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.stacks]]" restamp="true"></stack-page>
+                <!-- teams -->
+                <page-items q="[[q]]" class="teams" model="[[model]]" sections="[[sections]]" section="[[sections.teams]]" items="[[model.teamsArray]]"></page-items>
+                <team-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></team-page>
+                <member-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-page>
+                <members-add model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></members-add>
+                <member-add-in-teams model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.teams]]" restamp="true"></member-add-in-teams>
+                <!-- scripts - leave scipts last due to editors highlighting problem -->
+                <page-items q="[[q]]" model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]" items="[[model.scriptsArray]]"></page-items>
+                <script-page model="[[model]]" params="[[params]]" sections="[[sections]]" section="[[sections.scripts]]"></script-page>
+                <script-add model="[[model]]" sections="[[sections]]" section="[[sections.scripts]]"></script-add>
+
+                <page-account user="[[model.user]]"></page-account>
+
+                <page-not-found></page-not-found>
+            </iron-pages>
+        </paper-header-panel>
+    </template>
+</dom-module>
+
+<script type="text/javascript" src="../../bower_components/swiftSet/swiftSet.js"></script>
+
+<script type="text/javascript" src="../providers.js" inline></script>
+
+<script>
+    var app = Polymer({
+        is: 'app-main',
+
+        properties: {
+            model: {
+                type: Object
+            },
+            providers: {
+                type: Object,
+                value: PROVIDERS
+            },
+            sections: {
+                type: Object
+            },
+            sectionsArray: {
+                type: Array,
+                notify: true
+            },
+            onboarding: {
+                type: Object
+            },
+            title: {
+                type: String,
+                value: "",
+                notify: true
+            },
+            current: {
+                type: String,
+                value: "",
+                observer: '_currentChanged',
+                notify: true
+            },
+            q: { // search query
+                type: String,
+                value: '',
+                notify: true
+            },
+            style: {
+                computed: "_style(current, sections)",
+                value: "background-color: #424242;",
+                notify: true
+            },
+            tag: String
+        },
+        listeners: {
+            'iron-activate': 'updateDocTitle',
+            'iron-activate': 'updateCurrent',
+            'iron-navigate': 'scrollToTop',
+            'toggle-sidebar': 'toggleSidebar',
+            'page-meta': 'updateTitle',
+            'toast': 'showToast',
+            'subscribeLogEvents': 'subscribeLogEvents',
+            'search': 'updateSearchQuery'
+        },
+        _toast: null,
+        updateSearchQuery: function(e){
+            this.set('q',e.detail);
+        },
+        _currentChanged: function() {
+            // console.log('current: ', this.current);
+        },
+        ready: function() {
+            this.model = {
+                cloudsArray: [],
+                machinesArray: [],
+                imagesArray: [],
+                keysArray: [],
+                networksArray: [],
+                scriptsArray: [],
+                stacksArray: [],
+                templatesArray: [],
+                teamsArray: [],
+                teams: [],
+                pending: {
+                    clouds: true,
+                    monitoring: true
+                }
+            };
+            this.model.permissions = {
+                'cloud': [
+                    'add',
+                    'read',
+                    'edit',
+                    'remove',
+                    'create_resources',
+                    'edit_tags',
+                    'read_logs',
+                ],
+                'machine': [
+                    'read',
+                    'edit',
+                    'create',
+                    'edit_tags',
+                    'edit_rules',
+                    'edit_graphs',
+                    'edit_custom_metrics',
+                    'start',
+                    'stop',
+                    'reboot',
+                    'destroy',
+                    'resize',
+                    'run_script',
+                    'open_shell',
+                    'associate_key',
+                    'disassociate_key',
+                    'read_logs',
+                ],
+                'script': [
+                    'add',
+                    'read',
+                    'edit',
+                    'run',
+                    'remove',
+                    'edit_tags',
+                    'read_logs',
+                ],
+                'key': [
+                    'add',
+                    'read',
+                    'read_private',
+                    'edit',
+                    'remove',
+                    'edit_tags',
+                    'read_logs',
+                ],
+                'template': [
+                    'add',
+                    'read',
+                    'edit',
+                    'remove',
+                    'apply',
+                    'edit_tags',
+                    'read_logs',
+                ],
+                'stack': [
+                    'create',
+                    'read',
+                    'edit',
+                    'remove',
+                    'run_workflow',
+                    'edit_tags',
+                    'read_logs',
+                ],
+                'team': [
+                    'add',
+                    'read',
+                    'edit',
+                    'remove',
+                    'edit_tags',
+                    'read_logs',
+                ],
+            };
+
+            for(i = 1; i<= this.model.teamsArray.length; i++){
+              this.model.teams = this.model.teamsArray[i].teams[i].id;
+            };
+
+            this.sectionsArray = [{
+                id: 'dashboard',
+                color: '#424242',
+            }, {
+                id: 'incidents',
+                color: '#d96557',
+            }, {
+                id: 'machines',
+                color: '#8c76d1',
+                icon: 'hardware:computer',
+                count: '0',
+                add: '/create-machine'
+            }, {
+                id: 'images',
+                color: '#0099cc',
+                icon: 'image:photo',
+                count: '0'
+            }, {
+                id: 'keys',
+                color: '#009688',
+                icon: 'communication:vpn-key',
+                count: '0',
+                add: '/add-key'
+            }, {
+                id: 'networks',
+                color: '#795548',
+                icon: 'hardware:device-hub',
+                count: '0',
+                add: '/add-network'
+            }, {
+                id: 'scripts',
+                color: '#D48900',
+                icon: 'image:movie-creation',
+                count: '0',
+                add: '/add-script'
+            }, {
+                id: 'templates',
+                color: '#0097A7',
+                icon: 'av:art-track',
+                count: '0',
+                add: '/add-template'
+            }, {
+                id: 'teams',
+                color: '#607D8B',
+                icon: 'social:people',
+                count: '0'
+            }, {
+                id: 'stacks',
+                color: '#0277BD',
+                icon: 'maps:layers',
+                count: '0'
+            }, {
+                id: 'account',
+                color: '#2F2F3E',
+                icon: 'accont-circle',
+                count: null
+            }];
+
+            this.sections = _generateMap(this.sectionsArray);
+        },
+
+        toggleSidebar: function() {
+            this.$.sidebar.toggleClass('close');
+            this.querySelector("#app-main").toggleClass('center');
+        },
+        subscribeLogEvents: function(searchFilter) {
+            console.log('subscribeLogEvents', searchFilter.detail);
+            var socket = this.querySelector('app-socket');
+            socket.send('sub', 'logs');
+            socket.send('msg', 'logs', 'ready');
+            socket.send('msg', 'logs', 'get_logs', searchFilter.detail);
+        },
+
+        attributeChanged: function(attrName, oldVal, newVal) {
+            console.warn('attrChanged', attrName, oldVal, newVal);
+        },
+
+        updateCurrent: function(e) {
+            // trigger must be an iron-route, so current does not change in forms when selecting dropdown values
+            var el = e.detail.item;
+            //console.log("el",e.detail);
+            if (el.nodeName == 'IRON-ROUTE' && el.title && el.getAttribute("current")) {
+                this.current = el.getAttribute("current");
+                this.title = el.title;
+                // console.log("el", e.detail);
+                if (el.nodeName == 'IRON-ROUTE') {
+                    this.current = el.getAttribute("current");
+                    this.title = el.title;
+                }
+            }
+        },
+
+        _style: function(current, sections) {
+            if (current) {
+                return "background-color: " + sections[current].color;
+            }
+        },
+
+        updateTitle: function(_, detail) {
+            if (detail.title && detail.title.length) {
+                document.title = detail.title + " - mist.io";
+            } else {
+                document.title = "mist.io";
+            }
+        },
+
+        updateDocTitle: function(e, details) {
+            if (details.item.title && details.item.title.length) {
+                document.title = details.item.title + " - mist.io";
+            } else {
+                document.title = "mist.io";
+            }
+        },
+
+        showToast: function(e, detail) {
+            if (!this._toast) {
+                this._toast = document.createElement('paper-toast');
+                Polymer.dom(this.$.router).appendChild(this._toast);
+            }
+            this._toast.text = detail.text;
+            this.async(this._toast.show.bind(this._toast), 1);
+        },
+
+        trackPageview: function(e, detail) {
+            return;
+            this.debounce('pageview', function() {
+                var loc = window.location.pathname + window.location.search;
+                ga('send', 'pageview', {
+                    location: loc,
+                    title: document.title
+                });
+                ga('set', 'page', loc);
+            }, 2000);
+        },
+
+        scrollToTop: function() {
+            // TODO: scroll to top on iron-navigate
+            // https://groups.google.com/forum/#!topic/polymer-dev/tDetYDnxG48
+            // https://github.com/Polymer/docs/blob/master/js/app.js#L141:L147
+            // scrollIntoViewIfNeeded
+            // document.querySelector('#mainContainer').scrollTop();
+        }
+    });
+</script>

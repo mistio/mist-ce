@@ -1,0 +1,128 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/fade-out-animation.html">
+
+<dom-module id="team-edit">
+    <template>
+        <style is="custom-style" include="dialogs"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-card {
+                display: block;
+            }
+
+            paper-dialog {
+                width: 300px;
+            }
+            .submit-btn {
+                background-color: var(--mist-blue);
+                color: #fff;
+            }
+        </style>
+
+        <paper-dialog id="editTeamModal" entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+            <h2>Rename Team</h2>
+            <paper-icon-button class="close" icon="clear" dialog-dismiss></paper-icon-button>
+            <paper-dialog-scrollable>
+                <p>
+                    <paper-input id="name" label="Name" required error-message="Please enter team's name" value="{{newTeam.name}}"></paper-input>
+                    <paper-textarea id="description" label="Description (optional)" rows="5" max-rows="5" error-message="Please enter team's description" value="{{newTeam.description}}"></paper-textarea>
+                </p>
+                <div class="clearfix btn-group">
+                <paper-button class="submit-btn btn-block" disabled$="[[!formReady]]" raised on-tap="_submitForm">Submit</paper-button>
+                </div>
+            </paper-dialog-scrollable>
+        </paper-dialog>
+
+        <iron-ajax id="teamEditAjaxRequest" url="/api/v1/org/[[org.id]]/teams/[[team.id]]" method="PUT" on-response="_handleTeamEditAjaxResponse" on-error="_handleTeamEditAjaxError"></iron-ajax>
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'team-edit',
+
+                properties: {
+                    org: {
+                        type: Object
+                    },
+                    team: {
+                        type: Object
+                    },
+                    newTeam: {
+                        type: Object,
+                        computed: '_computeNewTeam(team)',
+                        notify: true
+                    },
+                    sendingData: {
+                        type: Boolean,
+                        value: false
+                    },
+                    formReady: {
+                        type: Boolean,
+                        computed: '_computeFormReady(newTeam.name, sendingData)'
+                    }
+                },
+                listeners: {
+                    'iron-overlay-closed': '_modalClosed'
+                },
+                _computeNewTeam: function(team) {
+                    return {
+                        name: team.name,
+                        description: team.description
+                    };
+                },
+                _computeFormReady: function(id, sendingData) {
+                    var formReady = false;
+
+                    if (id) {
+                        formReady = true;
+                    }
+
+                    if (sendingData) {
+                        formReady = false;
+                    }
+
+                    return formReady;
+                },
+                _openEditTeamModal: function(e) {
+                    this.$.editTeamModal.open();
+                },
+                _closeEditTeamModal: function(e) {
+                    this.$.editTeamModal.close();
+                },
+                _modalClosed: function() {
+                    this._formReset();
+                },
+                _submitForm: function(e) {
+                    // this.fire('updateSelectedTeam', {
+                    //     team: this.team
+                    // });
+
+                    this.$.teamEditAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.teamEditAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.teamEditAjaxRequest.body = {
+                        'new_name': this.newTeam.name,
+                        'new_description': this.newTeam.description
+                    };
+                    this.$.teamEditAjaxRequest.generateRequest();
+
+                    this.set('sendingData', true);
+                },
+                _formReset: function() {
+                    //   this.set('team.id', '');
+                },
+                _handleTeamEditAjaxResponse: function(e) {
+                    this.set('sendingData', false);
+                    this._closeEditTeamModal();
+                }
+            });
+        })();
+    </script>
+</dom-module>

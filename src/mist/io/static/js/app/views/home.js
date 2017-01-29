@@ -20,14 +20,32 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                 return !Mist.openIncidents && Mist.isCore;
             }),
 
-            hasIncidents: function () {
+            hasIncidents: Ember.computed('Mist.openIncidents', function () {
                 if (Mist.openIncidents)
                     return !!Mist.openIncidents.length;
-            }.property('Mist.openIncidents'),
+            }),
 
-            machineCount: function () {
+            machineCount: Ember.computed('Mist.cloudsController.machineCount', function () {
                 return Mist.cloudsController.machineCount;
-            }.property('Mist.cloudsController.machineCount'),
+            }),
+
+            hasOrg: Ember.computed('Mist.organization', function() {
+                return !!Object.keys(Mist.organization).length;
+            }),
+
+            firstOrg: Ember.computed('Mist.organization.name', 'hasOrg', function() {
+                return this.get('hasOrg') && !Mist.organization.name;
+            }),
+
+            isOrgOwner: Ember.computed('hasOrg', 'Mist.teamsController.model', function() {
+                if (this.get('hasOrg')) {
+                    return Mist.teamsController.model.some(function(team) {
+                        return team.name.toLowerCase() == 'owners';
+                    });
+                }
+
+                return false;
+            }),
 
             //
             //  Initialization
@@ -63,6 +81,10 @@ define('app/views/home', ['app/views/page', 'app/models/graph'],
                     else
                         Mist.__container__.lookup('router:main').transitionTo('machine',
                             incident.get('machine'));
+                },
+
+                editOrg: function() {
+                    Mist.organizationEditController.save();
                 }
             },
 

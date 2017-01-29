@@ -1,0 +1,533 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="network-add">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+        :host {
+            display: block;
+        }
+        #content {
+            max-width: 900px;
+        }
+
+        paper-material {
+            display: block;
+            padding: 24px;
+        }
+
+        paper-progress {
+            position: absolute;
+            bottom: 85px;
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
+
+        :host >::content paper-input-container {
+            padding-top: 16px;
+            padding-bottom: 16px;
+        }
+        </style>
+
+
+
+                <div id="content">
+                    <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                        <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                        <div class="title flex">
+                            <h2>
+                                Add Network
+                            </h2>
+                            <div class="subtitle">
+
+                            </div>
+                        </div>
+                    </paper-material>
+                    <paper-material>
+                        <div class="grid-row" hidden$=[[!hasOpenstackClouds]]>
+                            <template is="dom-repeat" items="{{fields}}" as="field">
+                                <template is="dom-if" if="[[_computeFieldType(field, 'text', field.show)]]">
+                                    <paper-input id="[[field.name]]" placeholder="[[field.placeholder]]" label="[[field.label]]" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" class="xs12"></paper-input>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'textarea', field.show)]]">
+                                    <paper-textarea id="[[field.name]]" label="[[field.label]]" rows="5" max-rows="8" value="{{field.value}}" auto-validate required="[[field.required]]" error-message="[[field.errorMessage]]" class="xs12"></paper-textarea>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'dropdown', field.show)]]">
+                                    <paper-dropdown-menu class="dropdown-block l6 xs12" label="[[field.label]]" horizontal-align="left">
+                                        <paper-menu id="[[field.name]]" attr-for-selected="value" selected="{{field.value}}" class="dropdown-content">
+                                            <template is="dom-repeat" items="[[field.options]]" as="option">
+                                                <paper-item value="[[option.val]]">[[option.title]]</paper-item>
+                                            </template>
+                                        </paper-menu>
+                                    </paper-dropdown-menu>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'switch', field.show)]]">
+                                    <paper-toggle-button class="l4 xs6" checked="{{field.value}}">[[field.label]]</paper-toggle-button>
+                                </template>
+                                <template is="dom-if" if="[[_computeFieldType(field, 'checkbox', field.show)]]">
+                                    <paper-checkbox  class="l4 xs6" checked="{{field.value}}"> [[field.label]]</paper-checkbox>
+                                </template>
+                            </template>
+
+                            <paper-progress id="progress" value="0" hidden$="[[hideprogress]]"></paper-progress>
+                            <hr class="xs12" />
+                            <div class="clearfix bottom-actions xs12">
+                                <paper-button class="submit-btn pull-left" disabled$="[[!formReady]]" raised on-tap="_submitForm" onclick="startProgress();">Add</paper-button>
+                                <paper-button class="submit-btn pull-right" raised on-tap="_resetForm">Reset</paper-button>
+                            </div>
+                        </div>
+
+                        <div hidden$=[[hasOpenstackClouds]]>
+                            <p>You cannot add a network since you don't have an enabled Openstack cloud in your account!</p>
+                        </div>
+                    </paper-material>
+                </div>
+
+        <iron-ajax id="addNetworkRequest" url="/api/v1/clouds/[[network.cloud.id]]/networks" method="POST" on-response="_handleAddNetworkResponse" on-error="_handleAddNetworkError"></iron-ajax>
+    </template>
+    <script>
+    (function() {
+        'use strict';
+
+        Polymer({
+            is: 'network-add',
+
+            properties: {
+                sections: {
+                    type: Object
+                },
+                section: {
+                    type: Object
+                },
+                color: {
+                    type: String,
+                    computed: '_getHeaderStyle(section)'
+                },
+                model: {
+                    type: Object
+                },
+                network: {
+                    type: Object,
+                    value: function() {
+                        return {
+                            name: '',
+                            cloud: '',
+                            adminStateUp: '',
+                            createSubnet: '',
+                            subnet_name: '',
+                            subnet_address: '',
+                            subnet_ipv: '',
+                            subnet_gatewayIp: '',
+                            subnet_disableGateway: '',
+                            subnet_enableDHCP: '',
+                            subnet_createRouter: '',
+                            subnet_routerNname: '',
+                            network_routerPublicGateway: '',
+                            subnet_allocationPools: ''
+                        }
+                    }
+                },
+                typedName: {
+                    type: String,
+                    value: '',
+                    notify: true
+                },
+                fields: {
+                    type: Array,
+                    value: [{
+                        name: "name",
+                        label: "Name *",
+                        type: "text",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please enter network's name",
+                        show: true,
+                        required: true
+                    }, {
+                        name: "cloud",
+                        label: "Cloud *",
+                        type: "dropdown",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please select a cloud",
+                        show: true,
+                        required: true,
+                        options: []
+                    }, {
+                        name: "adminStateUp",
+                        label: "Admin State *",
+                        type: "dropdown",
+                        value: true,
+                        defaultValue: true,
+                        placeholder: "",
+                        show: true,
+                        required: true,
+                        options: [{
+                            title: "Up",
+                            val: true
+                        }, {
+                            title: "Down",
+                            val: false
+                        }]
+                    }, {
+                        name: "createSubnet",
+                        label: "Create Subnet",
+                        type: "switch",
+                        value: false,
+                        defaultValue: false,
+                        placeholder: "",
+                        show: true,
+                        required: false
+                    }, {
+                        name: "subnet_name",
+                        label: "Subnet Name",
+                        type: "text",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "createSubnet",
+                            fieldValues: [true]
+                        }
+                    }, {
+                        name: "subnet_address",
+                        label: "Network Address (CIDR)",
+                        type: "text",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "subnet_name",
+                            fieldExists: true
+                        }
+                    }, {
+                        name: "subnet_ipv",
+                        label: "IP Version",
+                        type: "dropdown",
+                        value: "ipv4",
+                        defaultValue: "ipv4",
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        options: [{
+                            title: "IPv4",
+                            val: "ipv4"
+                        }, {
+                            title: "IPv6",
+                            val: "ipv6"
+                        }],
+                        showIf: {
+                            fieldName: "subnet_address",
+                            fieldExists: true
+                        }
+                    }, {
+                        name: "subnet_gatewayIp",
+                        label: "Gateway IP",
+                        type: "text",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "subnet_address",
+                            fieldExists: true
+                        }
+                    }, {
+                        name: "subnet_disableGateway",
+                        label: "Disable Gateway",
+                        type: "checkbox",
+                        value: false,
+                        defaultValue: false,
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "subnet_address",
+                            fieldExists: true
+                        }
+                    }, {
+                        name: "subnet_enableDHCP",
+                        label: "Enable DHCP",
+                        type: "checkbox",
+                        value: false,
+                        defaultValue: false,
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "subnet_address",
+                            fieldExists: true
+                        }
+                    }, {
+                        name: "subnet_createRouter",
+                        label: "Create Router",
+                        type: "checkbox",
+                        value: false,
+                        defaultValue: false,
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "subnet_address",
+                            fieldExists: true
+                        }
+                    }, {
+                        name: "subnet_routerName",
+                        label: "Router Name",
+                        type: "text",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "subnet_createRouter",
+                            fieldValues: [true]
+                        }
+                    }, {
+                        name: "network_routerPublicGateway",
+                        label: "Set Public Gateway",
+                        type: "checkbox",
+                        value: true,
+                        defaultValue: true,
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "subnet_createRouter",
+                            fieldValues: [true]
+                        }
+                    }, {
+                        name: "subnet_allocationPools",
+                        label: "Allocation Pools",
+                        type: "textarea",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        show: false,
+                        required: false,
+                        showIf: {
+                            fieldName: "subnet_address",
+                            fieldExists: true
+                        }
+                    }],
+                    notify: true
+                },
+                clouds: {
+                    type: Array
+                },
+                openstackClouds: {
+                    type: Array,
+                    computed: '_computeOpenstackClouds(clouds.*)'
+                },
+                hasOpenstackClouds: {
+                    type: Boolean,
+                    computed: '_computeHasOpenstackClouds(openstackClouds)'
+                },
+                sendingData: {
+                    type: Boolean,
+                    value: false
+                },
+                formReady: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+            observers: [
+                '_fieldsChanged(fields.*, sendingData)',
+                '_cloudsChanged(openstackClouds.*)'
+            ],
+            _getHeaderStyle: function(section) {
+                return 'background-color: ' + section.color + '; color: #fff;';
+            },
+            _computeOpenstackClouds: function(clouds) {
+                return this.clouds.filter(function(cloud) {
+                    return cloud.enabled && cloud.provider == 'openstack';
+                });
+            },
+            _computeHasOpenstackClouds: function(openstackClouds) {
+                return openstackClouds.length > 0;
+            },
+            _computeFieldType: function(field, value, show) {
+                if (!(field.showIf && !field.show)) {
+                    return field.type == value;
+                }
+            },
+            _fieldsChanged: function(fields, sendingData) {
+                var network = this.network,
+                    show = true,
+                    dependency;
+
+                fields.base.forEach(function(el, index) {
+                    this.set('network.' + el.name, el.value);
+
+                    if (el.showIf) {
+                        if (el.showIf.fieldExists) {
+                            dependency = network[el.showIf.fieldName],
+                                show = dependency;
+                            this.set('fields.' + index + '.show', show);
+                        } else {
+                            dependency = network[el.showIf.fieldName],
+                                show = el.showIf.fieldValues.indexOf(dependency) != -1;
+                            this.set('fields.' + index + '.show', show);
+                        }
+
+                        if (!show) {
+                            this._resetField(el, index);
+                        }
+                    }
+                }, this);
+
+                var valid = fields.base.every(function(el, index) {
+                    return el.show && el.required ? el.value != '' : true;
+                }, this);
+
+                this.set('network', network);
+
+                this.set('formReady', valid && !sendingData);
+            },
+            _cloudsChanged: function(clouds) {
+                var index = this.fields.findIndex(function(field) {
+                    return field.name == "cloud";
+                }, this);
+
+                var options = clouds.base.map(function(cloud) {
+                    var obj = {};
+                    obj['title'] = cloud.title;
+                    obj['val'] = cloud;
+                    return obj;
+                }, this);
+
+                this.set('fields.' + index + '.options', options);
+                this.set('fields.' + index + '.value', '');
+            },
+            _submitForm: function() {
+                console.log(this.network);
+                var payload = {},
+                    network = this.network;
+                payload.network = {};
+                payload.network.cloud = network.cloud;
+                payload.network.name = network.name;
+                payload.network.admin_state_up = network.adminStateUp;
+
+                // Construct subnet params
+                if (network.createSubnet) {
+
+                    payload.subnet = {};
+                    if (network.subnet_name !== null) {
+                        payload.subnet.name = network.subnet_name;
+                    }
+
+                    if (network.subnet_ipv !== null) {
+                        payload.subnet.ip_version = network.subnet_ipv.charAt(3);
+                    }
+
+                    if (network.subnet_address) {
+                        payload.subnet.cidr = network.subnet_address;
+                    }
+
+                    if (!network.subnet_disableGateway) {
+                        payload.subnet.gateway_ip = network.subnet_gatewayIp;
+                    }
+
+                    payload.subnet.enable_dhcp = network.subnet_enableDHCP;
+
+                    if (network.subnet_allocationPools) {
+                        payload.subnet.allocation_pools = network.subnet_allocationPools
+                            .split('\n')
+                            .map(function(pool) {
+                                var tuple = pool.split(',');
+                                if (tuple.length == 2)
+                                    return {
+                                        start: tuple[0].trim(),
+                                        end: tuple[1].trim()
+                                    };
+                                return {
+                                    start: '',
+                                    end: ''
+                                };
+                            });
+                    }
+
+                    // Construct router params
+                    if (network.subnet_createRouter) {
+                        payload.subnet.router = {};
+
+                        if (network.subnet_routerNname) {
+                            payload.subnet.router.name = network.subnet_routerNname;
+                        }
+
+                        payload.subnet.router.publicGateway = network.network_routerPublicGateway;
+                    }
+                }
+
+                console.log(payload);
+                this.$.addNetworkRequest.body = payload;
+                this.$.addNetworkRequest.headers["Content-Type"] = 'application/json';
+                this.$.addNetworkRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                this.$.addNetworkRequest.generateRequest();
+            },
+            _handleAddNetworkResponse: function(e) {
+                console.log(e);
+                this.set('sendingData', false);
+
+                // this.fire('addNetwork', {
+                //     network: {}
+                // });
+            },
+            _resetForm: function(e) {
+                // Reset network
+                this.set('network.name', '');
+                this.set('network.cloud', '');
+                this.set('network.adminStateUp', '');
+                this.set('network.createSubnet', '');
+                this.set('network.subnet_name', '');
+                this.set('network.subnet_address', '');
+                this.set('network.subnet_ipv', '');
+                this.set('network.subnet_gatewayIp', '');
+                this.set('network.subnet_disableGateway', '');
+                this.set('network.subnet_enableDHCP', '');
+                this.set('network.subnet_createRouter', '');
+                this.set('network.subnet_routerNname', '');
+                this.set('network.network_routerPublicGateway', '');
+                this.set('network.subnet_allocationPools', '');
+
+                // Reset Form Fields
+                this.fields.forEach(function(el, index) {
+                    if (el.showIf) {
+                        this.set('fields.' + index + '.show', false);
+                    }
+
+                    // Reset Form Fields Validation
+                    this._resetField(el, index);
+                }, this);
+            },
+            _resetField: function(el, index) {
+                this.set('fields.' + index + '.value', el.defaultValue);
+
+                var input = this.querySelector('#' + el.name);
+                if (input) {
+                    input.invalid = false;
+                }
+            },
+            _goBack: function() {
+                history.back();
+            }
+        });
+    })();
+    </script>
+</dom-module>

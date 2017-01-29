@@ -1,5 +1,4 @@
-define('app/controllers/images',
-    [
+define('app/controllers/images', [
         'app/controllers/base_array',
         'app/models/image'
     ],
@@ -8,7 +7,7 @@ define('app/controllers/images',
     //
     //  @returns Class
     //
-    function (BaseArrayController, ImageModel) {
+    function(BaseArrayController, ImageModel) {
 
         'use strict';
 
@@ -26,7 +25,7 @@ define('app/controllers/images',
             //  Computed Properties
             //
 
-            hasStarred: function () {
+            hasStarred: function() {
                 return !!this.model.findBy('star', true);
             }.property('[].star'),
 
@@ -35,53 +34,59 @@ define('app/controllers/images',
             //  Methods
             //
 
-            searchImages: function (filter, callback) {
+            searchImages: function(filter, callback) {
                 var that = this;
-                Mist.ajax.POST('/clouds/' + this.cloud.id + '/images', {
-                    'search_term': filter
-                }).error(function () {
-                    Mist.notificationController.notify(
-                        'Failed to search images on ' + that.cloud.title);
-                }).complete(function (success, images) {
-                    var imagesToReturn = [];
-                    if (success) {
-                        images.forEach(function (image) {
-                            image.cloud = that.cloud;
-                            imagesToReturn.push(ImageModel.create(image));
-                        });
-                    }
-                    if (callback) callback(success, imagesToReturn);
-                });
+                Mist.ajax
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/images', {
+                        'search_term': filter
+                    })
+                    .error(function() {
+                        Mist.notificationController.notify(
+                            'Failed to search images on ' + that.cloud.title);
+                    })
+                    .complete(function(success, images) {
+                        var imagesToReturn = [];
+                        if (success) {
+                            images.forEach(function(image) {
+                                image.cloud = that.cloud;
+                                imagesToReturn.push(ImageModel.create(image));
+                            });
+                        }
+                        if (callback) callback(success, imagesToReturn);
+                    });
             },
 
-            toggleImageStar: function (image, callback) {
+            toggleImageStar: function(image, callback) {
                 var that = this;
-                Mist.ajax.POST('/clouds/' + this.cloud.id + '/images/' + image.id, {
-                }).success(function (star) {
-                    if (!that.objectExists(image.id))
-                        that._addObject(image);
-                    that._toggleImageStar(image, star);
-                }).error(function () {
-                    Mist.notificationController.notify('Failed to (un)star image');
-                }).complete(function (success, star) {
-                    if (callback) callback(success, star);
-                });
+                Mist.ajax
+                    .POST('/api/v1/clouds/' + this.cloud.id + '/images/' + image.id, {})
+                    .success(function(star) {
+                        if (!that.objectExists(image.id))
+                            that._addObject(image);
+                        that._toggleImageStar(image, star);
+                    })
+                    .error(function(err) {
+                        Mist.notificationController.notify(err);
+                    })
+                    .complete(function(success, star) {
+                        if (callback) callback(success, star);
+                    });
             },
 
-            getImageOS: function (imageId) {
+            getImageOS: function(imageId) {
                 // TODO (gtsop): Move this into a computed
                 // property on image model
                 var os = 'generic';
                 var image = this.getObject(imageId);
 
-                if(!image)
+                if (!image)
                     var imageTitle = imageId;
                 else
                     var imageTitle = image.name;
 
-                OS_MAP.some(function (pair) {
-                    return pair[0].some(function (key) {
-                        if (imageTitle.toLowerCase().indexOf(key) > -1){
+                OS_MAP.some(function(pair) {
+                    return pair[0].some(function(key) {
+                        if (imageTitle.toLowerCase().indexOf(key) > -1) {
                             os = pair[1];
                             return true;
                         }
@@ -96,8 +101,8 @@ define('app/controllers/images',
             //  Pseudo-Private Methods
             //
 
-            _toggleImageStar: function (image, star) {
-                Ember.run(this, function () {
+            _toggleImageStar: function(image, star) {
+                Ember.run(this, function() {
                     image.set('star', star);
                     this.trigger('onStarToggle', {
                         object: image,

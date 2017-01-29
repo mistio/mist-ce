@@ -1,0 +1,484 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../helpers/dialog-element.html">
+<link rel="import" href="../tags/tags-list.html">
+
+<link rel="import" href="key-edit.html">
+
+<dom-module id="key-page">
+    <template>
+        <style is="custom-style" include="single-page"></style>
+        <style is="custom-style" include="tags-and-labels"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                display: block;
+                padding: 24px;
+            }
+
+            paper-menu-button paper-button {
+                display: block;
+            }
+
+            a.machine {
+                color: var(--mist-blue) !important;
+            }
+
+            .machine-info {
+                font-size: 0.9rem;
+                color: rgba(0, 0, 0, 0.54);
+            }
+
+            [size=xs] > * {
+                display: none;
+            }
+
+            [size=xs] app-sidebar {
+                min-width: 100%;
+                height: auto;
+            }
+
+            iron-icon.bottom {
+                padding-right: 8px;
+            }
+
+            #keyPublicContainer textarea,
+            #keyPrivateContainer textarea {
+                height: 120px;
+                overflow: auto;
+                font-family: monospace;
+                width: 100%;
+                font-size: 14px;
+                line-height: 1.4em;
+                padding: 10px 15px;
+                box-sizing: border-box;
+                background-color: #f8f8f8;
+                border-color: #eeedeb;
+                color: rgba(0, 0, 0, 0.54);
+                white-space: normal;
+                text-align: left;
+            }
+
+            #keyPublicContainer textarea {
+                height: 120px;
+            }
+
+            #keyPrivateContainer {
+                text-align: center;
+            }
+
+            #keyPrivateContainer textarea {
+                height: 440px;
+            }
+
+            #keyPrivateContainer #showPrivateKeybtn {
+                margin: 20px 0;
+            }
+
+            paper-button.right {
+                text-align: right;
+            }
+
+            paper-button.link,
+            paper-button.link iron-icon {
+                background-color: transparent !important;
+                color: var(--mist-blue) !important;
+            }
+
+            .head {
+                @apply(--layout-horizontal);
+                align-items: center;
+            }
+
+            h4.key {
+                @apply(--layout-flex);
+                text-transform: uppercase;
+                font-size: 0.9rem;
+                font-weight: 700;
+            }
+
+            h4.id {
+                display: inline-block;
+                text-transform: uppercase;
+                font-size: 0.9rem;
+                font-weight: 700;
+                margin-right: 16px;
+            }
+            /* TODO: better */
+            h4.id.tags {
+                padding-left: 36px;
+            }
+
+            .tag {
+                padding: 0.5em;
+                display: inline-block;
+                vertical-align: middle;
+            }
+            /**/
+            .head paper-button {
+                flex: none !important;
+                display: inline-block;
+            }
+
+            paper-button.right,
+            #showPrivateKeybtn {
+                font-size: 0.9rem;
+            }
+
+            #showPrivateKeybtn {
+                padding-left: 16px;
+                padding-right: 16px;
+                font-weight: 500;
+            }
+
+            #showPrivateKeybtn iron-icon {
+                color: #fff !important;
+                width: 20px;
+                height: 20px;
+            }
+
+            ul {
+                padding: 0;
+            }
+
+            ul li {
+                list-style: none;
+            }
+
+            .wide {
+                display: none;
+            }
+
+            .machines-list iron-icon {
+                opacity: 0.32;
+            }
+
+            @media (min-width: 1339px) {
+                .wide {
+                    display: inline;
+                }
+            }
+        </style>
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        [[key.name]] <iron-icon icon="star" hidden$="[[!isDefault]]"></iron-icon>
+                    </h2>
+                    <div class="subtitle">
+                        <span hidden$="[[keyHasMachines]]">
+                            No machines are using this key
+                        </span>
+                        <span hidden$="[[!keyHasMachines]]">
+                            [[keyMachines.length]] machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s</span> associated with this key
+                        </span>
+                    </div>
+
+                </div>
+                <div class="item-actions">
+                    <paper-button on-tap="_makeDefaultKey" hidden$="[[isDefault]]" class="simple">make default</paper-button>
+                    <paper-button on-tap="_editTags" class="simple">tags</paper-button>
+                    <paper-button on-tap="_deleteKey" class="simple">delete
+                        <iron-icon icon="delete"></iron-icon>
+                    </paper-button>
+                </div>
+            </paper-material>
+
+            <div class="key-info">
+                <!-- <paper-material></paper-material> -->
+                <paper-material>
+                    <h4 class="id">Key ID:</h4><span class="id">[[key.id]]</span>                    
+                    <template is="dom-if" if="[[key.tags]]">
+                        <h4 class="id tags" hidden$="[[!key.tags.length]]">
+                            Tags <span class="id">([[key.tags.length]])</span>:
+                        </h4>
+                        <template is="dom-repeat" items="[[key.tags]]">
+                            <span class="id tag">[[item.key]]<span hidden="[[!item.value]]">=[[item.value]]</span></span>
+                        </template>
+                    </template>
+                </paper-material>
+                <paper-material>
+                    <div class="head">
+                        <h4 class="key">Public Key</h4>
+                        <paper-button hidden$="[[!publicKey]]" on-tap="copyPublicKey" class="right link">Copy <span class="wide">public key</span>
+                            <iron-icon icon="content-copy"></iron-icon>
+                        </paper-button>
+                    </div>
+                    <div id="keyPublicContainer">
+                        <textarea id="keyPublic">
+                            [[publicKey]]
+                        </textarea>
+                    </div>
+                </paper-material>
+                <paper-material>
+                    <div class="head">
+                        <h4 class="key">Private Key</h4>
+                        <paper-button hidden$="[[!visiblePrivateKey]]" id="hidePrivateKeybtn" on-tap="hidePrivateKey" class="right link">Hide <span class="wide">Private Key</span>
+                            <iron-icon icon="icons:visibility-off"></iron-icon>
+                        </paper-button>
+                        <paper-button hidden$="[[!visiblePrivateKey]]" on-tap="copyPrivateKey" class="right link">Copy <span class="wide">private key</span>
+                            <iron-icon icon="content-copy"></iron-icon>
+                        </paper-button>
+                    </div>
+                    <div id="keyPrivateContainer">
+                        <paper-button hidden$="[[visiblePrivateKey]]" id="showPrivateKeybtn" on-tap="showPrivateKey">
+                            <iron-icon icon="icons:visibility"></iron-icon> View Private Key</paper-button>
+                        <textarea hidden$="[[!visiblePrivateKey]]" id="keyPrivate">
+                        [[privateKey]]
+                        </textarea>
+                    </div>
+                </paper-material>
+                <br/>
+                <paper-material class="machines-list" hidden$="[[!keyHasMachines]]">
+                    <h4 class="key">Machine<span hidden$="[[!keyHasMachinesMoreThanOne]]">s <span>([[keyMachines.length]])</span></span> associated with this key</h4>
+                    <ul>
+                        <template is="dom-repeat" items="[[key.machines]]" as="machine">
+                            <li>
+                                <iron-icon icon='hardware:laptop'></iron-icon> <a href="[[getMachineUrl(machine)]]" class="machine">[[getMachineName(machine)]]</a>
+                                <span class="machine-info">
+                                    <span hidden="[[!machine.1]]">: id: [[machine.1]], </span>
+                                <span hidden="[[!machine.3]]">image: [[machine.3]]</span>
+                                </span>
+                            </li>
+                        </template>
+                    </ul>
+                </paper-material>
+            </div>
+        </div>
+        <template is="dom-if" if="{{key.id}}">
+            <iron-ajax auto id="keyPublicRequest" url="{{baseUrl}}/public" on-response="handlePublicResponse" on-error="handleError"></iron-ajax>
+        </template>
+        <template is="dom-if" if="{{key.id}}">
+            <iron-ajax auto id="keyPrivateRequest" url="{{baseUrl}}/private" on-response="handlePrivateResponse" on-error="handleError"></iron-ajax>
+        </template>
+        <iron-ajax id="keyMakeDefaultAjaxRequest" url="/api/v1/keys/[[key.id]]" method="POST" on-response="_handleKeyMakeDefaultAjaxResponse" on-error="_handleMakeDefaultAjaxError"></iron-ajax>
+        <iron-ajax id="keyDeleteAjaxRequest" url="/api/v1/keys/[[key.id]]" method="DELETE" on-response="_handleKeyDeleteAjaxResponse" on-error="_handleKeyDeleteAjaxError"></iron-ajax>
+        <key-edit key="[[key]]"></key-edit>
+        <dialog-element></dialog-element>
+        <paper-toast></paper-toast>
+        <tags-list resource="key"></tags-list>
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'key-page',
+
+                properties: {
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    model: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    params: {
+                        type: Object,
+                        notify: true
+                    },
+                    key: {
+                        type: Object,
+                        computed: '_computeKey(params, model.keysArray.*)'
+                    },
+                    id: {
+                        type: String,
+                        computed: '_computeId(params)',
+                        notify: true
+                    },
+                    isDefault: {
+                        type: String,
+                        computed: '_computeIsDefault(key.isDefault)'
+                    },
+                    publicKey: {
+                        type: String,
+                        value: null
+                    },
+                    privateKey: {
+                        type: String,
+                        value: null
+                    },
+                    keyMachines: {
+                        type: Array,
+                        computed: '_computeKeyMachines(key)'
+                    },
+                    keyHasMachines: {
+                        type: Boolean,
+                        computed: '_keyHasMachines(keyMachines)'
+                    },
+                    keyHasMachinesMoreThanOne: {
+                        type: Boolean,
+                        computed: '_keyHasMachinesMoreThanOne(keyMachines)'
+                    },
+                    visiblePrivateKey: {
+                        type: Boolean,
+                        value: false
+                    },
+                    baseUrl: {
+                        type: String,
+                        computed: '_baseUrl(params)',
+                        notify: true
+                    }
+                },
+                observers: [
+                    'update(params, model.keys.*)'
+                ],
+                listeners: {
+                    'confirmation': '_deleteKeyEventResponse',
+                    'updateSelectedKey': '_updateKey',
+                    'paramsChanged': 'update'
+                },
+                update: function(params) {
+                    if (this.$.keyPublicRequest) {
+                        this.$.keyPublicRequest.generateRequest();
+                    }
+                    this.visiblePrivateKey = false;
+                    this.set('privateKey', null);
+                },
+                _baseUrl: function(params) {
+                    return '/keys/' + this.params.id;
+                },
+                _getHeaderStyle: function(section) {
+                    return 'background-color: ' + section.color + '; color: #fff;';
+                },
+                _computeKey: function(params, keys) {
+                    return keys.base.find(function(key) {
+                        return key.id == params.id;
+                    });
+                },
+                _computeId: function(params) {
+                    return params.id;
+                },
+                _computeKeyMachines: function(key) {
+                    return key.machines;
+                },
+                _keyHasMachines: function(keyMachines) {
+                    return keyMachines.length > 0 ? true : false;
+                },
+                _keyHasMachinesMoreThanOne: function(keyMachines) {
+                    return keyMachines.length > 1 ? true : false;
+                },
+                getMachineUrl: function(keymachine) {
+                    var url;
+                    var machine = this.model.machinesArray.find(function(machine) {
+                        return machine.id == keymachine[1];
+                    });
+                    url = machine ? "/machines/" + machine.uuid : '';
+                    return url;
+                },
+                getMachineName: function(keymachine) {
+                    var name;
+                    var machine = this.model.machinesArray.find(function(machine) {
+                        return machine.id == keymachine[1];
+                    });
+                    name = machine ? machine.name : 'missing';
+                    return name;
+                },
+                _computeIsDefault: function(isDefault) {
+                    return isDefault;
+                },
+                copyPublicKey: function() {
+                    this.$.keyPublic.select();
+                    document.execCommand('copy');
+                    this._showToast('The Public Key was copied to clipboard!');
+                },
+                copyPrivateKey: function() {
+                    this.$.keyPrivate.select();
+                    document.execCommand('copy');
+                    this._showToast('The Private Key was copied to clipboard!');
+                },
+                handlePublicResponse: function(data) {
+                    this.publicKey = data.detail.response;
+                },
+                showPrivateKey: function() {
+                    // this.$.keyPrivateRequest.generateRequest();
+                    this.visiblePrivateKey = true;
+                },
+                hidePrivateKey: function() {
+                    // this.$.keyPrivateRequest.generateRequest();
+                    this.visiblePrivateKey = false;
+                },
+                handlePrivateResponse: function(data) {
+                    this.privateKey = data.detail.response;
+                },
+                _editKey: function(e) {
+                    var el = this.querySelector('key-edit');
+                    el._openEditKeyModal();
+                },
+                _updateKey: function(e) {
+                    var key = e.detail.key;
+                    this.set('key.id', key.id);
+                },
+                _makeDefaultKey: function(e) {
+                    this.$.keyMakeDefaultAjaxRequest.headers["Content-Type"] = 'application/json';
+                    this.$.keyMakeDefaultAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                    this.$.keyMakeDefaultAjaxRequest.body = {};
+                    this.$.keyMakeDefaultAjaxRequest.generateRequest();
+                },
+                _handleKeyMakeDefaultAjaxResponse: function(e) {
+                    this._showToast(this.key.name + ' has become your default Key!');
+                },
+                _editTags: function() {
+                    var el = this.querySelector('tags-list'),
+                    items = [];
+                    items.push(this.key);
+                    el.items = items;
+                    el._openDialog();
+                },
+                _deleteKey: function(e) {
+                    this._showDialog({
+                        title: 'Delete Key?',
+                        body: "Deleting a key can not be undone. You are about to delete key '" + this.key.name + "'.",
+                        danger: true,
+                        reason: "key.delete"
+                    });
+                },
+                _deleteKeyEventResponse: function(e) {
+                    var reason = e.detail.reason,
+                        response = e.detail.response;
+
+                    if (response.confirmed && reason == "key.delete") {
+                        this.$.keyDeleteAjaxRequest.body = {};
+                        this.$.keyDeleteAjaxRequest.headers["Content-Type"] = 'application/json';
+                        this.$.keyDeleteAjaxRequest.headers["Csrf-Token"] = CSRF_TOKEN;
+                        this.$.keyDeleteAjaxRequest.generateRequest();
+                    }
+                },
+                _handleKeyDeleteAjaxResponse: function(e) {
+                    page.show('/keys');
+                },
+                _showDialog: function(info) {
+                    var dialog = this.querySelector('dialog-element');
+                    for (var i in info) {
+                        dialog[i] = info[i];
+                    }
+                    dialog._openDialog();
+                },
+                _showToast: function(msg) {
+                    var toast = this.querySelector('paper-toast');
+                    toast.text = msg;
+                    toast.show();
+                    var newnot = {};
+                    newnot["text"] = msg;
+                    newnot["type"] = 'green';
+                    document.querySelector("notifications-element").notifications.push(newnot);
+                },
+                _goBack: function() {
+                    history.back();
+                }
+            });
+        })();
+    </script>
+</dom-module>

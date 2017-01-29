@@ -1,0 +1,313 @@
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<dom-module id="rule-identifier">
+	<template>
+		<style is="custom-style" include="tags-and-labels"></style>
+        <style is="custom-style" include="shared-styles">
+        :host {
+        	display: inline-block;
+        }
+        paper-dropdown-menu {
+            width: 150px;
+            --paper-dropdown-menu-input: {
+                text-transform: uppercase;
+            }
+            --paper-input-container-underline: {
+                /*display: none;*/
+                opacity: 0.32;
+            };
+        }
+        paper-dropdown-menu ::content div.floated-label-placeholder {
+            margin-top: -12px;
+        }
+        paper-dropdown-menu.short {
+            /*width: 80px;*/
+            margin-right: 16px;
+        }
+        paper-input ::content div.floated-label-placeholder{
+            display: none;
+        }
+        paper-input {
+            vertical-align: baseline;
+        }
+        paper-input ::content paper-input-container {
+            padding: 0;
+        }
+        .flex {
+            display: inline-flex;
+        }
+        .tag {
+        	display: inline-block;
+        	vertical-align: middle;
+        }
+        paper-input {
+        	width: 150px;
+        	--paper-input-container-underline {
+        		opacity: 0.32;
+        	}
+        }
+        .tag iron-icon {
+        	color: #fff;
+        	width: 13px;
+        	height: 13px;
+        	cursor: pointer;
+        }
+        iron-icon.edit {
+        	color: inherit;
+        	padding: 8px;
+        	opacity: 0.32
+        }
+        iron-icon
+        </style>
+        <paper-dropdown-menu class="short" no-animations>
+        	<paper-listbox class="dropdown-content" selected="[[selectedIndetifierType]]">
+        		<paper-item class="indettype" value="always">ALWAYS</paper-item>
+                <paper-item class="indettype" value="ID" hidden$="[[!rtype.length]]">WHERE ID</paper-item>
+                <paper-item class="indettype" value="TAGS">WHERE TAGS</paper-item>
+          	</paper-listbox>
+        </paper-dropdown-menu>
+
+        <span hidden$="[[!showTags]]">
+            <template is="dom-repeat" items="[[tags]]" as="tag">
+            	<span class="tag" class="flex" hidden$="[[showEdit]]">[[tag]] <iron-icon id$="tag-[[index]]" icon="close" on-tap="_deleteTag"></iron-icon></span>
+            </template>
+        </span>
+        <span hidden$="[[!showDropDown]]">
+            <paper-dropdown-menu no-animations hidden$="[[showTags]]">>
+                <paper-listbox class="dropdown-content" selected="[[selectedResource]]" >
+                    <template is="dom-repeat" items="[[resourceDropDown]]" as="resource">
+                        <paper-item class="rid" value="[[resource.id]]">[[resource.title]] [[resource.name]]</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+        </span>
+        <span hidden$="[[!showTags]]">
+	        <paper-input id="inputField" class="flex" value$="{{tagString::input}}" hidden$="[[!showEdit]]" on-blur="_updateTags"></paper-input>
+	        <iron-icon class="edit" icon="editor:mode-edit" on-tap="_toggleShowEdit"></iron-icon>
+        </span>
+    </template>
+ </dom-module>
+ <script>
+ 	(function() {
+        'use strict';
+
+        Polymer({
+            is: 'rule-identifier',
+            properties: {
+            	model: Object,
+            	rule: {
+            		type: Object,
+            		notify: true
+            	},
+            	index: Number,
+            	rtype: String,
+            	rtags: Object,
+            	selectedIndetifierType: {
+            		type: Number,
+            		computed: "_computeSelectedIdentifierType(rule)"
+            	},
+            	resourceDropDown: {
+            		type: Array,
+            		computed: "_computeRuleDD(rule, rtype, model)"
+            	},
+            	selectedResource: {
+            		type: Number,
+            		computed: "_computeSelectedRuleDD(rule, model)"
+            	},
+            	showDropDown: {
+            		type: Boolean,
+            		value: false
+            	},
+            	showTags: {
+            		type: Boolean,
+            		value: false
+            	},
+            	ruleHasTags: {
+            		type: Boolean,
+            		value: false,
+            		computed: "_ruleHasTags(rule, rtags)"
+            	},
+            	showEdit: {
+            		type: Boolean,
+            		value: false
+            	},
+            	tagString: {
+            		type: String,
+            		computed: "_computeTagString(rule, rule.rtags)"
+            	},
+            	tags: {
+            		type: Array,
+            		computed: '_computeRTags(rule.rtags, rtags)'
+            	}
+            },
+            listeners: {
+            	'iron-select': '_updateIdentifier',
+            	keyup: 'hotkeys'
+            },
+            ready: function(){
+
+            },
+            _computeTagString: function(rule, rtags){
+            	return this._computeRTags(rtags).join(', ');
+            },
+            _updateIdentifier: function(e){
+                // case of changing indettype 
+                if (e.detail.item.attributes.class.nodeValue.indexOf('indettype') > -1){
+                	console.log(e.detail);
+                    var indettype = e.detail.item.attributes.value.value.toLowerCase();
+                    if (indettype == 'tags') {
+                        this.set('showDropDown', false);
+                        this.set('showTags', true);
+                    	// this.fire('update-rid', {'index': this.index, 'rid': ''});
+                    }
+                    else if (indettype == 'id'){
+                        var id = this.rule.rid;
+                     	this.set('showDropDown', true); 
+                     	this.set('showTags', false);
+                        // this.fire('update-rtags', {'index': this.index, 'rtags': {}});
+                    }
+                    else {
+                    	this.set('showDropDown', false);
+                        this.set('showTags', false);
+                    	this.fire('update-rid', {'index': this.index, 'rid': ''});
+                    	this.fire('update-rtags', {'index': this.index, 'rtags': {}});
+                    }
+                    
+                }
+                // case of choοsing rid                 
+                if (e.detail.item.attributes.class.nodeValue.indexOf('rid') > -1){
+                    var rid = e.detail.item.value;
+                    // only in case of machines we need uuid instead
+                    if (this.rtype == 'machine'){
+                    	var mach = this.model.machinesArray.find(function(m){
+                    		return m.id == rid;
+                    	})
+                    	rid = mach.uuid;
+                    }
+                    this.fire('update-rid', {'index': this.index, 'rid': rid});
+                }
+            },
+            _ruleHasTags: function(rule, tags){
+            	if (Object.keys(rule.rtags).length > 0)
+            		this.showTags = true;
+            	return Object.keys(rule.rtags).length > 0 ? true : false;
+            },
+            _ruleHasId: function(rule){
+                return rule.rid.length > 0 ? true : false;
+            },
+            _computeRTags: function(tags, rtags){
+            	if (tags) {
+	            	var arrTags = Object.keys(tags); 
+	                for (var i=0; i < arrTags.length; i++) {
+	                	var t = arrTags[i];
+	                	if (tags[t] != null) {
+	                		arrTags[i] = arrTags[i]+'='+tags[t];
+	                	}
+	                }
+	                return arrTags;
+            	}
+            	else {
+            		return []
+            	}
+            },
+            _computeLink: function(type, id){
+            	if (type && id && type != "cloud") {
+            		return false;
+            	}
+            	else if (type == "cloud" && id){
+            		return this.model.clouds[id].title;
+            	}
+                else if (type == "cloud" && !id){
+                    return 'all clouds';
+                }
+            },
+            _computeResourceName: function(type, id){
+                if (type && id) {                    
+                    var mod =  this.model[type+'s'];
+                    return mod[id].name;
+                }
+            },
+            _computeSelectedIdentifierType: function(rule){
+                if (rule.rid.length > 0) {
+                    return 1;
+                }
+                else {
+                    return Object.keys(this.rule.rtags).length > 0 ? 2 : 0;
+                }
+            },
+            _computeRuleDD: function(rule, rtype, model){
+                if (rtype && rtype!='' && this.model[rtype+'sArray'] && this.model[rtype+'sArray'].length > 0) {
+                    return this.model[rtype+'sArray'];
+                }
+                else {
+                    return [{name:'no '+rtype+'s found'}];
+                }
+            },
+            _computeRuleCombo: function(rtype){
+                if (rtype && this.model[rtype+'sArray'].length > 0) {
+                    var ar = [];
+                    for (var i=0; i<this.model[rtype+'sArray'].length; i++){
+                        var name = this.model[rtype+'sArray'][i].title ? this.model[rtype+'sArray'][i].title : this.model[rtype+'sArray'][i].name;
+                        ar.push(name);
+                    }
+                    return ar;
+                }
+                else {
+                    return [{name:'no '+rtype+'s found'}];
+                }
+            },
+            _computeSelectedRuleDD: function(rule, model){
+                if (rule.rid && rule.rid.length > 0){
+                    var i;
+                    var obj = this.model[rule.rtype+'sArray'].find(function(r, index){
+                        i = index;
+                        console.log('_computeSelectedRuleDD',rule.rid, i)
+                        if (rule.rtype != 'machine'){
+                        	return r.id == rule.rid;
+                        }
+                        else{
+                        	return r.uuid == rule.rid;
+                        }
+                    });
+                    return i;
+                }
+                else {
+                    return null;
+                }
+            },
+            _toggleShowEdit: function(){
+            	this.set('showEdit', !this.showEdit);
+            },
+            _updateTags: function(){          	
+            	var tagArr = this.$.inputField.value.split(',');
+            	var newRtags = {};
+            	tagArr.forEach(function(t){
+            		var k = t.split("=")[0].replace(' ','').trim();
+            		if (k !='') {
+	            		var v = t.split("=")[1] ? t.split("=")[1].trim() : null;
+	            		newRtags[k] = v;
+	            	}
+            	}, this);
+            	console.log('newRtags',newRtags);
+            	this.fire('update-rtags', {'index': this.index, 'rtags': newRtags});
+            },
+            _deleteTag: function(e){
+            	var tag = e.detail.sourceEvent.path[1].textContent.split('=')[0].trim();
+            	var index = e.detail.sourceEvent.path[0].id.split('-')[1];
+            	this.fire('delete-rtag', {'index': this.index, 'tag': tag});
+            },
+            hotkeys: function(e){
+            	// if 'enter'
+            	if (e.keyCode === 13){
+
+            		console.log("enetr", Polymer.dom(e).rootTarget)
+            	}
+            	if (e.keyCode === 13 && Polymer.dom(e).rootTarget === this.$.input) {
+            		this._updateTags();
+            	}
+            }
+        });
+    })();
+ </script>

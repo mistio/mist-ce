@@ -6,6 +6,7 @@ behaving==1.4.1
 celery==3.1.17
 gevent==1.0.2
 gevent-subprocess==0.1.1
+mongoengine==0.10.5
 netaddr==0.7.18
 paramiko==1.16.0
 PasteDeploy==1.5.2

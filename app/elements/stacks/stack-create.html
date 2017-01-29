@@ -1,0 +1,334 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+
+<link rel="import" href="../app-form/app-form.html">
+<dom-module id="stack-create">
+    <template>
+        <style is="custom-style" include="forms"></style>
+        <style is="custom-style" include="single-page"></style>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+
+            paper-material {
+                display: block;
+                padding: 24px;
+            }
+
+            #content {
+                max-width: 900px;
+            }
+
+            paper-progress {
+                position: absolute;
+                bottom: 87px;
+                width: 100%;
+                left: 0;
+                right: 0;
+            }
+
+            :host >::content paper-input-container {
+                padding-top: 16px;
+                padding-bottom: 16px;
+            }
+
+            paper-item.lead {
+                font-size: 2em;
+            }
+
+            paper-toggle-button[disabled]::content {
+                color: rgba(0, 0, 0, 0.32);
+            }
+
+            paper-toggle-button::content paper-input-container input {
+                color: color: rgba(0, 0, 0, 0.54);
+            }
+
+            .spacer {
+                display: block;
+                height: 24px;
+                width: 100%;
+            }
+
+            .bottom-actions {
+                padding-left: 20px;
+            }
+
+            *:not(paper-button)[disabled] {
+                display: none;
+            }
+
+            paper-radio-group {
+                padding: 16px 8px;
+            }
+        </style>
+
+
+        <div id="content">
+            <paper-material class="single-head layout horizontal" style$="background-color: [[section.color]]">
+                <span class="icon"><iron-icon icon="[[section.icon]]"></iron-icon></span>
+                <div class="title flex">
+                    <h2>
+                        Create Stack
+                    </h2>
+                    <div class="subtitle">
+                        from [[template.name]]
+                        <a href$="/templates/[[template.id]]">
+                            <iron-icon icon="icons:link"></iron-icon>
+                        </a>
+                        <span class="desc" hidden$="[[!template.description]]">([[template.description]])</span>
+                    </div>
+                </div>
+            </paper-material>
+            <paper-material>
+                <app-form model=[[model]] fields="[[fields]]" templateid="[[template.id]]" workflow="install" url="/api/v1/stacks" on-request="_handleRequest" on-response="_handleResponse" on-error="_handleError" btncontent="create stack"></app-form>
+            </paper-material>
+        </div>
+
+
+    </template>
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'stack-create',
+
+                properties: {
+                    model: {
+                        type: Object
+                    },
+                    sections: {
+                        type: Object
+                    },
+                    section: {
+                        type: Object
+                    },
+                    color: {
+                        type: String,
+                        computed: '_getHeaderStyle(section)'
+                    },
+                    stack: {
+                        type: Object,
+                        value: {}
+                    },
+                    form: {
+                        type: Object,
+                        value: {}
+                    },
+                    params: {
+                        type: Object
+                    },
+                    template: {
+                        type: Object,
+                        value: {},
+                        computed: '_fromTemplate(params, model.templates.*)'
+                    },
+                    fields: {
+                        type: Array
+                    },
+                    keys: {
+                        type: Array,
+                        computed: "_keys(model)"
+                    },
+                    clouds: {
+                        type: Array,
+                        computed: "_clouds(model)"
+                    },
+                    images: {
+                        type: Array,
+                        computed: "_images(model)"
+                    },
+                    uri: {
+                        type: String,
+                        computed: "_uri(model)"
+                    },
+                },
+
+                observers: [
+                    '_computeFields(template, model.templates.*)',
+                ],
+
+                _fromTemplate: function(params, templates) {
+                    if (params.id && this.model.templates) {
+                        return this.model.templates[params.id]
+                    } else {
+                        return {
+                            name: "Template is missing"
+                        }
+                    }
+                },
+
+                _computeFields: function(template) {
+                    var yaml_inputs = '', yaml_array = [];
+                    if (this.template.inputs) {
+                        for (var i = 0; i < this.template.inputs.length; i++) {
+                            if (['mist_uri', 'api_token'].indexOf(this.template.inputs[i].name) == -1) {
+                                yaml_inputs += this.template.inputs[i].name + ': ';
+                                yaml_inputs += this.template.inputs[i].default+'\n';
+
+                                yaml_array[this.template.inputs[i].name] = this.template.inputs[i].default;
+                            }
+                        }
+                    }
+
+                    var ret = [{
+                        name: "name",
+                        label: "Stack Name",
+                        type: "text",
+                        value: "",
+                        isLead: true,
+                        defaultValue: "",
+                        placeholder: "",
+                        errorMessage: "Please enter a name for the stack",
+                        show: true,
+                        required: true
+                    }, {
+                        name: "description",
+                        label: "Stack Description",
+                        type: "textarea",
+                        value: "",
+                        defaultValue: "",
+                        placeholder: "",
+                        helptext: "Choose a usefull description for your stack",
+                        errorMessage: "Please enter stacks's description",
+                        show: true,
+                        required: false
+                    }, {
+                        name: "yaml_or_form",
+                        label: "YAML or form",
+                        type: "radio",
+                        value: "yaml",
+                        defaultValue: "yaml",
+                        helptext: "Choose the way you want to insert inputs",
+                        errorMessage: "Choose an input format",
+                        show: true,
+                        required: true,
+                        options: [{
+                            title: "YAML",
+                            val: "yaml"
+                        }, {
+                            title: "Form",
+                            val: "form"
+                        }]
+                    }, {
+                        name: "stackinputs",
+                        label: "Stack Inputs YAML",
+                        type: "textarea",
+                        value: yaml_inputs,
+                        defaultValue: yaml_inputs,
+                        placeholder: "",
+                        helptext: "Enter the stack inputs in yaml format",
+                        errorMessage: "Please enter stacks's inputs",
+                        show: true,
+                        required: true,
+                        showIf: {
+                            fieldName: "yaml_or_form",
+                            fieldValues: ["yaml"]
+                        }
+                    }];
+
+                    if (template && template.inputs) {
+                        template.inputs.forEach(function(inp) {
+                            inp['showIf'] = {
+                                fieldName: "yaml_or_form",
+                                fieldValues: ["form"]
+                            }
+                            inp['value'] = yaml_array[inp.name];
+                            inp['defaultValue'] = yaml_array[inp.name];
+
+                            // make key dropdown
+                            if(inp.name == "key") {
+                                inp.type = 'dropdown';
+                                inp.query = ["keysArray"];
+                            }
+
+                            // make cloud dropdown
+                            if(inp.name == "cloud_id") {
+                                inp.type = 'dropdown';
+                                inp.query = ["cloudsArray"];
+                            }
+
+                            // make image dropdown & dependent on cloud
+                            if(inp.name == "image_id") {
+                                inp.show = false;
+                                inp.type = 'dropdown';
+                                inp.query = ["clouds","$.cloud_id", "imagesArray"],
+                                inp.andshowIf = {
+                                    fieldName: "cloud_id",
+                                    fieldExists: true
+                                }
+                            }
+
+                            ret.push(inp);
+                        });
+                    }
+
+                    ret.push({
+                        name: "deploy",
+                        label: "Deploy Now",
+                        type: "toggle",
+                        value: true,
+                        defaultValue: true,
+                        placeholder: true,
+                        helptext: "Enable this option to deploy your stack now",
+                        errorMessage: "",
+                        show: true,
+                        required: false
+                    });
+
+                    this.set('fields', ret);
+
+                },
+
+                _handleRequest: function(e) {
+
+                },
+
+                _handleResponse: function(e) {
+                    // console.log('create stack ', e);
+                    var response = YAML.parse(e.detail.xhr.response);
+                    var sid = response.stack.id;
+                    page('/stacks/' + sid);                
+
+                    this.debounce('resetForm', function() {
+                        this._resetForm();
+                    }, 500);
+                },
+
+                _handleError: function(e) {
+
+                },
+
+                _resetForm: function(e) {
+                    // Reset form
+                    for (var attr in this.form) {
+                        this.set('form.' + attr, '');
+                    }
+                    // Reset Form Fields
+                    this.fields.forEach(function(el, index) {
+                        if (el.showIf) {
+                            this.set('fields.' + index + '.show', false);
+                        }
+                        // Reset Form Fields Validation
+                        this._resetField(el, index);
+                    }, this);
+                },
+                _resetField: function(el, index) {
+                    // this.set('fields.' + index + '.value', el.defaultValue);
+                    // var input = this.querySelector('#' + el.name);
+                    // if (input) {
+                    //     input.invalid = false;
+                    // }
+                },
+
+            });
+        })();
+    </script>
+</dom-module>

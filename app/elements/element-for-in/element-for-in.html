@@ -1,0 +1,96 @@
+<dom-module id="element-for-in">
+    <template>
+        <style is="custom-style" include="shared-styles">
+            :host {
+                font-size: 15px;
+            }
+            :host ::content .flex-horizontal-with-ratios {
+                @apply(--layout-horizontal);
+            }
+
+            :host ::content .flexchild {
+                @apply(--layout-flex);
+                padding: 16px;
+            }
+            :host ::content .flexchild.key {
+                font-weight: 500;
+            }
+            :host ::content .flex-horizontal-with-ratios:nth-child(even){
+                background-color: #f2f2f2;
+            }
+        </style>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is: 'element-for-in',
+        properties: {
+            content: {
+                type: Object,
+                value: {},
+                observer: '_contentChanged'
+            }
+        },
+        _contentChanged: function(newValue, oldValue) {
+            var newObj = [],
+                el,
+                obj = newValue;
+
+            // check if not empty the container object
+            if (obj && Object.keys(obj).length > 0) {
+                // loop through pairs
+                for (el in obj) {
+                    if (obj[el]) {
+                        // If the value is not object or array
+                        if (!(obj[el] instanceof Array) && !(obj[el] instanceof Object)) {
+                            newObj.push({
+                                key: el,
+                                value: obj[el]
+                            });
+                        }
+                    }
+                }
+
+                this.sortArr(newObj);
+            }
+
+            this.innerHTML = this.createTpl(newObj);
+        },
+        sortArr: function(array) {
+            array.sort(function(a, b) {
+                var x = a.key;
+                var y = b.key;
+                return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+            });
+        },
+        createTpl: function(content) {
+            var tpl = '';
+
+            for (var i = 0, len = content.length; i < len; i++) {
+                tpl += "<div class='info-item flex-horizontal-with-ratios'>";
+                tpl += "<div class='flexchild key'>" + this.processKeys(content[i].key) + "</div>";
+                tpl += "<div class='flexchild'>" + content[i].value + "</div>";
+                tpl += "</div>";
+            }
+
+            return tpl;
+        },
+        processKeys: function(str) {
+            var words = str.split('_'),
+                result = '',
+                gap, word;
+            for (var i = 0, len = words.length; i < len; i++) {
+                gap = i == 0 ? '' : ' ';
+                word = this.toTitleCase(words[i]);
+                result += gap.concat(word);
+            }
+            return result;
+        },
+        toTitleCase: function(str) {
+            return str.replace(/\w\S*/g, function(txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+            });
+        }
+    });
+</script>

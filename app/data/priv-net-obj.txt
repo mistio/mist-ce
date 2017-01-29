@@ -1,0 +1,11 @@
+{
+	"name": "myTunnel", 
+	"accessed_at": "2016-07-01 11:12:38.173492",
+	"script": "#!/bin/bash\\n\\nif ! which openvpn > /dev/null; then\\n    if ! which apt-get > /dev/null; then\\n        echo \\"Couldn\'t find apt-get to install OpenVPN.\\"\\n        exit 1\\n    fi\\n    if ! apt-get install -y openvpn; then\\n        apt-get update && apt-get install -y openvpn\\n    fi\\nfi\\n\\ncat > /etc/openvpn/vpn-proxy-tun46.key << EOF\\n#\\n# 2048 bit OpenVPN static key\\n#\\n-----BEGIN OpenVPN Static key V1-----\\nd037b91603960ea211497be85dbd01ef\\n069f0ca43871a005ce8223d1cbe74b3c\\n140dd332eeea7f99d1f0a2278113a1d8\\nc06e5e8c83febf007dbd98953070f37d\\nd4066bb625fde197858b3a984654c042\\ne677dc09a1a030cd2768ef7df78c989a\\n5d3dc4122df18457bed73ac219f77121\\nc8bf4e0a050984c984746a6acbaeacdf\\ndd2b7d096006f97ccadc540775a27745\\na3deff4af295b69c1c2699b3b13f9faa\\nf27445bc37fe253729e719ec73064a5d\\nb00e49ab1c3a8d06fc1adb418d30daa1\\n70850a278a4f3b8f13870837154fb9fb\\n752f5101a6945cef0c15c86ab58bdf8c\\ne50814591a7779a130df1a2b387259cc\\ncaad2ced1a9b838ab88e7d1229a4b627\\n-----END OpenVPN Static key V1-----\\n\\nEOF\\n\\ncat > /etc/openvpn/vpn-proxy-tun46.conf << EOF\\nremote 192.168.75.100\\ndev vpn-proxy-tun46\\ndev-type tun\\nport 1240\\nifconfig 172.17.17.10 172.17.17.11\\nsecret /etc/openvpn/vpn-proxy-tun46.key\\nEOF\\n\\nservice openvpn start vpn-proxy-tun46\\n\\necho 1 > /proc/sys/net/ipv4/ip_forward\\n\\nifaces=`ip link show | grep \'^[0-9]*:\' | awk \'{print $2}\' | sed \'s/:$//\'`\\neth_ifaces=`echo \\"$ifaces\\" | grep ^eth`\\nfor iface in $eth_ifaces; do\\n    iptables -t nat -A POSTROUTING -o $iface -j MASQUERADE\\ndone\\n", 
+	"cidrs": ["10.75.0.0/16"], 
+	"server": "172.17.17.11", 
+	"owner": "747bc46bed5c4f45b47fd2ef37cfafda", 
+	"client": "172.17.17.10", 
+	"active": true, 
+	"tunnel_id": 46, 
+	"_id": "c66743d03a0f4945ba17a3be0b1bb93d"}

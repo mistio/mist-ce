@@ -1,0 +1,87 @@
+<div id="policy-rule-operator-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-b"></div>
+<div id="policy-rule-operator-popup"
+     class="ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow">
+
+    <div id="policy-rule-operator"
+         class="ui-popup"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip">
+
+        <ul data-role="listview">
+            {{#each view.operatorOptions as |operator|}}
+            <li data-icon="false">
+                <a class="ui-btn" {{action "operatorClicked" operator target=view}}>
+                    {{operator}}
+                </a>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
+</div>
+
+<div id="policy-rule-resource-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-b"></div>
+<div id="policy-rule-resource-popup"
+     class="ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow">
+
+    <div id="policy-rule-resource"
+         class="ui-popup"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip">
+
+        <ul data-role="listview">
+            {{#each view.resourceTypesOptions as |resource|}}
+            <li data-icon="false">
+                <a class="ui-btn" {{action "resourceClicked" resource.type target=view}}>
+                    {{resource.type}}
+                </a>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
+</div>
+
+<div id="policy-rule-action-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-b"></div>
+<div id="policy-rule-action-popup"
+     class="ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow">
+
+    <div id="policy-rule-action"
+         class="ui-popup"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip">
+
+        <ul data-role="listview">
+            {{#each view.resourceActionsOptions as |option|}}
+            <li data-icon="false">
+                <a class="ui-btn" {{action "actionClicked" option target=view}}>
+                    {{option}}
+                </a>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
+</div>
+
+<div id="policy-rule-identification-screen" class="ui-popup-screen ui-screen-hidden ui-overlay-b"></div>
+<div id="policy-rule-identification-popup"
+     class="ui-popup-container ui-popup-hidden ui-body-inherit ui-overlay-shadow">
+
+    <div id="policy-rule-identification"
+         class="ui-popup"
+         data-role="popup"
+         data-enhanced="true"
+         data-transition="flip">
+
+        <ul data-role="listview">
+            {{#each view.resourceIdentificationOptions as |option|}}
+            <li data-icon="false">
+                <a class="ui-btn" {{action "identificationClicked" option target=view}}>
+                    {{option}}
+                </a>
+            </li>
+            {{/each}}
+        </ul>
+    </div>
+</div>

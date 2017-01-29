@@ -1,0 +1,132 @@
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../teams/team-add.html">
+
+<dom-module id="empty-pages">
+    <template>
+        <style>
+        :host {
+            background: rgba(0, 0, 0, 0);
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+        }
+        #onboarding-area {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 600px;
+            box-sizing: border-box;
+            @apply(--layout-vertical);
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none;   /* Chrome/Safari/Opera */
+            -khtml-user-select: none;    /* Konqueror */
+            -moz-user-select: none;      /* Firefox */
+            -ms-user-select: none;       /* Internet Explorer/Edge */
+            user-select: none;
+            transition: var(--material-curve-320);
+            transition-delay: 200ms;
+        }
+        #onboarding-area[higher] {
+            transform: translate(0, -150px);
+        }
+        .onb-graphics {
+            margin: 0 auto;
+            height: auto;
+            vertical-align: middle;
+            top: 0;
+            width: 200px;
+            max-width: 100%;
+        }
+        #list-form {
+            text-align: center;
+            padding-bottom: 200px;
+        }
+        paper-button{
+          margin: 12px;
+        }
+        </style>
+        <div id="list-form">
+          <img class="onb-graphics top" src="../../images/onboarding/clouds.svg"/>
+            <div hidden$="[[!isStacks]]">
+                <div>To create [[section.id]] you need to use a template.</div>
+                <paper-button class="wide blue" on-tap="_goToTemplate"> VIEW YOUR TEMPLATES </paper-button>
+            </div>
+            <div hidden$="[[isStacks]]">
+                <template is="dom-if" if="[[needCloud]]">
+                <div hidden$="[[!isStacks]]">
+                    <div>To create [[section.id]] you need to have added templates.</div>
+                    <paper-button class="wide blue" on-tap="_addTemplate"> ADD YOUR TEMPLATES </paper-button>
+                </div>
+              </template>
+              <template is="dom-if" if="[[!needCloud]]">
+                <div hidden$="[[isStacks]]">
+                    <div>No [[section.id]] available. Yet.</div>
+                    <paper-button class="wide blue" on-tap="_fabAction"> ADD YOUR [[section.id]] </paper-button>
+                </div>            
+              </template>
+            </div>
+        </div>
+        <team-add></team-add>
+    </template>
+</dom-module>
+<script>
+
+Polymer({
+    is: 'empty-pages',
+
+    properties: {
+        section: Object,
+        clouds: {
+            type: Array
+        },
+        isStacks: {
+            type: Boolean,
+            value: false,
+            computed: '_computeIsStacks(section)'
+        },
+        needCloud: {
+            type: Boolean,
+            value: true,
+            computed: "needCloudChange(clouds, section)"
+        },
+    },
+    needCloudChange: function(clouds, section){
+        if (this.clouds.length > 0) {
+            return false;
+        }
+        else {
+          if(this.section.id == "machines" || this.section.id == "networks" || this.section.id == "images" || this.section.id == "stacks"){
+            return true;
+          }
+          else {
+            return false;
+          }
+        }
+    },
+    _addCloudAction: function(){
+        page("/add-cloud");
+    },
+    _goToTemplate: function(){
+        page("/templates");
+    },
+    _computeIsStacks: function(section){
+        return this.section.id == "stacks";
+    },
+    _fabAction: function(e) {
+        if(this.section.id != "teams")
+        {
+          console.debug('fabAction', e, this.section.add);
+          page(this.section.add);
+        }
+        else{
+          var dialog = this.querySelector('team-add');
+          dialog.openDialog();
+        }
+    }
+
+});
+</script>

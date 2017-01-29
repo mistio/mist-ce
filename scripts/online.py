@@ -1,10 +1,21 @@
 import logging
 import requests
-
-from mist.io.sock import mist_conn_str
+import datetime
 
 
 logging.getLogger().setLevel(logging.CRITICAL)
+
+
+def mist_conn_str(conn_dict):
+    parts = []
+    dt_last_rcv = datetime.datetime.fromtimestamp(conn_dict['last_rcv'])
+    conn_dict['last_rcv'] = dt_last_rcv
+    for key in ('name', 'last_rcv', 'user', 'ip', 'user_agent', 'closed',
+                'session_id'):
+        if key in conn_dict:
+            parts.append(conn_dict.pop(key))
+    parts.extend(conn_dict.values())
+    return ' - '.join(map(str, parts))
 
 
 def query(host='127.0.0.1:8081'):
@@ -24,7 +35,7 @@ def query(host='127.0.0.1:8081'):
 
 
 if __name__ == '__main__':
-    for port in (8081, 8082):
+    for port in (8081, 8082, 8083, 8084):
         print
         host = '127.0.0.1:%d' % port
         try:

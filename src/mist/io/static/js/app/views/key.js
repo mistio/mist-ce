@@ -142,9 +142,9 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
 
                 renameClicked: function () {
                     var key = this.key;
-                    Mist.keyEditController.open(key.id, function (success) {
+                    Mist.keyEditController.open(key, function (success) {
                         if (success) {
-                            Mist.__container__.lookup('router:main').transitionTo('key', Mist.keyEditController.newKeyId);
+                            Mist.__container__.lookup('router:main').transitionTo('key', key.id);
                         }
                     });
                 },
@@ -152,7 +152,8 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
 
                 deleteClicked: function () {
 
-                    var keyId = this.key.id;
+                    var keyId = this.key.id,
+                        keyName = this.key.name;
 
                     Mist.dialogController.open({
                         type: DIALOG_TYPES.YES_NO,
@@ -160,7 +161,7 @@ define('app/views/key', ['app/views/page', 'app/models/machine'],
                         body: [
                             {
                                 paragraph: 'Are you sure you want to delete "' +
-                                    keyId + '" ?'
+                                    keyName + '"?'
                             }
                         ],
                         callback: function (didConfirm) {

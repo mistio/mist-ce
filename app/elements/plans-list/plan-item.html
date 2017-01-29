@@ -1,0 +1,125 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+
+<dom-module id="plan-item">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                margin: 16px;
+                padding: 16px;
+                width: 31%;
+                box-sizing: border-box;
+            }
+
+            paper-material {
+                display: block;
+                width: 25%;
+                float: left;
+                text-align: center;
+                margin-top: 22px;
+            }
+
+            hr {
+                border: none;
+                border-bottom: 1px solid #ccc;
+            }
+
+            h4 {
+                font-weight: bold;
+            }
+
+            #select {
+                color: #ffffff;
+                background-color: #039BE5;
+            }
+
+            #select[disabled] {
+                background-color: #ACDEF6;
+            }
+            .current-plan {
+                color: rgba(0,0,0,.5);
+            }
+        </style>
+
+        <h4>[[plan.title]]</h4>
+        <hr>
+        <p>[[priceText]]</p>
+        <p>[[descriptionText]]</p>
+        <p hidden$="[[!plan.promo]]">[[plan.promo.description]]</p>
+        <p hidden$="[[!expirationDate]]">expires on [[expirationDate]]</p>
+        <paper-button id="select" class="btn-block submit-btn" disabled$="[[isCurrent]]" raised on-tap="_selectPlan">Select</paper-button>
+
+    </template>
+
+    <script>
+        (function() {
+            'use strict';
+
+            Polymer({
+                is: 'plan-item',
+
+                properties: {
+                    user: {
+                        type: Object,
+                        notify: true
+                    },
+                    plan: {
+                        type: Object
+                    },
+                    index: {
+                        type: Number,
+                        value: 0
+                    },
+                    iscurrent: {
+                        type: Boolean,
+                        //TODO: make as a computed property
+                    },
+                    priceText: {
+                        type: String,
+                        computed: '_computePriceText(plan.price)'
+                    },
+                    descriptionText: {
+                        type: String,
+                        computed: '_computeDescriptionText(plan.description, plan.machine_limit)'
+                    },
+                    discountedPriceText: {
+                        type: String,
+                        computed: '_computeDiscountedPriceText(plan.promo)'
+                    },
+                    expirationDate: {
+                        type: String,
+                        computed: '_computeExpirationDate(plan.expiration)'
+                    }
+                },
+                _computePriceText: function(price) {
+                    return price != null ? '$' + price + '/month' : '';
+                },
+                _computeDescriptionText: function(description, machineLimit) {
+                    return description ? description : machineLimit + ' monitored servers';
+                },
+                _computeDiscountedPriceText: function(promo) {
+                    if (promo) {
+                        var newPrice = Math.round(price * (1 - (promo.discount / 100)));
+                        return '$' + newPrice + '/month';
+                    }
+                    return '';
+                },
+                _computeExpirationDate: function(expiration) {
+                    if (expiration) {
+                        var d = new Date(expiration * 1000);
+                        return d.getMonth() + " " + d.getDate() + ", " + d.getFullYear();
+                    }
+                    return '';
+                },
+                _selectPlan: function(e) {
+                    console.log(this.plan);
+                },
+                _triggerInfo: function() {
+                    console.log('info popup');
+                }
+            });
+        })();
+    </script>
+</dom-module>

@@ -17,20 +17,39 @@
         {{#if Mist.cloudsController.loading}}
             <!-- Loader !-->
         {{else}}
-            {{#if Mist.cloudsController.model}}
-                {{view "cloudAdd"}}
-            {{else}}
-            <div id="no-collection" class="ui-responsive">
-                <div id="no-collection-inner" class="ui-shadow">
-                    <span class="icon-cloud-check"></span>
-                    <h1>Welcome to mist.io</h1>
-                    <h2>Get started by adding your clouds.</h2>
-                    {{view "cloudAdd"}}
-                    <p>
-                        Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM & bare metal hosts.
-                    </p>
+            {{#if view.firstOrg}}
+                <div id="no-collection" class="ui-responsive">
+                    <div id="no-collection-inner" class="ui-shadow">
+                        <span class="icon-teams"></span>
+                        <h1>Welcome to mist.io</h1>
+                        <h2>GET STARTED BY ADDING AN ORGANISATION NAME.</h2>
+                        <form id="edit-org-form" {{action "editOrg" on="submit" target=view}}>
+                            {{input value=Mist.organizationEditController.newName placeholder="Organisation name"}}
+                            <button type="submit" class="ui-btn ui-btn-d ui-shadow ui-caps {{if Mist.organizationEditController.formReady '' 'ui-state-disabled'}}">Ok</button>
+                        </form>
+                        <p>
+                            Organisations help you collaborate, delegate &amp; audit access to your infrastructure.<br>You can always add more organisations later.
+                        </p>
+                    </div>
                 </div>
-            </div>
+            {{else}}
+                <!-- Edit Organization's name which was created during sign up -->
+                {{#if Mist.cloudsController.model}}
+                    {{view "cloudAdd"}}
+                {{else}}
+                    <!-- Add Cloud for first time -->
+                    <div id="no-collection" class="ui-responsive">
+                        <div id="no-collection-inner" class="ui-shadow">
+                            <span class="icon-cloud-check"></span>
+                            <h1>GREAT! YOU ARE READY TO GO</h1>
+                            <h2>Add your clouds.</h2>
+                            {{view "cloudAdd"}}
+                            <p>
+                                Mist.io supports public &amp; private computing clouds, as well as<br>Docker, CoreOS, KVM &amp; bare metal hosts.
+                            </p>
+                        </div>
+                    </div>
+                {{/if}}
             {{/if}}
         {{/if}}
 
@@ -101,6 +120,18 @@
                                 Scripts
                             {{/link-to}}
                         </li>
+
+                        {{#if view.isOrgOwner}}
+                        <!-- Teams link -->
+                        <li class="ui-li-has-count">
+                            {{#link-to 'teams' class="ui-btn ui-btn-icon-left icon-teams ui-alt-icon"}}
+                                <span class="ui-li-count ui-body-inherit">
+                                    {{Mist.teamsController.model.length}}
+                                </span>
+                                Teams
+                            {{/link-to}}
+                        </li>
+                        {{/if}}
                         {{/if}}
                     </ul>
                 </div>
@@ -109,7 +140,7 @@
             {{#if Mist.isCore}}
             <div class="ui-block-b">
                 <div class="ui-body ui-shadow">
-                    <div class="incidents {{if view.hasIncidents '' 'no-incidents'}} {{if Mist.isCore 'is-core' '' }} {{if Mist.cloudsController.hasNetworks 'has-networks' ''}}">
+                    <div class="incidents {{if view.hasIncidents '' 'no-incidents'}} {{if Mist.isCore 'is-core' '' }} {{if Mist.cloudsController.hasNetworks 'has-networks' ''}} {{if view.isOrgOwner 'has-org' ''}}">
                         <h4 class="ui-caps">Incidents</h4>
                         {{#if view.loadingIncidents}}
                             <div class="no-incident">

@@ -1,0 +1,46 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<dom-module id="tag-item">
+    <template>
+        <style include="shared-styles">
+        :host {
+            @apply(--layout-horizontal);
+            align-items: flex-end;
+        }
+        paper-input {
+            padding-right: 8px;
+        }
+        </style>
+
+        <paper-input label$="tag [[newIndex]]" value="{{tag.key}}" class="flex"></paper-input>
+        <paper-input value="{{tag.value}}"  class="flex"></paper-input>
+        <paper-icon-button icon="icons:close" on-tap="_deleteTag"></paper-icon-button>
+
+    </template>
+</dom-module>
+<script>
+    Polymer({
+        is: 'tag-item',
+
+        properties: {
+            tag: {
+                type: Object,
+                notify: true
+            },
+            index: Number,
+            newIndex: {
+                type: Number,
+                computed: '_computeNewIndex(index)'
+            }
+        },
+        _computeNewIndex: function(index) {
+            return index + 1;
+        },
+        _deleteTag: function(e) {
+            this.fire('tag-delete', {
+                tag: this.tag
+            });
+        }
+    });
+</script>

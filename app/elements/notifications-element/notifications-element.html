@@ -1,0 +1,213 @@
+<link rel="import" href="../../bower_components/iron-icons/maps-icons.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animated-pages.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animatable.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animations.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+
+<dom-module id="notifications-element">
+  <template>
+    <style>
+      h2{
+        color: rgba(0,0,0,0.54);
+        line-height: 64px;
+        font-weight: 400;
+        text-align: center;
+      }
+      #settings{
+        width: 24px;
+        height: 26px;
+        top: -5px;
+        left: -12px;
+        background-color: #bdbdbd;
+        color: #ffffff;
+      }
+      #arrow{
+        width: 24px;
+        height: 26px;
+        top: -5px;
+        left: -12px;
+        background-color: #bdbdbd;
+        color: #ffffff;
+      }
+      #settings:hover {
+        color: rgba(0,0,0,.55);
+      }
+      #arrow:hover {
+        color: rgba(0,0,0,.55);
+        top: 12px;
+        position: absolute;
+        left: 5px;
+        opacity: 0.26;
+      }
+      .showall{
+        background: #ebebeb;
+        cursor: pointer;
+        width: 360px;
+      }
+
+      #notif{
+        border-bottom: solid;
+      }
+      paper-item{
+        color: rgba(0,0,0,0.87);
+        border-bottom: 1px solid #ddd;
+      }
+      .header{
+        background-color: #cacaca;
+        margin-top: 0;
+        height: 64px;
+        position: relative;
+        @apply(--layout-horizontal);
+        align-items: center;
+      }
+      paper-dialog{
+        position: absolute;
+        right: -40px;
+        top: 30px;
+        z-index: 1;
+      }
+      paper-dialog ::content paper-dialog-scrollable {
+        padding: 0 !important;
+      }
+      #notfab{
+        box-sizing: border-box;
+        border-radius: 100%;
+        height: 40px;
+        width: 40px;
+        color: #fff;
+      }
+      paper-icon-button ::content iron-icon {
+        color: inherit;
+      }
+      .bullet{
+        color: var(--red-color);
+        width: 16px;
+        margin-right: 8px;
+      }
+      .red {
+        --paper-badge-background: var(--red-color);
+        color: var(--red-color);
+      }
+      .green {
+        color: var(--green-color);
+      }
+      .orange {
+        color: var(--orange-color);
+      }
+      paper-badge {
+        --paper-badge-margin-left: -40px;
+        --paper-badge-margin-bottom: -16px;
+      }
+      paper-dialog > *:first-child {
+        margin-top: 0 !important;
+      }
+      #setdial{
+        width: 382px;
+        height: 273px;
+      }
+      a{
+        color:#07C;
+        margin-left: 5px;
+      }
+    </style>
+
+    <paper-icon-button id="notfab" icon="social:notifications" toggles active="{{mainDialogOpen}}">notifications</paper-icon-button>
+
+    <paper-badge for="notfab" label="3" class="red"></paper-badge>
+
+
+    <neon-animated-pages id="pages" selected="[[selected]]" entry-animation="[[entryAnimation]]" exit-animation="[[exitAnimation]]">
+
+      <neon-animatable>
+        <paper-dialog opened="{{mainDialogOpen}}">
+          <div class="header">
+            <iron-icon id="settings" icon="icons:settings" on-click="_onNextClick" active="{{mainDialogOpen}}"></iron-icon>
+            <h2 class="flex">Notifications</h2>
+          </div>
+          <paper-dialog-scrollable>
+            <template is="dom-repeat" items="[[notifications]]">
+              <paper-item><iron-icon class$="bullet [[item.type]]" icon="image:lens"></iron-icon>[[item.text]]</paper-item>
+            </template>
+          </paper-dialog-scrollable>
+          <div class="buttons">
+            <paper-button class="showall" href="url">Show all</paper-button>
+          </div>
+        </paper-dialog>
+      </neon-animatable>
+
+      <neon-animatable>
+        <paper-dialog id="setdial" opened="{{mainDialogOpen}}">
+          <div class="header">
+            <iron-icon id="arrow" icon="icons:arrow-back" on-click="_onPrevClick"></iron-icon>
+            <h2>Settings</h2>
+          </div>
+          <paper-dialog-scrollable>
+            <paper-item>Allow notifications here from:</paper-item>
+            <paper-item>Mist.io <a href="url">Settings</a></paper-item>
+          </paper-dialog-scrollable>
+        </paper-dialog>
+      </neon-animatable>
+
+    </neon-animated-pages>
+
+
+  </template>
+  <script>
+    Polymer({
+      is: 'notifications-element',
+
+      properties: {
+        mainDialogOpen: Boolean,
+
+        selected: {
+          type: Number,
+          value: 0
+        },
+        // notifications: {
+        // 	type: Array,
+        // 	value: [],
+        // 	notify: true
+        // },
+        notifications: {
+          type: Array,
+          value: [
+            {
+              text: 'Server down-time',
+              type: 'red'
+            },
+            {
+              text: 'Machine stopped working',
+              type: 'red'
+            },
+            {
+              text: 'Server down-time',
+              type: 'orange'
+            },
+            {
+              text: 'Collectd installed successfully',
+              type: 'green'
+            }
+          ]
+        }
+
+
+
+      },
+
+      _onPrevClick: function() {
+        this.entryAnimation = 'slide-from-left-animation';
+        this.exitAnimation = 'slide-right-animation';
+        this.selected = this.selected === 0 ? 4 : (this.selected - 1);
+      },
+      _onNextClick: function() {
+        this.entryAnimation = 'slide-from-right-animation';
+        this.exitAnimation = 'slide-left-animation';
+        this.selected = this.selected === 4 ? 0 : (this.selected + 1);
+
+      },
+
+    });
+  </script>
+</dom-module>
