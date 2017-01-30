@@ -380,10 +380,11 @@ class OtherMainController(BaseMainController):
         rename_kwargs(kwargs, 'machine_key', 'ssh_key')
         rename_kwargs(kwargs, 'machine_port', 'ssh_port')
         rename_kwargs(kwargs, 'remote_desktop_port', 'rdp_port')
-        if kwargs.pop('windows', False):
+        if kwargs.get('operating_system') == 'windows':
             kwargs['os_type'] = 'windows'
         else:
             kwargs['os_type'] = 'unix'
+        kwargs.pop('operating_system', None)
         errors = {}
         for key in kwargs.keys():
             if key not in ('host', 'ssh_user', 'ssh_port', 'ssh_key',

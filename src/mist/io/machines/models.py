@@ -241,6 +241,7 @@ class Machine(me.Document):
             'public_ips': self.public_ips,
             'private_ips': self.private_ips,
             'imageId': self.image_id,
+            'os_type': self.os_type,
             'last_seen': str(self.last_seen or ''),
             'missing_since': str(self.missing_since or ''),
             'state': self.state,
