@@ -4,6 +4,7 @@ This currently contains only BaseController. It includes basic functionality
 for a given schedule.
 Cloud specific controllers are in `mist.io.schedules.controllers`.
 """
+import json
 import logging
 import datetime
 import mongoengine as me
@@ -204,7 +205,7 @@ class BaseController(object):
             raise ScheduleOperationError()
 
     def _update__preparse_machines(self, auth_context, kwargs):
-        """Preparse machines arguments to `self.uppdate`
+        """Preparse machines arguments to `self.update`
 
         This is called by `self.update` when adding a new schedule,
         in order to apply pre processing to the given params. Any subclass
@@ -255,6 +256,13 @@ class BaseController(object):
                 machines=machines_obj)
 
         # check permissions for machines' tags
+        if machines_tags and (not isinstance(machines_tags, dict) and
+                        machines_tags != ''):
+            try:
+                machines_tags = json.loads(machines_tags)
+            except:
+                raise BadRequestError("Tags are not in an acceptable form")
+
         if machines_tags:
             if action:
                 # SEC require permission ACTION on machine
