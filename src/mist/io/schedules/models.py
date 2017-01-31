@@ -1,4 +1,5 @@
 """Schedule entity model."""
+import re
 import datetime
 from uuid import uuid4
 import celery.schedules
@@ -187,7 +188,7 @@ class ListOfMachinesSchedule(BaseResourceForm):
 
 
 class TaggedMachinesSchedule(BaseResourceForm):
-    tags = me.ListField(required=True)
+    tags = me.DictField(required=True, default={})
 
     @property
     def get_machines(self):
@@ -202,6 +203,26 @@ class TaggedMachinesSchedule(BaseResourceForm):
                 cloud_machines_pairs.append((cloud_id, machine_id))
 
         return cloud_machines_pairs
+
+    def validate(self, clean=True):
+        if self.tags:
+            regex = re.complile(r'^[a-z0-9_-]+$')
+            for key, value in self.tags.iteritems():
+                if not key:
+                    raise me.ValidationError('You cannot add a tag '
+                                             'without a key')
+                elif not regex.match(key) or (value
+                                              and not regex.match(value)):
+                    raise me.ValidationError('Tags must be in key=value '
+                                             'format and only contain the '
+                                             'characters a-z, 0-9, _, -')
+        super(TaggedMachinesSchedule, self).validate(clean=True)
+
+    def clean(self):
+        if not self.tags:
+            self.tags = {}
+        elif not isinstance(self.tags, dict):
+            raise me.ValidationError('Tags must be a dictionary')
 
     def __str__(self):
         return 'Tags: %s' % self.tags
@@ -392,6 +413,7 @@ class Schedule(me.Document):
             'run_immediately': self.run_immediately or '',
             'last_run_at': str(self.last_run_at or ''),
             'total_run_count': self.total_run_count or 0,
+            'max_run_count': self.max_run_count or 0,
         }
 
         if isinstance(self.resource_form, ListOfMachinesSchedule):
