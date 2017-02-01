@@ -406,14 +406,6 @@ class MainConnection(MistConnection):
                 # update cloud machine count in multi-user setups
                 cloud = Cloud.objects.get(owner=self.owner, id=cloud_id,
                                           deleted=None)
-                try:
-                    if len(machines) != cloud.machine_count:
-                        tasks.update_machine_count.delay(self.owner.id,
-                                                         cloud_id,
-                                                         len(machines))
-                except Exception as exc:
-                    log.warning("Error while update_machine_count.delay: %r",
-                                exc)
                 for machine in machines:
                     bmid = (cloud_id, machine['id'])
                     if bmid in self.running_machines:
