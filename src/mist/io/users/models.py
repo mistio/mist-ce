@@ -506,6 +506,8 @@ class Organization(Owner):
     selected_plan = me.StringField()
     enterprise_plan = me.DictField()
 
+    insights_enabled = me.BooleanField(default=False)
+
     @property
     def mapper(self):
         """Returns the `PermissionMapper` for the current Org context."""
