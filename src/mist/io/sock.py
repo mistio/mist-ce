@@ -244,19 +244,17 @@ class MainConnection(MistConnection):
 
     @tornado.gen.coroutine
     def periodic_update_poller(self):
-        """Every 4 minutes, tell poller to continue for next 5 minutes"""
         while True:
             if self.closed:
                 break
             self.update_poller()
-            yield tornado.gen.sleep(240)
+            yield tornado.gen.sleep(100)
 
     def update_poller(self):
         """Increase polling frequency for all clouds"""
         log.info("Updating poller for %s", self)
         for cloud in Cloud.objects(owner=self.owner, deleted=None):
-            ListMachinesPollingSchedule.add(cloud=cloud, default=300,
-                                            interval=10, ttl=300)
+            ListMachinesPollingSchedule.add(cloud=cloud, interval=10, ttl=120)
 
     def update_user(self):
         self.send('user', core_methods.get_user_data(self.auth_context))

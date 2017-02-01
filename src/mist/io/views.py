@@ -338,10 +338,18 @@ def update_cloud(request):
 
     fail_on_error = params.pop('fail_on_error', True)
     fail_on_invalid_params = params.pop('fail_on_invalid_params', True)
+    polling_interval = params.pop('polling_interval', None)
 
     # Edit the cloud
     cloud.ctl.update(fail_on_error=fail_on_error,
                      fail_on_invalid_params=fail_on_invalid_params, **creds)
+
+    try:
+        polling_interval = int(polling_interval)
+    except (ValueError, TypeError):
+        pass
+    else:
+        cloud.ctl.set_polling_interval(polling_interval)
 
     log.info("Cloud with id '%s' updated successfully.", cloud.id)
     trigger_session_update(auth_context.owner, ['clouds'])
