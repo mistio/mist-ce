@@ -51,42 +51,11 @@ class MistError(Exception):
         super(MistError, self).__init__(msg)
 
 
+# MistError related exceptions
 # BAD REQUESTS (translated as 400 in views)
 class BadRequestError(MistError):
     msg = "Bad Request"
     http_code = 400
-
-
-class RequiredParameterMissingError(BadRequestError):
-    msg = "Required parameter not provided"
-
-
-class KeyParameterMissingError(RequiredParameterMissingError):
-    msg = "Key id parameter missing"
-
-
-class KeyValidationError(BadRequestError):
-    msg = "Invalid private key"
-
-
-# UNAUTHORIZED (translated as 401 in views)
-class UnauthorizedError(MistError):
-    msg = "Not authorized"
-    http_code = 401
-
-
-class CloudUnauthorizedError(UnauthorizedError):
-    msg = "Invalid cloud credentials"
-
-
-class MachineUnauthorizedError(UnauthorizedError):
-    msg = "Couldn't authenticate to machine"
-
-
-# PAYMENT REQUIRED (translated as 402 in views)
-class PaymentRequiredError(MistError):
-    msg = "Payment required"
-    http_code = 402
 
 
 # FORBIDDEN (translated as 403 in views)
@@ -101,10 +70,68 @@ class NotFoundError(MistError):
     http_code = 404
 
 
-class CloudNotFoundError(NotFoundError, KeyError):
-    msg = "Cloud not found"
+# UNAUTHORIZED (translated as 401 in views)
+class UnauthorizedError(MistError):
+    msg = "Not authorized"
+    http_code = 401
 
 
+# CONFLICT (translated as 409 in views)
+class ConflictError(MistError):
+    msg = "Conflict"
+    http_code = 409
+
+
+# NOT ALLOWED (translated as 405 in views)
+class MethodNotAllowedError(MistError):
+    msg = "Method Not Allowed"
+    http_code = 405
+
+
+# INTERNAL ERROR (translated as 500 in views)
+class InternalServerError(MistError):
+    msg = "Internal Server Error"
+    http_code = 500
+
+
+# SERVICE UNAVAILABLE (translated as 503 in views)
+class ServiceUnavailableError(MistError):
+    msg = "Service unavailable"
+    http_code = 503
+
+
+class SSLError(MistError):
+    msg = "SSL certificate verification error"
+
+
+class RequiredParameterMissingError(BadRequestError):
+    msg = "Required parameter not provided"
+
+
+# Key related exceptions
+class KeyParameterMissingError(RequiredParameterMissingError):
+    msg = "Key id parameter missing"
+
+
+class KeyValidationError(BadRequestError):
+    msg = "Invalid private key"
+
+
+class KeyNotFoundError(NotFoundError, KeyError):
+    msg = "Key not found"
+
+
+class KeyExistsError(ConflictError):
+    msg = "Key name exists"
+
+
+# PAYMENT REQUIRED (translated as 402 in views)
+class PaymentRequiredError(MistError):
+    msg = "Payment required"
+    http_code = 402
+
+
+# Network related exceptions
 class NetworkActionNotSupported(MistError):
     msg = "Action is not supported for this cloud"
     http_code = 404
@@ -118,42 +145,25 @@ class NetworkError(NotFoundError, KeyError):
     msg = "Error on network action"
 
 
-class KeyNotFoundError(NotFoundError, KeyError):
-    msg = "Key not found"
+class NetworkCreationError(InternalServerError):
+    msg = "Network creation failed"
+
+
+class ZoneNotFoundError(NotFoundError):
+    msg = "No zone found for the provided id"
+
+
+class RecordNotFoundError(NotFoundError):
+    msg = "No record found for the provided id"
+
+
+# Machine related exceptions
+class MachineUnauthorizedError(UnauthorizedError):
+    msg = "Couldn't authenticate to machine"
 
 
 class MachineNotFoundError(NotFoundError, KeyError):
     msg = "Machine not found"
-
-
-# NOT ALLOWED (translated as 405 in views)
-class MethodNotAllowedError(MistError):
-    msg = "Method Not Allowed"
-    http_code = 405
-
-
-# CONFLICT (translated as 409 in views)
-class ConflictError(MistError):
-    msg = "Conflict"
-    http_code = 409
-
-
-class CloudExistsError(ConflictError):
-    msg = "Cloud with this name already exists"
-
-
-class CloudNameExistsError(ConflictError):
-    msg = "Cloud name exists"
-
-
-class KeyExistsError(ConflictError):
-    msg = "Key name exists"
-
-
-# INTERNAL ERROR (translated as 500 in views)
-class InternalServerError(MistError):
-    msg = "Internal Server Error"
-    http_code = 500
 
 
 class MachineCreationError(InternalServerError):
@@ -164,31 +174,136 @@ class MachineNameValidationError(InternalServerError):
     msg = "Error validating name"
 
 
-class NetworkCreationError(InternalServerError):
-    msg = "Network creation failed"
+class MachineUnavailableError(ServiceUnavailableError):
+    msg = "Machine currently unavailable"
 
 
-class SSLError(MistError):
-    msg = "SSL certificate verification error"
+# Cloud related exceptions
+class CloudExistsError(ConflictError):
+    msg = "Cloud with this name already exists"
 
 
-# SERVICE UNAVAILABLE (translated as 503 in views)
-class ServiceUnavailableError(MistError):
-    msg = "Service unavailable"
-    http_code = 503
+class CloudNameExistsError(ConflictError):
+    msg = "Cloud name exists"
+
+
+class CloudUnauthorizedError(UnauthorizedError):
+    msg = "Invalid cloud credentials"
+
+
+class CloudNotFoundError(NotFoundError, KeyError):
+    msg = "Cloud not found"
 
 
 class CloudUnavailableError(ServiceUnavailableError):
     msg = "Cloud unavailable"
 
 
-class MachineUnavailableError(ServiceUnavailableError):
-    msg = "Machine currently unavailable"
+# Schedule related exceptions
+class ScheduleTaskNotFound(NotFoundError):
+    msg = "Couldn't find task"
 
 
-class ZoneNotFoundError(NotFoundError):
-    msg = "No zone found for the provided id"
+class ScheduleNameExistsError(ConflictError):
+    msg = "Schedule name exists"
 
 
-class RecordNotFoundError(NotFoundError):
-    msg = "No record found for the provided id"
+class ScheduleOperationError(BadRequestError):
+    msg = "Attempt to update a document not yet saved"
+
+
+class InvalidSchedule(BadRequestError):
+    msg = "Scheduler is not valid"
+
+
+# Script related exceptions
+class ScriptNotFoundError(NotFoundError):
+    msg = "Script not found"
+
+
+class ScriptFormatError(MistError):
+    msg = "Script was not formatted properly"
+
+
+# CONFLICT (translated as 409 in views)
+class ScriptNameExistsError(ConflictError):
+    msg = "Script name exists"
+
+
+# Organization related exceptions
+class OrganizationNotFound(NotFoundError):
+    msg = 'Organization not found'
+
+
+class OrganizationNameExistsError(ConflictError):
+    msg = 'Organization name exists'
+
+
+class OrganizationOperationError(BadRequestError):
+    msg = "Attempt to update a document not yet saved"
+
+
+# UNAUTHORIZED (translated as 401 in views)
+class OrganizationAuthorizationFailure(UnauthorizedError):
+    msg = "You are not authorized to view or edit the organization"
+
+
+class TeamNotFound(NotFoundError):
+    msg = 'Team not found'
+
+
+class TeamNameExistsError(ConflictError):
+    msg = 'Team name exists'
+
+
+class TeamOperationError(BadRequestError):
+    msg = "Attempt to update a document not yet saved"
+
+
+# UNAUTHORIZED (translated as 401 in views)
+class TeamFailure(UnauthorizedError):
+    msg = "You are not authorized to view team entry"
+
+
+class TeamForbidden(ForbiddenError):
+    msg = "You cannot delete Owners team"
+
+
+class MemberNotFound(NotFoundError):
+    msg = 'Member not found'
+
+
+class MemberConflictError(ConflictError):
+    msg = 'Member exists'
+
+
+class PolicyError(BadRequestError):
+    msg = "Policy Rule Error"
+
+
+# UNAUTHORIZED (translated as 401 in views)
+class PolicyUnauthorizedError(ForbiddenError):
+    msg = "Policy Unauthorized Error"
+
+
+class InvalidApiToken(MistError):
+    msg = 'Api Token is not valid'
+
+
+# FORBIDDEN (translated as 403 in views)
+class LoginThrottledError(ForbiddenError):
+    msg = "Maximum number of failed login attempts reached"
+
+
+# UNAUTHORIZED (translated as 401 in views)
+class UserUnauthorizedError(UnauthorizedError):
+    msg = "User not authenticated. Please log in"
+
+
+# NOT FOUND (translated as 404 in views)
+class UserNotFoundError(NotFoundError):
+    msg = "Couldn't find user"
+
+
+class AdminUnauthorizedError(UserUnauthorizedError):
+    msg = "User is not authorized as an administrator"
