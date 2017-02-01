@@ -441,7 +441,10 @@ class BaseComputeController(BaseController):
                 s.connect(dnat(self.cloud.owner, hostname, port))
                 s.shutdown(2)
             except:
-                s.shutdown(2)
+                try:
+                    s.shutdown(2)
+                except:
+                    pass
                 log.info("Failed to connect to %s:%d", hostname, port)
                 continue
             log.info("Connected to %s:%d", hostname, port)
