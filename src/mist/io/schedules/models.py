@@ -3,12 +3,12 @@ import datetime
 from uuid import uuid4
 import celery.schedules
 import mongoengine as me
-from mist.core.tag.models import Tag
+from mist.io.tag.models import Tag
 from mist.io.machines.models import Machine
 from mist.io.exceptions import BadRequestError
 from mist.io.users.models import Owner, Organization
 from celerybeatmongo.schedulers import MongoScheduler
-from mist.core.exceptions import ScheduleNameExistsError
+from mist.io.exceptions import ScheduleNameExistsError
 from mist.io.exceptions import RequiredParameterMissingError
 
 

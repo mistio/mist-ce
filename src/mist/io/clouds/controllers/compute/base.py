@@ -38,7 +38,7 @@ from mist.core.vpn.methods import super_ping
 
 from mist.io.clouds.controllers.base import BaseController
 
-from mist.core.tag.models import Tag
+from mist.io.tag.models import Tag
 
 from mist.io.machines.models import Machine
 

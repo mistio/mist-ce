@@ -1,7 +1,7 @@
 """Script entity model."""
 from uuid import uuid4
 import mongoengine as me
-import mist.core.tag.models
+import mist.io.tag.models
 from urlparse import urlparse
 from mist.io.users.models import Owner
 from mist.io.exceptions import BadRequestError
@@ -208,7 +208,7 @@ class Script(me.Document):
 
     def delete(self):
         super(Script, self).delete()
-        mist.core.tag.models.Tag.objects(resource=self).delete()
+        mist.io.tag.models.Tag.objects(resource=self).delete()
         self.owner.mapper.remove(self)
 
     def as_dict_old(self):

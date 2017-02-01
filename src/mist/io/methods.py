@@ -411,7 +411,7 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
         )
 
     if tags:
-        from mist.core.tag.methods import resolve_id_and_set_tags
+        from mist.io.tag.methods import resolve_id_and_set_tags
         resolve_id_and_set_tags(owner, 'machine', node.id, tags,
                                 cloud_id=cloud_id)
 
@@ -1178,7 +1178,7 @@ def star_image(owner, cloud_id, image_id):
 
 def list_clouds(owner):
     # FIXME: Move import to the top of the file.
-    from mist.core.tag.methods import get_tags_for_resource
+    from mist.io.tag.methods import get_tags_for_resource
     clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=owner,
                                                          deleted=None)]
     for cloud in clouds:
@@ -1193,7 +1193,7 @@ def list_keys(owner):
     :param owner:
     :return:
     """
-    from mist.core.tag.methods import get_tags_for_resource
+    from mist.io.tag.methods import get_tags_for_resource
     keys = Key.objects(owner=owner, deleted=None)
     clouds = Cloud.objects(owner=owner, deleted=None)
     key_objects = []
@@ -2047,7 +2047,7 @@ def find_public_ips(ips):
 def notify_admin(title, message="", team="all"):
     """ This will only work on a multi-user setup configured to send emails """
     try:
-        from mist.core.helpers import send_email
+        from mist.io.helpers import send_email
         send_email(title, message,
                    config.NOTIFICATION_EMAIL.get(team,
                                                  config.NOTIFICATION_EMAIL))
@@ -2112,7 +2112,7 @@ def notify_user(owner, title, message="", email_notify=True, **kwargs):
 
     try: # Send email in multi-owner env
         if email_notify:
-            from mist.core.helpers import send_email
+            from mist.io.helpers import send_email
             email = owner.email if hasattr(owner, 'email') else owner.get_email()
             send_email("[mist.io] %s" % title, body.encode('utf-8', 'ignore'),
                        email)

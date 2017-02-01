@@ -3,18 +3,33 @@
 import os
 import re
 import sys
-import time
 import json
 import string
 import random
 import socket
+import smtplib
 import datetime
 import tempfile
+import traceback
 import functools
+from time import time, strftime, sleep
+
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+
 from contextlib import contextmanager
+from email.utils import formatdate, make_msgid
+from mongoengine import DoesNotExist
+
+from pyramid.view import view_config as pyramid_view_config
+from pyramid.httpexceptions import HTTPError
 
 import iso8601
 import netaddr
+
+from Crypto.Cipher import AES
+from Crypto.Hash import SHA256
+from Crypto.Random import get_random_bytes
 
 from amqp import Message
 from amqp.connection import Connection
@@ -22,13 +37,15 @@ from amqp.exceptions import NotFound as AmqpNotFound
 
 from distutils.version import LooseVersion
 
-from mist.io.exceptions import MistError
+from mist.io.exceptions import MistError, NotFoundError
+from mist.io.exceptions import RequiredParameterMissingError
 import mist.io.users.models
 
-try:
-    from mist.core import config
-except ImportError:
-    from mist.io import config
+from mist.core import config
+# try:
+#
+# except ImportError:
+#     from mist.io import config
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -73,7 +90,7 @@ def params_from_request(request):
         params = request.json_body
     except:
         params = request.params
-    return params
+    return params or {}
 
 
 def b58_encode(num):
@@ -330,7 +347,7 @@ def trigger_session_update(owner, sections=['clouds', 'keys', 'monitoring',
 
 def amqp_log(msg):
     return
-    msg = "[%s] %s" % (time.strftime("%Y-%m-%d %H:%M:%S %Z"), msg)
+    msg = "[%s] %s" % (strftime("%Y-%m-%d %H:%M:%S %Z"), msg)
     try:
         amqp_publish('mist_debug', '', msg)
     except:
@@ -566,3 +583,726 @@ def rename_kwargs(kwargs, old_key, new_key):
         else:
             log.warning("Got both param '%s' and '%s', will not transform.",
                         old_key, new_key)
+
+
+def snake_to_camel(s):
+    return reduce(lambda y, z: y + z.capitalize(), s.split('_'))
+
+
+def ip_from_request(request):
+    """Extract IP address from HTTP Request headers."""
+    return (request.get('HTTP_X_REAL_IP') or
+            request.get('HTTP_X_FORWARDED_FOR') or
+            request.get('REMOTE_ADDR') or
+            '0.0.0.0')
+
+
+def send_email(subject, body, recipients, sender=None, bcc=None, attempts=3):
+    """Send email.
+
+    subject: email's subject
+    body: email's body
+    recipients: an email address as a string or an iterable of email addresses
+    sender: the email address of the sender. default value taken from config
+
+    """
+    if isinstance(subject, str):
+        subject = subject.decode('utf-8', 'ignore')
+
+    if not sender:
+        sender = config.EMAIL_FROM
+    if isinstance(recipients, basestring):
+        recipients = [recipients]
+    headers = [
+        "From: %s" % sender,
+        "To: %s" % ", ".join(recipients),
+        "Subject: %s" % subject,
+        "Date: %s" % formatdate(),
+        "Message-ID: %s" % make_msgid()
+    ]
+    if bcc:
+        headers.append("Bcc: %s" % bcc)
+        recipients.append(bcc)
+
+    if isinstance(body, str):
+        body = body.decode('utf8')
+
+    message = "%s\r\n\r\n%s" % ("\r\n".join(headers), body)
+    message = message.encode('utf-8', 'ignore')
+
+    mail_settings = config.MAILER_SETTINGS
+    host = mail_settings.get('mail.host')
+    port = mail_settings.get('mail.port', '5555')
+    username = mail_settings.get('mail.username')
+    password = mail_settings.get('mail.password')
+    tls = mail_settings.get('mail.tls')
+    starttls = mail_settings.get('mail.starttls')
+
+    # try 3 times to circumvent network issues
+    for attempt in range(attempts):
+        try:
+            if tls and not starttls:
+                server = smtplib.SMTP_SSL(host, port)
+            else:
+                server = smtplib.SMTP(host, port)
+            if tls and starttls:
+                server.starttls()
+            if username:
+                server.login(username, password)
+
+            ret = server.sendmail(sender, recipients, message)
+            server.quit()
+            return True
+        except smtplib.SMTPException as exc:
+            if attempt == attempts - 1:
+                log.error("Could not send email after %d retries! Error: %r",
+                          attempts, exc)
+                return False
+            else:
+                log.warn("Could not send email! Error: %r", exc)
+                log.warn("Retrying in 5 seconds...")
+                sleep(5)
+
+
+rtype_to_classpath = {
+    'cloud': 'mist.io.clouds.models.Cloud',
+    'clouds': 'mist.io.clouds.models.Cloud',
+    'machine': 'mist.io.machines.models.Machine',
+    'machines': 'mist.io.machines.models.Machine',
+    'script': 'mist.io.scripts.models.Script',
+    'key': 'mist.io.keys.models.Key',
+    'template': 'mist.core.orchestration.models.Template',
+    'stack': 'mist.core.orchestration.models.Stack',
+    'schedule': 'mist.io.schedules.models.Schedule',
+    'tunnel': 'mist.core.vpn.models.Tunnel',
+}
+
+
+def get_resource_model(rtype):
+    model_path = rtype_to_classpath[rtype]
+    mod, member = model_path.rsplit('.', 1)
+    __import__(mod)
+    return getattr(sys.modules[mod], member)
+
+
+def get_object_with_id(owner, rid, rtype, *args, **kwargs):
+    query = {}
+    if rtype in ['machine', 'network', 'image', 'location']:
+        if 'cloud_id' not in kwargs:
+            raise RequiredParameterMissingError('No cloud id provided')
+        else:
+            query.update({'cloud': kwargs['cloud_id']})
+    if rtype == 'machine':
+        query.update({'machine_id': rid})
+    else:
+        query.update({'id': rid, 'deleted': None})
+
+    if rtype not in ['machine', 'image']:
+        query.update({'owner': owner})
+
+    try:
+        resource_obj = get_resource_model(rtype).objects.get(**query)
+    except DoesNotExist:
+        raise NotFoundError('Resource with this id could not be located')
+
+    return resource_obj
+
+
+def ts_to_str(timestamp):
+    """Return a timestamp as a nicely formated datetime string."""
+    try:
+        date = datetime.datetime.fromtimestamp(timestamp)
+        date_string = date.strftime("%d/%m/%Y %H:%M %Z")
+        return date_string
+    except:
+        return None
+
+
+def encrypt2(plaintext, key=config.SECRET, key_salt='', no_iv=False):
+    """Encrypt shit the right way"""
+
+    # sanitize inputs
+    key = SHA256.new(key + key_salt).digest()
+    if len(key) not in AES.key_size:
+        raise Exception()
+    if isinstance(plaintext, unicode):
+        plaintext = plaintext.encode('utf-8')
+
+    # pad plaintext using PKCS7 padding scheme
+    padlen = AES.block_size - len(plaintext) % AES.block_size
+    plaintext += chr(padlen) * padlen
+
+    # generate random initialization vector using CSPRNG
+    iv = '\0' * AES.block_size if no_iv else get_random_bytes(AES.block_size)
+
+    # encrypt using AES in CFB mode
+    ciphertext = AES.new(key, AES.MODE_CFB, iv).encrypt(plaintext)
+
+    # prepend iv to ciphertext
+    if not no_iv:
+        ciphertext = iv + ciphertext
+
+    # return ciphertext in hex encoding
+    return ciphertext.encode('hex')
+
+
+def log_event(owner_id, event_type, action, error=None, story_id='',
+              user_id=None, _mongo_conn=None, **kwargs):
+
+    """Log dict of the keyword arguments passed"""
+    conn = _mongo_conn if _mongo_conn else MongoClient(config.MONGO_URI)
+    coll = conn['mist'].logging
+
+    try:
+        def _default(obj):
+            return {'_python_object': str(obj)}
+
+        event = {
+            'owner_id': str(owner_id),
+            'type': str(event_type),
+            'action': str(action),
+            'time': time(),
+            'error': error if error is not None else False,
+            'extra': json.dumps(kwargs, default=_default),
+        }
+        if user_id:
+            event['user_id'] = user_id
+            event['email'] = mist.io.users.models.User.objects.get(
+                id=user_id).email
+        for key in ('cloud_id', 'machine_id', 'script_id', 'rule_id',
+                    'job_id', 'shell_id', 'session_id', 'incident_id'):
+            if key in kwargs:
+                event[key] = kwargs.pop(key)
+        event['_id'] = str(coll.save(event.copy()))
+        try:
+            stories = log_story(event, _mongo_conn=conn)
+        except Exception as exc:
+            log.error("failed to log story: %s %s %s %s %s Error %r",
+                      owner_id, event_type, error, action, kwargs, exc)
+            stories = []
+    except Exception as exc:
+        log.error("failed to log event: %s %s %s %s %s Error %r",
+                  owner_id, event_type, error, action, kwargs, exc)
+        return
+    finally:
+        if not _mongo_conn:
+            conn.close()
+
+    # broadcast events to rabbitmq 'events' exchange
+    parts = ['owner_id', 'type', 'action']
+    keys = [str(event[key]).lower().replace('.', '^') for key in parts]
+    keys.append('true' if event['error'] else 'false')
+    routing_key = '.'.join(keys)
+    _event = event.copy()
+    _event['_stories'] = stories
+    amqp_publish('events', routing_key, _event,
+                 ex_type='topic', ex_declare=True,
+                 auto_delete=False)
+    event.pop('extra')
+    event.update(kwargs)
+    return event
+
+
+def log_story(event, _mongo_conn=None):
+    fields = ('owner_id', 'user_id',
+              'cloud_id', 'machine_id', 'script_id', 'rule_id',
+              'job_id', 'incident_id', 'shell_id', 'session_id')
+    story = {'log_ids': [event['_id']], 'error': event['error'],
+             'started_at': event['time'], 'finished_at': 0}
+    story.update({key: event[key] for key in event if key in fields})
+    etype, eaction = event['type'], event['action']
+    conn = _mongo_conn if _mongo_conn else MongoClient(config.MONGO_URI)
+    coll = conn['mist'].stories
+
+    # find all relevant stories
+    prev_stories, new_stories = [], []
+    # autodiscover/autocreate relevant stories based on
+    # job_id, incident_id, shell_id, session_id
+    for story_type in ('job', 'incident', 'shell', 'session'):
+        story_id_lbl = '%s_id' % story_type
+        if story_id_lbl in story:
+            story_ids = story[story_id_lbl]
+            if isinstance(story_ids, basestring):
+                story_ids = story_ids.split(',')
+            for story_id in story_ids:
+                prev_story = coll.find_one({'story_id': story_id})
+                if prev_story:
+                    prev_stories.append(prev_story)
+                else:
+                    _story = {'type': story_type, 'story_id': story_id}
+                    _story.update(story)
+                    new_stories.append(_story)
+    # manual discovery of relevant stories for specific cases
+    # close any relevant incidents if appropriate
+    closes_inc = ('update_rule', 'delete_rule', 'destroy_machine',
+                  'disable_monitoring')
+    if event.get('owner_id') and eaction in closes_inc:
+        log.error('event will close incident(s): %s', event)
+        incident_stories = []
+        # find all open incidents matching this event
+        query = {'owner_id': event['owner_id'],
+                 'type': 'incident', 'finished_at': 0}
+        for key in ('cloud_id', 'machine_id', 'rule_id'):
+            if key in event:
+                query[key] = event[key]
+        # append them to prev_stories so that the event will be logged there
+        # and the incident will be closed
+        log.error('incidents query: %s', query)
+        for story in conn['mist'].stories.find(query):
+            log.error('Found incident to be closed: %s', story)
+            prev_stories.append(story)
+
+    ret = []
+
+    # create new stories
+    for story in new_stories:
+        # if log came with an error, close the story (single event story)
+        if story['error']:
+            story['finished_at'] = event['time']
+
+        # start create machine story (possibly for multiple machines)
+        if etype == 'request' and eaction == 'create_machine':
+            try:
+                params = json.loads(event['extra'])['request_params']
+            except Exception as exc:
+                log.error("log_story: Couldn't load params %r", exc)
+                params = {}
+            quantity = params.get('quantity', 1)
+            story['quantity'] = quantity
+            subres = {'success': 0, 'error': 0, 'skipped': 0,
+                      'pending': quantity}
+            summary = {'create': subres.copy(), 'probe': subres.copy()}
+            if not params.get('async'):
+                summary['create']['pending'] = 0
+                summary['create']['success'] = 1
+            if params.get('monitoring'):
+                summary['monitoring'] = subres.copy()
+            if params.get('script_id') or params.get('script'):
+                summary['script'] = subres.copy()
+            story['summary'] = summary
+
+        # start incident story
+        # elif etype == 'incident' and eaction == 'rule_triggered':
+            # TODO: put custom logic for incident stories here
+
+        coll.save(story)
+        ret.append((story['story_id'], story['type']))
+
+    # append to previous stories
+    for story in prev_stories:
+        started = conn['mist'].logging.find_one(
+            {'_id': ObjectId(story['log_ids'][0])}
+        )
+        if 'extra' in started:
+            try:
+                # bring extra key-value pairs to top level
+                for key, val in json.loads(started['extra']).items():
+                    started[key] = val
+                started.pop('extra')
+            except:
+                pass
+        update = {'$push': {'log_ids': event['_id']}, '$set': {}}
+        if event['error']:
+            update['$set']['error'] = event['error']
+        stype = story['type']
+        etype, eaction = event['type'], event['action']
+        if stype == 'shell' and etype == 'shell' and eaction == 'close':
+            update['$set']['finished_at'] = event['time']
+        elif stype == 'session':
+            if etype == 'session' and eaction == 'disconnect':
+                update['$set']['finished_at'] = event['time']
+        elif stype == 'incident':
+            # close incident if a relevent request specified above
+            if eaction in closes_inc:
+                update['$set']['finished_at'] = event['time']
+            # or if we got a rule_untriggered log entry
+            elif etype == 'incident' and eaction == 'rule_untriggered':
+                update['$set']['finished_at'] = event['time']
+        elif stype == 'job':
+            if etype == 'job':
+                if started['action'] == 'run_script':
+                    if eaction == 'script_finished':
+                        update['$set']['finished_at'] = event['time']
+                elif started['action'] in ['create_stack', 'execute_workflow',
+                                           'workflow_started']:
+                    if eaction == 'workflow_finished':
+                        update['$set']['finished_at'] = event['time']
+                elif started['action'] == 'deploy_collectd_started':
+                    if eaction == 'deploy_collectd_finished':
+                        update['$set']['finished_at'] = event['time']
+                elif started['action'] == 'undeploy_collectd_started':
+                    if eaction == 'undeploy_collectd_finished':
+                        update['$set']['finished_at'] = event['time']
+                elif started['action'] == 'create_machine':
+                    assert 'summary' in story
+                    inc = {}
+                    if eaction == 'machine_creation_finished':
+                        inc['summary.create.pending'] = -1
+                        if not event['error']:
+                            inc['summary.create.success'] = 1
+                        else:
+                            inc['summary.create.error'] = 1
+                            inc['summary.probe.skipped'] = 1
+                            inc['summary.probe.pending'] = -1
+                            if 'script' in story['summary']:
+                                inc['summary.script.skipped'] = 1
+                                inc['summary.script.pending'] = -1
+                            if 'monitoring' in story['summary']:
+                                inc['summary.monitoring.skipped'] = 1
+                                inc['summary.monitoring.pending'] = -1
+                    elif eaction == 'probe':
+                        inc['summary.probe.pending'] = -1
+                        if not event['error']:
+                            inc['summary.probe.success'] = 1
+                        else:
+                            inc['summary.probe.error'] = 1
+                            if 'script' in story['summary']:
+                                inc['summary.script.skipped'] = 1
+                                inc['summary.script.pending'] = -1
+                            if 'monitoring' in story['summary']:
+                                inc['summary.monitoring.skipped'] = 1
+                                inc['summary.monitoring.pending'] = -1
+                    elif eaction in ('deploy_collectd_finished',
+                                     'enable_monitoring_failed'):
+                        assert 'monitoring' in story['summary']
+                        inc['summary.monitoring.pending'] = -1
+                        if not event['error']:
+                            inc['summary.monitoring.success'] = 1
+                        else:
+                            inc['summary.monitoring.error'] = 1
+                    elif eaction in ('deployment_script_finished',
+                                     'script_finished'):
+                        assert 'script' in story['summary']
+                        inc['summary.script.pending'] = -1
+                        if not event['error']:
+                            inc['summary.script.success'] = 1
+                        else:
+                            inc['summary.script.error'] = 1
+                    update['$inc'] = inc
+                    # atomic updates
+                    update = {key: val for key, val in update.items()
+                              if val}
+                    if update:
+                        conn['mist'].stories.update(
+                            {'story_id': story['story_id']}, update
+                        )
+                    story = coll.find_one({'story_id': story['story_id']})
+                    update = {}
+                    pending = 0
+                    for key in story['summary']:
+                        pending += story['summary'][key].get('pending', 0)
+                    if not pending:
+                        update = {'$set': {'finished_at': event['time']}}
+        update = {key: val for key, val in update.items()
+                  if val}
+        if update:
+            conn['mist'].stories.update({'story_id': story['story_id']},
+                                        update)
+        ret.append((story['story_id'], story['type']))
+    if not _mongo_conn:
+        conn.close()
+    return ret
+
+
+def get_stories(story_type='', owner_id='', user_id='',
+                cloud_id='', machine_id='', script_id='', rule_id='',
+                error=False, pending=None, sort='started_at',
+                sort_order=-1,
+                limit=0, **kwargs):
+
+    query = kwargs
+    if story_type:
+        query['type'] = story_type
+    if owner_id:
+        query['owner_id'] = owner_id
+    if user_id:
+        query['user_id'] = user_id
+    if cloud_id:
+        query['cloud_id'] = cloud_id
+    if machine_id:
+        query['machine_id'] = machine_id
+    if script_id:
+        query['script_id'] = script_id
+    if rule_id:
+        query['rule_id'] = rule_id
+    if pending is True:
+        query['finished_at'] = 0
+    elif pending is False:
+        query['finished_at'] = {'$ne': 0}
+    if error:
+        query['error'] = {'$nin': [None, False]}
+
+    conn = MongoClient(config.MONGO_URI)  # todo vasil
+    coll = conn['mist'].stories
+    stories = list(coll.find(query or {}).sort(sort, sort_order).limit(limit))
+    log_ids = [ObjectId(log_id)
+               for story in stories for log_id in story['log_ids']]
+    events = {}
+    for event in conn['mist'].logging.find({'_id': {'$in': log_ids}}):
+        events[str(event.pop('_id'))] = event
+    for story in stories:
+        story.pop('_id')
+        story['logs'] = []
+        for log_id in story.pop('log_ids'):
+            if log_id in events:
+                event = events[log_id]
+                if 'extra' in event:
+                    try:
+                        # bring extra key-value pairs to top level
+                        for key, val in json.loads(event['extra']).items():
+                            event[key] = val
+                        event.pop('extra')
+                    except:
+                        pass
+            else:
+                log.error('Log_id %s not found', log_id)
+                event = {}
+            story['logs'].append(event)
+    return stories
+
+
+def get_story(story_id):
+    stories = get_stories(story_id=story_id)
+    if not stories:
+        raise NotFoundError(story_id)
+    if len(stories) > 1:
+        log.error('MULTIPLE ENTRIES WITH SAME STORY ID?????')
+    return stories[0]
+
+
+def logging_view_decorator(func):
+    """Decorator that logs a view function's request and response."""
+    def logging_view(context, request):
+        """Call view function and log API request and its response.
+
+        If an exception is raised inside a view, then the exception handler
+        view will be activated and the request along with its error response
+        will be handled there.
+
+        """
+
+        # hack to preserve view function's name if an exception is raised
+        # and handled by exception handler (otherwise we got exception_handler
+        # as view_name)
+        if not hasattr(request, 'real_view_name'):
+            request.real_view_name = func.func_name
+
+
+        # check if exception occurred
+        try:
+            response = func(context, request)
+        except HTTPError as e:
+            if request.path_info.startswith('/social_auth/complete'):
+                log.info("There was a bad error during SSO connection: %s, and "
+                         "request was %s" % (repr(e), request.__dict__))
+            raise e
+        # check if exception occured
+        exc_flag = (config.LOG_EXCEPTIONS and
+                    isinstance(context, Exception) and
+                    not isinstance(context, MistError))
+
+        if request.method in ('GET', 'HEAD') and not exc_flag:
+            # only continue to log non GET/HEAD requests
+            # that didn't raise exceptions)
+            return response
+        elif request.real_view_name in ('rule_triggered', 'not_found',
+                                        'enable_insights', 'register'):
+            # don't log these views no matter what
+            return response
+
+        # log request #
+        log_dict = {
+            'event_type': 'request',
+            'action': request.real_view_name,
+            'request_path': request.path_info,
+            'request_method': request.method,
+            'request_ip': ip_from_request(request),
+            'user_agent': request.user_agent,
+            'response_code': response.status_code,
+            'error': response.status_code >= 400,
+        }
+
+        # log original exception
+        if isinstance(context, MistError):
+            if context.orig_exc:
+                log_dict['_exc'] = repr(context.orig_exc)
+                log_dict['_exc_type'] = type(context.orig_exc)
+                if context.orig_traceback:
+                    log_dict['_traceback'] = context.orig_traceback
+        elif isinstance(context, Exception):
+            log_dict['_exc'] = repr(context)
+            log_dict['_exc_type'] = type(context)
+            log_dict['_traceback'] = traceback.format_exc()
+
+        # log user
+        session = request.environ['session']
+        user = session.get_user(effective=False)
+        #    swagIt(request,response,func)
+        if user is not None:
+            log_dict['user_id'] = user.id
+            sudoer = session.get_user()
+            if sudoer != user:
+                log_dict['sudoer_id'] = sudoer.id
+            auth_context = mist.core.auth.methods.auth_context_from_request(request)
+            log_dict['owner_id'] = auth_context.owner.id
+        else:
+            log_dict['user_id'] = None
+            log_dict['owner_id'] = None
+
+        from mist.core.auth.models import ApiToken, datetime_to_str
+        if isinstance(session, ApiToken):
+            if not 'dummy' in session.name:
+                log_dict['api_token_id'] = str(session.id)
+                log_dict['api_token_name'] = session.name
+                log_dict['api_token'] = session.token[:4] + '***CENSORED***'
+                log_dict['token_expires'] = datetime_to_str(session.expires())
+
+        # log matchdict and params
+        params = dict(params_from_request(request))
+        for key in ['email', 'cloud', 'machine', 'rule', 'script_id', 'tunnel_id']:
+            if key != 'email' and key in request.matchdict:
+                if not key.endswith('_id'):
+                    log_dict[key + '_id'] = request.matchdict[key]
+                else:
+                    log_dict[key] = request.matchdict[key]
+                continue
+            if key != 'email':
+                key += '_id'
+            if key in params:
+                log_dict[key] = params.pop(key)
+            if snake_to_camel(key) in params:
+                log_dict[key] = params.pop(snake_to_camel(key))
+
+        for key in ('priv', 'password', 'new_password', 'apikey', 'apisecret',
+                    'cert_file', 'key_file'):
+            if params.get(key):
+                params[key] = '***CENSORED***'
+        if log_dict['action'] == 'add_cloud':
+            provider = params.get('provider')
+            censor = {'vcloud': 'password',
+                      'indonesian_vcloud': 'password',
+                      'ec2': 'api_secret',
+                      'rackspace': 'api_key',
+                      'nephoscale': 'password',
+                      'softlayer': 'api_key',
+                      'digitalocean': 'token',
+                      'gce': 'private_key',
+                      'azure': 'certificate',
+                      'linode': 'api_key',
+                      'docker': 'auth_password',
+                      'hp': 'password',
+                      'openstack': 'password'}.get(provider)
+            if censor and censor in params:
+                params[censor] = '***CENSORED***'
+        log_dict['request_params'] = params
+
+        # log response body
+        try:
+            bdict = json.loads(response.body)
+            for key in ('job_id', ):
+                if key in bdict and key not in log_dict:
+                    log_dict[key] = bdict[key]
+            if 'cloud' in bdict and 'cloud_id' not in log_dict:
+                log_dict['cloud_id'] = bdict['cloud']
+            if 'machine' in bdict and 'machine_id' not in log_dict:
+                log_dict['machine_id'] = bdict['machine']
+            # Match resource type based on the action performed.
+            for rtype in ['cloud', 'machine', 'key', 'script', 'tunnel',
+                          'stack', 'template', 'schedule']:
+                if rtype in log_dict['action']:
+                    if 'id' in bdict and '%s_id' % rtype not in log_dict:
+                        log_dict['%s_id' % rtype] = bdict['id']
+                        break
+            if log_dict['action'] == 'update_rule':
+                if 'id' in bdict and 'rule_id' not in log_dict:
+                    log_dict['rule_id'] = bdict['id']
+            for key in ('priv', ):
+                if key in bdict:
+                    bdict[key] = '***CENSORED***'
+            if 'token' in bdict:
+                bdict['token'] = bdict['token'][:4] + '***CENSORED***'
+            log_dict['response_body'] = json.dumps(bdict)
+        except:
+            log_dict['response_body'] = response.body
+
+        # override logged action for specific views
+        if log_dict['action'] == 'machine_actions':
+            action = log_dict['request_params'].pop('action', None)
+            if action:
+                log_dict['action'] = '%s_machine' % action
+        elif log_dict['action'] == 'toggle_cloud':
+            state = log_dict['request_params'].pop('new_state', None)
+            if state == '1':
+                log_dict['action'] = 'enable_cloud'
+            elif state == '0':
+                log_dict['action'] = 'disable_cloud'
+        elif log_dict['action'] == 'update_monitoring':
+            if log_dict['request_params'].pop('action', None) == 'enable':
+                log_dict['action'] = 'enable_monitoring'
+            else:
+                log_dict['action'] = 'disable_monitoring'
+
+        # we save log_dict in mongo logging collection
+        mist.io.helpers.log_event(**log_dict)
+
+        # if a bad exception didn't occur then return, else log it to file
+        if not exc_flag:
+            return response
+
+        # Publish traceback in rabbitmq, for heka to parse and forward to elastic
+        log.info("Bad exception occured, logging to rabbitmq")
+        es_dict = log_dict.copy()
+        es_dict.pop('_exc_type')
+        # es_dict['timestamp'] = str(datetime.datetime.now())
+        es_dict['timestamp'] = time()
+        es_dict['traceback'] = es_dict.pop('_traceback')
+        es_dict['exception'] = es_dict.pop('_exc')
+        es_dict['type'] = 'exception'
+        routing_key = "%s.%s" % (es_dict['owner_id'], es_dict['action'])
+
+        amqp_publish('exceptions', routing_key, es_dict,
+                     ex_type='topic', ex_declare=True,
+                     auto_delete=False)
+
+        # log bad exception to file
+        log.info("Bad exception occured, logging to file")
+        lines = []
+        lines.append("Exception: %s" % log_dict.pop('_exc'))
+        lines.append("Exception type: %s" % log_dict.pop('_exc_type'))
+        lines.append("Time: %s" % strftime("%Y-%m-%d %H:%M %Z"))
+        lines += (
+            ["%s: %s" % (key, value) for key, value in log_dict.items()
+             if value and key != '_traceback']
+        )
+        for key in ('owner', 'user', 'sudoer'):
+            _id = log_dict.get('%s_id' % key)
+            if _id:
+                try:
+                    value = mist.io.users.models.Owner.objects.get(id=_id)
+                    lines.append("%s: %s" % (key, value))
+                except mist.io.users.models.Owner.DoesNotExist:
+                    pass
+                except Exception as exc:
+                    log.error("Error finding user in logged exc: %r", exc)
+        lines.append("-" * 10)
+        lines.append(log_dict['_traceback'])
+        lines.append("=" * 10)
+        msg = "\n".join(lines) + "\n"
+        directory = "var/log/exceptions"
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        filename = "%s/%s" % (directory, int(time()))
+        with open(filename, 'w+') as f:
+            f.write(msg)
+            # traceback.print_exc(file=f)
+
+        return response
+
+    return logging_view
+
+
+def view_config(*args, **kwargs):
+    """Override pyramid's view_config to log API requests and responses."""
+
+    return pyramid_view_config(*args, decorator=logging_view_decorator,
+                               **kwargs)
