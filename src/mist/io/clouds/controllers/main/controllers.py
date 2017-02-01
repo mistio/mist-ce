@@ -46,6 +46,7 @@ from mist.core.vpn.methods import to_tunnel
 from mist.io.helpers import rename_kwargs
 from mist.io.clouds.controllers.main.base import BaseMainController
 from mist.io.clouds.controllers.compute import controllers as compute_ctls
+from mist.io.clouds.controllers.dns import controllers as dns_ctls
 
 
 log = logging.getLogger(__name__)
@@ -55,6 +56,7 @@ class AmazonMainController(BaseMainController):
 
     provider = 'ec2'
     ComputeController = compute_ctls.AmazonComputeController
+    DnsController = dns_ctls.AmazonDNSController
 
     def _add__preparse_kwargs(self, kwargs):
         # Autofill apisecret from other Amazon Cloud.
@@ -136,6 +138,7 @@ class GoogleMainController(BaseMainController):
 
     provider = 'gce'
     ComputeController = compute_ctls.GoogleComputeController
+    DnsController = dns_ctls.GoogleDNSController
 
     def _update__preparse_kwargs(self, kwargs):
         private_key = kwargs.get('private_key', self.cloud.private_key)
@@ -377,10 +380,11 @@ class OtherMainController(BaseMainController):
         rename_kwargs(kwargs, 'machine_key', 'ssh_key')
         rename_kwargs(kwargs, 'machine_port', 'ssh_port')
         rename_kwargs(kwargs, 'remote_desktop_port', 'rdp_port')
-        if kwargs.pop('windows', False):
+        if kwargs.get('operating_system') == 'windows':
             kwargs['os_type'] = 'windows'
         else:
             kwargs['os_type'] = 'unix'
+        kwargs.pop('operating_system', None)
         errors = {}
         for key in kwargs.keys():
             if key not in ('host', 'ssh_user', 'ssh_port', 'ssh_key',

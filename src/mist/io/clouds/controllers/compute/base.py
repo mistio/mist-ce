@@ -38,7 +38,7 @@ from mist.core.vpn.methods import super_ping
 
 from mist.io.clouds.controllers.base import BaseController
 
-from mist.core.tag.models import Tag
+from mist.io.tag.models import Tag
 
 from mist.io.machines.models import Machine
 
@@ -429,6 +429,7 @@ class BaseComputeController(BaseController):
                 s.connect(dnat(self.cloud.owner, hostname, port))
                 s.shutdown(2)
             except:
+                s.shutdown(2)
                 log.info("Failed to connect to %s:%d", hostname, port)
                 continue
             log.info("Connected to %s:%d", hostname, port)
