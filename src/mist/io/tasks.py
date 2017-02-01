@@ -188,13 +188,37 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
 
             if hostname:
                 try:
-                    record = create_dns_a_record(owner, hostname, host)
+                    # split hostname in dot separated parts
+                    parts = [part for part in hostname.split('.') if part]
+                    # find all possible domains for this domain name,
+                    # longest first
+                    all_domains = {}
+                    for i in range(1, len(parts) - 1):
+                        subdomain = '.'.join(parts[:i])
+                        domain = '.'.join(parts[i:]) + '.'
+                        all_domains[domain] = subdomain
+                    if not all_domains:
+                        raise MistError("Couldn't extract a valid domain from \
+                                         '%s'."  % domain_name)
+                    # Get all available zones under this cloud
+                    zones = cloud.ctl.dns.list_zones()
+                    # We need to iterate over all the cloud DNS zones to find
+                    # any that is matching based on the domain. If one is found
+                    # then create an "A" type record with the provided name.
+                    # TODO: need to find what the default ttl for this record
+                    # should be, for now adding nothing further and just try to
+                    # used the cloud provider default.
+                    for zone in zones:
+                        for domain, subdomain in all_domains.iteritems():
+                            if zone['domain'] == domain:
+                                record = cloud.ctl.dns.create_record(
+                                    zone['id'], subdomain, "A", host, 3600)
                     hostname = '.'.join((record.name, record.zone.domain))
-                    log_event(action='create_dns_a_record', hostname=hostname,
-                              **log_dict)
+                    log_event(action='cloud.ctl.dns.create_record',
+                              hostname=hostname, **log_dict)
                 except Exception as exc:
-                    log_event(action='create_dns_a_record', error=str(exc),
-                              **log_dict)
+                    log_event(action='cloud.ctl.dns.create_record',
+                              error=str(exc), **log_dict)
 
             error = False
             if script_id:
