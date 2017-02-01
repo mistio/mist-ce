@@ -73,6 +73,11 @@ class BaseController(object):
             raise BadRequestError('schedule type must be one of these '
                                   '(crontab, interval, one_off)]')
 
+        if kwargs.get('schedule_type') == 'one_off' and not kwargs.get(
+                'schedule_entry', ''):
+            raise BadRequestError('one_off schedule '
+                                  'requires date given in schedule_entry')
+
         try:
             self.update(**kwargs)
         except (me.ValidationError, me.NotUniqueError) as exc:
@@ -113,6 +118,8 @@ class BaseController(object):
         # for ui compatibility
         if kwargs.get('expires') == '':
             kwargs['expires'] = None
+        if kwargs.get('max_run_count') == '':
+            kwargs['max_run_count'] = None
         # transform string to datetime
         if kwargs.get('expires'):
             try:
@@ -175,23 +182,26 @@ class BaseController(object):
                 type(self.schedule.schedule_type) == schedules.OneOff):
             # implements Interval under the hood
             future_date = kwargs.get('schedule_entry', '')
-            if not future_date:
-                raise BadRequestError('one_off schedule requires date '
-                                      'given in schedule_entry')
-            try:
-                future_date = datetime.datetime.strptime(future_date,
-                                                         '%Y-%m-%d %H:%M:%S')
-            except ValueError:
-                raise BadRequestError('Date value was not valid')
 
-            delta = future_date - now
-            # expires = future_date + datetime.timedelta(minutes=1)
-            one_off = schedules.OneOff(period='seconds',
-                                       every=delta.seconds,
-                                       entry=future_date)
-            self.schedule.schedule_type = one_off
-            self.schedule.max_run_count = 1
-            # self.schedule.expires = expires
+            if future_date:
+                try:
+                    future_date = datetime.datetime.strptime(
+                        future_date, '%Y-%m-%d %H:%M:%S')
+                except ValueError:
+                    raise BadRequestError('Date value was not valid')
+
+                if future_date < now:
+                    raise BadRequestError(
+                        'Date of future task is in the past. '
+                        'Please contact Marty McFly')
+
+                delta = future_date - now
+
+                one_off = schedules.OneOff(period='seconds',
+                                           every=delta.seconds,
+                                           entry=future_date)
+                self.schedule.schedule_type = one_off
+                self.schedule.max_run_count = 1
 
         try:
             self.schedule.save()
