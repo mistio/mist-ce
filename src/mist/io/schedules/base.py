@@ -267,8 +267,8 @@ class BaseController(object):
                 machines=machines_obj)
 
         # check permissions for machines' tags
-        if machines_tags and (not isinstance(machines_tags, dict) and
-                        machines_tags != ''):
+        if machines_tags and (not isinstance(machines_tags, dict)
+                              and machines_tags != ''):
             try:
                 machines_tags = json.loads(machines_tags)
             except:
