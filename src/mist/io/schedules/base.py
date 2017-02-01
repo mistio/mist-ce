@@ -185,12 +185,13 @@ class BaseController(object):
                 raise BadRequestError('Date value was not valid')
 
             delta = future_date - now
-            expires = future_date + datetime.timedelta(minutes=1)
+            # expires = future_date + datetime.timedelta(minutes=1)
             one_off = schedules.OneOff(period='seconds',
                                        every=delta.seconds,
                                        entry=future_date)
             self.schedule.schedule_type = one_off
-            self.schedule.expires = expires
+            self.schedule.max_run_count = 1
+            # self.schedule.expires = expires
 
         try:
             self.schedule.save()
