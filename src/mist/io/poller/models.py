@@ -1,3 +1,4 @@
+import logging
 import datetime
 
 import celery
@@ -7,7 +8,8 @@ import mongoengine as me
 
 from mist.io.users.models import Owner
 
-from mist.io.clouds.models import Cloud
+
+log = logging.getLogger(__name__)
 
 
 class PollingInterval(me.EmbeddedDocument):
@@ -194,16 +196,15 @@ class DebugPollingSchedule(PollingSchedule):
 
 class CloudPollingSchedule(PollingSchedule):
 
-    cloud = me.ReferenceField(Cloud)
+    cloud = me.ReferenceField('Cloud')
 
     @classmethod
-    def add(cls, cloud, default=None, interval=None, ttl=300):
+    def add(cls, cloud, interval=None, ttl=300):
         try:
             schedule = cls.objects.get(cloud=cloud)
         except cls.DoesNotExist:
             schedule = cls(cloud=cloud)
-        if default is not None and schedule.default_interval.every != default:
-            schedule.set_default_interval(default)
+        schedule.set_default_interval(cloud.polling_interval)
         if interval is not None:
             schedule.add_interval(interval, ttl)
         schedule.run_immediately = True
@@ -220,6 +221,13 @@ class CloudPollingSchedule(PollingSchedule):
         return (super(CloudPollingSchedule, self).enabled
                 and self.cloud.enabled
                 and not self.cloud.deleted)
+    @property
+    def interval(self):
+        if self.default_interval.every != self.cloud.polling_interval:
+            log.warning("Schedule has different interval from cloud, fixing")
+            self.default_interval.every = self.cloud.polling_interval
+            self.save()
+        return super(CloudPollingSchedule, self).interval
 
 
 class ListMachinesPollingSchedule(CloudPollingSchedule):

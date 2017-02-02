@@ -56,41 +56,6 @@ app.conf.update(**config.CELERY_SETTINGS)
 
 
 @app.task
-def update_machine_count(owner, cloud_id, machine_count):
-    """
-    Counts the machines number of a cloud and of an owner.
-    :param owner:
-    :param cloud_id:
-    :param machine_count:
-    :return:
-    """
-    if owner.find("@")!=-1:
-        owner = User.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-    cloud.machine_count = machine_count
-    cloud.save()
-    # TODO machine count property function
-    # TODO total machine count property function
-    clouds = Cloud.objects(owner=owner, deleted=None)
-
-    owner.total_machine_count = sum(
-        [cloud.machine_count for cloud in clouds]
-    )
-    owner.save()
-
-    org_machine_count = 0
-    orgs = Organization.objects(members=owner)
-    for org in orgs:
-        org_clouds = Cloud.objects(owner=org, deleted=None)
-        org.total_machine_count = sum(
-            [cloud.machine_count for cloud in org_clouds]
-        )
-        org.save()
-
-
-@app.task
 def ssh_command(owner, cloud_id, machine_id, host, command,
                       key_id=None, username=None, password=None, port=22):
     if owner.find("@")!=-1:
@@ -876,7 +841,7 @@ def deploy_collectd(owner, cloud_id, machine_id, extra_vars, job_id='',
                     plugins=None):
     # FIXME
     from mist.io.methods import deploy_collectd
-    
+
     if isinstance(owner, basestring) and '@' in owner:
         owner = User.objects.get(email=owner)
     else:
