@@ -194,9 +194,9 @@ class TaggedMachinesSchedule(BaseMachinesCondition):
     def get_machines(self):
         # all machines currently matching the tags
         cloud_machines_pairs = []
-        for k,v in self.tags.iteritems():
+        for k, v in self.tags.iteritems():
             machines_from_tags = Tag.objects(owner=self._instance.owner,
-                                             resource_type='machines', 
+                                             resource_type='machines',
                                              key=k, value=v)
             for m in machines_from_tags:
                 if m.resource.state != 'terminated':
