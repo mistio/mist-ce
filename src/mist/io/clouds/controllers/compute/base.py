@@ -199,15 +199,41 @@ class BaseComputeController(BaseController):
                 except TypeError:
                     extra[key] = str(val)
 
-            machine.extra = extra
+            # TODO: We need to add here an initial check on whether this
+            # machine has an attached DNS A record.
+            # If not then we should fallback to using the rest of the hostname
+            # stack i.e. Provider hostname if exists, then public IP.
+            # TODO: This code needs to be refactored when the corresponding
+            # Mongo models for DNS zones and records have been created.
+            records = []
+            hostname = ""
+            zones = machine.cloud.ctl.dns.list_zones()
+            for zone in zones:
+                records = machine.cloud.ctl.dns.list_records(zone['id'])
+                for ip in machine.public_ips:
+                    for record in records:
+                        if ':' not in ip and record['type'] == 'A':
+                            if ip == record['data']:
+                                hostname = record['name'] + "." + zone['domain']
+                                # Remove trailing dot from hostname
+                                machine.hostname = hostname[:len(hostname) -1]
+                                break
 
-            if machine.extra.get('dns_name'):
-                machine.hostname = machine.extra['dns_name']
-            else:
-                for ip in machine.public_ips + machine.private_ips:
-                    if ':' not in ip:
-                        machine.hostname = ip
-                        break
+            # If no relevant DNS record was found for this machine then use the
+            # either the provider hostname, or if there's none, then one of the
+            # machine's public IP(s).
+            if not machine.hostname:
+                machine.extra = extra
+
+                if machine.extra.get('dns_name'):
+                    machine.hostname = machine.extra['dns_name']
+                else:
+                    for ip in machine.public_ips + machine.private_ips:
+                        if ':' not in ip:
+                            machine.hostname = ip
+                            break
+
+            log.info("Machine hostname: %s", machine.hostname)
 
             # Get machine tags from db
             tags = {tag.key: tag.value for tag in Tag.objects(
@@ -829,6 +855,18 @@ class BaseComputeController(BaseController):
         while machine.key_associations:
             machine.key_associations.pop()
         machine.state = 'terminated'
+
+        # Delete any DNS records associated with this machine
+        zones = machine.cloud.ctl.dns.list_zones()
+        for zone in zones:
+            records = machine.cloud.ctl.dns.list_records(zone['id'])
+            for ip in machine.public_ips:
+                for record in records:
+                    if ':' not in ip and record['type'] == 'A':
+                        if ip == record['data']:
+                            machine.cloud.ctl.dns.delete_record(zone['id'],
+                                                                record['id'])
+                            break
         machine.save()
 
     def _destroy_machine(self, machine, machine_libcloud):

@@ -212,7 +212,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                         for domain, subdomain in all_domains.iteritems():
                             if zone['domain'] == domain:
                                 record = cloud.ctl.dns.create_record(
-                                    zone['id'], subdomain, "A", host, "")
+                                    zone['id'], subdomain, "A", host, 3600)
                     hostname = '.'.join((record.name, record.zone.domain))
                     log_event(action='cloud.ctl.dns.create_record',
                               hostname=hostname, **log_dict)
