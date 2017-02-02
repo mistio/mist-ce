@@ -263,8 +263,8 @@ class BaseController(object):
 
                 machines_obj.append(machine)
 
-            self.schedule.resource_form = schedules.ListOfMachinesSchedule(
-                machines=machines_obj)
+            self.schedule.machines_condition = \
+                schedules.ListOfMachinesSchedule(machines=machines_obj)
 
         # check permissions for machines' tags
         if machines_tags and (not isinstance(machines_tags, dict)
@@ -282,7 +282,7 @@ class BaseController(object):
                 # SEC require permission RUN_SCRIPT on machine
                 auth_context.check_perm("machine", "run_script", None)
 
-            self.schedule.resource_form = schedules.TaggedMachinesSchedule(
-                tags=machines_tags)
+            self.schedule.machines_condition = \
+                schedules.TaggedMachinesSchedule(tags=machines_tags)
 
         return
