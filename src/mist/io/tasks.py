@@ -1027,7 +1027,7 @@ def group_machines_actions(owner_id, action, name, cloud_machines_pairs):
         'description': schedule.description or '',
         'schedule_type': unicode(schedule.schedule_type or ''),
         'owner_id': owner_id,
-        'machines_match': schedule.get_machines(),
+        'machines_match': schedule.machines_condition.get_machines,
         'machine_action': action,
         'expires': str(schedule.expires or ''),
         'enabled': schedule.enabled,
@@ -1107,33 +1107,27 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
                     machine.ctl.start()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Start failed',
-                                                **log_dict)
+                    log_event(action='Start failed', **log_dict)
                 else:
-                    log_event(action='Start succeeded'
-                                            , **log_dict)
+                    log_event(action='Start succeeded', **log_dict)
             elif action == 'stop':
                 log_event(action='Stop', **log_dict)
                 try:
                     machine.ctl.stop()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Stop failed',
-                                                **log_dict)
+                    log_event(action='Stop failed', **log_dict)
                 else:
-                    log_event(action='Stop succeeded',
-                                                **log_dict)
+                    log_event(action='Stop succeeded', **log_dict)
             elif action == 'reboot':
                 log_event(action='Reboot', **log_dict)
                 try:
                     machine.ctl.reboot()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Reboot failed',
-                                                **log_dict)
+                    log_event(action='Reboot failed', **log_dict)
                 else:
-                    log_event(action='Reboot succeeded',
-                                            **log_dict)
+                    log_event(action='Reboot succeeded', **log_dict)
             elif action == 'destroy':
                 log_event(action='Destroy', **log_dict)
                 try:
@@ -1182,7 +1176,7 @@ def group_run_script(owner_id, script_id, name, cloud_machines_pairs):
         'description': schedule.description or '',
         'schedule_type': unicode(schedule.schedule_type or ''),
         'owner_id': owner_id,
-        'machines_match': schedule.get_machines(),
+        'machines_match': schedule.machines_condition.get_machines,
         'script_id': script_id,
         'expires': str(schedule.expires or ''),
         'enabled': schedule.enabled,
@@ -1269,7 +1263,7 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
         ret['key_id'], ret['ssh_user'] = shell.autoconfigure(
             owner, cloud_id, machine_id, username, password, port
         )
-
+        # FIXME wrap here script.run_script
         path, params, wparams = script.ctl.run_script(shell,
                                                       params=params,
                                                       job_id=ret.get('job_id'))
@@ -1343,6 +1337,6 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
     if ret['error']:
         title += " for user %s" % str(owner)
         notify_admin(
-            title, "%s\n\n%s" % (ret['stdout'], ret['error']), team='dev'
+            title, "%s\n\n%s" % (ret['stdout'], ret['error']), team = 'dev'
         )
     return ret
