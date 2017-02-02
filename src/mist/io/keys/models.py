@@ -2,7 +2,7 @@
 import logging
 from uuid import uuid4
 import mongoengine as me
-import mist.core.tag.models
+import mist.io.tag.models
 from Crypto.PublicKey import RSA
 from mist.io.users.models import Owner
 from mist.io.exceptions import BadRequestError
@@ -123,7 +123,7 @@ class Key(me.Document):
 
     def delete(self):
         super(Key, self).delete()
-        mist.core.tag.models.Tag.objects(resource=self).delete()
+        mist.io.tag.models.Tag.objects(resource=self).delete()
         self.owner.mapper.remove(self)
 
     def as_dict(self):

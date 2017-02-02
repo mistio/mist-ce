@@ -7,7 +7,7 @@ from mist.core import config
 from pyramid.response import Response
 from mist.io.exceptions import BadRequestError
 from mist.io.helpers import trigger_session_update
-from mist.core.exceptions import ScriptNameExistsError
+from mist.io.exceptions import ScriptNameExistsError
 
 log = logging.getLogger(__name__)
 
@@ -94,6 +94,7 @@ class BaseScriptController(object):
         except me.NotUniqueError as exc:
             log.error("Script %s not unique error: %s", self.script.name, exc)
             raise ScriptNameExistsError()
+        self.script.owner.mapper.update(self.script)
         log.info("Added script with name '%s'", self.script.name)
         trigger_session_update(self.script.owner, ['scripts'])
 

@@ -4,7 +4,7 @@ import uuid
 
 import mongoengine as me
 
-from mist.core.tag.models import Tag
+from mist.io.tag.models import Tag
 from mist.io.keys.models import Key
 from mist.io.users.models import Organization
 
