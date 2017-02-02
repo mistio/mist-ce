@@ -153,7 +153,7 @@ class ScriptTask(BaseTaskType):
         return 'Run script: %s' % self.script_id
 
 
-class BaseResourceForm(me.EmbeddedDocument):
+class BaseMachinesCondition(me.EmbeddedDocument):
     """Abstract Base class used as a common interface
         for scheduler's resource types. List of
         machines_uuids or machines_tags"""
@@ -165,7 +165,7 @@ class BaseResourceForm(me.EmbeddedDocument):
         raise NotImplementedError()
 
 
-class ListOfMachinesSchedule(BaseResourceForm):
+class ListOfMachinesSchedule(BaseMachinesCondition):
     machines = me.ListField(me.ReferenceField(Machine, required=True,),
                             required=True)
     # TODO
@@ -187,7 +187,7 @@ class ListOfMachinesSchedule(BaseResourceForm):
     #     return 'Machines: %s' % self.machines
 
 
-class TaggedMachinesSchedule(BaseResourceForm):
+class TaggedMachinesSchedule(BaseMachinesCondition):
     tags = me.DictField(required=True, default={})
 
     @property
@@ -198,9 +198,10 @@ class TaggedMachinesSchedule(BaseResourceForm):
             machines_from_tags = Tag.objects(owner=self._instance.owner,
                                              resource_type='machines', key=tag)
             for m in machines_from_tags:
-                machine_id = m.resource.machine_id
-                cloud_id = m.resource.cloud.id
-                cloud_machines_pairs.append((cloud_id, machine_id))
+                if m.resource.state != 'terminated':
+                    machine_id = m.resource.machine_id
+                    cloud_id = m.resource.cloud.id
+                    cloud_machines_pairs.append((cloud_id, machine_id))
 
         return cloud_machines_pairs
 
@@ -272,11 +273,12 @@ class Schedule(me.Document):
     # mist specific fields
     schedule_type = me.EmbeddedDocumentField(BaseScheduleType, required=True)
     task_type = me.EmbeddedDocumentField(BaseTaskType, required=True)
-    resource_form = me.EmbeddedDocumentField(BaseResourceForm, required=True)
+    machines_condition = me.EmbeddedDocumentField(BaseMachinesCondition,
+                                                  required=True)
 
     # celerybeat-mongo specific fields
     expires = me.DateTimeField()
-    enabled = me.BooleanField(default=False)
+    task_enabled = me.BooleanField(default=False)
     run_immediately = me.BooleanField()
     last_run_at = me.DateTimeField()
     total_run_count = me.IntField(min_value=0, default=0)
@@ -327,7 +329,7 @@ class Schedule(me.Document):
 
     @property
     def args(self):
-        m = self.resource_form.get_machines
+        m = self.machines_condition.get_machines
         fire_up = self.task_type.args
 
         return [self.owner.id, fire_up, self.name, m]
@@ -339,6 +341,13 @@ class Schedule(me.Document):
     @property
     def task(self):
         return self.task_type.task
+
+    @property
+    def enabled(self):
+        if not self.machines_condition.get_machines:
+            return False
+        else:
+            return self.task_enabled
 
     def __unicode__(self):
         fmt = '{0.name}: {{no schedule}}'
@@ -389,9 +398,9 @@ class Schedule(me.Document):
         """Pre-save cleaning to ensure that a Schedule is disabled & expired
         in case it has been marked as deleted."""
         if self.deleted:
-            self.enabled = False
+            self.task_enabled = False
         if self.expires and self.expires < datetime.datetime.now():
-            self.enabled = False  # TODO property
+            self.task_enabled = False
 
     def delete(self):
         super(Schedule, self).delete()
@@ -409,19 +418,19 @@ class Schedule(me.Document):
             'schedule_entry': self.schedule_type.as_dict(),
             'task_type': str(self.task_type),
             'expires': str(self.expires or ''),
-            'enabled': self.enabled,
+            'task_enabled': self.task_enabled,
             'run_immediately': self.run_immediately or '',
             'last_run_at': str(self.last_run_at or ''),
             'total_run_count': self.total_run_count or 0,
             'max_run_count': self.max_run_count or 0,
         }
 
-        if isinstance(self.resource_form, ListOfMachinesSchedule):
+        if isinstance(self.machines_condition, ListOfMachinesSchedule):
             machines_uuids = [machine.id for machine in
-                              self.resource_form.machines]
+                              self.machines_condition.machines]
             sdict.update({'machines_uuids': machines_uuids})
         else:
-            sdict.update({'machines_tags': self.resource_form.tags})
+            sdict.update({'machines_tags': self.machines_condition.tags})
 
         return sdict
 
