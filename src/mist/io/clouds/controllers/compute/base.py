@@ -429,8 +429,6 @@ class BaseComputeController(BaseController):
             machine.private_ips[0] if machine.private_ips else '')
         if not hostname:
             return False
-        socket.setdefaulttimeout(5)
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ports_list = [22, 80, 443, 3389]
         for port in (machine.ssh_port, machine.rdp_port):
             if port and port not in ports_list:
@@ -438,6 +436,8 @@ class BaseComputeController(BaseController):
         for port in ports_list:
             log.info("Attempting to connect to %s:%d", hostname, port)
             try:
+                socket.setdefaulttimeout(3)
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect(dnat(self.cloud.owner, hostname, port))
                 s.shutdown(2)
             except:
