@@ -196,7 +196,7 @@ class DebugPollingSchedule(PollingSchedule):
 
 class CloudPollingSchedule(PollingSchedule):
 
-    cloud = me.ReferenceField('Cloud')
+    cloud = me.ReferenceField('Cloud', reverse_delete_rule=me.CASCADE)
 
     @classmethod
     def add(cls, cloud, interval=None, ttl=300):
