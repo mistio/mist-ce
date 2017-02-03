@@ -433,18 +433,14 @@ class BaseComputeController(BaseController):
         for port in (machine.ssh_port, machine.rdp_port):
             if port and port not in ports_list:
                 ports_list.insert(0, port)
+        socket_timeout = 3
+        # add timeout for socket
         for port in ports_list:
             log.info("Attempting to connect to %s:%d", hostname, port)
             try:
-                socket.setdefaulttimeout(3)
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect(dnat(self.cloud.owner, hostname, port))
+                s = socket.create_connection(dnat(self.cloud.owner, hostname, port), socket_timeout)
                 s.shutdown(2)
             except:
-                try:
-                    s.shutdown(2)
-                except:
-                    pass
                 log.info("Failed to connect to %s:%d", hostname, port)
                 continue
             log.info("Connected to %s:%d", hostname, port)
