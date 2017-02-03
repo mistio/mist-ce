@@ -87,6 +87,7 @@ class Cloud(me.Document):
 
     last_success = me.DateTimeField()
     last_failure = me.DateTimeField()
+    last_attempt_started = me.DateTimeField()
     failure_count = me.IntField(default=0)
 
     meta = {

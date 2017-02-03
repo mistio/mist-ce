@@ -26,8 +26,8 @@ def debug(value=42):
 
 @app.task
 def list_machines(cloud_id):
+    """Perform list machines. Cloud controller stores results in mongodb."""
 
-    # Perform list machines. Cloud controller stores results in mongodb.
     cloud = Cloud.objects.get(id=cloud_id)
 
     # Find last run. If too recent, abort.
@@ -43,6 +43,18 @@ def list_machines(cloud_id):
         if datetime.datetime.now() - last_run < schedule.interval.timedelta:
             log.warning("Running too soon for cloud %s, aborting!", cloud)
 
+    # Is another same task running?
+    now = datetime.datetime.now()
+    if cloud.last_attempt_started:
+        # Other same task started recently, abort.
+        if now - cloud.last_attemp_started < datetime.timedelta(seconds=60):
+            log.warning("Other same tasks started recently, aborting.")
+        # Has been running for too long or has died. Ignore.
+        log.warning("Other same task seems to have started, but it's been "
+                    "quite a while, will ignore and run normally.")
+    cloud.last_attempt_started = now
+    cloud.save()
+
     try:
         # Run list_machines.
         machines = cloud.ctl.compute.list_machines()
@@ -51,6 +63,7 @@ def list_machines(cloud_id):
         log.warning("Failed to list_machines for cloud %s: %r", cloud, exc)
         cloud.last_failure = datetime.datetime.now()
         cloud.failure_count += 1
+        cloud.last_attempt_started = None
         cloud.save()
         raise
     else:
@@ -58,6 +71,7 @@ def list_machines(cloud_id):
         log.info("Succeeded to list_machines for cloud %s", cloud)
         cloud.last_success = datetime.datetime.now()
         cloud.failure_count = 0
+        cloud.last_attempt_started = None
         cloud.save()
 
     # Publish results to rabbitmq (for backwards compatibility).
