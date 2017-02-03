@@ -17,20 +17,14 @@ from mist.io.exceptions import ScriptNotFoundError
 from mist.io.exceptions import ScheduleOperationError
 from mist.io.exceptions import ScheduleNameExistsError
 
+from mist.io.machines.models import Machine
+from mist.io.exceptions import NotFoundError
 
 log = logging.getLogger(__name__)
 
 
 class BaseController(object):
-    """Abstract base class for every schedule/kind_of_machines controller
 
-    This base controller factors out all the steps common to all schedules
-    into a base class, and defines an interface for kinf_of_machines specific
-    schedule controllers
-
-    Subclasses are meant to extend or override methods of this base class to
-    account for differencies between different schedule types.
-    """
     def __init__(self, schedule, auth_context=None):
         """Initialize schedule controller given a schedule
 
@@ -74,12 +68,25 @@ class BaseController(object):
             raise BadRequestError(
                 "You must provide a list of machine ids or tags")
 
+        if kwargs.get('schedule_type') not in ['crontab',
+                                               'interval', 'one_off']:
+            raise BadRequestError('schedule type must be one of these '
+                                  '(crontab, interval, one_off)]')
+
+        if kwargs.get('schedule_type') == 'one_off' and not kwargs.get(
+                'schedule_entry', ''):
+            raise BadRequestError('one_off schedule '
+                                  'requires date given in schedule_entry')
+
         try:
             self.update(**kwargs)
-        except me.ValidationError:
+        except (me.ValidationError, me.NotUniqueError) as exc:
             # Propagate original error.
+            log.error("Error adding %s: %s", self.schedule.name,
+                      exc.to_dict())
             raise
-        return self.schedule.id
+        log.info("Added schedule with name '%s'", self.schedule.name)
+        self.schedule.owner.mapper.update(self.schedule)
 
     def update(self, **kwargs):
         """Edit an existing Schedule"""
@@ -108,14 +115,28 @@ class BaseController(object):
             # SEC require permission RUN on script
             auth_context.check_perm('script', 'run', script_id)
 
+        # for ui compatibility
+        if kwargs.get('expires') == '':
+            kwargs['expires'] = None
+        if kwargs.get('max_run_count') == '':
+            kwargs['max_run_count'] = None
+        # transform string to datetime
+        if kwargs.get('expires'):
+            try:
+                kwargs['expires'] = datetime.datetime.strptime(
+                                    kwargs['expires'], '%Y-%m-%d %H:%M:%S')
+            except ValueError:
+                raise BadRequestError('Expiration date value was not valid')
+
         # set schedule attributes
         for key, value in kwargs.iteritems():
             if key in self.schedule._fields.keys():
                 setattr(self.schedule, key, value)
 
-        # for ui compatibility
-        if self.schedule.expires == '':
-            self.schedule.expires = None
+        now = datetime.datetime.now()
+        if self.schedule.expires and self.schedule.expires < now:
+            raise BadRequestError('Date of future task is in the past. '
+                                  'Please contact Marty McFly')
 
         # Schedule specific kwargs preparsing.
         try:
@@ -135,61 +156,52 @@ class BaseController(object):
             self.schedule.task_type = schedules.ScriptTask(script_id=script_id)
 
         schedule_type = kwargs.get('schedule_type')
-        if schedule_type not in ['crontab', 'interval', 'one_off', None]:
-            raise BadRequestError('schedule type must be one of these '
-                                  '(crontab, interval, one_off)]')
 
-        future_date = None
         if (schedule_type == 'crontab' or
                 isinstance(self.schedule.schedule_type, schedules.Crontab)):
-            if self.schedule.expires:
-                future_date = str(self.schedule.expires)
-
-        elif (schedule_type == 'interval' or
-                isinstance(self.schedule.schedule_type, schedules.Interval)):
-            if self.schedule.expires:
-                future_date = str(self.schedule.expires)
-
-        elif schedule_type == 'one_off':
-            future_date = kwargs.get('schedule_entry', '')
-            if not future_date:
-                raise BadRequestError('one_off schedule requires date '
-                                      'given in schedule_entry')
-
-        if future_date:
-            try:
-                future_date = datetime.datetime.strptime(future_date,
-                                                         '%Y-%m-%d %H:%M:%S')
-            except ValueError:
-                raise BadRequestError('Expiration date value was not valid')
-            now = datetime.datetime.now()
-            if future_date < now:
-                raise BadRequestError('Date of future task is in the past. '
-                                      'Please contact Marty McFly')
-
-        if schedule_type == 'crontab':
-            schedule_entry = json.loads(kwargs.get('schedule_entry', '{}'))
-            for k in schedule_entry.keys():
+            schedule_entry = kwargs.get('schedule_entry', {})
+            for k in schedule_entry:
                 if k not in ['minute', 'hour', 'day_of_week', 'day_of_month',
                              'month_of_year']:
                     raise BadRequestError("Invalid key given: %s" % k)
             self.schedule.schedule_type = schedules.Crontab(**schedule_entry)
 
-        elif schedule_type == 'interval':
-            schedule_entry = json.loads(kwargs.get('schedule_entry', '{}'))
-            for k in schedule_entry.keys():
-                if k not in ['period', 'every']:
-                    raise BadRequestError("Invalid key given: %s" % k)
+        elif (schedule_type == 'interval' or
+                type(self.schedule.schedule_type) == schedules.Interval):
+            schedule_entry = kwargs.get('schedule_entry', {})
 
-            self.schedule.schedule_type = schedules.Interval(**schedule_entry)
+            if schedule_entry:
+                for k in schedule_entry:
+                    if k not in ['period', 'every']:
+                        raise BadRequestError("Invalid key given: %s" % k)
 
-        elif schedule_type == 'one_off':
-            delta = future_date - now
-            future_date += datetime.timedelta(minutes=1)
-            interval = schedules.Interval(period='seconds',
-                                          every=delta.seconds)
-            self.schedule.schedule_type = interval
-            self.schedule.expires = future_date.strftime('%Y-%m-%d %H:%M:%S')
+                self.schedule.schedule_type = schedules.Interval(
+                    **schedule_entry)
+
+        elif (schedule_type == 'one_off' or
+                type(self.schedule.schedule_type) == schedules.OneOff):
+            # implements Interval under the hood
+            future_date = kwargs.get('schedule_entry', '')
+
+            if future_date:
+                try:
+                    future_date = datetime.datetime.strptime(
+                        future_date, '%Y-%m-%d %H:%M:%S')
+                except ValueError:
+                    raise BadRequestError('Date value was not valid')
+
+                if future_date < now:
+                    raise BadRequestError(
+                        'Date of future task is in the past. '
+                        'Please contact Marty McFly')
+
+                delta = future_date - now
+
+                one_off = schedules.OneOff(period='seconds',
+                                           every=delta.seconds,
+                                           entry=future_date)
+                self.schedule.schedule_type = one_off
+                self.schedule.max_run_count = 1
 
         try:
             self.schedule.save()
@@ -197,16 +209,14 @@ class BaseController(object):
             log.error("Error updating %s: %s", self.schedule.name,
                       e.to_dict())
             raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
-        except me.NotUniqueError:
+        except me.NotUniqueError as exc:
+            log.error("Schedule %s not unique error: %s", self.schedule, exc)
             raise ScheduleNameExistsError()
         except me.OperationError:
             raise ScheduleOperationError()
 
-        return self.schedule.id
-
-    # FIXME
     def _update__preparse_machines(self, auth_context, kwargs):
-        """Preparse machines arguments to `self.uppdate`
+        """Preparse machines arguments to `self.update`
 
         This is called by `self.update` when adding a new schedule,
         in order to apply pre processing to the given params. Any subclass
@@ -222,4 +232,57 @@ class BaseController(object):
         Subclasses MAY override this method.
 
         """
+        import mist.io.schedules.models as schedules
+
+        machines_uuids = kwargs.get('machines_uuids', '')
+        machines_tags = kwargs.get('machines_tags', '')
+        action = kwargs.get('action', '')
+
+        # convert machines' uuids to machine objects
+        # and check permissions
+        if machines_uuids:
+            machines_obj = []
+            for machine_uuid in machines_uuids:
+                try:
+                    machine = Machine.objects.get(id=machine_uuid,
+                                                  state__ne='terminated')
+                except me.DoesNotExist:
+                    raise NotFoundError('Machine state is terminated')
+
+                cloud_id = machine.cloud.id
+                # SEC require permission READ on cloud
+                auth_context.check_perm("cloud", "read", cloud_id)
+
+                if action:
+                    # SEC require permission ACTION on machine
+                    auth_context.check_perm("machine", action, machine_uuid)
+                else:
+                    # SEC require permission RUN_SCRIPT on machine
+                    auth_context.check_perm("machine", "run_script",
+                                            machine_uuid)
+
+                machines_obj.append(machine)
+
+            self.schedule.machines_condition = \
+                schedules.ListOfMachinesSchedule(machines=machines_obj)
+
+        # check permissions for machines' tags
+        if machines_tags and (not isinstance(machines_tags, dict)
+                              and machines_tags != ''):
+            try:
+                machines_tags = json.loads(machines_tags)
+            except:
+                raise BadRequestError("Tags are not in an acceptable form")
+
+        if machines_tags:
+            if action:
+                # SEC require permission ACTION on machine
+                auth_context.check_perm("machine", action, None)
+            else:
+                # SEC require permission RUN_SCRIPT on machine
+                auth_context.check_perm("machine", "run_script", None)
+
+            self.schedule.machines_condition = \
+                schedules.TaggedMachinesSchedule(tags=machines_tags)
+
         return
