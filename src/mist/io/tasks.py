@@ -38,8 +38,8 @@ from mist.core import config
 
 celery_cfg = 'mist.core.celery_config'
 
-from mist.core.helpers import log_event
-from mist.core.helpers import send_email as helper_send_email
+from mist.io.helpers import log_event
+from mist.io.helpers import send_email as helper_send_email
 from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_owner_listening
 from mist.io.helpers import amqp_log
@@ -53,41 +53,6 @@ log = logging.getLogger(__name__)
 
 app = Celery('tasks')
 app.conf.update(**config.CELERY_SETTINGS)
-
-
-@app.task
-def update_machine_count(owner, cloud_id, machine_count):
-    """
-    Counts the machines number of a cloud and of an owner.
-    :param owner:
-    :param cloud_id:
-    :param machine_count:
-    :return:
-    """
-    if owner.find("@")!=-1:
-        owner = User.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-    cloud.machine_count = machine_count
-    cloud.save()
-    # TODO machine count property function
-    # TODO total machine count property function
-    clouds = Cloud.objects(owner=owner, deleted=None)
-
-    owner.total_machine_count = sum(
-        [cloud.machine_count for cloud in clouds]
-    )
-    owner.save()
-
-    org_machine_count = 0
-    orgs = Organization.objects(members=owner)
-    for org in orgs:
-        org_clouds = Cloud.objects(owner=org, deleted=None)
-        org.total_machine_count = sum(
-            [cloud.machine_count for cloud in org_clouds]
-        )
-        org.save()
 
 
 @app.task
@@ -120,7 +85,6 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
     from mist.io.methods import create_dns_a_record
 
     from mist.core.methods import enable_monitoring
-    from mist.core.helpers import log_event
 
     job_id = job_id or uuid.uuid4().hex
     if owner.find("@") != -1:
@@ -790,7 +754,7 @@ class ListMachines(UserTask):
                 for tag in machine["tags"]:
                     tags[tag["key"]]= tag["value"]
             try:
-                from mist.core.tag.methods import resolve_id_and_get_tags
+                from mist.io.tag.methods import resolve_id_and_get_tags
                 mistio_tags = resolve_id_and_get_tags(owner, 'machine',
                                                       machine.get("id"),
                                                       cloud_id=cloud_id)
@@ -877,7 +841,7 @@ def deploy_collectd(owner, cloud_id, machine_id, extra_vars, job_id='',
                     plugins=None):
     # FIXME
     from mist.io.methods import deploy_collectd
-    
+
     if isinstance(owner, basestring) and '@' in owner:
         owner = User.objects.get(email=owner)
     else:
@@ -1063,7 +1027,7 @@ def group_machines_actions(owner_id, action, name, cloud_machines_pairs):
         'description': schedule.description or '',
         'schedule_type': unicode(schedule.schedule_type or ''),
         'owner_id': owner_id,
-        'machines_match': schedule.get_machines(),
+        'machines_match': schedule.machines_condition.get_machines,
         'machine_action': action,
         'expires': str(schedule.expires or ''),
         'enabled': schedule.enabled,
@@ -1143,33 +1107,27 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
                     machine.ctl.start()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Start failed',
-                                                **log_dict)
+                    log_event(action='Start failed', **log_dict)
                 else:
-                    log_event(action='Start succeeded'
-                                            , **log_dict)
+                    log_event(action='Start succeeded', **log_dict)
             elif action == 'stop':
                 log_event(action='Stop', **log_dict)
                 try:
                     machine.ctl.stop()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Stop failed',
-                                                **log_dict)
+                    log_event(action='Stop failed', **log_dict)
                 else:
-                    log_event(action='Stop succeeded',
-                                                **log_dict)
+                    log_event(action='Stop succeeded', **log_dict)
             elif action == 'reboot':
                 log_event(action='Reboot', **log_dict)
                 try:
                     machine.ctl.reboot()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Reboot failed',
-                                                **log_dict)
+                    log_event(action='Reboot failed', **log_dict)
                 else:
-                    log_event(action='Reboot succeeded',
-                                            **log_dict)
+                    log_event(action='Reboot succeeded', **log_dict)
             elif action == 'destroy':
                 log_event(action='Destroy', **log_dict)
                 try:
@@ -1218,7 +1176,7 @@ def group_run_script(owner_id, script_id, name, cloud_machines_pairs):
         'description': schedule.description or '',
         'schedule_type': unicode(schedule.schedule_type or ''),
         'owner_id': owner_id,
-        'machines_match': schedule.get_machines(),
+        'machines_match': schedule.machines_condition.get_machines,
         'script_id': script_id,
         'expires': str(schedule.expires or ''),
         'enabled': schedule.enabled,
@@ -1305,7 +1263,7 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
         ret['key_id'], ret['ssh_user'] = shell.autoconfigure(
             owner, cloud_id, machine_id, username, password, port
         )
-
+        # FIXME wrap here script.run_script
         path, params, wparams = script.ctl.run_script(shell,
                                                       params=params,
                                                       job_id=ret.get('job_id'))
@@ -1379,6 +1337,6 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
     if ret['error']:
         title += " for user %s" % str(owner)
         notify_admin(
-            title, "%s\n\n%s" % (ret['stdout'], ret['error']), team='dev'
+            title, "%s\n\n%s" % (ret['stdout'], ret['error']), team = 'dev'
         )
     return ret

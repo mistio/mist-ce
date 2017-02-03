@@ -4,7 +4,7 @@ import uuid
 
 import mongoengine as me
 
-from mist.core.tag.models import Tag
+from mist.io.tag.models import Tag
 from mist.io.keys.models import Key
 from mist.io.users.models import Organization
 
@@ -81,6 +81,7 @@ class Cloud(me.Document):
 
     starred = me.ListField()
     unstarred = me.ListField()
+    polling_interval = me.IntField(default=0)  # in seconds
 
     deleted = me.DateTimeField()
 
@@ -170,6 +171,7 @@ class Cloud(me.Document):
             'provider': self.ctl.provider,
             'enabled': self.enabled,
             'state': 'online' if self.enabled else 'offline',
+            'polling_interval': self.polling_interval,
         }
         cdict.update({key: getattr(self, key)
                       for key in self._cloud_specific_fields

@@ -26,8 +26,12 @@ from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
-from mist.io.clouds.controllers.compute.base import BaseComputeController
 from mist.io.helpers import rename_kwargs
+
+from mist.io.clouds.controllers.compute.base import BaseComputeController
+from mist.io.clouds.controllers.dns.base import BaseDNSController
+
+from mist.io.poller.models import ListMachinesPollingSchedule
 
 
 log = logging.getLogger(__name__)
@@ -75,7 +79,7 @@ class BaseMainController(object):
     """
 
     ComputeController = None
-    # DnsController = None
+    DnsController = None
     # NetworkController = None
 
     def __init__(self, cloud):
@@ -101,10 +105,10 @@ class BaseMainController(object):
         assert issubclass(self.ComputeController, BaseComputeController)
         self.compute = self.ComputeController(self)
 
-        # TODO: Initialize dns controller.
-        # if self.DnsController is not None:
-        #     assert issubclass(self.DnsController, DnsController)
-        #     self.dns = self.DnsController(self)
+        # Initialize DNS controller.
+        if self.DnsController is not None:
+            assert issubclass(self.DnsController, BaseDNSController)
+            self.dns = self.DnsController(self)
 
         # TODO: Initialize network controller.
         # if self.NetworkController is not None:
@@ -297,6 +301,16 @@ class BaseMainController(object):
     def disable(self):
         self.cloud.enabled = False
         self.cloud.save()
+
+    def set_polling_interval(self, interval):
+        if not isinstance(interval, int):
+            raise BadRequestError("Invalid interval type: %r" % interval)
+        if interval != 0 and not 600 <= interval <= 3600 * 12:
+            raise BadRequestError("Interval must be at least 10 mins "
+                                  "and at most 12 hours.")
+        self.cloud.polling_interval = interval
+        self.cloud.save()
+        ListMachinesPollingSchedule.add(cloud=self.cloud)
 
     def delete(self, expire=False):
         """Delete a Cloud.

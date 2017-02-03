@@ -38,7 +38,7 @@ from mist.core.vpn.methods import super_ping
 
 from mist.io.clouds.controllers.base import BaseController
 
-from mist.core.tag.models import Tag
+from mist.io.tag.models import Tag
 
 from mist.io.machines.models import Machine
 
@@ -313,6 +313,18 @@ class BaseComputeController(BaseController):
         # Update RBAC Mappings given the list of nodes seen for the first time.
         self.cloud.owner.mapper.update(new_machines)
 
+        # Update machine counts on cloud and org.
+        # FIXME: resolve circular import issues
+        from mist.io.clouds.models import Cloud
+        self.cloud.machine_count = len(machines)
+        self.cloud.save()
+        self.cloud.owner.total_machine_count = sum(
+            cloud.machine_count for cloud in Cloud.objects(
+                owner=self.cloud.owner, deleted=None
+            ).only('machine_count')
+        )
+        self.cloud.owner.save()
+
         return machines
 
     def _list_machines__fetch_machines(self):
@@ -429,6 +441,10 @@ class BaseComputeController(BaseController):
                 s.connect(dnat(self.cloud.owner, hostname, port))
                 s.shutdown(2)
             except:
+                try:
+                    s.shutdown(2)
+                except:
+                    pass
                 log.info("Failed to connect to %s:%d", hostname, port)
                 continue
             log.info("Connected to %s:%d", hostname, port)
