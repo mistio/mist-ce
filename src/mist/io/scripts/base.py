@@ -7,7 +7,7 @@ from mist.core import config
 from pyramid.response import Response
 from mist.io.exceptions import BadRequestError
 from mist.io.helpers import trigger_session_update
-from mist.core.exceptions import ScriptNameExistsError
+from mist.io.exceptions import ScriptNameExistsError
 
 log = logging.getLogger(__name__)
 
@@ -96,6 +96,8 @@ class BaseScriptController(object):
             raise ScriptNameExistsError()
         self.script.owner.mapper.update(self.script)
         log.info("Added script with name '%s'", self.script.name)
+
+        self.script.owner.mapper.update(self.script)
         trigger_session_update(self.script.owner, ['scripts'])
 
     def edit(self, name=None, description=None):
