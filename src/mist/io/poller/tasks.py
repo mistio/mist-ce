@@ -9,7 +9,6 @@ from mist.io.clouds.models import Cloud
 
 from mist.core.tasks import app
 
-from mist.io.poller.models import ListMachinesPollingSchedule
 
 
 log = logging.getLogger(__name__)
@@ -27,6 +26,9 @@ def debug(value=42):
 @app.task
 def list_machines(cloud_id):
     """Perform list machines. Cloud controller stores results in mongodb."""
+
+    # FIXME: Resolve circular imports
+    from mist.io.poller.models import ListMachinesPollingSchedule
 
     cloud = Cloud.objects.get(id=cloud_id)
 
