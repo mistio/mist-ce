@@ -9,6 +9,8 @@ from mist.io.clouds.models import Cloud
 
 from mist.core.tasks import app
 
+from mist.io.poller.models import ListMachinesPollingSchedule
+
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +29,36 @@ def list_machines(cloud_id):
 
     # Perform list machines. Cloud controller stores results in mongodb.
     cloud = Cloud.objects.get(id=cloud_id)
-    machines = cloud.ctl.compute.list_machines()
+
+    # Find last run. If too recent, abort.
+    if cloud.last_success and cloud.last_failure:
+        last_run = max(cloud.last_success, cloud.last_failure)
+    else:
+        last_run = cloud.last_success or cloud.last_failure
+    if last_run:
+        try:
+            schedule = ListMachinesPollingSchedule.objects.get(cloud=cloud)
+        except ListMachinesPollingSchedule.DoesNotExist:
+            schedule = ListMachinesPollingSchedule.add(cloud)
+        if datetime.datetime.now() - last_run < schedule.interval.timedelta:
+            log.warning("Running too soon for cloud %s, aborting!", cloud)
+
+    try:
+        # Run list_machines.
+        machines = cloud.ctl.compute.list_machines()
+    except Exception as exc:
+        # Store failure.
+        log.warning("Failed to list_machines for cloud %s: %r", cloud, exc)
+        cloud.last_failure = datetime.datetime.now()
+        cloud.failure_count += 1
+        cloud.save()
+        raise
+    else:
+        # Store success.
+        log.info("Succeeded to list_machines for cloud %s", cloud)
+        cloud.last_success = datetime.datetime.now()
+        cloud.failure_count = 0
+        cloud.save()
 
     # Publish results to rabbitmq (for backwards compatibility).
     if amqp_owner_listening(cloud.owner.id):

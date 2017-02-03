@@ -85,6 +85,10 @@ class Cloud(me.Document):
 
     deleted = me.DateTimeField()
 
+    last_success = me.DateTimeField()
+    last_failure = me.DateTimeField()
+    failure_count = me.IntField(default=0)
+
     meta = {
         'allow_inheritance': True,
         'collection': 'clouds',  # collection 'cloud' is used by core's model
