@@ -439,7 +439,9 @@ class BaseComputeController(BaseController):
             log.info("Attempting to connect to %s:%d", hostname, port)
             try:
                 s = socket.create_connection(
-                        dnat(self.cloud.owner,hostname, port), socket_timeout)
+                    dnat(self.cloud.owner, hostname, port),
+                    socket_timeout
+                )
                 s.shutdown(2)
             except:
                 log.info("Failed to connect to %s:%d", hostname, port)
