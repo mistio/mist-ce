@@ -846,6 +846,12 @@ class LibvirtComputeController(BaseComputeController):
                                                 user=self.cloud.username,
                                                 tcp_port=int(port))
 
+    def _list_machines__fetch_machines(self):
+        """Needs to call connection disconnect after getting the list"""
+        nodes = self.connection.list_nodes()
+        self.connection.disconnect()
+        return nodes
+
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
         super(LibvirtComputeController, self)._list_machines__machine_actions(
                machine, machine_libcloud)

@@ -1319,7 +1319,6 @@ def list_projects(owner, cloud_id):
             'extra': project.extra
             }
            for project in projects]
-    return ret
 
     if conn.type == 'libvirt':
         # close connection with libvirt
