@@ -1099,33 +1099,44 @@ def destroy_machine(user, cloud_id, machine_id):
     machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
 
     if not machine.monitoring.hasmonitoring:
-        machine.ctl.destroy()
-        return
 
-    # if machine has monitoring, disable it. the way we disable depends on
-    # whether this is a standalone io installation or not
-    disable_monitoring_function = None
-    try:
-        from mist.core.methods import disable_monitoring as dis_mon_core
-        disable_monitoring_function = dis_mon_core
-    except ImportError:
-        # this is a standalone io instal/mlation, using io's disable_monitoring
-        # if we have an authentication token for the core service
-        if user.mist_api_token:
-            disable_monitoring_function = disable_monitoring
-    if disable_monitoring_function is not None:
-        log.info("Will try to disable monitoring for machine before "
-                 "destroying it (we don't bother to check if it "
-                 "actually has monitoring enabled.")
+        # if machine has monitoring, disable it. the way we disable depends on
+        # whether this is a standalone io installation or not
+        disable_monitoring_function = None
         try:
-            # we don't actually bother to undeploy collectd
-            disable_monitoring_function(user, cloud_id, machine_id,
-                                        no_ssh=True)
-        except Exception as exc:
-            log.warning("Didn't manage to disable monitoring, maybe the "
-                        "machine never had monitoring enabled. Error: %r", exc)
+            from mist.core.methods import disable_monitoring as dis_mon_core
+            disable_monitoring_function = dis_mon_core
+        except ImportError:
+            # this is a standalone io instal/mlation, using io's disable_monitoring
+            # if we have an authentication token for the core service
+            if user.mist_api_token:
+                disable_monitoring_function = disable_monitoring
+        if disable_monitoring_function is not None:
+            log.info("Will try to disable monitoring for machine before "
+                    "destroying it (we don't bother to check if it "
+                    "actually has monitoring enabled.")
+            try:
+                # we don't actually bother to undeploy collectd
+                disable_monitoring_function(user, cloud_id, machine_id,
+                                            no_ssh=True)
+            except Exception as exc:
+                log.warning("Didn't manage to disable monitoring, maybe the "
+                            "machine never had monitoring enabled. Error: %r", exc)
 
     machine.ctl.destroy()
+
+    # Delete any DNS records associated with this machine
+    zones = machine.cloud.ctl.dns.list_zones()
+    for zone in zones:
+        records = machine.cloud.ctl.dns.list_records(zone['id'])
+        for ip in machine.public_ips:
+            for record in records:
+                if ':' not in ip and record['type'] == 'A':
+                    if ip == record['data']:
+                        machine.cloud.ctl.dns.delete_record(zone['id'],
+                                                            record['id'])
+                        break
+
 
 
 def ssh_command(owner, cloud_id, machine_id, host, command,

@@ -82,7 +82,6 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
 
     from mist.io.methods import connect_provider, probe_ssh_only
     from mist.io.methods import notify_user, notify_admin
-    from mist.io.methods import create_dns_a_record
 
     from mist.core.methods import enable_monitoring
 
