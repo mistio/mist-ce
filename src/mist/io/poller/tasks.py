@@ -49,7 +49,7 @@ def list_machines(cloud_id):
     now = datetime.datetime.now()
     if cloud.last_attempt_started:
         # Other same task started recently, abort.
-        if now - cloud.last_attemp_started < datetime.timedelta(seconds=60):
+        if now - cloud.last_attempt_started < datetime.timedelta(seconds=60):
             log.warning("Other same tasks started recently, aborting.")
         # Has been running for too long or has died. Ignore.
         log.warning("Other same task seems to have started, but it's been "
