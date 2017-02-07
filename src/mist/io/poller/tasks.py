@@ -44,6 +44,7 @@ def list_machines(cloud_id):
             schedule = ListMachinesPollingSchedule.add(cloud)
         if datetime.datetime.now() - last_run < schedule.interval.timedelta:
             log.warning("Running too soon for cloud %s, aborting!", cloud)
+            return
 
     # Is another same task running?
     now = datetime.datetime.now()
@@ -51,6 +52,7 @@ def list_machines(cloud_id):
         # Other same task started recently, abort.
         if now - cloud.last_attempt_started < datetime.timedelta(seconds=60):
             log.warning("Other same tasks started recently, aborting.")
+            return
         # Has been running for too long or has died. Ignore.
         log.warning("Other same task seems to have started, but it's been "
                     "quite a while, will ignore and run normally.")
