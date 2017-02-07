@@ -325,6 +325,12 @@ class BaseComputeController(BaseController):
         )
         self.cloud.owner.save()
 
+        # Close libcloud connection
+        try:
+            self.disconnect()
+        except Exception as exc:
+            log.warning("Error while closing connection: %r", exc)
+
         return machines
 
     def _list_machines__fetch_machines(self):
