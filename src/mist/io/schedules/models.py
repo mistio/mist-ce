@@ -422,6 +422,7 @@ class Schedule(me.Document):
             'schedule_entry': self.schedule_type.as_dict(),
             'task_type': str(self.task_type),
             'expires': str(self.expires or ''),
+            'start_after': str(self.start_after or ''),
             'task_enabled': self.task_enabled,
             'active': self.enabled,
             'run_immediately': self.run_immediately or '',
