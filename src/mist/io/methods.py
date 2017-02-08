@@ -192,7 +192,7 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
                    post_script_id='', post_script_params='', cloud_init='',
                    associate_floating_ip=False,
                    associate_floating_ip_subnet=None, project_id=None,
-                   cronjob={}, command=None, tags=None,
+                   schedule={}, command=None, tags=None,
                    bare_metal=False, hourly=True,
                    softlayer_backend_vlan_id=None):
 
@@ -375,7 +375,7 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
             script=script,
             script_id=script_id, script_params=script_params, job_id = job_id,
             hostname=hostname, plugins=plugins, post_script_id=post_script_id,
-            post_script_params=post_script_params, cronjob=cronjob,
+            post_script_params=post_script_params, schedule=schedule,
         )
     elif conn.type == Provider.OPENSTACK:
         if associate_floating_ip:
@@ -386,7 +386,7 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
                 public_key, script=script, script_id=script_id, script_params=script_params,
                 job_id = job_id, hostname=hostname, plugins=plugins,
                 post_script_params=post_script_params,
-                networks=networks, cronjob=cronjob,
+                networks=networks, schedule=schedule,
             )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -398,7 +398,7 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
             script_id=script_id, script_params=script_params,
             job_id = job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params, cronjob=cronjob
+            post_script_params=post_script_params, schedule=schedule
         )
 
     elif key_id:
@@ -407,7 +407,7 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
             key_id=key_id, script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params, cronjob=cronjob,
+            post_script_params=post_script_params, schedule=schedule,
         )
 
     if tags:
