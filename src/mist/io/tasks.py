@@ -231,7 +231,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             # TODO add schedule_id for adding a machine to an already exist
             if schedule:
                 try:
-                    name = schedule.pop('name') + machine_id
+                    name = schedule.pop('name') + '_' + machine_id
                     from mist.core.rbac.methods import AuthContext
                     auth_context = AuthContext.deserialize(
                         schedule.pop('auth_context'))
@@ -245,7 +245,6 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                     tmp_log("A new scheduler was added")
                     log_event(action='add scheduler entry',
                               scheduler=schedule_info.as_dict(), **log_dict)
-                    # before was schedule_info.to_json()
                 except Exception as e:
                     print repr(e)
                     error = True
