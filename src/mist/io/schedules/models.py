@@ -279,7 +279,7 @@ class Schedule(me.Document):
 
     # celerybeat-mongo specific fields
     expires = me.DateTimeField()
-    before_run = me.DateTimeField()
+    start_after = me.DateTimeField()
     task_enabled = me.BooleanField(default=False)
     run_immediately = me.BooleanField()
     last_run_at = me.DateTimeField()
@@ -352,7 +352,7 @@ class Schedule(me.Document):
             return False
         if self.expires and self.expires < datetime.datetime.now():
             return False
-        # if self.before_run and self.before_run < datetime.datetime.now():
+        # if self.start_after and self.start_after < datetime.datetime.now():
         #     return False
         if self.max_run_count and (
                     (self.total_run_count or 0) >= self.max_run_count
