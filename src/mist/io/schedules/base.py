@@ -90,7 +90,6 @@ class BaseController(object):
 
     def update(self, **kwargs):
         """Edit an existing Schedule"""
-
         import mist.io.schedules.models as schedules
 
         if self.auth_context is not None:
@@ -120,6 +119,8 @@ class BaseController(object):
             kwargs['expires'] = None
         if kwargs.get('max_run_count') == '':
             kwargs['max_run_count'] = None
+        if kwargs.get('start_after') == '':
+            kwargs['start_after'] = None
         # transform string to datetime
         if kwargs.get('expires'):
             try:
@@ -128,6 +129,15 @@ class BaseController(object):
             except ValueError:
                 raise BadRequestError('Expiration date value was not valid')
 
+        if kwargs.get('start_after'):
+            try:
+                kwargs['start_after'] = datetime.datetime.strptime(
+                                        kwargs['start_after'],
+                                        '%Y-%m-%d %H:%M:%S'
+                )
+            except ValueError:
+                raise BadRequestError('Start-after date value was not valid')
+
         # set schedule attributes
         for key, value in kwargs.iteritems():
             if key in self.schedule._fields.keys():
@@ -135,6 +145,9 @@ class BaseController(object):
 
         now = datetime.datetime.now()
         if self.schedule.expires and self.schedule.expires < now:
+            raise BadRequestError('Date of future task is in the past. '
+                                  'Please contact Marty McFly')
+        if self.schedule.start_after and self.schedule.start_after < now:
             raise BadRequestError('Date of future task is in the past. '
                                   'Please contact Marty McFly')
 
@@ -160,11 +173,15 @@ class BaseController(object):
         if (schedule_type == 'crontab' or
                 isinstance(self.schedule.schedule_type, schedules.Crontab)):
             schedule_entry = kwargs.get('schedule_entry', {})
-            for k in schedule_entry:
-                if k not in ['minute', 'hour', 'day_of_week', 'day_of_month',
-                             'month_of_year']:
-                    raise BadRequestError("Invalid key given: %s" % k)
-            self.schedule.schedule_type = schedules.Crontab(**schedule_entry)
+
+            if schedule_entry:
+                for k in schedule_entry:
+                    if k not in ['minute', 'hour', 'day_of_week',
+                                 'day_of_month', 'month_of_year']:
+                        raise BadRequestError("Invalid key given: %s" % k)
+
+                self.schedule.schedule_type = schedules.Crontab(
+                    **schedule_entry)
 
         elif (schedule_type == 'interval' or
                 type(self.schedule.schedule_type) == schedules.Interval):
