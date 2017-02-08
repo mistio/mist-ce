@@ -325,6 +325,12 @@ class BaseComputeController(BaseController):
         )
         self.cloud.owner.save()
 
+        # Close libcloud connection
+        try:
+            self.disconnect()
+        except Exception as exc:
+            log.warning("Error while closing connection: %r", exc)
+
         return machines
 
     def _list_machines__fetch_machines(self):
@@ -429,22 +435,21 @@ class BaseComputeController(BaseController):
             machine.private_ips[0] if machine.private_ips else '')
         if not hostname:
             return False
-        socket.setdefaulttimeout(5)
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ports_list = [22, 80, 443, 3389]
         for port in (machine.ssh_port, machine.rdp_port):
             if port and port not in ports_list:
                 ports_list.insert(0, port)
+        socket_timeout = 3
+        # add timeout for socket
         for port in ports_list:
             log.info("Attempting to connect to %s:%d", hostname, port)
             try:
-                s.connect(dnat(self.cloud.owner, hostname, port))
+                s = socket.create_connection(
+                    dnat(self.cloud.owner, hostname, port),
+                    socket_timeout
+                )
                 s.shutdown(2)
             except:
-                try:
-                    s.shutdown(2)
-                except:
-                    pass
                 log.info("Failed to connect to %s:%d", hostname, port)
                 continue
             log.info("Connected to %s:%d", hostname, port)

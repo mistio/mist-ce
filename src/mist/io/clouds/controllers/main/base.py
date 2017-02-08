@@ -31,8 +31,6 @@ from mist.io.helpers import rename_kwargs
 from mist.io.clouds.controllers.compute.base import BaseComputeController
 from mist.io.clouds.controllers.dns.base import BaseDNSController
 
-from mist.io.poller.models import ListMachinesPollingSchedule
-
 
 log = logging.getLogger(__name__)
 
@@ -310,6 +308,10 @@ class BaseMainController(object):
                                   "and at most 12 hours.")
         self.cloud.polling_interval = interval
         self.cloud.save()
+
+        # FIXME: Resolve circular import issues
+        from mist.io.poller.models import ListMachinesPollingSchedule
+
         ListMachinesPollingSchedule.add(cloud=self.cloud)
 
     def delete(self, expire=False):
