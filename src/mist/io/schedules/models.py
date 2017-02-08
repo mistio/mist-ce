@@ -161,7 +161,7 @@ class BaseMachinesCondition(me.EmbeddedDocument):
     meta = {'allow_inheritance': True}
 
     @property
-    def get_machines(self):
+    def sched_machines(self):
         raise NotImplementedError()
 
 
@@ -173,7 +173,7 @@ class ListOfMachinesSchedule(BaseMachinesCondition):
     # reverse_delete_rule=me.PULL
 
     @property
-    def get_machines(self):
+    def sched_machines(self):
         cloud_machines_pairs = []
         for machine in self.machines:
             if machine.state != 'terminated':
@@ -191,7 +191,7 @@ class TaggedMachinesSchedule(BaseMachinesCondition):
     tags = me.DictField(required=True, default={})
 
     @property
-    def get_machines(self):
+    def sched_machines(self):
         # all machines currently matching the tags
         cloud_machines_pairs = []
         for k, v in self.tags.iteritems():
@@ -279,6 +279,7 @@ class Schedule(me.Document):
 
     # celerybeat-mongo specific fields
     expires = me.DateTimeField()
+    before_run = me.DateTimeField()
     task_enabled = me.BooleanField(default=False)
     run_immediately = me.BooleanField()
     last_run_at = me.DateTimeField()
@@ -330,7 +331,7 @@ class Schedule(me.Document):
 
     @property
     def args(self):
-        m = self.machines_condition.get_machines
+        m = self.machines_condition.sched_machines
         fire_up = self.task_type.args
 
         return [self.owner.id, fire_up, self.name, m]
@@ -345,7 +346,17 @@ class Schedule(me.Document):
 
     @property
     def enabled(self):
-        if not self.machines_condition.get_machines:
+        if self.deleted:
+            return False
+        if not self.machines_condition.sched_machines:
+            return False
+        if self.expires and self.expires < datetime.datetime.now():
+            return False
+        # if self.before_run and self.before_run < datetime.datetime.now():
+        #     return False
+        if self.max_run_count and (
+                    (self.total_run_count or 0) >= self.max_run_count
+        ):
             return False
         else:
             return self.task_enabled
@@ -395,14 +406,6 @@ class Schedule(me.Document):
                                          % exc.message)
         super(Schedule, self).validate(clean=True)
 
-    def clean(self):
-        """Pre-save cleaning to ensure that a Schedule is disabled & expired
-        in case it has been marked as deleted."""
-        if self.deleted:
-            self.task_enabled = False
-        if self.expires and self.expires < datetime.datetime.now():
-            self.task_enabled = False
-
     def delete(self):
         super(Schedule, self).delete()
         Tag.objects(resource=self).delete()
@@ -419,7 +422,8 @@ class Schedule(me.Document):
             'schedule_entry': self.schedule_type.as_dict(),
             'task_type': str(self.task_type),
             'expires': str(self.expires or ''),
-            'task_enabled': self.task_enabled,
+            'task_enabled': self.task_enabled, # TODO user_enabled
+            'active': self.enabled,
             'run_immediately': self.run_immediately or '',
             'last_run_at': str(self.last_run_at or ''),
             'total_run_count': self.total_run_count or 0,
