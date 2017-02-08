@@ -1134,7 +1134,8 @@ def create_machine(request):
             'schedule_entry': params.get('schedule_entry'),
             'expires': params.get('expires', ''),
             'start_after': params.get('start_after', ''),
-            'enabled': bool(params.get('enabled', False)),
+            'max_run_count': params.get('max_run_count'),
+            'task_enabled': bool(params.get('task_enabled', True)),
             'auth_context': auth_context.serialize(),
         }
 
