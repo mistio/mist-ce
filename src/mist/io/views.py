@@ -1053,6 +1053,8 @@ def create_machine(request):
       description: ' Needed only by SoftLayer cloud'
       type: string
     """
+    # TODO add schedule in docstring
+
     params = params_from_request(request)
     cloud_id = request.matchdict['cloud']
 
@@ -1112,27 +1114,33 @@ def create_machine(request):
     hourly = params.get('billing', True)
     job_id = params.get('job_id', uuid.uuid4().hex)
 
-    # only for mist.core, parameters for cronjob
-    if not params.get('cronjob_type'):
-        cronjob = {}
-    else:
-        for key in ('cronjob_name', 'cronjob_type', 'cronjob_entry'):
-            if key not in params:
-                raise exceptions.RequiredParameterMissingError(key)
+    auth_context = auth_context_from_request(request)
 
-        cronjob = {
-            'name': params.get('cronjob_name'),
+    # compose schedule as a dict from relative parameters
+    if not params.get('schedule_type'):
+        schedule = {}
+    else:
+        if params.get('schedule_type') not in ['crontab',
+                                               'interval', 'one_off']:
+            raise exceptions.BadRequestError('schedule type must be one of '
+                                             'these (crontab, interval, '
+                                             'one_off)]')
+        if params.get('schedule_entry') == {}:
+            raise exceptions.RequiredParameterMissingError('schedule_entry')
+
+        schedule = {
+            'name': 'scheduler_' + params.get('name'),
             'description': params.get('description', ''),
-            'action': params.get('cronjob_action', ''),
-            'script_id': params.get('cronjob_script_id', ''),
-            'cronjob_type': params.get('cronjob_type'),
-            'cronjob_entry': params.get('cronjob_entry'),
+            'action': params.get('action', ''),
+            'script_id': params.get('schedule_script_id', ''),
+            'schedule_type': params.get('schedule_type'),
+            'schedule_entry': params.get('schedule_entry'),
             'expires': params.get('expires', ''),
-            'enabled': bool(params.get('cronjob_enabled', False)),
-            'run_immediately': params.get('run_immediately', False),
+            'start_after': params.get('start_after', ''),
+            'enabled': bool(params.get('enabled', False)),
+            'auth_context': auth_context.serialize(),
         }
 
-    auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
     auth_context.check_perm("cloud", "create_resources", cloud_id)
     tags = auth_context.check_perm("machine", "create", None)
@@ -1163,7 +1171,7 @@ def create_machine(request):
               'bare_metal': bare_metal,
               'tags': tags,
               'hourly': hourly,
-              'cronjob': cronjob,
+              'schedule': schedule,
               'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
     if not async:
         ret = methods.create_machine(auth_context.owner, *args, **kwargs)
