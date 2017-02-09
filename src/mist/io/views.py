@@ -35,7 +35,12 @@ import mist.core.methods
 
 from mist.io import methods
 
-import mist.io.exceptions as exceptions
+from mist.io.exceptions import RequiredParameterMissingError
+from mist.io.exceptions import NotFoundError, BadRequestError
+from mist.io.exceptions import SSLError, ServiceUnavailableError
+from mist.io.exceptions import KeyParameterMissingError, MistError
+from mist.io.exceptions import PolicyUnauthorizedError, UnauthorizedError
+
 import pyramid.httpexceptions
 
 from mist.io.helpers import get_auth_header, params_from_request
@@ -75,7 +80,7 @@ def exception_handler_mist(exc, request):
         return Response("NotUniqueError", 409)
 
     # non-mist exceptions. that shouldn't happen! never!
-    if not isinstance(exc, exceptions.MistError):
+    if not isinstance(exc, MistError):
         if not isinstance(exc, (ValidationError, NotUniqueError)):
             trace = traceback.format_exc()
             log.critical("Uncaught non-mist exception? WTF!\n%s", trace)
@@ -226,7 +231,7 @@ def add_cloud(request):
                                            'provider': provider})
 
     if not provider:
-        raise exceptions.RequiredParameterMissingError('provider')
+        raise RequiredParameterMissingError('provider')
 
     monitoring = None
     ret = methods.add_cloud_v_2(owner, title, provider, params)
@@ -266,7 +271,7 @@ def delete_cloud(request):
         cloud = Cloud.objects.get(owner=auth_context.owner,
                                   id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
     auth_context.check_perm('cloud', 'remove', cloud_id)
     methods.delete_cloud(auth_context.owner, cloud_id)
     return OK
@@ -293,12 +298,12 @@ def rename_cloud(request):
         cloud = Cloud.objects.get(owner=auth_context.owner,
                                   id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
 
     params = params_from_request(request)
     new_name = params.get('new_name', '')
     if not new_name:
-        raise exceptions.RequiredParameterMissingError('new_name')
+        raise RequiredParameterMissingError('new_name')
     auth_context.check_perm('cloud', 'edit', cloud_id)
 
     methods.rename_cloud(auth_context.owner, cloud_id, new_name)
@@ -323,14 +328,13 @@ def update_cloud(request):
         cloud = Cloud.objects.get(owner=auth_context.owner,
                                   id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
 
     params = params_from_request(request)
     creds = params
 
     if not creds:
-        raise exceptions.BadRequestError("You should provide your "
-                                         "new cloud settings")
+        raise BadRequestError("You should provide your new cloud settings")
 
     auth_context.check_perm('cloud', 'edit', cloud_id)
 
@@ -379,7 +383,7 @@ def toggle_cloud(request):
         cloud = Cloud.objects.get(owner=auth_context.owner,
                                   id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
 
     auth_context.check_perm('cloud', 'edit', cloud_id)
 
@@ -389,9 +393,9 @@ def toggle_cloud(request):
     elif new_state == '0':
         cloud.ctl.disable()
     elif new_state:
-        raise exceptions.BadRequestError('Invalid cloud state')
+        raise BadRequestError('Invalid cloud state')
     else:
-        raise exceptions.RequiredParameterMissingError('new_state')
+        raise RequiredParameterMissingError('new_state')
     trigger_session_update(auth_context.owner, ['clouds'])
     return OK
 
@@ -437,10 +441,9 @@ def add_key(request):
     key_tags = auth_context.check_perm("key", "add", None)
 
     if not key_name:
-        raise exceptions.BadRequestError("Key name is not provided")
+        raise BadRequestError("Key name is not provided")
     if not private_key:
-        raise exceptions.RequiredParameterMissingError("Private key is "
-                                                       "not provided")
+        raise RequiredParameterMissingError("Private key is not provided")
 
     if certificate:
         key = SignedSSHKey.add(auth_context.owner, key_name, **params)
@@ -484,13 +487,13 @@ def delete_key(request):
     auth_context = auth_context_from_request(request)
     key_id = request.matchdict.get('key')
     if not key_id:
-        raise exceptions.KeyParameterMissingError()
+        raise KeyParameterMissingError()
 
     try:
         key = Key.objects.get(owner=auth_context.owner, id=key_id,
                               deleted=None)
     except me.DoesNotExist:
-        raise exceptions.NotFoundError('Key id does not exist')
+        raise NotFoundError('Key id does not exist')
 
     auth_context.check_perm('key', 'remove', key.id)
     methods.delete_key(auth_context.owner, key_id)
@@ -521,7 +524,7 @@ def delete_keys(request):
     params = params_from_request(request)
     key_ids = params.get('key_ids', [])
     if type(key_ids) != list or len(key_ids) == 0:
-        raise exceptions.RequiredParameterMissingError('No key ids provided')
+        raise RequiredParameterMissingError('No key ids provided')
     # remove duplicate ids if there are any
     key_ids = set(key_ids)
 
@@ -535,7 +538,7 @@ def delete_keys(request):
             continue
         try:
             auth_context.check_perm('key', 'remove', key.id)
-        except exceptions.PolicyUnauthorizedError:
+        except PolicyUnauthorizedError:
             report[key_id] = 'unauthorized'
         else:
             methods.delete_key(auth_context.owner, key_id)
@@ -544,11 +547,11 @@ def delete_keys(request):
     # if no key id was valid raise exception
     if len(filter(lambda key_id: report[key_id] == 'not_found',
                   report)) == len(key_ids):
-        raise exceptions.NotFoundError('No valid key id provided')
+        raise NotFoundError('No valid key id provided')
     # if user was unauthorized for all keys
     if len(filter(lambda key_id: report[key_id] == 'unauthorized',
                   report)) == len(key_ids):
-        raise exceptions.NotFoundError('Unauthorized to modify any of the keys')
+        raise NotFoundError('Unauthorized to modify any of the keys')
     return report
 
 
@@ -572,14 +575,14 @@ def edit_key(request):
     params = params_from_request(request)
     new_name = params.get('new_name')
     if not new_name:
-        raise exceptions.RequiredParameterMissingError("new_name")
+        raise RequiredParameterMissingError("new_name")
 
     auth_context = auth_context_from_request(request)
     try:
         key = Key.objects.get(owner=auth_context.owner,
                               id=key_id, deleted=None)
     except me.DoesNotExist:
-        raise exceptions.NotFoundError('Key with that id does not exist')
+        raise NotFoundError('Key with that id does not exist')
     auth_context.check_perm('key', 'edit', key.id)
     key.ctl.rename(new_name)
 
@@ -606,7 +609,7 @@ def set_default_key(request):
         key = Key.objects.get(owner=auth_context.owner,
                               id=key_id, deleted=None)
     except me.DoesNotExist:
-        raise exceptions.NotFoundError('Key id does not exist')
+        raise NotFoundError('Key id does not exist')
 
     auth_context.check_perm('key', 'edit', key.id)
 
@@ -632,14 +635,14 @@ def get_private_key(request):
 
     key_id = request.matchdict['key']
     if not key_id:
-        raise exceptions.RequiredParameterMissingError("key_id")
+        raise RequiredParameterMissingError("key_id")
 
     auth_context = auth_context_from_request(request)
     try:
         key = SSHKey.objects.get(owner=auth_context.owner,
                                  id=key_id, deleted=None)
     except me.DoesNotExist:
-        raise exceptions.NotFoundError('Key id does not exist')
+        raise NotFoundError('Key id does not exist')
 
     auth_context.check_perm('key', 'read_private', key.id)
     return key.private
@@ -661,14 +664,14 @@ def get_public_key(request):
     """
     key_id = request.matchdict['key']
     if not key_id:
-        raise exceptions.RequiredParameterMissingError("key_id")
+        raise RequiredParameterMissingError("key_id")
 
     auth_context = auth_context_from_request(request)
     try:
         key = SSHKey.objects.get(owner=auth_context.owner,
                                  id=key_id, deleted=None)
     except me.DoesNotExist:
-        raise exceptions.NotFoundError('Key id does not exist')
+        raise NotFoundError('Key id does not exist')
 
     auth_context.check_perm('key', 'read', key.id)
     return key.public
@@ -735,7 +738,7 @@ def associate_key(request):
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
     except me.DoesNotExist:
-        raise exceptions.NotFoundError("Machine %s doesn't exist" % machine_id)
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
 
     auth_context.check_perm("machine", "associate_key", machine.id)
 
@@ -780,7 +783,7 @@ def disassociate_key(request):
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
     except me.DoesNotExist:
-        raise exceptions.NotFoundError("Machine %s doesn't exist" % machine_id)
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
     auth_context.check_perm("machine", "disassociate_key", machine.id)
 
     key = Key.objects.get(owner=auth_context.owner, id=key_id, deleted=None)
@@ -806,7 +809,7 @@ def list_dns_zones(request):
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
 
     return cloud.ctl.dns.list_zones()
 
@@ -823,7 +826,7 @@ def list_dns_records(request):
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
     return cloud.ctl.dns.list_records(zone_id)
 
 @view_config(route_name='api_v1_zones', request_method='POST', renderer='json')
@@ -838,7 +841,7 @@ def create_dns_zone(request):
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
     # Get the rest of the params
     # domain is required and must contain a trailing period(.)
     # type should be master or slave, and defaults to master.
@@ -848,7 +851,7 @@ def create_dns_zone(request):
     params = params_from_request(request)
     domain = params.get('domain', '')
     if not domain:
-        raise exceptions.RequiredParameterMissingError('domain')
+        raise RequiredParameterMissingError('domain')
     type = params.get('type', '')
     ttl = params.get('ttl', 0)
     extra = params.get('extra', '')
@@ -867,7 +870,7 @@ def create_dns_record(request):
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
 
     zone_id = request.matchdict['zone']
     # Get the rest of the params
@@ -879,13 +882,13 @@ def create_dns_record(request):
     params = params_from_request(request)
     name = params.get('name', '')
     if not name:
-        raise exceptions.RequiredParameterMissingError('name')
+        raise RequiredParameterMissingError('name')
     type = params.get('type', '')
     if not type:
-        raise exceptions.RequiredParameterMissingError('type')
+        raise RequiredParameterMissingError('type')
     data = params.get('data', '')
     if not data:
-        raise exceptions.RequiredParameterMissingError('data')
+        raise RequiredParameterMissingError('data')
     ttl = params.get('ttl', 0)
 
     return cloud.ctl.dns.create_record(zone_id, name, type, data, ttl)
@@ -902,7 +905,7 @@ def delete_dns_zone(request):
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
 
     return cloud.ctl.dns.delete_zone(zone_id)
 
@@ -919,7 +922,7 @@ def delete_dns_record(request):
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
 
     return cloud.ctl.dns.delete_record(zone_id, record_id)
 
@@ -1060,7 +1063,7 @@ def create_machine(request):
 
     for key in ('name', 'size'):
         if key not in params:
-            raise exceptions.RequiredParameterMissingError(key)
+            raise RequiredParameterMissingError(key)
 
     key_id = params.get('key')
     machine_name = params['name']
@@ -1119,11 +1122,11 @@ def create_machine(request):
     else:
         if params.get('schedule_type') not in ['crontab',
                                                'interval', 'one_off']:
-            raise exceptions.BadRequestError('schedule type must be one of '
-                                             'these (crontab, interval, '
-                                             'one_off)]')
+            raise BadRequestError('schedule type must be one of '
+                                  'these (crontab, interval, one_off)]'
+                                  )
         if params.get('schedule_entry') == {}:
-            raise exceptions.RequiredParameterMissingError('schedule_entry')
+            raise RequiredParameterMissingError('schedule_entry')
 
         schedule = {
             'name': 'scheduler_' + params.get('name'),
@@ -1227,10 +1230,10 @@ def machine_actions(request):
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
     except me.DoesNotExist:
-        raise exceptions.NotFoundError("Machine %s doesn't exist" % machine_id)
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
 
     if machine.cloud.owner != auth_context.owner:
-        raise exceptions.NotFoundError("Machine %s doesn't exist" % machine_id)
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
 
     auth_context.check_perm("machine", action, machine.id)
 
@@ -1238,9 +1241,9 @@ def machine_actions(request):
                'rename', 'undefine', 'suspend', 'resume')
 
     if action not in actions:
-        raise exceptions.BadRequestError("Action '%s' should be "
-                                         "one of %s" % (action, actions))
-
+        raise BadRequestError("Action '%s' should be "
+                              "one of %s" % (action, actions)
+                              )
     if action == 'destroy':
         methods.destroy_machine(auth_context.owner, cloud_id, machine_id)
     elif action in ('start', 'stop', 'reboot',
@@ -1248,7 +1251,7 @@ def machine_actions(request):
         getattr(machine.ctl, action)()
     elif action == 'rename':
         if not name:
-            raise exceptions.BadRequestError("You must give a name!")
+            raise BadRequestError("You must give a name!")
         getattr(machine.ctl, action)(name)
     elif action == 'resize':
         getattr(machine.ctl, action)(plan_id)
@@ -1298,7 +1301,7 @@ def machine_rdp(request):
     host = request.params.get('host')
 
     if not host:
-        raise exceptions.BadRequestError('no hostname specified')
+        raise BadRequestError('no hostname specified')
     try:
         1 < int(rdp_port) < 65535
     except:
@@ -1555,7 +1558,7 @@ def create_network(request):
     try:
         network = request.json_body.get('network')
     except Exception as e:
-        raise exceptions.RequiredParameterMissingError(e)
+        raise RequiredParameterMissingError(e)
 
     subnet = request.json_body.get('subnet', None)
     router = request.json_body.get('router', None)
@@ -1752,15 +1755,14 @@ def update_monitoring(request):
         email = params.get('email')
         password = params.get('password')
         if not email or not password:
-            raise exceptions.UnauthorizedError("You need to authenticate "
-                                               "to mist.io.")
+            raise UnauthorizedError("You need to authenticate to mist.io.")
         payload = {'email': email, 'password': password}
         try:
             ret = requests.post(config.CORE_URI + '/auth', params=payload,
                                 verify=config.SSL_VERIFY)
         except requests.exceptions.SSLError as exc:
             log.error("%r", exc)
-            raise exceptions.SSLError()
+            raise SSLError()
         if ret.status_code == 200:
             ret_dict = json.loads(ret.content)
             user.email = email
@@ -1771,11 +1773,9 @@ def update_monitoring(request):
             user.email = ""
             user.mist_api_token = ""
             user.save()
-            raise exceptions.UnauthorizedError("You need to authenticate "
-                                               "to mist.io.")
+            raise UnauthorizedError("You need to authenticate to mist.io.")
         else:
-            raise exceptions.UnauthorizedError("You need to authenticate "
-                                               "to mist.io.")
+            raise UnauthorizedError("You need to authenticate to mist.io.")
 
     action = params.get('action') or 'enable'
     name = params.get('name', '')
@@ -1793,7 +1793,7 @@ def update_monitoring(request):
         methods.disable_monitoring(user, cloud_id, machine_id, no_ssh=no_ssh)
         ret_dict = {}
     else:
-        raise exceptions.BadRequestError()
+        raise BadRequestError()
 
     return ret_dict
 
@@ -1922,7 +1922,7 @@ def assoc_metric(request):
     params = params_from_request(request)
     metric_id = params.get('metric_id')
     if not metric_id:
-        raise exceptions.RequiredParameterMissingError('metric_id')
+        raise RequiredParameterMissingError('metric_id')
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
     try:
@@ -1960,7 +1960,7 @@ def disassoc_metric(request):
     params = params_from_request(request)
     metric_id = params.get('metric_id')
     if not metric_id:
-        raise exceptions.RequiredParameterMissingError('metric_id')
+        raise RequiredParameterMissingError('metric_id')
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
     try:
@@ -2077,7 +2077,7 @@ def deploy_plugin(request):
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
     except me.DoesNotExist:
-        raise exceptions.NotFoundError("Machine %s doesn't exist" % machine_id)
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
 
     # SEC check permission EDIT_CUSTOM_METRICS on machine
     auth_context.check_perm("machine", "edit_custom_metrics", machine.id)
@@ -2085,11 +2085,10 @@ def deploy_plugin(request):
     try:
         Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except me.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud id %s does not exist' % cloud_id)
+        raise NotFoundError('Cloud id %s does not exist' % cloud_id)
 
     if not machine.monitoring.hasmonitoring:
-        raise exceptions.NotFoundError("Machine doesn't seem to "
-                                           "have monitoring enabled")
+        raise NotFoundError("Machine doesn't seem to have monitoring enabled")
 
     # create a collectdScript
     extra = {'value_type': params.get('value_type', 'gauge'),
@@ -2112,8 +2111,7 @@ def deploy_plugin(request):
         )
         return ret
     else:
-        raise exceptions.BadRequestError("Invalid plugin_type: "
-                                            "'%s'" % plugin_type)
+        raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
 
 @view_config(route_name='api_v1_deploy_plugin',
@@ -2166,8 +2164,7 @@ def undeploy_plugin(request):
                                              machine_id, plugin_id, host)
         return ret
     else:
-        raise exceptions.BadRequestError("Invalid plugin_type: '%s'"
-                                         % plugin_type)
+        raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
 
 # @view_config(route_name='metric', request_method='DELETE', renderer='json')
@@ -2207,10 +2204,10 @@ def update_rule(request):
         )
     except requests.exceptions.SSLError as exc:
         log.error("%r", exc)
-        raise exceptions.SSLError()
+        raise SSLError()
     if ret.status_code != 200:
         log.error("Error updating rule %d:%s", ret.status_code, ret.text)
-        raise exceptions.ServiceUnavailableError()
+        raise ServiceUnavailableError()
     trigger_session_update(user, ['monitoring'])
     return ret.json()
 
@@ -2236,10 +2233,10 @@ def delete_rule(request):
         )
     except requests.exceptions.SSLError as exc:
         log.error("%r", exc)
-        raise exceptions.SSLError()
+        raise SSLError()
     if ret.status_code != 200:
         log.error("Error deleting rule %d:%s", ret.status_code, ret.text)
-        raise exceptions.ServiceUnavailableError()
+        raise ServiceUnavailableError()
     trigger_session_update(user, ['monitoring'])
     return OK
 
