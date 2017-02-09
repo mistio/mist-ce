@@ -51,6 +51,20 @@ class MistError(Exception):
         super(MistError, self).__init__(msg)
 
 
+# REDIRECT (translated as 302 in views)
+class RedirectError(MistError):
+    """Redirection exception
+
+    This is used exclusively in views to send a 302 HTTP redirection.
+
+    """
+    msg = "Redirecting user to login"
+
+    def __init__(self, url=''):
+        super(RedirectError, self).__init__(url)
+        self.url = url
+
+
 # MistError related exceptions
 # BAD REQUESTS (translated as 400 in views)
 class BadRequestError(MistError):
