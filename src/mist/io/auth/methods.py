@@ -9,7 +9,7 @@ import mist.io.helpers
 
 from mist.io.exceptions import ConflictError
 
-from mist.core.exceptions import RedirectError
+from mist.io.exceptions import RedirectError
 from mist.io.exceptions import UserNotFoundError
 from mist.io.exceptions import UserUnauthorizedError
 from mist.io.exceptions import AdminUnauthorizedError
