@@ -1120,23 +1120,16 @@ def destroy_machine(user, cloud_id, machine_id):
                 disable_monitoring_function(user, cloud_id, machine_id,
                                             no_ssh=True)
             except Exception as exc:
-                log.warning("Didn't manage to disable monitoring, maybe the "
+                log.warning("Didn't manage to disable monitorin g, maybe the "
                             "machine never had monitoring enabled. Error: %r", exc)
 
     machine.ctl.destroy()
 
     # Delete any DNS records associated with this machine
-    zones = machine.cloud.ctl.dns.list_zones()
-    for zone in zones:
-        records = machine.cloud.ctl.dns.list_records(zone['id'])
-        for ip in machine.public_ips:
-            for record in records:
-                if ':' not in ip and record['type'] == 'A':
-                    if ip == record['data']:
-                        machine.cloud.ctl.dns.delete_record(zone['id'],
-                                                            record['id'])
-                        break
-
+    record = Record.objects(machine=machine)
+    # We only want to delete the record when it's assi
+    if len(record) == 1:
+        record.ctl.delete()
 
 
 def ssh_command(owner, cloud_id, machine_id, host, command,

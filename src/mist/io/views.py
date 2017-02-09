@@ -25,6 +25,7 @@ from mist.core.auth.methods import user_from_request
 from mist.io.keys.models import Key, SSHKey, SignedSSHKey
 from mist.io.scripts.models import CollectdScript
 from mist.io.clouds.models import Cloud
+from mist.io.dns.models import Zone
 from mist.io.machines.models import Machine
 from mist.core import config
 import mist.core.methods
@@ -820,11 +821,17 @@ def list_dns_records(request):
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     zone_id = request.matchdict['zone']
+    # Do we need the cloud here, now that the models have been created?
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise exceptions.NotFoundError('Cloud does not exist')
-    return cloud.ctl.dns.list_records(zone_id)
+    try:
+        zone = Zone.objects.get(owner=auth_context.owner, id=zone_id)
+    except Zone.DoesNotExist:
+        raise exceptions.NotFoundError('Zone does not exist')
+
+    return zone.ctl.list_records()
 
 @view_config(route_name='api_v1_zones', request_method='POST', renderer='json')
 def create_dns_zone(request):
@@ -899,12 +906,17 @@ def delete_dns_zone(request):
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     zone_id = request.matchdict['zone']
+    # Do we need the cloud here, now that the models have been created?
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise exceptions.NotFoundError('Cloud does not exist')
+    try:
+        zone = Zone.objects.get(owner=auth_context.owner, id=zone_id)
+    except Zone.DoesNotExist:
+        raise exceptions.NotFoundError('Zone does not exist')
 
-    return cloud.ctl.dns.delete_zone(zone_id)
+    return zone.ctl.delete_zone()
 
 @view_config(route_name='api_v1_record', request_method='DELETE', renderer='json')
 def delete_dns_record(request):

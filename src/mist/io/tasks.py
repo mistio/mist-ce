@@ -163,8 +163,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                     if not all_domains:
                         raise MistError("Couldn't extract a valid domain from \
                                          '%s'."  % domain_name)
-                    # Get all available zones under this cloud
-                    zones = cloud.ctl.dns.list_zones()
+                    zones = Zone.objects(owner=owner, deleted=None)
                     # We need to iterate over all the cloud DNS zones to find
                     # any that is matching based on the domain. If one is found
                     # then create an "A" type record with the provided name.
@@ -174,13 +173,13 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                     for zone in zones:
                         for domain, subdomain in all_domains.iteritems():
                             if zone['domain'] == domain:
-                                record = cloud.ctl.dns.create_record(
+                                record = zone.ctl.create_record(
                                     zone['id'], subdomain, "A", host, 3600)
                     hostname = '.'.join((record.name, record.zone.domain))
-                    log_event(action='cloud.ctl.dns.create_record',
+                    log_event(action='zone.ctl.create_record',
                               hostname=hostname, **log_dict)
                 except Exception as exc:
-                    log_event(action='cloud.ctl.dns.create_record',
+                    log_event(action='zone.ctl.create_record',
                               error=str(exc), **log_dict)
 
             error = False

@@ -8,6 +8,7 @@ with libcloud's DNS API.
 import re
 import ssl
 import logging
+import datetime
 
 from mist.io.clouds.controllers.base import BaseController
 
@@ -70,11 +71,29 @@ class BaseDNSController(BaseController):
         under a specific cloud.
         """
 
-        # Fetch zones, usually from libcloud connection.
-        zones = self._list_zones__fetch_zones()
+        # TODO: Adding here for circular dependency issue. Need to fix this.
+        from mist.io.dns.models import Zone
+
+        # Fetch zones from libcloud connection.
+        nodes = self._list_zones__fetch_zones()
+
+        zones = []
+        for node in nodes:
+            try:
+                zone = Zone.objects.get(cloud=self.cloud, zone_id=node.id)
+            except Zone.DoesNotExist:
+                log.info("Zone: %s/domain: %s not in the database, creating.",
+                         node.id, node.domain)
+                zone = Zone(cloud=self.cloud, owner=self.cloud.owner,
+                            zone_id=node.id, domain=node.domain,
+                            type=node.type, ttl=node.ttl,
+                            extra=node.extra)
+                zone.save()
+            zones.append(zone)
 
         # Format zone information.
         return [{"id": zone.id,
+                 "zone_id": zone.zone_id,
                  "domain": zone.domain,
                  "type": zone.type,
                  "ttl": zone.ttl,
@@ -105,26 +124,51 @@ class BaseDNSController(BaseController):
             log.exception("Error while running list_zones on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
-    def list_records(self, zone_id):
+    def list_records(self, zone):
         """
         Public method to return a list of  records under a specific zone.
         """
-        # Fetch records, from libcloud connection.
-        records = self._list_records__fetch_records(zone_id)
+        # Fetch records from libcloud connection.
+        nodes = self._list_records__fetch_records(zone.zone_id)
+
+        # TODO: Adding here for circular dependency issue. Need to fix this.
+        from mist.io.dns.models import Record
+        for node in nodes:
+            try:
+                record = Record.objects.get(zone=zone, record_id=node.id)
+            except Record.DoesNotExist:
+                log.info("Record: %s not in the database, creating.", node.id)
+                record = Record(record_id=node.id, name=node.name, 
+                                type=node.type, ttl=node.ttl, zone=zone)
+            # We need to check if any of the information returned by the
+            # provider is different than what we have in the DB
+            if record['name'] != node.name:
+                record['name'] = node.name
+            if record['type'] != node.type:
+                record['type'] = node.type
+            if record['ttl'] != node.ttl:
+                record['ttl'] = node.ttl
+            self._list__records_postparse_data(node, record)
+            record.save()
+
+        # There's a chance that we have received duplicate records as for
+        # example for Route NS records, we want to get the final records result
+        # set from the DB
+        records = Record.objects(zone=zone)
 
         # Format zone information.
         return [{"id": record.id,
+                 "record_id": record.record_id,
                  "name": record.name,
                  "type": record.type,
+                 "rdata": record.rdata,
                  "data": record.data,
                  "ttl": record.ttl,
                  "extra": record.extra} for record in records]
 
     def _list_records__fetch_records(self, zone_id):
-        """
-        Returns all available records on a specific zone.
+        """Returns all available records on a specific zone. """
 
-        """
         # Try to get the list of DNS records under a specific zone from
         # the provider API.
         # We cannot call list_records() with the zone_id, we need to provide
@@ -148,6 +192,10 @@ class BaseDNSController(BaseController):
         except Exception as exc:
             log.exception("Error while running list_records on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
+
+    def _list__records_postparse_data(self, record, model):
+        """Postparse the records returned from the provider"""
+        raise NotImplementedError()
 
     def delete_record(self, zone_id, record_id):
         """
@@ -175,11 +223,15 @@ class BaseDNSController(BaseController):
                           self.cloud)
             raise CloudUnavailableError(exc=exc)
 
-    def delete_zone(self, zone_id):
+    def delete_zone(self, zone):
         """
         Public method called to delete the specific zone for the provided id.
         """
-        return self._delete_zone__for_cloud(zone_id)
+        # TODO: Adding here for circular dependency issue. Need to fix this.
+        from mist.io.dns.models import Zone
+        self._delete_zone__for_cloud(zone.zone_id)
+        zone.deleted = datetime.datetime.utcnow()
+        zone.save()
 
     def _delete_zone__for_cloud(self, zone_id):
         """
@@ -198,7 +250,17 @@ class BaseDNSController(BaseController):
         """
         This is the public method that is called to create a new DNS zone.
         """
-        return self._create_zone__for_cloud(domain, type, ttl, extra)
+        # TODO: Adding here for circular dependency issue. Need to fix this.
+        from mist.io.dns.models import Zone
+
+        p_zone = self._create_zone__for_cloud(domain, type, ttl, extra)
+        log.info(p_zone)
+        if p_zone:
+            zone = Zone(cloud=self.cloud, owner=self.cloud.owner,
+                        zone_id=p_zone.id, domain=p_zone.domain,
+                        type=p_zone.type, ttl=p_zone.ttl,
+                        extra=p_zone.extra)
+            zone.save()
 
     def _create_zone__for_cloud(self, domain, type, ttl, extra):
         """
@@ -214,7 +276,7 @@ class BaseDNSController(BaseController):
             zone = self.connection.create_zone(domain, type, ttl, extra)
             log.info("Zone %s created successfully for %s.",
                      zone.domain, self.cloud)
-            return zone.id
+            return zone
         except InvalidCredsError as exc:
             log.warning("Invalid creds on running create_zone on %s: %s",
                         self.cloud, exc)
@@ -232,7 +294,14 @@ class BaseDNSController(BaseController):
         This is the public method that is called to create a new DNS record
         under a specific zone.
         """
+        # TODO: Adding here for circular dependency issue. Need to fix this.
+        # from mist.io.dns.models import Record
+
         return self._create_record__for_zone(zone_id, name, type, data, ttl)
+        # record = self._create_record__for_zone(zone_id, name, type, data, ttl)
+        # if record:
+        #     record = Record(cloud=self.cloud, machine_id=node.id).save()
+
 
     def _create_record__for_zone(self, zone_id, name, type, data, ttl):
         """
@@ -267,7 +336,8 @@ class BaseDNSController(BaseController):
 
     def _create_record__prepare_args(self, name, data, ttl):
         """
-        This is a private
+        This is a private method that should be implemented for each specific
+        provider depending on how they expect the record data.
         ---
         """
         raise NotImplementedError()

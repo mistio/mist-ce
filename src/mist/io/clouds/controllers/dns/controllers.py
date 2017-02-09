@@ -50,6 +50,12 @@ class AmazonDNSController(BaseDNSController):
         extra = {'ttl': ttl}
         return name, data, extra
 
+    def _list__records_postparse_data(self, node, record):
+        """Get the provider specific information into the Mongo model"""
+        if node.data not in record['rdata']:
+            record['rdata'].append(node.data)
+        record['data'] = {'rrdata': record['rdata']}
+        record['extra'] = node.extra
 
 class GoogleDNSController(BaseDNSController):
     """
@@ -71,3 +77,9 @@ class GoogleDNSController(BaseDNSController):
         record_data = {'ttl': ttl, 'rrdatas': []}
         record_data['rrdatas'].append(data)
         return name, record_data, extra
+
+    def _list__records_postparse_data(self, node, record):
+        """Get the provider specific information into the Mongo model"""
+        record['rdata'] = node.data['rrdatas']
+        record['data'] = node.data
+        record['extra'] = node.extra

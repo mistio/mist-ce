@@ -11,12 +11,12 @@ class ZoneController(object):
     def list_records(self):
         """Wrapper for the DNS cloud controller list_records() functionality
         """
-        return self.zone.cloud.ctl.dns.list_records(self.zone.zone_id)
+        return self.zone.cloud.ctl.dns.list_records(self.zone)
 
     def delete_zone(self):
         """Wrapper for the DNS cloud controller delete_zone() functionality
         """
-        return self.zone.cloud.ctl.dns.delete_zone(self.zone.zone_id)
+        return self.zone.cloud.ctl.dns.delete_zone(self.zone)
 
     def create_record(self, name, type, data, ttl):
         """Wrapper for the DNS cloud controller create_record() functionality
