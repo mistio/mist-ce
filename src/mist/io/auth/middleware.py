@@ -1,7 +1,7 @@
 import logging
 
 from mist.io.helpers import log_event, ip_from_request
-from mist.core.helpers import params_from_request
+from mist.io.helpers import params_from_request
 
 from mist.io.auth.models import ApiToken
 from mist.io.auth.models import SessionToken
