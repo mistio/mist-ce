@@ -3,10 +3,10 @@ import logging
 from mist.io.helpers import log_event, ip_from_request
 from mist.core.helpers import params_from_request
 
-from mist.core.auth.models import ApiToken
-from mist.core.auth.models import SessionToken
+from mist.io.auth.models import ApiToken
+from mist.io.auth.models import SessionToken
 
-from mist.core.auth.methods import session_from_request
+from mist.io.auth.methods import session_from_request
 
 from pyramid.request import Request
 

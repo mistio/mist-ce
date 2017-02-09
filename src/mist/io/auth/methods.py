@@ -18,8 +18,8 @@ from mist.io.exceptions import InternalServerError
 from mist.io.users.models import Organization, User
 from mist.core.rbac.methods import AuthContext
 
-from mist.core.auth.models import ApiToken
-from mist.core.auth.models import SessionToken
+from mist.io.auth.models import ApiToken
+from mist.io.auth.models import SessionToken
 
 
 log = logging.getLogger(__name__)

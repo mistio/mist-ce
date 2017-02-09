@@ -21,7 +21,7 @@ from pyramid.renderers import render_to_response
 
 # try:
 from mist.io.helpers import view_config
-from mist.core.auth.methods import user_from_request
+from mist.io.auth.methods import user_from_request
 from mist.io.keys.models import Key, SSHKey, SignedSSHKey
 from mist.io.scripts.models import CollectdScript
 from mist.io.clouds.models import Cloud
@@ -42,7 +42,7 @@ from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, amqp_publish_user
 from mist.io.helpers import transform_key_machine_associations
 
-from mist.core.auth.methods import auth_context_from_request
+from mist.io.auth.methods import auth_context_from_request
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -218,7 +218,7 @@ def add_cloud(request):
 
     if config.NEW_UI_EXPERIMENT_ENABLE:
         from mist.core.experiments import NewUIExperiment
-        from mist.core.auth.methods import session_from_request
+        from mist.io.auth.methods import session_from_request
 
         session = session_from_request(request)
         experiment = NewUIExperiment(userid=session.user_id)
