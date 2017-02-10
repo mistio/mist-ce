@@ -10,6 +10,7 @@ be performed inside the corresponding method functions.
 """
 import json
 import uuid
+import urllib
 import requests
 import traceback
 from time import time
@@ -20,8 +21,6 @@ import mongoengine as me
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
-
-
 # try:
 
 from mist.io.auth.methods import user_from_request
@@ -34,7 +33,8 @@ from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.io.users.models import User, Organization
 from mist.io.auth.models import SessionToken, ApiToken, AuthToken
-from mist.io.users.models import Team, MemberInvitation
+from mist.io.users.models import Team, MemberInvitation, Promo
+from mist.io.users.methods import get_users_count, register_user
 
 from mist.core import config
 import mist.core.methods
@@ -46,6 +46,7 @@ import mist.core.methods
 from mist.io import methods
 from mist.io import tasks
 
+from mist.io.exceptions import LoginThrottledError, ConflictError
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import NotFoundError, BadRequestError
 from mist.io.exceptions import SSLError, ServiceUnavailableError
@@ -61,11 +62,14 @@ from mist.io.exceptions import MemberConflictError, MemberNotFound
 from mist.io.exceptions import TeamForbidden, TeamNotFound, TeamOperationError
 from mist.io.exceptions import MethodNotAllowedError
 
+from mist.io.helpers import initiate_social_auth_request
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, amqp_publish_user
 from mist.io.helpers import transform_key_machine_associations
-from mist.io.helpers import view_config, get_stories
-from mist.io.helpers import ip_from_request
+from mist.io.helpers import view_config, get_stories, log_event
+from mist.io.helpers import ip_from_request, send_email
+from mist.io.helpers import encrypt, decrypt
+from mist.io.helpers import get_log_events
 
 from mist.io.auth.methods import auth_context_from_request
 from mist.io.auth.methods import token_with_name_not_exists
@@ -3022,7 +3026,7 @@ def create_token(request):
     org = None
     if org_id:
         try:
-            org = Organization.objects.get(Q(id=org_id) | Q(name=org_id))
+            org = Organization.objects.get(me.Q(id=org_id) | me.Q(name=org_id))
         except me.DoesNotExist:
             raise BadRequestError("Invalid org id '%s'" % org_id)
         if concerned_user not in org.members:
@@ -4032,3 +4036,611 @@ def delete_member_from_team(request):
     trigger_session_update(auth_context.owner, ['org'])
 
     return OK
+
+
+def get_csrf_token(request):
+    """
+    Returns the CSRF token registered to this request's user session.
+    """
+    session = session_from_request(request)
+    return session.csrf_token if isinstance(session, SessionToken) else ''
+
+
+# SEC
+@view_config(route_name='login', request_method='POST', renderer='json')
+@view_config(route_name='login_service', request_method='POST',
+             renderer='json')
+def login(request):
+    """
+    User posts authentication credentials (email, password).
+    If there is a 'return_to' parameter the user will be redirected to this
+    local url upon successful authentication.
+    There is also an optional 'service' parameter, mainly meant to be used for
+    SSO.
+    ---
+    email:
+      description: user's email
+      type: string
+      required: true
+    password:
+      description: user's password
+      type: string
+      required: true
+    service:
+      description: used for SSO
+      type: string
+
+    """
+    params = params_from_request(request)
+    email = params.get('email')
+    password = params.get('password', '')
+    service = request.matchdict.get('service') or params.get('service') or ''
+    return_to = params.get('return_to')
+    if return_to:
+        return_to = urllib.unquote(return_to)
+    else:
+        return_to = '/'
+    token_from_params = params.get('token')
+
+    if not email:
+        raise RequiredParameterMissingError('email')
+    email = email.lower()
+    try:
+        user = User.objects.get(email=email)
+    except (UserNotFoundError, me.DoesNotExist):
+        raise UserUnauthorizedError()
+    if not user.status == 'confirmed':
+        raise UserUnauthorizedError("User account has not been confirmed.")
+
+    if password:
+        # rate limit user logins
+        max_logins = config.FAILED_LOGIN_RATE_LIMIT['max_logins']
+        max_logins_period = config.FAILED_LOGIN_RATE_LIMIT['max_logins_period']
+        block_period = config.FAILED_LOGIN_RATE_LIMIT['block_period']
+
+        # check if rate limiting in place
+        incidents = get_log_events(user_id=user.id, event_type='incident',
+                                   action='login_rate_limiting',
+                                   start=time() - max_logins_period)
+        incidents = [inc for inc in incidents
+                     if inc.get('ip') == ip_from_request(request)]
+        if len(incidents):
+            secs = incidents[0]['time'] + block_period - time()
+            raise LoginThrottledError("Try again in %d seconds." % secs)
+
+        if not user.check_password(password):
+            # check if rate limiting condition just got triggered
+            logins = list(get_log_events(
+                user_id=user.id, event_type='request', action='login',
+                error=True, start=time() - max_logins_period))
+            logins = [login for login in logins
+                      if login.get('request_ip') == ip_from_request(request)]
+            if len(logins) > max_logins:
+                log_event(owner_id=user.id, user_id=user.id,
+                          event_type='incident',
+                          action='login_rate_limiting',
+                          ip=ip_from_request(request))
+                # alert admins something nasty is going on
+                subject = config.FAILED_LOGIN_ATTEMPTS_EMAIL_SUBJECT
+                body = config.FAILED_LOGIN_ATTEMPTS_EMAIL_BODY % (
+                    user.email,
+                    ip_from_request(request),
+                    max_logins,
+                    max_logins_period,
+                    block_period
+                )
+                send_email(subject, body, config.NOTIFICATION_EMAIL['ops'])
+            raise UserUnauthorizedError()
+    elif token_from_params:
+        try:
+            auth_token = ApiToken.objects.get(user_id=user.id,
+                                              token=token_from_params)
+        except me.DoesNotExist:
+            auth_token = None
+        if not (auth_token and auth_token.is_valid()):
+            raise UserUnauthorizedError()
+        auth_token.touch()
+        auth_token.save()
+    else:
+        raise RequiredParameterMissingError("'password' or 'token'")
+
+    reissue_cookie_session(request, user)
+
+    user.last_login = time()
+    user.user_agent = request.user_agent
+    user.save()
+
+    if not service:
+        # TODO: check that return_to is a local url
+        redirect = return_to
+    else:
+        raise BadRequestError("Invalid service '%s'." % service)
+
+    if params.get('invitoken'):
+        confirm_invitation(request)
+
+    return {
+        'auth': True,
+        'redirect': redirect,
+        'csrf_token': get_csrf_token(request),
+    }
+
+
+@view_config(route_name='switch_context', request_method='GET')
+@view_config(route_name='switch_context_org', request_method='GET')
+def switch_org(request):
+    """
+    Switch user's context.
+    Personal or organizational
+    ---
+    org_id:
+      description: The team's org id
+      type: string
+      required: true
+
+    """
+    org_id = request.matchdict.get('org_id')
+    user = user_from_request(request)
+    params = params_from_request(request)
+    return_to = params.get('return_to', '')
+    org = None
+    if org_id:
+        try:
+            org = Organization.objects.get(id=org_id)
+        except me.DoesNotExist:
+            raise ForbiddenError()
+        if user not in org.members:
+            raise ForbiddenError()
+    reissue_cookie_session(request, user, org=org, after=1)
+
+    raise RedirectError(urllib.unquote(return_to) or '/')
+
+
+@view_config(route_name='login', request_method='GET',
+             renderer='templates/home.pt')
+@view_config(route_name='login_service', request_method='GET',
+             renderer='templates/home.pt')
+def login_get(request):
+    """
+    User visits login form.
+    If there is a 'return_to' parameter the user will be redirected to this
+    local url upon successful authentication.
+    There is also an optional 'service' parameter, mainly meant to be used for
+    SSO.
+    ---
+    return_to:
+      description: if exists, redirect user
+      type: string
+    service:
+      description: used for SSO
+      type: string
+    """
+
+    # check if user sent a GET instead of POST, process it accordingly
+    from mist.core.views import splash_layout
+    try:
+        ret = login(request)
+        if ret['auth']:
+            return HTTPFound(ret['redirect'])
+    except:
+        pass
+    service = request.matchdict.get('service', '')
+    params = params_from_request(request)
+    return_to = params.get('return_to', '')
+    try:
+        user = user_from_request(request)
+        if not service:
+            return HTTPFound(urllib.unquote(return_to) or '/')
+        raise BadRequestError("Invalid service '%s'." % service)
+    except UserUnauthorizedError:
+        return {
+            'login': 1,
+            'service': service,
+            'return_to': return_to,
+            'layout': splash_layout(),
+            'privacy_policy': config.PRIVACY_POLICY,
+            'tos': config.TOS,
+            'csrf_token': json.dumps(get_csrf_token(request)),
+            'css_build': config.CSS_BUILD,
+            'js_build': config.JS_BUILD,
+            'last_build': config.LAST_BUILD
+        }
+
+
+@view_config(route_name='logout', request_method=('GET', 'POST'))
+def logout(request):
+    """
+    User logs out.
+    If user is an admin under su, he returns to his regular user.
+    """
+    user = user_from_request(request)
+    session = session_from_request(request)
+    if isinstance(session, ApiToken):
+        raise ForbiddenError('If you wish to revoke a token use the /tokens'
+                             ' path')
+    real_user = session.get_user(effective=False)
+
+    # this will revoke all the tokens sent by the provider
+    sso_backend = session.context.get('social_auth_backend')
+    if sso_backend:
+        initiate_social_auth_request(request, backend=sso_backend)
+        try:
+            request.backend.disconnect(user=user,
+                                       association_id=None,
+                                       request=request)
+        except Exception as e:
+            log.info('There was an exception while revoking tokens for user'
+                     ' %s: %s' % (user.email, repr(e)))
+    if user != real_user:
+        log.warn("Su logout")
+        reissue_cookie_session(request, real_user)
+    else:
+        reissue_cookie_session(request)
+    ibm_marketplace_redirect = session.context.get('from_ibm')
+    if user.is_ibm_user and ibm_marketplace_redirect:
+        raise RedirectError(config.IBM_MARKETPLACE_URL)
+    return HTTPFound('/')
+
+
+@view_config(route_name='register', request_method='POST', renderer='json')
+def register(request):
+    """
+    New user signs up.
+    """
+    params = params_from_request(request)
+    email = params.get('email').encode('utf-8', 'ignore')
+    promo_code = params.get('promo_code')
+    name = params.get('name').encode('utf-8', 'ignore')
+    token = params.get('token')
+    selected_plan = params.get('selected_plan')
+    request_demo = params.get('request_demo')
+    request_beta = params.get('request_beta', False)
+
+    if not email or not email.strip():
+        raise RequiredParameterMissingError('email')
+    if not name or not name.strip():
+        raise RequiredParameterMissingError('name')
+    if type(request_demo) != bool:
+        raise BadRequestError('Request demo must be a boolean value')
+
+    name = name.strip().split(" ", 1)
+    email = email.strip().lower()
+
+    if type(name) == unicode:
+        name = name.encode('utf-8', 'ignore')
+    if not request_beta:
+        try:
+            user = User.objects.get(email=email)
+            if user.status == 'confirmed' and not request_demo:
+                raise ConflictError("User already registered "
+                                    "and confirmed email.")
+        except me.DoesNotExist:
+            first_name = name[0]
+            last_name = name[1] if len(name) > 1 else ""
+            user, org = register_user(email, first_name, last_name, 'email',
+                                      selected_plan, promo_code, token)
+
+        if user.status == 'pending':
+            # if user is not confirmed yet resend the email
+            subject = config.CONFIRMATION_EMAIL_SUBJECT
+            body = config.CONFIRMATION_EMAIL_BODY % ((user.first_name + " " +
+                                                      user.last_name),
+                                                     config.CORE_URI,
+                                                     user.activation_key,
+                                                     ip_from_request(request),
+                                                     config.CORE_URI)
+
+            if not send_email(subject, body, user.email):
+                raise ServiceUnavailableError("Could not send "
+                                              "confirmation email.")
+
+    if request_demo:
+        # if user requested a demo then notify the mist.io team
+        subject = "Demo request"
+        body = "User %s has requested a demo\n" % user.email
+        tasks.send_email.delay(subject, body, config.NOTIFICATION_EMAIL['demo'])
+        user.requested_demo = True
+        user.demo_request_date = time()
+        user.save()
+
+        msg = "Dear %s %s, we will contact you within 24 hours to schedule a " \
+              "demo. In the meantime, we sent you an activation email so you" \
+              " can create an account to test Mist.io. If the email doesn't" \
+              " appear in your inbox, check your spam folder." \
+              % (user.first_name, user.last_name)
+    elif request_beta:
+        user = None
+        # if user requested a demo then notify the mist.io team
+        subject = "Private beta request"
+        body = "User %s <%s> has requested access to the private beta\n" % \
+            (params.get('name').encode('utf-8', 'ignore'), email)
+        tasks.send_email.delay(subject, body, config.NOTIFICATION_EMAIL['demo'])
+
+        msg = "Dear %s, we will contact you within 24 hours with more " \
+              "information about the Mist.io private beta program. In the " \
+              "meantime, if you have any questions don't hesitate to contact" \
+              " us at info@mist.io" % params.get('name').encode('utf-8', 'ignore')
+    else:
+        msg = "Dear %s %s, you will soon receive an activation email. If it " \
+              "doesn't appear in your Inbox within a few minutes, please " \
+              "check your spam folder." % (user.first_name, user.last_name)
+
+    return {
+        'msg': msg,
+        'user_ga_id': user and user.get_external_id('ga'),
+        'user_id': user and user.id}
+
+
+@view_config(route_name='confirm', request_method='GET')
+def confirm(request):
+    """
+    Confirm a user's email address when signing up.
+    After registering, the user is sent a confirmation email to his email
+    address with a link containing a token that directs the user to this view
+    to confirm his email address.
+    If invitation token exists redirect to set_password
+    """
+    params = params_from_request(request)
+    key = params.get('key')
+    if not key:
+        raise RequiredParameterMissingError('key')
+
+    try:
+        user = User.objects.get(activation_key=key)
+    except me.DoesNotExist:
+        return HTTPFound('/#badkey')
+    if user.status != 'pending' or user.password:
+        # if user has an invitation token but has been confirmed call the
+        # confirm invitation token
+        if params.get('invitoken'):
+            return confirm_invitation(request)
+        else:
+            return HTTPFound('/#alreadyconfirmed')
+
+    token = get_secure_rand_token()
+    key = encrypt("%s:%s" % (token, user.email), config.SECRET)
+    user.password_set_token = token
+    user.password_set_token_created = time()
+    user.password_set_user_agent = request.user_agent
+    log.debug("will now save (register)")
+    user.save()
+
+    invitoken = params.get('invitoken')
+    url = request.route_url('set_password', _query={'key': key})
+    if invitoken:
+        try:
+            MemberInvitation.objects.get(token=invitoken)
+            url += '&invitoken=' + invitoken
+        except me.DoesNotExist:
+            pass
+
+    return HTTPFound(url)
+
+
+@view_config(route_name='forgot_password', request_method='POST')
+def forgot_password(request):
+    """
+    User visits password forgot form and submits his email
+    or user presses the set password button in the account page
+    and has registered through the SSO and has no previous
+    password set in the database. In the latter case the email
+    will be fetched from the session.
+    """
+    try:
+        email = user_from_request(request).email
+    except UserUnauthorizedError:
+        email = params_from_request(request).get('email', '')
+
+    try:
+        user = User.objects.get(email=email)
+    except (UserNotFoundError, me.DoesNotExist):
+        # still return OK so that there's no leak on valid email
+        return OK
+
+    if user.status != 'confirmed':
+        # resend confirmation email
+        user.activation_key = get_secure_rand_token()
+        user.save()
+        subject = config.CONFIRMATION_EMAIL_SUBJECT
+        body = config.CONFIRMATION_EMAIL_BODY % ((user.first_name + " " +
+                                                  user.last_name),
+                                                 config.CORE_URI,
+                                                 user.activation_key,
+                                                 ip_from_request(request),
+                                                 config.CORE_URI)
+
+        if not send_email(subject, body, user.email):
+            raise ServiceUnavailableError("Could not send confirmation email.")
+
+        return OK
+
+    token = get_secure_rand_token()
+    user.password_reset_token = token
+    user.password_reset_token_created = time()
+    user.password_reset_token_ip_addr = ip_from_request(request)
+    log.debug("will now save (forgot)")
+    user.save()
+
+    subject = config.RESET_PASSWORD_EMAIL_SUBJECT
+    body = config.RESET_PASSWORD_EMAIL_BODY
+    body = body % ( (user.first_name or "") + " " + (user.last_name or ""),
+                   config.CORE_URI,
+                   encrypt("%s:%s" % (token, email), config.SECRET),
+                   user.password_reset_token_ip_addr,
+                   config.CORE_URI)
+    if not send_email(subject, body, email):
+        log.info("Failed to send email to user %s for forgot password link" %
+                 user.email)
+        raise ServiceUnavailableError()
+    log.info("Sent email to user %s\n%s" % (email, body))
+    return OK
+
+
+# SEC
+@view_config(route_name='reset_password', request_method=('GET', 'POST'))
+def reset_password(request):
+    """
+    User visits reset password form and posts his email address
+    If he is logged in when he presses the link then he will be logged out
+    and then redirected to the landing page with the reset password token.
+    """
+    params = params_from_request(request)
+    key = params.get('key')
+
+    if not key:
+        raise BadRequestError("Reset password token is missing")
+    reissue_cookie_session(request)  # logout
+
+    # SEC decrypt key using secret
+    try:
+        (token, email) = decrypt(key, config.SECRET).split(':')
+    except:
+        raise BadRequestError("invalid password token.")
+
+    try:
+        user = User.objects.get(email=email)
+    except (UserNotFoundError, me.DoesNotExist):
+        raise UserUnauthorizedError()
+
+    # SEC check status, token, expiration
+    if token != user.password_reset_token:
+        raise BadRequestError("Invalid reset password token.")
+    delay = time() - user.password_reset_token_created
+    if delay > config.RESET_PASSWORD_EXPIRATION_TIME:
+        raise MethodNotAllowedError("Password reset token has expired.")
+
+    if request.method == 'GET':
+        return render_to_response(
+            'templates/home.pt',
+            {
+                'layout': splash_layout(),
+                'privacy_policy': config.PRIVACY_POLICY,
+                'tos': config.TOS,
+                'pw_reset': 1,
+                'css_build': config.CSS_BUILD,
+                'js_build': config.JS_BUILD,
+                'last_build': config.LAST_BUILD,
+                'csrf_token': json.dumps(get_csrf_token(request))
+            },
+            request=request
+        )
+    elif request.method == 'POST':
+
+        password = params.get('password', '')
+        if not password:
+            raise RequiredParameterMissingError('password')
+
+        # change password
+        user.set_password(password)
+        user.status = 'confirmed'
+        # in case the use has been with a pending confirm state
+        user.password_reset_token_created = 0
+        user.save()
+
+        reissue_cookie_session(request, user)
+
+        return OK
+    raise BadRequestError("Bad method %s" % request.method)
+
+
+# SEC
+@view_config(route_name='set_password', request_method=('GET', 'POST'))
+def set_password(request):
+    """
+    User visits confirm link and sets password.
+    User set password if he/she forgot his/her password, if he/she is invited
+    by owner, if he/she signs up.
+    """
+    params = params_from_request(request)
+    key = params.get('key', '')
+
+    invitoken = params.get('invitoken', '')
+
+    if not key:
+        raise RequiredParameterMissingError('key')
+
+    # SEC decrypt key using secret
+    try:
+        (token, email) = decrypt(key, config.SECRET).split(':')
+    except:
+        raise BadRequestError("invalid password token.")
+
+    try:
+        user = User.objects.get(email=email)
+    except (UserNotFoundError, me.DoesNotExist):
+        raise UserUnauthorizedError()
+
+    if user.status != 'pending':
+        raise ForbiddenError("Already confirmed and password set.")
+    if token != user.password_set_token:
+        raise BadRequestError("invalid set password token.")
+    delay = time() - user.password_set_token_created
+    if delay > config.RESET_PASSWORD_EXPIRATION_TIME:
+        raise MethodNotAllowedError("Password set token has expired.")
+
+    if request.method == 'GET':
+        return render_to_response(
+            'templates/home.pt',
+            {
+                'layout': splash_layout(),
+                'privacy_policy': config.PRIVACY_POLICY,
+                'tos': config.TOS,
+                'pw_set': 1,
+                'css_build': config.CSS_BUILD,
+                'js_build': config.JS_BUILD,
+                'last_build': config.LAST_BUILD,
+                'csrf_token': json.dumps(get_csrf_token(request)),
+                'invitoken': invitoken,
+            },
+            request=request
+        )
+    elif request.method == 'POST':
+        password = params.get('password', '')
+        if not password:
+            raise RequiredParameterMissingError('password')
+        # set password
+        user.set_password(password)
+        user.status = 'confirmed'
+        user.activation_date = time()
+        user.password_set_token = ""
+        selected_plan = user.selected_plan
+        user.selected_plan = ''
+        user.last_login = time()
+
+        # activate trial
+        # plan = Plan()
+        # plan.title = 'Startup'
+        # plan.machine_limit = 20
+        # plan.started = time()
+        # plan.expiration = time() + 60 * 60 * 24 * 15
+        # plan.isTrial = True
+        # user.plans = []
+        # user.plans.append(plan)
+
+        user.save()
+
+        body = "one step closer to world domination!\n%s/%s confirmed" \
+            % (get_users_count(confirmed=True), get_users_count())
+        subject = '[mist.io] new user: %s' % user.email,
+        send_email(subject, body, 'we@mist.io')
+
+        # log in user
+        reissue_cookie_session(request, user)
+
+        ret = {'selectedPlan': selected_plan}
+        if user.promo_codes:
+            promo_code = user.promo_codes[-1]
+            promo = Promo.objects.get(code=promo_code)
+            ret['hasPromo'] = True
+            ret['sendToPurchase'] = promo.send_to_purchase
+
+        if invitoken:
+            try:
+                MemberInvitation.objects.get(token=invitoken)
+                confirm_invitation(request)
+            except me.DoesNotExist:
+                pass
+
+        return render_to_response('json', ret, request)
+    else:
+        raise BadRequestError("Invalid HTTP method")
