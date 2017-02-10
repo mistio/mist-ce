@@ -125,3 +125,14 @@ def add_routes(configurator):
                            '/api/v1/clouds/{cloud}/dns/zones/{zone}/records')
     configurator.add_route('api_v1_record',
                            '/api/v1/clouds/{cloud}/dns/zones/{zone}/records/{record}')
+
+    configurator.add_route('api_v1_ping', '/api/v1/ping')
+    configurator.add_route('api_v1_tokens', '/api/v1/tokens')
+    configurator.add_route('api_v1_sessions', '/api/v1/sessions')
+
+    configurator.add_route('api_v1_scripts', '/api/v1/scripts')
+    configurator.add_route('api_v1_script', '/api/v1/scripts/{script_id}')
+    configurator.add_route('api_v1_script_file', '/api/v1/scripts/{script_id}/file')
+
+    configurator.add_route('api_v1_schedules', '/api/v1/schedules')
+    configurator.add_route('api_v1_schedule', '/api/v1/schedules/{schedule_id}')
