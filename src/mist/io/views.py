@@ -12,13 +12,15 @@ import json
 import uuid
 import requests
 import traceback
+from time import time
 from datetime import datetime
 
 import mongoengine as me
-from mongoengine import ValidationError, NotUniqueError
 
 from pyramid.response import Response
+from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
+
 
 # try:
 
@@ -32,6 +34,7 @@ from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.io.users.models import User, Organization
 from mist.io.auth.models import SessionToken, ApiToken, AuthToken
+from mist.io.users.models import Team, MemberInvitation
 
 from mist.core import config
 import mist.core.methods
@@ -48,11 +51,15 @@ from mist.io.exceptions import NotFoundError, BadRequestError
 from mist.io.exceptions import SSLError, ServiceUnavailableError
 from mist.io.exceptions import KeyParameterMissingError, MistError
 from mist.io.exceptions import PolicyUnauthorizedError, UnauthorizedError
-from mist.io.exceptions import UnauthorizedError
+from mist.io.exceptions import UnauthorizedError, RedirectError
 from mist.io.exceptions import ScheduleTaskNotFound, ForbiddenError
-from mist.io.exceptions import UserUnauthorizedError
-
-import pyramid.httpexceptions
+from mist.io.exceptions import UserUnauthorizedError, UserNotFoundError
+from mist.io.exceptions import OrganizationAuthorizationFailure
+from mist.io.exceptions import OrganizationOperationError
+from mist.io.exceptions import OrganizationNameExistsError
+from mist.io.exceptions import MemberConflictError, MemberNotFound
+from mist.io.exceptions import TeamForbidden, TeamNotFound, TeamOperationError
+from mist.io.exceptions import MethodNotAllowedError
 
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, amqp_publish_user
@@ -63,7 +70,12 @@ from mist.io.helpers import ip_from_request
 from mist.io.auth.methods import auth_context_from_request
 from mist.io.auth.methods import token_with_name_not_exists
 from mist.io.auth.methods import get_random_name_for_token
+from mist.io.auth.methods import reissue_cookie_session
 from mist.io.auth.methods import session_from_request
+from mist.io.auth.models import get_secure_rand_token
+
+# TODO handle approprietly
+from mist.core import experiments
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -84,20 +96,20 @@ def exception_handler_mist(exc, request):
 
     """
     # mongoengine ValidationError
-    if isinstance(exc, ValidationError):
+    if isinstance(exc, me.ValidationError):
         trace = traceback.format_exc()
         log.warning("Uncaught me.ValidationError!\n%s", trace)
         return Response("Validation Error", 400)
 
     # mongoengine NotUniqueError
-    if isinstance(exc, NotUniqueError):
+    if isinstance(exc, me.NotUniqueError):
         trace = traceback.format_exc()
         log.warning("Uncaught me.NotUniqueError!\n%s", trace)
         return Response("NotUniqueError", 409)
 
     # non-mist exceptions. that shouldn't happen! never!
     if not isinstance(exc, MistError):
-        if not isinstance(exc, (ValidationError, NotUniqueError)):
+        if not isinstance(exc, (me.ValidationError, me.NotUniqueError)):
             trace = traceback.format_exc()
             log.critical("Uncaught non-mist exception? WTF!\n%s", trace)
             return Response("Internal Server Error", 500)
@@ -2885,9 +2897,8 @@ def edit_schedule_entry(request):
     trigger_session_update(auth_context.owner, ['schedules'])
     return schedule.as_dict()
 
-#TODO jobs, story, logs
 
-
+#  TODO jobs, story, logs
 @view_config(route_name='api_v1_tokens', request_method='GET', renderer='json')
 def list_tokens(request):
     """
@@ -3143,5 +3154,881 @@ def revoke_session(request):
 
     except me.DoesNotExist:
         raise NotFoundError('Session not found')
+
+    return OK
+
+
+@view_config(route_name='api_v1_orgs', request_method='GET', renderer='json')
+def list_user_organizations(request):
+    """
+    List user's organizations
+    List all the organizations where user is a member
+    """
+    try:
+        user = user_from_request(request)
+    except me.DoesNotExist:
+        raise UnauthorizedError()
+    return [{'id': org.id, 'name': org.name}
+            for org in Organization.objects(members=user)]
+
+
+# SEC
+@view_config(route_name='api_v1_org', request_method='POST', renderer='json')
+def create_organization(request):
+    """
+    Create organization.
+    The user creating it will be assigned to the
+    owners team. For now owner has only org
+    ---
+    name:
+      description: The new org  name (id)
+      type: string
+      required: true
+    """
+
+    auth_context = auth_context_from_request(request)
+
+    user = auth_context.user
+    # SEC
+    if not user.can_create_org:
+        raise OrganizationAuthorizationFailure('Unauthorized to '
+                                               'create organization')
+    params = params_from_request(request)
+
+    name = params.get('name')
+    # description = params.get('description')
+
+    if not name:
+        raise RequiredParameterMissingError()
+    if Organization.objects(name=name):
+        raise OrganizationNameExistsError()
+
+    org = Organization()
+    org.add_member_to_team('Owners', user)
+    org.name = name
+
+    try:
+        org.save()
+    except me.ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except me.OperationError:
+        raise OrganizationOperationError()
+
+    trigger_session_update(auth_context.user, ['user'])
+    return org.as_dict()
+
+
+@view_config(route_name='api_v1_org', request_method='GET', renderer='json')
+def show_user_organization(request):
+    """
+    Show user's organization.
+    If user is organization owner then show everything
+    If user is just a member then show just himself as a team member and the
+    name of the organization, the name of the team,
+    """
+    auth_context = auth_context_from_request(request)
+    org_dict = {}
+    if auth_context.org:
+        org_dict = auth_context.org.as_dict()
+        if not auth_context.is_owner():
+            # remove all the teams the user is not a member of
+            i = 0
+            while i < len(org_dict['teams']):
+                if auth_context.user.id not in org_dict['teams'][i]['members']:
+                    org_dict["teams"].pop(i)
+                else:
+                    # user is a member of the team. remove the other members
+                    org_dict['teams'][i]['members'] = [auth_context.user.id]
+                    i += 1
+        org_dict['is_owner'] = auth_context.is_owner()
+    return org_dict
+
+
+@view_config(route_name='user_invitations', request_method='GET',
+             renderer='json')
+def show_user_pending_invitations(request):
+    """
+    Show user's pending invitations.
+    Returns a list of dicts with all of user's pending invitations
+    """
+    auth_context = auth_context_from_request(request)
+    user_invitations = MemberInvitation.objects(user=auth_context.user)
+    invitations = []
+    for invitation in user_invitations:
+        invitation_view = {}
+        try:
+            org = invitation.org
+            invitation_view['org'] = org.name
+            invitation_view['org_id'] = org.id
+            invitation_view['token'] = invitation.token
+            invitation_view['teams'] = []
+            for team_id in invitation.teams:
+                try:
+                    team = org.get_team_by_id(team_id)
+                    invitation_view['teams'].append({
+                        'id': team.id,
+                        'name': team.name
+                    })
+                except:
+                    pass
+            invitations.append(invitation_view)
+        except:
+            pass
+
+    return invitations
+
+
+@view_config(route_name='api_v1_org_info', request_method='GET', renderer='json')
+def show_organization(request):
+    """
+    Show organization.
+    Details of org.
+    ---
+    org_id:
+      description: The org id
+      required: true
+      type: string
+    """
+    # TODO NEXT ITERATION
+    raise ForbiddenError("The proper request is /org")
+    auth_context = auth_context_from_request(request)
+
+    org_id = request.matchdict['org_id']
+
+    if not (auth_context.org and auth_context.is_owner()
+            and auth_context.org.id == org_id):
+        raise OrganizationAuthorizationFailure()
+
+    return auth_context.org.as_dict()
+
+
+@view_config(route_name='api_v1_org_info', request_method='PUT', renderer='json')
+def edit_organization(request):
+    """
+        Edit an organization entry in the db
+        Means rename.
+        Only available to organization owners.
+        ---
+        org_id:
+          description: The org's org id
+          type: string
+          required: true
+        name:
+          description: The team's name
+          type:string
+        """
+    auth_context = auth_context_from_request(request)
+    org_id = request.matchdict['org_id']
+    params = params_from_request(request)
+    name = params.get('new_name')
+    alerts_email = params.get('alerts_email')
+
+    if alerts_email and auth_context.is_owner():
+        mist.core.methods.update_monitoring_options(auth_context.owner,
+                                                    alerts_email)
+    elif not name:
+        raise RequiredParameterMissingError()
+
+    # SEC check if owner
+    if not (auth_context.org and auth_context.is_owner() and
+                    auth_context.org.id == org_id):
+        raise OrganizationAuthorizationFailure()
+
+    if Organization.objects(name=name) and auth_context.org.name != name:
+        raise OrganizationNameExistsError()
+
+    auth_context.org.name = name
+
+    try:
+        auth_context.org.save()
+    except me.ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except me.OperationError:
+        raise OrganizationOperationError()
+
+    log.info("Editing org with name '%s'.", name)
+    trigger_session_update(auth_context.owner, ['org'])
+
+    if config.NEW_UI_EXPERIMENT_ENABLE:
+        session = session_from_request(request)
+        experiment = experiments.NewUIExperiment(userid=session.user_id)
+        experiment.log_event('edit_org', {'title': name})
+
+    return auth_context.org.as_dict()
+
+
+# SEC
+@view_config(route_name='api_v1_teams', request_method='POST', renderer='json')
+def add_team(request):
+    """
+    Create new team.
+    Append it at org's teams list.
+    Only available to organization owners.
+    ---
+    name:
+      description: The new team name
+      type: string
+      required: true
+    description:
+      description: The new team description
+      type: string
+    """
+
+    log.info("Adding team")
+
+    auth_context = auth_context_from_request(request)
+    org_id = request.matchdict['org_id']
+
+    params = params_from_request(request)
+    name = params.get('name')
+    description = params.get('description', '')
+    visibility = params.get('visible', True)
+
+    if not name:
+        raise RequiredParameterMissingError()
+
+    # SEC check if owner
+    if not (auth_context.org and auth_context.is_owner()
+            and auth_context.org.id == org_id):
+        raise OrganizationAuthorizationFailure()
+
+    team = Team()
+    team.name = name
+    team.description = description
+    team.visible = visibility
+    team.init_mappings()
+    auth_context.org.teams.append(team)
+
+    try:
+        auth_context.org.save()
+    except me.ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except me.OperationError:
+        raise TeamOperationError()
+
+    log.info("Adding team with name '%s'.", name)
+    trigger_session_update(auth_context.owner, ['org'])
+
+    return team.as_dict()
+
+
+# SEC
+@view_config(route_name='api_v1_team', request_method='GET', renderer='json')
+def show_team(request):
+    """
+    Show team.
+    Only available to organization owners.
+    ---
+    org_id:
+      description: The team's org id
+      type: string
+      required: true
+    team_id:
+      description: The team's id
+      type: string
+    """
+
+    auth_context = auth_context_from_request(request)
+    org_id = request.matchdict['org_id']
+    team_id = request.matchdict['team_id']
+
+    # SEC check if owner
+    if not (auth_context.org and auth_context.is_owner()
+            and auth_context.org.id == org_id):
+        raise OrganizationAuthorizationFailure()
+
+    # Check if team entry exists
+    try:
+        team = auth_context.org.get_team_by_id(team_id)
+    except me.DoesNotExist:
+        raise TeamNotFound()
+
+    return team.as_dict()
+
+
+# SEC
+@view_config(route_name='api_v1_teams', request_method='GET', renderer='json')
+def list_teams(request):
+    """
+    List teams of an org.
+    Only available to organization owners.
+    ---
+    org_id:
+      description: The teams' org id
+      type: string
+      required: true
+    """
+
+    auth_context = auth_context_from_request(request)
+    org_id = request.matchdict['org_id']
+
+    # SEC check if owner
+    if not (auth_context.org and auth_context.is_owner()
+            and auth_context.org.id == org_id):
+        raise OrganizationAuthorizationFailure()
+
+    return [team.as_dict() for team in auth_context.org.teams]
+
+
+# SEC
+@view_config(route_name='api_v1_team', request_method='PUT', renderer='json')
+def edit_team(request):
+    """
+    Edit a team entry in the db
+    Means rename.
+    Only available to organization owners.
+    ---
+    org_id:
+      description: The org's org id
+      type: string
+      required: true
+    team_id:
+      description: The team's id
+      type: string
+      required: true
+    name:
+      description: The team's name
+      type:string
+    description:
+      description: the teams's description
+    """
+
+    auth_context = auth_context_from_request(request)
+    org_id = request.matchdict['org_id']
+    team_id = request.matchdict['team_id']
+
+    params = params_from_request(request)
+    name = params.get('new_name')
+    description = params.get('new_description', '')
+    visibility = params.get('new_visible')
+
+    if not name:
+        raise RequiredParameterMissingError()
+
+    # SEC check if owner
+    if not (auth_context.org and auth_context.is_owner() and
+            auth_context.org.id == org_id):
+        raise OrganizationAuthorizationFailure()
+
+    # Check if team entry exists
+    try:
+        team = auth_context.org.get_team_by_id(team_id)
+    except me.DoesNotExist:
+        raise TeamNotFound()
+
+    team.name = name
+    team.description = description if description else ''
+    if visibility is not None:
+        team.visible = visibility
+
+    try:
+        auth_context.org.save()
+    except me.ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except me.OperationError:
+        raise TeamOperationError()
+
+    log.info("Editing team with name '%s'.", name)
+    trigger_session_update(auth_context.owner, ['org'])
+
+    return team.as_dict()
+
+
+# SEC
+@view_config(route_name='api_v1_team', request_method='DELETE', renderer='json')
+def delete_team(request):
+    """
+    Delete a team entry in the db.
+    Only available to organization owners.
+    ---
+    org_id:
+      description: The team's org id
+      type: string
+      required: true
+    team_id:
+      description: The team's id
+      type: string
+      required: true
+    """
+    auth_context = auth_context_from_request(request)
+    org_id = request.matchdict['org_id']
+    team_id = request.matchdict['team_id']
+
+    # SEC check if owner
+    if not (auth_context.org and auth_context.is_owner() and
+            auth_context.org.id == org_id):
+        raise OrganizationAuthorizationFailure()
+
+    if auth_context.org.get_team('Owners').id == team_id:
+        raise ForbiddenError()
+
+    try:
+        team = auth_context.org.get_team_by_id(team_id)
+    except me.DoesNotExist:
+        raise NotFoundError()
+
+    if team.members:
+        raise BadRequestError(
+            'Team not empty. Remove all members and try again')
+
+    try:
+        team.drop_mappings()
+        auth_context.org.update(pull__teams__id=team_id)
+    except me.ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except me.OperationError:
+        raise TeamOperationError()
+
+    trigger_session_update(auth_context.owner, ['org'])
+
+    return OK
+
+
+# SEC
+@view_config(route_name='api_v1_teams', request_method='DELETE', renderer='json')
+def delete_teams(request):
+    """
+    Delete multiple teams.
+    Provide a list of team ids to be deleted. The method will try to delete
+    all of them and then return a json that describes for each team id
+    whether or not it was deleted or the not_found if the team id could not
+    be located. If no team id was found then a 404(Not Found) response will
+    be returned.
+    Only available to organization owners.
+    ---
+    team_ids:
+      required: true
+      type: array
+    items:
+      type: string
+      name: team_id
+    """
+    auth_context = auth_context_from_request(request)
+    org_id = request.matchdict['org_id']
+    params = params_from_request(request)
+    team_ids = params.get('team_ids', [])
+
+    # SEC check if owner
+    if not (auth_context.org and auth_context.is_owner() and
+            auth_context.org.id == org_id):
+        raise OrganizationAuthorizationFailure()
+
+    if not isinstance(team_ids, (list, basestring)) or len(team_ids) == 0:
+        raise RequiredParameterMissingError('No team ids provided')
+    # remove duplicate ids if there are any
+    teams_ids = sorted(team_ids)
+    i = 1
+    while i < len(teams_ids):
+        if teams_ids[i] == teams_ids[i - 1]:
+            teams_ids = teams_ids[:i] + teams_ids[i + 1:]
+        else:
+            i += 1
+    report = {}
+    for team_id in teams_ids:
+        # Check if team entry exists
+        try:
+            team = auth_context.org.get_team_by_id(team_id)
+        except me.DoesNotExist:
+            report[team_id] = 'not_found'
+        else:
+            if team.name == 'Owners':
+                report[team_id] = 'forbidden'
+            elif team.members != 0:
+                report[team_id] = 'not_empty'
+            else:
+                team.drop_mappings()
+                Organization.objects(id=org_id).modify(pull__teams=team)
+                report[team_id] = 'deleted'
+
+    # if no team id was valid raise exception
+    if len(filter(lambda team_id: report[team_id] == 'not_found',
+                  report)) == len(teams_ids):
+        raise NotFoundError('No valid team id provided')
+    # if team is not empty raise exception
+    if len(filter(lambda team_id: report[team_id] == 'not_empty',
+                  report)) == len(teams_ids):
+        raise BadRequestError('Delete only empty teams')
+    # if user was not authorized for any team raise exception
+    if len(filter(lambda team_id: report[team_id] == 'forbidden',
+                  report)) == len(team_ids):
+        raise TeamForbidden()
+
+    trigger_session_update(auth_context.owner, ['org'])
+
+    return report
+
+
+# SEC
+@view_config(route_name='api_v1_team_members', request_method='POST', renderer='json')
+def invite_member_to_team(request):
+    """
+    Invite a member to team.
+    For each user there can be one invitation per organization, but each
+    invitation could be for multiple teams.
+    There are three cases:
+    1) If user is not a member of the organization:
+        a) If user is registered in the service then an email will be sent with
+           a link to confirm the invitation
+        b) If user is not registered then a new entry will be created and an
+           email will be sent inviting him to set a password and confirm his
+           invitation to the organization
+    2) User is already a member then add the user directly to the organization
+       and send an email notification about the change in status.
+
+   Only available to organization owners.
+    ---
+    org_id:
+      description: The team's org id
+      type: string
+      required: true
+    team_id:
+      description: The team's id
+      type: string
+      required: true
+    emails:
+      description: The emails of the users to invite
+      type: string
+      required: true
+    """
+    auth_context = auth_context_from_request(request)
+
+    params = params_from_request(request)
+    org_id = request.matchdict['org_id']
+    team_id = request.matchdict['team_id']
+
+    # SEC check if owner
+    if not (auth_context.org and auth_context.is_owner() and
+            auth_context.org.id == org_id):
+        raise OrganizationAuthorizationFailure()
+
+    # Check if team entry exists
+    try:
+        team = auth_context.org.get_team_by_id(team_id)
+    except me.DoesNotExist:
+        raise TeamNotFound()
+
+    emails = params.get('emails', '').strip().lower().split('\n')
+
+    if not emails:
+        raise RequiredParameterMissingError('emails')
+
+    org = auth_context.org
+    subject = config.ORG_INVITATION_EMAIL_SUBJECT
+
+    for email in emails:
+        if not email or '@' not in email:
+            raise BadRequestError('Email %s is not valid' % email)
+
+    ret = []
+    for email in emails:
+        # if '@' not in email:
+
+        # check if user exists
+        try:
+            user = User.objects.get(email=email)
+        except me.DoesNotExist:
+            # If user doesn't exist then create one.
+            if email.split('@')[1] in config.BANNED_EMAIL_PROVIDERS:
+                raise MethodNotAllowedError("Email provider is banned.")
+            user = User()
+            user.email = email
+            user.registration_date = time()
+            user.status = 'pending'
+            user.activation_key = get_secure_rand_token()
+            user.save()
+
+        return_val = {
+            'id': user.id,
+            'name': user.get_nice_name(),
+            'email': user.email
+        }
+
+        invitoken = None
+
+        # if user status is pending then send user email with link for
+        # registration/invitation.
+        if user not in org.members:
+            # check if there is a pending invitation for the user for the same
+            # team. if there is no invitation for team create one.
+            # Also create a list of all the teams the user has been invited to.
+            org_invitations = MemberInvitation.objects(org=org, user=user)
+            for invitation in org_invitations:
+                # user has already been invited for this organization, resend
+                # registration/invitation email.
+                if team_id not in invitation.teams:
+                    invitation.teams.append(team_id)
+                    invitation.save()
+                pending_teams = invitation.teams
+                invitoken = invitation.token
+                break
+
+            if not invitoken:
+                # if there is no invitation create it
+                new_invitation = MemberInvitation()
+                new_invitation.user = user
+                new_invitation.org = org
+                new_invitation.teams.append(team_id)
+                new_invitation.token = invitoken = get_secure_rand_token()
+                try:
+                    new_invitation.save()
+                except:
+                    TeamOperationError('Could not send invitation')
+                pending_teams = new_invitation.teams
+
+            # create appropriate email body
+            if len(pending_teams) > 1:
+                team_name = 'following teams: "'
+                pending_team_names = []
+                for pending_team_id in pending_teams:
+                    try:
+                        pending_team = org.get_team_by_id(pending_team_id)
+                        pending_team_names.append(pending_team.name)
+                    except:
+                        pass
+                team_name += '", "'.join(pending_team_names) + '"'
+            else:
+                team_name = '"' + team.name + '" team'
+            if user.status == 'pending':
+                body = config.REGISTRATION_AND_ORG_INVITATION_EMAIL_BODY % \
+                (auth_context.user.get_nice_name(),
+                 org.name,
+                 team_name,
+                 config.CORE_URI,
+                 user.activation_key,
+                 invitoken,
+                 's' if len(pending_teams) > 1 else '',
+                 config.CORE_URI)
+            else:
+                body = config.USER_CONFIRM_ORG_INVITATION_EMAIL_BODY % \
+                                (auth_context.user.get_nice_name(),
+                                 org.name,
+                                 team_name,
+                                 config.CORE_URI,
+                                 invitoken,
+                                 's' if len(pending_teams) > 1 else '',
+                                 config.CORE_URI)
+            return_val['pending'] = True
+            log.info("Sending invitation to user with email '%s' for team %s "
+                     "of org %s with token %s", user.email, team.name,
+                     auth_context.org.name, invitoken)
+
+        else:
+            team = org.get_team_by_id(team_id)
+            if user in team.members:
+                raise MemberConflictError('Member already in team')
+            org.add_member_to_team_by_id(team_id, user)
+            org.save()
+            subject = config.ORG_NOTIFICATION_EMAIL_SUBJECT
+            body = config.USER_NOTIFY_ORG_TEAM_ADDITION % (team.name,
+                                                           org.name,
+                                                           config.CORE_URI)
+            return_val['pending'] = False
+
+            # if one of the org owners adds him/herself to team don't send email
+            if user == auth_context.user:
+                return return_val
+
+        tasks.send_email.delay(subject, body, user.email)
+        ret.append(return_val)
+
+    trigger_session_update(auth_context.owner, ['org'])
+    return ret
+
+
+@view_config(route_name='confirm_invitation', request_method='GET')
+def confirm_invitation(request):
+    """
+    Confirm that a user want to participate in team
+    If user has status pending then he/she will be redirected to confirm
+    to finalize registration and only after the process has finished
+    successfully will he/she be added to the team.
+    ---
+    invitoken:
+      description: member's invitation token
+      type: string
+      required: true
+
+    """
+    try:
+        auth_context = auth_context_from_request(request)
+    except UserUnauthorizedError:
+        auth_context = None
+    params = params_from_request(request)
+    invitoken = params.get('invitoken', '')
+    if not invitoken:
+        raise RequiredParameterMissingError('invitoken')
+    try:
+        invitation = MemberInvitation.objects.get(token=invitoken)
+    except me.DoesNotExist:
+        raise NotFoundError('Invalid invitation token')
+
+    user = invitation.user
+    # if user registration is pending redirect to confirm registration
+    if user.status == 'pending':
+        key = params.get('key')
+        if not key:
+            key = user.activation_key
+        uri = request.route_url('confirm',
+                                _query={'key': key, 'invitoken': invitoken})
+        raise RedirectError(uri)
+
+    # if user is confirmed but not logged in then redirect to log in page
+    if not auth_context:
+        uri = request.route_url('login', _query={'invitoken': invitoken})
+        raise RedirectError(uri)
+
+    # if user is logged in then make sure it's his invitation that he is
+    # confirming. if it's not redirect to home but don't confirm invitation.
+    if invitation.user != auth_context.user:
+        return HTTPFound('/')
+
+    org = invitation.org
+    for team_id in invitation.teams:
+        try:
+            org.add_member_to_team_by_id(team_id, user)
+        except:
+            pass
+
+    try:
+        org.save()
+    except:
+        raise TeamOperationError()
+
+    try:
+        invitation.delete()
+    except:
+        pass
+
+    args = {
+        'request': request,
+        'user_id': auth_context.user,
+        'org': org
+    }
+    if session_from_request(request).context.get('social_auth_backend'):
+        args.update({
+            'social_auth_backend': session_from_request(request).context.get('social_auth_backend')
+        })
+    reissue_cookie_session(**args)
+
+    trigger_session_update(auth_context.owner, ['org'])
+
+    return HTTPFound('/')
+
+
+# SEC
+@view_config(route_name='api_v1_team_member', request_method='DELETE', renderer='json')
+def delete_member_from_team(request):
+    """
+    Delete a team's member entry from the db.
+    It means remove member from list and save org.
+    Only available to organization owners.
+    ---
+    org_id:
+      description: The team's org id
+      type: string
+      required: true
+    team_id:
+      description: The team's id
+      type: string
+      required: true
+    user_id:
+      description: The user's id
+      type: string
+      required: true
+    """
+    auth_context = auth_context_from_request(request)
+
+    user_id = request.matchdict['user_id']
+    org_id = request.matchdict['org_id']
+    team_id = request.matchdict['team_id']
+
+    # SEC check if owner
+    if not (auth_context.org and auth_context.is_owner()
+            and auth_context.org.id == org_id):
+        raise OrganizationAuthorizationFailure()
+
+    # Check if team entry exists
+    try:
+        team = auth_context.org.get_team_by_id(team_id)
+    except me.DoesNotExist:
+        raise TeamNotFound()
+
+    # check if user exists
+    try:
+        user = User.objects.get(id=user_id)
+    except me.DoesNotExist:
+        raise UserNotFoundError()
+
+    # check if user has a pending invitation.
+    if user not in team.members:
+        try:
+            invitation = \
+                MemberInvitation.objects.get(user=user, org=auth_context.org)
+            # remove team from user's invitation. if there are no more teams
+            # then revoke the invitation.
+            if team_id not in invitation.teams:
+                raise NotFoundError()
+            invitation.teams.remove(team_id)
+            if len(invitation.teams) == 0:
+                subject = config.NOTIFY_INVITATION_REVOKED_SUBJECT
+                body = config.NOTIFY_INVITATION_REVOKED % \
+                       (auth_context.org.name, config.CORE_URI)
+                try:
+                    invitation.delete()
+                except me.ValidationError as e:
+                    raise BadRequestError(
+                        {"msg": e.message, "errors": e.to_dict()})
+                except me.OperationError:
+                    raise TeamOperationError()
+                # notify user that his invitation has been revoked
+                tasks.send_email.delay(subject, body, user.email)
+            else:
+                try:
+                    invitation.save()
+                except me.ValidationError as e:
+                    raise BadRequestError(
+                        {"msg": e.message, "errors": e.to_dict()})
+                except me.OperationError:
+                    raise TeamOperationError()
+
+            trigger_session_update(auth_context.owner, ['org'])
+            return OK
+        except:
+            raise MemberNotFound()
+
+    # if user belongs in more than one teams then just remove him from the team
+    # otherwise remove him both from team and the organization.
+    remove_from_org = True
+    auth_context.org.remove_member_from_team_by_id(team_id, user)
+    for team in auth_context.org.teams:
+        if user in team.members and team.id != team_id:
+            # if user is in some other team too then just remove him from the
+            # team.
+            remove_from_org = False
+            break
+
+    subject = config.ORG_TEAM_STATUS_CHANGE_EMAIL_SUBJECT
+    if remove_from_org:
+        body = config.NOTIFY_REMOVED_FROM_ORG % \
+               (auth_context.org.name, config.CORE_URI)
+        auth_context.org.remove_member_from_members(user)
+    else:
+        body = config.NOTIFY_REMOVED_FROM_TEAM % \
+        (team.name,
+         auth_context.org.name,
+         auth_context.user.get_nice_name(),
+         config.CORE_URI)
+
+    try:
+        auth_context.org.save()
+    except me.ValidationError as e:
+        raise BadRequestError({"msg": e.message, "errors": e.to_dict()})
+    except me.OperationError:
+        raise TeamOperationError()
+
+    if user != auth_context.user:
+        tasks.send_email.delay(subject, body, user.email)
+
+    trigger_session_update(auth_context.owner, ['org'])
 
     return OK

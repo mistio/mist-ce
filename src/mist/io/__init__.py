@@ -136,3 +136,16 @@ def add_routes(configurator):
 
     configurator.add_route('api_v1_schedules', '/api/v1/schedules')
     configurator.add_route('api_v1_schedule', '/api/v1/schedules/{schedule_id}')
+
+    configurator.add_route('api_v1_orgs', '/api/v1/orgs')
+    configurator.add_route('api_v1_org', '/api/v1/org')
+    configurator.add_route('api_v1_org_info', '/api/v1/org/{org_id}')
+
+    configurator.add_route('api_v1_teams', '/api/v1/org/{org_id}/teams')
+    configurator.add_route('api_v1_team', '/api/v1/org/{org_id}/teams/{team_id}')
+
+    configurator.add_route('api_v1_members', '/api/v1/org/{org_name}/members')
+    configurator.add_route('api_v1_member', '/api/v1/org/{org_name}/members/{user_id}')
+
+    configurator.add_route('api_v1_team_members', '/api/v1/org/{org_id}/teams/{team_id}/members')
+    configurator.add_route('api_v1_team_member', '/api/v1/org/{org_id}/teams/{team_id}/members/{user_id}')
