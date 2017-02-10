@@ -8,11 +8,12 @@ only check that all required params are provided. Any further checking should
 be performed inside the corresponding method functions.
 
 """
-
-import requests
 import json
 import uuid
+import requests
 import traceback
+from datetime import datetime
+
 import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError
 
@@ -20,12 +21,18 @@ from pyramid.response import Response
 from pyramid.renderers import render_to_response
 
 # try:
-from mist.io.helpers import view_config
+
 from mist.io.auth.methods import user_from_request
 from mist.io.keys.models import Key, SSHKey, SignedSSHKey
 from mist.io.scripts.models import CollectdScript
+from mist.io.scripts.models import ExecutableScript, AnsibleScript, Script
+from mist.io.schedules.models import Schedule
+from mist.io.tag.methods import add_tags_to_resource, resolve_id_and_set_tags
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
+from mist.io.users.models import User, Organization
+from mist.io.auth.models import SessionToken, ApiToken, AuthToken
+
 from mist.core import config
 import mist.core.methods
 # except ImportError:
@@ -34,20 +41,29 @@ import mist.core.methods
 #     from pyramid.view import view_config
 
 from mist.io import methods
+from mist.io import tasks
 
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import NotFoundError, BadRequestError
 from mist.io.exceptions import SSLError, ServiceUnavailableError
 from mist.io.exceptions import KeyParameterMissingError, MistError
 from mist.io.exceptions import PolicyUnauthorizedError, UnauthorizedError
+from mist.io.exceptions import UnauthorizedError
+from mist.io.exceptions import ScheduleTaskNotFound, ForbiddenError
+from mist.io.exceptions import UserUnauthorizedError
 
 import pyramid.httpexceptions
 
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, amqp_publish_user
 from mist.io.helpers import transform_key_machine_associations
+from mist.io.helpers import view_config, get_stories
+from mist.io.helpers import ip_from_request
 
 from mist.io.auth.methods import auth_context_from_request
+from mist.io.auth.methods import token_with_name_not_exists
+from mist.io.auth.methods import get_random_name_for_token
+from mist.io.auth.methods import session_from_request
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -149,7 +165,7 @@ def list_clouds(request):
     auth_context = auth_context_from_request(request)
     # to prevent iterate throw every cloud
     auth_context.check_perm("cloud", "read", None)
-    return mist.core.methods.filter_list_clouds(auth_context)
+    return mist.io.methods.filter_list_clouds(auth_context)
 
 
 @view_config(route_name='api_v1_clouds', request_method='POST', renderer='json')
@@ -409,7 +425,7 @@ def list_keys(request):
     ---
     """
     auth_context = auth_context_from_request(request)
-    return mist.core.methods.filter_list_keys(auth_context)
+    return mist.io.methods.filter_list_keys(auth_context)
 
 
 @view_config(route_name='api_v1_keys', request_method='PUT', renderer='json')
@@ -941,7 +957,7 @@ def list_machines(request):
 
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
-    return mist.core.methods.filter_list_machines(auth_context, cloud_id)
+    return mist.io.methods.filter_list_machines(auth_context, cloud_id)
 
 
 @view_config(route_name='api_v1_machines', request_method='POST',
@@ -1257,7 +1273,7 @@ def machine_actions(request):
         getattr(machine.ctl, action)(plan_id)
 
     # TODO: We shouldn't return list_machines, just OK. Save the API!
-    return mist.core.methods.filter_list_machines(auth_context, cloud_id)
+    return mist.io.methods.filter_list_machines(auth_context, cloud_id)
 
 
 @view_config(route_name='api_v1_machine_rdp', request_method='GET',
@@ -2259,3 +2275,873 @@ def list_supported_providers(request):
         return {'supported_providers': config.SUPPORTED_PROVIDERS_V_2}
     else:
         return {'supported_providers': config.SUPPORTED_PROVIDERS}
+
+
+# SEC
+@view_config(route_name='api_v1_scripts', request_method='GET',
+             renderer='json')
+#@view_config(route_name='scripts', request_method='GET', renderer='json')
+def list_scripts(request):
+    """
+    List user scripts
+    READ permission required on each script.
+    ---
+    """
+    auth_context = auth_context_from_request(request)
+    scripts_list = mist.io.methods.filter_list_scripts(auth_context)
+    return scripts_list
+
+
+# SEC
+@view_config(route_name='api_v1_scripts', request_method='POST',
+             renderer='json')
+#@view_config(route_name='scripts', request_method='POST', renderer='json')
+def add_script(request):
+    """
+    Add script to user scripts
+    ADD permission required on SCRIPT
+    ---
+    name:
+      type: string
+      required: true
+    script:
+      type: string
+      required: false
+    script_inline:
+      type: string
+      required: false
+    script_github:
+      type: string
+      required: false
+    script_url:
+      type: string
+      required: false
+    location_type:
+      type: string
+      required: true
+    entrypoint:
+      type: string
+    exec_type:
+      type: string
+      required: true
+    description:
+      type: string
+    extra:
+      type: dict
+    """
+
+    params = params_from_request(request)
+
+    # SEC
+    auth_context = auth_context_from_request(request)
+    script_tags = auth_context.check_perm("script", "add", None)
+
+    kwargs = {}
+
+    for key in ('name', 'script', 'location_type', 'entrypoint', 'exec_type',
+                'description', 'extra','script_inline', 'script_url',
+                'script_github'):
+        kwargs[key] = params.get(key)   # TODO maybe change this
+
+    kwargs['script'] = choose_script_from_params(kwargs['location_type'],
+                                                 kwargs['script'],
+                                                 kwargs['script_inline'],
+                                                 kwargs['script_url'],
+                                                 kwargs['script_github'])
+    for key in ('script_inline', 'script_url', 'script_github'):
+        kwargs.pop(key)
+
+    name = kwargs.pop('name')
+    exec_type = kwargs.pop('exec_type')
+
+    if exec_type == 'executable':
+        script = ExecutableScript.add(auth_context.owner, name, **kwargs)
+    elif exec_type == 'ansible':
+        script = AnsibleScript.add(auth_context.owner, name, **kwargs)
+    elif exec_type == 'collectd_python_plugin':
+        script = CollectdScript.add(auth_context.owner, name, **kwargs)
+    else:
+        raise BadRequestError(
+            "Param 'exec_type' must be in ('executable', 'ansible', "
+            "'collectd_python_plugin')."
+        )
+
+    if script_tags:
+        add_tags_to_resource(auth_context.owner, script, script_tags.items())
+
+    script = script.as_dict_old()
+
+    if 'job_id' in params:
+        script['job_id'] = params['job_id']
+
+    return script
+
+
+# TODO this isn't nice
+def choose_script_from_params(location_type, script,
+                              script_inline, script_url,
+                              script_github):
+    if script != '' and script != None:
+        return script
+
+    if location_type == 'github':
+        return script_github
+    elif location_type == 'url':
+        return script_url
+    else:
+        return script_inline
+
+
+# SEC
+@view_config(route_name='api_v1_script', request_method='GET', renderer='json')
+#@view_config(route_name='script', request_method='GET', renderer='json')
+def show_script(request):
+    """
+    Show script details and job history.
+    READ permission required on script.
+    ---
+    script_id:
+      type: string
+      required: true
+      in: path
+    """
+    script_id = request.matchdict['script_id']
+    auth_context = auth_context_from_request(request)
+
+    if not script_id:
+        raise RequiredParameterMissingError('No script id provided')
+
+    try:
+        script = Script.objects.get(owner=auth_context.owner,
+                                    id=script_id, deleted=None)
+    except me.DoesNotExist:
+        raise NotFoundError('Script id not found')
+
+    # SEC require READ permission on SCRIPT
+    auth_context.check_perm('script', 'read', script_id)
+
+    ret_dict = script.as_dict_old()
+    jobs = get_stories('job', auth_context.owner.id, script_id=script_id)
+    ret_dict['jobs'] = [job['job_id'] for job in jobs]
+    return ret_dict
+
+
+@view_config(route_name='api_v1_script_file', request_method='GET',
+             renderer='json')
+def download_script(request):
+    """
+    Download script file or archive.
+    READ permission required on script.
+    ---
+    script_id:
+      type: string
+      required: true
+      in: path
+    """
+    script_id = request.matchdict['script_id']
+    auth_context = auth_context_from_request(request)
+
+    if not script_id:
+        raise RequiredParameterMissingError('No script id provided')
+
+    try:
+        script = Script.objects.get(owner=auth_context.owner,
+                                    id=script_id, deleted=None)
+    except me.DoesNotExist:
+        raise NotFoundError('Script id not found')
+
+    # SEC require READ permission on SCRIPT
+    auth_context.check_perm('script', 'read', script_id)
+    try:
+        return script.ctl.get_file()
+    except BadRequestError():
+        return Response("Unable to find: {}".format(request.path_info))
+
+
+# SEC
+@view_config(route_name='api_v1_script', request_method='DELETE', renderer='json')
+#@view_config(route_name='script', request_method='DELETE', renderer='json')
+def delete_script(request):
+    """
+    Delete script
+    REMOVE permission required on script.
+    ---
+    script_id:
+      in: path
+      required: true
+      type: string
+    """
+    script_id = request.matchdict['script_id']
+    auth_context = auth_context_from_request(request)
+
+    if not script_id:
+        raise RequiredParameterMissingError('No script id provided')
+
+    try:
+        script = Script.objects.get(owner=auth_context.owner,
+                                    id=script_id, deleted=None)
+    except me.DoesNotExist:
+        raise NotFoundError('Script id not found')
+
+    # SEC require REMOVE permission on script
+    auth_context.check_perm('script', 'remove', script_id)
+
+    script.ctl.delete()
+    return OK
+
+
+# SEC
+@view_config(route_name='api_v1_scripts',
+             request_method='DELETE', renderer='json')
+#@view_config(route_name='scripts', request_method='DELETE', renderer='json')
+def delete_scripts(request):
+    """
+    Delete multiple scripts.
+    Provide a list of script ids to be deleted. The method will try to delete
+    all of them and then return a json that describes for each script id
+    whether or not it was deleted or the not_found if the script id could not
+    be located. If no script id was found then a 404(Not Found) response will
+    be returned.
+    REMOVE permission required on each script.
+    ---
+    script_ids:
+      required: true
+      type: array
+      items:
+        type: string
+        name: script_id
+    """
+    auth_context = auth_context_from_request(request)
+    params = params_from_request(request)
+    script_ids = params.get('script_ids', [])
+    if type(script_ids) != list or len(script_ids) == 0:
+        raise RequiredParameterMissingError('No script ids provided')
+
+    # remove duplicate ids if there are any
+    script_ids = sorted(script_ids)
+    i = 1
+    while i < len(script_ids):
+        if script_ids[i] == script_ids[i - 1]:
+            script_ids = script_ids[:i] + script_ids[i + 1:]
+        else:
+            i += 1
+
+    report = {}
+    for script_id in script_ids:
+        try:
+            script = Script.objects.get(owner=auth_context.owner,
+                                        id=script_id, deleted=None)
+        except me.DoesNotExist:
+            report[script_id] = 'not_found'
+            continue
+        # SEC require REMOVE permission on script
+        try:
+            auth_context.check_perm('script', 'remove', script_id)
+        except PolicyUnauthorizedError:
+            report[script_id] = 'unauthorized'
+        else:
+            script.ctl.delete()
+            report[script_id] = 'deleted'
+        # /SEC
+
+    # if no script id was valid raise exception
+    if len(filter(lambda script_id: report[script_id] == 'not_found',
+                  report)) == len(script_ids):
+        raise NotFoundError('No valid script id provided')
+    # if user was not authorized for any script raise exception
+    if len(filter(lambda script_id: report[script_id] == 'unauthorized',
+                  report)) == len(script_ids):
+        raise UnauthorizedError("You don't have authorization for any of these"
+                                " scripts")
+    return report
+
+
+# SEC
+@view_config(route_name='api_v1_script', request_method='PUT', renderer='json')
+#@view_config(route_name='script', request_method='PUT', renderer='json')
+def edit_script(request):
+    """
+    Edit script (rename only as for now)
+    EDIT permission required on script.
+    ---
+    script_id:
+      in: path
+      required: true
+      type: string
+    new_name:
+      type: string
+      required: true
+    new_description:
+      type: string
+    """
+    script_id = request.matchdict['script_id']
+    params = params_from_request(request)
+    new_name = params.get('new_name')
+    new_description = params.get('new_description')
+
+    auth_context = auth_context_from_request(request)
+    # SEC require EDIT permission on script
+    auth_context.check_perm('script', 'edit', script_id)
+    try:
+        script = Script.objects.get(owner=auth_context.owner,
+                                    id=script_id, deleted=None)
+    except me.DoesNotExist:
+        raise NotFoundError('Script id not found')
+
+    if not new_name:
+        raise RequiredParameterMissingError('No new name provided')
+
+    script.ctl.edit(new_name, new_description)
+    ret = {'new_name': new_name}
+    if isinstance(new_description, basestring):
+        ret['new_description'] = new_description
+    return ret
+
+
+# SEC
+@view_config(route_name='api_v1_script', request_method='POST', renderer='json')
+#@view_config(route_name='script', request_method='POST', renderer='json')
+def run_script(request):
+    """
+    Start a script job to run the script.
+    READ permission required on cloud.
+    RUN_SCRIPT permission required on machine.
+    RUN permission required on script.
+    ---
+    script_id:
+      in: path
+      required: true
+      type: string
+    cloud_id:
+      required: true
+      type: string
+    machine_id:
+      required: true
+      type: string
+    params:
+      type: string
+    su:
+      type: boolean
+    env:
+      type: string
+    job_id:
+      type: string
+    """
+    script_id = request.matchdict['script_id']
+    params = params_from_request(request)
+    cloud_id = params['cloud_id']
+    machine_id = params['machine_id']
+    script_params = params.get('params', '')
+    su = params.get('su', False)
+    env = params.get('env')
+    job_id = params.get('job_id')
+    if isinstance(env, dict):
+        env = json.dumps(env)
+    for key in ('cloud_id', 'machine_id'):
+        if key not in params:
+            raise RequiredParameterMissingError(key)
+    auth_context = auth_context_from_request(request)
+    auth_context.check_perm("cloud", "read", cloud_id)
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+    except me.DoesNotExist:
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
+
+    # SEC require permission RUN_SCRIPT on machine
+    auth_context.check_perm("machine", "run_script", machine.id)
+    # SEC require permission RUN on script
+    auth_context.check_perm('script', 'run', script_id)
+    try:
+        script = Script.objects.get(owner=auth_context.owner,
+                                    id=script_id, deleted=None)
+    except me.DoesNotExist:
+        raise NotFoundError('Script id not found')
+    job_id = job_id or uuid.uuid4().hex
+    tasks.run_script.delay(auth_context.owner.id, script.id,
+                           cloud_id, machine_id, params=script_params,
+                           env=env, su=su, job_id=job_id)
+    return {'job_id': job_id}
+
+
+# SEC
+@view_config(route_name='api_v1_schedules', request_method='POST',
+             renderer='json')
+def add_schedule_entry(request):
+    """
+    Add an entry to user schedules
+    Add permission required on schedule.
+    READ permission required on cloud.
+    RUN_SCRIPT permission required on machine.
+    RUN permission required on script.
+    ---
+    script_id:
+      type: string
+    action:
+      type: string
+    machines_uuids:
+      required: true
+      type: array
+      description: list of machines_uuids
+    machines_tags:
+      required: true
+      type: array
+      description: list of machines_tags
+    name:
+      required:true
+      type:string
+      description: schedule name
+    task_enabled:
+      type: boolean
+      description: schedule is ready to run
+    run_immediately:
+      type: boolean
+      description: run immediately only  the first time
+    expires:
+      type: string
+      description: expiration date
+    description:
+      type: string
+      description: describe schedule
+    schedule_type:
+      type: string
+      description: three different types, interval, crontab, one_off
+    schedule_entry:
+      type: object
+      description: period of time
+    params:
+      type: string
+    """
+    params = params_from_request(request)
+
+    # SEC
+    auth_context = auth_context_from_request(request)
+    # SEC require ADD permission on schedule
+    schedule_tags = auth_context.check_perm("schedule", "add", None)
+
+    name = params.pop('name')
+
+    schedule = Schedule.add(auth_context, name, **params)
+
+    if schedule_tags:
+        resolve_id_and_set_tags(auth_context.owner, 'schedule', schedule.id,
+                                schedule_tags.items())
+    trigger_session_update(auth_context.owner, ['schedules'])
+    return schedule.as_dict()
+
+
+@view_config(route_name='api_v1_schedules', request_method='GET',
+             renderer='json')
+def list_schedules_entries(request):
+    """
+    List user schedules entries, order by _id
+    READ permission required on schedules
+    ---
+    """
+
+    auth_context = auth_context_from_request(request)
+
+    # SEC
+    schedules_list = mist.io.methods.filter_list_schedules(auth_context)
+
+    return [schedule for schedule in schedules_list]
+
+
+# SEC
+@view_config(route_name='api_v1_schedule', request_method='GET',
+             renderer='json')
+def show_schedule_entry(request):
+    """
+    Show a schedule details of a user
+    READ permission required on schedule
+    ---
+    schedule_id:
+      type: string
+    """
+    schedule_id = request.matchdict['schedule_id']
+    auth_context = auth_context_from_request(request)
+
+    if not schedule_id:
+        raise RequiredParameterMissingError('No schedule id provided')
+
+    try:
+        schedule = Schedule.objects.get(id=schedule_id, deleted=None,
+                                        owner=auth_context.owner)
+    except Schedule.DoesNotExist:
+        raise ScheduleTaskNotFound()
+
+    # SEC require READ permission on schedule
+    auth_context.check_perm('schedule', 'read', schedule_id)
+
+    return schedule.as_dict()
+
+
+@view_config(route_name='api_v1_schedule', request_method='DELETE',
+             renderer='json')
+def delete_schedule(request):
+    """
+    Delete a schedule entry of a user
+    REMOVE permission required on schedule
+    ---
+    schedule_id:
+      type: string
+    """
+    schedule_id = request.matchdict['schedule_id']
+    auth_context = auth_context_from_request(request)
+
+    if not schedule_id:
+        raise RequiredParameterMissingError('No schedule id provided')
+
+    # Check if entry exists
+    try:
+        schedule = Schedule.objects.get(id=schedule_id, deleted=None)
+    except Schedule.DoesNotExist:
+        raise ScheduleTaskNotFound()
+
+    # SEC
+    auth_context.check_perm('schedule', 'remove', schedule_id)
+
+    # NOTE: Do not perform an atomic operation when marking a schedule as
+    # deleted, since we do not wish to bypass pre-save validation/cleaning.
+    schedule.deleted = datetime.utcnow()
+    schedule.save()
+
+    trigger_session_update(auth_context.owner, ['schedules'])
+    return OK
+
+
+# SEC
+@view_config(route_name='api_v1_schedule',
+             request_method='PATCH', renderer='json')
+def edit_schedule_entry(request):
+    """
+    Edit a schedule entry
+    EDIT permission required on schedule
+    READ permission required on cloud.
+    RUN_SCRIPT permission required on machine.
+    RUN permission required on script.
+
+    ---
+    script_id:
+      type: string
+    action:
+      type: string
+     machines_uuids:
+      required: true
+      type: array
+      description: list of machines_uuids
+    machines_tags:
+      required: true
+      type: array
+      description: list of machines_tags
+    name:
+      required:true
+      type:string
+      description: schedule name
+    enabled:
+      type: boolean
+      description: schedule is ready to run
+    run_immediately:
+      type: boolean
+      description: run immediately only  the first time
+    expires:
+      type: string
+      description: expiration date
+    description:
+      type: string
+      description: describe schedule
+    schedule_type:
+      type: string
+      description: three different types, interval, crontab, one_off
+    schedule_entry:
+      type: object
+      description: period of time
+    schedule_id:
+      type: string
+    params:
+      type: string
+    """
+
+    auth_context = auth_context_from_request(request)
+    params = params_from_request(request)
+    schedule_id = request.matchdict['schedule_id']
+
+    if not schedule_id:
+        raise RequiredParameterMissingError('No schedule id provided')
+
+    # SEC require EDIT permission on schedule
+    auth_context.check_perm('schedule', 'edit', schedule_id)
+
+    owner = auth_context.owner
+    # Check if entry exists
+    try:
+        schedule = Schedule.objects.get(id=schedule_id, owner=owner,
+                                        deleted=None)
+    except Schedule.DoesNotExist:
+        raise ScheduleTaskNotFound()
+
+    schedule.ctl.set_auth_context(auth_context)
+    schedule.ctl.update(**params)
+
+    trigger_session_update(auth_context.owner, ['schedules'])
+    return schedule.as_dict()
+
+#TODO jobs, story, logs
+
+
+@view_config(route_name='api_v1_tokens', request_method='GET', renderer='json')
+def list_tokens(request):
+    """
+    List user's api tokens
+    ---
+    """
+    # FIXME: should call an optimized methods.list_tokens
+    auth_context = auth_context_from_request(request)
+    api_tokens = ApiToken.objects(user_id=auth_context.user.id, revoked=False)
+    tokens_list = []
+    for token in api_tokens:
+        if token.is_valid():
+            token_view = token.get_public_view()
+            if token_view['last_accessed_at'] == 'None':
+                token_view['last_accessed_at'] = 'Never'
+            tokens_list.append(token_view)
+
+    # If user is owner also include all active tokens in the current org context
+    if auth_context.is_owner():
+        org_tokens = ApiToken.objects(org=auth_context.org, revoked=False)
+        for token in org_tokens:
+            if token.is_valid():
+                token_view = token.get_public_view()
+                if token_view['last_accessed_at'] == 'None':
+                    token_view['last_accessed_at'] = 'Never'
+                try:
+                    tokens_list.index(token_view)
+                except ValueError:
+                    tokens_list.append(token_view)
+    return tokens_list
+
+
+@view_config(route_name='api_v1_tokens', request_method='POST', renderer='json')
+def create_token(request):
+    """
+    Create a new api token
+    Used so that a user can send his credentials and produce a new api token.
+    They api token itself will be returned in a json document along with it's
+    id and it's name.
+    If user has used su then he should provide his own credentials however the
+    api token will authenticate the user that he is impersonating.
+    User can also send as parameters the name and the ttl.
+    If name is not sent then a random one with the format api_token_xyz where
+    xyz is a number will be produced.
+    If the user provides a name then there must be no other token for that user
+    with the same name.
+    If the user has a cookie or sends an api token in the request headers then
+    the username and password must belong to him.
+    Used by io to authenticate to core (when running separately. Io sends
+    user's email and password. We return an access token that will be used to
+    authenticate any further communications.
+    An anti-CSRF token is not needed to access this api call.
+    If user is coming from oauth then he will be able to create a new token
+    without a password provided he is authenticated somehow.
+    If you are using the /auth route please switch to /api_v1_tokens route. The
+    /auth route is deprecated and will be removed completely in the future.
+    ---
+    email:
+      description: User's email
+      required: true
+      type: string
+    password:
+      description: User's password
+      required: true
+      type: string
+    name:
+      description: Api token name
+      type: string
+    ttl:
+      description: Time to live for the token
+      type: integer
+    org_id:
+      description: Org id if this token is to be used in organizational context
+      type: string
+    """
+
+    # requesting user is the user that POSTed the function and he is the one
+    # that must provide his credentials. If the user has used
+    # su then requesting_user is the effective user.
+    session = request.environ['session']
+    requesting_user = session.get_user(effective=True)
+
+    params = params_from_request(request)
+    email = params.get('email', '').lower()
+    password = params.get('password', '')
+    api_token_name = params.get('name', '')
+    org_id = params.get('org_id', '')
+    ttl = params.get('ttl', 60 * 60)
+    if not email:
+        raise RequiredParameterMissingError("No email provided")
+    if (isinstance(ttl, str) or isinstance(ttl, unicode)) and not ttl.isdigit():
+        raise BadRequestError('Ttl must be a number greater than 0')
+    if int(ttl) < 0:
+        raise BadRequestError('Ttl must be greater or equal to zero')
+
+    # concerned user is the user by whom the api token will be used.
+    if requesting_user is not None:
+        concerned_user = session.get_user(effective=False)
+    else:
+        try:
+            requesting_user = concerned_user = User.objects.get(email=email)
+        except me.DoesNotExist:
+            raise UserUnauthorizedError(email)
+
+    if requesting_user.status != 'confirmed' \
+            or concerned_user.status != 'confirmed':
+        raise UserUnauthorizedError()
+
+    if requesting_user.password is None or requesting_user.password == '':
+        if password:
+            raise BadRequestError('Wrong password')
+        else:
+            raise BadRequestError('Please use the GUI to set a password and '
+                                  'then retry')
+    else:
+        if not password:
+            raise BadRequestError('No password provided')
+        if not requesting_user.check_password(password):
+            raise BadRequestError('Wrong password')
+
+    org = None
+    if org_id:
+        try:
+            org = Organization.objects.get(Q(id=org_id) | Q(name=org_id))
+        except me.DoesNotExist:
+            raise BadRequestError("Invalid org id '%s'" % org_id)
+        if concerned_user not in org.members:
+            raise ForbiddenError()
+
+    # first check if the api token name is unique if it has been provided
+    # otherwise produce a new one.
+    if api_token_name:
+        token_with_name_not_exists(concerned_user, api_token_name)
+        session.name = api_token_name
+    else:
+        api_token_name = get_random_name_for_token(concerned_user)
+    api_tokens = ApiToken.objects(user_id=concerned_user.id, revoked=False)
+    tokens_list = []
+    for token in api_tokens:
+        if token.is_valid():
+            token_view = token.get_public_view()
+            if token_view['last_accessed_at'] == 'None':
+                token_view['last_accessed_at'] = 'Never'
+            tokens_list.append(token_view)
+
+    # FIXME: should call an optimized methods.list_tokens(active=True)
+    if len(tokens_list) < config.ACTIVE_APITOKEN_NUM:
+        new_api_token = ApiToken()
+        new_api_token.name = api_token_name
+        new_api_token.org = org
+        new_api_token.ttl = ttl
+        new_api_token.set_user(concerned_user)
+        new_api_token.ip_address = ip_from_request(request)
+        new_api_token.user_agent = request.user_agent
+        new_api_token.save()
+    else:
+        raise BadRequestError("MAX number of %s active tokens reached"
+                              % config.ACTIVE_APITOKEN_NUM)
+
+    token_view = new_api_token.get_public_view()
+    token_view['last_accessed_at'] = 'Never'
+    token_view['token'] = new_api_token.token
+
+    return token_view
+
+
+@view_config(route_name='api_v1_ping', request_method=('GET', 'POST'), renderer='json')
+def ping(request):
+    """
+    Check that an api token is correct.
+    ---
+    """
+    user = user_from_request(request)
+    if isinstance(session_from_request(request), SessionToken):
+        raise BadRequestError('This call is for users with api tokens')
+    return {'hello': user.email}
+
+
+@view_config(route_name='api_v1_sessions', request_method='GET', renderer='json')
+def list_sessions(request):
+    """
+    List active sessions
+    ---
+    """
+    auth_context = auth_context_from_request(request)
+    session = request.environ['session']
+    # Get active sessions for the current user
+    session_tokens = SessionToken.objects(user_id=auth_context.user.id, revoked=False)
+    sessions_list = []
+    for token in session_tokens:
+        if token.is_valid():
+            public_view = token.get_public_view()
+            if isinstance(session, SessionToken) and session.id == token.id:
+                public_view['active'] = True
+            sessions_list.append(public_view)
+
+    # If user is owner include all active sessions in the org context
+    if auth_context.is_owner():
+        org_tokens = SessionToken.objects(org=auth_context.org, revoked=False)
+        for token in org_tokens:
+            if token.is_valid():
+                public_view = token.get_public_view()
+                if isinstance(session, SessionToken) and session.id == token.id:
+                    public_view['active'] = True
+                try:
+                    sessions_list.index(public_view)
+                except ValueError:
+                    sessions_list.append(public_view)
+
+    return sessions_list
+
+
+# SEC FIXME add permission checks
+@view_config(route_name='api_v1_tokens', request_method='DELETE')
+def revoke_token(request):
+    """
+    Revoke api token
+    ---
+    id:
+      description: Api token ID
+    """
+    return revoke_session(request)
+
+
+# SEC do we need permission checks here ?
+@view_config(route_name='api_v1_sessions', request_method='DELETE')
+def revoke_session(request):
+    """
+    Revoke an active session
+    ---
+    id:
+      description: Session ID
+    """
+
+    auth_context = auth_context_from_request(request)
+    params = params_from_request(request)
+    auth_token_id = params.get("id")
+
+    if not auth_token_id:
+        raise RequiredParameterMissingError("No token id parameter provided")
+
+    try:
+        if auth_context.is_owner():
+            auth_token = AuthToken.objects.get(org=auth_context.org,
+                                               id=auth_token_id)
+        else:
+            auth_token = AuthToken.objects.get(user_id=
+                                               auth_context.user.get_id(),
+                                               id=auth_token_id)
+        if auth_token.is_valid():
+            auth_token.invalidate()
+            auth_token.save()
+
+    except me.DoesNotExist:
+        raise NotFoundError('Session not found')
+
+    return OK
