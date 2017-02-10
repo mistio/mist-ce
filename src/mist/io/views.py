@@ -4217,7 +4217,6 @@ def login_get(request):
     """
 
     # check if user sent a GET instead of POST, process it accordingly
-    from mist.core.views import splash_layout
     try:
         ret = login(request)
         if ret['auth']:
@@ -4484,7 +4483,6 @@ def reset_password(request):
     If he is logged in when he presses the link then he will be logged out
     and then redirected to the landing page with the reset password token.
     """
-    from mist.core.views import splash_layout
     params = params_from_request(request)
     key = params.get('key')
 
@@ -4552,7 +4550,6 @@ def set_password(request):
     User set password if he/she forgot his/her password, if he/she is invited
     by owner, if he/she signs up.
     """
-    from mist.core.views import splash_layout
     params = params_from_request(request)
     key = params.get('key', '')
 
