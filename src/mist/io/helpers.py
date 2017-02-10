@@ -4,9 +4,11 @@ import os
 import re
 import sys
 import json
+import zlib
 import string
 import random
 import socket
+import struct
 import smtplib
 import datetime
 import tempfile
@@ -22,7 +24,7 @@ from email.utils import formatdate, make_msgid
 from mongoengine import DoesNotExist
 
 from pyramid.view import view_config as pyramid_view_config
-from pyramid.httpexceptions import HTTPError
+from pyramid.httpexceptions import HTTPError, HTTPNotFound
 
 import iso8601
 import netaddr
@@ -36,6 +38,10 @@ from amqp.connection import Connection
 from amqp.exceptions import NotFound as AmqpNotFound
 
 from distutils.version import LooseVersion
+
+from social.exceptions import MissingBackend
+from social.apps.pyramid_app.utils import load_backend
+from social.apps.pyramid_app.utils import load_strategy
 
 from mist.io.exceptions import MistError, NotFoundError
 from mist.io.exceptions import RequiredParameterMissingError
@@ -718,6 +724,60 @@ def ts_to_str(timestamp):
         return None
 
 
+class CheckSumError(Exception):
+    pass
+
+
+def _lazysecret(secret, blocksize=32, padding='}'):
+    """pads secret if not legal AES block size (16, 24, 32)"""
+    if not len(secret) in (16, 24, 32):
+        return secret + (blocksize - len(secret)) * padding
+    return secret
+
+
+def encrypt(plaintext, secret, lazy=True, checksum=True):
+    """encrypt plaintext with secret
+    plaintext   - content to encrypt
+    secret      - secret to encrypt plaintext
+    lazy        - pad secret if less than legal blocksize (default: True)
+    checksum    - attach crc32 byte encoded (default: True)
+    returns ciphertext
+    """
+
+    secret = _lazysecret(secret) if lazy else secret
+    encobj = AES.new(secret, AES.MODE_CFB, 'q'*16)
+
+    if plaintext.__class__ is unicode:
+        plaintext = plaintext.encode('utf-8')
+
+    if checksum:
+        plaintext += struct.pack("i", zlib.crc32(plaintext))
+
+    return encobj.encrypt(plaintext).encode('hex')
+
+
+def decrypt(ciphertext, secret, lazy=True, checksum=True):
+    """decrypt ciphertext with secret
+    ciphertext  - encrypted content to decrypt
+    secret      - secret to decrypt ciphertext
+    lazy        - pad secret if less than legal blocksize (default: True)
+    checksum    - verify crc32 byte encoded checksum (default: True)
+    returns plaintext
+    """
+
+    secret = _lazysecret(secret) if lazy else secret
+
+    encobj = AES.new(secret, AES.MODE_CFB, 'q'*16)
+    plaintext = encobj.decrypt(ciphertext.decode('hex'))
+
+    if checksum:
+        crc, plaintext = (plaintext[-4:], plaintext[:-4])
+        if not crc == struct.pack("i", zlib.crc32(plaintext)):
+            raise CheckSumError("checksum mismatch")
+
+    return plaintext
+
+
 def encrypt2(plaintext, key=config.SECRET, key_salt='', no_iv=False):
     """Encrypt shit the right way"""
 
@@ -801,6 +861,67 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
     event.pop('extra')
     event.update(kwargs)
     return event
+
+
+def get_log_events(owner_id='', user_id='', event_type='', action='',
+                   error=None, start=0, stop=0, limit=0, newest=True,
+                   **kwargs):
+    """
+    Get logging events
+    :param owner_id:
+    :param user_id:
+    :param event_type:
+    :param action:
+    :param error:
+    :param start:
+    :param stop:
+    :param limit:
+    :param newest:
+    :param kwargs:
+    :return:
+    """
+
+    connection = MongoClient(config.MONGO_URI)
+    logging = connection['mist'].logging
+    query = kwargs
+    if owner_id:
+        query['owner_id'] = owner_id
+    if user_id:
+        query['user_id'] = user_id
+    if event_type:
+        if isinstance(event_type, basestring):
+            event_type = event_type.split(',')
+        try:
+            query['type'] = {'$in': list(event_type)}
+        except:
+            pass
+    if action:
+        query['action'] = action
+    if error:
+        query['error'] = {'$nin': [None, False]}
+    timerange = {}
+    if start:
+        timerange['$gte'] = start
+    if stop:
+        timerange['$lt'] = stop
+    if timerange:
+        query['time'] = timerange
+    order = -1 if newest is True else None
+    cursor = logging.find(query).sort('time', order).limit(limit)
+    for event in cursor:
+        event.pop('_id')  # remove mongo _id field
+        try:
+            # bring extra key-value pairs to top level
+            for key, val in json.loads(event.pop('extra')).items():
+                event[key] = val
+        except:
+            pass
+
+        if not event.get('type') or not event.get('action'):
+            log.error("Event missing type or action: %s", event)
+            continue
+        yield event
+    connection.close()
 
 
 def log_story(event, _mongo_conn=None):
@@ -1307,3 +1428,24 @@ def view_config(*args, **kwargs):
 
     return pyramid_view_config(*args, decorator=logging_view_decorator,
                                **kwargs)
+
+
+def initiate_social_auth_request(request, route_name=None, backend=None):
+    if not backend:
+        backend = request.matchdict.get('backend')
+        if not backend:
+            log.info('Backend was not found in the request. Request object was '
+                     '%s', request.__dict__)
+            raise HTTPNotFound('Missing backend')
+
+    uri = request.route_url(route_name, backend=backend) if route_name else ''
+
+    request.strategy = load_strategy(request)
+    try:
+        request.backend = load_backend(request.strategy, backend, uri)
+    except MissingBackend as e:
+        log.info("There was an exception when completing oauth2 connect "
+                 "request: %s. Request object was %s" % (repr(e),
+                                                         request.__dict__))
+        raise HTTPNotFound("Mist.io does not support oauth2 authentication "
+                           "with %s\n" % backend)
