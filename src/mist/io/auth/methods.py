@@ -201,7 +201,7 @@ def reissue_cookie_session(request, user_id='', su='', org=None, after=0,
     if not isinstance(session, SessionToken):
         raise Exception("Can not reissue an API token session.")
     if after:
-        from mist.core.tasks import revoke_token
+        from mist.io.tasks import revoke_token
         revoke_token.apply_async(args=(session.token, ), countdown=after)
     else:
         session.invalidate()

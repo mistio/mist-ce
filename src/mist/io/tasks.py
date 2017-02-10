@@ -844,6 +844,14 @@ class Ping(UserTask):
 
 
 @app.task
+def revoke_token(token):
+    from mist.io.auth.models import AuthToken
+    auth_token = AuthToken.objects.get(token=token)
+    auth_token.invalidate()
+    auth_token.save()
+
+
+@app.task
 def deploy_collectd(owner, cloud_id, machine_id, extra_vars, job_id='',
                     plugins=None):
     # FIXME
