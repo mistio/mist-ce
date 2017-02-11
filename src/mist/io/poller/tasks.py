@@ -5,58 +5,75 @@ from mist.io.helpers import amqp_publish
 from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_owner_listening
 
-from mist.io.clouds.models import Cloud
-
+from mist.io.methods import notify_user
 from mist.core.tasks import app
-
 
 
 log = logging.getLogger(__name__)
 
 
+def autodisable_cloud(cloud):
+    """Disable cloud after multiple failures and notify user"""
+    log.warning("Autodisabling %s", cloud)
+    cloud.ctl.disable()
+    title = "Cloud %s has been automatically disabled" % cloud.title
+    message = "%s after multiple failures to connect to it." % title
+    notify_user(cloud.owner, title=cloud, message=message, email_notify=True)
+
+
 @app.task
-def debug(value=42):
+def debug(schedule_id):
+    # FIXME: Resolve circular imports
+    from mist.io.poller.models import DebugPollingSchedule
+    sched = DebugPollingSchedule.objects.get(schedule_id)
     path = '/tmp/poller-debug.txt'
-    msg = '%s - %s' % (datetime.datetime.now(), value)
+    msg = '%s - %s' % (datetime.datetime.now(), sched.value)
     print msg
     with open(path, 'a') as fobj:
         fobj.write(msg)
 
 
 @app.task
-def list_machines(cloud_id):
+def list_machines(schedule_id):
     """Perform list machines. Cloud controller stores results in mongodb."""
 
-    # FIXME: Resolve circular imports
+    # Fetch schedule and cloud from database.
+    # FIXME: resolve circular deps error
     from mist.io.poller.models import ListMachinesPollingSchedule
+    sched = ListMachinesPollingSchedule.objects.get(id=schedule_id)
+    cloud = sched.cloud
+    now = datetime.datetime.now()
 
-    cloud = Cloud.objects.get(id=cloud_id)
+    # Check if this cloud should be autodisabled.
+    if sched.last_success:
+        two_days = datetime.timedelta(days=2)
+        if now - sched.last_success > two_days and sched.failure_count > 50:
+            autodisable_cloud(sched.cloud)
+            return
+    elif sched.failure_count > 100:
+        autodisable_cloud(sched.cloud)
+        return
 
     # Find last run. If too recent, abort.
-    if cloud.last_success and cloud.last_failure:
-        last_run = max(cloud.last_success, cloud.last_failure)
+    if sched.last_success and sched.last_failure:
+        last_run = max(sched.last_success, sched.last_failure)
     else:
-        last_run = cloud.last_success or cloud.last_failure
+        last_run = sched.last_success or sched.last_failure
     if last_run:
-        try:
-            schedule = ListMachinesPollingSchedule.objects.get(cloud=cloud)
-        except ListMachinesPollingSchedule.DoesNotExist:
-            schedule = ListMachinesPollingSchedule.add(cloud)
-        if datetime.datetime.now() - last_run < schedule.interval.timedelta:
+        if now - last_run < sched.interval.timedelta:
             log.warning("Running too soon for cloud %s, aborting!", cloud)
             return
 
     # Is another same task running?
-    now = datetime.datetime.now()
-    if cloud.last_attempt_started:
+    if sched.last_attempt_started:
         # Other same task started recently, abort.
-        if now - cloud.last_attempt_started < datetime.timedelta(seconds=60):
+        if now - sched.last_attempt_started < datetime.timedelta(seconds=60):
             log.warning("Other same tasks started recently, aborting.")
             return
         # Has been running for too long or has died. Ignore.
         log.warning("Other same task seems to have started, but it's been "
                     "quite a while, will ignore and run normally.")
-    cloud.last_attempt_started = now
+    sched.last_attempt_started = now
     cloud.save()
 
     try:
@@ -65,17 +82,17 @@ def list_machines(cloud_id):
     except Exception as exc:
         # Store failure.
         log.warning("Failed to list_machines for cloud %s: %r", cloud, exc)
-        cloud.last_failure = datetime.datetime.now()
-        cloud.failure_count += 1
-        cloud.last_attempt_started = None
+        sched.last_failure = datetime.datetime.now()
+        sched.failure_count += 1
+        sched.last_attempt_started = None
         cloud.save()
         raise
     else:
         # Store success.
         log.info("Succeeded to list_machines for cloud %s", cloud)
-        cloud.last_success = datetime.datetime.now()
-        cloud.failure_count = 0
-        cloud.last_attempt_started = None
+        sched.last_success = datetime.datetime.now()
+        sched.failure_count = 0
+        sched.last_attempt_started = None
         cloud.save()
 
     # Publish results to rabbitmq (for backwards compatibility).
