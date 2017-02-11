@@ -33,7 +33,7 @@ except ImportError:
     from mist.io.methods import get_stats
     multi_user = False
 
-from mist.core.auth.methods import auth_context_from_session_id
+from mist.io.auth.methods import auth_context_from_session_id
 
 from mist.io.exceptions import BadRequestError, UnauthorizedError, MistError
 from mist.io.exceptions import PolicyUnauthorizedError
