@@ -7,8 +7,6 @@ from mist.io.helpers import amqp_owner_listening
 
 from mist.core.tasks import app
 
-from mist.io.poller.models import ListMachinesPollingSchedule
-
 
 log = logging.getLogger(__name__)
 
@@ -30,6 +28,8 @@ def list_machines(schedule_id):
     """Perform list machines. Cloud controller stores results in mongodb."""
 
     # Fetch schedule and cloud from database.
+    # FIXME: resolve circular deps error
+    from mist.io.poller.models import ListMachinesPollingSchedule
     sched = ListMachinesPollingSchedule.objects.get(id=schedule_id)
     cloud = sched.cloud
     now = datetime.datetime.now()
