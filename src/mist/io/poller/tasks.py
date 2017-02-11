@@ -5,10 +5,20 @@ from mist.io.helpers import amqp_publish
 from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_owner_listening
 
+from mist.io.methods import notify_user
 from mist.core.tasks import app
 
 
 log = logging.getLogger(__name__)
+
+
+def autodisable_cloud(cloud):
+    """Disable cloud after multiple failures and notify user"""
+    log.warning("Autodisabling %s", cloud)
+    cloud.ctl.disable()
+    title = "Cloud %s has been automatically disabled" % cloud.title
+    message = "%s after multiple failures to connect to it." % title
+    notify_user(cloud.owner, title=cloud, message=message, email_notify=True)
 
 
 @app.task
@@ -33,6 +43,16 @@ def list_machines(schedule_id):
     sched = ListMachinesPollingSchedule.objects.get(id=schedule_id)
     cloud = sched.cloud
     now = datetime.datetime.now()
+
+    # Check if this cloud should be autodisabled.
+    if sched.last_success:
+        two_days = datetime.timedelta(days=2)
+        if now - sched.last_success > two_days and sched.failure_count > 50:
+            autodisable_cloud(sched.cloud)
+            return
+    elif sched.failure_count > 100:
+        autodisable_cloud(sched.cloud)
+        return
 
     # Find last run. If too recent, abort.
     if sched.last_success and sched.last_failure:
