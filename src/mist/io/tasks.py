@@ -688,7 +688,7 @@ class ListNetworks(UserTask):
     result_expires = 60 * 60 * 24
     result_fresh = 0
     polling = False
-    soft_time_limit = 60  # 30
+    soft_time_limit = 60
 
     def execute(self, owner_id, cloud_id):
         owner = Owner.objects.get(id=owner_id)
