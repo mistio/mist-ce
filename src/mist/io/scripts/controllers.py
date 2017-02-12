@@ -5,7 +5,7 @@ import logging
 import mist.io.shell
 from StringIO import StringIO
 from mist.io.exceptions import BadRequestError
-from mist.core.exceptions import ScriptFormatError
+from mist.io.exceptions import ScriptFormatError
 from mist.io.scripts.base import BaseScriptController
 from yaml.parser import ParserError as YamlParserError
 from yaml.scanner import ScannerError as YamlScannerError
@@ -72,7 +72,7 @@ class CollectdScriptController(BaseScriptController):
         plugin_id = re.sub('^_', '', plugin_id)
         plugin_id = re.sub('_$', '', plugin_id)
 
-        user = self.script.owner
+        owner = self.script.owner
         value_type = self.script.extra.get('value_type', 'gauge')
         read_function = self.script.location.source_code
         host = machine.hostname
@@ -104,7 +104,7 @@ class CollectdScriptController(BaseScriptController):
 
         # Initialize SSH connection
         shell = mist.io.shell.Shell(host)
-        key_id, ssh_user = shell.autoconfigure(user, machine.cloud.id,
+        key_id, ssh_user = shell.autoconfigure(owner, machine.cloud.id,
                                                machine.machine_id)
         sftp = shell.ssh.open_sftp()
 

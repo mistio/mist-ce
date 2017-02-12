@@ -1,7 +1,0 @@
-<td><img src="{{view.gravatarURL}}" class="member-gravatar" alt="{{member.name}}" />  {{member.name}} {{#if member.pending}}<span class="label-pending">pending</span>{{/if}}</td>
-<td>{{member.email}}</td>
-<td class="member-actions">
-    {{#unless team.isOwners}}
-    <a {{action "removeMemberClicked" target=view}} class="ui-btn icon-xx ui-btn-icon-notext"></a>
-    {{/unless}}
-</td>

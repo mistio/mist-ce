@@ -9,10 +9,10 @@ be performed inside the corresponding method functions.
 
 """
 
-import re
 import requests
 import json
 import uuid
+import traceback
 import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError
 
@@ -20,14 +20,13 @@ from pyramid.response import Response
 from pyramid.renderers import render_to_response
 
 # try:
-from mist.core.helpers import view_config
-from mist.core.auth.methods import user_from_request
+from mist.io.helpers import view_config
+from mist.io.auth.methods import user_from_request
 from mist.io.keys.models import Key, SSHKey, SignedSSHKey
 from mist.io.scripts.models import CollectdScript
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.io.networks.models import Network, Subnet
-from mist.core.exceptions import PolicyUnauthorizedError
 from mist.core import config
 import mist.core.methods
 # except ImportError:
@@ -37,14 +36,19 @@ import mist.core.methods
 
 from mist.io import methods
 
-import mist.io.exceptions as exceptions
-from mist.io.exceptions import *
+from mist.io.exceptions import RequiredParameterMissingError
+from mist.io.exceptions import NotFoundError, BadRequestError
+from mist.io.exceptions import SSLError, ServiceUnavailableError
+from mist.io.exceptions import KeyParameterMissingError, MistError
+from mist.io.exceptions import PolicyUnauthorizedError, UnauthorizedError
+
 import pyramid.httpexceptions
 
 from mist.io.helpers import get_auth_header, params_from_request
-from mist.io.helpers import trigger_session_update, transform_key_machine_associations
+from mist.io.helpers import trigger_session_update, amqp_publish_user
+from mist.io.helpers import transform_key_machine_associations
 
-from mist.core.auth.methods import auth_context_from_request
+from mist.io.auth.methods import auth_context_from_request
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -77,7 +81,7 @@ def exception_handler_mist(exc, request):
         return Response("NotUniqueError", 409)
 
     # non-mist exceptions. that shouldn't happen! never!
-    if not isinstance(exc, exceptions.MistError):
+    if not isinstance(exc, MistError):
         if not isinstance(exc, (ValidationError, NotUniqueError)):
             trace = traceback.format_exc()
             log.critical("Uncaught non-mist exception? WTF!\n%s", trace)
@@ -98,6 +102,8 @@ def exception_handler_mist(exc, request):
 
 
 @view_config(route_name='home', request_method='GET')
+@view_config(route_name='clouds', request_method='GET')
+@view_config(route_name='cloud', request_method='GET')
 @view_config(route_name='machines', request_method='GET')
 @view_config(route_name='machine', request_method='GET')
 @view_config(route_name='images', request_method='GET')
@@ -134,74 +140,7 @@ def home(request):
         }, request=request)
 
 
-@view_config(route_name="check_auth", request_method='POST', renderer="json")
-def check_auth(request):
-    """Check on the mist.core service if authenticated"""
-
-    params = params_from_request(request)
-    email = params.get('email', '').lower()
-    password = params.get('password', '')
-
-    payload = {'email': email, 'password': password}
-    try:
-        ret = requests.post(config.CORE_URI + '/auth', params=payload,
-                            verify=config.SSL_VERIFY)
-    except requests.exceptions.SSLError as exc:
-        log.error("%r", exc)
-        raise SSLError()
-    if ret.status_code == 200:
-        ret_dict = json.loads(ret.content)
-        user = user_from_request(request)
-        user.email = email
-        user.mist_api_token = ret_dict.pop('token', '')
-        user.save()
-        log.info("successfully check_authed")
-        return ret_dict
-    else:
-        log.error("Couldn't check_auth to mist.io: %r", ret)
-        raise UnauthorizedError()
-
-
-@view_config(route_name='account', request_method='POST', renderer='json')
-def update_user_settings(request):
-    """try free plan, by communicating to the mist.core service"""
-
-    params = params_from_request(request)
-    action = params.get('action', '').lower()
-    plan = params.get('plan', '')
-    name = params.get('name', '')
-    company_name = params.get('company_name', '')
-    country = params.get('country', '')
-    number_of_servers = params.get('number_of_servers', '')
-    number_of_people = params.get('number_of_people', '')
-
-    user = user_from_request(request)
-
-    payload = {'action': action,
-               'plan': plan,
-               'name': name,
-               'company_name': company_name,
-               'country': country,
-               'number_of_servers': number_of_servers,
-               'number_of_people': number_of_people}
-
-    try:
-        ret = requests.post(config.CORE_URI + '/account',
-                            params=payload,
-                            headers={'Authorization': get_auth_header(user)},
-                            verify=config.SSL_VERIFY)
-    except requests.exceptions.SSLError as exc:
-        log.error("%r", exc)
-        raise SSLError()
-    if ret.status_code == 200:
-        ret = json.loads(ret.content)
-        return ret
-    else:
-        raise UnauthorizedError()
-
-
 @view_config(route_name='api_v1_clouds', request_method='GET', renderer='json')
-@view_config(route_name='clouds', request_method='GET', renderer='json')
 def list_clouds(request):
     """
     Request a list of all added clouds.
@@ -215,7 +154,6 @@ def list_clouds(request):
 
 
 @view_config(route_name='api_v1_clouds', request_method='POST', renderer='json')
-@view_config(route_name='clouds', request_method='POST', renderer='json')
 def add_cloud(request):
     """
     Add a new cloud
@@ -286,7 +224,7 @@ def add_cloud(request):
 
     if config.NEW_UI_EXPERIMENT_ENABLE:
         from mist.core.experiments import NewUIExperiment
-        from mist.core.auth.methods import session_from_request
+        from mist.io.auth.methods import session_from_request
 
         session = session_from_request(request)
         experiment = NewUIExperiment(userid=session.user_id)
@@ -305,7 +243,7 @@ def add_cloud(request):
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
     if cloud_tags:
-        from mist.core.tag.methods import add_tags_to_resource
+        from mist.io.tag.methods import add_tags_to_resource
         add_tags_to_resource(owner, cloud, cloud_tags.items())
 
     c_count = Cloud.objects(owner=owner, deleted=None).count()
@@ -317,7 +255,6 @@ def add_cloud(request):
 
 
 @view_config(route_name='api_v1_cloud_action', request_method='DELETE')
-@view_config(route_name='cloud_action', request_method='DELETE')
 def delete_cloud(request):
     """
     Delete a cloud
@@ -342,7 +279,6 @@ def delete_cloud(request):
 
 
 @view_config(route_name='api_v1_cloud_action', request_method='PUT')
-@view_config(route_name='cloud_action', request_method='PUT')
 def rename_cloud(request):
     """
     Rename a cloud
@@ -376,7 +312,6 @@ def rename_cloud(request):
 
 
 @view_config(route_name='api_v1_cloud_action', request_method='PATCH')
-@view_config(route_name='cloud_action', request_method='PATCH')
 def update_cloud(request):
     """
     UPDATE cloud with given cloud_id.
@@ -408,10 +343,18 @@ def update_cloud(request):
 
     fail_on_error = params.pop('fail_on_error', True)
     fail_on_invalid_params = params.pop('fail_on_invalid_params', True)
+    polling_interval = params.pop('polling_interval', None)
 
     # Edit the cloud
     cloud.ctl.update(fail_on_error=fail_on_error,
                      fail_on_invalid_params=fail_on_invalid_params, **creds)
+
+    try:
+        polling_interval = int(polling_interval)
+    except (ValueError, TypeError):
+        pass
+    else:
+        cloud.ctl.set_polling_interval(polling_interval)
 
     log.info("Cloud with id '%s' updated successfully.", cloud.id)
     trigger_session_update(auth_context.owner, ['clouds'])
@@ -419,7 +362,6 @@ def update_cloud(request):
 
 
 @view_config(route_name='api_v1_cloud_action', request_method='POST')
-@view_config(route_name='cloud_action', request_method='POST')
 def toggle_cloud(request):
     """
     Toggle a cloud
@@ -472,7 +414,6 @@ def list_keys(request):
 
 
 @view_config(route_name='api_v1_keys', request_method='PUT', renderer='json')
-@view_config(route_name='keys', request_method='PUT', renderer='json')
 def add_key(request):
     """
     Add key
@@ -511,7 +452,7 @@ def add_key(request):
         key = SSHKey.add(auth_context.owner, key_name, **params)
 
     if key_tags:
-        from mist.core.tag.methods import add_tags_to_resource
+        from mist.io.tag.methods import add_tags_to_resource
         add_tags_to_resource(auth_context.owner, key, key_tags.items())
     # since its a new key machines fields should be an empty list
 
@@ -529,7 +470,6 @@ def add_key(request):
 
 @view_config(route_name='api_v1_key_action', request_method='DELETE',
              renderer='json')
-@view_config(route_name='key_action', request_method='DELETE', renderer='json')
 def delete_key(request):
     """
     Delete key
@@ -617,7 +557,6 @@ def delete_keys(request):
 
 
 @view_config(route_name='api_v1_key_action', request_method='PUT', renderer='json')
-@view_config(route_name='key_action', request_method='PUT', renderer='json')
 def edit_key(request):
     """
     Edit a key
@@ -652,7 +591,6 @@ def edit_key(request):
 
 
 @view_config(route_name='api_v1_key_action', request_method='POST')
-@view_config(route_name='key_action', request_method='POST')
 def set_default_key(request):
     """
     Set default key
@@ -682,7 +620,6 @@ def set_default_key(request):
 
 @view_config(route_name='api_v1_key_private', request_method='GET',
              renderer='json')
-@view_config(route_name='key_private', request_method='GET', renderer='json')
 def get_private_key(request):
     """
     Gets private key from key name.
@@ -714,7 +651,6 @@ def get_private_key(request):
 
 @view_config(route_name='api_v1_key_public', request_method='GET',
              renderer='json')
-@view_config(route_name='key_public', request_method='GET', renderer='json')
 def get_public_key(request):
     """
     Get public key
@@ -756,8 +692,6 @@ def generate_keypair(request):
 
 
 @view_config(route_name='api_v1_key_association', request_method='PUT',
-             renderer='json')
-@view_config(route_name='key_association', request_method='PUT',
              renderer='json')
 def associate_key(request):
     """
@@ -820,8 +754,6 @@ def associate_key(request):
 
 @view_config(route_name='api_v1_key_association', request_method='DELETE',
              renderer='json')
-@view_config(route_name='key_association', request_method='DELETE',
-             renderer='json')
 def disassociate_key(request):
     """
     Disassociate a key from a machine
@@ -864,6 +796,136 @@ def disassociate_key(request):
     assoc_machines = transform_key_machine_associations(machines, key)
     return assoc_machines
 
+@view_config(route_name='api_v1_zones', request_method='GET', renderer='json')
+def list_dns_zones(request):
+    """
+    List all DNS zones.
+    Retrieves a list of all DNS zones based on the user Clouds.
+    For each cloud that supports DNS functionality, we get all available zones.
+    ---
+    """
+    auth_context = auth_context_from_request(request)
+    cloud_id = request.matchdict['cloud']
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
+    return cloud.ctl.dns.list_zones()
+
+
+@view_config(route_name='api_v1_records', request_method='GET', renderer='json')
+def list_dns_records(request):
+    """
+    List all DNS zone records for a particular zone.
+    ---
+    """
+    auth_context = auth_context_from_request(request)
+    cloud_id = request.matchdict['cloud']
+    zone_id = request.matchdict['zone']
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+    return cloud.ctl.dns.list_records(zone_id)
+
+@view_config(route_name='api_v1_zones', request_method='POST', renderer='json')
+def create_dns_zone(request):
+    """
+    Create a new DNS zone under a specific cloud.
+    ---
+    """
+    auth_context = auth_context_from_request(request)
+    cloud_id = request.matchdict['cloud']
+    # Try to get the specific cloud for which we will create the zone.
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+    # Get the rest of the params
+    # domain is required and must contain a trailing period(.)
+    # type should be master or slave, and defaults to master.
+    # ttl is the time for which the zone should be valid for. Defaults to None.
+    # Should be an integer value.
+    # extra is a dictionary with extra details. Defaults to None.
+    params = params_from_request(request)
+    domain = params.get('domain', '')
+    if not domain:
+        raise RequiredParameterMissingError('domain')
+    type = params.get('type', '')
+    ttl = params.get('ttl', 0)
+    extra = params.get('extra', '')
+
+    return cloud.ctl.dns.create_zone(domain, type, ttl, extra)
+
+@view_config(route_name='api_v1_records', request_method='POST', renderer='json')
+def create_dns_record(request):
+    """
+    Create a new record under a specific zone
+    ---
+    """
+    auth_context = auth_context_from_request(request)
+    cloud_id = request.matchdict['cloud']
+    # Try to get the specific cloud for which we will create the zone.
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
+    zone_id = request.matchdict['zone']
+    # Get the rest of the params
+    # name is required and must contain a trailing period(.)
+    # type should be the type of the record we want to create (A,MX,CNAME etc),
+    # and it is required.
+    # ttl is the time for which the record should be valid for. Defaults to 0.
+    # Should be an integer value.
+    params = params_from_request(request)
+    name = params.get('name', '')
+    if not name:
+        raise RequiredParameterMissingError('name')
+    type = params.get('type', '')
+    if not type:
+        raise RequiredParameterMissingError('type')
+    data = params.get('data', '')
+    if not data:
+        raise RequiredParameterMissingError('data')
+    ttl = params.get('ttl', 0)
+
+    return cloud.ctl.dns.create_record(zone_id, name, type, data, ttl)
+
+@view_config(route_name='api_v1_zone', request_method='DELETE', renderer='json')
+def delete_dns_zone(request):
+    """
+    Delete a specific DNS zone under a cloud.
+    ---
+    """
+    auth_context = auth_context_from_request(request)
+    cloud_id = request.matchdict['cloud']
+    zone_id = request.matchdict['zone']
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
+    return cloud.ctl.dns.delete_zone(zone_id)
+
+@view_config(route_name='api_v1_record', request_method='DELETE', renderer='json')
+def delete_dns_record(request):
+    """
+    Delete a specific DNS record under a zone.
+    ---
+    """
+    auth_context = auth_context_from_request(request)
+    cloud_id = request.matchdict['cloud']
+    zone_id = request.matchdict['zone']
+    record_id = request.matchdict['record']
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
+    return cloud.ctl.dns.delete_record(zone_id, record_id)
 
 @view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
 def list_machines(request):
@@ -885,7 +947,6 @@ def list_machines(request):
 
 @view_config(route_name='api_v1_machines', request_method='POST',
              renderer='json')
-@view_config(route_name='machines', request_method='POST', renderer='json')
 def create_machine(request):
     """
     Create machine(s) on cloud
@@ -932,7 +993,7 @@ def create_machine(request):
     image_extra:
       description: ' Needed only by Linode cloud'
       type: string
-    image_id:
+    image:
       description: ' Id of image to be used with the creation'
       required: true
       type: string
@@ -996,6 +1057,8 @@ def create_machine(request):
       description: ' Needed only by SoftLayer cloud'
       type: string
     """
+    # TODO add schedule in docstring
+
     params = params_from_request(request)
     cloud_id = request.matchdict['cloud']
 
@@ -1006,15 +1069,12 @@ def create_machine(request):
     key_id = params.get('key')
     machine_name = params['name']
     location_id = params.get('location', None)
-    if params.get('provider') == 'libvirt':
-        image_id = params.get('image')
-        disk_size = int(params.get('libvirt_disk_size', 4))
-        disk_path = params.get('libvirt_disk_path', '')
-    else:
-        image_id = params.get('image')
-        if not image_id:
-            raise RequiredParameterMissingError("image_id")
-        disk_size = disk_path = None
+    image_id = params.get('image')
+    if not image_id:
+        raise RequiredParameterMissingError("image")
+    # this is used in libvirt
+    disk_size = int(params.get('libvirt_disk_size', 4))
+    disk_path = params.get('libvirt_disk_path', '')
     size_id = params['size']
     # deploy_script received as unicode, but ScriptDeployment wants str
     script = str(params.get('script', ''))
@@ -1055,27 +1115,34 @@ def create_machine(request):
     hourly = params.get('billing', True)
     job_id = params.get('job_id', uuid.uuid4().hex)
 
-    # only for mist.core, parameters for cronjob
-    if not params.get('cronjob_type'):
-        cronjob = {}
-    else:
-        for key in ('cronjob_name', 'cronjob_type', 'cronjob_entry'):
-            if key not in params:
-                raise RequiredParameterMissingError(key)
+    auth_context = auth_context_from_request(request)
 
-        cronjob = {
-            'name': params.get('cronjob_name'),
+    # compose schedule as a dict from relative parameters
+    if not params.get('schedule_type'):
+        schedule = {}
+    else:
+        if params.get('schedule_type') not in ['crontab',
+                                               'interval', 'one_off']:
+            raise BadRequestError('schedule type must be one of '
+                                  'these (crontab, interval, one_off)]'
+                                  )
+        if params.get('schedule_entry') == {}:
+            raise RequiredParameterMissingError('schedule_entry')
+
+        schedule = {
+            'name': 'scheduler_' + params.get('name'),
             'description': params.get('description', ''),
-            'action': params.get('cronjob_action', ''),
-            'script_id': params.get('cronjob_script_id', ''),
-            'cronjob_type': params.get('cronjob_type'),
-            'cronjob_entry': params.get('cronjob_entry'),
+            'action': params.get('action', ''),
+            'script_id': params.get('schedule_script_id', ''),
+            'schedule_type': params.get('schedule_type'),
+            'schedule_entry': params.get('schedule_entry'),
             'expires': params.get('expires', ''),
-            'enabled': bool(params.get('cronjob_enabled', False)),
-            'run_immediately': params.get('run_immediately', False),
+            'start_after': params.get('start_after', ''),
+            'max_run_count': params.get('max_run_count'),
+            'task_enabled': bool(params.get('task_enabled', True)),
+            'auth_context': auth_context.serialize(),
         }
 
-    auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
     auth_context.check_perm("cloud", "create_resources", cloud_id)
     tags = auth_context.check_perm("machine", "create", None)
@@ -1106,7 +1173,7 @@ def create_machine(request):
               'bare_metal': bare_metal,
               'tags': tags,
               'hourly': hourly,
-              'cronjob': cronjob,
+              'schedule': schedule,
               'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
     if not async:
         ret = methods.create_machine(auth_context.owner, *args, **kwargs)
@@ -1119,7 +1186,6 @@ def create_machine(request):
 
 
 @view_config(route_name='api_v1_machine', request_method='POST', renderer='json')
-@view_config(route_name='machine', request_method='POST', renderer='json')
 def machine_actions(request):
     """
     Call an action on machine
@@ -1176,9 +1242,9 @@ def machine_actions(request):
                'rename', 'undefine', 'suspend', 'resume')
 
     if action not in actions:
-        raise BadRequestError("Action '%s' should be one of %s" % (action,
-                                                                   actions))
-
+        raise BadRequestError("Action '%s' should be "
+                              "one of %s" % (action, actions)
+                              )
     if action == 'destroy':
         methods.destroy_machine(auth_context.owner, cloud_id, machine_id)
     elif action in ('start', 'stop', 'reboot',
@@ -1282,9 +1348,9 @@ def machine_rdp(request):
 #     try:
 #         tags = request.json_body['tags']
 #     except:
-#         raise BadRequestError('tags should be list of tags')
+#         raise exceptions.BadRequestError('tags should be list of tags')
 #     if type(tags) != list:
-#         raise BadRequestError('tags should be list of tags')
+#         raise exceptions.BadRequestError('tags should be list of tags')
 #
 #     auth_context = auth_context_from_request(request)
 #     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
@@ -1350,7 +1416,6 @@ def machine_rdp(request):
 
 
 @view_config(route_name='api_v1_images', request_method='POST', renderer='json')
-@view_config(route_name='images', request_method='POST', renderer='json')
 def list_specific_images(request):
     # FIXME: 1) i shouldn't exist, 2) i shouldn't be a post
     return list_images(request)
@@ -1384,7 +1449,6 @@ def list_images(request):
 
 
 @view_config(route_name='api_v1_image', request_method='POST', renderer='json')
-@view_config(route_name='image', request_method='POST', renderer='json')
 def star_image(request):
     """
     Star/unstar an image
@@ -1794,11 +1858,16 @@ def probe(request):
 
     ret = methods.probe(auth_context.owner, cloud_id, machine_id, host, key_id,
                         ssh_user)
+    amqp_publish_user(auth_context.owner, "probe",
+                 {
+                    'cloud_id': cloud_id,
+                    'machine_id': machine_id,
+                    'result': ret
+                 })
     return ret
 
 
 @view_config(route_name='api_v1_monitoring', request_method='GET', renderer='json')
-@view_config(route_name='monitoring', request_method='GET', renderer='json')
 def check_monitoring(request):
     """
     Check monitoring
@@ -1811,7 +1880,6 @@ def check_monitoring(request):
 
 
 @view_config(route_name='api_v1_update_monitoring', request_method='POST', renderer='json')
-@view_config(route_name='update_monitoring', request_method='POST', renderer='json')
 def update_monitoring(request):
     """
     Enable monitoring
@@ -1899,7 +1967,6 @@ def update_monitoring(request):
 
 
 @view_config(route_name='api_v1_stats', request_method='GET', renderer='json')
-@view_config(route_name='stats', request_method='GET', renderer='json')
 def get_stats(request):
     """
     Get monitor data for a machine
@@ -1969,7 +2036,6 @@ def get_stats(request):
 
 
 @view_config(route_name='api_v1_metrics', request_method='GET', renderer='json')
-@view_config(route_name='metrics', request_method='GET', renderer='json')
 def find_metrics(request):
     """
     Get metrics of a machine
@@ -2000,7 +2066,6 @@ def find_metrics(request):
 
 
 @view_config(route_name='api_v1_metrics', request_method='PUT', renderer='json')
-@view_config(route_name='metrics', request_method='PUT', renderer='json')
 def assoc_metric(request):
     """
     Associate metric with machine
@@ -2039,7 +2104,6 @@ def assoc_metric(request):
 
 
 @view_config(route_name='api_v1_metrics', request_method='DELETE', renderer='json')
-@view_config(route_name='metrics', request_method='DELETE', renderer='json')
 def disassoc_metric(request):
     """
     Disassociate metric from machine
@@ -2079,7 +2143,6 @@ def disassoc_metric(request):
 
 
 @view_config(route_name='api_v1_metric', request_method='PUT', renderer='json')
-@view_config(route_name='metric', request_method='PUT', renderer='json')
 def update_metric(request):
     """
     Update a metric configuration
@@ -2134,7 +2197,6 @@ def update_metric(request):
 
 
 @view_config(route_name='api_v1_deploy_plugin', request_method='POST', renderer='json')
-@view_config(route_name='deploy_plugin', request_method='POST', renderer='json')
 def deploy_plugin(request):
     """
     Deploy a plugin on a machine.
@@ -2194,7 +2256,7 @@ def deploy_plugin(request):
         raise NotFoundError('Cloud id %s does not exist' % cloud_id)
 
     if not machine.monitoring.hasmonitoring:
-        raise ForbiddenError("Machine doesn't seem to have monitoring enabled")
+        raise NotFoundError("Machine doesn't seem to have monitoring enabled")
 
     # create a collectdScript
     extra = {'value_type': params.get('value_type', 'gauge'),
@@ -2220,8 +2282,8 @@ def deploy_plugin(request):
         raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
 
-@view_config(route_name='api_v1_deploy_plugin', request_method='DELETE', renderer='json')
-@view_config(route_name='deploy_plugin', request_method='DELETE', renderer='json')
+@view_config(route_name='api_v1_deploy_plugin',
+             request_method='DELETE', renderer='json')
 def undeploy_plugin(request):
     """
     Undeploy a plugin on a machine.
@@ -2286,15 +2348,14 @@ def undeploy_plugin(request):
         # raise SSLError()
     # except Exception as exc:
         # log.error("Exception removing metric: %r", exc)
-        # raise ServiceUnavailableError()
+        # raise exceptions.ServiceUnavailableError()
     # if not resp.ok:
         # log.error("Error removing metric %d:%s", resp.status_code, resp.text)
-        # raise BadRequestError(resp.text)
+        # raise exceptions.BadRequestError(resp.text)
     # return resp.json()
 
 
 @view_config(route_name='api_v1_rules', request_method='POST', renderer='json')
-@view_config(route_name='rules', request_method='POST', renderer='json')
 def update_rule(request):
     """
     Creates or updates a rule.
@@ -2320,7 +2381,6 @@ def update_rule(request):
 
 
 @view_config(route_name='api_v1_rule', request_method='DELETE')
-@view_config(route_name='rule', request_method='DELETE')
 def delete_rule(request):
     """
     Delete rule
@@ -2350,7 +2410,6 @@ def delete_rule(request):
 
 
 @view_config(route_name='api_v1_providers', request_method='GET', renderer='json')
-@view_config(route_name='providers', request_method='GET', renderer='json')
 def list_supported_providers(request):
     """
     List supported providers

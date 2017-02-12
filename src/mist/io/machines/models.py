@@ -4,8 +4,7 @@ import uuid
 import mongoengine as me
 
 from mist.core import config as core_config
-import mist.core.tag.models
-from mist.io.clouds.models import Cloud
+import mist.io.tag.models
 from mist.io.keys.models import Key
 from mist.io.machines.controllers import MachineController
 
@@ -111,7 +110,7 @@ class Machine(me.Document):
 
     id = me.StringField(primary_key=True, default=lambda: uuid.uuid4().hex)
 
-    cloud = me.ReferenceField(Cloud, required=True)
+    cloud = me.ReferenceField('Cloud', required=True)
     name = me.StringField()
 
     # Info gathered mostly by libcloud (or in some cases user input).
@@ -131,11 +130,15 @@ class Machine(me.Document):
     image_id = me.StringField()
     size = me.StringField()
     # libcloud.compute.types.NodeState
-    state = me.StringField(choices=('running', 'starting', 'rebooting',
+    state = me.StringField(default='unknown',
+                           choices=('running', 'starting', 'rebooting',
                                     'terminated', 'pending', 'unknown',
                                     'stopping', 'stopped', 'suspended',
-                                    'error', 'paused', 'reconfiguring')
-                           )
+                                    'error', 'paused', 'reconfiguring'))
+    machine_type = me.StringField(default='machine',
+                                  choices=('machine', 'vm', 'container',
+                                           'hypervisor', 'container-host'))
+    parent = me.ReferenceField('Machine', required=False)
 
     # We should think this through a bit.
     key_associations = me.EmbeddedDocumentListField(KeyAssociation)
@@ -175,14 +178,14 @@ class Machine(me.Document):
 
     def delete(self):
         super(Machine, self).delete()
-        mist.core.tag.models.Tag.objects(resource=self).delete()
+        mist.io.tag.models.Tag.objects(resource=self).delete()
         self.owner.mapper.remove(self)
 
     def as_dict(self):
         # Return a dict as it will be returned to the API
 
         # tags as a list return for the ui
-        tags = {tag.key: tag.value for tag in mist.core.tag.models.Tag.objects(
+        tags = {tag.key: tag.value for tag in mist.io.tag.models.Tag.objects(
              owner=self.cloud.owner, resource=self
         ).only('key', 'value')}
         # Optimize tags data structure for js...
@@ -212,7 +215,9 @@ class Machine(me.Document):
             'cloud': self.cloud.id,
             'last_seen': str(self.last_seen or ''),
             'missing_since': str(self.missing_since or ''),
-            'created': str(self.created or '')
+            'created': str(self.created or ''),
+            'machine_type': self.machine_type,
+            'parent_id': self.parent.id if self.parent is not None else '',
         }
 
     def as_dict_old(self):
@@ -223,7 +228,7 @@ class Machine(me.Document):
                            'cost_per_month': '%.2f' % (self.cost.monthly),
                            'cost_per_hour': '%.2f' % (self.cost.hourly)})
         # tags as a list return for the ui
-        tags = {tag.key: tag.value for tag in mist.core.tag.models.Tag.objects(
+        tags = {tag.key: tag.value for tag in mist.io.tag.models.Tag.objects(
             owner=self.cloud.owner, resource=self).only('key', 'value')}
         # Optimize tags data structure for js...
         if isinstance(tags, dict):
@@ -236,6 +241,7 @@ class Machine(me.Document):
             'public_ips': self.public_ips,
             'private_ips': self.private_ips,
             'imageId': self.image_id,
+            'os_type': self.os_type,
             'last_seen': str(self.last_seen or ''),
             'missing_since': str(self.missing_since or ''),
             'state': self.state,
@@ -250,7 +256,9 @@ class Machine(me.Document):
             'can_undefine': self.actions.undefine,
             'can_rename': self.actions.rename,
             'can_suspend': self.actions.suspend,
-            'can_resume': self.actions.resume
+            'can_resume': self.actions.resume,
+            'machine_type': self.machine_type,
+            'parent_id': self.parent.id if self.parent is not None else '',
         }
 
     def __str__(self):

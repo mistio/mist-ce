@@ -37,7 +37,6 @@ class BaseController(object):
         # FIXME: Solve circular dependencies.
         from mist.io.clouds.controllers.main.base import BaseMainController
         assert isinstance(main_ctl, BaseMainController)
-        self.ctl = main_ctl
         self.cloud = main_ctl.cloud
         self.provider = main_ctl.provider
         self._conn = None

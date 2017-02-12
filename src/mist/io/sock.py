@@ -33,10 +33,10 @@ except ImportError:
     from mist.io.methods import get_stats
     multi_user = False
 
-from mist.core.auth.methods import auth_context_from_session_id
+from mist.io.auth.methods import auth_context_from_session_id
 
 from mist.io.exceptions import BadRequestError, UnauthorizedError, MistError
-from mist.core.exceptions import PolicyUnauthorizedError
+from mist.io.exceptions import PolicyUnauthorizedError
 from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
@@ -240,19 +240,21 @@ class MainConnection(MistConnection):
         self.list_clouds()
         self.check_monitoring()
         if config.ACTIVATE_POLLER:
-            self.update_poller()
+            self.periodic_update_poller()
 
     @tornado.gen.coroutine
-    def update_poller(self):
-        """Every 4 minutes, tell poller to continue for next 5 minutes"""
+    def periodic_update_poller(self):
         while True:
             if self.closed:
                 break
-            log.info("Updating poller for %s", self)
-            for cloud in Cloud.objects(owner=self.owner, deleted=None):
-                ListMachinesPollingSchedule.add(cloud=cloud,
-                                                interval=10, ttl=300)
-            yield tornado.gen.sleep(240)
+            self.update_poller()
+            yield tornado.gen.sleep(100)
+
+    def update_poller(self):
+        """Increase polling frequency for all clouds"""
+        log.info("Updating poller for %s", self)
+        for cloud in Cloud.objects(owner=self.owner, deleted=None):
+            ListMachinesPollingSchedule.add(cloud=cloud, interval=10, ttl=120)
 
     def update_user(self):
         self.send('user', core_methods.get_user_data(self.auth_context))
@@ -295,6 +297,8 @@ class MainConnection(MistConnection):
                   core_methods.filter_list_vpn_tunnels(self.auth_context))
 
     def list_clouds(self):
+        if config.ACTIVATE_POLLER:
+            self.update_poller()
         self.send('list_clouds',
                   core_methods.filter_list_clouds(self.auth_context))
         clouds = Cloud.objects(owner=self.owner, enabled=True, deleted=None)
@@ -400,14 +404,6 @@ class MainConnection(MistConnection):
                 # update cloud machine count in multi-user setups
                 cloud = Cloud.objects.get(owner=self.owner, id=cloud_id,
                                           deleted=None)
-                try:
-                    if len(machines) != cloud.machine_count:
-                        tasks.update_machine_count.delay(self.owner.id,
-                                                         cloud_id,
-                                                         len(machines))
-                except Exception as exc:
-                    log.warning("Error while update_machine_count.delay: %r",
-                                exc)
                 for machine in machines:
                     bmid = (cloud_id, machine['id'])
                     if bmid in self.running_machines:

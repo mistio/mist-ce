@@ -6,7 +6,7 @@ import yaml
 import pytest
 import mist.io.clouds.models as models
 from mist.io.keys.models import SSHKey
-from mist.core.user.models import Organization, User
+from mist.io.users.models import Organization, User
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -235,6 +235,22 @@ def load_staging_l_sizes():
 def load_staging_l_images():
     path = os.path.join(TEST_DIR, 'list_images.json')
     print "Reading images from path '%s'." % path
+    with open(path) as fobj:
+        return json.load(fobj)
+
+
+@pytest.fixture
+def load_staging_l_zones():
+    path = os.path.join(TEST_DIR, 'list_zones.json')
+    print "Reading zones from path '%s'." % path
+    with open(path) as fobj:
+        return json.load(fobj)
+
+
+@pytest.fixture
+def load_staging_l_records():
+    path = os.path.join(TEST_DIR, 'list_records.json')
+    print "Reading records from path '%s'." % path
     with open(path) as fobj:
         return json.load(fobj)
 
