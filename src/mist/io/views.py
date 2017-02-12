@@ -42,6 +42,9 @@ from mist.io.exceptions import SSLError, ServiceUnavailableError
 from mist.io.exceptions import KeyParameterMissingError, MistError
 from mist.io.exceptions import PolicyUnauthorizedError, UnauthorizedError
 
+from mist.io.exceptions import CloudNotFoundError
+from mist.io.exceptions import NetworkNotFoundError, SubnetNotFoundError
+
 import pyramid.httpexceptions
 
 from mist.io.helpers import get_auth_header, params_from_request

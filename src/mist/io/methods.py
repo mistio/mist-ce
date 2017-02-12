@@ -1237,7 +1237,7 @@ def list_networks(owner, cloud_id):
            'routers': []}
 
     try:
-        cloud = Cloud.objects.get(owner=user, id=cloud_id)
+        cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise CloudNotFoundError
 
