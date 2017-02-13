@@ -1241,6 +1241,9 @@ def list_networks(owner, cloud_id):
     except Cloud.DoesNotExist:
         raise CloudNotFoundError
 
+    if not hasattr(cloud.ctl, 'network'):
+        return ret
+
     networks = cloud.ctl.network.list_networks()
 
     for network in networks:
@@ -1262,7 +1265,8 @@ def list_subnets(cloud, network):
     Currently EC2, Openstack and GCE clouds are supported. For other providers
     this returns an empty list.
     """
-
+    if not hasattr(cloud.ctl, 'network'):
+        return []
     subnets = cloud.ctl.network.list_subnets(network=network)
     return [subnet.as_dict() for subnet in subnets]
 
@@ -1309,6 +1313,9 @@ def create_network(owner, cloud, network_params):
     Creates a new network on the specified cloud.
     Network_params is a dict containing all the necessary values that describe a network.
     """
+    if not hasattr(cloud.ctl, 'network'):
+        raise NotImplementedError()
+
     # Create a DB document for the new network and call libcloud
     #  to declare it on the cloud provider
     new_network = NETWORKS[cloud.ctl.provider].add(cloud=cloud,
@@ -1325,6 +1332,9 @@ def create_subnet(owner, cloud, network, subnet_params):
     Create a new subnet attached to the specified network ont he given cloud.
     Subnet_params is a dict containing all the necessary values that describe a subnet.
     """
+    if not hasattr(cloud.ctl, 'network'):
+        raise NotImplementedError()
+
     # Create a DB document for the new subnet and call libcloud
     #  to declare it on the cloud provider
     new_subnet = SUBNETS[cloud.ctl.provider].add(network=network,
