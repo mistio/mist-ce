@@ -155,6 +155,10 @@ class NetworkNotFoundError(NotFoundError, KeyError):
     msg = "Network not found"
 
 
+class SubnetNotFoundError(NotFoundError, KeyError):
+    msg = "Subnet not found"
+
+
 class NetworkError(NotFoundError, KeyError):
     msg = "Error on network action"
 
@@ -205,6 +209,26 @@ class CloudUnauthorizedError(UnauthorizedError):
     msg = "Invalid cloud credentials"
 
 
+class NetworkExistsError(ConflictError):
+    msg = "Network already exists"
+
+
+class SubnetExistsError(ConflictError):
+    msg = "Subnet already exists"
+
+
+#  Rate Limit Error (translated as 429 in views)
+class RateLimitError(MistError):
+    msg = "Rate Limit Error"
+    http_code = 429
+
+
+# INTERNAL ERROR (translated as 500 in views)
+class InternalServerError(MistError):
+    msg = "Internal Server Error"
+    http_code = 500
+
+
 class CloudNotFoundError(NotFoundError, KeyError):
     msg = "Cloud not found"
 
@@ -220,6 +244,47 @@ class ScheduleTaskNotFound(NotFoundError):
 
 class ScheduleNameExistsError(ConflictError):
     msg = "Schedule name exists"
+
+
+class NetworkListingError(InternalServerError):
+    msg = "Error while getting a network listing"
+
+
+class NetworkDeletionError(InternalServerError):
+    msg = "Network deletion failed"
+
+
+class SubnetCreationError(InternalServerError):
+    msg = "Subnet creation failed"
+
+
+class SubnetListingError(InternalServerError):
+    msg = "Error while getting a subnet listing"
+
+
+class SubnetDeletionError(InternalServerError):
+    msg = "Subnet deletion failed"
+
+
+class SSLError(MistError):
+    msg = "SSL certificate verification error"
+
+
+#  BAD GATEWAY (translated as 502 in views)
+class BadGatewayError(MistError):
+    """Used to notify about failures in upstream services according to RFC 2616"""
+    msg = "Bad Gateway"
+    http_code = 502
+
+
+class MalformedResponseError(BadGatewayError):
+    msg = "Malformed response received from upstream service"
+
+
+# SERVICE UNAVAILABLE (translated as 503 in views)
+class ServiceUnavailableError(MistError):
+    msg = "Service unavailable"
+    http_code = 503
 
 
 class ScheduleOperationError(BadRequestError):

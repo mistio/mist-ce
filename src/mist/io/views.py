@@ -14,18 +14,22 @@ import json
 import uuid
 import traceback
 import mongoengine as me
-from mongoengine import ValidationError, NotUniqueError
+from datetime import datetime
 
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
-
+import pyramid.httpexceptions
 # try:
-from mist.io.helpers import view_config
-from mist.io.auth.methods import user_from_request
+
+
 from mist.io.keys.models import Key, SSHKey, SignedSSHKey
 from mist.io.scripts.models import CollectdScript
+from mist.io.scripts.models import Script, ExecutableScript, AnsibleScript
+from mist.io.schedules.models import Schedule
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
+from mist.io.networks.models import Network, Subnet
+
 from mist.core import config
 import mist.core.methods
 # except ImportError:
@@ -34,20 +38,26 @@ import mist.core.methods
 #     from pyramid.view import view_config
 
 from mist.io import methods
+from mist.io import tasks
+
+from mist.io.tag.methods import add_tags_to_resource, resolve_id_and_set_tags
 
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import NotFoundError, BadRequestError
 from mist.io.exceptions import SSLError, ServiceUnavailableError
 from mist.io.exceptions import KeyParameterMissingError, MistError
 from mist.io.exceptions import PolicyUnauthorizedError, UnauthorizedError
-
-import pyramid.httpexceptions
+from mist.io.exceptions import CloudNotFoundError, ScheduleTaskNotFound
+from mist.io.exceptions import NetworkNotFoundError, SubnetNotFoundError
 
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, amqp_publish_user
 from mist.io.helpers import transform_key_machine_associations
+from mist.io.helpers import get_stories
+from mist.io.helpers import view_config
 
 from mist.io.auth.methods import auth_context_from_request
+from mist.io.auth.methods import user_from_request
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -68,20 +78,20 @@ def exception_handler_mist(exc, request):
 
     """
     # mongoengine ValidationError
-    if isinstance(exc, ValidationError):
+    if isinstance(exc, me.ValidationError):
         trace = traceback.format_exc()
         log.warning("Uncaught me.ValidationError!\n%s", trace)
         return Response("Validation Error", 400)
 
     # mongoengine NotUniqueError
-    if isinstance(exc, NotUniqueError):
+    if isinstance(exc, me.NotUniqueError):
         trace = traceback.format_exc()
         log.warning("Uncaught me.NotUniqueError!\n%s", trace)
         return Response("NotUniqueError", 409)
 
     # non-mist exceptions. that shouldn't happen! never!
     if not isinstance(exc, MistError):
-        if not isinstance(exc, (ValidationError, NotUniqueError)):
+        if not isinstance(exc, (me.ValidationError, me.NotUniqueError)):
             trace = traceback.format_exc()
             log.critical("Uncaught non-mist exception? WTF!\n%s", trace)
             return Response("Internal Server Error", 500)
@@ -149,7 +159,7 @@ def list_clouds(request):
     auth_context = auth_context_from_request(request)
     # to prevent iterate throw every cloud
     auth_context.check_perm("cloud", "read", None)
-    return mist.core.methods.filter_list_clouds(auth_context)
+    return mist.io.methods.filter_list_clouds(auth_context)
 
 
 @view_config(route_name='api_v1_clouds', request_method='POST', renderer='json')
@@ -409,7 +419,7 @@ def list_keys(request):
     ---
     """
     auth_context = auth_context_from_request(request)
-    return mist.core.methods.filter_list_keys(auth_context)
+    return mist.io.methods.filter_list_keys(auth_context)
 
 
 @view_config(route_name='api_v1_keys', request_method='PUT', renderer='json')
@@ -941,7 +951,7 @@ def list_machines(request):
 
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
-    return mist.core.methods.filter_list_machines(auth_context, cloud_id)
+    return mist.io.methods.filter_list_machines(auth_context, cloud_id)
 
 
 @view_config(route_name='api_v1_machines', request_method='POST',
@@ -1257,7 +1267,7 @@ def machine_actions(request):
         getattr(machine.ctl, action)(plan_id)
 
     # TODO: We shouldn't return list_machines, just OK. Save the API!
-    return mist.core.methods.filter_list_machines(auth_context, cloud_id)
+    return mist.io.methods.filter_list_machines(auth_context, cloud_id)
 
 
 @view_config(route_name='api_v1_machine_rdp', request_method='GET',
@@ -1496,7 +1506,7 @@ def list_locations(request):
     List locations from each cloud. Locations mean different things in each cl-
     oud. e.g. EC2 uses it as a datacenter in a given availability zone, where-
     as Linode lists availability zones. However all responses share id, name
-    and country eventhough in some cases might be empty, e.g. Openstack. In E-
+    and country even though in some cases might be empty, e.g. Openstack. In E-
     C2 all locations by a provider have the same name, so the availability zo-
     nes are listed instead of name.
     READ permission required on cloud.
@@ -1515,10 +1525,9 @@ def list_locations(request):
 @view_config(route_name='api_v1_networks', request_method='GET', renderer='json')
 def list_networks(request):
     """
-    List networks of a cloud
-    List networks from each cloud.
-    Currently NephoScale and Openstack networks
-    are supported. For other providers this returns an empty list.
+    List networks of a cloud.
+    Currently supports the EC2, GCE and OpenStack clouds.
+    For other providers this returns an empty list.
     READ permission required on cloud.
     ---
     cloud:
@@ -1529,7 +1538,54 @@ def list_networks(request):
     cloud_id = request.matchdict['cloud']
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
-    return methods.list_networks(auth_context.owner, cloud_id)
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+
+    networks = methods.list_networks(auth_context.owner, cloud_id)
+
+    return networks
+
+
+@view_config(route_name='api_v1_subnets', request_method='GET', renderer='json')
+def list_subnets(request):
+    """
+    List subnets of a cloud
+    Currently supports the EC2, GCE and OpenStack clouds.
+    For other providers this returns an empty list.
+    READ permission required on cloud.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    network_id:
+      in: path
+      required: true
+      description: The DB ID of the network whose subnets will be returned
+      type: string
+    """
+
+    cloud_id = request.matchdict['cloud']
+    network_id = request.matchdict['network']
+    auth_context = auth_context_from_request(request)
+    auth_context.check_perm("cloud", "read", cloud_id)
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+
+    try:
+        network = Network.objects.get(cloud=cloud, id=network_id)
+    except Network.DoesNotExist:
+        raise NetworkNotFoundError
+
+    subnets = methods.list_subnets(cloud, network=network)
+
+    return subnets
 
 
 @view_config(route_name='api_v1_networks', request_method='POST', renderer='json')
@@ -1537,7 +1593,7 @@ def create_network(request):
     """
     Create network on a cloud
     Creates a new network. If subnet dict is specified, after creating the net-
-    work it will use the new network's id to create a subnet
+    work it will use the new network's id to create a subnet.
     CREATE_RESOURCES permission required on cloud.
     ---
     cloud_id:
@@ -1547,39 +1603,104 @@ def create_network(request):
       type: string
     network:
       required: true
-      type: string
-    router:
-      type: string
+      type: dict
     subnet:
-      type: string
+      type: dict
     """
     cloud_id = request.matchdict['cloud']
 
-    try:
-        network = request.json_body.get('network')
-    except Exception as e:
-        raise RequiredParameterMissingError(e)
+    params = params_from_request(request)
+    network_params = params.get('network')
+    subnet_params = params.get('subnet')
 
-    subnet = request.json_body.get('subnet', None)
-    router = request.json_body.get('router', None)
     auth_context = auth_context_from_request(request)
-    auth_context.check_perm("cloud", "create_resources", cloud_id)
-    return methods.create_network(auth_context.owner, cloud_id,
-                                  network, subnet, router)
+
+    if not network_params:
+        raise RequiredParameterMissingError('network')
+
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+
+    network = methods.create_network(auth_context.owner, cloud, network_params)
+    network_dict = network.as_dict()
+
+    # Bundling Subnet creation in this call because it is required
+    #  for backwards compatibility with the current UI
+    if subnet_params:
+        try:
+            subnet = methods.create_subnet(auth_context.owner, cloud, network, subnet_params)
+        except Exception as exc:
+            # Cleaning up the network object in case subnet creation
+            #  fails for any reason
+            network.ctl.delete()
+            raise exc
+        network_dict['subnet'] = subnet.as_dict()
+
+    return network.as_dict()
+
+
+@view_config(route_name='api_v1_subnets', request_method='POST', renderer='json')
+def create_subnet(request):
+    """
+    Create subnet on a given network on a cloud.
+    CREATE_RESOURCES permission required on cloud.
+    ---
+    cloud_id:
+      in: path
+      required: true
+      description: The Cloud ID
+      type: string
+    network_id:
+      in: path
+      required: true
+      description: The ID of the Network that will contain the new subnet
+      type: string
+    subnet:
+      required: true
+      type: dict
+    """
+    cloud_id = request.matchdict['cloud']
+    network_id = request.matchdict['network']
+
+    params = params_from_request(request)
+
+    auth_context = auth_context_from_request(request)
+
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
+
+    try:
+        cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+    try:
+        network = Network.objects.get(id=network_id, cloud=cloud)
+    except Network.DoesNotExist:
+        raise NetworkNotFoundError
+
+    subnet = methods.create_subnet(auth_context.owner, cloud, network, params)
+
+    return subnet.as_dict()
 
 
 @view_config(route_name='api_v1_network', request_method='DELETE')
 def delete_network(request):
     """
-    Delete a network
-    Delete a network
+    Delete a network.
     CREATE_RESOURCES permission required on cloud.
     ---
     cloud_id:
       in: path
       required: true
       type: string
-    network:
+    network_id:
       in: path
       required: true
       type: string
@@ -1588,8 +1709,70 @@ def delete_network(request):
     network_id = request.matchdict['network']
 
     auth_context = auth_context_from_request(request)
-    auth_context.check_perm("cloud", "create_resources", cloud_id)
-    methods.delete_network(auth_context.owner, cloud_id, network_id)
+
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
+
+    try:
+        cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+    try:
+        network = Network.objects.get(id=network_id, cloud=cloud)
+    except Network.DoesNotExist:
+        raise NetworkNotFoundError
+
+    methods.delete_network(auth_context.owner, network)
+
+    return OK
+
+
+@view_config(route_name='api_v1_subnet', request_method='DELETE')
+def delete_subnet(request):
+    """
+    Delete a subnet.
+    CREATE_RESOURCES permission required on cloud.
+    ---
+    cloud_id:
+      in: path
+      required: true
+      type: string
+    network_id:
+      in: path
+      required: true
+      type: string
+    subnet_id:
+      in: path
+      required: true
+      type: string
+    """
+    cloud_id = request.matchdict['cloud']
+    subnet_id = request.matchdict['subnet']
+    network_id = request.matchdict['network']
+
+    auth_context = auth_context_from_request(request)
+
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
+
+    try:
+        cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+
+    try:
+        network = Network.objects.get(id=network_id, cloud=cloud)
+    except Network.DoesNotExist:
+        raise NetworkNotFoundError
+
+    try:
+        subnet = Subnet.objects.get(id=subnet_id, network=network)
+    except Subnet.DoesNotExist:
+        raise SubnetNotFoundError
+
+    methods.delete_subnet(auth_context.owner, subnet)
 
     return OK
 
@@ -2326,3 +2509,613 @@ def delete_avatar(request):
     avatar.delete()
     trigger_session_update(auth_context.owner, ["org"])
     return OK
+
+
+# SEC
+@view_config(route_name='api_v1_scripts', request_method='GET',
+             renderer='json')
+#@view_config(route_name='scripts', request_method='GET', renderer='json')
+def list_scripts(request):
+    """
+    List user scripts
+    READ permission required on each script.
+    ---
+    """
+    auth_context = auth_context_from_request(request)
+    scripts_list = mist.io.methods.filter_list_scripts(auth_context)
+    return scripts_list
+
+
+# SEC
+@view_config(route_name='api_v1_scripts', request_method='POST',
+             renderer='json')
+#@view_config(route_name='scripts', request_method='POST', renderer='json')
+def add_script(request):
+    """
+    Add script to user scripts
+    ADD permission required on SCRIPT
+    ---
+    name:
+      type: string
+      required: true
+    script:
+      type: string
+      required: false
+    script_inline:
+      type: string
+      required: false
+    script_github:
+      type: string
+      required: false
+    script_url:
+      type: string
+      required: false
+    location_type:
+      type: string
+      required: true
+    entrypoint:
+      type: string
+    exec_type:
+      type: string
+      required: true
+    description:
+      type: string
+    extra:
+      type: dict
+    """
+
+    params = params_from_request(request)
+
+    # SEC
+    auth_context = auth_context_from_request(request)
+    script_tags = auth_context.check_perm("script", "add", None)
+
+    kwargs = {}
+
+    for key in ('name', 'script', 'location_type', 'entrypoint', 'exec_type',
+                'description', 'extra','script_inline', 'script_url',
+                'script_github'):
+        kwargs[key] = params.get(key)   # TODO maybe change this
+
+    kwargs['script'] = choose_script_from_params(kwargs['location_type'],
+                                                 kwargs['script'],
+                                                 kwargs['script_inline'],
+                                                 kwargs['script_url'],
+                                                 kwargs['script_github'])
+    for key in ('script_inline', 'script_url', 'script_github'):
+        kwargs.pop(key)
+
+    name = kwargs.pop('name')
+    exec_type = kwargs.pop('exec_type')
+
+    if exec_type == 'executable':
+        script = ExecutableScript.add(auth_context.owner, name, **kwargs)
+    elif exec_type == 'ansible':
+        script = AnsibleScript.add(auth_context.owner, name, **kwargs)
+    elif exec_type == 'collectd_python_plugin':
+        script = CollectdScript.add(auth_context.owner, name, **kwargs)
+    else:
+        raise BadRequestError(
+            "Param 'exec_type' must be in ('executable', 'ansible', "
+            "'collectd_python_plugin')."
+        )
+
+    if script_tags:
+        add_tags_to_resource(auth_context.owner, script, script_tags.items())
+
+    script = script.as_dict_old()
+
+    if 'job_id' in params:
+        script['job_id'] = params['job_id']
+
+    return script
+
+
+# TODO this isn't nice
+def choose_script_from_params(location_type, script,
+                              script_inline, script_url,
+                              script_github):
+    if script != '' and script != None:
+        return script
+
+    if location_type == 'github':
+        return script_github
+    elif location_type == 'url':
+        return script_url
+    else:
+        return script_inline
+
+
+# SEC
+@view_config(route_name='api_v1_script', request_method='GET', renderer='json')
+#@view_config(route_name='script', request_method='GET', renderer='json')
+def show_script(request):
+    """
+    Show script details and job history.
+    READ permission required on script.
+    ---
+    script_id:
+      type: string
+      required: true
+      in: path
+    """
+    script_id = request.matchdict['script_id']
+    auth_context = auth_context_from_request(request)
+
+    if not script_id:
+        raise RequiredParameterMissingError('No script id provided')
+
+    try:
+        script = Script.objects.get(owner=auth_context.owner,
+                                    id=script_id, deleted=None)
+    except me.DoesNotExist:
+        raise NotFoundError('Script id not found')
+
+    # SEC require READ permission on SCRIPT
+    auth_context.check_perm('script', 'read', script_id)
+
+    ret_dict = script.as_dict_old()
+    jobs = get_stories('job', auth_context.owner.id, script_id=script_id)
+    ret_dict['jobs'] = [job['job_id'] for job in jobs]
+    return ret_dict
+
+
+@view_config(route_name='api_v1_script_file', request_method='GET',
+             renderer='json')
+def download_script(request):
+    """
+    Download script file or archive.
+    READ permission required on script.
+    ---
+    script_id:
+      type: string
+      required: true
+      in: path
+    """
+    script_id = request.matchdict['script_id']
+    auth_context = auth_context_from_request(request)
+
+    if not script_id:
+        raise RequiredParameterMissingError('No script id provided')
+
+    try:
+        script = Script.objects.get(owner=auth_context.owner,
+                                    id=script_id, deleted=None)
+    except me.DoesNotExist:
+        raise NotFoundError('Script id not found')
+
+    # SEC require READ permission on SCRIPT
+    auth_context.check_perm('script', 'read', script_id)
+    try:
+        return script.ctl.get_file()
+    except BadRequestError():
+        return Response("Unable to find: {}".format(request.path_info))
+
+
+# SEC
+@view_config(route_name='api_v1_script', request_method='DELETE', renderer='json')
+#@view_config(route_name='script', request_method='DELETE', renderer='json')
+def delete_script(request):
+    """
+    Delete script
+    REMOVE permission required on script.
+    ---
+    script_id:
+      in: path
+      required: true
+      type: string
+    """
+    script_id = request.matchdict['script_id']
+    auth_context = auth_context_from_request(request)
+
+    if not script_id:
+        raise RequiredParameterMissingError('No script id provided')
+
+    try:
+        script = Script.objects.get(owner=auth_context.owner, id=script_id,
+                                    deleted=None)
+
+    except me.DoesNotExist:
+        raise NotFoundError('Script id not found')
+
+    # SEC require REMOVE permission on script
+    auth_context.check_perm('script', 'remove', script_id)
+
+    script.ctl.delete()
+    return OK
+
+
+# SEC
+@view_config(route_name='api_v1_scripts',
+             request_method='DELETE', renderer='json')
+#@view_config(route_name='scripts', request_method='DELETE', renderer='json')
+def delete_scripts(request):
+    """
+    Delete multiple scripts.
+    Provide a list of script ids to be deleted. The method will try to delete
+    all of them and then return a json that describes for each script id
+    whether or not it was deleted or the not_found if the script id could not
+    be located. If no script id was found then a 404(Not Found) response will
+    be returned.
+    REMOVE permission required on each script.
+    ---
+    script_ids:
+      required: true
+      type: array
+      items:
+        type: string
+        name: script_id
+    """
+    auth_context = auth_context_from_request(request)
+    params = params_from_request(request)
+    script_ids = params.get('script_ids', [])
+    if type(script_ids) != list or len(script_ids) == 0:
+        raise RequiredParameterMissingError('No script ids provided')
+
+    # remove duplicate ids if there are any
+    script_ids = sorted(script_ids)
+    i = 1
+    while i < len(script_ids):
+        if script_ids[i] == script_ids[i - 1]:
+            script_ids = script_ids[:i] + script_ids[i + 1:]
+        else:
+            i += 1
+
+    report = {}
+    for script_id in script_ids:
+        try:
+            script = Script.objects.get(owner=auth_context.owner,
+                                        id=script_id, deleted=None)
+        except me.DoesNotExist:
+            report[script_id] = 'not_found'
+            continue
+        # SEC require REMOVE permission on script
+        try:
+            auth_context.check_perm('script', 'remove', script_id)
+        except PolicyUnauthorizedError:
+            report[script_id] = 'unauthorized'
+        else:
+            script.ctl.delete()
+            report[script_id] = 'deleted'
+        # /SEC
+
+    # if no script id was valid raise exception
+    if len(filter(lambda script_id: report[script_id] == 'not_found',
+                  report)) == len(script_ids):
+        raise NotFoundError('No valid script id provided')
+    # if user was not authorized for any script raise exception
+    if len(filter(lambda script_id: report[script_id] == 'unauthorized',
+                  report)) == len(script_ids):
+        raise UnauthorizedError("You don't have authorization for any of these"
+                                " scripts")
+    return report
+
+
+# SEC
+@view_config(route_name='api_v1_script', request_method='PUT', renderer='json')
+#@view_config(route_name='script', request_method='PUT', renderer='json')
+def edit_script(request):
+    """
+    Edit script (rename only as for now)
+    EDIT permission required on script.
+    ---
+    script_id:
+      in: path
+      required: true
+      type: string
+    new_name:
+      type: string
+      required: true
+    new_description:
+      type: string
+    """
+    script_id = request.matchdict['script_id']
+    params = params_from_request(request)
+    new_name = params.get('new_name')
+    new_description = params.get('new_description')
+
+    auth_context = auth_context_from_request(request)
+    # SEC require EDIT permission on script
+    auth_context.check_perm('script', 'edit', script_id)
+    try:
+        script = Script.objects.get(owner=auth_context.owner,
+                                    id=script_id, deleted=None)
+    except me.DoesNotExist:
+        raise NotFoundError('Script id not found')
+
+    if not new_name:
+        raise RequiredParameterMissingError('No new name provided')
+
+    script.ctl.edit(new_name, new_description)
+    ret = {'new_name': new_name}
+    if isinstance(new_description, basestring):
+        ret['new_description'] = new_description
+    return ret
+
+
+# SEC
+@view_config(route_name='api_v1_script', request_method='POST', renderer='json')
+#@view_config(route_name='script', request_method='POST', renderer='json')
+def run_script(request):
+    """
+    Start a script job to run the script.
+    READ permission required on cloud.
+    RUN_SCRIPT permission required on machine.
+    RUN permission required on script.
+    ---
+    script_id:
+      in: path
+      required: true
+      type: string
+    cloud_id:
+      required: true
+      type: string
+    machine_id:
+      required: true
+      type: string
+    params:
+      type: string
+    su:
+      type: boolean
+    env:
+      type: string
+    job_id:
+      type: string
+    """
+    script_id = request.matchdict['script_id']
+    params = params_from_request(request)
+    cloud_id = params['cloud_id']
+    machine_id = params['machine_id']
+    script_params = params.get('params', '')
+    su = params.get('su', False)
+    env = params.get('env')
+    job_id = params.get('job_id')
+    if isinstance(env, dict):
+        env = json.dumps(env)
+    for key in ('cloud_id', 'machine_id'):
+        if key not in params:
+            raise RequiredParameterMissingError(key)
+    auth_context = auth_context_from_request(request)
+    auth_context.check_perm("cloud", "read", cloud_id)
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+    except me.DoesNotExist:
+        raise NotFoundError("Machine %s doesn't exist" % machine_id)
+
+    # SEC require permission RUN_SCRIPT on machine
+    auth_context.check_perm("machine", "run_script", machine.id)
+    # SEC require permission RUN on script
+    auth_context.check_perm('script', 'run', script_id)
+    try:
+        script = Script.objects.get(owner=auth_context.owner,
+                                    id=script_id, deleted=None)
+    except me.DoesNotExist:
+        raise NotFoundError('Script id not found')
+    job_id = job_id or uuid.uuid4().hex
+    tasks.run_script.delay(auth_context.owner.id, script.id,
+                           cloud_id, machine_id, params=script_params,
+                           env=env, su=su, job_id=job_id)
+    return {'job_id': job_id}
+
+
+# SEC
+@view_config(route_name='api_v1_schedules', request_method='POST',
+             renderer='json')
+def add_schedule_entry(request):
+    """
+    Add an entry to user schedules
+    Add permission required on schedule.
+    READ permission required on cloud.
+    RUN_SCRIPT permission required on machine.
+    RUN permission required on script.
+    ---
+    script_id:
+      type: string
+    action:
+      type: string
+    machines_uuids:
+      required: true
+      type: array
+      description: list of machines_uuids
+    machines_tags:
+      required: true
+      type: array
+      description: list of machines_tags
+    name:
+      required:true
+      type:string
+      description: schedule name
+    task_enabled:
+      type: boolean
+      description: schedule is ready to run
+    run_immediately:
+      type: boolean
+      description: run immediately only  the first time
+    expires:
+      type: string
+      description: expiration date
+    description:
+      type: string
+      description: describe schedule
+    schedule_type:
+      type: string
+      description: three different types, interval, crontab, one_off
+    schedule_entry:
+      type: object
+      description: period of time
+    params:
+      type: string
+    """
+    params = params_from_request(request)
+
+    # SEC
+    auth_context = auth_context_from_request(request)
+    # SEC require ADD permission on schedule
+    schedule_tags = auth_context.check_perm("schedule", "add", None)
+
+    name = params.pop('name')
+
+    schedule = Schedule.add(auth_context, name, **params)
+
+    if schedule_tags:
+        resolve_id_and_set_tags(auth_context.owner, 'schedule', schedule.id,
+                                schedule_tags.items())
+    trigger_session_update(auth_context.owner, ['schedules'])
+    return schedule.as_dict()
+
+
+@view_config(route_name='api_v1_schedules', request_method='GET',
+             renderer='json')
+def list_schedules_entries(request):
+    """
+    List user schedules entries, order by _id
+    READ permission required on schedules
+    ---
+    """
+
+    auth_context = auth_context_from_request(request)
+
+    # SEC
+    schedules_list = mist.io.methods.filter_list_schedules(auth_context)
+
+    return [schedule for schedule in schedules_list]
+
+
+# SEC
+@view_config(route_name='api_v1_schedule', request_method='GET',
+             renderer='json')
+def show_schedule_entry(request):
+    """
+    Show a schedule details of a user
+    READ permission required on schedule
+    ---
+    schedule_id:
+      type: string
+    """
+    schedule_id = request.matchdict['schedule_id']
+    auth_context = auth_context_from_request(request)
+
+    if not schedule_id:
+        raise RequiredParameterMissingError('No schedule id provided')
+
+    try:
+        schedule = Schedule.objects.get(id=schedule_id, deleted=None,
+                                        owner=auth_context.owner)
+    except me.DoesNotExist:
+        raise ScheduleTaskNotFound()
+
+    # SEC require READ permission on schedule
+    auth_context.check_perm('schedule', 'read', schedule_id)
+
+    return schedule.as_dict()
+
+
+@view_config(route_name='api_v1_schedule', request_method='DELETE',
+             renderer='json')
+def delete_schedule(request):
+    """
+    Delete a schedule entry of a user
+    REMOVE permission required on schedule
+    ---
+    schedule_id:
+      type: string
+    """
+    schedule_id = request.matchdict['schedule_id']
+    auth_context = auth_context_from_request(request)
+
+    if not schedule_id:
+        raise RequiredParameterMissingError('No schedule id provided')
+
+    # Check if entry exists
+    try:
+        schedule = Schedule.objects.get(id=schedule_id, deleted=None)
+    except me.DoesNotExist:
+        raise ScheduleTaskNotFound()
+
+    # SEC
+    auth_context.check_perm('schedule', 'remove', schedule_id)
+
+    # NOTE: Do not perform an atomic operation when marking a schedule as
+    # deleted, since we do not wish to bypass pre-save validation/cleaning.
+    schedule.deleted = datetime.utcnow()
+    schedule.save()
+
+    trigger_session_update(auth_context.owner, ['schedules'])
+    return OK
+
+
+# SEC
+@view_config(route_name='api_v1_schedule',
+             request_method='PATCH', renderer='json')
+def edit_schedule_entry(request):
+    """
+    Edit a schedule entry
+    EDIT permission required on schedule
+    READ permission required on cloud.
+    RUN_SCRIPT permission required on machine.
+    RUN permission required on script.
+
+    ---
+    script_id:
+      type: string
+    action:
+      type: string
+     machines_uuids:
+      required: true
+      type: array
+      description: list of machines_uuids
+    machines_tags:
+      required: true
+      type: array
+      description: list of machines_tags
+    name:
+      required:true
+      type:string
+      description: schedule name
+    enabled:
+      type: boolean
+      description: schedule is ready to run
+    run_immediately:
+      type: boolean
+      description: run immediately only  the first time
+    expires:
+      type: string
+      description: expiration date
+    description:
+      type: string
+      description: describe schedule
+    schedule_type:
+      type: string
+      description: three different types, interval, crontab, one_off
+    schedule_entry:
+      type: object
+      description: period of time
+    schedule_id:
+      type: string
+    params:
+      type: string
+    """
+
+    auth_context = auth_context_from_request(request)
+    params = params_from_request(request)
+    schedule_id = request.matchdict['schedule_id']
+
+    if not schedule_id:
+        raise RequiredParameterMissingError('No schedule id provided')
+
+    # SEC require EDIT permission on schedule
+    auth_context.check_perm('schedule', 'edit', schedule_id)
+
+    owner = auth_context.owner
+    # Check if entry exists
+    try:
+        schedule = Schedule.objects.get(id=schedule_id, owner=owner,
+                                        deleted=None)
+    except me.DoesNotExist:
+        raise ScheduleTaskNotFound()
+
+    schedule.ctl.set_auth_context(auth_context)
+    schedule.ctl.update(**params)
+
+    trigger_session_update(auth_context.owner, ['schedules'])
+    return schedule.as_dict()

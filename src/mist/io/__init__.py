@@ -99,9 +99,15 @@ def add_routes(configurator):
     configurator.add_route('api_v1_sizes', '/api/v1/clouds/{cloud}/sizes')
     configurator.add_route('api_v1_locations',
                            '/api/v1/clouds/{cloud}/locations')
-    configurator.add_route('api_v1_networks', '/api/v1/clouds/{cloud}/networks')
+
+    configurator.add_route('api_v1_networks',
+                           '/api/v1/clouds/{cloud}/networks')
     configurator.add_route('api_v1_network',
                            '/api/v1/clouds/{cloud}/networks/{network}')
+    configurator.add_route('api_v1_subnets',
+                           '/api/v1/clouds/{cloud}/networks/{network}/subnets')
+    configurator.add_route('api_v1_subnet',
+                           '/api/v1/clouds/{cloud}/networks/{network}/subnets/{subnet}')
 
     configurator.add_route('api_v1_keys', '/api/v1/keys')
     configurator.add_route('api_v1_key_action', '/api/v1/keys/{key}')
@@ -122,3 +128,10 @@ def add_routes(configurator):
                            '/api/v1/clouds/{cloud}/dns/zones/{zone}/records')
     configurator.add_route('api_v1_record',
                            '/api/v1/clouds/{cloud}/dns/zones/{zone}/records/{record}')
+
+    configurator.add_route('api_v1_scripts', '/api/v1/scripts')
+    configurator.add_route('api_v1_script', '/api/v1/scripts/{script_id}')
+    configurator.add_route('api_v1_script_file', '/api/v1/scripts/{script_id}/file')
+
+    configurator.add_route('api_v1_schedules', '/api/v1/schedules')
+    configurator.add_route('api_v1_schedule', '/api/v1/schedules/{schedule_id}')
