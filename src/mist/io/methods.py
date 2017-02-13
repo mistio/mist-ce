@@ -48,6 +48,7 @@ import mist.io.tasks
 import mist.io.inventory
 
 from mist.io.clouds.models import Cloud
+from mist.io.networks.models import NETWORKS, SUBNETS, Network, Subnet
 from mist.io.machines.models import Machine
 
 from mist.core.vpn.methods import super_ping
@@ -55,6 +56,7 @@ from mist.core.vpn.methods import super_ping
 import mist.io.clouds.models as cloud_models
 
 import logging
+
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
@@ -192,10 +194,9 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
                    post_script_id='', post_script_params='', cloud_init='',
                    associate_floating_ip=False,
                    associate_floating_ip_subnet=None, project_id=None,
-                   cronjob={}, command=None, tags=None,
+                   schedule={}, command=None, tags=None,
                    bare_metal=False, hourly=True,
                    softlayer_backend_vlan_id=None):
-
     """Creates a new virtual machine on the specified cloud.
 
     If the cloud is Rackspace it attempts to deploy the node with an ssh key
@@ -373,9 +374,9 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
             owner.id, cloud_id, node.id, monitoring, key_id,
             node.extra.get('username'), node.extra.get('password'), public_key,
             script=script,
-            script_id=script_id, script_params=script_params, job_id = job_id,
+            script_id=script_id, script_params=script_params, job_id=job_id,
             hostname=hostname, plugins=plugins, post_script_id=post_script_id,
-            post_script_params=post_script_params, cronjob=cronjob,
+            post_script_params=post_script_params, schedule=schedule,
         )
     elif conn.type == Provider.OPENSTACK:
         if associate_floating_ip:
@@ -384,9 +385,9 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
                 owner.id, cloud_id, node.id, monitoring, key_id,
                 node.extra.get('username'), node.extra.get('password'),
                 public_key, script=script, script_id=script_id, script_params=script_params,
-                job_id = job_id, hostname=hostname, plugins=plugins,
+                job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_params=post_script_params,
-                networks=networks, cronjob=cronjob,
+                networks=networks, schedule=schedule,
             )
     elif conn.type == Provider.RACKSPACE_FIRST_GEN:
         # for Rackspace First Gen, cannot specify ssh keys. When node is
@@ -396,9 +397,9 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
             owner.id, cloud_id, node.id, monitoring, key_id,
             node.extra.get('password'), public_key, script=script,
             script_id=script_id, script_params=script_params,
-            job_id = job_id, hostname=hostname, plugins=plugins,
+            job_id=job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params, cronjob=cronjob
+            post_script_params=post_script_params, schedule=schedule
         )
 
     elif key_id:
@@ -407,11 +408,11 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
             key_id=key_id, script_id=script_id, script_params=script_params,
             job_id=job_id, hostname=hostname, plugins=plugins,
             post_script_id=post_script_id,
-            post_script_params=post_script_params, cronjob=cronjob,
+            post_script_params=post_script_params, schedule=schedule,
         )
 
     if tags:
-        from mist.core.tag.methods import resolve_id_and_set_tags
+        from mist.io.tag.methods import resolve_id_and_set_tags
         resolve_id_and_set_tags(owner, 'machine', node.id, tags,
                                 cloud_id=cloud_id)
 
@@ -435,7 +436,7 @@ def _create_machine_rackspace(conn, public_key, machine_name,
 
     """
 
-    key = str(public_key).replace('\n','')
+    key = str(public_key).replace('\n', '')
 
     try:
         server_key = ''
@@ -449,7 +450,8 @@ def _create_machine_rackspace(conn, public_key, machine_name,
             server_key = server_key.name
     except:
         try:
-            server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
+            server_key = conn.ex_import_keypair_from_string(name='mistio' + str(random.randint(1, 100000)),
+                                                            key_material=key)
             server_key = server_key.name
         except AttributeError:
             # RackspaceFirstGenNodeDriver based on OpenStack_1_0_NodeDriver
@@ -466,14 +468,14 @@ def _create_machine_rackspace(conn, public_key, machine_name,
 
 
 def _create_machine_openstack(conn, private_key, public_key, machine_name,
-                             image, size, location, networks, user_data):
+                              image, size, location, networks, user_data):
     """Create a machine in Openstack.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
 
     """
-    key = str(public_key).replace('\n','')
+    key = str(public_key).replace('\n', '')
 
     try:
         server_key = ''
@@ -486,7 +488,8 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
             server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
             server_key = server_key.name
     except:
-        server_key = conn.ex_import_keypair_from_string(name='mistio'+str(random.randint(1,100000)), key_material=key)
+        server_key = conn.ex_import_keypair_from_string(name='mistio' + str(random.randint(1, 100000)),
+                                                        key_material=key)
         server_key = server_key.name
 
     # select the right OpenStack network object
@@ -518,7 +521,7 @@ def _create_machine_openstack(conn, private_key, public_key, machine_name,
 
 
 def _create_machine_ec2(conn, key_name, private_key, public_key,
-                       machine_name, image, size, location, user_data):
+                        machine_name, image, size, location, user_data):
     """Create a machine in Amazon EC2.
 
     Here there is no checking done, all parameters are expected to be
@@ -568,7 +571,7 @@ def _create_machine_ec2(conn, key_name, private_key, public_key,
 
 
 def _create_machine_nephoscale(conn, key_name, private_key, public_key,
-                              machine_name, image, size, location, ips):
+                               machine_name, image, size, location, ips):
     """Create a machine in Nephoscale.
 
     Here there is no checking done, all parameters are expected to be
@@ -615,9 +618,9 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key,
         if console_keys:
             console_key = console_keys[0].id
     if size.name and size.name.startswith('D'):
-        baremetal=True
+        baremetal = True
     else:
-        baremetal=False
+        baremetal = False
 
     with get_temp_file(private_key) as tmp_key_path:
         try:
@@ -639,15 +642,15 @@ def _create_machine_nephoscale(conn, key_name, private_key, public_key,
 
 
 def _create_machine_softlayer(conn, key_name, private_key, public_key,
-                             machine_name, image, size, location, bare_metal, cloud_init, hourly,
-                             softlayer_backend_vlan_id):
+                              machine_name, image, size, location, bare_metal, cloud_init, hourly,
+                              softlayer_backend_vlan_id):
     """Create a machine in Softlayer.
 
     Here there is no checking done, all parameters are expected to be
     sanitized by create_machine.
 
     """
-    key = str(public_key).replace('\n','')
+    key = str(public_key).replace('\n', '')
     try:
         server_key = ''
         keys = conn.list_key_pairs()
@@ -659,7 +662,7 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
             server_key = conn.create_key_pair(machine_name, key)
             server_key = server_key.id
     except:
-        server_key = conn.create_key_pair('mistio'+str(random.randint(1,100000)), key)
+        server_key = conn.create_key_pair('mistio' + str(random.randint(1, 100000)), key)
         server_key = server_key.id
 
     if '.' in machine_name:
@@ -737,9 +740,9 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
     """
     key = public_key.replace('\n', '')
 
-    #on API v1 list keys returns only ids, without actual public keys
-    #So the check fails. If there's already a key with the same pub key,
-    #create key call will fail!
+    # on API v1 list keys returns only ids, without actual public keys
+    # So the check fails. If there's already a key with the same pub key,
+    # create key call will fail!
     try:
         server_key = ''
         keys = conn.ex_list_ssh_keys()
@@ -751,10 +754,10 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
             server_key = conn.ex_create_ssh_key(machine_name, key)
     except:
         try:
-            server_key = conn.ex_create_ssh_key('mistio'+str(random.randint(1,100000)), key)
+            server_key = conn.ex_create_ssh_key('mistio' + str(random.randint(1, 100000)), key)
         except:
-            #on API v1 if we can't create that key, means that key is already
-            #on our account. Since we don't know the id, we pass all the ids
+            # on API v1 if we can't create that key, means that key is already
+            # on our account. Since we don't know the id, we pass all the ids
             server_keys = [str(key.id) for key in keys]
 
     if not server_key:
@@ -910,7 +913,7 @@ def _create_machine_vultr(conn, public_key, machine_name, image, size, location,
         if not server_key:
             server_key = conn.ex_create_ssh_key(machine_name, key)
     except:
-        server_key = conn.ex_create_ssh_key('mistio'+str(random.randint(1,100000)), key)
+        server_key = conn.ex_create_ssh_key('mistio' + str(random.randint(1, 100000)), key)
 
     try:
         server_key = server_key.id
@@ -944,9 +947,9 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
 
     port_bindings = []
     if azure_port_bindings and type(azure_port_bindings) in [str, unicode]:
-    # we receive something like: http tcp 80:80, smtp tcp 25:25, https tcp 443:443
-    # and transform it to [{'name':'http', 'protocol': 'tcp', 'local_port': 80, 'port': 80},
-    # {'name':'smtp', 'protocol': 'tcp', 'local_port': 25, 'port': 25}]
+        # we receive something like: http tcp 80:80, smtp tcp 25:25, https tcp 443:443
+        # and transform it to [{'name':'http', 'protocol': 'tcp', 'local_port': 80, 'port': 80},
+        # {'name':'smtp', 'protocol': 'tcp', 'local_port': 25, 'port': 25}]
 
         for port_binding in azure_port_bindings.split(','):
             try:
@@ -995,8 +998,8 @@ def _create_machine_vcloud(conn, machine_name, image, size, public_key, networks
 
     """
     key = public_key.replace('\n', '')
-    #we have the option to pass a guest customisation script as ex_vm_script. We'll pass
-    #the ssh key there
+    # we have the option to pass a guest customisation script as ex_vm_script. We'll pass
+    # the ssh key there
 
     deploy_script = NamedTemporaryFile(delete=False)
     deploy_script.write('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % key)
@@ -1025,7 +1028,7 @@ def _create_machine_vcloud(conn, machine_name, image, size, public_key, networks
             ex_vm_ipmode='DHCP'
         )
     except Exception as e:
-            raise MachineCreationError("vCloud, got exception %s" % e, e)
+        raise MachineCreationError("vCloud, got exception %s" % e, e)
 
     return node
 
@@ -1040,9 +1043,9 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
     """
     key = public_key.replace('\n', '')
 
-    metadata = {#'startup-script': script,
-                'sshKeys': 'user:%s' % key}
-    #metadata for ssh user, ssh key and script to deploy
+    metadata = {  # 'startup-script': script,
+        'sshKeys': 'user:%s' % key}
+    # metadata for ssh user, ssh key and script to deploy
     if cloud_init:
         metadata['startup-script'] = cloud_init
 
@@ -1061,7 +1064,7 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
 
 
 def _create_machine_linode(conn, key_name, private_key, public_key,
-                          machine_name, image, size, location):
+                           machine_name, image, size, location):
     """Create a machine in Linode.
 
     Here there is no checking done, all parameters are expected to be
@@ -1178,7 +1181,7 @@ def star_image(owner, cloud_id, image_id):
 
 def list_clouds(owner):
     # FIXME: Move import to the top of the file.
-    from mist.core.tag.methods import get_tags_for_resource
+    from mist.io.tag.methods import get_tags_for_resource
     clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=owner,
                                                          deleted=None)]
     for cloud in clouds:
@@ -1193,7 +1196,7 @@ def list_keys(owner):
     :param owner:
     :return:
     """
-    from mist.core.tag.methods import get_tags_for_resource
+    from mist.io.tag.methods import get_tags_for_resource
     keys = Key.objects(owner=owner, deleted=None)
     clouds = Cloud.objects(owner=owner, deleted=None)
     key_objects = []
@@ -1226,78 +1229,46 @@ def list_locations(owner, cloud_id):
 
 def list_networks(owner, cloud_id):
     """List networks from each cloud.
-    Currently NephoScale and Openstack networks are supported. For other providers
-    this returns an empty list
-
+    Currently EC2, Openstack and GCE clouds are supported. For other providers
+    this returns an empty list.
     """
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-    conn = connect_provider(cloud)
+    ret = {'public': [],
+           'private': [],
+           'routers': []}
 
-    ret = {}
-    ret['public'] = []
-    ret['private'] = []
-    ret['routers'] = []
+    try:
+        cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
 
-    # Get the actual networks
-    if conn.type in [Provider.NEPHOSCALE]:
-        networks = conn.ex_list_networks()
-        for network in networks:
-            ret['public'].append(nephoscale_network_to_dict(network))
-    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        networks = conn.ex_list_networks()
+    if not hasattr(cloud.ctl, 'network'):
+        return ret
 
-        for network in networks:
-            ret['public'].append({
-                'id': network.id,
-                'name': network.name,
-                'extra': network.extra,
-            })
-    elif conn.type in (Provider.OPENSTACK,):
-        networks = conn.ex_list_networks()
-        subnets = conn.ex_list_subnets()
-        routers = conn.ex_list_routers()
-        floating_ips = conn.ex_list_floating_ips()
-        if conn.connection.tenant_id:
-            floating_ips = [floating_ip for floating_ip in floating_ips if floating_ip.extra.get('tenant_id') == conn.connection.tenant_id]
-        if floating_ips:
-            nodes = conn.list_nodes()
+    networks = cloud.ctl.network.list_networks()
+
+    for network in networks:
+
+        network_dict = network.as_dict()
+        network_dict['subnets'] = [subnet.as_dict() for
+                                   subnet in network.ctl.list_subnets()]
+
+    # TODO: Backwards-compatible network privacy detection, to be replaced
+        if not network_dict.get('router_external'):
+            ret['private'].append(network_dict)
         else:
-            nodes = []
-
-        public_networks = []
-        for net in networks:
-            if net.router_external:
-                net_index = networks.index(net)
-                public_networks.append(networks.pop(net_index))
-
-        for pub_net in public_networks:
-            ret['public'].append(openstack_network_to_dict(pub_net, subnets, floating_ips, nodes))
-        for network in networks:
-            ret['private'].append(openstack_network_to_dict(network, subnets))
-        for router in routers:
-            ret['routers'].append(openstack_router_to_dict(router))
-    elif conn.type in [Provider.GCE]:
-        networks = conn.ex_list_networks()
-        all_subnets = conn.ex_list_subnets()
-        subnets = []
-        for region in all_subnets:
-            subnets += all_subnets[region]['subnetworks']
-        for network in networks:
-            ret['public'].append(gce_network_to_dict(network,
-                                 subnets=[s for s in subnets if s['network'].endswith(network.name)]))
-    elif conn.type in [Provider.EC2, Provider.EC2_AP_NORTHEAST, Provider.EC2_AP_NORTHEAST1, Provider.EC2_AP_NORTHEAST2,
-                       Provider.EC2_AP_SOUTHEAST, Provider.EC2_AP_SOUTHEAST2,
-                       Provider.EC2_EU, Provider.EC2_EU_WEST,
-                       Provider.EC2_SA_EAST, Provider.EC2_US_EAST,
-                       Provider.EC2_US_WEST, Provider.EC2_US_WEST_OREGON]:
-        networks = conn.ex_list_networks()
-        for network in networks:
-            ret['public'].append(ec2_network_to_dict(network))
-
-    if conn.type == 'libvirt':
-        # close connection with libvirt
-        conn.disconnect()
+            ret['public'].append(network_dict)
     return ret
+
+
+def list_subnets(cloud, network):
+    """List subnets for a particular network on a given cloud.
+    Currently EC2, Openstack and GCE clouds are supported. For other providers
+    this returns an empty list.
+    """
+    if not hasattr(cloud.ctl, 'network'):
+        return []
+    subnets = cloud.ctl.network.list_subnets(network=network)
+    return [subnet.as_dict() for subnet in subnets]
 
 
 def list_projects(owner, cloud_id):
@@ -1327,123 +1298,6 @@ def list_projects(owner, cloud_id):
     return ret
 
 
-def ec2_network_to_dict(network):
-    net = {}
-    net['name'] = network.name
-    net['id'] = network.id
-    net['is_default'] = network.extra.get('is_default', False)
-    net['state'] = network.extra.get('state')
-    net['instance_tenancy'] = network.extra.get('instance_tenancy')
-    net['dhcp_options_id'] = network.extra.get('dhcp_options_id')
-    net['tags'] = network.extra.get('tags', [])
-    net['subnets'] = [{'name': network.cidr_block}]
-    return net
-
-
-def nephoscale_network_to_dict(network):
-    net = {}
-    net['name'] = network.name
-    net['id'] = network.id
-    net['subnets'] = network.subnets
-    net['is_default'] = network.is_default
-    net['zone'] = network.zone
-    net['domain_type'] = network.domain_type
-    return net
-
-
-def gce_network_to_dict(network, subnets=[]):
-    net = {}
-    net['name'] = network.name
-    net['id'] = network.id
-    net['extra'] = network.extra
-    net['subnets'] = [gce_subnet_to_dict(s) for s in subnets]
-    return net
-
-
-def gce_subnet_to_dict(subnet):
-    # In case network is empty
-    if not subnet:
-        return {}
-    # Network and region come in URL form, so we have to split it
-    # and use the last element of the splited list
-    network = subnet['network'].split("/")[-1]
-    region = subnet['region'].split("/")[-1]
-
-    ret = {
-        'id': subnet['id'],
-        'name': subnet['name'],
-        'network': network,
-        'region': region,
-        'cidr': subnet['ipCidrRange'],
-        'gateway_ip': subnet['gatewayAddress'],
-        'creation_timestamp': subnet['creationTimestamp']
-    }
-    return ret
-
-
-def openstack_network_to_dict(network, subnets=[], floating_ips=[], nodes=[]):
-    net = {}
-    net['name'] = network.name
-    net['id'] = network.id
-    net['status'] = network.status
-    net['router_external'] = network.router_external
-    net['extra'] = network.extra
-    net['public'] = bool(network.router_external)
-    net['subnets'] = [openstack_subnet_to_dict(subnet) for subnet in subnets if subnet.id in network.subnets]
-    net['floating_ips'] = []
-    for floating_ip in floating_ips:
-        if floating_ip.floating_network_id == network.id:
-            net['floating_ips'].append(openstack_floating_ip_to_dict(floating_ip, nodes))
-    return net
-
-
-def openstack_floating_ip_to_dict(floating_ip, nodes=[]):
-    ret = {}
-    ret['id'] = floating_ip.id
-    ret['floating_network_id'] = floating_ip.floating_network_id
-    ret['floating_ip_address'] = floating_ip.floating_ip_address
-    ret['fixed_ip_address'] = floating_ip.fixed_ip_address
-    ret['status'] = str(floating_ip.status)
-    ret['port_id'] = floating_ip.port_id
-    ret['extra'] = floating_ip.extra
-    ret['node_id'] = ''
-
-    for node in nodes:
-        if floating_ip.fixed_ip_address in node.private_ips:
-            ret['node_id'] = node.id
-
-    return ret
-
-def openstack_subnet_to_dict(subnet):
-    net = {}
-
-    net['name'] = subnet.name
-    net['id'] = subnet.id
-    net['cidr'] = subnet.cidr
-    net['enable_dhcp'] = subnet.enable_dhcp
-    net['dns_nameservers'] = subnet.dns_nameservers
-    net['allocation_pools'] = subnet.allocation_pools
-    net['gateway_ip'] = subnet.gateway_ip
-    net['ip_version'] = subnet.ip_version
-    net['extra'] = subnet.extra
-
-    return net
-
-
-def openstack_router_to_dict(router):
-    ret = {}
-
-    ret['name'] = router.name
-    ret['id'] = router.id
-    ret['status'] = router.status
-    ret['external_gateway_info'] = router.external_gateway_info
-    ret['external_gateway'] = router.external_gateway
-    ret['admin_state_up'] = router.admin_state_up
-    ret['extra'] = router.extra
-
-    return ret
-
-
 def associate_ip(owner, cloud_id, network_id, ip, machine_id=None, assign=True):
     cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
     conn = connect_provider(cloud)
@@ -1454,189 +1308,63 @@ def associate_ip(owner, cloud_id, network_id, ip, machine_id=None, assign=True):
     return conn.ex_associate_ip(ip, server=machine_id, assign=assign)
 
 
-def create_network(owner, cloud_id, network, subnet, router):
+def create_network(owner, cloud, network_params):
     """
-    Creates a new network. If subnet dict is specified, after creating the network
-    it will use the new network's id to create a subnet
-
+    Creates a new network on the specified cloud.
+    Network_params is a dict containing all the necessary values that describe a network.
     """
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-    conn = connect_provider(cloud)
-    if conn.type not in (Provider.OPENSTACK,):
-        raise NetworkActionNotSupported()
+    if not hasattr(cloud.ctl, 'network'):
+        raise NotImplementedError()
 
-    if conn.type is Provider.OPENSTACK:
-        ret = _create_network_openstack(conn, network, subnet, router)
+    # Create a DB document for the new network and call libcloud
+    #  to declare it on the cloud provider
+    new_network = NETWORKS[cloud.ctl.provider].add(cloud=cloud,
+                                                   **network_params)
 
-    task = mist.io.tasks.ListNetworks()
-    task.clear_cache(owner.id, cloud_id)
+    # Schedule a UI update
     trigger_session_update(owner, ['clouds'])
-    return ret
+
+    return new_network
 
 
-def _create_network_hpcloud(conn, network, subnet, router):
+def create_subnet(owner, cloud, network, subnet_params):
     """
-    Create hpcloud network
-    NOT used anymore, stays for reference
-
+    Create a new subnet attached to the specified network ont he given cloud.
+    Subnet_params is a dict containing all the necessary values that describe a subnet.
     """
-    try:
-        network_name = network.get('name')
-    except Exception as e:
-        raise RequiredParameterMissingError(e)
+    if not hasattr(cloud.ctl, 'network'):
+        raise NotImplementedError()
 
-    admin_state_up = network.get('admin_state_up', True)
-    shared = network.get('shared', False)
+    # Create a DB document for the new subnet and call libcloud
+    #  to declare it on the cloud provider
+    new_subnet = SUBNETS[cloud.ctl.provider].add(network=network,
+                                                 **subnet_params)
 
-    # First we create the network
+    # Schedule a UI update
+    trigger_session_update(owner, ['clouds'])
 
-    try:
-        new_network = conn.ex_create_network(name=network_name,
-                                             admin_state_up=admin_state_up,
-                                             shared=shared)
-    except Exception as e:
-        raise NetworkCreationError("Got error %s" % str(e))
-
-    ret = dict()
-    if subnet:
-        network_id = new_network.id
-
-        try:
-            subnet_name = subnet.get('name')
-            cidr = subnet.get('cidr')
-        except Exception as e:
-            raise RequiredParameterMissingError(e)
-
-        allocation_pools = subnet.get('allocation_pools', [])
-        gateway_ip = subnet.get('gateway_ip', None)
-        ip_version = subnet.get('ip_version', '4')
-        enable_dhcp = subnet.get('enable_dhcp', True)
-
-        try:
-            subnet = conn.ex_create_subnet(name=subnet_name,
-                                           network_id=network_id, cidr=cidr,
-                                           allocation_pools=allocation_pools,
-                                           gateway_ip=gateway_ip,
-                                           ip_version=ip_version,
-                                           enable_dhcp=enable_dhcp)
-        except Exception as e:
-            conn.ex_delete_network(network_id)
-            raise NetworkError(e)
-
-        ret['network'] = openstack_network_to_dict(new_network)
-        ret['network']['subnets'].append(openstack_subnet_to_dict(subnet))
-
-        if router:
-            try:
-                router_name = router.get('name')
-            except Exception as e:
-                raise RequiredParameterMissingError(e)
-
-            subnet_id = ret['network']['subnets'][0]['id']
-            external_gateway = router.get('publicGateway', False)
-
-            # If external gateway, find the ext-net
-            if external_gateway:
-                available_networks = conn.ex_list_networks()
-                external_networks = [net for net in available_networks if net.router_external]
-                if external_networks:
-                    ext_net_id = external_networks[0].id
-                else:
-                    external_gateway = False
-                    ext_net_id = ""
-
-            # First we create the router
-            router_obj = conn.ex_create_router(name=router_name,
-                                               external_gateway=external_gateway,
-                                               ext_net_id=ext_net_id)
-
-            # Then we attach the router to the subnet
-            router_obj = conn.ex_add_router_interface(
-                         router_obj['router']['id'], subnet_id
-            )
-
-    else:
-        ret = openstack_network_to_dict(new_network)
-
-    return ret
+    return new_subnet
 
 
-def _create_network_openstack(conn, network, subnet, router):
+def delete_network(owner, network):
     """
-    Create openstack specific network
+    Delete a network.
+    All subnets attached to the network will be deleted before the network itself.
     """
-    try:
-        network_name = network.get('name')
-    except Exception as e:
-        raise RequiredParameterMissingError(e)
+    network.ctl.delete()
 
-    admin_state_up = network.get('admin_state_up', True)
-    shared = network.get('shared', False)
-
-    # First we create the network
-    try:
-        new_network = conn.ex_create_network(name=network_name,
-                                             admin_state_up=admin_state_up,
-                                             shared=shared)
-    except Exception as e:
-        raise NetworkCreationError("Got error %s" % str(e))
-
-    ret = dict()
-    if subnet:
-        network_id = new_network.id
-
-        try:
-            subnet_name = subnet.get('name')
-            cidr = subnet.get('cidr')
-        except Exception as e:
-            raise RequiredParameterMissingError(e)
-
-        allocation_pools = subnet.get('allocation_pools', [])
-        gateway_ip = subnet.get('gateway_ip', None)
-        ip_version = subnet.get('ip_version', '4')
-        enable_dhcp = subnet.get('enable_dhcp', True)
-
-        try:
-            subnet = conn.ex_create_subnet(name=subnet_name,
-                                           network_id=network_id, cidr=cidr,
-                                           allocation_pools=allocation_pools,
-                                           gateway_ip=gateway_ip,
-                                           ip_version=ip_version,
-                                           enable_dhcp=enable_dhcp)
-        except Exception as e:
-            conn.ex_delete_network(network_id)
-            raise NetworkError(e)
-
-        ret['network'] = openstack_network_to_dict(new_network)
-        ret['network']['subnets'].append(openstack_subnet_to_dict(subnet))
-
-    else:
-        ret = openstack_network_to_dict(new_network)
-
-    return ret
+    # Schedule a UI update
+    trigger_session_update(owner, ['clouds'])
 
 
-def delete_network(owner, cloud_id, network_id):
+def delete_subnet(owner, subnet):
     """
-    Delete a neutron network
+    Delete a subnet.
     """
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-    conn = connect_provider(cloud)
+    subnet.ctl.delete()
 
-    if conn.type is Provider.OPENSTACK:
-        try:
-            conn.ex_delete_network(network_id)
-        except Exception as e:
-            raise NetworkError(e)
-    else:
-        raise NetworkActionNotSupported()
-
-    try:
-        task = mist.io.tasks.ListNetworks()
-        task.clear_cache(owner.id, cloud_id)
-        trigger_session_update(owner, ['clouds'])
-    except Exception as e:
-        pass
+    # Schedule a UI update
+    trigger_session_update(owner, ['clouds'])
 
 
 def set_machine_tags(owner, cloud_id, machine_id, tags):
@@ -1776,9 +1504,9 @@ def delete_machine_tag(owner, cloud_id, machine_id, tag):
         tags = machine.extra.get('tags', None)
         pair = None
         for mkey, mdata in tags.iteritems():
-            if type(mkey) ==  unicode:
+            if type(mkey) == unicode:
                 mkey = mkey.encode('utf-8')
-            if type(mdata) ==  unicode:
+            if type(mdata) == unicode:
                 mdata = mdata.encode('utf-8')
             if tag == mkey:
                 pair = {mkey: mdata}
@@ -1952,30 +1680,30 @@ def probe_ssh_only(owner, cloud_id, machine_id, host, key_id='', ssh_user='',
 
     # run SSH commands
     command = (
-       "echo \""
-       "sudo -n uptime 2>&1|"
-       "grep load|"
-       "wc -l && "
-       "echo -------- && "
-       "uptime && "
-       "echo -------- && "
-       "if [ -f /proc/uptime ]; then cat /proc/uptime; "
-       "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;"
-       "fi; "
-       "echo -------- && "
-       "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
-       "else sysctl hw.ncpu | awk '{print $2}';"
-       "fi;"
-       "echo -------- && "
-       "/sbin/ifconfig;"
-       "echo -------- &&"
-       "/bin/df -Pah;"
-       "echo -------- &&"
-       "uname -r ;"
-       "echo -------- &&"
-       "cat /etc/*release;"
-       "echo --------"
-       "\"|sh" # In case there is a default shell other than bash/sh (e.g. csh)
+        "echo \""
+        "sudo -n uptime 2>&1|"
+        "grep load|"
+        "wc -l && "
+        "echo -------- && "
+        "uptime && "
+        "echo -------- && "
+        "if [ -f /proc/uptime ]; then cat /proc/uptime; "
+        "else expr `date '+%s'` - `sysctl kern.boottime | sed -En 's/[^0-9]*([0-9]+).*/\\1/p'`;"
+        "fi; "
+        "echo -------- && "
+        "if [ -f /proc/cpuinfo ]; then grep -c processor /proc/cpuinfo;"
+        "else sysctl hw.ncpu | awk '{print $2}';"
+        "fi;"
+        "echo -------- && "
+        "/sbin/ifconfig;"
+        "echo -------- &&"
+        "/bin/df -Pah;"
+        "echo -------- &&"
+        "uname -r ;"
+        "echo -------- &&"
+        "cat /etc/*release;"
+        "echo --------"
+        "\"|sh"  # In case there is a default shell other than bash/sh (e.g. csh)
     )
 
     if key_id:
@@ -1986,7 +1714,7 @@ def probe_ssh_only(owner, cloud_id, machine_id, host, key_id='', ssh_user='',
                                  host, command, key_id=key_id)
     else:
         retval, cmd_output = shell.command(command)
-    cmd_output = cmd_output.replace('\r','').split('--------')
+    cmd_output = cmd_output.replace('\r', '').split('--------')
     log.warn(cmd_output)
     uptime_output = cmd_output[1]
     loadavg = re.split('load averages?: ', uptime_output)[1].split(', ')
@@ -2047,7 +1775,7 @@ def find_public_ips(ips):
 def notify_admin(title, message="", team="all"):
     """ This will only work on a multi-user setup configured to send emails """
     try:
-        from mist.core.helpers import send_email
+        from mist.io.helpers import send_email
         send_email(title, message,
                    config.NOTIFICATION_EMAIL.get(team,
                                                  config.NOTIFICATION_EMAIL))
@@ -2110,9 +1838,9 @@ def notify_user(owner, title, message="", email_notify=True, **kwargs):
     if 'output' in kwargs:
         body += "Output: %s\n" % kwargs['output'].decode('utf-8', 'ignore')
 
-    try: # Send email in multi-owner env
+    try:  # Send email in multi-user env
         if email_notify:
-            from mist.core.helpers import send_email
+            from mist.io.helpers import send_email
             email = owner.email if hasattr(owner, 'email') else owner.get_email()
             send_email("[mist.io] %s" % title, body.encode('utf-8', 'ignore'),
                        email)
@@ -2122,7 +1850,7 @@ def notify_user(owner, title, message="", email_notify=True, **kwargs):
 
 def find_metrics(user, cloud_id, machine_id):
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
-                                                  cloud_id, machine_id)
+                                                cloud_id, machine_id)
     headers = {'Authorization': get_auth_header(user)}
     try:
         resp = requests.get(url, headers=headers, verify=config.SSL_VERIFY)
@@ -2158,7 +1886,7 @@ def assoc_metric(user, cloud_id, machine_id, metric_id):
 
 def disassoc_metric(user, cloud_id, machine_id, metric_id):
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
-                                                  cloud_id, machine_id)
+                                                cloud_id, machine_id)
     try:
         resp = requests.delete(url,
                                headers={'Authorization': get_auth_header(user)},
@@ -2178,7 +1906,7 @@ def disassoc_metric(user, cloud_id, machine_id, metric_id):
 def update_metric(user, metric_id, name=None, unit=None,
                   cloud_id=None, machine_id=None):
     url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
-    headers={'Authorization': get_auth_header(user)}
+    headers = {'Authorization': get_auth_header(user)}
     params = {
         'name': name,
         'unit': unit,
@@ -2235,7 +1963,7 @@ def get_stats(user, cloud_id, machine_id, start='', stop='', step='', metrics=''
     try:
         resp = requests.get(
             "%s/clouds/%s/machines/%s/stats" % (config.CORE_URI,
-                                                  cloud_id, machine_id),
+                                                cloud_id, machine_id),
             params={'start': start, 'stop': stop, 'step': step},
             headers={'Authorization': get_auth_header(user)},
             verify=config.SSL_VERIFY
@@ -2399,13 +2127,14 @@ def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
            '-Scope CurrentUser -Force;(New-Object System.Net.WebClient).' \
            'DownloadFile(\'https://raw.githubusercontent.com/mistio/' \
            'deploy_collectm/master/collectm.remote.install.ps1\',' \
-           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 '\
+           ' \'.\collectm.remote.install.ps1\');.\collectm.remote.install.ps1 ' \
            '-SetupConfigFile -setupArgs \'-username "%s" -password "%s" ' \
-           '-servers @("%s:%s")\''  % (uuid, password, monitor, port)
+           '-servers @("%s:%s")\'' % (uuid, password, monitor, port)
 
 
 def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
-    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s -e COLLECTD_PORT=%s mist/collectd" % (uuid, password, monitor, port)
+    return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s -e COLLECTD_PORT=%s mist/collectd" % (
+        uuid, password, monitor, port)
 
 
 def machine_name_validator(provider, name):
@@ -2429,18 +2158,18 @@ def machine_name_validator(provider, name):
     elif provider is Provider.GCE:
         if not re.search(r'^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$', name):
             raise MachineNameValidationError("name must be 1-63 characters long, with the first " + \
-                "character being a lowercase letter, and all following characters must be a dash, " + \
-                "lowercase letter, or digit, except the last character, which cannot be a dash.")
+                                             "character being a lowercase letter, and all following characters must be a dash, " + \
+                                             "lowercase letter, or digit, except the last character, which cannot be a dash.")
     elif provider is Provider.SOFTLAYER:
         pass
     elif provider is Provider.DIGITAL_OCEAN:
         if not re.search(r'^[0-9a-zA-Z]+[0-9a-zA-Z-.]{0,}[0-9a-zA-Z]+$', name):
             raise MachineNameValidationError("machine name may only contain ASCII letters " + \
-                "or numbers, dashes and dots")
+                                             "or numbers, dashes and dots")
     elif provider is Provider.PACKET:
         if not re.search(r'^[0-9a-zA-Z-.]+$', name):
             raise MachineNameValidationError("machine name may only contain ASCII letters " + \
-                "or numbers, dashes and periods")
+                                             "or numbers, dashes and periods")
     elif provider == Provider.AZURE:
         pass
     elif provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
@@ -2450,8 +2179,8 @@ def machine_name_validator(provider, name):
             raise MachineNameValidationError("machine name should be at least 3 chars")
         if not re.search(r'^[0-9a-zA-Z][0-9a-zA-Z-_]+[0-9a-zA-Z]$', name):
             raise MachineNameValidationError("machine name may only contain ASCII letters " + \
-                "or numbers, dashes and underscores. Must begin and end with letters or numbers, " + \
-                "and be at least 3 characters long")
+                                             "or numbers, dashes and underscores. Must begin and end with letters or numbers, " + \
+                                             "and be at least 3 characters long")
     return name
 
 
@@ -2482,10 +2211,10 @@ def create_dns_a_record(owner, domain_name, ip_addr):
         if isinstance(cloud, cloud_models.AmazonCloud):
             provider = DnsProvider.ROUTE53
             creds = cloud.apikey, cloud.apisecret
-        #TODO: add support for more providers
-        #elif cloud.provider == Provider.LINODE:
+        # TODO: add support for more providers
+        # elif cloud.provider == Provider.LINODE:
         #    pass
-        #elif cloud.provider == Provider.RACKSPACE:
+        # elif cloud.provider == Provider.RACKSPACE:
         #    pass
         else:
             # no DNS support for this provider, skip
@@ -2538,8 +2267,8 @@ def create_dns_a_record(owner, domain_name, ip_addr):
              name, zone.domain, provider)
 
     # debug
-    #log.debug("Will print all existing A records for zone '%s'.", zone.domain)
-    #for record in zone.list_records():
+    # log.debug("Will print all existing A records for zone '%s'.", zone.domain)
+    # for record in zone.list_records():
     #    if record.type == 'A':
     #        log.info("%s -> %s", record.name, record.data)
 

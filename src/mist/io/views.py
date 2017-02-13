@@ -12,6 +12,7 @@ be performed inside the corresponding method functions.
 import requests
 import json
 import uuid
+import traceback
 import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError
 
@@ -19,13 +20,13 @@ from pyramid.response import Response
 from pyramid.renderers import render_to_response
 
 # try:
-from mist.core.helpers import view_config
-from mist.core.auth.methods import user_from_request
+from mist.io.helpers import view_config
+from mist.io.auth.methods import user_from_request
 from mist.io.keys.models import Key, SSHKey, SignedSSHKey
 from mist.io.scripts.models import CollectdScript
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
-from mist.core.exceptions import PolicyUnauthorizedError
+from mist.io.networks.models import Network, Subnet
 from mist.core import config
 import mist.core.methods
 # except ImportError:
@@ -35,15 +36,22 @@ import mist.core.methods
 
 from mist.io import methods
 
-import mist.io.exceptions as exceptions
-from mist.io.exceptions import *
+from mist.io.exceptions import RequiredParameterMissingError
+from mist.io.exceptions import NotFoundError, BadRequestError
+from mist.io.exceptions import SSLError, ServiceUnavailableError
+from mist.io.exceptions import KeyParameterMissingError, MistError
+from mist.io.exceptions import PolicyUnauthorizedError, UnauthorizedError
+
+from mist.io.exceptions import CloudNotFoundError
+from mist.io.exceptions import NetworkNotFoundError, SubnetNotFoundError
+
 import pyramid.httpexceptions
 
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, amqp_publish_user
 from mist.io.helpers import transform_key_machine_associations
 
-from mist.core.auth.methods import auth_context_from_request
+from mist.io.auth.methods import auth_context_from_request
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -76,7 +84,7 @@ def exception_handler_mist(exc, request):
         return Response("NotUniqueError", 409)
 
     # non-mist exceptions. that shouldn't happen! never!
-    if not isinstance(exc, exceptions.MistError):
+    if not isinstance(exc, MistError):
         if not isinstance(exc, (ValidationError, NotUniqueError)):
             trace = traceback.format_exc()
             log.critical("Uncaught non-mist exception? WTF!\n%s", trace)
@@ -219,7 +227,7 @@ def add_cloud(request):
 
     if config.NEW_UI_EXPERIMENT_ENABLE:
         from mist.core.experiments import NewUIExperiment
-        from mist.core.auth.methods import session_from_request
+        from mist.io.auth.methods import session_from_request
 
         session = session_from_request(request)
         experiment = NewUIExperiment(userid=session.user_id)
@@ -238,7 +246,7 @@ def add_cloud(request):
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
     if cloud_tags:
-        from mist.core.tag.methods import add_tags_to_resource
+        from mist.io.tag.methods import add_tags_to_resource
         add_tags_to_resource(owner, cloud, cloud_tags.items())
 
     c_count = Cloud.objects(owner=owner, deleted=None).count()
@@ -338,10 +346,18 @@ def update_cloud(request):
 
     fail_on_error = params.pop('fail_on_error', True)
     fail_on_invalid_params = params.pop('fail_on_invalid_params', True)
+    polling_interval = params.pop('polling_interval', None)
 
     # Edit the cloud
     cloud.ctl.update(fail_on_error=fail_on_error,
                      fail_on_invalid_params=fail_on_invalid_params, **creds)
+
+    try:
+        polling_interval = int(polling_interval)
+    except (ValueError, TypeError):
+        pass
+    else:
+        cloud.ctl.set_polling_interval(polling_interval)
 
     log.info("Cloud with id '%s' updated successfully.", cloud.id)
     trigger_session_update(auth_context.owner, ['clouds'])
@@ -439,7 +455,7 @@ def add_key(request):
         key = SSHKey.add(auth_context.owner, key_name, **params)
 
     if key_tags:
-        from mist.core.tag.methods import add_tags_to_resource
+        from mist.io.tag.methods import add_tags_to_resource
         add_tags_to_resource(auth_context.owner, key, key_tags.items())
     # since its a new key machines fields should be an empty list
 
@@ -980,7 +996,7 @@ def create_machine(request):
     image_extra:
       description: ' Needed only by Linode cloud'
       type: string
-    image_id:
+    image:
       description: ' Id of image to be used with the creation'
       required: true
       type: string
@@ -1044,6 +1060,8 @@ def create_machine(request):
       description: ' Needed only by SoftLayer cloud'
       type: string
     """
+    # TODO add schedule in docstring
+
     params = params_from_request(request)
     cloud_id = request.matchdict['cloud']
 
@@ -1054,15 +1072,12 @@ def create_machine(request):
     key_id = params.get('key')
     machine_name = params['name']
     location_id = params.get('location', None)
-    if params.get('provider') == 'libvirt':
-        image_id = params.get('image')
-        disk_size = int(params.get('libvirt_disk_size', 4))
-        disk_path = params.get('libvirt_disk_path', '')
-    else:
-        image_id = params.get('image')
-        if not image_id:
-            raise RequiredParameterMissingError("image_id")
-        disk_size = disk_path = None
+    image_id = params.get('image')
+    if not image_id:
+        raise RequiredParameterMissingError("image")
+    # this is used in libvirt
+    disk_size = int(params.get('libvirt_disk_size', 4))
+    disk_path = params.get('libvirt_disk_path', '')
     size_id = params['size']
     # deploy_script received as unicode, but ScriptDeployment wants str
     script = str(params.get('script', ''))
@@ -1103,27 +1118,34 @@ def create_machine(request):
     hourly = params.get('billing', True)
     job_id = params.get('job_id', uuid.uuid4().hex)
 
-    # only for mist.core, parameters for cronjob
-    if not params.get('cronjob_type'):
-        cronjob = {}
-    else:
-        for key in ('cronjob_name', 'cronjob_type', 'cronjob_entry'):
-            if key not in params:
-                raise RequiredParameterMissingError(key)
+    auth_context = auth_context_from_request(request)
 
-        cronjob = {
-            'name': params.get('cronjob_name'),
+    # compose schedule as a dict from relative parameters
+    if not params.get('schedule_type'):
+        schedule = {}
+    else:
+        if params.get('schedule_type') not in ['crontab',
+                                               'interval', 'one_off']:
+            raise BadRequestError('schedule type must be one of '
+                                  'these (crontab, interval, one_off)]'
+                                  )
+        if params.get('schedule_entry') == {}:
+            raise RequiredParameterMissingError('schedule_entry')
+
+        schedule = {
+            'name': 'scheduler_' + params.get('name'),
             'description': params.get('description', ''),
-            'action': params.get('cronjob_action', ''),
-            'script_id': params.get('cronjob_script_id', ''),
-            'cronjob_type': params.get('cronjob_type'),
-            'cronjob_entry': params.get('cronjob_entry'),
+            'action': params.get('action', ''),
+            'script_id': params.get('schedule_script_id', ''),
+            'schedule_type': params.get('schedule_type'),
+            'schedule_entry': params.get('schedule_entry'),
             'expires': params.get('expires', ''),
-            'enabled': bool(params.get('cronjob_enabled', False)),
-            'run_immediately': params.get('run_immediately', False),
+            'start_after': params.get('start_after', ''),
+            'max_run_count': params.get('max_run_count'),
+            'task_enabled': bool(params.get('task_enabled', True)),
+            'auth_context': auth_context.serialize(),
         }
 
-    auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
     auth_context.check_perm("cloud", "create_resources", cloud_id)
     tags = auth_context.check_perm("machine", "create", None)
@@ -1154,7 +1176,7 @@ def create_machine(request):
               'bare_metal': bare_metal,
               'tags': tags,
               'hourly': hourly,
-              'cronjob': cronjob,
+              'schedule': schedule,
               'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
     if not async:
         ret = methods.create_machine(auth_context.owner, *args, **kwargs)
@@ -1223,9 +1245,9 @@ def machine_actions(request):
                'rename', 'undefine', 'suspend', 'resume')
 
     if action not in actions:
-        raise BadRequestError("Action '%s' should be one of %s" % (action,
-                                                                   actions))
-
+        raise BadRequestError("Action '%s' should be "
+                              "one of %s" % (action, actions)
+                              )
     if action == 'destroy':
         methods.destroy_machine(auth_context.owner, cloud_id, machine_id)
     elif action in ('start', 'stop', 'reboot',
@@ -1329,9 +1351,9 @@ def machine_rdp(request):
 #     try:
 #         tags = request.json_body['tags']
 #     except:
-#         raise BadRequestError('tags should be list of tags')
+#         raise exceptions.BadRequestError('tags should be list of tags')
 #     if type(tags) != list:
-#         raise BadRequestError('tags should be list of tags')
+#         raise exceptions.BadRequestError('tags should be list of tags')
 #
 #     auth_context = auth_context_from_request(request)
 #     cloud_tags = mist.core.methods.get_cloud_tags(auth_context.owner, cloud_id)
@@ -1478,7 +1500,7 @@ def list_locations(request):
     List locations from each cloud. Locations mean different things in each cl-
     oud. e.g. EC2 uses it as a datacenter in a given availability zone, where-
     as Linode lists availability zones. However all responses share id, name
-    and country eventhough in some cases might be empty, e.g. Openstack. In E-
+    and country even though in some cases might be empty, e.g. Openstack. In E-
     C2 all locations by a provider have the same name, so the availability zo-
     nes are listed instead of name.
     READ permission required on cloud.
@@ -1497,10 +1519,9 @@ def list_locations(request):
 @view_config(route_name='api_v1_networks', request_method='GET', renderer='json')
 def list_networks(request):
     """
-    List networks of a cloud
-    List networks from each cloud.
-    Currently NephoScale and Openstack networks
-    are supported. For other providers this returns an empty list.
+    List networks of a cloud.
+    Currently supports the EC2, GCE and OpenStack clouds.
+    For other providers this returns an empty list.
     READ permission required on cloud.
     ---
     cloud:
@@ -1511,7 +1532,48 @@ def list_networks(request):
     cloud_id = request.matchdict['cloud']
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
-    return methods.list_networks(auth_context.owner, cloud_id)
+    networks = methods.list_networks(auth_context.owner, cloud_id)
+
+    return networks
+
+
+@view_config(route_name='api_v1_subnets', request_method='GET', renderer='json')
+def list_subnets(request):
+    """
+    List subnets of a cloud
+    Currently supports the EC2, GCE and OpenStack clouds.
+    For other providers this returns an empty list.
+    READ permission required on cloud.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    network_id:
+      in: path
+      required: true
+      description: The DB ID of the network whose subnets will be returned
+      type: string
+    """
+
+    cloud_id = request.matchdict['cloud']
+    network_id = request.matchdict['network']
+    auth_context = auth_context_from_request(request)
+    auth_context.check_perm("cloud", "read", cloud_id)
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+
+    try:
+        network = Network.objects.get(cloud=cloud, id=network_id)
+    except Network.DoesNotExist:
+        raise NetworkNotFoundError
+
+    subnets = methods.list_subnets(cloud, network=network)
+
+    return subnets
 
 
 @view_config(route_name='api_v1_networks', request_method='POST', renderer='json')
@@ -1519,7 +1581,7 @@ def create_network(request):
     """
     Create network on a cloud
     Creates a new network. If subnet dict is specified, after creating the net-
-    work it will use the new network's id to create a subnet
+    work it will use the new network's id to create a subnet.
     CREATE_RESOURCES permission required on cloud.
     ---
     cloud_id:
@@ -1529,39 +1591,104 @@ def create_network(request):
       type: string
     network:
       required: true
-      type: string
-    router:
-      type: string
+      type: dict
     subnet:
-      type: string
+      type: dict
     """
     cloud_id = request.matchdict['cloud']
 
-    try:
-        network = request.json_body.get('network')
-    except Exception as e:
-        raise RequiredParameterMissingError(e)
+    params = params_from_request(request)
+    network_params = params.get('network')
+    subnet_params = params.get('subnet')
 
-    subnet = request.json_body.get('subnet', None)
-    router = request.json_body.get('router', None)
     auth_context = auth_context_from_request(request)
-    auth_context.check_perm("cloud", "create_resources", cloud_id)
-    return methods.create_network(auth_context.owner, cloud_id,
-                                  network, subnet, router)
+
+    if not network_params:
+        raise RequiredParameterMissingError('network')
+
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+
+    network = methods.create_network(auth_context.owner, cloud, network_params)
+    network_dict = network.as_dict()
+
+    # Bundling Subnet creation in this call because it is required
+    #  for backwards compatibility with the current UI
+    if subnet_params:
+        try:
+            subnet = methods.create_subnet(auth_context.owner, cloud, network, subnet_params)
+        except Exception as exc:
+            # Cleaning up the network object in case subnet creation
+            #  fails for any reason
+            network.ctl.delete()
+            raise exc
+        network_dict['subnet'] = subnet.as_dict()
+
+    return network.as_dict()
+
+
+@view_config(route_name='api_v1_subnets', request_method='POST', renderer='json')
+def create_subnet(request):
+    """
+    Create subnet on a given network on a cloud.
+    CREATE_RESOURCES permission required on cloud.
+    ---
+    cloud_id:
+      in: path
+      required: true
+      description: The Cloud ID
+      type: string
+    network_id:
+      in: path
+      required: true
+      description: The ID of the Network that will contain the new subnet
+      type: string
+    subnet:
+      required: true
+      type: dict
+    """
+    cloud_id = request.matchdict['cloud']
+    network_id = request.matchdict['network']
+
+    params = params_from_request(request)
+
+    auth_context = auth_context_from_request(request)
+
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
+
+    try:
+        cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+    try:
+        network = Network.objects.get(id=network_id, cloud=cloud)
+    except Network.DoesNotExist:
+        raise NetworkNotFoundError
+
+    subnet = methods.create_subnet(auth_context.owner, cloud, network, params)
+
+    return subnet.as_dict()
 
 
 @view_config(route_name='api_v1_network', request_method='DELETE')
 def delete_network(request):
     """
-    Delete a network
-    Delete a network
+    Delete a network.
     CREATE_RESOURCES permission required on cloud.
     ---
     cloud_id:
       in: path
       required: true
       type: string
-    network:
+    network_id:
       in: path
       required: true
       type: string
@@ -1570,8 +1697,70 @@ def delete_network(request):
     network_id = request.matchdict['network']
 
     auth_context = auth_context_from_request(request)
-    auth_context.check_perm("cloud", "create_resources", cloud_id)
-    methods.delete_network(auth_context.owner, cloud_id, network_id)
+
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
+
+    try:
+        cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+    try:
+        network = Network.objects.get(id=network_id, cloud=cloud)
+    except Network.DoesNotExist:
+        raise NetworkNotFoundError
+
+    methods.delete_network(auth_context.owner, network)
+
+    return OK
+
+
+@view_config(route_name='api_v1_subnet', request_method='DELETE')
+def delete_subnet(request):
+    """
+    Delete a subnet.
+    CREATE_RESOURCES permission required on cloud.
+    ---
+    cloud_id:
+      in: path
+      required: true
+      type: string
+    network_id:
+      in: path
+      required: true
+      type: string
+    subnet_id:
+      in: path
+      required: true
+      type: string
+    """
+    cloud_id = request.matchdict['cloud']
+    subnet_id = request.matchdict['subnet']
+    network_id = request.matchdict['network']
+
+    auth_context = auth_context_from_request(request)
+
+    # TODO
+    if not auth_context.is_owner():
+        raise PolicyUnauthorizedError()
+
+    try:
+        cloud = Cloud.objects.get(id=cloud_id, owner=auth_context.owner)
+    except Cloud.DoesNotExist:
+        raise CloudNotFoundError
+
+    try:
+        network = Network.objects.get(id=network_id, cloud=cloud)
+    except Network.DoesNotExist:
+        raise NetworkNotFoundError
+
+    try:
+        subnet = Subnet.objects.get(id=subnet_id, network=network)
+    except Subnet.DoesNotExist:
+        raise SubnetNotFoundError
+
+    methods.delete_subnet(auth_context.owner, subnet)
 
     return OK
 
@@ -2070,7 +2259,7 @@ def deploy_plugin(request):
         raise NotFoundError('Cloud id %s does not exist' % cloud_id)
 
     if not machine.monitoring.hasmonitoring:
-        raise ForbiddenError("Machine doesn't seem to have monitoring enabled")
+        raise NotFoundError("Machine doesn't seem to have monitoring enabled")
 
     # create a collectdScript
     extra = {'value_type': params.get('value_type', 'gauge'),
@@ -2096,7 +2285,8 @@ def deploy_plugin(request):
         raise BadRequestError("Invalid plugin_type: '%s'" % plugin_type)
 
 
-@view_config(route_name='api_v1_deploy_plugin', request_method='DELETE', renderer='json')
+@view_config(route_name='api_v1_deploy_plugin',
+             request_method='DELETE', renderer='json')
 def undeploy_plugin(request):
     """
     Undeploy a plugin on a machine.
@@ -2161,10 +2351,10 @@ def undeploy_plugin(request):
         # raise SSLError()
     # except Exception as exc:
         # log.error("Exception removing metric: %r", exc)
-        # raise ServiceUnavailableError()
+        # raise exceptions.ServiceUnavailableError()
     # if not resp.ok:
         # log.error("Error removing metric %d:%s", resp.status_code, resp.text)
-        # raise BadRequestError(resp.text)
+        # raise exceptions.BadRequestError(resp.text)
     # return resp.json()
 
 

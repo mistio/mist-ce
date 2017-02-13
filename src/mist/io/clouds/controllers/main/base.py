@@ -26,9 +26,10 @@ from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
-from mist.io.clouds.controllers.compute.base import BaseComputeController
 from mist.io.helpers import rename_kwargs
+from mist.io.clouds.controllers.network.base import BaseNetworkController
 
+from mist.io.clouds.controllers.compute.base import BaseComputeController
 from mist.io.clouds.controllers.dns.base import BaseDNSController
 
 
@@ -77,8 +78,8 @@ class BaseMainController(object):
     """
 
     ComputeController = None
+    NetworkController = None
     DnsController = None
-    # NetworkController = None
 
     def __init__(self, cloud):
         """Initialize main cloud controller given a cloud
@@ -108,10 +109,10 @@ class BaseMainController(object):
             assert issubclass(self.DnsController, BaseDNSController)
             self.dns = self.DnsController(self)
 
-        # TODO: Initialize network controller.
-        # if self.NetworkController is not None:
-        #     assert issubclass(self.NetworkController, NetworkController)
-        #     self.network = self.NetworkController(self)
+        # Initialize network controller.
+        if self.NetworkController is not None:
+            assert issubclass(self.NetworkController, BaseNetworkController)
+            self.network = self.NetworkController(self)
 
     def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
         """Add new Cloud to the database
@@ -299,6 +300,20 @@ class BaseMainController(object):
     def disable(self):
         self.cloud.enabled = False
         self.cloud.save()
+
+    def set_polling_interval(self, interval):
+        if not isinstance(interval, int):
+            raise BadRequestError("Invalid interval type: %r" % interval)
+        if interval != 0 and not 600 <= interval <= 3600 * 12:
+            raise BadRequestError("Interval must be at least 10 mins "
+                                  "and at most 12 hours.")
+        self.cloud.polling_interval = interval
+        self.cloud.save()
+
+        # FIXME: Resolve circular import issues
+        from mist.io.poller.models import ListMachinesPollingSchedule
+
+        ListMachinesPollingSchedule.add(cloud=self.cloud)
 
     def delete(self, expire=False):
         """Delete a Cloud.

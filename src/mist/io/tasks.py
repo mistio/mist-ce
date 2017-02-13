@@ -38,8 +38,8 @@ from mist.core import config
 
 celery_cfg = 'mist.core.celery_config'
 
-from mist.core.helpers import log_event
-from mist.core.helpers import send_email as helper_send_email
+from mist.io.helpers import log_event
+from mist.io.helpers import send_email as helper_send_email
 from mist.io.helpers import amqp_publish_user
 from mist.io.helpers import amqp_owner_listening
 from mist.io.helpers import amqp_log
@@ -53,41 +53,6 @@ log = logging.getLogger(__name__)
 
 app = Celery('tasks')
 app.conf.update(**config.CELERY_SETTINGS)
-
-
-@app.task
-def update_machine_count(owner, cloud_id, machine_count):
-    """
-    Counts the machines number of a cloud and of an owner.
-    :param owner:
-    :param cloud_id:
-    :param machine_count:
-    :return:
-    """
-    if owner.find("@")!=-1:
-        owner = User.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-    cloud.machine_count = machine_count
-    cloud.save()
-    # TODO machine count property function
-    # TODO total machine count property function
-    clouds = Cloud.objects(owner=owner, deleted=None)
-
-    owner.total_machine_count = sum(
-        [cloud.machine_count for cloud in clouds]
-    )
-    owner.save()
-
-    org_machine_count = 0
-    orgs = Organization.objects(members=owner)
-    for org in orgs:
-        org_clouds = Cloud.objects(owner=org, deleted=None)
-        org.total_machine_count = sum(
-            [cloud.machine_count for cloud in org_clouds]
-        )
-        org.save()
 
 
 @app.task
@@ -113,14 +78,13 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                       key_id=None, username=None, password=None, port=22,
                       script_id='', script_params='', job_id=None,
                       hostname='', plugins=None, script='',
-                      post_script_id='', post_script_params='', cronjob={}):
+                      post_script_id='', post_script_params='', schedule={}):
 
     from mist.io.methods import connect_provider, probe_ssh_only
     from mist.io.methods import notify_user, notify_admin
     from mist.io.methods import create_dns_a_record
 
     from mist.core.methods import enable_monitoring
-    from mist.core.helpers import log_event
 
     job_id = job_id or uuid.uuid4().hex
     if owner.find("@") != -1:
@@ -137,7 +101,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
         try:
             cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
             conn = connect_provider(cloud)
-            nodes = conn.list_nodes() # TODO: use cache
+            nodes = conn.list_nodes()  # TODO: use cache
             for n in nodes:
                 if n.id == machine_id:
                     node = n
@@ -263,24 +227,32 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                 error = ret['error']
                 tmp_log('executed post_script_id %s', post_script_id)
 
-            # only for mist.core, set cronjob entry as a post deploy step
-            if cronjob:
+            # set schedule entry as a post deploy step
+            # TODO add schedule_id for adding a machine to an already exist
+            if schedule:
                 try:
-                    from mist.core.cronjobs.methods import add_cronjob_entry
-                    tmp_log('Add cronjob entry %s', cronjob["name"])
-                    cronjob["machines_per_cloud"] = [[cloud_id, machine_id]]
-                    cronjob_info = add_cronjob_entry(owner, cronjob)
-                    tmp_log("A cronjob entry was added")
-                    log_event(action='add cronjob entry',
-                              cronjob=cronjob_info.to_json(), **log_dict)
-
+                    name = schedule.pop('name') + '_' + machine_id
+                    from mist.core.rbac.methods import AuthContext
+                    auth_context = AuthContext.deserialize(
+                        schedule.pop('auth_context'))
+                    # TODO add machines
+                    m = Machine.objects.get(cloud=cloud, machine_id=machine_id)
+                    machines_uuids = [m.id]
+                    schedule['machines_uuids'] = machines_uuids
+                    tmp_log('Add scheduler entry %s', name)
+                    schedule_info = Schedule.add(auth_context, name,
+                                                 **schedule)
+                    tmp_log("A new scheduler was added")
+                    log_event(action='add scheduler entry',
+                              scheduler=schedule_info.as_dict(), **log_dict)
                 except Exception as e:
                     print repr(e)
                     error = True
-                    notify_user(owner, "add cronjob entry failed for machine %s"
-                                % machine_id, repr(e))
-                    log_event(action='Add cronjob entry failed', error=repr(e),
-                              **log_dict)
+                    notify_user(owner, "add scheduler entry failed for "
+                                       "machine %s" % machine_id, repr(e),
+                                error=error)
+                    log_event(action='Add scheduler entry failed',
+                              error=error, **log_dict)
 
             log_event(action='post_deploy_finished', error=error, **log_dict)
 
@@ -313,7 +285,7 @@ def openstack_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
                                 script_id='', script_params='', job_id=None,
                                 hostname='', plugins=None,
                                 post_script_id='', post_script_params='',
-                                networks=[], cronjob={}):
+                                networks=[], schedule={}):
 
     from mist.io.methods import connect_provider
     if owner.find("@")!=-1:
@@ -342,7 +314,7 @@ def openstack_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
                 script=script, script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
-                post_script_params=post_script_params, cronjob=cronjob
+                post_script_params=post_script_params, schedule=schedule
             )
 
         else:
@@ -403,7 +375,7 @@ def azure_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
                             key_id, username, password, public_key, script='',
                             script_id='', script_params='', job_id=None,
                             hostname='', plugins=None, post_script_id='',
-                            post_script_params='',cronjob={}):
+                            post_script_params='', schedule={}):
     from mist.io.methods import connect_provider
     if owner.find("@")!=-1:
         owner = User.objects.get(email=owner)
@@ -467,7 +439,7 @@ def azure_post_create_steps(self, owner, cloud_id, machine_id, monitoring,
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
-                post_script_params=post_script_params, cronjob=cronjob,
+                post_script_params=post_script_params, schedule=schedule,
             )
 
         except Exception as exc:
@@ -482,8 +454,7 @@ def rackspace_first_gen_post_create_steps(
     self, owner, cloud_id, machine_id, monitoring, key_id, password,
     public_key, username='root', script='', script_id='', script_params='',
     job_id=None, hostname='', plugins=None, post_script_id='',
-    post_script_params='', cronjob={}
-):
+    post_script_params='', schedule={}):
     from mist.io.methods import connect_provider
     if owner.find("@")!=-1:
         owner = User.objects.get(email=owner)
@@ -531,7 +502,7 @@ def rackspace_first_gen_post_create_steps(
                 script_id=script_id, script_params=script_params,
                 job_id=job_id, hostname=hostname, plugins=plugins,
                 post_script_id=post_script_id,
-                post_script_params=post_script_params, cronjob=cronjob
+                post_script_params=post_script_params, schedule=schedule
             )
 
         except Exception as exc:
@@ -717,7 +688,7 @@ class ListNetworks(UserTask):
     result_expires = 60 * 60 * 24
     result_fresh = 0
     polling = False
-    soft_time_limit = 30
+    soft_time_limit = 60
 
     def execute(self, owner_id, cloud_id):
         owner = Owner.objects.get(id=owner_id)
@@ -790,7 +761,7 @@ class ListMachines(UserTask):
                 for tag in machine["tags"]:
                     tags[tag["key"]]= tag["value"]
             try:
-                from mist.core.tag.methods import resolve_id_and_get_tags
+                from mist.io.tag.methods import resolve_id_and_get_tags
                 mistio_tags = resolve_id_and_get_tags(owner, 'machine',
                                                       machine.get("id"),
                                                       cloud_id=cloud_id)
@@ -877,7 +848,7 @@ def deploy_collectd(owner, cloud_id, machine_id, extra_vars, job_id='',
                     plugins=None):
     # FIXME
     from mist.io.methods import deploy_collectd
-    
+
     if isinstance(owner, basestring) and '@' in owner:
         owner = User.objects.get(email=owner)
     else:
@@ -957,7 +928,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
                          disk_size=None, disk_path=None,
                          cloud_init='', associate_floating_ip=False,
                          associate_floating_ip_subnet=None, project_id=None,
-                         tags=None, cronjob={}, bare_metal=False, hourly=True,
+                         tags=None, schedule={}, bare_metal=False, hourly=True,
                          softlayer_backend_vlan_id=None):
     from multiprocessing.dummy import Pool as ThreadPool
     from mist.io.methods import create_machine
@@ -1004,7 +975,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
              'disk_path': disk_path,
              'project_id': project_id,
              'tags': tags,
-             'cronjob': cronjob,
+             'schedule': schedule,
              'softlayer_backend_vlan_id': softlayer_backend_vlan_id}
         ))
 
@@ -1063,10 +1034,10 @@ def group_machines_actions(owner_id, action, name, cloud_machines_pairs):
         'description': schedule.description or '',
         'schedule_type': unicode(schedule.schedule_type or ''),
         'owner_id': owner_id,
-        'machines_match': schedule.get_machines(),
+        'machines_match': schedule.machines_condition.sched_machines,
         'machine_action': action,
         'expires': str(schedule.expires or ''),
-        'enabled': schedule.enabled,
+        'task_enabled': schedule.task_enabled,
         'run_immediately': schedule.run_immediately,
         'event_type': 'schedule',
         'error': False,
@@ -1088,7 +1059,8 @@ def group_machines_actions(owner_id, action, name, cloud_machines_pairs):
         log.info('Schedule action failed: %s', log_dict)
     else:
         log.info('Schedule action succeeded: %s', log_dict)
-
+    owner = Owner.objects.get(id=owner_id)
+    trigger_session_update(owner, ['schedules'])
     return log_dict
 
 
@@ -1143,33 +1115,27 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
                     machine.ctl.start()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Start failed',
-                                                **log_dict)
+                    log_event(action='Start failed', **log_dict)
                 else:
-                    log_event(action='Start succeeded'
-                                            , **log_dict)
+                    log_event(action='Start succeeded', **log_dict)
             elif action == 'stop':
                 log_event(action='Stop', **log_dict)
                 try:
                     machine.ctl.stop()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Stop failed',
-                                                **log_dict)
+                    log_event(action='Stop failed', **log_dict)
                 else:
-                    log_event(action='Stop succeeded',
-                                                **log_dict)
+                    log_event(action='Stop succeeded', **log_dict)
             elif action == 'reboot':
                 log_event(action='Reboot', **log_dict)
                 try:
                     machine.ctl.reboot()
                 except Exception as exc:
                     log_dict['error'] = str(exc)
-                    log_event(action='Reboot failed',
-                                                **log_dict)
+                    log_event(action='Reboot failed', **log_dict)
                 else:
-                    log_event(action='Reboot succeeded',
-                                            **log_dict)
+                    log_event(action='Reboot succeeded', **log_dict)
             elif action == 'destroy':
                 log_event(action='Destroy', **log_dict)
                 try:
@@ -1218,10 +1184,10 @@ def group_run_script(owner_id, script_id, name, cloud_machines_pairs):
         'description': schedule.description or '',
         'schedule_type': unicode(schedule.schedule_type or ''),
         'owner_id': owner_id,
-        'machines_match': schedule.get_machines(),
+        'machines_match': schedule.machines_condition.sched_machines,
         'script_id': script_id,
         'expires': str(schedule.expires or ''),
-        'enabled': schedule.enabled,
+        'task_enabled': schedule.task_enabled,
         'run_immediately': schedule.run_immediately,
         'event_type': 'schedule',
         'error': False,
@@ -1243,7 +1209,8 @@ def group_run_script(owner_id, script_id, name, cloud_machines_pairs):
         log.info('Schedule run_script failed: %s', log_dict)
     else:
         log.info('Schedule run_script succeeded: %s', log_dict)
-
+    owner = Owner.objects.get(id=owner_id)
+    trigger_session_update(owner, ['schedules'])
     return log_dict
 
 
@@ -1305,7 +1272,7 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
         ret['key_id'], ret['ssh_user'] = shell.autoconfigure(
             owner, cloud_id, machine_id, username, password, port
         )
-
+        # FIXME wrap here script.run_script
         path, params, wparams = script.ctl.run_script(shell,
                                                       params=params,
                                                       job_id=ret.get('job_id'))
@@ -1379,6 +1346,6 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
     if ret['error']:
         title += " for user %s" % str(owner)
         notify_admin(
-            title, "%s\n\n%s" % (ret['stdout'], ret['error']), team='dev'
+            title, "%s\n\n%s" % (ret['stdout'], ret['error']), team = 'dev'
         )
     return ret

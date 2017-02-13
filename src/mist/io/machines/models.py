@@ -4,7 +4,7 @@ import uuid
 import mongoengine as me
 
 from mist.core import config as core_config
-import mist.core.tag.models
+import mist.io.tag.models
 from mist.io.keys.models import Key
 from mist.io.machines.controllers import MachineController
 
@@ -178,14 +178,14 @@ class Machine(me.Document):
 
     def delete(self):
         super(Machine, self).delete()
-        mist.core.tag.models.Tag.objects(resource=self).delete()
+        mist.io.tag.models.Tag.objects(resource=self).delete()
         self.owner.mapper.remove(self)
 
     def as_dict(self):
         # Return a dict as it will be returned to the API
 
         # tags as a list return for the ui
-        tags = {tag.key: tag.value for tag in mist.core.tag.models.Tag.objects(
+        tags = {tag.key: tag.value for tag in mist.io.tag.models.Tag.objects(
              owner=self.cloud.owner, resource=self
         ).only('key', 'value')}
         # Optimize tags data structure for js...
@@ -228,7 +228,7 @@ class Machine(me.Document):
                            'cost_per_month': '%.2f' % (self.cost.monthly),
                            'cost_per_hour': '%.2f' % (self.cost.hourly)})
         # tags as a list return for the ui
-        tags = {tag.key: tag.value for tag in mist.core.tag.models.Tag.objects(
+        tags = {tag.key: tag.value for tag in mist.io.tag.models.Tag.objects(
             owner=self.cloud.owner, resource=self).only('key', 'value')}
         # Optimize tags data structure for js...
         if isinstance(tags, dict):
@@ -241,6 +241,7 @@ class Machine(me.Document):
             'public_ips': self.public_ips,
             'private_ips': self.private_ips,
             'imageId': self.image_id,
+            'os_type': self.os_type,
             'last_seen': str(self.last_seen or ''),
             'missing_since': str(self.missing_since or ''),
             'state': self.state,

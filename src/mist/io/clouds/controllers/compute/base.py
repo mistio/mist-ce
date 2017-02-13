@@ -38,7 +38,7 @@ from mist.core.vpn.methods import super_ping
 
 from mist.io.clouds.controllers.base import BaseController
 
-from mist.core.tag.models import Tag
+from mist.io.tag.models import Tag
 
 from mist.io.machines.models import Machine
 
@@ -54,7 +54,7 @@ class BaseComputeController(BaseController):
     technology specific cloud controllers.
 
     Subclasses are meant to extend or override methods of this base class to
-    account for differencies between different cloud types.
+    account for differences between different cloud types.
 
     Care should be taken when considering to add new methods to a subclass.
     All controllers should have the same interface, to the degree this is
@@ -313,6 +313,24 @@ class BaseComputeController(BaseController):
         # Update RBAC Mappings given the list of nodes seen for the first time.
         self.cloud.owner.mapper.update(new_machines)
 
+        # Update machine counts on cloud and org.
+        # FIXME: resolve circular import issues
+        from mist.io.clouds.models import Cloud
+        self.cloud.machine_count = len(machines)
+        self.cloud.save()
+        self.cloud.owner.total_machine_count = sum(
+            cloud.machine_count for cloud in Cloud.objects(
+                owner=self.cloud.owner, deleted=None
+            ).only('machine_count')
+        )
+        self.cloud.owner.save()
+
+        # Close libcloud connection
+        try:
+            self.disconnect()
+        except Exception as exc:
+            log.warning("Error while closing connection: %r", exc)
+
         return machines
 
     def _list_machines__fetch_machines(self):
@@ -417,16 +435,19 @@ class BaseComputeController(BaseController):
             machine.private_ips[0] if machine.private_ips else '')
         if not hostname:
             return False
-        socket.setdefaulttimeout(5)
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ports_list = [22, 80, 443, 3389]
         for port in (machine.ssh_port, machine.rdp_port):
             if port and port not in ports_list:
                 ports_list.insert(0, port)
+        socket_timeout = 3
+        # add timeout for socket
         for port in ports_list:
             log.info("Attempting to connect to %s:%d", hostname, port)
             try:
-                s.connect(dnat(self.cloud.owner, hostname, port))
+                s = socket.create_connection(
+                    dnat(self.cloud.owner, hostname, port),
+                    socket_timeout
+                )
                 s.shutdown(2)
             except:
                 log.info("Failed to connect to %s:%d", hostname, port)

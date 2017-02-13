@@ -5,7 +5,7 @@ import logging
 import mist.io.shell
 from StringIO import StringIO
 from mist.io.exceptions import BadRequestError
-from mist.core.exceptions import ScriptFormatError
+from mist.io.exceptions import ScriptFormatError
 from mist.io.scripts.base import BaseScriptController
 from yaml.parser import ParserError as YamlParserError
 from yaml.scanner import ScannerError as YamlScannerError
