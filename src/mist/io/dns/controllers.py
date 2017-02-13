@@ -21,8 +21,8 @@ class ZoneController(object):
     def create_record(self, name, type, data, ttl):
         """Wrapper for the DNS cloud controller create_record() functionality
         """
-        return self.zone.cloud.ctl.dns.create_record(self.zone.zone_id, name,
-                                                     type, data, ttl)
+        return self.zone.cloud.ctl.dns.create_record(self.zone, name, type,
+                                                     data, ttl)
 
 
 class RecordController(object):
@@ -35,4 +35,4 @@ class RecordController(object):
 
     def delete_record(self):
         return self.record.zone.cloud.ctl.dns.delete_record(
-            self.record.zone.id, self.record.id)
+            self.record.zone, self.record)

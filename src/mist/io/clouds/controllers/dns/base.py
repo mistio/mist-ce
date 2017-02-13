@@ -154,7 +154,7 @@ class BaseDNSController(BaseController):
         # There's a chance that we have received duplicate records as for
         # example for Route NS records, we want to get the final records result
         # set from the DB
-        records = Record.objects(zone=zone)
+        records = Record.objects(zone=zone, deleted=None)
 
         # Format zone information.
         return [{"id": record.id,
@@ -197,12 +197,14 @@ class BaseDNSController(BaseController):
         """Postparse the records returned from the provider"""
         raise NotImplementedError()
 
-    def delete_record(self, zone_id, record_id):
+    def delete_record(self, zone, record):
         """
         Public method to be called with a zone and record ids to delete the
         specific record under the specified zone.
         """
-        return self._delete_record__from_id(zone_id, record_id)
+        self._delete_record__from_id(zone.zone_id, record.record_id)
+        record.deleted = datetime.datetime.utcnow()
+        record.save()
 
     def _delete_record__from_id(self, zone_id, record_id):
         """
@@ -228,10 +230,14 @@ class BaseDNSController(BaseController):
         Public method called to delete the specific zone for the provided id.
         """
         # TODO: Adding here for circular dependency issue. Need to fix this.
-        from mist.io.dns.models import Zone
+        from mist.io.dns.models import Record
         self._delete_zone__for_cloud(zone.zone_id)
         zone.deleted = datetime.datetime.utcnow()
         zone.save()
+        records = Record.objects(zone=zone, deleted=None)
+        for record in records:
+            record.deleted = datetime.datetime.utcnow()
+            record.save()
 
     def _delete_zone__for_cloud(self, zone_id):
         """
@@ -253,13 +259,12 @@ class BaseDNSController(BaseController):
         # TODO: Adding here for circular dependency issue. Need to fix this.
         from mist.io.dns.models import Zone
 
-        p_zone = self._create_zone__for_cloud(domain, type, ttl, extra)
-        log.info(p_zone)
-        if p_zone:
+        node = self._create_zone__for_cloud(domain, type, ttl, extra)
+        if node:
             zone = Zone(cloud=self.cloud, owner=self.cloud.owner,
-                        zone_id=p_zone.id, domain=p_zone.domain,
-                        type=p_zone.type, ttl=p_zone.ttl,
-                        extra=p_zone.extra)
+                        zone_id=node.id, domain=node.domain,
+                        type=node.type, ttl=node.ttl,
+                        extra=node.extra)
             zone.save()
 
     def _create_zone__for_cloud(self, domain, type, ttl, extra):
@@ -289,18 +294,21 @@ class BaseDNSController(BaseController):
             log.exception("Error while running create_zone on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
-    def create_record(self, zone_id, name, type, data, ttl):
+    def create_record(self, zone, name, type, data, ttl):
         """
         This is the public method that is called to create a new DNS record
         under a specific zone.
         """
         # TODO: Adding here for circular dependency issue. Need to fix this.
-        # from mist.io.dns.models import Record
+        from mist.io.dns.models import Record
 
-        return self._create_record__for_zone(zone_id, name, type, data, ttl)
-        # record = self._create_record__for_zone(zone_id, name, type, data, ttl)
-        # if record:
-        #     record = Record(cloud=self.cloud, machine_id=node.id).save()
+        node = self._create_record__for_zone(zone.zone_id, name, type, data,
+                                             ttl)
+        record = Record(record_id=node.id, name=node.name,
+                        type=node.type, ttl=node.ttl, zone=zone)
+        self._list__records_postparse_data(node, record)
+        record.save()
+
 
 
     def _create_record__for_zone(self, zone_id, name, type, data, ttl):

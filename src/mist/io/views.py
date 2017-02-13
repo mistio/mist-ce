@@ -25,7 +25,7 @@ from mist.core.auth.methods import user_from_request
 from mist.io.keys.models import Key, SSHKey, SignedSSHKey
 from mist.io.scripts.models import CollectdScript
 from mist.io.clouds.models import Cloud
-from mist.io.dns.models import Zone
+from mist.io.dns.models import Zone, Record
 from mist.io.machines.models import Machine
 from mist.core import config
 import mist.core.methods
@@ -877,6 +877,11 @@ def create_dns_record(request):
         raise exceptions.NotFoundError('Cloud does not exist')
 
     zone_id = request.matchdict['zone']
+    try:
+        zone = Zone.objects.get(owner=auth_context.owner, id=zone_id)
+    except Zone.DoesNotExist:
+        raise exceptions.NotFoundError('Zone does not exist')
+
     # Get the rest of the params
     # name is required and must contain a trailing period(.)
     # type should be the type of the record we want to create (A,MX,CNAME etc),
@@ -895,7 +900,7 @@ def create_dns_record(request):
         raise exceptions.RequiredParameterMissingError('data')
     ttl = params.get('ttl', 0)
 
-    return cloud.ctl.dns.create_record(zone_id, name, type, data, ttl)
+    return zone.ctl.create_record(name, type, data, ttl)
 
 @view_config(route_name='api_v1_zone', request_method='DELETE', renderer='json')
 def delete_dns_zone(request):
@@ -932,8 +937,16 @@ def delete_dns_record(request):
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise exceptions.NotFoundError('Cloud does not exist')
+    try:
+        zone = Zone.objects.get(owner=auth_context.owner, id=zone_id)
+    except Zone.DoesNotExist:
+        raise exceptions.NotFoundError('Zone does not exist')
+    try:
+        record = Record.objects.get(zone=zone, id=record_id)
+    except Record.DoesNotExist:
+        raise exceptions.NotFoundError('Record does not exist')
 
-    return cloud.ctl.dns.delete_record(zone_id, record_id)
+    return record.ctl.delete_record()
 
 @view_config(route_name='api_v1_machines', request_method='GET', renderer='json')
 def list_machines(request):

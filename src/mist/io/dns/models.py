@@ -72,10 +72,9 @@ class Record(me.Document):
     data = me.DictField()
     extra = me.DictField()
     ttl = me.IntField(default=0)
-    # Need to check if DNS providers allow zones to be deleted when there are
-    # records under them. If not then the reverse_delete_rule need to change to
-    # me.DENY (this however could be a risk since having the DENY could cause
-    # machines to become undestructable. Test this <<<<<<<<<<<<<<<<<<< )
+    # This ensures that any records that are under a zone are also deleted when
+    # we delete the zone. However this should only apply for the required
+    # records as when there are extra the provider will not allow it.
     zone = me.ReferenceField(Zone, required=True,
                              reverse_delete_rule=me.CASCADE)
     deleted = me.DateTimeField()
