@@ -2278,7 +2278,7 @@ def upload_avatar(request):
 @view_config(route_name='api_v1_avatar', request_method='GET')
 def get_avatar(request):
     """
-    Returns the requested avatar uf fiybd
+    Returns the requested avatar
     ---
     avatar:
       description: 'Avatar Id'
@@ -2295,3 +2295,34 @@ def get_avatar(request):
         raise NotFound
 
     return Response(content_type=str(avatar.content_type), body=str(avatar.body))
+
+@view_config(route_name='api_v1_avatar', request_method='DELETE')
+def delete_avatar(request):
+    """
+    Deletes the requested avatar
+    ---
+    avatar:
+      description: 'Avatar Id'
+      in: path
+      required: true
+      type: string
+    """
+    avatar_id = request.matchdict['avatar']
+    auth_context = auth_context_from_request(request)
+
+    from mist.io.users.models import Avatar, Owner
+    try:
+        avatar = Avatar.objects.get(id=avatar_id, owner=auth_context.user)
+    except me.DoesNotExist:
+        raise NotFound
+
+    try:
+        org = Owner.objects.get(avatar=avatar_id)
+        org.avatar = ''
+        org.save()
+    except me.DoesNotExist:
+        pass
+
+    avatar.delete()
+    trigger_session_update(auth_context.owner, ["org"])
+    return OK
