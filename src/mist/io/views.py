@@ -2638,10 +2638,9 @@ def delete_script(request):
         raise RequiredParameterMissingError('No script id provided')
 
     try:
-        # FIXME wtf here, do we need this name=script_id?
-        script = Script.objects.get(Q(owner=auth_context.owner)
-                                    & Q(deleted=None)
-                                    & (Q(id=script_id) | Q(name=script_id)))
+        script = Script.objects.get(owner=auth_context.owner, id=script_id,
+                                    deleted=None)
+
     except me.DoesNotExist:
         raise NotFoundError('Script id not found')
 
