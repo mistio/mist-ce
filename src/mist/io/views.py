@@ -29,6 +29,7 @@ from mist.io.schedules.models import Schedule
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.io.networks.models import Network, Subnet
+from mist.io.users.models import Avatar, Owner
 
 from mist.core import config
 import mist.core.methods
@@ -2471,13 +2472,13 @@ def get_avatar(request):
     """
     avatar_id = request.matchdict['avatar']
 
-    from mist.io.users.models import Avatar
     try:
         avatar = Avatar.objects.get(id=avatar_id)
-    except DoesNotExist:
-        raise NotFound
+    except me.DoesNotExist:
+        raise NotFoundError()
 
     return Response(content_type=str(avatar.content_type), body=str(avatar.body))
+
 
 @view_config(route_name='api_v1_avatar', request_method='DELETE')
 def delete_avatar(request):
@@ -2493,11 +2494,10 @@ def delete_avatar(request):
     avatar_id = request.matchdict['avatar']
     auth_context = auth_context_from_request(request)
 
-    from mist.io.users.models import Avatar, Owner
     try:
         avatar = Avatar.objects.get(id=avatar_id, owner=auth_context.user)
     except me.DoesNotExist:
-        raise NotFound
+        raise NotFoundError()
 
     try:
         org = Owner.objects.get(avatar=avatar_id)
