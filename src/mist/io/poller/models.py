@@ -6,7 +6,7 @@ import celery
 import mongoengine as me
 
 
-from mist.io.users.models import Owner
+from mist.io.clouds.models import Cloud
 
 
 log = logging.getLogger(__name__)
@@ -74,17 +74,21 @@ class PollingSchedule(me.Document):
     total_run_count = me.IntField(min_value=0)
     run_immediately = me.BooleanField()
 
+    # Extra fields used by poller.
+    last_success = me.DateTimeField()
+    last_failure = me.DateTimeField()
+    last_attempt_started = me.DateTimeField()
+    failure_count = me.IntField(default=0)
+
     def get_name(self):
-        """Construct name based on self.{task,args,kwargs}"""
-        parts = []
-        for arg in self.args:
-            parts.append('%r' % arg)
-        for kwarg in self.kwargs.iteritems():
-            parts.append('%s=%r' % kwarg)
-        return '%s(%s)' % (self.task, ', '.join(parts))
+        """Construct name based on self.task"""
+        try:
+            return self.task.split('.')[-1]
+        except NotImplementedError:
+            return '%s: No task specified.' % self.__class__.__name__
 
     def clean(self):
-        """Automatically set value of name and remove expired overrides"""
+        """Automatically set value of name"""
         self.name = self.get_name()
 
     @property
@@ -97,18 +101,12 @@ class PollingSchedule(me.Document):
 
     @property
     def args(self):
-        """Return task args for this schedule
-
-        Subclasses should define an attribute, property or field to do this.
-        """
-        return []
+        """Return task args for this schedule"""
+        return [str(self.id)]
 
     @property
     def kwargs(self):
-        """Return task kwargs for this schedule
-
-        Subclasses should define an attribute, property or field to do this.
-        """
+        """Return task kwargs for this schedule"""
         return {}
 
     @property
@@ -183,20 +181,18 @@ class PollingSchedule(me.Document):
 
 class DebugPollingSchedule(PollingSchedule):
 
+    task = 'mist.io.poller.tasks.debug'
+
     value = me.StringField()
-
-    @property
-    def task(self):
-        return 'mist.io.poller.tasks.debug'
-
-    @property
-    def args(self):
-        return [self.value]
 
 
 class CloudPollingSchedule(PollingSchedule):
 
-    cloud = me.ReferenceField('Cloud')
+    cloud = me.ReferenceField(Cloud, reverse_delete_rule=me.CASCADE)
+
+    def get_name(self):
+        return '%s(%s)' % (super(CloudPollingSchedule, self).get_name(),
+                           self.cloud)
 
     @classmethod
     def add(cls, cloud, interval=None, ttl=300):
@@ -213,14 +209,11 @@ class CloudPollingSchedule(PollingSchedule):
         return schedule
 
     @property
-    def args(self):
-        return [self.cloud.id]
-
-    @property
     def enabled(self):
         return (super(CloudPollingSchedule, self).enabled
                 and self.cloud.enabled
                 and not self.cloud.deleted)
+
     @property
     def interval(self):
         if self.default_interval.every != self.cloud.polling_interval:
@@ -232,6 +225,4 @@ class CloudPollingSchedule(PollingSchedule):
 
 class ListMachinesPollingSchedule(CloudPollingSchedule):
 
-    @property
-    def task(self):
-        return 'mist.io.poller.tasks.list_machines'
+    task = 'mist.io.poller.tasks.list_machines'

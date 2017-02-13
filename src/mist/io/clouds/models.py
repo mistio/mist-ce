@@ -86,6 +86,7 @@ class Cloud(me.Document):
     deleted = me.DateTimeField()
 
     meta = {
+        'strict': False,
         'allow_inheritance': True,
         'collection': 'clouds',  # collection 'cloud' is used by core's model
         'indexes': [

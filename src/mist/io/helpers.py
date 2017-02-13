@@ -1143,13 +1143,14 @@ def logging_view_decorator(func):
             sudoer = session.get_user()
             if sudoer != user:
                 log_dict['sudoer_id'] = sudoer.id
-            auth_context = mist.core.auth.methods.auth_context_from_request(request)
+            auth_context = mist.io.auth.methods.auth_context_from_request(
+                request)
             log_dict['owner_id'] = auth_context.owner.id
         else:
             log_dict['user_id'] = None
             log_dict['owner_id'] = None
 
-        from mist.core.auth.models import ApiToken, datetime_to_str
+        from mist.io.auth.models import ApiToken, datetime_to_str
         if isinstance(session, ApiToken):
             if not 'dummy' in session.name:
                 log_dict['api_token_id'] = str(session.id)
