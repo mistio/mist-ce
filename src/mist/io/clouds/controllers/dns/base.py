@@ -75,29 +75,22 @@ class BaseDNSController(BaseController):
         from mist.io.dns.models import Zone
 
         # Fetch zones from libcloud connection.
-        nodes = self._list_zones__fetch_zones()
+        pr_zones = self._list_zones__fetch_zones()
 
         zones = []
-        for node in nodes:
+        for pr_zone in pr_zones:
             try:
-                zone = Zone.objects.get(cloud=self.cloud, zone_id=node.id)
+                zone = Zone.objects.get(cloud=self.cloud, zone_id=pr_zone.id)
             except Zone.DoesNotExist:
                 log.info("Zone: %s/domain: %s not in the database, creating.",
-                         node.id, node.domain)
+                         pr_zone.id, pr_zone.domain)
                 zone = Zone(cloud=self.cloud, owner=self.cloud.owner,
-                            zone_id=node.id, domain=node.domain,
-                            type=node.type, ttl=node.ttl,
-                            extra=node.extra)
-                zone.save()
+                            zone_id=pr_zone.id)
+            zone.save()
             zones.append(zone)
 
         # Format zone information.
-        return [{"id": zone.id,
-                 "zone_id": zone.zone_id,
-                 "domain": zone.domain,
-                 "type": zone.type,
-                 "ttl": zone.ttl,
-                 "extra": zone.extra} for zone in zones]
+        return [zone.as_dict() for zone in zones]
 
     def _list_zones__fetch_zones(self):
         """
@@ -138,7 +131,7 @@ class BaseDNSController(BaseController):
                 record = Record.objects.get(zone=zone, record_id=node.id)
             except Record.DoesNotExist:
                 log.info("Record: %s not in the database, creating.", node.id)
-                record = Record(record_id=node.id, name=node.name, 
+                record = Record(record_id=node.id, name=node.name,
                                 type=node.type, ttl=node.ttl, zone=zone)
             # We need to check if any of the information returned by the
             # provider is different than what we have in the DB
@@ -157,14 +150,7 @@ class BaseDNSController(BaseController):
         records = Record.objects(zone=zone, deleted=None)
 
         # Format zone information.
-        return [{"id": record.id,
-                 "record_id": record.record_id,
-                 "name": record.name,
-                 "type": record.type,
-                 "rdata": record.rdata,
-                 "data": record.data,
-                 "ttl": record.ttl,
-                 "extra": record.extra} for record in records]
+        return [record.as_dict() for record in records]
 
     def _list_records__fetch_records(self, zone_id):
         """Returns all available records on a specific zone. """
@@ -197,14 +183,13 @@ class BaseDNSController(BaseController):
         """Postparse the records returned from the provider"""
         raise NotImplementedError()
 
-    def delete_record(self, zone, record):
+    def delete_record(self, record):
         """
         Public method to be called with a zone and record ids to delete the
         specific record under the specified zone.
         """
-        self._delete_record__from_id(zone.zone_id, record.record_id)
-        record.deleted = datetime.datetime.utcnow()
-        record.save()
+        self._delete_record__from_id(record.zone.zone_id, record.record_id)
+        record.delete()
 
     def _delete_record__from_id(self, zone_id, record_id):
         """
@@ -232,12 +217,7 @@ class BaseDNSController(BaseController):
         # TODO: Adding here for circular dependency issue. Need to fix this.
         from mist.io.dns.models import Record
         self._delete_zone__for_cloud(zone.zone_id)
-        zone.deleted = datetime.datetime.utcnow()
-        zone.save()
-        records = Record.objects(zone=zone, deleted=None)
-        for record in records:
-            record.deleted = datetime.datetime.utcnow()
-            record.save()
+        zone.delete( )
 
     def _delete_zone__for_cloud(self, zone_id):
         """
@@ -275,8 +255,6 @@ class BaseDNSController(BaseController):
         this.
         ----
         """
-        if not re.match(".*\.$", domain):
-            domain += "."
         try:
             zone = self.connection.create_zone(domain, type, ttl, extra)
             log.info("Zone %s created successfully for %s.",

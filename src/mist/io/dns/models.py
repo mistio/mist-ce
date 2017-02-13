@@ -1,12 +1,17 @@
 """Definition of DNS Zone and Record mongoengine models"""
 
+import re
 import uuid
 
 import mongoengine as me
 
 from mist.io.clouds.models import Cloud
-#from mist.io.users.models import Organization
+from mist.io.users.models import Organization
 from mist.io.dns.controllers import ZoneController, RecordController
+
+from mist.io.exceptions import BadRequestError
+from mist.io.exceptions import ZoneExistsError
+from mist.io.exceptions import RequiredParameterMissingError
 
 class Zone(me.Document):
     """This is the class definition for the Mongo Engine Document related to a
@@ -23,7 +28,6 @@ class Zone(me.Document):
     extra = me.DictField()
     cloud = me.ReferenceField(Cloud, required=True,
                               reverse_delete_rule=me.CASCADE)
-    deleted = me.DateTimeField()
 
     meta = {
         'collection': 'zones',
@@ -42,6 +46,38 @@ class Zone(me.Document):
         super(Zone, self).__init__(*args, **kwargs)
         self.ctl = ZoneController(self)
 
+    @classmethod
+    def add(cls, owner, cloud, domain, id='', **kwargs):
+        """Add Zone
+
+        This is a class method, meaning that it is meant to be called on the
+        class itself and not on an instance of the class.
+
+        You're not meant to be calling this directly, but on a cloud subclass
+        instead like this:
+
+            zone = Zone.add(owner=org, domain='domain.com.')
+
+        Params:
+        - owner and domain are common and required params
+        - only provide a custom zone id if you're migrating something
+        - kwargs will be passed to appropriate controller, in most cases these
+          should match the extra fields of the particular zone type.
+
+        """
+        if not domain:
+            raise RequiredParameterMissingError('domain')
+        #assert isinstance(cloud, Cloud)
+        if not cloud or not isinstance(cloud, Cloud):
+            raise BadRequestError('cloud')
+        if not owner or not isinstance(owner, Organization):
+            raise BadRequestError('owner')
+        zone = cls(owner=owner, cloud=cloud, domain=domain)
+        if id:
+            zone.id = id
+        zone.ctl.create_zone(domain, **kwargs)
+        return zone
+
     def as_dict(self):
         """Return a dict with the model values."""
         return {
@@ -54,9 +90,19 @@ class Zone(me.Document):
             'cloud': self.cloud.id
         }
 
+    def clean(self):
+        """Overriding the default clean method to implement param checking"""
+        if not re.match(".*\.$", self.domain):
+            self.domain += "."
+
+    def __str__(self):
+        return '%s zone %s (%s) of %s' % (self, self.domain, self.id,
+                                          self.owner)
+
+
 
 class Record(me.Document):
-    """This is the class definition for the Mongo Engine Document related to a 
+    """This is the class definition for the Mongo Engine Document related to a
     DNS record.
     """
 
@@ -68,7 +114,7 @@ class Record(me.Document):
     # The default empty string value here is a hack since even though this
     # field is required we only have that information after a provider
     # specific postparsing of the returned data from the providers.
-    rdata = me.ListField(required=True, default=[])
+    rdata = me.ListField(required=True)
     data = me.DictField()
     extra = me.DictField()
     ttl = me.IntField(default=0)
@@ -77,7 +123,6 @@ class Record(me.Document):
     # records as when there are extra the provider will not allow it.
     zone = me.ReferenceField(Zone, required=True,
                              reverse_delete_rule=me.CASCADE)
-    deleted = me.DateTimeField()
 
     meta = {
         'collection': 'records',
@@ -94,6 +139,49 @@ class Record(me.Document):
     def __init__(self, *args, **kwargs):
         super(Record, self).__init__(*args, **kwargs)
         self.ctl = RecordController(self)
+
+    @classmethod
+    def add(cls, zone, id='', **kwargs):
+        """Add Record
+
+        This is a class method, meaning that it is meant to be called on the
+        class itself and not on an instance of the class.
+
+        You're not meant to be calling this directly, but on a cloud subclass
+        instead like this:
+
+            record = Record.add(zone=zone, **kwargs)
+
+        Params:
+        - zone is a required param
+        - only provide a custom record id if you're migrating something
+        - kwargs will be passed to appropriate controller, in most cases these
+          should match the extra fields of the particular record type.
+
+        """
+        if not kwargs['name']:
+            raise RequiredParameterMissingError('name')
+        if not kwargs['data']:
+            raise RequiredParameterMissingError('data')
+        if not kwargs['type']:
+            raise RequiredParameterMissingError('type')
+        #assert isinstance(cloud, Cloud)
+        if not zone or not isinstance(zone, Zone):
+            raise BadRequestError('zone')
+        record = cls(zone=zone)
+        if id:
+            record.id = id
+        record.ctl.create_record(**kwargs)
+        return record
+
+    def clean(self):
+        """Overriding the default clean method to implement param checking"""
+        if not re.match(".*\.$", self.name):
+            self.name += "."
+
+    def __str__(self):
+        return '%s record %s (%s) of type %s under zone %s' % \
+            (self, self.name, self.id, self.type, self.zone)
 
     def as_dict(self):
         """ Return a dict with the model values."""

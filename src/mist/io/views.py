@@ -889,25 +889,10 @@ def create_dns_record(request):
     except Zone.DoesNotExist:
         raise exceptions.NotFoundError('Zone does not exist')
 
-    # Get the rest of the params
-    # name is required and must contain a trailing period(.)
-    # type should be the type of the record we want to create (A,MX,CNAME etc),
-    # and it is required.
-    # ttl is the time for which the record should be valid for. Defaults to 0.
-    # Should be an integer value.
+    # Get the params and create the new record
     params = params_from_request(request)
-    name = params.get('name', '')
-    if not name:
-        raise RequiredParameterMissingError('name')
-    type = params.get('type', '')
-    if not type:
-        raise RequiredParameterMissingError('type')
-    data = params.get('data', '')
-    if not data:
-        raise RequiredParameterMissingError('data')
-    ttl = params.get('ttl', 0)
 
-    return zone.ctl.create_record(name, type, data, ttl)
+    return Record.add(zone, **params)
 
 @view_config(route_name='api_v1_zone', request_method='DELETE', renderer='json')
 def delete_dns_zone(request):

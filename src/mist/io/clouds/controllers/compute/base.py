@@ -209,8 +209,6 @@ class BaseComputeController(BaseController):
                         machine.hostname = ip
                         break
 
-            log.info("Machine hostname: %s", machine.hostname)
-
             # Get machine tags from db
             tags = {tag.key: tag.value for tag in Tag.objects(
                 owner=self.cloud.owner, resource=machine,
@@ -852,7 +850,6 @@ class BaseComputeController(BaseController):
         while machine.key_associations:
             machine.key_associations.pop()
         machine.state = 'terminated'
-
         machine.save()
 
     def _destroy_machine(self, machine, machine_libcloud):

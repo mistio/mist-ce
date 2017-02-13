@@ -216,6 +216,9 @@ class NetworkExistsError(ConflictError):
 class SubnetExistsError(ConflictError):
     msg = "Subnet already exists"
 
+class ZoneExistsError(ConflictError):
+    msg = "Zone already exists"
+
 
 #  Rate Limit Error (translated as 429 in views)
 class RateLimitError(MistError):
