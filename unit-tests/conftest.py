@@ -59,7 +59,7 @@ CLOUDS = load_clouds_from_config()
 CLOUD_NAMES = [cdict['name'] for cdict in CLOUDS]
 CREDS = {cdict['name']:cdict.get('creds') for cdict in CLOUDS}
 
-TODO: Need to add the scripts.yaml file
+# TODO: Need to add the scripts.yaml file
 @pytest.fixture
 def load_scripts_from_config():
     """Loads scripts configuration from unit_tests/scripts.yaml
