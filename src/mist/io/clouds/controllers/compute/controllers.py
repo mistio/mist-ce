@@ -693,6 +693,7 @@ class DockerComputeController(BaseComputeController):
                 ca_cert_temp_file.write(self.cloud.ca_cert_file)
                 ca_cert_temp_file.close()
                 ca_cert = ca_cert_temp_file.name
+
             return get_driver(Provider.DOCKER)(host=host,
                                                port=port,
                                                key_file=key_temp_file.name,

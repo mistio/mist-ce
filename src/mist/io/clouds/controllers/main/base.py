@@ -27,6 +27,7 @@ from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.io.helpers import rename_kwargs
+from mist.io.clouds.controllers.network.base import BaseNetworkController
 
 from mist.io.clouds.controllers.compute.base import BaseComputeController
 from mist.io.clouds.controllers.dns.base import BaseDNSController
@@ -77,8 +78,8 @@ class BaseMainController(object):
     """
 
     ComputeController = None
+    NetworkController = None
     DnsController = None
-    # NetworkController = None
 
     def __init__(self, cloud):
         """Initialize main cloud controller given a cloud
@@ -108,10 +109,10 @@ class BaseMainController(object):
             assert issubclass(self.DnsController, BaseDNSController)
             self.dns = self.DnsController(self)
 
-        # TODO: Initialize network controller.
-        # if self.NetworkController is not None:
-        #     assert issubclass(self.NetworkController, NetworkController)
-        #     self.network = self.NetworkController(self)
+        # Initialize network controller.
+        if self.NetworkController is not None:
+            assert issubclass(self.NetworkController, BaseNetworkController)
+            self.network = self.NetworkController(self)
 
     def add(self, fail_on_error=True, fail_on_invalid_params=True, **kwargs):
         """Add new Cloud to the database
