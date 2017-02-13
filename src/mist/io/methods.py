@@ -50,6 +50,8 @@ import mist.io.inventory
 from mist.io.clouds.models import Cloud
 from mist.io.networks.models import NETWORKS, SUBNETS, Network, Subnet
 from mist.io.machines.models import Machine
+from mist.io.scripts.models import Script
+from mist.io.schedules.models import Schedule
 
 from mist.core.vpn.methods import super_ping
 
@@ -1219,6 +1221,28 @@ def list_keys(owner):
     return key_objects
 
 
+def list_scripts(owner):
+    from mist.io.tag.methods import get_tags_for_resource
+    scripts = Script.objects(owner=owner, deleted=None)
+    script_objects = []
+    for script in scripts:
+        script_object = script.as_dict_old()
+        script_object["tags"] = get_tags_for_resource(owner, script)
+        script_objects.append(script_object)
+    return script_objects
+
+
+def list_schedules(owner):
+    from mist.io.tag.methods import get_tags_for_resource
+    schedules = Schedule.objects(owner=owner, deleted=None).order_by('-_id')
+    schedule_objects = []
+    for schedule in schedules:
+        schedule_object = schedule.as_dict()
+        schedule_object["tags"] =  get_tags_for_resource(owner, schedule)
+        schedule_objects.append(schedule_object)
+    return schedule_objects
+
+
 def list_sizes(owner, cloud_id):
     """List sizes (aka flavors) from each cloud"""
     return Cloud.objects.get(owner=owner, id=cloud_id,
@@ -1300,6 +1324,79 @@ def list_projects(owner, cloud_id):
         # close connection with libvirt
         conn.disconnect()
     return ret
+
+
+# SEC
+def filter_list_clouds(auth_context, perm='read'):
+    """Returns a list of clouds, which is filtered based on RBAC Mappings for
+    non-Owners.
+    """
+    clouds = list_clouds(auth_context.owner)
+    if not auth_context.is_owner():
+        clouds = [cloud for cloud in clouds if cloud['id'] in
+                  auth_context.get_allowed_resources(rtype='clouds')]
+    return clouds
+
+
+# SEC
+def filter_list_keys(auth_context, perm='read'):
+    """Returns of a list of keys. The list is filtered for non-Owners based on
+    the permissions granted.
+    """
+    keys = list_keys(auth_context.owner)
+    if not auth_context.is_owner():
+        keys = [key for key in keys if key['id'] in
+                auth_context.get_allowed_resources(rtype='keys')]
+    return keys
+
+
+# SEC
+def filter_list_machines(auth_context, cloud_id, machines=None, perm='read'):
+    """Returns a list of machines.
+
+    In case of non-Owners, the QuerySet only includes machines found in the
+    RBAC Mappings of the Teams the current user is a member of.
+    """
+    assert cloud_id
+
+    if machines is None:
+        machines = list_machines(auth_context.owner, cloud_id)
+    if not machines:  # Exit early in case the cloud provider returned 0 nodes.
+        return []
+
+    # NOTE: We can trust the RBAC Mappings in order to fetch the latest list of
+    # machines for the current user, since mongo has been updated by either the
+    # Poller or the above `list_machines`.
+
+    if not auth_context.is_owner():
+        try:
+            auth_context.check_perm('cloud', 'read', cloud_id)
+        except PolicyUnauthorizedError:
+            return []
+        allowed_ids = set(auth_context.get_allowed_resources(rtype='machines'))
+        machines = [machine for machine in machines
+                    if machine['uuid'] in allowed_ids]
+
+    return machines
+
+
+def filter_list_scripts(auth_context, perm='read'):
+    """Return a list of scripts based on the user's RBAC map."""
+    scripts = list_scripts(auth_context.owner)
+    if not auth_context.is_owner():
+        scripts = [script for script in scripts if script['id'] in
+                   auth_context.get_allowed_resources(rtype='scripts')]
+    return scripts
+
+
+def filter_list_schedules(auth_context, perm='read'):
+    """List scheduler entries based on the permissions granted to the user."""
+    schedules = list_schedules(auth_context.owner)
+    if not auth_context.is_owner():
+        schedules = [schedule for schedule in schedules if schedule['id']
+                     in auth_context.get_allowed_resources(rtype='schedules')]
+    return schedules
+
 
 
 def associate_ip(owner, cloud_id, network_id, ip, machine_id=None, assign=True):
