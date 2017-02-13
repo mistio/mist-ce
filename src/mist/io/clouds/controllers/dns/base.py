@@ -302,7 +302,7 @@ class BaseDNSController(BaseController):
         # TODO: Adding here for circular dependency issue. Need to fix this.
         from mist.io.dns.models import Record
 
-        node = self._create_record__for_zone(zone.zone_id, name, type, data,
+        node = self._create_record__for_zone(zone, name, type, data,
                                              ttl)
         record = Record(record_id=node.id, name=node.name,
                         type=node.type, ttl=node.ttl, zone=zone)
@@ -311,7 +311,7 @@ class BaseDNSController(BaseController):
 
 
 
-    def _create_record__for_zone(self, zone_id, name, type, data, ttl):
+    def _create_record__for_zone(self, zone, name, type, data, ttl):
         """
         This is the private method called to create a record under a specific
         zone. The underlying functionality is implement in the same way for
@@ -319,9 +319,10 @@ class BaseDNSController(BaseController):
         this.
         ----
         """
-        name, data, extra = self._create_record__prepare_args(name, data, ttl)
+        name, data, extra = self._create_record__prepare_args(zone, name, data,
+                                                              ttl)
         try:
-            zone = self.connection.get_zone(zone_id)
+            zone = self.connection.get_zone(zone.zone_id)
             record = zone.create_record(name, type, data, extra)
             log.info("Type %s record created successfully for %s.",
                      record.type, self.cloud)
@@ -335,14 +336,15 @@ class BaseDNSController(BaseController):
                       self.cloud, exc)
             raise CloudUnavailableError(exc=exc)
         except ZoneDoesNotExistError as exc:
-            log.warning("No zone found for %s in: %s ", zone_id, self.cloud)
+            log.warning("No zone found for %s in: %s ", zone.zone_id, 
+                        self.cloud)
             raise ZoneNotFoundError(exc=exc)
         except Exception as exc:
             log.exception("Error while running create_record on %s",
                           self.cloud)
             raise CloudUnavailableError(exc=exc)
 
-    def _create_record__prepare_args(self, name, data, ttl):
+    def _create_record__prepare_args(self, zone, name, data, ttl):
         """
         This is a private method that should be implemented for each specific
         provider depending on how they expect the record data.

@@ -59,19 +59,20 @@ def test_create_zone(cloud):
     type = 'master'
     ttl = 3600
 
-    __num_zones__ = len(Zone.objects(deleted=None))
+    __num_zones__ = len(Zone.objects(cloud=cloud, deleted=None))
+    print "Zones initially %d" % __num_zones__
     __num_records__ = len(Record.objects(deleted=None))
     print "**** Create DNS zone with domain %s" % domain
     cloud.ctl.dns.create_zone(domain, type, ttl)
 
-    zones = Zone.objects(owner=cloud.owner, deleted=None)
+    zones = Zone.objects(deleted=None)
     for zone in zones:
         if zone.domain == 'domain.com.':
             __zone_id__ = zone.id
             break
 
     if __zone_id__:
-        if __num_zones__ == len(Zone.objects(deleted=None)) -1:
+        if __num_zones__ == len(Zone.objects(cloud=cloud, deleted=None)) -1:
             print "**DNS zone created succesfully on the provide and on the DB"
             __num_zones__ += 1
             print "__num_zones__: %d" % __num_zones__
@@ -88,6 +89,7 @@ def test_list_zones(cloud, load_staging_l_zones):
     global __num_zones__
 
     response = cloud.ctl.dns.list_zones()
+    __num_zones__ = len(Zone.objects(cloud=cloud, deleted=None))
     print "Num zones response: %d" % len(response)
     if len(response) == __num_zones__:
         print "Success, we have %d zones" % len(response)
@@ -179,12 +181,11 @@ def test_delete_zone(cloud):
     Testing the deletion of a particular DNS zone
     """
     global __zone_id__
-    # zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
-    zones = Zone.objects(owner=cloud.owner, domain='domain.com.')
-    for zone in zones:
-        try:
-            zone.ctl.delete_zone()
-            print "DNS Zone %s deleted successfully at: %s" % \
-            (zone.domain, zone.deleted)
-        except Exception:
-            print "Failed, cannot delete Zone: %s/%s" % (zone.zone_id, zone.domain)
+    zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
+    # zones = Zone.objects(owner=cloud.owner, domain='domain.com.')
+    try:
+        zone.ctl.delete_zone()
+        print "DNS Zone %s deleted successfully at: %s" % \
+        (zone.domain, zone.deleted)
+    except Exception:
+        print "Failed, cannot delete Zone: %s/%s" % (zone.zone_id, zone.domain)
