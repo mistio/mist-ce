@@ -149,6 +149,8 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             msg = "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title, cloud_id)
             msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name, node.id)
 
+            hostname = 'machine1.test.io'
+
             if hostname:
                 try:
                     # split hostname in dot separated parts
@@ -180,11 +182,10 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                                 kwargs['ttl'] = None
                                 record = Record.add(zone=zone, id='', **kwargs)
                     hostname = '.'.join((record.name, record.zone.domain))
-                    log_event(action='zone.ctl.create_record',
-                              hostname=hostname, **log_dict)
+                    log_event(action='Record.add', hostname=hostname,
+                              **log_dict)
                 except Exception as exc:
-                    log_event(action='zone.ctl.create_record',
-                              error=str(exc), **log_dict)
+                    log_event(action='Record.add', error=str(exc), **log_dict)
 
             error = False
             if script_id:

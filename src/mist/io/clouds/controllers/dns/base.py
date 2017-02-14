@@ -5,10 +5,8 @@ The `BaseDNSController` is a sub-controller, which is set as an attribute to a
 with libcloud's DNS API.
 
 """
-import re
 import ssl
 import logging
-import datetime
 
 import mongoengine as me
 

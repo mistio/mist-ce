@@ -176,8 +176,8 @@ class Record(me.Document):
         # We need to be checking the rdata based on the type of record
 
     def __str__(self):
-        return 'Record %s (name:%s, type:%s) of %s' % (self.id, self.name,
-                                                       self.type, self.owner)
+        return 'Record %s (name:%s, type:%s) of %s' % \
+            (self.id, self.name, self.type, self.zone.domain)
 
     def as_dict(self):
         """ Return a dict with the model values."""
