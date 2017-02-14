@@ -53,27 +53,27 @@ def test_create_zone(cloud):
     """
     global __zone_id__
     global __num_zones__
-    global __num_records__
 
-    domain = "domain.com"
-    type = 'master'
-    ttl = 3600
+    kwargs = {}
+    kwargs['domain'] = 'domain.com'
+    kwargs['type'] = 'master'
+    kwargs['ttl'] = 172800
+    kwargs['extra'] = {}
 
-    __num_zones__ = len(Zone.objects(cloud=cloud, deleted=None))
+    __num_zones__ = len(Zone.objects(cloud=cloud))
     print "Zones initially %d" % __num_zones__
-    __num_records__ = len(Record.objects(deleted=None))
-    print "**** Create DNS zone with domain %s" % domain
-    cloud.ctl.dns.create_zone(domain, type, ttl)
+    print "**** Create DNS zone with domain %s" % kwargs['domain']
+    Zone.add(owner=cloud.owner, cloud=cloud, id='', **kwargs)
 
-    zones = Zone.objects(deleted=None)
+    zones = Zone.objects()
     for zone in zones:
         if zone.domain == 'domain.com.':
             __zone_id__ = zone.id
             break
 
     if __zone_id__:
-        if __num_zones__ == len(Zone.objects(cloud=cloud, deleted=None)) -1:
-            print "**DNS zone created succesfully on the provide and on the DB"
+        if __num_zones__ == len(Zone.objects(cloud=cloud)) -1:
+            print "**DNS zone created succesfully on the provider and the DB"
             __num_zones__ += 1
             print "__num_zones__: %d" % __num_zones__
         else:
@@ -89,7 +89,7 @@ def test_list_zones(cloud, load_staging_l_zones):
     global __num_zones__
 
     response = cloud.ctl.dns.list_zones()
-    __num_zones__ = len(Zone.objects(cloud=cloud, deleted=None))
+    __num_zones__ = len(Zone.objects(cloud=cloud))
     print "Num zones response: %d" % len(response)
     if len(response) == __num_zones__:
         print "Success, we have %d zones" % len(response)
@@ -116,16 +116,20 @@ def test_create_record(cloud):
     global __num_records__
     zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
 
-    name = "gogogo"
-    type = "A"
-    data = "1.2.3.4"
-    ttl = 172800
-    print "**** Create type %s DNS record with name %s" % (type, name)
-    zone.ctl.create_record(name, type, data, ttl)
+    kwargs = {}
+    kwargs['name'] = 'blog'
+    kwargs['type'] = 'A'
+    kwargs['data'] = '1.2.3.4'
+    kwargs['ttl'] = 172800
+
+    print "**** Create type %s DNS record with name %s" % \
+        (kwargs['type'], kwargs['name'])
+    Record.add(zone, id='', **kwargs)
     print "**** DNS record created succesfully"
     record = Record.objects.get(zone=zone, type='A')
     __record_id__ = record.id
-    __num_records__ += 1
+    __num_records__ = 1
+    print "Num records %d" % __num_records__
 
 
 def test_list_records(cloud, load_staging_l_records):
@@ -134,17 +138,20 @@ def test_list_records(cloud, load_staging_l_records):
     """
     global __zone_id__
     global __num_records__
-    # zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
-    zones = Zone.objects(owner=cloud.owner, domain='domain.com.')
+    zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
 
-    for zone in zones:
-        records = zone.ctl.list_records()
-        print len(records)
+    records = zone.ctl.list_records()
+    print len(records)
 
-    if len(records) == __num_records__:
+    if len(records) == __num_records__ + 2:
         print "List Records success"
     else:
         raise Exception
+
+    # zones = Zone.objects(owner=cloud.owner, domain='domain.com.')
+    # for zone in zones:
+    #     records = zone.ctl.list_records()
+    #     print len(records)
 
         # if cloud.ctl.provider == "ec2":
         #     dnsprovider = "route53"
@@ -161,19 +168,24 @@ def test_delete_record(cloud):
     """
     global __zone_id__
     global __record_id__
-    #zone = Zone.objects(owner=cloud.owner, id=__zone_id__)
-    zones = Zone.objects(owner=cloud.owner, domain='domain.com.')
-    print "%d zones" % len(zones)
-    # record = Record.objects.get(zone=zone, id=__record_id__)
-    for zone in zones:
-        records = Record.objects(zone=zone, type='A')
-        print "%d records" % len(records)
-        for record in records:
-            try:
-                record.ctl.delete_record()
-            except Exception:
-                print "can't delete record: %s" % record.record_id
+    zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
+    record = Record.objects.get(zone=zone, id=__record_id__)
+    try:
+        record.ctl.delete_record()
+    except Exception:
+        print "can't delete record: %s" % record.record_id
     print "**** Record deleted successfully"
+
+    # zones = Zone.objects(owner=cloud.owner, domain='domain.com.')
+    # print "We got %d zones" % len(zones)
+    # for zone in zones:
+    #     records = Record.objects(zone=zone, type='A')
+    #     for record in records:
+    #         try:
+    #             record.ctl.delete_record()
+    #         except Exception:
+    #             print "can't delete record: %s" % record.record_id
+    #         print "**** Record deleted successfully"
 
 
 def test_delete_zone(cloud):
@@ -182,10 +194,18 @@ def test_delete_zone(cloud):
     """
     global __zone_id__
     zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
-    # zones = Zone.objects(owner=cloud.owner, domain='domain.com.')
     try:
         zone.ctl.delete_zone()
-        print "DNS Zone %s deleted successfully at: %s" % \
-        (zone.domain, zone.deleted)
+        print "*** DNS Zone %s deleted successfully" % zone.domain
     except Exception:
         print "Failed, cannot delete Zone: %s/%s" % (zone.zone_id, zone.domain)
+
+    # zones = Zone.objects(owner=cloud.owner, domain='domain.com.')
+    # for zone in zones:
+    #     try:
+    #         zone.ctl.delete_zone()
+    #         print "DNS Zone %s deleted successfully" % \
+    #         (zone.domain)
+    #     except Exception as exc:
+    #         print "Failed, cannot delete Zone: %s/%s because %s" % \
+    #             (zone.zone_id, zone.domain, exc)

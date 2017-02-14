@@ -47,7 +47,7 @@ class Zone(me.Document):
         self.ctl = ZoneController(self)
 
     @classmethod
-    def add(cls, owner, cloud, domain, id='', **kwargs):
+    def add(cls, owner, cloud, id='', **kwargs):
         """Add Zone
 
         This is a class method, meaning that it is meant to be called on the
@@ -65,17 +65,17 @@ class Zone(me.Document):
           should match the extra fields of the particular zone type.
 
         """
-        if not domain:
+        if not kwargs['domain']:
             raise RequiredParameterMissingError('domain')
         #assert isinstance(cloud, Cloud)
         if not cloud or not isinstance(cloud, Cloud):
             raise BadRequestError('cloud')
         if not owner or not isinstance(owner, Organization):
             raise BadRequestError('owner')
-        zone = cls(owner=owner, cloud=cloud, domain=domain)
+        zone = cls(owner=owner, cloud=cloud, domain=kwargs['domain'])
         if id:
             zone.id = id
-        zone.ctl.create_zone(domain, **kwargs)
+        zone.ctl.create_zone(**kwargs)
         return zone
 
     def as_dict(self):
@@ -96,7 +96,7 @@ class Zone(me.Document):
             self.domain += "."
 
     def __str__(self):
-        return '%s zone %s (%s) of %s' % (self, self.domain, self.id,
+        return 'Zone %s (%s/%s) of %s' % (self.id, self.zone_id, self.domain,
                                           self.owner)
 
 
@@ -111,16 +111,11 @@ class Record(me.Document):
     record_id = me.StringField(required=True)
     name = me.StringField(required=True)
     type = me.StringField(required=True)
-    # The default empty string value here is a hack since even though this
-    # field is required we only have that information after a provider
-    # specific postparsing of the returned data from the providers.
     rdata = me.ListField(required=True)
-    data = me.DictField()
     extra = me.DictField()
     ttl = me.IntField(default=0)
     # This ensures that any records that are under a zone are also deleted when
-    # we delete the zone. However this should only apply for the required
-    # records as when there are extra the provider will not allow it.
+    # we delete the zone.
     zone = me.ReferenceField(Zone, required=True,
                              reverse_delete_rule=me.CASCADE)
 
@@ -178,10 +173,11 @@ class Record(me.Document):
         """Overriding the default clean method to implement param checking"""
         if not re.match(".*\.$", self.name):
             self.name += "."
+        # We need to be checking the rdata based on the type of record
 
     def __str__(self):
-        return '%s record %s (%s) of type %s under zone %s' % \
-            (self, self.name, self.id, self.type, self.zone)
+        return 'Record %s (name:%s, type:%s) of %s' % (self.id, self.name,
+                                                       self.type, self.owner)
 
     def as_dict(self):
         """ Return a dict with the model values."""
@@ -190,7 +186,7 @@ class Record(me.Document):
             'record_id': self.record_id,
             'name': self.name,
             'type': self.type,
-            'data': self.data,
+            'rdata': self.rdata,
             'ttl': self.ttl,
             'extra': self.extra,
             'zone': self.zone.id

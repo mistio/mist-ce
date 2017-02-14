@@ -10,6 +10,8 @@ import ssl
 import logging
 import datetime
 
+import mongoengine as me
+
 from mist.io.clouds.controllers.base import BaseController
 
 from libcloud.common.types import InvalidCredsError
@@ -19,6 +21,10 @@ from mist.io.exceptions import CloudUnavailableError
 from mist.io.exceptions import CloudUnauthorizedError
 from mist.io.exceptions import ZoneNotFoundError
 from mist.io.exceptions import RecordNotFoundError
+from mist.io.exceptions import BadRequestError
+from mist.io.exceptions import RecordExistsError
+from mist.io.exceptions import ZoneExistsError
+
 
 log = logging.getLogger(__name__)
 
@@ -86,8 +92,16 @@ class BaseDNSController(BaseController):
                          pr_zone.id, pr_zone.domain)
                 zone = Zone(cloud=self.cloud, owner=self.cloud.owner,
                             zone_id=pr_zone.id)
+            zone.domain = pr_zone.domain
+            zone.type = pr_zone.type
+            zone.ttl = pr_zone.ttl
+            zone.extra = pr_zone.extra
             zone.save()
             zones.append(zone)
+
+        # Delete any zones in the DB that were not returned by the provider
+        # meaning they were deleted otherwise.
+        Zone.objects(cloud=self.cloud, id__nin=[z.id for z in zones]).delete()
 
         # Format zone information.
         return [zone.as_dict() for zone in zones]
@@ -122,32 +136,36 @@ class BaseDNSController(BaseController):
         Public method to return a list of  records under a specific zone.
         """
         # Fetch records from libcloud connection.
-        nodes = self._list_records__fetch_records(zone.zone_id)
+        pr_records = self._list_records__fetch_records(zone.zone_id)
 
         # TODO: Adding here for circular dependency issue. Need to fix this.
         from mist.io.dns.models import Record
-        for node in nodes:
+        for pr_record in pr_records:
             try:
-                record = Record.objects.get(zone=zone, record_id=node.id)
+                record = Record.objects.get(zone=zone, record_id=pr_record.id)
             except Record.DoesNotExist:
-                log.info("Record: %s not in the database, creating.", node.id)
-                record = Record(record_id=node.id, name=node.name,
-                                type=node.type, ttl=node.ttl, zone=zone)
+                log.info("Record: %s not in the database, creating.",
+                         pr_record.id)
+                record = Record(record_id=pr_record.id, zone=zone)
             # We need to check if any of the information returned by the
             # provider is different than what we have in the DB
-            if record['name'] != node.name:
-                record['name'] = node.name
-            if record['type'] != node.type:
-                record['type'] = node.type
-            if record['ttl'] != node.ttl:
-                record['ttl'] = node.ttl
-            self._list__records_postparse_data(node, record)
+            record.name = pr_record.name
+            record.type = pr_record.type
+            record.ttl = pr_record.ttl
+            record.extra = pr_record.extra
+
+            self._list__records_postparse_data(pr_record, record)
             record.save()
 
         # There's a chance that we have received duplicate records as for
         # example for Route NS records, we want to get the final records result
         # set from the DB
-        records = Record.objects(zone=zone, deleted=None)
+        records = Record.objects(zone=zone)
+
+        # Then delete any records that are in the DB for this zone but were not
+        # returned by the list_records() method meaning the were deleted in the
+        # DNS provider.
+        Record.objects(zone=zone, id__nin=[r.id for r in records]).delete()
 
         # Format zone information.
         return [record.as_dict() for record in records]
@@ -181,7 +199,7 @@ class BaseDNSController(BaseController):
 
     def _list__records_postparse_data(self, record, model):
         """Postparse the records returned from the provider"""
-        raise NotImplementedError()
+        return
 
     def delete_record(self, record):
         """
@@ -214,10 +232,8 @@ class BaseDNSController(BaseController):
         """
         Public method called to delete the specific zone for the provided id.
         """
-        # TODO: Adding here for circular dependency issue. Need to fix this.
-        from mist.io.dns.models import Record
         self._delete_zone__for_cloud(zone.zone_id)
-        zone.delete( )
+        zone.delete()
 
     def _delete_zone__for_cloud(self, zone_id):
         """
@@ -232,22 +248,38 @@ class BaseDNSController(BaseController):
             log.exception("Error while running delete_zone on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
-    def create_zone(self, domain, type='master', ttl=None, extra=None):
+    def create_zone(self, zone, **kwargs):
         """
         This is the public method that is called to create a new DNS zone.
         """
-        # TODO: Adding here for circular dependency issue. Need to fix this.
-        from mist.io.dns.models import Zone
 
-        node = self._create_zone__for_cloud(domain, type, ttl, extra)
-        if node:
-            zone = Zone(cloud=self.cloud, owner=self.cloud.owner,
-                        zone_id=node.id, domain=node.domain,
-                        type=node.type, ttl=node.ttl,
-                        extra=node.extra)
-            zone.save()
+        pr_zone = self._create_zone__for_cloud(**kwargs)
+        if pr_zone:
+            # Set fields to cloud model and perform early validation.
+            zone.zone_id = pr_zone.id
+            zone.domain = pr_zone.domain
+            zone.type = pr_zone.type
+            zone.ttl = pr_zone.ttl
+            zone.extra = pr_zone.extra
+            try:
+                zone.validate(clean=True)
+            except me.ValidationError as exc:
+                log.error("Error updating %s: %s", zone, exc.to_dict())
+                raise BadRequestError({'msg': exc.message,
+                                       'errors': exc.to_dict()})
+            # Attempt to save.
+            try:
+                zone.save()
+            except me.ValidationError as exc:
+                log.error("Error updating %s: %s", zone, exc.to_dict())
+                raise BadRequestError({'msg': exc.message,
+                                       'errors': exc.to_dict()})
+            except me.NotUniqueError as exc:
+                log.error("Zone %s not unique error: %s", zone, exc)
+                raise ZoneExistsError()
 
-    def _create_zone__for_cloud(self, domain, type, ttl, extra):
+
+    def _create_zone__for_cloud(self, **kwargs):
         """
         This is the private method called to create a record under a specific
         zone. The underlying functionality is implement in the same way for
@@ -256,7 +288,7 @@ class BaseDNSController(BaseController):
         ----
         """
         try:
-            zone = self.connection.create_zone(domain, type, ttl, extra)
+            zone = self.connection.create_zone(**kwargs)
             log.info("Zone %s created successfully for %s.",
                      zone.domain, self.cloud)
             return zone
@@ -272,24 +304,40 @@ class BaseDNSController(BaseController):
             log.exception("Error while running create_zone on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
-    def create_record(self, zone, name, type, data, ttl):
+    def create_record(self, record, **kwargs):
         """
         This is the public method that is called to create a new DNS record
         under a specific zone.
         """
-        # TODO: Adding here for circular dependency issue. Need to fix this.
-        from mist.io.dns.models import Record
 
-        node = self._create_record__for_zone(zone, name, type, data,
-                                             ttl)
-        record = Record(record_id=node.id, name=node.name,
-                        type=node.type, ttl=node.ttl, zone=zone)
-        self._list__records_postparse_data(node, record)
-        record.save()
+        self._create_record__prepare_args(record.zone, kwargs)
+        pr_record = self._create_record__for_zone(record.zone, **kwargs)
+        if pr_record:
+            self._list__records_postparse_data(pr_record, record)
+            # Set fields to cloud model and perform early validation.
+            record.record_id = pr_record.id
+            record.name = pr_record.name
+            record.type = pr_record.type
+            record.ttl = pr_record.ttl
+            record.extra = pr_record.extra
+            try:
+                record.validate(clean=True)
+            except me.ValidationError as exc:
+                log.error("Error updating %s: %s", record, exc.to_dict())
+                raise BadRequestError({'msg': exc.message,
+                                       'errors': exc.to_dict()})
+            # Attempt to save.
+            try:
+                record.save()
+            except me.ValidationError as exc:
+                log.error("Error updating %s: %s", record, exc.to_dict())
+                raise BadRequestError({'msg': exc.message,
+                                       'errors': exc.to_dict()})
+            except me.NotUniqueError as exc:
+                log.error("Record %s not unique error: %s", record, exc)
+                raise RecordExistsError()
 
-
-
-    def _create_record__for_zone(self, zone, name, type, data, ttl):
+    def _create_record__for_zone(self, zone, **kwargs):
         """
         This is the private method called to create a record under a specific
         zone. The underlying functionality is implement in the same way for
@@ -297,11 +345,9 @@ class BaseDNSController(BaseController):
         this.
         ----
         """
-        name, data, extra = self._create_record__prepare_args(zone, name, data,
-                                                              ttl)
         try:
             zone = self.connection.get_zone(zone.zone_id)
-            record = zone.create_record(name, type, data, extra)
+            record = zone.create_record(**kwargs)
             log.info("Type %s record created successfully for %s.",
                      record.type, self.cloud)
             return record
@@ -314,7 +360,7 @@ class BaseDNSController(BaseController):
                       self.cloud, exc)
             raise CloudUnavailableError(exc=exc)
         except ZoneDoesNotExistError as exc:
-            log.warning("No zone found for %s in: %s ", zone.zone_id, 
+            log.warning("No zone found for %s in: %s ", zone.zone_id,
                         self.cloud)
             raise ZoneNotFoundError(exc=exc)
         except Exception as exc:
@@ -322,10 +368,10 @@ class BaseDNSController(BaseController):
                           self.cloud)
             raise CloudUnavailableError(exc=exc)
 
-    def _create_record__prepare_args(self, zone, name, data, ttl):
+    def _create_record__prepare_args(self, zone, kwargs):
         """
         This is a private method that should be implemented for each specific
         provider depending on how they expect the record data.
         ---
         """
-        raise NotImplementedError()
+        return

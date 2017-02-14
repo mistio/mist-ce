@@ -22,7 +22,6 @@ controller, using the `ctl` abbreviation, like this:
 
 """
 
-import re
 import logging
 
 from libcloud.dns.types import Provider
@@ -42,20 +41,18 @@ class AmazonDNSController(BaseDNSController):
         return get_driver(Provider.ROUTE53)(self.cloud.apikey,
                                             self.cloud.apisecret)
 
-    def _create_record__prepare_args(self, zone, name, data, ttl):
+    def _create_record__prepare_args(self, zone, kwargs):
         """
         This is a private
         ---
         """
-        extra = {'ttl': ttl}
-        return name, data, extra
+        kwargs['extra'] = {'ttl': kwargs.pop('ttl', 0)}
 
-    def _list__records_postparse_data(self, node, record):
+    def _list__records_postparse_data(self, pr_record, record):
         """Get the provider specific information into the Mongo model"""
-        if node.data not in record['rdata']:
-            record['rdata'].append(node.data)
-        record['data'] = {'rrdata': record['rdata']}
-        record['extra'] = node.extra
+        if pr_record.data not in record['rdata']:
+            record.rdata.append(pr_record.data)
+
 
 class GoogleDNSController(BaseDNSController):
     """
@@ -66,21 +63,18 @@ class GoogleDNSController(BaseDNSController):
                                            self.cloud.private_key,
                                            project=self.cloud.project_id)
 
-    def _create_record__prepare_args(self, zone, name, data, ttl):
+    def _create_record__prepare_args(self, zone, kwargs):
         """
         This is a private
         ---
         """
-        if not re.match(".*\.$", name):
-            name += "."
-        name += zone.domain
-        extra = None
-        record_data = {'ttl': ttl, 'rrdatas': []}
-        record_data['rrdatas'].append(data)
-        return name, record_data, extra
+        if not kwargs['name'].endswith('.'):
+            kwargs['name'] += "."
+        kwargs['name'] += zone.domain
+        kwargs['extra'] = None
+        kwargs['data'] = {'ttl': kwargs['ttl'], 'rrdatas': []}
+        kwargs['data']['rrdatas'].append(kwargs['data'])
 
-    def _list__records_postparse_data(self, node, record):
+    def _list__records_postparse_data(self, pr_record, record):
         """Get the provider specific information into the Mongo model"""
-        record['rdata'] = node.data['rrdatas']
-        record['data'] = node.data
-        record['extra'] = node.extra
+        record.rdata = pr_record.data['rrdatas']

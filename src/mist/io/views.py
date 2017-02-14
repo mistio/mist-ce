@@ -866,14 +866,7 @@ def create_dns_zone(request):
     # Should be an integer value.
     # extra is a dictionary with extra details. Defaults to None.
     params = params_from_request(request)
-    domain = params.get('domain', '')
-    if not domain:
-        raise RequiredParameterMissingError('domain')
-    type = params.get('type', '')
-    ttl = params.get('ttl', 0)
-    extra = params.get('extra', '')
-
-    return cloud.ctl.dns.create_zone(domain, type, ttl, extra)
+    return Zone.add(owner=cloud.owner, cloud=cloud, id='', **params)
 
 @view_config(route_name='api_v1_records', request_method='POST', renderer='json')
 def create_dns_record(request):
@@ -898,7 +891,7 @@ def create_dns_record(request):
     # Get the params and create the new record
     params = params_from_request(request)
 
-    return Record.add(zone, **params)
+    return Record.add(zone, id='', **params)
 
 @view_config(route_name='api_v1_zone', request_method='DELETE', renderer='json')
 def delete_dns_zone(request):

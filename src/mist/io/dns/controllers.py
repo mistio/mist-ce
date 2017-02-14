@@ -7,9 +7,9 @@ class ZoneController(object):
         """
         self.zone = zone
 
-    def create_zone(self, domain, **kwargs):
+    def create_zone(self, **kwargs):
         """Create a zone under the specific cloud"""
-        return self.zone.cloud.ctl.dns.create_zone(domain, **kwargs)
+        return self.zone.cloud.ctl.dns.create_zone(self.zone, **kwargs)
 
     def list_records(self):
         """Wrapper for the DNS cloud controller list_records() functionality
@@ -29,11 +29,12 @@ class RecordController(object):
         """
         self.record = record
 
-    def create_record(self, name, type, data, ttl):
+    def create_record(self, **kwargs):
         """Wrapper for the DNS cloud controller create_record() functionality
         """
-        return self.record.cloud.ctl.dns.create_record(self.record.zone, name,
-                                                       type, data, ttl)
+        return self.record.zone.cloud.ctl.dns.create_record(self.record,
+                                                            **kwargs)
 
     def delete_record(self):
+        """Wrapper for the delete_record DNSController functionality."""
         return self.record.zone.cloud.ctl.dns.delete_record(self.record)

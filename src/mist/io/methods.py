@@ -1130,12 +1130,6 @@ def destroy_machine(user, cloud_id, machine_id):
 
     machine.ctl.destroy()
 
-    # Delete any DNS records associated with this machine
-    record = Record.objects(machine=machine)
-    # We only want to delete the record when it's assi
-    if len(record) == 1:
-        record.ctl.delete()
-
 
 def ssh_command(owner, cloud_id, machine_id, host, command,
                 key_id=None, username=None, password=None, port=22):
