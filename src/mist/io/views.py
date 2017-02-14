@@ -27,7 +27,7 @@ from mist.io.machines.models import Machine
 from mist.io.networks.models import Network, Subnet
 
 from mist.core import config
-import mist.core.methods
+
 # except ImportError:
 #     from mist.io import config
 #     from mist.io.helpers import user_from_request
@@ -49,7 +49,7 @@ from mist.io.helpers import transform_key_machine_associations
 from mist.io.helpers import view_config
 
 from mist.io.auth.methods import auth_context_from_request
-from mist.io.auth.methods import user_from_request
+from mist.io.auth.methods import user_from_request, session_from_request
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -1872,6 +1872,18 @@ def probe(request):
                     'result': ret
                  })
     return ret
+
+
+@view_config(route_name='api_v1_ping', request_method=('GET', 'POST'), renderer='json')
+def ping(request):
+    """
+    Check that an api token is correct.
+    ---
+    """
+    user = user_from_request(request)
+    if isinstance(session_from_request(request), SessionToken):
+        raise BadRequestError('This call is for users with api tokens')
+    return {'hello': user.email}
 
 
 @view_config(route_name='api_v1_monitoring', request_method='GET', renderer='json')
