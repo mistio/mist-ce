@@ -18,7 +18,9 @@ from mist.io.exceptions import PolicyUnauthorizedError, UnauthorizedError
 from mist.io.helpers import get_stories
 from mist.io.helpers import view_config, params_from_request
 
-from mist.io.tag.methods import add_tags_to_resource, resolve_id_and_set_tags
+from mist.io.methods import filter_list_scripts
+
+from mist.io.tag.methods import add_tags_to_resource
 
 OK = Response("OK", 200)
 
@@ -32,7 +34,7 @@ def list_scripts(request):
     ---
     """
     auth_context = auth_context_from_request(request)
-    scripts_list = mist.io.methods.filter_list_scripts(auth_context)
+    scripts_list = filter_list_scripts(auth_context)
     return scripts_list
 
 
@@ -81,9 +83,10 @@ def add_script(request):
 
     kwargs = {}
 
-    for key in ('name', 'script', 'location_type', 'entrypoint', 'exec_type',
-                'description', 'extra','script_inline', 'script_url',
-                'script_github'):
+    for key in ('name', 'script', 'location_type', 'entrypoint',
+                'exec_type', 'description', 'extra','script_inline',
+                'script_url', 'script_github'
+                ):
         kwargs[key] = params.get(key)   # TODO maybe change this
 
     kwargs['script'] = choose_script_from_params(kwargs['location_type'],
@@ -124,7 +127,7 @@ def add_script(request):
 def choose_script_from_params(location_type, script,
                               script_inline, script_url,
                               script_github):
-    if script != '' and script != None:
+    if script != '' and script is not None:
         return script
 
     if location_type == 'github':
