@@ -25,6 +25,7 @@ from mist.io.scripts.models import CollectdScript
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.io.networks.models import Network, Subnet
+from mist.io.auth.models import SessionToken
 
 from mist.core import config
 
