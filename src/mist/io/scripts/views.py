@@ -84,7 +84,7 @@ def add_script(request):
     kwargs = {}
 
     for key in ('name', 'script', 'location_type', 'entrypoint',
-                'exec_type', 'description', 'extra','script_inline',
+                'exec_type', 'description', 'extra', 'script_inline',
                 'script_url', 'script_github'
                 ):
         kwargs[key] = params.get(key)   # TODO maybe change this
