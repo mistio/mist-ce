@@ -849,10 +849,8 @@ def deploy_collectd(owner, cloud_id, machine_id, extra_vars, job_id='',
     # FIXME
     from mist.io.methods import deploy_collectd
 
-    if isinstance(owner, basestring) and '@' in owner:
-        owner = User.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
+    assert isinstance(owner, Organization)
+
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
     machine.monitoring.installation_status.state = 'installing'
@@ -1221,12 +1219,8 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
     import mist.io.shell
     from mist.io.methods import list_machines, notify_admin, notify_user
 
-    if not isinstance(owner, Owner):
-        if isinstance(owner, basestring):
-            if '@' in owner:
-                owner = User.objects.get(email=owner)
-            else:
-                owner = Owner.objects.get(id=owner)
+    assert isinstance(owner, Organization)
+
     ret = {
         'owner_id': owner.id,
         'job_id': job_id or uuid.uuid4().hex,
