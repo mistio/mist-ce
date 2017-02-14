@@ -1881,6 +1881,8 @@ def check_monitoring(request):
     Ask the mist.io service if monitoring is enabled for this machine.
     ---
     """
+    raise NotImplementedError()
+
     user = user_from_request(request)
     ret = methods.check_monitoring(user)
     return ret
@@ -1921,6 +1923,8 @@ def update_monitoring(request):
         type: string
       type: array
     """
+    raise NotImplementedError()
+
     user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
@@ -2017,6 +2021,8 @@ def get_stats(request):
       required: false
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
 
@@ -2059,6 +2065,8 @@ def find_metrics(request):
       required: true
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     auth_context = auth_context_from_request(request)
@@ -2092,6 +2100,8 @@ def assoc_metric(request):
       description: ' Metric_id '
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
@@ -2130,6 +2140,8 @@ def disassoc_metric(request):
       description: ' Metric_id '
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
@@ -2180,6 +2192,8 @@ def update_metric(request):
         unit'
       type: string
     """
+    raise NotImplementedError()
+
     metric_id = request.matchdict['metric']
     params = params_from_request(request)
     machine_id = params.get('machine_id')
@@ -2241,6 +2255,8 @@ def deploy_plugin(request):
       default: gauge
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     plugin_id = request.matchdict['plugin']
@@ -2320,6 +2336,8 @@ def undeploy_plugin(request):
       required: true
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     plugin_id = request.matchdict['plugin']
@@ -2368,6 +2386,8 @@ def update_rule(request):
     Creates or updates a rule.
     ---
     """
+    raise NotImplementedError()
+
     user = user_from_request(request)
     params = params_from_request(request)
     try:
@@ -2399,6 +2419,8 @@ def delete_rule(request):
       required: true
       type: string
     """
+    raise NotImplementedError()
+
     user = user_from_request(request)
     try:
         ret = requests.delete(
