@@ -138,3 +138,6 @@ def add_routes(configurator):
 
     configurator.add_route('api_v1_schedules', '/api/v1/schedules')
     configurator.add_route('api_v1_schedule', '/api/v1/schedules/{schedule_id}')
+
+    configurator.add_route('api_v1_tokens', '/api/v1/tokens')
+    configurator.add_route('api_v1_sessions', '/api/v1/sessions')
