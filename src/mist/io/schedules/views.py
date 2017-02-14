@@ -12,7 +12,9 @@ from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import view_config, params_from_request
 
-from mist.io.tag.methods import add_tags_to_resource, resolve_id_and_set_tags
+from mist.io.methods import filter_list_schedules
+
+from mist.io.tag.methods import resolve_id_and_set_tags
 
 
 OK = Response("OK", 200)
@@ -96,7 +98,7 @@ def list_schedules_entries(request):
     auth_context = auth_context_from_request(request)
 
     # SEC
-    schedules_list = mist.io.methods.filter_list_schedules(auth_context)
+    schedules_list = filter_list_schedules(auth_context)
 
     return [schedule for schedule in schedules_list]
 
