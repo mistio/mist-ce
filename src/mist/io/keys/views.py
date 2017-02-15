@@ -3,7 +3,7 @@ from pyramid.response import Response
 
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
-from mist.io.keys.models import SignedSSHKey,SSHKey, Key
+from mist.io.keys.models import SignedSSHKey, SSHKey, Key
 
 from mist.io.auth.methods import auth_context_from_request
 
