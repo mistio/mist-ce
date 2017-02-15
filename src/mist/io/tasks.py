@@ -34,7 +34,7 @@ from mist.io.machines.models import Machine
 from mist.io.scripts.models import Script
 from mist.io.schedules.models import Schedule
 
-from mist.core import config
+from mist.core import config  # TODO handle this for open.source
 
 celery_cfg = 'mist.core.celery_config'
 
@@ -84,7 +84,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
     from mist.io.methods import notify_user, notify_admin
     from mist.io.methods import create_dns_a_record
 
-    from mist.core.methods import enable_monitoring
+    from mist.core.methods import enable_monitoring  # TODO handle for open.so
 
     job_id = job_id or uuid.uuid4().hex
     if owner.find("@") != -1:
@@ -232,7 +232,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             if schedule:
                 try:
                     name = schedule.pop('name') + '_' + machine_id
-                    from mist.core.rbac.methods import AuthContext
+                    from mist.core.rbac.methods import AuthContext  # TODO
                     auth_context = AuthContext.deserialize(
                         schedule.pop('auth_context'))
                     # TODO add machines
@@ -1349,3 +1349,14 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
             title, "%s\n\n%s" % (ret['stdout'], ret['error']), team = 'dev'
         )
     return ret
+
+
+@app.task
+def revoke_token(token):
+    from mist.io.auth.models import AuthToken
+    auth_token = AuthToken.objects.get(token=token)
+    auth_token.invalidate()
+    auth_token.save()
+
+
+
