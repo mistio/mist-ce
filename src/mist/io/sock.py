@@ -40,6 +40,9 @@ from mist.io.exceptions import PolicyUnauthorizedError
 from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
+from mist.io.clouds.methods import filter_list_clouds
+from mist.io.keys.methods import filter_list_keys
+
 from mist.core import methods as core_methods
 from mist.core.orchestration import methods as orchestration_methods
 from mist.core.rbac import methods as rbac_methods
@@ -273,7 +276,7 @@ class MainConnection(MistConnection):
                   core_methods.filter_list_tags(self.auth_context))
 
     def list_keys(self):
-        self.send('list_keys', methods.filter_list_keys(self.auth_context))
+        self.send('list_keys', filter_list_keys(self.auth_context))
 
     def list_scripts(self):
         self.send('list_scripts', methods.filter_list_scripts(
@@ -298,7 +301,7 @@ class MainConnection(MistConnection):
     def list_clouds(self):
         if config.ACTIVATE_POLLER:
             self.update_poller()
-        self.send('list_clouds', methods.filter_list_clouds(self.auth_context))
+        self.send('list_clouds', filter_list_clouds(self.auth_context))
         clouds = Cloud.objects(owner=self.owner, enabled=True, deleted=None)
         log.info(clouds)
         periodic_tasks = []
