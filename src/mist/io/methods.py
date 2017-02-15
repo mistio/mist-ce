@@ -7,11 +7,9 @@ import json
 import base64
 import requests
 
-import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError, DoesNotExist
 
 from time import time
-from datetime import datetime
 from tempfile import NamedTemporaryFile
 
 from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
@@ -35,7 +33,7 @@ from mist.core import config
 from mist.io.shell import Shell
 from mist.io.helpers import get_temp_file
 from mist.io.helpers import get_auth_header
-from mist.io.helpers import transform_key_machine_associations
+
 from mist.io.exceptions import *
 
 from mist.io.helpers import trigger_session_update
@@ -53,7 +51,7 @@ from mist.io.machines.models import Machine
 from mist.io.scripts.models import Script
 from mist.io.schedules.models import Schedule
 
-from mist.core.vpn.methods import super_ping
+from mist.core.vpn.methods import super_ping  # TODO handle this for open_sourc
 
 import mist.io.clouds.models as cloud_models
 
@@ -63,110 +61,6 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
 log = logging.getLogger(__name__)
-
-
-def add_cloud_v_2(owner, title, provider, params):
-    """Add cloud to owner"""
-
-    # FIXME: Some of these should be explicit arguments, others shouldn't exist
-    fail_on_error = params.pop('fail_on_error',
-                               params.pop('remove_on_error', True))
-    monitoring = params.pop('monitoring', False)
-    params.pop('title', None)
-    params.pop('provider', None)
-    # Find proper Cloud subclass.
-    if not provider:
-        raise RequiredParameterMissingError("provider")
-    log.info("Adding new cloud in provider '%s'", provider)
-    if provider not in cloud_models.CLOUDS:
-        raise BadRequestError("Invalid provider '%s'." % provider)
-    cloud_cls = cloud_models.CLOUDS[provider]  # Class of Cloud model.
-
-    # Add the cloud.
-    cloud = cloud_cls.add(owner, title, fail_on_error=fail_on_error,
-                          fail_on_invalid_params=False, **params)
-    ret = {'cloud_id': cloud.id}
-    if provider == 'bare_metal' and monitoring:
-        # Let's overload this a bit more by also combining monitoring.
-        machine = Machine.objects.get(cloud=cloud)
-        try:
-            from mist.core.methods import enable_monitoring as _en_mon
-        except ImportError:
-            _en_mon = enable_monitoring
-        ret['monitoring'] = _en_mon(
-            owner, cloud.id, machine.machine_id,
-            no_ssh=not (machine.os_type == 'unix' and
-                        machine.key_associations)
-        )
-
-    # SEC
-    owner.mapper.update(cloud)
-
-    log.info("Cloud with id '%s' added succesfully.", cloud.id)
-    trigger_session_update(owner, ['clouds'])
-    return ret
-
-
-def rename_cloud(owner, cloud_id, new_name):
-    """Renames cloud with given cloud_id."""
-
-    log.info("Renaming cloud: %s", cloud_id)
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-    cloud.ctl.rename(new_name)
-    log.info("Succesfully renamed cloud '%s'", cloud_id)
-    trigger_session_update(owner, ['clouds'])
-
-
-def delete_cloud(owner, cloud_id):
-    """Deletes cloud with given cloud_id."""
-
-    log.info("Deleting cloud: %s", cloud_id)
-
-    # if a core/io installation, disable monitoring for machines
-    try:
-        from mist.core.methods import disable_monitoring_cloud
-    except ImportError:
-        # this is a standalone io installation, don't bother
-        pass
-    else:
-        # this a core/io installation, disable directly using core's function
-        log.info("Disabling monitoring before deleting cloud.")
-        try:
-            disable_monitoring_cloud(owner, cloud_id)
-        except Exception as exc:
-            log.warning("Couldn't disable monitoring before deleting cloud. "
-                        "Error: %r", exc)
-
-    try:
-        cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-        cloud.ctl.delete()
-    except Cloud.DoesNotExist:
-        raise NotFoundError('Cloud does not exist')
-
-    log.info("Succesfully deleted cloud '%s'", cloud_id)
-    trigger_session_update(owner, ['clouds'])
-
-
-def delete_key(owner, key_id):
-    """Deletes given key.
-    If key was default, then it checks if there are still keys left
-    and assigns another one as default.
-
-    :param owner:
-    :param key_id:
-    :return:
-    """
-    log.info("Deleting key with id '%s'.", key_id)
-    key = Key.objects.get(owner=owner, id=key_id, deleted=None)
-    default_key = key.default
-    key.update(set__deleted=datetime.utcnow())
-    other_key = Key.objects(owner=owner, id__ne=key_id, deleted=None).first()
-    if default_key and other_key:
-        other_key.default = True
-        other_key.save()
-
-    log.info("Deleted key with id '%s'.", key_id)
-    trigger_session_update(owner, ['keys'])
 
 
 def connect_provider(cloud):
@@ -1181,42 +1075,6 @@ def star_image(owner, cloud_id, image_id):
     return not star
 
 
-def list_clouds(owner):
-    # FIXME: Move import to the top of the file.
-    from mist.io.tag.methods import get_tags_for_resource
-    clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=owner,
-                                                         deleted=None)]
-    for cloud in clouds:
-        # FIXME: cloud must be a mongoengine object FFS!
-        # Also, move into cloud model's as_dict method?
-        cloud['tags'] = get_tags_for_resource(owner, cloud)
-    return clouds
-
-
-def list_keys(owner):
-    """List owner's keys
-    :param owner:
-    :return:
-    """
-    from mist.io.tag.methods import get_tags_for_resource
-    keys = Key.objects(owner=owner, deleted=None)
-    clouds = Cloud.objects(owner=owner, deleted=None)
-    key_objects = []
-    # FIXME: This must be taken care of in Keys.as_dict
-    for key in keys:
-        key_object = {}
-        machines = Machine.objects(cloud__in=clouds,
-                                   key_associations__keypair__exact=key)
-        key_object["id"] = key.id
-        key_object['name'] = key.name
-        key_object["isDefault"] = key.default
-        key_object["machines"] = transform_key_machine_associations(machines,
-                                                                    key)
-        key_object['tags'] = get_tags_for_resource(owner, key)
-        key_objects.append(key_object)
-    return key_objects
-
-
 def list_scripts(owner):
     from mist.io.tag.methods import get_tags_for_resource
     scripts = Script.objects(owner=owner, deleted=None)
@@ -1323,30 +1181,6 @@ def list_projects(owner, cloud_id):
 
 
 # SEC
-def filter_list_clouds(auth_context, perm='read'):
-    """Returns a list of clouds, which is filtered based on RBAC Mappings for
-    non-Owners.
-    """
-    clouds = list_clouds(auth_context.owner)
-    if not auth_context.is_owner():
-        clouds = [cloud for cloud in clouds if cloud['id'] in
-                  auth_context.get_allowed_resources(rtype='clouds')]
-    return clouds
-
-
-# SEC
-def filter_list_keys(auth_context, perm='read'):
-    """Returns of a list of keys. The list is filtered for non-Owners based on
-    the permissions granted.
-    """
-    keys = list_keys(auth_context.owner)
-    if not auth_context.is_owner():
-        keys = [key for key in keys if key['id'] in
-                auth_context.get_allowed_resources(rtype='keys')]
-    return keys
-
-
-# SEC
 def filter_list_machines(auth_context, cloud_id, machines=None, perm='read'):
     """Returns a list of machines.
 
@@ -1392,7 +1226,6 @@ def filter_list_schedules(auth_context, perm='read'):
         schedules = [schedule for schedule in schedules if schedule['id']
                      in auth_context.get_allowed_resources(rtype='schedules')]
     return schedules
-
 
 
 def associate_ip(owner, cloud_id, network_id, ip, machine_id=None, assign=True):
