@@ -116,3 +116,62 @@ def resolve_id_and_delete_tags(owner, rtype, rid, tags, *args, **kwargs):
     """
     resource_obj = get_object_with_id(owner, rid, rtype, *args, **kwargs)
     return remove_tags_from_resource(owner, resource_obj, tags, *args, **kwargs)
+
+
+def modify_security_tags(auth_context, tags, resource=None):
+    """
+    This method splits the resources' tags in security and non-security
+    groups. Security tags are part of team policies. Such tags should only
+    be modified by organization owners in order to enforce team policies.
+    If a team member attempts to edit a security tag, an UnauthorizedError
+    will be thrown
+    :param tags: the new tags dict
+    :param resource: the resource on which the tags are going to be applied
+    :return: False, if a security tag has been modified in the new tags
+    dict by someone other than the organization owner, otherwise True
+    """
+    # private context
+    if auth_context.org is None:
+        return True
+
+    if auth_context.is_owner():
+        return True
+    else:
+        rtags = Tag.objects(owner=auth_context.owner.id,
+                            resource=resource).only('key', 'value')
+        rtags = {rtag.key: rtag.value for rtag in rtags}
+        security_tags = auth_context.get_security_tags()
+        # check whether the new tags tend to modify any of the security_tags
+        for security_tag in security_tags:
+            for key, value in security_tag.items():
+                if key not in rtags.keys():
+                    if key in tags.keys():
+                        return False
+                else:
+                    if key not in tags.keys():
+                        return False
+                    elif value != tags[key]:
+                        return False
+        return True
+
+
+def delete_security_tag(auth_context, tag_key):
+    """
+    This method checks whether the tag to be deleted belongs to the
+    secure tags group
+    :param tag_key: the key of the tag to be removed
+    :return: False in case a security tag is about to be deleted
+    """
+    # private context
+    if auth_context.org is None:
+        return True
+
+    if auth_context.is_owner():
+        return True
+    else:
+        security_tags = auth_context.get_security_tags()
+        for security_tag in security_tags:
+            for key, value in security_tag.items():
+                if key == tag_key:
+                    return False
+        return True
