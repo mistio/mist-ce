@@ -412,7 +412,7 @@ def list_keys(request):
     ---
     """
     auth_context = auth_context_from_request(request)
-    return mist.io.methods.filter_list_keys(auth_context)
+    return methods.filter_list_keys(auth_context)
 
 
 @view_config(route_name='api_v1_keys', request_method='PUT', renderer='json')
@@ -944,7 +944,7 @@ def list_machines(request):
 
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
-    return mist.io.methods.filter_list_machines(auth_context, cloud_id)
+    return methods.filter_list_machines(auth_context, cloud_id)
 
 
 @view_config(route_name='api_v1_machines', request_method='POST',
@@ -1260,7 +1260,7 @@ def machine_actions(request):
         getattr(machine.ctl, action)(plan_id)
 
     # TODO: We shouldn't return list_machines, just OK. Save the API!
-    return mist.io.methods.filter_list_machines(auth_context, cloud_id)
+    return methods.filter_list_machines(auth_context, cloud_id)
 
 
 @view_config(route_name='api_v1_machine_rdp', request_method='GET',
