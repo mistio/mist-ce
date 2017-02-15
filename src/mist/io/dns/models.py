@@ -2,6 +2,7 @@
 
 import re
 import uuid
+import ipaddress as ip
 
 import mongoengine as me
 
@@ -92,7 +93,7 @@ class Zone(me.Document):
 
     def clean(self):
         """Overriding the default clean method to implement param checking"""
-        if not re.match(".*\.$", self.domain):
+        if not self.domain.endswith('.'):
             self.domain += "."
 
     def __str__(self):
@@ -171,13 +172,28 @@ class Record(me.Document):
 
     def clean(self):
         """Overriding the default clean method to implement param checking"""
-        if not re.match(".*\.$", self.name):
+        if not self.name.endswith('.'):
             self.name += "."
         # We need to be checking the rdata based on the type of record
+        if type == 'A':
+            try:
+                ip_addr = self.rdata[0].decode('utf-8')
+                ip.ip_address(ip_addr)
+            except ValueError:
+                raise me.ValidationError('IPv4 address provided is not valid')
+        if type == 'AAAA':
+            try:
+                ip_addr = self.rdata[0].decode('utf-8')
+                ip.ip_address(ip_addr)
+            except ValueError:
+                raise me.ValidationError('IPv6 address provided is not valid')
+        if type == "CNAME":
+            if not self.rdata[0].endswith('.'):
+                self.rdata[0] += '.'
 
     def __str__(self):
-        return 'Record %s (name:%s, type:%s) of %s' % \
-            (self.id, self.name, self.type, self.zone.domain)
+        return 'Record %s (name:%s, type:%s) of %s' % (
+            self.id, self.name, self.type, self.zone.domain)
 
     def as_dict(self):
         """ Return a dict with the model values."""

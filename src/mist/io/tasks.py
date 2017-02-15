@@ -33,6 +33,7 @@ from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.io.scripts.models import Script
 from mist.io.schedules.models import Schedule
+from mist.io.dns.models import Zone, Record
 
 from mist.core import config
 
@@ -149,8 +150,6 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             msg = "Cloud:\n  Name: %s\n  Id: %s\n" % (cloud.title, cloud_id)
             msg += "Machine:\n  Name: %s\n  Id: %s\n" % (node.name, node.id)
 
-            hostname = 'machine1.test.io'
-
             if hostname:
                 try:
                     # split hostname in dot separated parts
@@ -165,6 +164,7 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                     if not all_domains:
                         raise MistError("Couldn't extract a valid domain from \
                                          '%s'."  % domain_name)
+
                     zones = Zone.objects(owner=owner)
                     # We need to iterate over all the cloud DNS zones to find
                     # any that is matching based on the domain. If one is found
@@ -176,10 +176,10 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                         for domain, subdomain in all_domains.iteritems():
                             if zone.domain == domain:
                                 kwargs = {}
-                                kwargs['domain'] = subdomain
+                                kwargs['name'] = subdomain
                                 kwargs['type'] = 'A'
-                                kwargs['host'] = host
-                                kwargs['ttl'] = None
+                                kwargs['data'] = host
+                                kwargs['ttl'] = 3600
                                 record = Record.add(zone=zone, id='', **kwargs)
                     hostname = '.'.join((record.name, record.zone.domain))
                     log_event(action='Record.add', hostname=hostname,
