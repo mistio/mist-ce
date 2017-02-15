@@ -82,8 +82,27 @@ def add_routes(configurator):
     configurator.add_route('api_v1_machine_tag',
                            '/api/v1/clouds/{cloud}/machines/{machine}/tags/{tag}')
     configurator.add_route('api_v1_tags', '/api/v1/tags')
+    configurator.add_route('cloud_tags', '/clouds/{cloud_id}/tags')
+    configurator.add_route('key_tags', '/keys/{key_id}/tags')
+
+    configurator.add_route('script_tags', '/scripts/{script_id}/tags')
+    configurator.add_route('schedule_tags', '/schedules/{schedule_id}/tags')
+    configurator.add_route('network_tags',
+                           '/clouds/{cloud_id}/networks/{network_id}/tags')
+
+    configurator.add_route('script_tag', '/scripts/{script_id}/tag')
+    configurator.add_route('schedule_tag', '/schedules/{schedule_id}/tag')
+    configurator.add_route('network_tag',
+                           '/clouds/{cloud}/networks/{network_id}/tag/{tag_key}')
+    configurator.add_route('key_tag', '/keys/{key_id}/tag')
+    configurator.add_route('cloud_tag', '/clouds/{cloud_id}/tag')
+
+    configurator.add_route('machine_tag',
+                           '/clouds/{cloud_id}/machines/{machine_id}/tag')
+
     configurator.add_route('api_v1_probe',
                            '/api/v1/clouds/{cloud}/machines/{machine}/probe')
+    configurator.add_route('api_v1_ping', '/api/v1/ping')
 
     configurator.add_route('api_v1_monitoring', '/api/v1/monitoring')
     configurator.add_route('api_v1_update_monitoring',
@@ -97,8 +116,7 @@ def add_routes(configurator):
                            '/api/v1/clouds/{cloud}/machines/{machine}/plugins/{plugin}')
 
     configurator.add_route('api_v1_images', '/api/v1/clouds/{cloud}/images')
-    configurator.add_route('api_v1_image',
-                           '/api/v1/clouds/{cloud}/images/{image:.*}')
+    configurator.add_route('api_v1_image', '/api/v1/clouds/{cloud}/images/{image}')
     configurator.add_route('api_v1_sizes', '/api/v1/clouds/{cloud}/sizes')
     configurator.add_route('api_v1_locations',
                            '/api/v1/clouds/{cloud}/locations')
@@ -138,3 +156,6 @@ def add_routes(configurator):
 
     configurator.add_route('api_v1_schedules', '/api/v1/schedules')
     configurator.add_route('api_v1_schedule', '/api/v1/schedules/{schedule_id}')
+
+    configurator.add_route('api_v1_tokens', '/api/v1/tokens')
+    configurator.add_route('api_v1_sessions', '/api/v1/sessions')
