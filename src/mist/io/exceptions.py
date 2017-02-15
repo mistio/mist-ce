@@ -266,13 +266,10 @@ class SubnetDeletionError(InternalServerError):
     msg = "Subnet deletion failed"
 
 
-class SSLError(MistError):
-    msg = "SSL certificate verification error"
-
-
 #  BAD GATEWAY (translated as 502 in views)
 class BadGatewayError(MistError):
-    """Used to notify about failures in upstream services according to RFC 2616"""
+    """Used to notify about failures in upstream services
+    according to RFC 2616"""
     msg = "Bad Gateway"
     http_code = 502
 

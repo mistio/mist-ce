@@ -14,34 +14,28 @@ import json
 import uuid
 import traceback
 import mongoengine as me
-from datetime import datetime
 
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
 import pyramid.httpexceptions
 # try:
 
-
 from mist.io.keys.models import Key, SSHKey, SignedSSHKey
 from mist.io.scripts.models import CollectdScript
-from mist.io.scripts.models import Script, ExecutableScript, AnsibleScript
-from mist.io.schedules.models import Schedule
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.io.networks.models import Network, Subnet
 from mist.io.users.models import Avatar, Owner
+from mist.io.auth.models import SessionToken
 
 from mist.core import config
-import mist.core.methods
+
 # except ImportError:
 #     from mist.io import config
 #     from mist.io.helpers import user_from_request
 #     from pyramid.view import view_config
 
 from mist.io import methods
-from mist.io import tasks
-
-from mist.io.tag.methods import add_tags_to_resource, resolve_id_and_set_tags
 
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import NotFoundError, BadRequestError
@@ -54,11 +48,10 @@ from mist.io.exceptions import NetworkNotFoundError, SubnetNotFoundError
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, amqp_publish_user
 from mist.io.helpers import transform_key_machine_associations
-from mist.io.helpers import get_stories
 from mist.io.helpers import view_config
 
 from mist.io.auth.methods import auth_context_from_request
-from mist.io.auth.methods import user_from_request
+from mist.io.auth.methods import user_from_request, session_from_request
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -160,7 +153,7 @@ def list_clouds(request):
     auth_context = auth_context_from_request(request)
     # to prevent iterate throw every cloud
     auth_context.check_perm("cloud", "read", None)
-    return mist.io.methods.filter_list_clouds(auth_context)
+    return methods.filter_list_clouds(auth_context)
 
 
 @view_config(route_name='api_v1_clouds', request_method='POST', renderer='json')
@@ -420,7 +413,7 @@ def list_keys(request):
     ---
     """
     auth_context = auth_context_from_request(request)
-    return mist.io.methods.filter_list_keys(auth_context)
+    return methods.filter_list_keys(auth_context)
 
 
 @view_config(route_name='api_v1_keys', request_method='PUT', renderer='json')
@@ -566,7 +559,8 @@ def delete_keys(request):
     return report
 
 
-@view_config(route_name='api_v1_key_action', request_method='PUT', renderer='json')
+@view_config(route_name='api_v1_key_action', request_method='PUT',
+             renderer='json')
 def edit_key(request):
     """
     Edit a key
@@ -952,7 +946,7 @@ def list_machines(request):
 
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
-    return mist.io.methods.filter_list_machines(auth_context, cloud_id)
+    return methods.filter_list_machines(auth_context, cloud_id)
 
 
 @view_config(route_name='api_v1_machines', request_method='POST',
@@ -1268,7 +1262,7 @@ def machine_actions(request):
         getattr(machine.ctl, action)(plan_id)
 
     # TODO: We shouldn't return list_machines, just OK. Save the API!
-    return mist.io.methods.filter_list_machines(auth_context, cloud_id)
+    return methods.filter_list_machines(auth_context, cloud_id)
 
 
 @view_config(route_name='api_v1_machine_rdp', request_method='GET',
@@ -1883,6 +1877,18 @@ def probe(request):
     return ret
 
 
+@view_config(route_name='api_v1_ping', request_method=('GET', 'POST'), renderer='json')
+def ping(request):
+    """
+    Check that an api token is correct.
+    ---
+    """
+    user = user_from_request(request)
+    if isinstance(session_from_request(request), SessionToken):
+        raise BadRequestError('This call is for users with api tokens')
+    return {'hello': user.email}
+
+
 @view_config(route_name='api_v1_monitoring', request_method='GET', renderer='json')
 def check_monitoring(request):
     """
@@ -1890,6 +1896,8 @@ def check_monitoring(request):
     Ask the mist.io service if monitoring is enabled for this machine.
     ---
     """
+    raise NotImplementedError()
+
     user = user_from_request(request)
     ret = methods.check_monitoring(user)
     return ret
@@ -1930,6 +1938,8 @@ def update_monitoring(request):
         type: string
       type: array
     """
+    raise NotImplementedError()
+
     user = user_from_request(request)
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
@@ -2026,6 +2036,8 @@ def get_stats(request):
       required: false
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
 
@@ -2068,6 +2080,8 @@ def find_metrics(request):
       required: true
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     auth_context = auth_context_from_request(request)
@@ -2101,6 +2115,8 @@ def assoc_metric(request):
       description: ' Metric_id '
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
@@ -2139,6 +2155,8 @@ def disassoc_metric(request):
       description: ' Metric_id '
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     params = params_from_request(request)
@@ -2189,6 +2207,8 @@ def update_metric(request):
         unit'
       type: string
     """
+    raise NotImplementedError()
+
     metric_id = request.matchdict['metric']
     params = params_from_request(request)
     machine_id = params.get('machine_id')
@@ -2250,6 +2270,8 @@ def deploy_plugin(request):
       default: gauge
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     plugin_id = request.matchdict['plugin']
@@ -2329,6 +2351,8 @@ def undeploy_plugin(request):
       required: true
       type: string
     """
+    raise NotImplementedError()
+
     cloud_id = request.matchdict['cloud']
     machine_id = request.matchdict['machine']
     plugin_id = request.matchdict['plugin']
@@ -2377,6 +2401,8 @@ def update_rule(request):
     Creates or updates a rule.
     ---
     """
+    raise NotImplementedError()
+
     user = user_from_request(request)
     params = params_from_request(request)
     try:
@@ -2408,6 +2434,8 @@ def delete_rule(request):
       required: true
       type: string
     """
+    raise NotImplementedError()
+
     user = user_from_request(request)
     try:
         ret = requests.delete(
@@ -2444,6 +2472,7 @@ def list_supported_providers(request):
     else:
         return {'supported_providers': config.SUPPORTED_PROVIDERS}
 
+<<<<<<< HEAD
 
 @view_config(route_name='api_v1_avatars', request_method='POST', renderer='json')
 def upload_avatar(request):
@@ -3119,3 +3148,4 @@ def edit_schedule_entry(request):
 
     trigger_session_update(auth_context.owner, ['schedules'])
     return schedule.as_dict()
+
