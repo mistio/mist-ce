@@ -152,7 +152,7 @@ def list_clouds(request):
     auth_context = auth_context_from_request(request)
     # to prevent iterate throw every cloud
     auth_context.check_perm("cloud", "read", None)
-    return mist.io.methods.filter_list_clouds(auth_context)
+    return methods.filter_list_clouds(auth_context)
 
 
 @view_config(route_name='api_v1_clouds', request_method='POST', renderer='json')
