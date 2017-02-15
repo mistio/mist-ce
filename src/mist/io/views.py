@@ -558,7 +558,8 @@ def delete_keys(request):
     return report
 
 
-@view_config(route_name='api_v1_key_action', request_method='PUT', renderer='json')
+@view_config(route_name='api_v1_key_action', request_method='PUT',
+             renderer='json')
 def edit_key(request):
     """
     Edit a key
