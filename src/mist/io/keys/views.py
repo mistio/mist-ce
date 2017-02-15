@@ -10,7 +10,8 @@ from mist.io.auth.methods import auth_context_from_request
 from mist.io.helpers import view_config, params_from_request
 from mist.io.helpers import transform_key_machine_associations
 
-from mist.io.keys.methods import filter_list_keys, delete_key
+from mist.io.keys.methods import filter_list_keys
+from mist.io.keys.methods import delete_key as m_delete_key
 
 from mist.io.exceptions import PolicyUnauthorizedError
 from mist.io.exceptions import BadRequestError, KeyParameterMissingError
@@ -116,7 +117,7 @@ def delete_key(request):
         raise NotFoundError('Key id does not exist')
 
     auth_context.check_perm('key', 'remove', key.id)
-    delete_key(auth_context.owner, key_id)
+    m_delete_key(auth_context.owner, key_id)
     return list_keys(request)
 
 
