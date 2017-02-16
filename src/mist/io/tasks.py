@@ -694,8 +694,8 @@ class ListNetworks(UserTask):
         owner = Owner.objects.get(id=owner_id)
         log.warn('Running list networks for user %s cloud %s'
                  % (owner.id, cloud_id))
-        from mist.io import methods
-        networks = methods.list_networks(owner, cloud_id)
+        from mist.io.networks.methods import list_networks
+        networks = list_networks(owner, cloud_id)
         log.warn('Returning list networks for user %s cloud %s'
                  % (owner.id, cloud_id))
         return {'cloud_id': cloud_id, 'networks': networks}
@@ -748,11 +748,11 @@ class ListMachines(UserTask):
     soft_time_limit = 60
 
     def execute(self, owner_id, cloud_id):
-        from mist.io import methods
+        from mist.io.machines.methods import list_machines
         owner = Owner.objects.get(id=owner_id)
         log.warn('Running list machines for user %s cloud %s',
                  owner.id, cloud_id)
-        machines = methods.list_machines(owner, cloud_id)
+        machines = list_machines(owner, cloud_id)
 
         for machine in machines:
             # TODO tags tags tags
@@ -931,7 +931,7 @@ def create_machine_async(owner, cloud_id, key_id, machine_name, location_id,
                          tags=None, schedule={}, bare_metal=False, hourly=True,
                          softlayer_backend_vlan_id=None):
     from multiprocessing.dummy import Pool as ThreadPool
-    from mist.io.methods import create_machine
+    from mist.io.machines.methods import create_machine
     from mist.io.exceptions import MachineCreationError
     log.warn('MULTICREATE ASYNC %d' % quantity)
 
@@ -1105,7 +1105,7 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
         if action in ('start', 'stop', 'reboot', 'destroy'):
             # call list machines here cause we don't have another way
             # to update machine state if user isn't logged in
-            from mist.io.methods import list_machines, destroy_machine
+            from mist.io.machines.methods import list_machines, destroy_machine
             from mist.io.methods import notify_admin, notify_user
             list_machines(owner, cloud_id)
 
