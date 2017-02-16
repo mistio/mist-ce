@@ -23,6 +23,7 @@ from mist.io.scripts.models import CollectdScript
 from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.io.networks.models import Network, Subnet
+from mist.io.users.models import Avatar, Owner
 from mist.io.auth.models import SessionToken
 
 from mist.core import config
@@ -1306,4 +1307,70 @@ def list_supported_providers(request):
         return {'supported_providers': config.SUPPORTED_PROVIDERS_V_2}
     else:
         return {'supported_providers': config.SUPPORTED_PROVIDERS}
+
+
+@view_config(route_name='api_v1_avatars', request_method='POST', renderer='json')
+def upload_avatar(request):
+    user = user_from_request(request)
+    body = request.POST['file'].file.read()
+    if len(body) > 256*1024:
+        raise BadRequestError("File too large")
+    from mist.io.users.models import Avatar
+    avatar = Avatar()
+    avatar.owner = user
+    avatar.body = body
+    avatar.save()
+    return {'id': avatar.id}
+
+
+@view_config(route_name='api_v1_avatar', request_method='GET')
+def get_avatar(request):
+    """
+    Returns the requested avatar
+    ---
+    avatar:
+      description: 'Avatar Id'
+      in: path
+      required: true
+      type: string
+    """
+    avatar_id = request.matchdict['avatar']
+
+    try:
+        avatar = Avatar.objects.get(id=avatar_id)
+    except me.DoesNotExist:
+        raise NotFoundError()
+
+    return Response(content_type=str(avatar.content_type), body=str(avatar.body))
+
+
+@view_config(route_name='api_v1_avatar', request_method='DELETE')
+def delete_avatar(request):
+    """
+    Deletes the requested avatar
+    ---
+    avatar:
+      description: 'Avatar Id'
+      in: path
+      required: true
+      type: string
+    """
+    avatar_id = request.matchdict['avatar']
+    auth_context = auth_context_from_request(request)
+
+    try:
+        avatar = Avatar.objects.get(id=avatar_id, owner=auth_context.user)
+    except me.DoesNotExist:
+        raise NotFoundError()
+
+    try:
+        org = Owner.objects.get(avatar=avatar_id)
+        org.avatar = ''
+        org.save()
+    except me.DoesNotExist:
+        pass
+
+    avatar.delete()
+    trigger_session_update(auth_context.owner, ["org"])
+    return OK
 
