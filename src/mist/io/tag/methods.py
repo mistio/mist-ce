@@ -1,6 +1,6 @@
 from mongoengine import Q
 from mist.io.tag.models import Tag
-from mist.core.methods import trigger_session_update
+from mist.io.helpers import trigger_session_update
 from mist.io.helpers import get_object_with_id
 
 
