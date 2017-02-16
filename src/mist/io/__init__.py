@@ -30,14 +30,8 @@ def main(global_config, **settings):
 
     json_renderer.add_adapter(object, string_adapter)
     configurator.add_renderer('json', json_renderer)
-    configurator.add_static_view('resources', 'mist.io:static')
-    configurator.add_static_view('src', path='../../../ui/src')
-    configurator.add_static_view('assets', path='../../../ui/assets')
 
     configurator.add_static_view('docs', path='../../../docs/build')
-
-    # polymer resources
-    configurator.add_static_view('bower_components', path='../../../ui/bower_components')
 
     configurator.include(add_routes)
     configurator.scan()
@@ -67,6 +61,9 @@ def add_routes(configurator):
     configurator.add_route('key', '/keys/{key}')
     configurator.add_route('images', '/images')
     configurator.add_route('image', '/images/{image}')
+
+    configurator.add_route('api_v1_avatars', '/api/v1/avatars')
+    configurator.add_route('api_v1_avatar', '/api/v1/avatars/{avatar}')
 
     configurator.add_route('api_v1_providers', '/api/v1/providers')
     configurator.add_route('api_v1_clouds', '/api/v1/clouds')

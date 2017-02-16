@@ -12,6 +12,8 @@ import datetime
 import tempfile
 import traceback
 import functools
+import jsonpickle
+
 from time import time, strftime, sleep
 
 from pymongo import MongoClient
@@ -1260,8 +1262,8 @@ def logging_view_decorator(func):
         es_dict['exception'] = es_dict.pop('_exc')
         es_dict['type'] = 'exception'
         routing_key = "%s.%s" % (es_dict['owner_id'], es_dict['action'])
-
-        amqp_publish('exceptions', routing_key, es_dict,
+        pickler = jsonpickle.pickler.Pickler()
+        amqp_publish('exceptions', routing_key, pickler.flatten(es_dict),
                      ex_type='topic', ex_declare=True,
                      auto_delete=False)
 
