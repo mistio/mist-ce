@@ -166,7 +166,7 @@ class BaseDNSController(BaseController):
         Record.objects(zone=zone, id__nin=[r.id for r in records]).delete()
 
         # Format zone information.
-        return [record.as_dict() for record in records]
+        return records
 
     def _list_records__fetch_records(self, zone_id):
         """Returns all available records on a specific zone. """
@@ -259,12 +259,6 @@ class BaseDNSController(BaseController):
             zone.type = pr_zone.type
             zone.ttl = pr_zone.ttl
             zone.extra = pr_zone.extra
-            try:
-                zone.validate(clean=True)
-            except me.ValidationError as exc:
-                log.error("Error updating %s: %s", zone, exc.to_dict())
-                raise BadRequestError({'msg': exc.message,
-                                       'errors': exc.to_dict()})
             # Attempt to save.
             try:
                 zone.save()
@@ -285,6 +279,8 @@ class BaseDNSController(BaseController):
         this.
         ----
         """
+        if not kwargs['domain'].endswith('.'):
+            kwargs['domain'] += '.'
         try:
             zone = self.connection.create_zone(**kwargs)
             log.info("Zone %s created successfully for %s.",
@@ -307,30 +303,32 @@ class BaseDNSController(BaseController):
         This is the public method that is called to create a new DNS record
         under a specific zone.
         """
+        record.name = kwargs['name']
+        record.type = kwargs['type']
+        if isinstance(kwargs['data'], list):
+            record.rdata = kwargs['data']
+        else:
+            record.rdata = list(kwargs['data'])
+        record.ttl = kwargs['ttl']
+
+        try:
+            record.clean()
+        except me.ValidationError as exc:
+            log.error("Error validating %s: %s", record, exc.to_dict())
+            raise BadRequestError({'msg': exc.message,
+                                   'errors': exc.to_dict()})
 
         self._create_record__prepare_args(record.zone, kwargs)
         pr_record = self._create_record__for_zone(record.zone, **kwargs)
         if pr_record:
-            self._list__records_postparse_data(pr_record, record)
-            # Set fields to cloud model and perform early validation.
             record.record_id = pr_record.id
-            record.name = pr_record.name
-            record.type = pr_record.type
-            record.ttl = pr_record.ttl
-            record.extra = pr_record.extra
-            try:
-                record.validate(clean=True)
-            except me.ValidationError as exc:
-                log.error("Error updating %s: %s", record, exc.to_dict())
-                raise BadRequestError({'msg': exc.message,
-                                       'errors': exc.to_dict()})
-            # Attempt to save.
+            # This is not something that should be given by the user, e.g. we
+            # are only using this to store the ttl, so we should onl save this
+            # value if it's returned by the provider.
+            record.extra = pr_record.extra 
+            # Attempt to save, without validation.
             try:
                 record.save()
-            except me.ValidationError as exc:
-                log.error("Error updating %s: %s", record, exc.to_dict())
-                raise BadRequestError({'msg': exc.message,
-                                       'errors': exc.to_dict()})
             except me.NotUniqueError as exc:
                 log.error("Record %s not unique error: %s", record, exc)
                 raise RecordExistsError()

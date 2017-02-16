@@ -43,14 +43,15 @@ class AmazonDNSController(BaseDNSController):
 
     def _create_record__prepare_args(self, zone, kwargs):
         """
-        This is a private
+        This is a private method to transform the arguments to provider the
+        provide specific form.
         ---
         """
         kwargs['extra'] = {'ttl': kwargs.pop('ttl', 0)}
 
     def _list__records_postparse_data(self, pr_record, record):
         """Get the provider specific information into the Mongo model"""
-        if pr_record.data not in record['rdata']:
+        if pr_record.data not in record.rdata:
             record.rdata.append(pr_record.data)
 
 
@@ -65,15 +66,16 @@ class GoogleDNSController(BaseDNSController):
 
     def _create_record__prepare_args(self, zone, kwargs):
         """
-        This is a private
+        This is a private method to transform the arguments to provider the
+        provide specific form.
         ---
         """
         if not kwargs['name'].endswith('.'):
             kwargs['name'] += "."
         kwargs['name'] += zone.domain
-        kwargs['extra'] = None
+        data = kwargs.pop('data', '')
         kwargs['data'] = {'ttl': kwargs['ttl'], 'rrdatas': []}
-        kwargs['data']['rrdatas'].append(kwargs['data'])
+        kwargs['data']['rrdatas'].append(data)
 
     def _list__records_postparse_data(self, pr_record, record):
         """Get the provider specific information into the Mongo model"""

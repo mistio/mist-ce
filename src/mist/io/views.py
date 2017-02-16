@@ -828,17 +828,17 @@ def list_dns_records(request):
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     zone_id = request.matchdict['zone']
-    # Do we need the cloud here, now that the models have been created?
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise exceptions.NotFoundError('Cloud does not exist')
     try:
-        zone = Zone.objects.get(owner=auth_context.owner, id=zone_id)
+        zone = Zone.objects.get(owner=auth_context.owner, cloud=cloud,
+                                id=zone_id)
     except Zone.DoesNotExist:
         raise exceptions.NotFoundError('Zone does not exist')
 
-    return zone.ctl.list_records()
+    return [record.as_dict() for record in zone.ctl.list_records()]
 
 @view_config(route_name='api_v1_zones', request_method='POST', renderer='json')
 def create_dns_zone(request):
@@ -853,14 +853,9 @@ def create_dns_zone(request):
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
-    # Get the rest of the params
-    # domain is required and must contain a trailing period(.)
-    # type should be master or slave, and defaults to master.
-    # ttl is the time for which the zone should be valid for. Defaults to None.
-    # Should be an integer value.
-    # extra is a dictionary with extra details. Defaults to None.
+
     params = params_from_request(request)
-    return Zone.add(owner=cloud.owner, cloud=cloud, id='', **params)
+    return Zone.add(owner=cloud.owner, cloud=cloud, **params).as_dict()
 
 @view_config(route_name='api_v1_records', request_method='POST', renderer='json')
 def create_dns_record(request):
@@ -885,7 +880,7 @@ def create_dns_record(request):
     # Get the params and create the new record
     params = params_from_request(request)
 
-    return Record.add(zone, id='', **params)
+    return Record.add(zone, id='', **params).as_dict()
 
 @view_config(route_name='api_v1_zone', request_method='DELETE', renderer='json')
 def delete_dns_zone(request):
