@@ -6,11 +6,12 @@ from mist.io.helpers import trigger_session_update
 from mist.io.helpers import view_config, params_from_request
 
 
-from mist.io.exceptions import BadRequestError, KeyParameterMissingError
+from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import RequiredParameterMissingError, NotFoundError
 
-from mist.io.clouds.methods import filter_list_clouds
-from mist.io.clouds.methods import rename_cloud, add_cloud_v_2, delete_cloud
+from mist.io.clouds.methods import filter_list_clouds, add_cloud_v_2
+from mist.io.clouds.methods import rename_cloud as m_rename_cloud
+from mist.io.clouds.methods import delete_cloud as m_delete_cloud
 
 from mist.io.tag.methods import add_tags_to_resource
 
@@ -39,7 +40,8 @@ def list_clouds(request):
     return filter_list_clouds(auth_context)
 
 
-@view_config(route_name='api_v1_clouds', request_method='POST', renderer='json')
+@view_config(route_name='api_v1_clouds',
+             request_method='POST', renderer='json')
 def add_cloud(request):
     """
     Add a new cloud
@@ -155,12 +157,11 @@ def delete_cloud(request):
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     try:
-        cloud = Cloud.objects.get(owner=auth_context.owner,
-                                  id=cloud_id, deleted=None)
+        Cloud.objects.get(owner=auth_context.owner, id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
     auth_context.check_perm('cloud', 'remove', cloud_id)
-    delete_cloud(auth_context.owner, cloud_id)
+    m_delete_cloud(auth_context.owner, cloud_id)
     return OK
 
 
@@ -182,8 +183,7 @@ def rename_cloud(request):
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     try:
-        cloud = Cloud.objects.get(owner=auth_context.owner,
-                                  id=cloud_id, deleted=None)
+        Cloud.objects.get(owner=auth_context.owner, id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
@@ -193,7 +193,7 @@ def rename_cloud(request):
         raise RequiredParameterMissingError('new_name')
     auth_context.check_perm('cloud', 'edit', cloud_id)
 
-    rename_cloud(auth_context.owner, cloud_id, new_name)
+    m_rename_cloud(auth_context.owner, cloud_id, new_name)
     return OK
 
 

@@ -125,5 +125,3 @@ def list_clouds(owner):
         # Also, move into cloud model's as_dict method?
         cloud['tags'] = get_tags_for_resource(owner, cloud)
     return clouds
-
-
