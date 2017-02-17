@@ -43,7 +43,7 @@ from mist.io.exceptions import MistError, NotFoundError
 from mist.io.exceptions import RequiredParameterMissingError
 import mist.io.users.models
 
-from mist.core import config
+from mist.core import config  # TODO handle for open.source
 # try:
 #
 # except ImportError:
