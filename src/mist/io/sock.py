@@ -43,6 +43,8 @@ from mist.io import methods
 from mist.io.clouds.methods import filter_list_clouds
 from mist.io.keys.methods import filter_list_keys
 from mist.io.machines.methods import filter_list_machines
+from mist.io.scripts.methods import filter_list_scripts
+from mist.io.schedules.methods import filter_list_schedules
 
 from mist.core import methods as core_methods
 from mist.core.orchestration import methods as orchestration_methods
@@ -280,12 +282,10 @@ class MainConnection(MistConnection):
         self.send('list_keys', filter_list_keys(self.auth_context))
 
     def list_scripts(self):
-        self.send('list_scripts', methods.filter_list_scripts(
-            self.auth_context))
+        self.send('list_scripts', filter_list_scripts(self.auth_context))
 
     def list_schedules(self):
-        self.send('list_schedules', methods.filter_list_schedules(
-            self.auth_context))
+        self.send('list_schedules', filter_list_schedules(self.auth_context))
 
     def list_templates(self):
         self.send('list_templates',
