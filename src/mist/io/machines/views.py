@@ -1,8 +1,8 @@
 import uuid
 
-from mist.io.machines.models import Machine
-
 import mist.io.machines.methods as methods
+
+from mist.io.machines.models import Machine
 
 from mist.io import tasks
 
@@ -319,7 +319,7 @@ def machine_actions(request):
 
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-    except me.DoesNotExist:
+    except Machine.DoesNotExist:
         raise NotFoundError("Machine %s doesn't exist" % machine_id)
 
     if machine.cloud.owner != auth_context.owner:
