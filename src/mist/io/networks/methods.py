@@ -1,5 +1,5 @@
 from mist.io.clouds.models import Cloud
-from mist.io.networks.models import NETWORKS, Network
+from mist.io.networks.models import NETWORKS
 
 from mist.io.exceptions import CloudNotFoundError
 from mist.io.helpers import trigger_session_update
@@ -83,6 +83,3 @@ def associate_ip(owner, cloud_id, network_id, ip,
         return False
 
     return conn.ex_associate_ip(ip, server=machine_id, assign=assign)
-
-
-
