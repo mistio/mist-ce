@@ -40,6 +40,12 @@ from mist.io.exceptions import PolicyUnauthorizedError
 from mist.io.amqp_tornado import Consumer
 
 from mist.io import methods
+from mist.io.clouds.methods import filter_list_clouds
+from mist.io.keys.methods import filter_list_keys
+from mist.io.machines.methods import filter_list_machines
+from mist.io.scripts.methods import filter_list_scripts
+from mist.io.schedules.methods import filter_list_schedules
+
 from mist.core import methods as core_methods
 from mist.core.orchestration import methods as orchestration_methods
 from mist.core.rbac import methods as rbac_methods
@@ -273,15 +279,13 @@ class MainConnection(MistConnection):
                   core_methods.filter_list_tags(self.auth_context))
 
     def list_keys(self):
-        self.send('list_keys', methods.filter_list_keys(self.auth_context))
+        self.send('list_keys', filter_list_keys(self.auth_context))
 
     def list_scripts(self):
-        self.send('list_scripts', methods.filter_list_scripts(
-            self.auth_context))
+        self.send('list_scripts', filter_list_scripts(self.auth_context))
 
     def list_schedules(self):
-        self.send('list_schedules', methods.filter_list_schedules(
-            self.auth_context))
+        self.send('list_schedules', filter_list_schedules(self.auth_context))
 
     def list_templates(self):
         self.send('list_templates',
@@ -298,7 +302,7 @@ class MainConnection(MistConnection):
     def list_clouds(self):
         if config.ACTIVATE_POLLER:
             self.update_poller()
-        self.send('list_clouds', methods.filter_list_clouds(self.auth_context))
+        self.send('list_clouds', filter_list_clouds(self.auth_context))
         clouds = Cloud.objects(owner=self.owner, enabled=True, deleted=None)
         log.info(clouds)
         periodic_tasks = []
@@ -309,7 +313,7 @@ class MainConnection(MistConnection):
                 after = datetime.datetime.utcnow() - datetime.timedelta(days=1)
                 machines = Machine.objects(cloud=cloud, missing_since=None,
                                            last_seen__gt=after)
-                machines = methods.filter_list_machines(
+                machines = filter_list_machines(
                     self.auth_context, cloud_id=cloud.id,
                     machines=[machine.as_dict_old() for machine in machines]
                 )
@@ -329,7 +333,7 @@ class MainConnection(MistConnection):
                 if cached is not None:
                     log.info("Emitting %s from cache", key)
                     if key == 'list_machines':
-                        cached['machines'] = methods.filter_list_machines(
+                        cached['machines'] = filter_list_machines(
                             self.auth_context, **cached
                         )
                         if cached['machines'] is None:
@@ -393,7 +397,7 @@ class MainConnection(MistConnection):
                 # probe newly discovered running machines
                 machines = result['machines']
                 cloud_id = result['cloud_id']
-                filtered_machines = methods.filter_list_machines(
+                filtered_machines = filter_list_machines(
                     self.auth_context, cloud_id, machines
                 )
                 if filtered_machines is not None:

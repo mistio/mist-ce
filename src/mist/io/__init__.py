@@ -72,8 +72,10 @@ def add_routes(configurator):
     configurator.add_route('api_v1_machines', '/api/v1/clouds/{cloud}/machines')
     configurator.add_route('api_v1_machine',
                            '/api/v1/clouds/{cloud}/machines/{machine}')
+
     configurator.add_route('api_v1_machine_rdp',
                            '/api/v1/clouds/{cloud}/machines/{machine}/rdp')
+
     configurator.add_route('api_v1_machine_tags',
                            '/api/v1/clouds/{cloud}/machines/{machine}/tags')
     configurator.add_route('api_v1_machine_tag',
