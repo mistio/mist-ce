@@ -49,7 +49,7 @@ class AmazonDNSController(BaseDNSController):
         """
         kwargs['extra'] = {'ttl': kwargs.pop('ttl', 0)}
 
-    def _list__records_postparse_data(self, pr_record, record):
+    def _list_records__postparse_data(self, pr_record, record):
         """Get the provider specific information into the Mongo model"""
         if pr_record.data not in record.rdata:
             record.rdata.append(pr_record.data)
@@ -77,6 +77,6 @@ class GoogleDNSController(BaseDNSController):
         kwargs['data'] = {'ttl': kwargs.pop('ttl', 0), 'rrdatas': []}
         kwargs['data']['rrdatas'].append(data)
 
-    def _list__records_postparse_data(self, pr_record, record):
+    def _list_records__postparse_data(self, pr_record, record):
         """Get the provider specific information into the Mongo model"""
         record.rdata = pr_record.data['rrdatas']

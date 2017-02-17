@@ -94,7 +94,15 @@ class BaseDNSController(BaseController):
             zone.type = pr_zone.type
             zone.ttl = pr_zone.ttl
             zone.extra = pr_zone.extra
-            zone.save()
+            try:
+                zone.save()
+            except me.ValidationError as exc:
+                log.error("Error updating %s: %s", zone, exc.to_dict())
+                raise BadRequestError({'msg': exc.message,
+                                       'errors': exc.to_dict()})
+            except me.NotUniqueError as exc:
+                log.error("Zone %s not unique error: %s", zone, exc)
+                raise ZoneExistsError()
             zones.append(zone)
 
         # Delete any zones in the DB that were not returned by the provider
@@ -102,7 +110,7 @@ class BaseDNSController(BaseController):
         Zone.objects(cloud=self.cloud, id__nin=[z.id for z in zones]).delete()
 
         # Format zone information.
-        return [zone.as_dict() for zone in zones]
+        return zones
 
     def _list_zones__fetch_zones(self):
         """
@@ -152,8 +160,15 @@ class BaseDNSController(BaseController):
             record.ttl = pr_record.ttl
             record.extra = pr_record.extra
 
-            self._list__records_postparse_data(pr_record, record)
-            record.save()
+            self._list_records__postparse_data(pr_record, record)
+            try:
+                record.save()
+            except me.NotUniqueError as exc:
+                log.error("Record %s not unique error: %s", record, exc)
+                raise RecordExistsError()
+            except me.NotUniqueError as exc:
+                log.error("Record %s not unique error: %s", record, exc)
+                raise RecordExistsError()
 
         # There's a chance that we have received duplicate records as for
         # example for Route NS records, we want to get the final records result
@@ -195,7 +210,7 @@ class BaseDNSController(BaseController):
             log.exception("Error while running list_records on %s", self.cloud)
             raise CloudUnavailableError(exc=exc)
 
-    def _list__records_postparse_data(self, record, model):
+    def _list_records__postparse_data(self, record, model):
         """Postparse the records returned from the provider"""
         return
 
@@ -252,24 +267,22 @@ class BaseDNSController(BaseController):
         """
 
         pr_zone = self._create_zone__for_cloud(**kwargs)
-        if pr_zone:
-            # Set fields to cloud model and perform early validation.
-            zone.zone_id = pr_zone.id
-            zone.domain = pr_zone.domain
-            zone.type = pr_zone.type
-            zone.ttl = pr_zone.ttl
-            zone.extra = pr_zone.extra
-            # Attempt to save.
-            try:
-                zone.save()
-            except me.ValidationError as exc:
-                log.error("Error updating %s: %s", zone, exc.to_dict())
-                raise BadRequestError({'msg': exc.message,
-                                       'errors': exc.to_dict()})
-            except me.NotUniqueError as exc:
-                log.error("Zone %s not unique error: %s", zone, exc)
-                raise ZoneExistsError()
-
+        # Set fields to cloud model and perform early validation.
+        zone.zone_id = pr_zone.id
+        zone.domain = pr_zone.domain
+        zone.type = pr_zone.type
+        zone.ttl = pr_zone.ttl
+        zone.extra = pr_zone.extra
+        # Attempt to save.
+        try:
+            zone.save()
+        except me.ValidationError as exc:
+            log.error("Error updating %s: %s", zone, exc.to_dict())
+            raise BadRequestError({'msg': exc.message,
+                                    'errors': exc.to_dict()})
+        except me.NotUniqueError as exc:
+            log.error("Zone %s not unique error: %s", zone, exc)
+            raise ZoneExistsError()
 
     def _create_zone__for_cloud(self, **kwargs):
         """
@@ -320,18 +333,20 @@ class BaseDNSController(BaseController):
 
         self._create_record__prepare_args(record.zone, kwargs)
         pr_record = self._create_record__for_zone(record.zone, **kwargs)
-        if pr_record:
-            record.record_id = pr_record.id
-            # This is not something that should be given by the user, e.g. we
-            # are only using this to store the ttl, so we should onl save this
-            # value if it's returned by the provider.
-            record.extra = pr_record.extra 
-            # Attempt to save, without validation.
-            try:
-                record.save()
-            except me.NotUniqueError as exc:
-                log.error("Record %s not unique error: %s", record, exc)
-                raise RecordExistsError()
+        record.record_id = pr_record.id
+        # This is not something that should be given by the user, e.g. we
+        # are only using this to store the ttl, so we should onl save this
+        # value if it's returned by the provider.
+        record.extra = pr_record.extra
+        try:
+            record.save()
+        except me.ValidationError as exc:
+            log.error("Error validating %s: %s", record, exc.to_dict())
+            raise BadRequestError({'msg': exc.message,
+                                   'errors': exc.to_dict()})
+        except me.NotUniqueError as exc:
+            log.error("Record %s not unique error: %s", record, exc)
+            raise RecordExistsError()
 
     def _create_record__for_zone(self, zone, **kwargs):
         """

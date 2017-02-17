@@ -816,7 +816,7 @@ def list_dns_zones(request):
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
-    return cloud.ctl.dns.list_zones()
+    return [zone.as_dict() for zone in cloud.ctl.dns.list_zones()]
 
 
 @view_config(route_name='api_v1_records', request_method='GET', renderer='json')
@@ -880,7 +880,7 @@ def create_dns_record(request):
     # Get the params and create the new record
     params = params_from_request(request)
 
-    return Record.add(zone, id='', **params).as_dict()
+    return Record.add(zone, **params).as_dict()
 
 @view_config(route_name='api_v1_zone', request_method='DELETE', renderer='json')
 def delete_dns_zone(request):
