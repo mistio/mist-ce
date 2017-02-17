@@ -1,7 +1,10 @@
 import uuid
+import logging
+from pyramid.response import Response
 
 import mist.io.machines.methods as methods
 
+from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 
 from mist.io import tasks
@@ -12,6 +15,15 @@ from mist.io.helpers import view_config, params_from_request
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import BadRequestError, NotFoundError
 
+#  TODO handle this for open.source, it is used from machine_rdp
+from mist.core.vpn.methods import destination_nat
+from mist.core import config
+
+logging.basicConfig(level=config.PY_LOG_LEVEL,
+                    format=config.PY_LOG_FORMAT,
+                    datefmt=config.PY_LOG_FORMAT_DATE)
+log = logging.getLogger(__name__)
+
 
 @view_config(route_name='api_v1_machines',
              request_method='GET', renderer='json')
@@ -19,6 +31,8 @@ def list_machines(request):
     """
     List machines on cloud
     Gets machines and their metadata from a cloud
+    Check Permissions take place in filter_list_machines
+    READ permission required on cloud.
     READ permission required on machine.
     ---
     cloud:
@@ -29,7 +43,24 @@ def list_machines(request):
 
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
-    return methods.filter_list_machines(auth_context, cloud_id)
+    # SEC get filtered resources based on auth_context
+    machines = methods.filter_list_machines(auth_context, cloud_id)
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner,
+                                  id=cloud_id, deleted=None)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
+
+    if cloud.machine_count != len(machines):
+        try:
+            tasks.update_machine_count.delay(
+                auth_context.owner.id, cloud_id, len(machines))
+        except Exception as e:
+            log.error('Cannot update machine count for user %s: %r' %
+                      (auth_context.owner.id, e))
+
+    return machines
 
 
 @view_config(route_name='api_v1_machines', request_method='POST',
@@ -348,3 +379,61 @@ def machine_actions(request):
 
     # TODO: We shouldn't return list_machines, just OK. Save the API!
     return methods.filter_list_machines(auth_context, cloud_id)
+
+
+@view_config(route_name='api_v1_machine_rdp',
+             request_method='GET', renderer='json')
+def machine_rdp(request):
+    """
+    Rdp file for windows machines
+    Generate and return an rdp file for windows machines
+    READ permission required on cloud.
+    READ permission required on machine.
+    ---
+    cloud:
+      in: path
+      required: true
+      type: string
+    machine:
+      in: path
+      required: true
+      type: string
+    rdp_port:
+      default: 3389
+      in: query
+      required: true
+      type: integer
+    host:
+      in: query
+      required: true
+      type: string
+    """
+    cloud_id = request.matchdict['cloud']
+    machine_id = request.matchdict['machine']
+    auth_context = auth_context_from_request(request)
+    auth_context.check_perm("cloud", "read", cloud_id)
+    try:
+        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
+        machine_uuid = machine.id
+    except Machine.DoesNotExist:
+        machine_uuid = ""
+    auth_context.check_perm("machine", "read", machine_uuid)
+    rdp_port = request.params.get('rdp_port', 3389)
+    host = request.params.get('host')
+
+    if not host:
+        raise BadRequestError('no hostname specified')
+    try:
+        1 < int(rdp_port) < 65535
+    except:
+        rdp_port = 3389
+
+    host, rdp_port = destination_nat(auth_context.owner, host, rdp_port)
+
+    rdp_content = 'full address:s:%s:%s\nprompt for credentials:i:1' % \
+                  (host, rdp_port)
+    return Response(content_type='application/octet-stream',
+                    content_disposition='attachment; filename="%s.rdp"' % host,
+                    charset='utf8',
+                    pragma='no-cache',
+                    body=rdp_content)
