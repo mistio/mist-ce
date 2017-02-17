@@ -74,7 +74,7 @@ class GoogleDNSController(BaseDNSController):
             kwargs['name'] += "."
         kwargs['name'] += zone.domain
         data = kwargs.pop('data', '')
-        kwargs['data'] = {'ttl': kwargs['ttl'], 'rrdatas': []}
+        kwargs['data'] = {'ttl': kwargs.pop('ttl', 0), 'rrdatas': []}
         kwargs['data']['rrdatas'].append(data)
 
     def _list__records_postparse_data(self, pr_record, record):
