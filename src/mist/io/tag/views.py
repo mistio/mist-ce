@@ -551,7 +551,7 @@ def delete_machine_tag(request):
       type: string
     """
     auth_context = auth_context_from_request(request)
-    params =params_from_request(request)
+    params = params_from_request(request)
     cloud_id = request.matchdict["cloud_id"]
     machine_id = request.matchdict["machine_id"]
     tag_key = params.get("tag_key")
