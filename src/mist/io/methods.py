@@ -114,28 +114,6 @@ def star_image(owner, cloud_id, image_id):
     return not star
 
 
-def list_scripts(owner):
-    from mist.io.tag.methods import get_tags_for_resource
-    scripts = Script.objects(owner=owner, deleted=None)
-    script_objects = []
-    for script in scripts:
-        script_object = script.as_dict_old()
-        script_object["tags"] = get_tags_for_resource(owner, script)
-        script_objects.append(script_object)
-    return script_objects
-
-
-def list_schedules(owner):
-    from mist.io.tag.methods import get_tags_for_resource
-    schedules = Schedule.objects(owner=owner, deleted=None).order_by('-_id')
-    schedule_objects = []
-    for schedule in schedules:
-        schedule_object = schedule.as_dict()
-        schedule_object["tags"] =  get_tags_for_resource(owner, schedule)
-        schedule_objects.append(schedule_object)
-    return schedule_objects
-
-
 def list_sizes(owner, cloud_id):
     """List sizes (aka flavors) from each cloud"""
     return Cloud.objects.get(owner=owner, id=cloud_id,
@@ -184,24 +162,6 @@ def list_projects(owner, cloud_id):
         # close connection with libvirt
         conn.disconnect()
     return ret
-
-
-def filter_list_scripts(auth_context, perm='read'):
-    """Return a list of scripts based on the user's RBAC map."""
-    scripts = list_scripts(auth_context.owner)
-    if not auth_context.is_owner():
-        scripts = [script for script in scripts if script['id'] in
-                   auth_context.get_allowed_resources(rtype='scripts')]
-    return scripts
-
-
-def filter_list_schedules(auth_context, perm='read'):
-    """List scheduler entries based on the permissions granted to the user."""
-    schedules = list_schedules(auth_context.owner)
-    if not auth_context.is_owner():
-        schedules = [schedule for schedule in schedules if schedule['id']
-                     in auth_context.get_allowed_resources(rtype='schedules')]
-    return schedules
 
 
 def create_subnet(owner, cloud, network, subnet_params):
