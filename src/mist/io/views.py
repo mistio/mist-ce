@@ -272,65 +272,6 @@ def delete_dns_record(request):
     return cloud.ctl.dns.delete_record(zone_id, record_id)
 
 
-@view_config(route_name='api_v1_machine_rdp', request_method='GET',
-             renderer='json')
-def machine_rdp(request):
-    """
-    Rdp file for windows machines
-    Generate and return an rdp file for windows machines
-    READ permission required on cloud.
-    READ permission required on machine.
-    ---
-    cloud:
-      in: path
-      required: true
-      type: string
-    machine:
-      in: path
-      required: true
-      type: string
-    rdp_port:
-      default: 3389
-      in: query
-      required: true
-      type: integer
-    host:
-      in: query
-      required: true
-      type: string
-    """
-    cloud_id = request.matchdict['cloud']
-    machine_id = request.matchdict['machine']
-    auth_context = auth_context_from_request(request)
-    auth_context.check_perm("cloud", "read", cloud_id)
-    try:
-        machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-        machine_uuid = machine.id
-    except me.DoesNotExist:
-        machine_uuid = ""
-    auth_context.check_perm("machine", "read", machine_uuid)
-    rdp_port = request.params.get('rdp_port', 3389)
-    host = request.params.get('host')
-
-    if not host:
-        raise BadRequestError('no hostname specified')
-    try:
-        1 < int(rdp_port) < 65535
-    except:
-        rdp_port = 3389
-
-    from mist.core.vpn.methods import destination_nat
-    host, rdp_port = destination_nat(auth_context.owner, host, rdp_port)
-
-    rdp_content = 'full address:s:%s:%s\nprompt for credentials:i:1' % \
-                  (host, rdp_port)
-    return Response(content_type='application/octet-stream',
-                    content_disposition='attachment; filename="%s.rdp"' % host,
-                    charset='utf8',
-                    pragma='no-cache',
-                    body=rdp_content)
-
-
 @view_config(route_name='api_v1_images', request_method='POST', renderer='json')
 def list_specific_images(request):
     # FIXME: 1) i shouldn't exist, 2) i shouldn't be a post
