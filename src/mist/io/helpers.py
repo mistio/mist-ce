@@ -61,11 +61,11 @@ def get_temp_file(content):
     """Creates a temporary file on disk and saves 'content' in it.
 
     It is meant to be used like this:
-    with get_temp_file(my_string) as filepath:
-        do_stuff(filepath)
+    with get_temp_file(my_string) as file_path:
+        do_stuff(file_path)
 
     Once the with block is exited, the file is always deleted, even if an
-    exception has been rised.
+    exception has been raised.
 
     """
     (tmp_fd, tmp_path) = tempfile.mkstemp()
