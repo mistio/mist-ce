@@ -9,6 +9,7 @@ import mongoengine as me
 from mist.io.clouds.models import Cloud
 from mist.io.users.models import Organization
 from mist.io.dns.controllers import ZoneController, RecordController
+from mist.io.clouds.controllers.dns.base import BaseDNSController
 
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import ZoneExistsError
@@ -137,7 +138,7 @@ class Record(me.Document):
         self.ctl = RecordController(self)
 
     @classmethod
-    def add(cls, zone, id='', **kwargs):
+    def add(cls, owner, zone=None, id='', **kwargs):
         """Add Record
 
         This is a class method, meaning that it is meant to be called on the
@@ -161,9 +162,15 @@ class Record(me.Document):
             raise RequiredParameterMissingError('data')
         if not kwargs['type']:
             raise RequiredParameterMissingError('type')
+        if not owner:
+            raise RequiredParameterMissingError('owner')
         #assert isinstance(cloud, Cloud)
-        if not zone or not isinstance(zone, Zone):
+        if not zone and type in ['A', 'AAAA', 'CNAME']:
+            raise RequiredParameterMissingError('zone')
+        zone = BaseDNSController.find_best_matching_zone(owner, kwargs)
+        if zone and not isinstance(zone, Zone):
             raise BadRequestError('zone')
+
         record = cls(zone=zone)
         if id:
             record.id = id

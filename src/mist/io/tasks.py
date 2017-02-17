@@ -152,40 +152,20 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
 
             if hostname:
                 try:
-                    # split hostname in dot separated parts
-                    parts = [part for part in hostname.split('.') if part]
-                    # find all possible domains for this domain name,
-                    # longest first
-                    all_domains = {}
-                    for i in range(1, len(parts) - 1):
-                        subdomain = '.'.join(parts[:i])
-                        domain = '.'.join(parts[i:]) + '.'
-                        all_domains[domain] = subdomain
-                    if not all_domains:
-                        raise MistError("Couldn't extract a valid domain from \
-                                         '%s'."  % domain_name)
+                    kwargs = {}
+                    kwargs['name'] = subdomain
+                    kwargs['type'] = 'A'
+                    kwargs['data'] = host
+                    kwargs['ttl'] = 3600
 
-                    zones = Zone.objects(owner=owner)
-                    # We need to iterate over all the cloud DNS zones to find
-                    # any that is matching based on the domain. If one is found
-                    # then create an "A" type record with the provided name.
-                    # TODO: need to find what the default ttl for this record
-                    # should be, for now adding nothing further and just try to
-                    # used the cloud provider default.
-                    for zone in zones:
-                        for domain, subdomain in all_domains.iteritems():
-                            if zone.domain == domain:
-                                kwargs = {}
-                                kwargs['name'] = subdomain
-                                kwargs['type'] = 'A'
-                                kwargs['data'] = host
-                                kwargs['ttl'] = 3600
-                                record = Record.add(zone=zone, id='', **kwargs)
+                    
+                    record = Record.add(**kwargs)
                     hostname = '.'.join((record.name, record.zone.domain))
-                    log_event(action='Record.add', hostname=hostname,
+                    log_event(action='Create_A_record', hostname=hostname,
                               **log_dict)
                 except Exception as exc:
-                    log_event(action='Record.add', error=str(exc), **log_dict)
+                    log_event(action='Create_A_record', hostname=hostname,
+                              error=str(exc), **log_dict)
 
             error = False
             if script_id:

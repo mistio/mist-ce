@@ -880,7 +880,7 @@ def create_dns_record(request):
     # Get the params and create the new record
     params = params_from_request(request)
 
-    return Record.add(zone, **params).as_dict()
+    return Record.add(owner=auth_context.owner, zone=zone, **params).as_dict()
 
 @view_config(route_name='api_v1_zone', request_method='DELETE', renderer='json')
 def delete_dns_zone(request):

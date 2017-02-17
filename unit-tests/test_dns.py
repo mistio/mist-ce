@@ -117,16 +117,15 @@ def test_create_record(cloud):
     zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
 
     kwargs = {}
-    kwargs['name'] = 'blog'
+    kwargs['name'] = 'blog.test.io'
     kwargs['type'] = 'A'
     kwargs['data'] = '1.2.3.4'
     kwargs['ttl'] = 172800
 
     print "**** Create type %s DNS record with name %s" % \
         (kwargs['type'], kwargs['name'])
-    Record.add(zone, id='', **kwargs)
+    record = Record.add(owner=cloud.owner, **kwargs)
     print "**** DNS record created succesfully"
-    record = Record.objects.get(zone=zone, type='A')
     __record_id__ = record.id
     __num_records__ = 1
     print "Num records %d" % __num_records__
@@ -138,20 +137,21 @@ def test_list_records(cloud, load_staging_l_records):
     """
     global __zone_id__
     global __num_records__
-    zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
+    # zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
 
-    records = zone.ctl.list_records()
-    print len(records)
+    # records = zone.ctl.list_records()
+    # print len(records)
 
-    if len(records) == __num_records__ + 2:
-        print "List Records success"
-    else:
-        raise Exception
+    # if len(records) == __num_records__ + 2:
+    #     print "List Records success"
+    # else:
+    #     raise Exception
 
-    # zones = Zone.objects(owner=cloud.owner, domain='domain.com.')
-    # for zone in zones:
-    #     records = zone.ctl.list_records()
-    #     print len(records)
+    zones = Zone.objects(owner=cloud.owner)
+    for zone in zones:
+        records = zone.ctl.list_records()
+        for record in records:
+            print record.as_dict()
 
         # if cloud.ctl.provider == "ec2":
         #     dnsprovider = "route53"
@@ -168,24 +168,24 @@ def test_delete_record(cloud):
     """
     global __zone_id__
     global __record_id__
-    zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
-    record = Record.objects.get(zone=zone, id=__record_id__)
-    try:
-        record.ctl.delete_record()
-    except Exception:
-        print "can't delete record: %s" % record.record_id
-    print "**** Record deleted successfully"
+    # zone = Zone.objects.get(owner=cloud.owner, id=__zone_id__)
+    # record = Record.objects.get(id=__record_id__)
+    # try:
+    #     record.ctl.delete_record()
+    # except Exception:
+    #     print "can't delete record: %s" % record.record_id
+    # print "**** Record deleted successfully"
 
-    # zones = Zone.objects(owner=cloud.owner, domain='domain.com.')
-    # print "We got %d zones" % len(zones)
-    # for zone in zones:
-    #     records = Record.objects(zone=zone, type='A')
-    #     for record in records:
-    #         try:
-    #             record.ctl.delete_record()
-    #         except Exception:
-    #             print "can't delete record: %s" % record.record_id
-    #         print "**** Record deleted successfully"
+    zones = Zone.objects(owner=cloud.owner)
+    print "We got %d zones" % len(zones)
+    for zone in zones:
+        records = Record.objects(zone=zone, type='A')
+        for record in records:
+            try:
+                record.ctl.delete_record()
+            except Exception:
+                print "can't delete record: %s" % record.record_id
+            print "**** Record deleted successfully"
 
 
 def test_delete_zone(cloud):

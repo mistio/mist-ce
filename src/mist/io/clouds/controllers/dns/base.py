@@ -279,7 +279,7 @@ class BaseDNSController(BaseController):
         except me.ValidationError as exc:
             log.error("Error updating %s: %s", zone, exc.to_dict())
             raise BadRequestError({'msg': exc.message,
-                                    'errors': exc.to_dict()})
+                                   'errors': exc.to_dict()})
         except me.NotUniqueError as exc:
             log.error("Zone %s not unique error: %s", zone, exc)
             raise ZoneExistsError()
@@ -321,7 +321,7 @@ class BaseDNSController(BaseController):
         if isinstance(kwargs['data'], list):
             record.rdata = kwargs['data']
         else:
-            record.rdata = list(kwargs['data'])
+            record.rdata = [kwargs['data']]
         record.ttl = kwargs['ttl']
 
         try:
@@ -386,3 +386,45 @@ class BaseDNSController(BaseController):
         ---
         """
         return
+
+    @staticmethod
+    def find_best_matching_zone(owner, kwargs):
+        """
+        This is a static method that tries to extract a valid domain from
+        the name provided, trying to find the best matching DNS zone. This only
+        works with 'A', 'AAAA' and 'CNAME' type records.
+        This is common for all providers, there's no need to override this.
+        ---
+        """
+        # TODO: Adding here for circular dependency issue. Need to fix this.
+        from mist.io.dns.models import Zone
+
+        if kwargs['type'] in ['A', 'AAAA', 'CNAME']:
+            # Split hostname in dot separated parts.
+            parts = [part for part in kwargs['name'].split('.') if part]
+            # Find all possible domains for this domain name,
+            # longest first
+            all_domains = {}
+            for i in range(1, len(parts) - 1):
+                subdomain = '.'.join(parts[:i])
+                domain = '.'.join(parts[i:]) + '.'
+                all_domains[domain] = subdomain
+            if not all_domains:
+                raise BadRequestError("Couldn't extract a valid domain from \
+                                    the provided '%s'."  % kwargs['name'])
+
+            zones = Zone.objects(owner=owner)
+            # We need to iterate over all the cloud DNS zones to find
+            # any that is matching based on the domain. If one is found
+            # then create an "A" type record with the provided name.
+            for zone_candidate in zones:
+                for domain, subdomain in all_domains.iteritems():
+                    if zone_candidate.domain == domain:
+                        zone = zone_candidate
+                        break
+        if not zone:
+            raise BadRequestError("No DNS zone found, can't proceed with \
+                                   creating record '%s'."  % kwargs['name'])
+        return zone
+
+

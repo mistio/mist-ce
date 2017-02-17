@@ -43,10 +43,12 @@ class AmazonDNSController(BaseDNSController):
 
     def _create_record__prepare_args(self, zone, kwargs):
         """
-        This is a private method to transform the arguments to provider the
-        provide specific form.
+        This is a private method to transform the arguments to the provider
+        specific form.
         ---
         """
+        if kwargs['name'].endswith(zone.domain):
+            kwargs['name'] = kwargs['name'][:-len(zone.domain)]
         kwargs['extra'] = {'ttl': kwargs.pop('ttl', 0)}
 
     def _list_records__postparse_data(self, pr_record, record):
@@ -66,13 +68,10 @@ class GoogleDNSController(BaseDNSController):
 
     def _create_record__prepare_args(self, zone, kwargs):
         """
-        This is a private method to transform the arguments to provider the
-        provide specific form.
+        This is a private method to transform the arguments to the provider
+        specific form.
         ---
         """
-        if not kwargs['name'].endswith('.'):
-            kwargs['name'] += "."
-        kwargs['name'] += zone.domain
         data = kwargs.pop('data', '')
         kwargs['data'] = {'ttl': kwargs.pop('ttl', 0), 'rrdatas': []}
         kwargs['data']['rrdatas'].append(data)
