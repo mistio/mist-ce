@@ -7,7 +7,7 @@ def list_schedules(owner):
     schedule_objects = []
     for schedule in schedules:
         schedule_object = schedule.as_dict()
-        schedule_object["tags"] =  get_tags_for_resource(owner, schedule)
+        schedule_object["tags"] = get_tags_for_resource(owner, schedule)
         schedule_objects.append(schedule_object)
     return schedule_objects
 
