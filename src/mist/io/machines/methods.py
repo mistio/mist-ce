@@ -621,22 +621,23 @@ def _create_machine_softlayer(conn, key_name, private_key, public_key,
         postInstallScriptUri = ''
     else:
         postInstallScriptUri = None
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(
-                name=name,
-                ex_domain=domain,
-                image=image,
-                size=size,
-                location=location,
-                sshKeys=server_key,
-                bare_metal=bare_metal,
-                postInstallScriptUri=postInstallScriptUri,
-                ex_hourly=hourly,
-                ex_backend_vlan=softlayer_backend_vlan_id
-            )
-        except Exception as e:
-            raise MachineCreationError("Softlayer, got exception %s" % e, e)
+
+    try:
+        node = conn.create_node(
+            name=name,
+            ex_domain=domain,
+            image=image,
+            size=size,
+            location=location,
+            sshKeys=server_key,
+            bare_metal=bare_metal,
+            postInstallScriptUri=postInstallScriptUri,
+            ex_hourly=hourly,
+            ex_backend_vlan=softlayer_backend_vlan_id
+        )
+    except Exception as e:
+        raise MachineCreationError("Softlayer, got exception %s" % e, e)
+
     return node
 
 
@@ -925,30 +926,29 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
             except:
                 pass
 
-    with get_temp_file(private_key) as tmp_key_path:
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            size=size,
+            image=image,
+            location=location,
+            ex_cloud_service_name=cloud_service_name,
+            endpoint_ports=port_bindings,
+            custom_data=base64.b64encode(cloud_init)
+        )
+    except Exception as e:
         try:
-            node = conn.create_node(
-                name=machine_name,
-                size=size,
-                image=image,
-                location=location,
-                ex_cloud_service_name=cloud_service_name,
-                endpoint_ports=port_bindings,
-                custom_data=base64.b64encode(cloud_init)
-            )
-        except Exception as e:
-            try:
-                # try to get the message only out of the XML response
-                msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value)
-                if not msg:
-                    msg = re.search(r"(Message: ')(.*?)(', Body)", e.value)
-                if msg:
-                    msg = msg.group(2)
-            except:
-                msg = e
-            raise MachineCreationError('Azure, got exception %s' % msg)
+            # try to get the message only out of the XML response
+            msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value)
+            if not msg:
+                msg = re.search(r"(Message: ')(.*?)(', Body)", e.value)
+            if msg:
+                msg = msg.group(2)
+        except:
+            msg = e
+        raise MachineCreationError('Azure, got exception %s' % msg)
 
-        return node
+    return node
 
 
 def _create_machine_vcloud(conn, machine_name, image,
@@ -1014,18 +1014,18 @@ def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
     if cloud_init:
         metadata['startup-script'] = cloud_init
 
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(
-                name=machine_name,
-                image=image,
-                size=size,
-                location=location,
-                ex_metadata=metadata
-            )
-        except Exception as e:
-            raise MachineCreationError(
-                "Google Compute Engine, got exception %s" % e, e)
+    try:
+        node = conn.create_node(
+            name=machine_name,
+            image=image,
+            size=size,
+            location=location,
+            ex_metadata=metadata
+        )
+    except Exception as e:
+        raise MachineCreationError(
+            "Google Compute Engine, got exception %s" % e, e)
+
     return node
 
 
