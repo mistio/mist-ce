@@ -68,12 +68,12 @@ def machine_name_validator(provider, name):
         if not re.search(r'^[0-9a-zA-Z]+[0-9a-zA-Z-.]{0,}[0-9a-zA-Z]+$', name):
             raise MachineNameValidationError(
                 "machine name may only contain ASCII letters "
-                 "or numbers, dashes and dots")
+                "or numbers, dashes and dots")
     elif provider is Provider.PACKET:
         if not re.search(r'^[0-9a-zA-Z-.]+$', name):
             raise MachineNameValidationError(
                 "machine name may only contain ASCII letters "
-                 "or numbers, dashes and periods")
+                "or numbers, dashes and periods")
     elif provider == Provider.AZURE:
         pass
     elif provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
@@ -174,7 +174,7 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
                 docker_env=docker_env,
                 docker_command=docker_command,
                 docker_port_bindings=docker_port_bindings,
-               docker_exposed_ports=docker_exposed_ports
+                docker_exposed_ports=docker_exposed_ports
             )
             node_info = conn.inspect_node(node)
             try:
@@ -223,9 +223,9 @@ def create_machine(owner, cloud_id, key_id, machine_name, location_id,
     elif conn.type is Provider.SOFTLAYER:
         node = _create_machine_softlayer(
             conn, key_id, private_key, public_key,
-             machine_name, image, size,
-             location, bare_metal, cloud_init,
-             hourly, softlayer_backend_vlan_id
+            machine_name, image, size,
+            location, bare_metal, cloud_init,
+            hourly, softlayer_backend_vlan_id
         )
     elif conn.type is Provider.DIGITAL_OCEAN:
         node = _create_machine_digital_ocean(
@@ -706,7 +706,7 @@ def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
         except:
             # on API v1 if we can't create that key, means that key is already
             # on our account. Since we don't know the id, we pass all the ids
-            server_keys = [str(key.id) for key in keys]
+            server_keys = [str(k.id) for k in keys]
 
     if not server_key:
         ex_ssh_key_ids = server_keys
@@ -901,7 +901,7 @@ def _create_machine_azure(conn, key_name, private_key, public_key,
     sanitized by create_machine.
 
     """
-    key = public_key.replace('\n', '')
+    public_key.replace('\n', '')
 
     port_bindings = []
     if azure_port_bindings and type(azure_port_bindings) in [str, unicode]:
@@ -1078,6 +1078,8 @@ def destroy_machine(user, cloud_id, machine_id):
         from mist.core.methods import disable_monitoring as dis_mon_core
         disable_monitoring_function = dis_mon_core
     except ImportError:
+        #  TODO handle this for open.source
+        from mist.io.methods import disable_monitoring
         # this is a standalone io instal/mlation, using io's disable_monitoring
         # if we have an authentication token for the core service
         if user.mist_api_token:
