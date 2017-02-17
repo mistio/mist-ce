@@ -18,7 +18,7 @@ from mist.io.exceptions import PolicyUnauthorizedError, UnauthorizedError
 from mist.io.helpers import get_stories
 from mist.io.helpers import view_config, params_from_request
 
-from mist.io.methods import filter_list_scripts
+from mist.io.scripts.methods import filter_list_scripts
 
 from mist.io.tag.methods import add_tags_to_resource
 
