@@ -41,8 +41,6 @@ import mist.io.inventory
 from mist.io.clouds.models import Cloud
 from mist.io.networks.models import NETWORKS, SUBNETS, Network, Subnet
 from mist.io.machines.models import Machine
-from mist.io.scripts.models import Script
-from mist.io.schedules.models import Schedule
 
 from mist.core.vpn.methods import super_ping  # TODO handle this for open_sourc
 from mist.core import config
@@ -193,6 +191,7 @@ def delete_subnet(owner, subnet):
     trigger_session_update(owner, ['clouds'])
 
 
+#  TODO we don't use this
 def set_machine_tags(owner, cloud_id, machine_id, tags):
     """Sets metadata for a machine, given the cloud and machine id.
 
@@ -286,6 +285,7 @@ def set_machine_tags(owner, cloud_id, machine_id, tags):
                 raise InternalServerError("error creating tags", exc)
 
 
+#  TODO we don't use this
 def delete_machine_tag(owner, cloud_id, machine_id, tag):
     """Deletes metadata for a machine, given the machine id and the tag to be
     deleted.
