@@ -3,6 +3,7 @@
 import os
 import re
 import sys
+import uuid
 import json
 import string
 import random
@@ -748,6 +749,7 @@ def encrypt2(plaintext, key=config.SECRET, key_salt='', no_iv=False):
     return ciphertext.encode('hex')
 
 
+# TODO: Deprecate. Move to io/events/methods.py once fully switched to ES.
 def log_event(owner_id, event_type, action, error=None, story_id='',
               user_id=None, _mongo_conn=None, **kwargs):
 
@@ -778,6 +780,10 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
         event['_id'] = str(coll.save(event.copy()))
         try:
             stories = log_story(event, _mongo_conn=conn)
+            if config.LOGS_FROM_ELASTIC:
+                from mist.io.events.methods import log_story as log_story_to_elastic
+                event.update({'log_id': uuid.uuid4().hex, '_stories': []})
+                log_story_to_elastic(event)
         except Exception as exc:
             log.error("failed to log story: %s %s %s %s %s Error %r",
                       owner_id, event_type, error, action, kwargs, exc)
@@ -796,7 +802,10 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
     keys.append('true' if event['error'] else 'false')
     routing_key = '.'.join(keys)
     _event = event.copy()
-    _event['_stories'] = stories
+
+    if not config.LOGS_FROM_ELASTIC:  # Taken care of in `log_story` otherwise.
+        _event['_stories'] = stories
+
     amqp_publish('events', routing_key, _event,
                  ex_type='topic', ex_declare=True,
                  auto_delete=False)
@@ -1006,11 +1015,21 @@ def log_story(event, _mongo_conn=None):
     return ret
 
 
+# TODO: Deprecate.
 def get_stories(story_type='', owner_id='', user_id='',
                 cloud_id='', machine_id='', script_id='', rule_id='',
-                error=False, pending=None, sort='started_at',
+                error=None, pending=None, sort='started_at',
                 sort_order=-1,
                 limit=0, **kwargs):
+
+    if config.LOGS_FROM_ELASTIC:
+        from mist.io.events.methods import get_stories as get_stories_from_elastic
+        return get_stories_from_elastic(
+            story_type=story_type, owner_id=owner_id, user_id=user_id,
+            cloud_id=cloud_id, machine_id=machine_id, script_id=script_id,
+            rule_id=script_id, error=error, pending=pending, sort=sort,
+            sort_order=sort_order, limit=limit, **kwargs
+        )
 
     query = kwargs
     if story_type:
@@ -1063,8 +1082,9 @@ def get_stories(story_type='', owner_id='', user_id='',
     return stories
 
 
+# TODO: Deprecate.
 def get_story(story_id):
-    stories = get_stories(story_id=story_id)
+    stories = get_stories(story_id=story_id, expand=True)
     if not stories:
         raise NotFoundError(story_id)
     if len(stories) > 1:
