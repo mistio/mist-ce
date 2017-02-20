@@ -1,21 +1,15 @@
 import os
 import re
 import shutil
-import random
 import tempfile
 import json
-import base64
 import requests
 
-import mongoengine as me
 from mongoengine import ValidationError, NotUniqueError, DoesNotExist
 
 from time import time
-from datetime import datetime
-from tempfile import NamedTemporaryFile
 
-from libcloud.compute.base import Node, NodeSize, NodeImage, NodeLocation
-from libcloud.compute.base import NodeAuthSSHKey
+from libcloud.compute.base import Node
 from libcloud.compute.types import Provider, NodeState
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
@@ -29,13 +23,10 @@ import ansible.callbacks
 import ansible.utils
 import ansible.constants
 
-from mist.io.keys.models import Key
-from mist.core import config
-
 from mist.io.shell import Shell
-from mist.io.helpers import get_temp_file
+
 from mist.io.helpers import get_auth_header
-from mist.io.helpers import transform_key_machine_associations
+
 from mist.io.exceptions import *
 
 from mist.io.helpers import trigger_session_update
@@ -50,10 +41,9 @@ import mist.io.inventory
 from mist.io.clouds.models import Cloud
 from mist.io.networks.models import NETWORKS, SUBNETS, Network, Subnet
 from mist.io.machines.models import Machine
-from mist.io.scripts.models import Script
-from mist.io.schedules.models import Schedule
 
-from mist.core.vpn.methods import super_ping
+from mist.core.vpn.methods import super_ping  # TODO handle this for open_sourc
+from mist.core import config
 
 import mist.io.clouds.models as cloud_models
 
@@ -65,110 +55,6 @@ logging.basicConfig(level=config.PY_LOG_LEVEL,
 log = logging.getLogger(__name__)
 
 
-def add_cloud_v_2(owner, title, provider, params):
-    """Add cloud to owner"""
-
-    # FIXME: Some of these should be explicit arguments, others shouldn't exist
-    fail_on_error = params.pop('fail_on_error',
-                               params.pop('remove_on_error', True))
-    monitoring = params.pop('monitoring', False)
-    params.pop('title', None)
-    params.pop('provider', None)
-    # Find proper Cloud subclass.
-    if not provider:
-        raise RequiredParameterMissingError("provider")
-    log.info("Adding new cloud in provider '%s'", provider)
-    if provider not in cloud_models.CLOUDS:
-        raise BadRequestError("Invalid provider '%s'." % provider)
-    cloud_cls = cloud_models.CLOUDS[provider]  # Class of Cloud model.
-
-    # Add the cloud.
-    cloud = cloud_cls.add(owner, title, fail_on_error=fail_on_error,
-                          fail_on_invalid_params=False, **params)
-    ret = {'cloud_id': cloud.id}
-    if provider == 'bare_metal' and monitoring:
-        # Let's overload this a bit more by also combining monitoring.
-        machine = Machine.objects.get(cloud=cloud)
-        try:
-            from mist.core.methods import enable_monitoring as _en_mon
-        except ImportError:
-            _en_mon = enable_monitoring
-        ret['monitoring'] = _en_mon(
-            owner, cloud.id, machine.machine_id,
-            no_ssh=not (machine.os_type == 'unix' and
-                        machine.key_associations)
-        )
-
-    # SEC
-    owner.mapper.update(cloud)
-
-    log.info("Cloud with id '%s' added succesfully.", cloud.id)
-    trigger_session_update(owner, ['clouds'])
-    return ret
-
-
-def rename_cloud(owner, cloud_id, new_name):
-    """Renames cloud with given cloud_id."""
-
-    log.info("Renaming cloud: %s", cloud_id)
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-    cloud.ctl.rename(new_name)
-    log.info("Succesfully renamed cloud '%s'", cloud_id)
-    trigger_session_update(owner, ['clouds'])
-
-
-def delete_cloud(owner, cloud_id):
-    """Deletes cloud with given cloud_id."""
-
-    log.info("Deleting cloud: %s", cloud_id)
-
-    # if a core/io installation, disable monitoring for machines
-    try:
-        from mist.core.methods import disable_monitoring_cloud
-    except ImportError:
-        # this is a standalone io installation, don't bother
-        pass
-    else:
-        # this a core/io installation, disable directly using core's function
-        log.info("Disabling monitoring before deleting cloud.")
-        try:
-            disable_monitoring_cloud(owner, cloud_id)
-        except Exception as exc:
-            log.warning("Couldn't disable monitoring before deleting cloud. "
-                        "Error: %r", exc)
-
-    try:
-        cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-        cloud.ctl.delete()
-    except Cloud.DoesNotExist:
-        raise NotFoundError('Cloud does not exist')
-
-    log.info("Succesfully deleted cloud '%s'", cloud_id)
-    trigger_session_update(owner, ['clouds'])
-
-
-def delete_key(owner, key_id):
-    """Deletes given key.
-    If key was default, then it checks if there are still keys left
-    and assigns another one as default.
-
-    :param owner:
-    :param key_id:
-    :return:
-    """
-    log.info("Deleting key with id '%s'.", key_id)
-    key = Key.objects.get(owner=owner, id=key_id, deleted=None)
-    default_key = key.default
-    key.update(set__deleted=datetime.utcnow())
-    other_key = Key.objects(owner=owner, id__ne=key_id, deleted=None).first()
-    if default_key and other_key:
-        other_key.default = True
-        other_key.save()
-
-    log.info("Deleted key with id '%s'.", key_id)
-    trigger_session_update(owner, ['keys'])
-
-
 def connect_provider(cloud):
     """Establishes cloud connection using the credentials specified.
 
@@ -176,961 +62,6 @@ def connect_provider(cloud):
 
     """
     return cloud.ctl.compute.connect()
-
-
-def list_machines(owner, cloud_id):
-    """List all machines in this cloud via API call to the provider."""
-    machines = Cloud.objects.get(owner=owner, id=cloud_id,
-                                 deleted=None).ctl.compute.list_machines()
-    return [machine.as_dict_old() for machine in machines]
-
-
-def create_machine(owner, cloud_id, key_id, machine_name, location_id,
-                   image_id, size_id, image_extra, disk, image_name,
-                   size_name, location_name, ips, monitoring, networks=[],
-                   docker_env=[], docker_command=None, ssh_port=22, script='',
-                   script_id='', script_params='', job_id=None,
-                   docker_port_bindings={}, docker_exposed_ports={},
-                   azure_port_bindings='', hostname='', plugins=None,
-                   disk_size=None, disk_path=None,
-                   post_script_id='', post_script_params='', cloud_init='',
-                   associate_floating_ip=False,
-                   associate_floating_ip_subnet=None, project_id=None,
-                   schedule={}, command=None, tags=None,
-                   bare_metal=False, hourly=True,
-                   softlayer_backend_vlan_id=None):
-    """Creates a new virtual machine on the specified cloud.
-
-    If the cloud is Rackspace it attempts to deploy the node with an ssh key
-    provided in config. the method used is the only one working in the old
-    Rackspace cloud. create_node(), from libcloud.compute.base, with 'auth'
-    kwarg doesn't do the trick. Didn't test if you can upload some ssh related
-    files using the 'ex_files' kwarg from openstack 1.0 driver.
-
-    In Linode creation is a bit different. There you can pass the key file
-    directly during creation. The Linode API also requires to set a disk size
-    and doesn't get it from size.id. So, send size.disk from the client and
-    use it in all cases just to avoid provider checking. Finally, Linode API
-    does not support association between a machine and the image it came from.
-    We could set this, at least for machines created through mist.io in
-    ex_comment, lroot or lconfig. lroot seems more appropriate. However,
-    liblcoud doesn't support linode.config.list at the moment, so no way to
-    get them. Also, it will create inconsistencies for machines created
-    through mist.io and those from the Linode interface.
-
-    """
-    # script: a command that is given once
-    # script_id: id of a script that exists - for mist.core
-    # script_params: extra params, for script_id
-    # post_script_id: id of a script that exists - for mist.core. If script_id
-    # or monitoring are supplied, this will run after both finish
-    # post_script_params: extra params, for post_script_id
-
-    log.info('Creating machine %s on cloud %s' % (machine_name, cloud_id))
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-    conn = connect_provider(cloud)
-
-    machine_name = machine_name_validator(conn.type, machine_name)
-    key = None
-    if key_id:
-        key = Key.objects.get(owner=owner, id=key_id, deleted=None)
-
-    # if key_id not provided, search for default key
-    if conn.type not in [Provider.LIBVIRT, Provider.DOCKER]:
-        if not key_id:
-            key = Key.objects.get(owner=owner, default=True, deleted=None)
-            key_id = key.name
-    if key:
-        private_key = key.private
-        public_key = key.public
-    else:
-        public_key = None
-
-    size = NodeSize(size_id, name=size_name, ram='', disk=disk,
-                    bandwidth='', price='', driver=conn)
-    image = NodeImage(image_id, name=image_name, extra=image_extra,
-                      driver=conn)
-    location = NodeLocation(location_id, name=location_name, country='',
-                            driver=conn)
-
-    if conn.type is Provider.DOCKER:
-        if public_key:
-            node = _create_machine_docker(conn, machine_name, image_id, '',
-                                          public_key=public_key,
-                                          docker_env=docker_env,
-                                          docker_command=docker_command,
-                                          docker_port_bindings=docker_port_bindings,
-                                          docker_exposed_ports=docker_exposed_ports)
-            node_info = conn.inspect_node(node)
-            try:
-                ssh_port = int(node_info.extra['network_settings']['Ports']['22/tcp'][0]['HostPort'])
-            except:
-                pass
-        else:
-            node = _create_machine_docker(conn, machine_name, image_id, script, docker_env=docker_env,
-                                          docker_command=docker_command, docker_port_bindings=docker_port_bindings,
-                                          docker_exposed_ports=docker_exposed_ports)
-    elif conn.type in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
-        node = _create_machine_rackspace(conn, public_key, machine_name, image,
-                                         size, location, user_data=cloud_init)
-    elif conn.type in [Provider.OPENSTACK]:
-        node = _create_machine_openstack(conn, private_key, public_key,
-                                         machine_name, image, size, location,
-                                         networks, cloud_init)
-    elif conn.type in config.EC2_PROVIDERS and private_key:
-        locations = conn.list_locations()
-        for loc in locations:
-            if loc.id == location_id:
-                location = loc
-                break
-        node = _create_machine_ec2(conn, key_id, private_key, public_key,
-                                   machine_name, image, size, location,
-                                   cloud_init)
-    elif conn.type is Provider.NEPHOSCALE:
-        node = _create_machine_nephoscale(conn, key_id, private_key,
-                                          public_key, machine_name, image, size,
-                                          location, ips)
-    elif conn.type is Provider.GCE:
-        sizes = conn.list_sizes(location=location_name)
-        for size in sizes:
-            if size.id == size_id:
-                size = size
-                break
-        node = _create_machine_gce(conn, key_id, private_key, public_key,
-                                   machine_name, image, size, location,
-                                   cloud_init)
-    elif conn.type is Provider.SOFTLAYER:
-        node = _create_machine_softlayer(conn, key_id, private_key, public_key,
-                                         machine_name, image, size,
-                                         location, bare_metal, cloud_init, hourly, softlayer_backend_vlan_id)
-    elif conn.type is Provider.DIGITAL_OCEAN:
-        node = _create_machine_digital_ocean(conn, key_id, private_key,
-                                             public_key, machine_name,
-                                             image, size, location, cloud_init)
-    elif conn.type == Provider.AZURE:
-        node = _create_machine_azure(conn, key_id, private_key,
-                                     public_key, machine_name,
-                                     image, size, location, cloud_init=cloud_init,
-                                     cloud_service_name=None, azure_port_bindings=azure_port_bindings)
-    elif conn.type in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        node = _create_machine_vcloud(conn, machine_name, image, size, public_key, networks)
-    elif conn.type is Provider.LINODE and private_key:
-        # FIXME: The orchestration UI does not provide all the necessary
-        # parameters, thus we need to fetch the proper size and image objects.
-        # This should be properly fixed when migrated to the controllers.
-        if not disk:
-            for size in conn.list_sizes():
-                if int(size.id) == int(size_id):
-                    size = size
-                    break
-        if not image_extra:  # Missing: {'64bit': 1, 'pvops': 1}
-            for image in conn.list_images():
-                if int(image.id) == int(image_id):
-                    image = image
-                    break
-        node = _create_machine_linode(conn, key_id, private_key, public_key,
-                                      machine_name, image, size,
-                                      location)
-    elif conn.type == Provider.HOSTVIRTUAL:
-        node = _create_machine_hostvirtual(conn, public_key, machine_name, image,
-                                           size, location)
-    elif conn.type == Provider.VULTR:
-        node = _create_machine_vultr(conn, public_key, machine_name, image,
-                                     size, location, cloud_init)
-    elif conn.type is Provider.LIBVIRT:
-        try:
-            # size_id should have a format cpu:ram, eg 1:2048
-            cpu = size_id.split(':')[0]
-            ram = size_id.split(':')[1]
-        except:
-            ram = 512
-            cpu = 1
-        node = _create_machine_libvirt(conn, machine_name,
-                                       disk_size=disk_size, ram=ram, cpu=cpu,
-                                       image=image_id, disk_path=disk_path,
-                                       networks=networks,
-                                       public_key=public_key,
-                                       cloud_init=cloud_init)
-    elif conn.type == Provider.PACKET:
-        node = _create_machine_packet(conn, public_key, machine_name, image,
-                                      size, location, cloud_init, project_id)
-    else:
-        raise BadRequestError("Provider unknown.")
-
-    if key is not None:
-        # we did this change because there was race condition with
-        # list_machines
-        try:
-            machine = Machine(cloud=cloud, machine_id=node.id).save()
-        except NotUniqueError:
-            machine = Machine.objects.get(cloud=cloud, machine_id=node.id)
-
-        username = node.extra.get('username', '')
-        machine.ctl.associate_key(key, username=username,
-                                  port=ssh_port, no_connect=True)
-    # Call post_deploy_steps for every provider
-    if conn.type == Provider.AZURE:
-        # for Azure, connect with the generated password, deploy the ssh key
-        # when this is ok, it calls post_deploy for script/monitoring
-        mist.io.tasks.azure_post_create_steps.delay(
-            owner.id, cloud_id, node.id, monitoring, key_id,
-            node.extra.get('username'), node.extra.get('password'), public_key,
-            script=script,
-            script_id=script_id, script_params=script_params, job_id=job_id,
-            hostname=hostname, plugins=plugins, post_script_id=post_script_id,
-            post_script_params=post_script_params, schedule=schedule,
-        )
-    elif conn.type == Provider.OPENSTACK:
-        if associate_floating_ip:
-            networks = list_networks(owner, cloud_id)
-            mist.io.tasks.openstack_post_create_steps.delay(
-                owner.id, cloud_id, node.id, monitoring, key_id,
-                node.extra.get('username'), node.extra.get('password'),
-                public_key, script=script, script_id=script_id, script_params=script_params,
-                job_id=job_id, hostname=hostname, plugins=plugins,
-                post_script_params=post_script_params,
-                networks=networks, schedule=schedule,
-            )
-    elif conn.type == Provider.RACKSPACE_FIRST_GEN:
-        # for Rackspace First Gen, cannot specify ssh keys. When node is
-        # created we have the generated password, so deploy the ssh key
-        # when this is ok and call post_deploy for script/monitoring
-        mist.io.tasks.rackspace_first_gen_post_create_steps.delay(
-            owner.id, cloud_id, node.id, monitoring, key_id,
-            node.extra.get('password'), public_key, script=script,
-            script_id=script_id, script_params=script_params,
-            job_id=job_id, hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params, schedule=schedule
-        )
-
-    elif key_id:
-        mist.io.tasks.post_deploy_steps.delay(
-            owner.id, cloud_id, node.id, monitoring, script=script,
-            key_id=key_id, script_id=script_id, script_params=script_params,
-            job_id=job_id, hostname=hostname, plugins=plugins,
-            post_script_id=post_script_id,
-            post_script_params=post_script_params, schedule=schedule,
-        )
-
-    if tags:
-        from mist.io.tag.methods import resolve_id_and_set_tags
-        resolve_id_and_set_tags(owner, 'machine', node.id, tags,
-                                cloud_id=cloud_id)
-
-    ret = {'id': node.id,
-           'name': node.name,
-           'extra': node.extra,
-           'public_ips': node.public_ips,
-           'private_ips': node.private_ips,
-           'job_id': job_id,
-           }
-
-    return ret
-
-
-def _create_machine_rackspace(conn, public_key, machine_name,
-                              image, size, location, user_data):
-    """Create a machine in Rackspace.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-
-    key = str(public_key).replace('\n', '')
-
-    try:
-        server_key = ''
-        keys = conn.ex_list_keypairs()
-        for k in keys:
-            if key == k.public_key:
-                server_key = k.name
-                break
-        if not server_key:
-            server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
-            server_key = server_key.name
-    except:
-        try:
-            server_key = conn.ex_import_keypair_from_string(name='mistio' + str(random.randint(1, 100000)),
-                                                            key_material=key)
-            server_key = server_key.name
-        except AttributeError:
-            # RackspaceFirstGenNodeDriver based on OpenStack_1_0_NodeDriver
-            # has no support for keys. So don't break here, since create_node won't
-            # include it anyway
-            server_key = None
-
-    try:
-        node = conn.create_node(name=machine_name, image=image, size=size,
-                                location=location, ex_keyname=server_key, ex_userdata=user_data)
-        return node
-    except Exception as e:
-        raise MachineCreationError("Rackspace, got exception %r" % e, exc=e)
-
-
-def _create_machine_openstack(conn, private_key, public_key, machine_name,
-                              image, size, location, networks, user_data):
-    """Create a machine in Openstack.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    key = str(public_key).replace('\n', '')
-
-    try:
-        server_key = ''
-        keys = conn.ex_list_keypairs()
-        for k in keys:
-            if key == k.public_key:
-                server_key = k.name
-                break
-        if not server_key:
-            server_key = conn.ex_import_keypair_from_string(name=machine_name, key_material=key)
-            server_key = server_key.name
-    except:
-        server_key = conn.ex_import_keypair_from_string(name='mistio' + str(random.randint(1, 100000)),
-                                                        key_material=key)
-        server_key = server_key.name
-
-    # select the right OpenStack network object
-    available_networks = conn.ex_list_networks()
-    try:
-        chosen_networks = []
-        for net in available_networks:
-            if net.id in networks:
-                chosen_networks.append(net)
-    except:
-        chosen_networks = []
-
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(
-                name=machine_name,
-                image=image,
-                size=size,
-                location=location,
-                ssh_key=tmp_key_path,
-                ssh_alternate_usernames=['ec2-user', 'ubuntu'],
-                max_tries=1,
-                ex_keyname=server_key,
-                networks=chosen_networks,
-                ex_userdata=user_data)
-        except Exception as e:
-            raise MachineCreationError("OpenStack, got exception %s" % e, e)
-    return node
-
-
-def _create_machine_ec2(conn, key_name, private_key, public_key,
-                        machine_name, image, size, location, user_data):
-    """Create a machine in Amazon EC2.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    with get_temp_file(public_key) as tmp_key_path:
-        try:
-            # create keypair with key name and pub key
-            conn.ex_import_keypair(name=key_name, keyfile=tmp_key_path)
-        except:
-            # get existing key with that pub key
-            try:
-                keypair = conn.ex_find_or_import_keypair_by_key_material(pubkey=public_key)
-                key_name = keypair['keyName']
-            except Exception as exc:
-                raise CloudUnavailableError("Failed to import key")
-
-    # create security group
-    name = config.EC2_SECURITYGROUP.get('name', '')
-    description = config.EC2_SECURITYGROUP.get('description', '')
-    try:
-        log.info("Attempting to create security group")
-        conn.ex_create_security_group(name=name, description=description)
-        conn.ex_authorize_security_group_permissive(name=name)
-    except Exception as exc:
-        if 'Duplicate' in exc.message:
-            log.info('Security group already exists, not doing anything.')
-        else:
-            raise InternalServerError("Couldn't create security group", exc)
-
-    try:
-        node = conn.create_node(
-            name=machine_name,
-            image=image,
-            size=size,
-            location=location,
-            max_tries=1,
-            ex_keyname=key_name,
-            ex_securitygroup=config.EC2_SECURITYGROUP['name'],
-            ex_userdata=user_data
-        )
-    except Exception as e:
-        raise MachineCreationError("EC2, got exception %s" % e, e)
-
-    return node
-
-
-def _create_machine_nephoscale(conn, key_name, private_key, public_key,
-                               machine_name, image, size, location, ips):
-    """Create a machine in Nephoscale.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    machine_name = machine_name[:64].replace(' ', '-')
-    # name in NephoScale must start with a letter, can contain mixed
-    # alpha-numeric characters, hyphen ('-') and underscore ('_')
-    # characters, cannot exceed 64 characters, and can end with a
-    # letter or a number."
-
-    # Hostname must start with a letter, can contain mixed alpha-numeric
-    # characters and the hyphen ('-') character, cannot exceed 15 characters,
-    # and can end with a letter or a number.
-    key = public_key.replace('\n', '')
-
-    # NephoScale has 2 keys that need be specified, console and ssh key
-    # get the id of the ssh key if it exists, otherwise add the key
-    try:
-        server_key = ''
-        keys = conn.ex_list_keypairs(ssh=True, key_group=1)
-        for k in keys:
-            if key == k.public_key:
-                server_key = k.id
-                break
-        if not server_key:
-            server_key = conn.ex_create_keypair(machine_name, public_key=key)
-    except:
-        server_key = conn.ex_create_keypair(
-            'mistio' + str(random.randint(1, 100000)),
-            public_key=key
-        )
-
-    # mist.io does not support console key add through the wizzard.
-    # Try to add one
-    try:
-        console_key = conn.ex_create_keypair(
-            'mistio' + str(random.randint(1, 100000)),
-            key_group=4
-        )
-    except:
-        console_keys = conn.ex_list_keypairs(key_group=4)
-        if console_keys:
-            console_key = console_keys[0].id
-    if size.name and size.name.startswith('D'):
-        baremetal = True
-    else:
-        baremetal = False
-
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(
-                name=machine_name,
-                hostname=machine_name[:15],
-                image=image,
-                size=size,
-                zone=location.id,
-                server_key=server_key,
-                console_key=console_key,
-                ssh_key=tmp_key_path,
-                baremetal=baremetal,
-                ips=ips
-            )
-        except Exception as e:
-            raise MachineCreationError("Nephoscale, got exception %s" % e, e)
-        return node
-
-
-def _create_machine_softlayer(conn, key_name, private_key, public_key,
-                              machine_name, image, size, location, bare_metal, cloud_init, hourly,
-                              softlayer_backend_vlan_id):
-    """Create a machine in Softlayer.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    key = str(public_key).replace('\n', '')
-    try:
-        server_key = ''
-        keys = conn.list_key_pairs()
-        for k in keys:
-            if key == k.key:
-                server_key = k.id
-                break
-        if not server_key:
-            server_key = conn.create_key_pair(machine_name, key)
-            server_key = server_key.id
-    except:
-        server_key = conn.create_key_pair('mistio' + str(random.randint(1, 100000)), key)
-        server_key = server_key.id
-
-    if '.' in machine_name:
-        domain = '.'.join(machine_name.split('.')[1:])
-        name = machine_name.split('.')[0]
-    else:
-        domain = None
-        name = machine_name
-
-    # FIXME: SoftLayer allows only bash/script, no actual cloud-init
-    # Also need to upload this on a public https url...
-    if cloud_init:
-        postInstallScriptUri = ''
-    else:
-        postInstallScriptUri = None
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(
-                name=name,
-                ex_domain=domain,
-                image=image,
-                size=size,
-                location=location,
-                sshKeys=server_key,
-                bare_metal=bare_metal,
-                postInstallScriptUri=postInstallScriptUri,
-                ex_hourly=hourly,
-                ex_backend_vlan=softlayer_backend_vlan_id
-            )
-        except Exception as e:
-            raise MachineCreationError("Softlayer, got exception %s" % e, e)
-    return node
-
-
-def _create_machine_docker(conn, machine_name, image, script=None, public_key=None, docker_env={}, docker_command=None,
-                           tty_attach=True, docker_port_bindings={}, docker_exposed_ports={}):
-    """Create a machine in docker.
-
-    """
-
-    try:
-        if public_key:
-            environment = ['PUBLIC_KEY=%s' % public_key.strip()]
-        else:
-            environment = []
-
-        if docker_env:
-            # docker_env is a dict, and we must convert it ot be in the form:
-            # [ "key=value", "key=value"...]
-            docker_environment = ["%s=%s" % (key, value) for key, value in docker_env.iteritems()]
-            environment += docker_environment
-
-        node = conn.create_node(
-            name=machine_name,
-            image=image,
-            command=docker_command,
-            environment=environment,
-            tty=tty_attach,
-            ports=docker_exposed_ports,
-            port_bindings=docker_port_bindings,
-        )
-    except Exception as e:
-        raise MachineCreationError("Docker, got exception %s" % e, e)
-
-    return node
-
-
-def _create_machine_digital_ocean(conn, key_name, private_key, public_key,
-                                  machine_name, image, size, location, user_data):
-    """Create a machine in Digital Ocean.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    key = public_key.replace('\n', '')
-
-    # on API v1 list keys returns only ids, without actual public keys
-    # So the check fails. If there's already a key with the same pub key,
-    # create key call will fail!
-    try:
-        server_key = ''
-        keys = conn.ex_list_ssh_keys()
-        for k in keys:
-            if key == k.pub_key:
-                server_key = k
-                break
-        if not server_key:
-            server_key = conn.ex_create_ssh_key(machine_name, key)
-    except:
-        try:
-            server_key = conn.ex_create_ssh_key('mistio' + str(random.randint(1, 100000)), key)
-        except:
-            # on API v1 if we can't create that key, means that key is already
-            # on our account. Since we don't know the id, we pass all the ids
-            server_keys = [str(key.id) for key in keys]
-
-    if not server_key:
-        ex_ssh_key_ids = server_keys
-    else:
-        ex_ssh_key_ids = [str(server_key.id)]
-
-    # check if location allows the private_networking setting
-    private_networking = False
-    try:
-        locations = conn.list_locations()
-        for loc in locations:
-            if loc.id == location.id:
-                if 'private_networking' in loc.extra:
-                    private_networking = True
-                break
-    except:
-        # do not break if this fails for some reason
-        pass
-
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(
-                name=machine_name,
-                image=image,
-                size=size,
-                ex_ssh_key_ids=ex_ssh_key_ids,
-                location=location,
-                ssh_key=tmp_key_path,
-                private_networking=private_networking,
-                user_data=user_data
-            )
-        except Exception as e:
-            raise MachineCreationError("Digital Ocean, got exception %s" % e, e)
-
-        return node
-
-
-def _create_machine_libvirt(conn, machine_name, disk_size, ram, cpu,
-                            image, disk_path, networks, public_key, cloud_init):
-    """Create a machine in Libvirt.
-    """
-
-    try:
-        node = conn.create_node(
-            name=machine_name,
-            disk_size=disk_size,
-            ram=ram,
-            cpu=cpu,
-            image=image,
-            disk_path=disk_path,
-            networks=networks,
-            public_key=public_key,
-            cloud_init=cloud_init
-        )
-
-    except Exception as e:
-        raise MachineCreationError("KVM, got exception %s" % e, e)
-
-    return node
-
-
-def _create_machine_hostvirtual(conn, public_key, machine_name, image, size, location):
-    """Create a machine in HostVirtual.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    key = public_key.replace('\n', '')
-
-    auth = NodeAuthSSHKey(pubkey=key)
-
-    try:
-        node = conn.create_node(
-            name=machine_name,
-            image=image,
-            size=size,
-            auth=auth,
-            location=location
-        )
-    except Exception as e:
-        raise MachineCreationError("HostVirtual, got exception %s" % e, e)
-
-    return node
-
-
-def _create_machine_packet(conn, public_key, machine_name, image, size, location, cloud_init, project_id=None):
-    """Create a machine in Packet.net.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    key = public_key.replace('\n', '')
-    try:
-        conn.create_key_pair('mistio', key)
-    except:
-        # key exists and will be deployed
-        pass
-
-    # if project_id is not specified, use the project for which the driver
-    # has been initiated. If driver hasn't been initiated with a project,
-    # then use the first one from the projects
-    ex_project_id = None
-    if not project_id:
-        if conn.project_id:
-            ex_project_id = conn.project_id
-        else:
-            try:
-                ex_project_id = conn.projects[0].id
-            except IndexError:
-                raise BadRequestError("You don't have any projects on packet.net")
-    else:
-        for project_obj in conn.projects:
-            if project_id in [project_obj.name, project_obj.id]:
-                ex_project_id = project_obj.id
-                break
-        if not ex_project_id:
-            raise BadRequestError("Project id is invalid")
-
-    try:
-        node = conn.create_node(
-            name=machine_name,
-            size=size,
-            image=image,
-            location=location,
-            ex_project_id=ex_project_id,
-            cloud_init=cloud_init
-        )
-    except Exception as e:
-        raise MachineCreationError("Packet.net, got exception %s" % e, e)
-
-    return node
-
-
-def _create_machine_vultr(conn, public_key, machine_name, image, size, location, cloud_init):
-    """Create a machine in Vultr.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    key = public_key.replace('\n', '')
-
-    try:
-        server_key = ''
-        keys = conn.ex_list_ssh_keys()
-        for k in keys:
-            if key == k.ssh_key.replace('\n', ''):
-                server_key = k
-                break
-        if not server_key:
-            server_key = conn.ex_create_ssh_key(machine_name, key)
-    except:
-        server_key = conn.ex_create_ssh_key('mistio' + str(random.randint(1, 100000)), key)
-
-    try:
-        server_key = server_key.id
-    except:
-        pass
-
-    try:
-        node = conn.create_node(
-            name=machine_name,
-            size=size,
-            image=image,
-            location=location,
-            ssh_key=[server_key],
-            userdata=cloud_init
-        )
-    except Exception as e:
-        raise MachineCreationError("Vultr, got exception %s" % e, e)
-
-    return node
-
-
-def _create_machine_azure(conn, key_name, private_key, public_key,
-                          machine_name, image, size, location, cloud_init, cloud_service_name, azure_port_bindings):
-    """Create a machine Azure.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    key = public_key.replace('\n', '')
-
-    port_bindings = []
-    if azure_port_bindings and type(azure_port_bindings) in [str, unicode]:
-        # we receive something like: http tcp 80:80, smtp tcp 25:25, https tcp 443:443
-        # and transform it to [{'name':'http', 'protocol': 'tcp', 'local_port': 80, 'port': 80},
-        # {'name':'smtp', 'protocol': 'tcp', 'local_port': 25, 'port': 25}]
-
-        for port_binding in azure_port_bindings.split(','):
-            try:
-                port_dict = port_binding.split()
-                port_name = port_dict[0]
-                protocol = port_dict[1]
-                ports = port_dict[2]
-                local_port = ports.split(':')[0]
-                port = ports.split(':')[1]
-                binding = {'name': port_name, 'protocol': protocol, 'local_port': local_port, 'port': port}
-                port_bindings.append(binding)
-            except:
-                pass
-
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(
-                name=machine_name,
-                size=size,
-                image=image,
-                location=location,
-                ex_cloud_service_name=cloud_service_name,
-                endpoint_ports=port_bindings,
-                custom_data=base64.b64encode(cloud_init)
-            )
-        except Exception as e:
-            try:
-                # try to get the message only out of the XML response
-                msg = re.search(r"(<Message>)(.*?)(</Message>)", e.value)
-                if not msg:
-                    msg = re.search(r"(Message: ')(.*?)(', Body)", e.value)
-                if msg:
-                    msg = msg.group(2)
-            except:
-                msg = e
-            raise MachineCreationError('Azure, got exception %s' % msg)
-
-        return node
-
-
-def _create_machine_vcloud(conn, machine_name, image, size, public_key, networks):
-    """Create a machine vCloud.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    key = public_key.replace('\n', '')
-    # we have the option to pass a guest customisation script as ex_vm_script. We'll pass
-    # the ssh key there
-
-    deploy_script = NamedTemporaryFile(delete=False)
-    deploy_script.write('mkdir -p ~/.ssh && echo "%s" >> ~/.ssh/authorized_keys && chmod -R 700 ~/.ssh/' % key)
-    deploy_script.close()
-
-    # select the right network object
-    ex_network = None
-    try:
-        if networks:
-            network = networks[0]
-            available_networks = conn.ex_list_networks()
-            available_networks_ids = [net.id for net in available_networks]
-            if network in available_networks_ids:
-                ex_network = network
-    except:
-        pass
-
-    try:
-        node = conn.create_node(
-            name=machine_name,
-            image=image,
-            size=size,
-            ex_vm_script=deploy_script.name,
-            ex_vm_network=ex_network,
-            ex_vm_fence='bridged',
-            ex_vm_ipmode='DHCP'
-        )
-    except Exception as e:
-        raise MachineCreationError("vCloud, got exception %s" % e, e)
-
-    return node
-
-
-def _create_machine_gce(conn, key_name, private_key, public_key, machine_name,
-                        image, size, location, cloud_init):
-    """Create a machine in GCE.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-    key = public_key.replace('\n', '')
-
-    metadata = {  # 'startup-script': script,
-        'sshKeys': 'user:%s' % key}
-    # metadata for ssh user, ssh key and script to deploy
-    if cloud_init:
-        metadata['startup-script'] = cloud_init
-
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(
-                name=machine_name,
-                image=image,
-                size=size,
-                location=location,
-                ex_metadata=metadata
-            )
-        except Exception as e:
-            raise MachineCreationError("Google Compute Engine, got exception %s" % e, e)
-    return node
-
-
-def _create_machine_linode(conn, key_name, private_key, public_key,
-                           machine_name, image, size, location):
-    """Create a machine in Linode.
-
-    Here there is no checking done, all parameters are expected to be
-    sanitized by create_machine.
-
-    """
-
-    auth = NodeAuthSSHKey(public_key)
-
-    with get_temp_file(private_key) as tmp_key_path:
-        try:
-            node = conn.create_node(
-                name=machine_name,
-                image=image,
-                size=size,
-                location=location,
-                auth=auth,
-                ssh_key=tmp_key_path,
-                ex_private=True
-            )
-        except Exception as e:
-            raise MachineCreationError("Linode, got exception %s" % e, e)
-    return node
-
-
-def destroy_machine(user, cloud_id, machine_id):
-    """Destroys a machine on a certain cloud.
-
-    After destroying a machine it also deletes all key associations. However,
-    it doesn't undeploy the keypair. There is no need to do it because the
-    machine will be destroyed.
-    """
-    log.info('Destroying machine %s in cloud %s' % (machine_id, cloud_id))
-
-    machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
-
-    if not machine.monitoring.hasmonitoring:
-        machine.ctl.destroy()
-        return
-
-    # if machine has monitoring, disable it. the way we disable depends on
-    # whether this is a standalone io installation or not
-    disable_monitoring_function = None
-    try:
-        from mist.core.methods import disable_monitoring as dis_mon_core
-        disable_monitoring_function = dis_mon_core
-    except ImportError:
-        # this is a standalone io instal/mlation, using io's disable_monitoring
-        # if we have an authentication token for the core service
-        if user.mist_api_token:
-            disable_monitoring_function = disable_monitoring
-    if disable_monitoring_function is not None:
-        log.info("Will try to disable monitoring for machine before "
-                 "destroying it (we don't bother to check if it "
-                 "actually has monitoring enabled.")
-        try:
-            # we don't actually bother to undeploy collectd
-            disable_monitoring_function(user, cloud_id, machine_id,
-                                        no_ssh=True)
-        except Exception as exc:
-            log.warning("Didn't manage to disable monitoring, maybe the "
-                        "machine never had monitoring enabled. Error: %r", exc)
-
-    machine.ctl.destroy()
 
 
 def ssh_command(owner, cloud_id, machine_id, host, command,
@@ -1181,64 +112,6 @@ def star_image(owner, cloud_id, image_id):
     return not star
 
 
-def list_clouds(owner):
-    # FIXME: Move import to the top of the file.
-    from mist.io.tag.methods import get_tags_for_resource
-    clouds = [cloud.as_dict() for cloud in Cloud.objects(owner=owner,
-                                                         deleted=None)]
-    for cloud in clouds:
-        # FIXME: cloud must be a mongoengine object FFS!
-        # Also, move into cloud model's as_dict method?
-        cloud['tags'] = get_tags_for_resource(owner, cloud)
-    return clouds
-
-
-def list_keys(owner):
-    """List owner's keys
-    :param owner:
-    :return:
-    """
-    from mist.io.tag.methods import get_tags_for_resource
-    keys = Key.objects(owner=owner, deleted=None)
-    clouds = Cloud.objects(owner=owner, deleted=None)
-    key_objects = []
-    # FIXME: This must be taken care of in Keys.as_dict
-    for key in keys:
-        key_object = {}
-        machines = Machine.objects(cloud__in=clouds,
-                                   key_associations__keypair__exact=key)
-        key_object["id"] = key.id
-        key_object['name'] = key.name
-        key_object["isDefault"] = key.default
-        key_object["machines"] = transform_key_machine_associations(machines,
-                                                                    key)
-        key_object['tags'] = get_tags_for_resource(owner, key)
-        key_objects.append(key_object)
-    return key_objects
-
-
-def list_scripts(owner):
-    from mist.io.tag.methods import get_tags_for_resource
-    scripts = Script.objects(owner=owner, deleted=None)
-    script_objects = []
-    for script in scripts:
-        script_object = script.as_dict_old()
-        script_object["tags"] = get_tags_for_resource(owner, script)
-        script_objects.append(script_object)
-    return script_objects
-
-
-def list_schedules(owner):
-    from mist.io.tag.methods import get_tags_for_resource
-    schedules = Schedule.objects(owner=owner, deleted=None).order_by('-_id')
-    schedule_objects = []
-    for schedule in schedules:
-        schedule_object = schedule.as_dict()
-        schedule_object["tags"] =  get_tags_for_resource(owner, schedule)
-        schedule_objects.append(schedule_object)
-    return schedule_objects
-
-
 def list_sizes(owner, cloud_id):
     """List sizes (aka flavors) from each cloud"""
     return Cloud.objects.get(owner=owner, id=cloud_id,
@@ -1249,39 +122,6 @@ def list_locations(owner, cloud_id):
     """List locations from each cloud"""
     return Cloud.objects.get(owner=owner, id=cloud_id,
                              deleted=None).ctl.compute.list_locations()
-
-
-def list_networks(owner, cloud_id):
-    """List networks from each cloud.
-    Currently EC2, Openstack and GCE clouds are supported. For other providers
-    this returns an empty list.
-    """
-    ret = {'public': [],
-           'private': [],
-           'routers': []}
-
-    try:
-        cloud = Cloud.objects.get(owner=owner, id=cloud_id)
-    except Cloud.DoesNotExist:
-        raise CloudNotFoundError
-
-    if not hasattr(cloud.ctl, 'network'):
-        return ret
-
-    networks = cloud.ctl.network.list_networks()
-
-    for network in networks:
-
-        network_dict = network.as_dict()
-        network_dict['subnets'] = [subnet.as_dict() for
-                                   subnet in network.ctl.list_subnets()]
-
-    # TODO: Backwards-compatible network privacy detection, to be replaced
-        if not network_dict.get('router_external'):
-            ret['private'].append(network_dict)
-        else:
-            ret['public'].append(network_dict)
-    return ret
 
 
 def list_subnets(cloud, network):
@@ -1322,108 +162,6 @@ def list_projects(owner, cloud_id):
     return ret
 
 
-# SEC
-def filter_list_clouds(auth_context, perm='read'):
-    """Returns a list of clouds, which is filtered based on RBAC Mappings for
-    non-Owners.
-    """
-    clouds = list_clouds(auth_context.owner)
-    if not auth_context.is_owner():
-        clouds = [cloud for cloud in clouds if cloud['id'] in
-                  auth_context.get_allowed_resources(rtype='clouds')]
-    return clouds
-
-
-# SEC
-def filter_list_keys(auth_context, perm='read'):
-    """Returns of a list of keys. The list is filtered for non-Owners based on
-    the permissions granted.
-    """
-    keys = list_keys(auth_context.owner)
-    if not auth_context.is_owner():
-        keys = [key for key in keys if key['id'] in
-                auth_context.get_allowed_resources(rtype='keys')]
-    return keys
-
-
-# SEC
-def filter_list_machines(auth_context, cloud_id, machines=None, perm='read'):
-    """Returns a list of machines.
-
-    In case of non-Owners, the QuerySet only includes machines found in the
-    RBAC Mappings of the Teams the current user is a member of.
-    """
-    assert cloud_id
-
-    if machines is None:
-        machines = list_machines(auth_context.owner, cloud_id)
-    if not machines:  # Exit early in case the cloud provider returned 0 nodes.
-        return []
-
-    # NOTE: We can trust the RBAC Mappings in order to fetch the latest list of
-    # machines for the current user, since mongo has been updated by either the
-    # Poller or the above `list_machines`.
-
-    if not auth_context.is_owner():
-        try:
-            auth_context.check_perm('cloud', 'read', cloud_id)
-        except PolicyUnauthorizedError:
-            return []
-        allowed_ids = set(auth_context.get_allowed_resources(rtype='machines'))
-        machines = [machine for machine in machines
-                    if machine['uuid'] in allowed_ids]
-
-    return machines
-
-
-def filter_list_scripts(auth_context, perm='read'):
-    """Return a list of scripts based on the user's RBAC map."""
-    scripts = list_scripts(auth_context.owner)
-    if not auth_context.is_owner():
-        scripts = [script for script in scripts if script['id'] in
-                   auth_context.get_allowed_resources(rtype='scripts')]
-    return scripts
-
-
-def filter_list_schedules(auth_context, perm='read'):
-    """List scheduler entries based on the permissions granted to the user."""
-    schedules = list_schedules(auth_context.owner)
-    if not auth_context.is_owner():
-        schedules = [schedule for schedule in schedules if schedule['id']
-                     in auth_context.get_allowed_resources(rtype='schedules')]
-    return schedules
-
-
-
-def associate_ip(owner, cloud_id, network_id, ip, machine_id=None, assign=True):
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-    conn = connect_provider(cloud)
-
-    if conn.type != Provider.NEPHOSCALE:
-        return False
-
-    return conn.ex_associate_ip(ip, server=machine_id, assign=assign)
-
-
-def create_network(owner, cloud, network_params):
-    """
-    Creates a new network on the specified cloud.
-    Network_params is a dict containing all the necessary values that describe a network.
-    """
-    if not hasattr(cloud.ctl, 'network'):
-        raise NotImplementedError()
-
-    # Create a DB document for the new network and call libcloud
-    #  to declare it on the cloud provider
-    new_network = NETWORKS[cloud.ctl.provider].add(cloud=cloud,
-                                                   **network_params)
-
-    # Schedule a UI update
-    trigger_session_update(owner, ['clouds'])
-
-    return new_network
-
-
 def create_subnet(owner, cloud, network, subnet_params):
     """
     Create a new subnet attached to the specified network ont he given cloud.
@@ -1443,17 +181,6 @@ def create_subnet(owner, cloud, network, subnet_params):
     return new_subnet
 
 
-def delete_network(owner, network):
-    """
-    Delete a network.
-    All subnets attached to the network will be deleted before the network itself.
-    """
-    network.ctl.delete()
-
-    # Schedule a UI update
-    trigger_session_update(owner, ['clouds'])
-
-
 def delete_subnet(owner, subnet):
     """
     Delete a subnet.
@@ -1464,189 +191,191 @@ def delete_subnet(owner, subnet):
     trigger_session_update(owner, ['clouds'])
 
 
-def set_machine_tags(owner, cloud_id, machine_id, tags):
-    """Sets metadata for a machine, given the cloud and machine id.
+#  TODO we don't use this, do we need it?
+# def set_machine_tags(owner, cloud_id, machine_id, tags):
+#     """Sets metadata for a machine, given the cloud and machine id.
+#
+#     Libcloud handles this differently for each provider. Linode and Rackspace,
+#     at least the old Rackspace providers, don't support metadata adding.
+#
+#     machine_id comes as u'...' but the rest are plain strings so use == when
+#     comparing in ifs. u'f' is 'f' returns false and 'in' is too broad.
+#
+#     Tags is expected to be a list of key-value dicts
+#     """
+#     cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
+#
+#     if not isinstance(cloud, (cloud_models.AmazonCloud,
+#                               cloud_models.GoogleCloud,
+#                               cloud_models.RackSpaceCloud,
+#                               cloud_models.OpenStackCloud)):
+#         return False
+#
+#     conn = connect_provider(cloud)
+#
+#     machine = Node(machine_id, name='', state=NodeState.RUNNING,
+#                    public_ips=[], private_ips=[], driver=conn)
+#
+#     tags_dict = {}
+#     if isinstance(tags, list):
+#         for tag in tags:
+#             for tag_key, tag_value in tag.items():
+#                 if not tag_value:
+#                     tag_value = ""
+#                 if type(tag_key) == unicode:
+#                     tag_key = tag_key.encode('utf-8')
+#                 if type(tag_value) == unicode:
+#                     tag_value = tag_value.encode('utf-8')
+#                 tags_dict[tag_key] = tag_value
+#     elif isinstance(tags, dict):
+#         for tag_key in tags:
+#             tag_value = tags[tag_key]
+#             if not tag_value:
+#                 tag_value = ""
+#             if type(tag_key) == unicode:
+#                 tag_key = tag_key.encode('utf-8')
+#             if type(tag_value) == unicode:
+#                 tag_value = tag_value.encode('utf-8')
+#             tags_dict[tag_key] = tag_value
+#
+#     if isinstance(cloud, cloud_models.AmazonCloud):
+#         try:
+#             # first get a list of current tags. Make sure
+#             # the response dict gets utf-8 encoded
+#             # then delete tags and update with the new ones
+#             ec2_tags = conn.ex_describe_tags(machine)
+#             ec2_tags.pop('Name')
+#             encoded_ec2_tags = {}
+#             for ec2_key, ec2_value in ec2_tags.items():
+#                 if type(ec2_key) == unicode:
+#                     ec2_key = ec2_key.encode('utf-8')
+#                 if type(ec2_value) == unicode:
+#                     ec2_value = ec2_value.encode('utf-8')
+#                 encoded_ec2_tags[ec2_key] = ec2_value
+#             conn.ex_delete_tags(machine, encoded_ec2_tags)
+#             # ec2 resource can have up to 10 tags, with one of them being the Name
+#             if len(tags_dict) > 9:
+#                 tags_keys = tags_dict.keys()[:9]
+#                 pop_keys = [key for key in tags_dict.keys() if key not in tags_keys]
+#                 for key in pop_keys:
+#                     tags_dict.pop(key)
+#
+#             conn.ex_create_tags(machine, tags_dict)
+#         except Exception as exc:
+#             raise CloudUnavailableError(cloud_id, exc)
+#     else:
+#         if conn.type == 'gce':
+#             try:
+#                 for node in conn.list_nodes():
+#                     if node.id == machine_id:
+#                         machine = node
+#                         break
+#             except Exception as exc:
+#                 raise CloudUnavailableError(cloud_id, exc)
+#             if not machine:
+#                 raise MachineNotFoundError(machine_id)
+#             try:
+#                 conn.ex_set_node_metadata(machine, tags)
+#             except Exception as exc:
+#                 raise InternalServerError("error setting tags", exc)
+#         else:
+#             try:
+#                 conn.ex_set_metadata(machine, tags_dict)
+#             except Exception as exc:
+#                 raise InternalServerError("error creating tags", exc)
 
-    Libcloud handles this differently for each provider. Linode and Rackspace,
-    at least the old Rackspace providers, don't support metadata adding.
 
-    machine_id comes as u'...' but the rest are plain strings so use == when
-    comparing in ifs. u'f' is 'f' returns false and 'in' is too broad.
-
-    Tags is expected to be a list of key-value dicts
-    """
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-
-    if not isinstance(cloud, (cloud_models.AmazonCloud,
-                              cloud_models.GoogleCloud,
-                              cloud_models.RackSpaceCloud,
-                              cloud_models.OpenStackCloud)):
-        return False
-
-    conn = connect_provider(cloud)
-
-    machine = Node(machine_id, name='', state=NodeState.RUNNING,
-                   public_ips=[], private_ips=[], driver=conn)
-
-    tags_dict = {}
-    if isinstance(tags, list):
-        for tag in tags:
-            for tag_key, tag_value in tag.items():
-                if not tag_value:
-                    tag_value = ""
-                if type(tag_key) == unicode:
-                    tag_key = tag_key.encode('utf-8')
-                if type(tag_value) == unicode:
-                    tag_value = tag_value.encode('utf-8')
-                tags_dict[tag_key] = tag_value
-    elif isinstance(tags, dict):
-        for tag_key in tags:
-            tag_value = tags[tag_key]
-            if not tag_value:
-                tag_value = ""
-            if type(tag_key) == unicode:
-                tag_key = tag_key.encode('utf-8')
-            if type(tag_value) == unicode:
-                tag_value = tag_value.encode('utf-8')
-            tags_dict[tag_key] = tag_value
-
-    if isinstance(cloud, cloud_models.AmazonCloud):
-        try:
-            # first get a list of current tags. Make sure
-            # the response dict gets utf-8 encoded
-            # then delete tags and update with the new ones
-            ec2_tags = conn.ex_describe_tags(machine)
-            ec2_tags.pop('Name')
-            encoded_ec2_tags = {}
-            for ec2_key, ec2_value in ec2_tags.items():
-                if type(ec2_key) == unicode:
-                    ec2_key = ec2_key.encode('utf-8')
-                if type(ec2_value) == unicode:
-                    ec2_value = ec2_value.encode('utf-8')
-                encoded_ec2_tags[ec2_key] = ec2_value
-            conn.ex_delete_tags(machine, encoded_ec2_tags)
-            # ec2 resource can have up to 10 tags, with one of them being the Name
-            if len(tags_dict) > 9:
-                tags_keys = tags_dict.keys()[:9]
-                pop_keys = [key for key in tags_dict.keys() if key not in tags_keys]
-                for key in pop_keys:
-                    tags_dict.pop(key)
-
-            conn.ex_create_tags(machine, tags_dict)
-        except Exception as exc:
-            raise CloudUnavailableError(cloud_id, exc)
-    else:
-        if conn.type == 'gce':
-            try:
-                for node in conn.list_nodes():
-                    if node.id == machine_id:
-                        machine = node
-                        break
-            except Exception as exc:
-                raise CloudUnavailableError(cloud_id, exc)
-            if not machine:
-                raise MachineNotFoundError(machine_id)
-            try:
-                conn.ex_set_node_metadata(machine, tags)
-            except Exception as exc:
-                raise InternalServerError("error setting tags", exc)
-        else:
-            try:
-                conn.ex_set_metadata(machine, tags_dict)
-            except Exception as exc:
-                raise InternalServerError("error creating tags", exc)
-
-
-def delete_machine_tag(owner, cloud_id, machine_id, tag):
-    """Deletes metadata for a machine, given the machine id and the tag to be
-    deleted.
-
-    Libcloud handles this differently for each provider. Linode and Rackspace,
-    at least the old Rackspace providers, don't support metadata updating. In
-    EC2 you can delete just the tag you like. In Openstack you can only set a
-    new list and not delete from the existing.
-
-    Mist.io client knows only the value of the tag and not it's key so it
-    has to loop through the machine list in order to find it.
-
-    Don't forget to check string encoding before using them in ifs.
-    u'f' is 'f' returns false.
-
-    """
-
-    cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-
-    if not tag:
-        raise RequiredParameterMissingError("tag")
-    conn = connect_provider(cloud)
-
-    if type(tag) == unicode:
-        tag = tag.encode('utf-8')
-
-    if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
-        raise MethodNotAllowedError("Deleting metadata is not supported in %s"
-                                    % conn.type)
-
-    machine = None
-    try:
-        for node in conn.list_nodes():
-            if node.id == machine_id:
-                machine = node
-                break
-    except Exception as exc:
-        raise CloudUnavailableError(cloud_id, exc)
-    if not machine:
-        raise MachineNotFoundError(machine_id)
-    if isinstance(cloud, cloud_models.AmazonCloud):
-        tags = machine.extra.get('tags', None)
-        pair = None
-        for mkey, mdata in tags.iteritems():
-            if type(mkey) == unicode:
-                mkey = mkey.encode('utf-8')
-            if type(mdata) == unicode:
-                mdata = mdata.encode('utf-8')
-            if tag == mkey:
-                pair = {mkey: mdata}
-                break
-        if not pair:
-            raise NotFoundError("tag not found")
-
-        try:
-            conn.ex_delete_tags(machine, pair)
-        except Exception as exc:
-            raise CloudUnavailableError("Error deleting metadata in EC2", exc)
-
-    else:
-        if conn.type == 'gce':
-            try:
-                metadata = machine.extra['metadata']['items']
-                for tag_data in metadata:
-                    mkey = tag_data.get('key')
-                    mdata = tag_data.get('value')
-                    if tag == mkey:
-                        metadata.remove({u'value': mdata, u'key': mkey})
-                conn.ex_set_node_metadata(machine, metadata)
-            except Exception as exc:
-                raise InternalServerError("Error while updating metadata", exc)
-        else:
-            tags = machine.extra.get('metadata', None)
-            key = None
-            for mkey, mdata in tags.iteritems():
-                if type(mkey) == unicode:
-                    mkey = mkey.encode('utf-8')
-                if type(mdata) == unicode:
-                    mdata = mdata.encode('utf-8')
-                if tag == mkey:
-                    key = mkey
-            if key:
-                tags.pop(key.decode('utf-8'))
-            else:
-                raise NotFoundError("tag not found")
-
-            try:
-                conn.ex_set_metadata(machine, tags)
-            except:
-                raise CloudUnavailableError("Error while updating metadata")
+#  TODO we don't use this, do we need it?
+# def delete_machine_tag(owner, cloud_id, machine_id, tag):
+#     """Deletes metadata for a machine, given the machine id and the tag to be
+#     deleted.
+#
+#     Libcloud handles this differently for each provider. Linode and Rackspace,
+#     at least the old Rackspace providers, don't support metadata updating. In
+#     EC2 you can delete just the tag you like. In Openstack you can only set a
+#     new list and not delete from the existing.
+#
+#     Mist.io client knows only the value of the tag and not it's key so it
+#     has to loop through the machine list in order to find it.
+#
+#     Don't forget to check string encoding before using them in ifs.
+#     u'f' is 'f' returns false.
+#
+#     """
+#
+#     cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
+#
+#     if not tag:
+#         raise RequiredParameterMissingError("tag")
+#     conn = connect_provider(cloud)
+#
+#     if type(tag) == unicode:
+#         tag = tag.encode('utf-8')
+#
+#     if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
+#         raise MethodNotAllowedError("Deleting metadata is not supported in %s"
+#                                     % conn.type)
+#
+#     machine = None
+#     try:
+#         for node in conn.list_nodes():
+#             if node.id == machine_id:
+#                 machine = node
+#                 break
+#     except Exception as exc:
+#         raise CloudUnavailableError(cloud_id, exc)
+#     if not machine:
+#         raise MachineNotFoundError(machine_id)
+#     if isinstance(cloud, cloud_models.AmazonCloud):
+#         tags = machine.extra.get('tags', None)
+#         pair = None
+#         for mkey, mdata in tags.iteritems():
+#             if type(mkey) == unicode:
+#                 mkey = mkey.encode('utf-8')
+#             if type(mdata) == unicode:
+#                 mdata = mdata.encode('utf-8')
+#             if tag == mkey:
+#                 pair = {mkey: mdata}
+#                 break
+#         if not pair:
+#             raise NotFoundError("tag not found")
+#
+#         try:
+#             conn.ex_delete_tags(machine, pair)
+#         except Exception as exc:
+#             raise CloudUnavailableError("Error deleting metadata in EC2", exc)
+#
+#     else:
+#         if conn.type == 'gce':
+#             try:
+#                 metadata = machine.extra['metadata']['items']
+#                 for tag_data in metadata:
+#                     mkey = tag_data.get('key')
+#                     mdata = tag_data.get('value')
+#                     if tag == mkey:
+#                         metadata.remove({u'value': mdata, u'key': mkey})
+#                 conn.ex_set_node_metadata(machine, metadata)
+#             except Exception as exc:
+#                 raise InternalServerError("Error while updating metadata", exc)
+#         else:
+#             tags = machine.extra.get('metadata', None)
+#             key = None
+#             for mkey, mdata in tags.iteritems():
+#                 if type(mkey) == unicode:
+#                     mkey = mkey.encode('utf-8')
+#                 if type(mdata) == unicode:
+#                     mdata = mdata.encode('utf-8')
+#                 if tag == mkey:
+#                     key = mkey
+#             if key:
+#                 tags.pop(key.decode('utf-8'))
+#             else:
+#                 raise NotFoundError("tag not found")
+#
+#             try:
+#                 conn.ex_set_metadata(machine, tags)
+#             except:
+#                 raise CloudUnavailableError("Error while updating metadata")
 
 
 def check_monitoring(user):
@@ -2232,53 +961,6 @@ def get_deploy_collectd_command_windows(uuid, password, monitor, port=25826):
 def get_deploy_collectd_command_coreos(uuid, password, monitor, port=25826):
     return "sudo docker run -d -v /sys/fs/cgroup:/sys/fs/cgroup -e COLLECTD_USERNAME=%s -e COLLECTD_PASSWORD=%s -e MONITOR_SERVER=%s -e COLLECTD_PORT=%s mist/collectd" % (
         uuid, password, monitor, port)
-
-
-def machine_name_validator(provider, name):
-    """
-    Validates machine names before creating a machine
-    Provider specific
-    """
-    if not name and provider not in config.EC2_PROVIDERS:
-        raise MachineNameValidationError("machine name cannot be empty")
-    if provider is Provider.DOCKER:
-        pass
-    elif provider in [Provider.RACKSPACE_FIRST_GEN, Provider.RACKSPACE]:
-        pass
-    elif provider in [Provider.OPENSTACK]:
-        pass
-    elif provider in config.EC2_PROVIDERS:
-        if len(name) > 255:
-            raise MachineNameValidationError("machine name max chars allowed is 255")
-    elif provider is Provider.NEPHOSCALE:
-        pass
-    elif provider is Provider.GCE:
-        if not re.search(r'^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$', name):
-            raise MachineNameValidationError("name must be 1-63 characters long, with the first " + \
-                                             "character being a lowercase letter, and all following characters must be a dash, " + \
-                                             "lowercase letter, or digit, except the last character, which cannot be a dash.")
-    elif provider is Provider.SOFTLAYER:
-        pass
-    elif provider is Provider.DIGITAL_OCEAN:
-        if not re.search(r'^[0-9a-zA-Z]+[0-9a-zA-Z-.]{0,}[0-9a-zA-Z]+$', name):
-            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
-                                             "or numbers, dashes and dots")
-    elif provider is Provider.PACKET:
-        if not re.search(r'^[0-9a-zA-Z-.]+$', name):
-            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
-                                             "or numbers, dashes and periods")
-    elif provider == Provider.AZURE:
-        pass
-    elif provider in [Provider.VCLOUD, Provider.INDONESIAN_VCLOUD]:
-        pass
-    elif provider is Provider.LINODE:
-        if len(name) < 3:
-            raise MachineNameValidationError("machine name should be at least 3 chars")
-        if not re.search(r'^[0-9a-zA-Z][0-9a-zA-Z-_]+[0-9a-zA-Z]$', name):
-            raise MachineNameValidationError("machine name may only contain ASCII letters " + \
-                                             "or numbers, dashes and underscores. Must begin and end with letters or numbers, " + \
-                                             "and be at least 3 characters long")
-    return name
 
 
 def create_dns_a_record(owner, domain_name, ip_addr):

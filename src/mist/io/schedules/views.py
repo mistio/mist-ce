@@ -12,7 +12,7 @@ from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import view_config, params_from_request
 
-from mist.io.methods import filter_list_schedules
+from mist.io.schedules.methods import filter_list_schedules
 
 from mist.io.tag.methods import resolve_id_and_set_tags
 
