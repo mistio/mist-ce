@@ -168,7 +168,6 @@ class Record(me.Document):
             raise RequiredParameterMissingError('owner')
         if not zone and kwargs['type'] in ['A', 'AAAA', 'CNAME']:
             zone = BaseDNSController.find_best_matching_zone(kwargs)
-            print zone
         if zone and not isinstance(zone, Zone):
             raise BadRequestError('zone')
 
