@@ -189,18 +189,18 @@ class BaseComputeController(BaseController):
             machine.private_ips = node.private_ips
             machine.public_ips = node.public_ips
 
-            extra = copy.copy(node.extra)
-
+            # Set machine extra dict.
             # Make sure we don't meet any surprises when we try to json encode
             # later on in the HTTP response.
+            extra = self._list_machines__get_machine_extra(node)
             for key, val in extra.items():
                 try:
                     json.dumps(val)
                 except TypeError:
                     extra[key] = str(val)
-
             machine.extra = extra
 
+            # Set machine hostname
             if machine.extra.get('dns_name'):
                 machine.hostname = machine.extra['dns_name']
             else:
@@ -336,6 +336,14 @@ class BaseComputeController(BaseController):
     def _list_machines__fetch_machines(self):
         """Perform the actual libcloud call to get list of nodes"""
         return self.connection.list_nodes()
+
+    def _list_machines__get_machine_extra(self, machine_libcloud):
+        """Return extra dict for libcloud node
+
+        Subclasses can override/extend this method if they wish to filter or
+        inject extra metadata.
+        """
+        return copy.deepcopy(machine_libcloud.extra)
 
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return
