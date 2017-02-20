@@ -154,7 +154,7 @@ def log_story(event):
 
     """
     # Ensure `owner_id` is present, since ES indices are based on it.
-    assert event.get('owner_id')
+    assert event.get('owner_id') and event.get('owner_id') != 'None', 'OwnerID'
 
     etype = event['type']
     eaction = event['action']
