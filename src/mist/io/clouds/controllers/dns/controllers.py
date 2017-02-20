@@ -47,7 +47,9 @@ class AmazonDNSController(BaseDNSController):
         specific form.
         ---
         """
-        if kwargs['name'].endswith(zone.domain):
+        # Route53 requires just the subdomain for A, AAAA, and CNAME records.
+        if (kwargs['type'] in ['A', 'AAAA', 'CNAME'] and
+                kwargs['name'].endswith(zone.domain)):
             kwargs['name'] = kwargs['name'][:-len(zone.domain)]
         kwargs['extra'] = {'ttl': kwargs.pop('ttl', 0)}
 
@@ -72,6 +74,12 @@ class GoogleDNSController(BaseDNSController):
         specific form.
         ---
         """
+        # Google requires the full subdomain+domain for A, AAAA, and CNAME
+        # records with a trailing dot.
+        if (kwargs['type'] in ['A', 'AAAA', 'CNAME'] and
+                not kwargs['name'].endswith('.')):
+            kwargs['name'] += "."
+
         data = kwargs.pop('data', '')
         kwargs['data'] = {'ttl': kwargs.pop('ttl', 0), 'rrdatas': []}
         kwargs['data']['rrdatas'].append(data)

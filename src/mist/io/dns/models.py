@@ -138,7 +138,7 @@ class Record(me.Document):
         self.ctl = RecordController(self)
 
     @classmethod
-    def add(cls, owner, zone=None, id='', **kwargs):
+    def add(cls, zone=None, id='', **kwargs):
         """Add Record
 
         This is a class method, meaning that it is meant to be called on the
@@ -162,10 +162,13 @@ class Record(me.Document):
             raise RequiredParameterMissingError('data')
         if not kwargs['type']:
             raise RequiredParameterMissingError('type')
-        if not owner:
+        # If we were not given a zone then we need the owner to try and find
+        # the best matching domain.
+        if not zone and not kwargs['owner']:
             raise RequiredParameterMissingError('owner')
-        if not zone and type in ['A', 'AAAA', 'CNAME']:
-            zone = BaseDNSController.find_best_matching_zone(owner, kwargs)
+        if not zone and kwargs['type'] in ['A', 'AAAA', 'CNAME']:
+            zone = BaseDNSController.find_best_matching_zone(kwargs)
+            print zone
         if zone and not isinstance(zone, Zone):
             raise BadRequestError('zone')
 
@@ -177,8 +180,6 @@ class Record(me.Document):
 
     def clean(self):
         """Overriding the default clean method to implement param checking"""
-        if not self.name.endswith('.'):
-            self.name += "."
         # We need to be checking the rdata based on the type of record
         if type == 'A':
             try:

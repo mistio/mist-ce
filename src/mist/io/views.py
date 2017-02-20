@@ -831,12 +831,12 @@ def list_dns_records(request):
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
     try:
         zone = Zone.objects.get(owner=auth_context.owner, cloud=cloud,
                                 id=zone_id)
     except Zone.DoesNotExist:
-        raise exceptions.NotFoundError('Zone does not exist')
+        raise NotFoundError('Zone does not exist')
 
     return [record.as_dict() for record in zone.ctl.list_records()]
 
@@ -875,7 +875,7 @@ def create_dns_record(request):
     try:
         zone = Zone.objects.get(owner=auth_context.owner, id=zone_id)
     except Zone.DoesNotExist:
-        raise exceptions.NotFoundError('Zone does not exist')
+        raise NotFoundError('Zone does not exist')
 
     # Get the params and create the new record
     params = params_from_request(request)
@@ -895,11 +895,11 @@ def delete_dns_zone(request):
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
     try:
         zone = Zone.objects.get(owner=auth_context.owner, id=zone_id)
     except Zone.DoesNotExist:
-        raise exceptions.NotFoundError('Zone does not exist')
+        raise NotFoundError('Zone does not exist')
 
     return zone.ctl.delete_zone()
 
@@ -916,15 +916,15 @@ def delete_dns_record(request):
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
-        raise exceptions.NotFoundError('Cloud does not exist')
+        raise NotFoundError('Cloud does not exist')
     try:
         zone = Zone.objects.get(owner=auth_context.owner, id=zone_id)
     except Zone.DoesNotExist:
-        raise exceptions.NotFoundError('Zone does not exist')
+        raise NotFoundError('Zone does not exist')
     try:
         record = Record.objects.get(zone=zone, id=record_id)
     except Record.DoesNotExist:
-        raise exceptions.NotFoundError('Record does not exist')
+        raise NotFoundError('Record does not exist')
 
     return record.ctl.delete_record()
 
