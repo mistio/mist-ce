@@ -420,11 +420,6 @@ class BaseDNSController(BaseController):
             for zone_candidate in zones:
                 for domain, subdomain in all_domains.iteritems():
                     if zone_candidate.domain == domain:
-                        zone = zone_candidate
-                        break
-        if not zone:
-            raise BadRequestError("No DNS zone found, can't proceed with \
-                                   creating record '%s'."  % kwargs['name'])
-        return zone
-
-
+                        return zone_candidate
+            raise BadRequestError("No DNS zone found, can't proceed with "
+                                  "creating record '%s'."  % kwargs['name'])

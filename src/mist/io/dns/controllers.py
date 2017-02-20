@@ -3,8 +3,7 @@
 class ZoneController(object):
 
     def __init__(self, zone):
-        """Initialize zone controller given a zone
-        """
+        """Initialize zone controller given a zone"""
         self.zone = zone
 
     def create_zone(self, **kwargs):
@@ -25,8 +24,7 @@ class ZoneController(object):
 class RecordController(object):
 
     def __init__(self, record):
-        """Initialize record controller given a record
-        """
+        """Initialize record controller given a record"""
         self.record = record
 
     def create_record(self, **kwargs):

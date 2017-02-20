@@ -153,13 +153,11 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             if hostname:
                 try:
                     kwargs = {}
-                    kwargs['name'] = subdomain
+                    kwargs['name'] = hostname
                     kwargs['type'] = 'A'
                     kwargs['data'] = host
                     kwargs['ttl'] = 3600
-
-                    
-                    record = Record.add(**kwargs)
+                    record = Record.add(owner=owner, **kwargs)
                     hostname = '.'.join((record.name, record.zone.domain))
                     log_event(action='Create_A_record', hostname=hostname,
                               **log_dict)
