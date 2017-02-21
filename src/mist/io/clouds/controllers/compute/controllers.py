@@ -435,7 +435,7 @@ class GoogleComputeController(BaseComputeController):
     def _list_machines__get_machine_extra(self, machine, machine_libcloud):
         # FIXME: we delete the extra.metadata for now because it can be
         # > 40kb per machine on GCE clouds with enabled GKE, causing the
-        # websocket to overload and hang and is also a security concern. 
+        # websocket to overload and hang and is also a security concern.
         # We should revisit this and see if there is some use for this
         # metadata and if there are other fields that should be filtered
         # as well
