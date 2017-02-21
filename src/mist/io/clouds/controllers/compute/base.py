@@ -192,7 +192,8 @@ class BaseComputeController(BaseController):
             # Set machine extra dict.
             # Make sure we don't meet any surprises when we try to json encode
             # later on in the HTTP response.
-            extra = self._list_machines__get_machine_extra(node)
+            extra = self._list_machines__get_machine_extra(machine, node)
+
             for key, val in extra.items():
                 try:
                     json.dumps(val)
@@ -337,13 +338,13 @@ class BaseComputeController(BaseController):
         """Perform the actual libcloud call to get list of nodes"""
         return self.connection.list_nodes()
 
-    def _list_machines__get_machine_extra(self, machine_libcloud):
+    def _list_machines__get_machine_extra(self, machine, machine_libcloud):
         """Return extra dict for libcloud node
 
         Subclasses can override/extend this method if they wish to filter or
         inject extra metadata.
         """
-        return copy.deepcopy(machine_libcloud.extra)
+        return copy.copy(machine_libcloud.extra)
 
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return
