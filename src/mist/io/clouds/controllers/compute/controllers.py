@@ -897,7 +897,7 @@ class LibvirtComputeController(BaseComputeController):
                            machine_libcloud.private_ips[0]
                 command = '$(command -v sudo) shutdown -r now'
                 # todo move it up
-                from mist.core.methods import ssh_command
+                from mist.io.methods import ssh_command
                 ssh_command(self.cloud.owner, self.cloud.id,
                             machine_libcloud.id, hostname, command)
                 return True
