@@ -21,6 +21,7 @@ accessed through a cloud model, using the `ctl` abbreviation, like this:
 
 
 import re
+import copy
 import socket
 import logging
 import tempfile
@@ -430,6 +431,20 @@ class GoogleComputeController(BaseComputeController):
         return get_driver(Provider.GCE)(self.cloud.email,
                                         self.cloud.private_key,
                                         project=self.cloud.project_id)
+
+    def _list_machines__get_machine_extra(self, machine, machine_libcloud):
+        # we keep only these fields for now. Because we don't want to parse
+        # 400KB data and overload websocket. In future, if we need sth more we
+        # must change this function and perhaps add rbac..
+
+        extra = copy.copy(machine_libcloud.extra)
+
+        for key in extra.keys():
+            if key not in ['boot_disk', 'disks', 'location',
+                           'machineType', 'os_type', 'zone',
+                           'dns_name', 'creationTimestamp']:
+                del extra[key]
+        return extra
 
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         # iso8601 string
