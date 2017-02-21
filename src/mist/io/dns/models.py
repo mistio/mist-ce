@@ -162,11 +162,15 @@ class Record(me.Document):
             raise RequiredParameterMissingError('data')
         if not kwargs['type']:
             raise RequiredParameterMissingError('type')
+        # Owner is needed when we don't have a domain/zone and we need to
+        # find the best matching one. As such we always need to be popping this
+        # as the libcloud create_record doesn't accept an owner param.
+        owner = kwargs.pop('owner', "")
         # If we were not given a zone then we need the owner to try and find
         # the best matching domain.
         if not zone and kwargs['type'] in ['A', 'AAAA', 'CNAME']:
-            assert isinstance(kwargs['owner'], Organization)
-            zone = BaseDNSController.find_best_matching_zone(kwargs['owner'], kwargs)
+            assert isinstance(owner, Organization)
+            zone = BaseDNSController.find_best_matching_zone(owner, kwargs)
         if zone and not isinstance(zone, Zone):
             raise BadRequestError('zone')
 
