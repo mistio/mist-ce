@@ -146,6 +146,8 @@ class BaseDNSController(BaseController):
 
         # TODO: Adding here for circular dependency issue. Need to fix this.
         from mist.io.dns.models import Record
+
+        records = []
         for pr_record in pr_records:
             try:
                 record = Record.objects.get(zone=zone, record_id=pr_record.id)
@@ -169,11 +171,11 @@ class BaseDNSController(BaseController):
             except me.NotUniqueError as exc:
                 log.error("Record %s not unique error: %s", record, exc)
                 raise RecordExistsError()
-
-        # There's a chance that we have received duplicate records as for
-        # example for Route NS records, we want to get the final records result
-        # set from the DB
-        records = Record.objects(zone=zone)
+            # There's a chance that we have received duplicate records as for
+            # example for Route NS records, so skip adding it to the list if we
+            # already have it
+            if record not in records:
+                records.append(record)
 
         # Then delete any records that are in the DB for this zone but were not
         # returned by the list_records() method meaning the were deleted in the
@@ -388,7 +390,7 @@ class BaseDNSController(BaseController):
         return
 
     @staticmethod
-    def find_best_matching_zone(kwargs):
+    def find_best_matching_zone(owner, kwargs):
         """
         This is a static method that tries to extract a valid domain from
         the name provided, trying to find the best matching DNS zone. This only
@@ -399,9 +401,6 @@ class BaseDNSController(BaseController):
         # TODO: Adding here for circular dependency issue. Need to fix this.
         from mist.io.dns.models import Zone
 
-        # We are going to pop the owner from the kwargs since we don't want it
-        # passed on to the create record params.
-        owner = kwargs.pop('owner', "")
         # Split hostname in dot separated parts.
         parts = [part for part in kwargs['name'].split('.') if part]
         # Find all possible domains for this domain name,

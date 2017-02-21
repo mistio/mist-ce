@@ -164,10 +164,9 @@ class Record(me.Document):
             raise RequiredParameterMissingError('type')
         # If we were not given a zone then we need the owner to try and find
         # the best matching domain.
-        if not zone and not kwargs['owner']:
-            raise RequiredParameterMissingError('owner')
         if not zone and kwargs['type'] in ['A', 'AAAA', 'CNAME']:
-            zone = BaseDNSController.find_best_matching_zone(kwargs)
+            assert isinstance(kwargs['owner'], Organization)
+            zone = BaseDNSController.find_best_matching_zone(kwargs['owner'], kwargs)
         if zone and not isinstance(zone, Zone):
             raise BadRequestError('zone')
 
