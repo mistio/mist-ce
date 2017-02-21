@@ -433,16 +433,17 @@ class GoogleComputeController(BaseComputeController):
                                         project=self.cloud.project_id)
 
     def _list_machines__get_machine_extra(self, machine, machine_libcloud):
-        # we keep only these fields for now. Because we don't want to parse
-        # 400KB data and overload websocket. In future, if we need sth more we
-        # must change this function and perhaps add rbac..
+        # FIXME: we delete the extra.metadata for now because it can be
+        # > 40kb per machine on GCE clouds with enabled GKE, causing the
+        # websocket to overload and hang and is also a security concern. 
+        # We should revisit this and see if there is some use for this
+        # metadata and if there are other fields that should be filtered
+        # as well
 
         extra = copy.copy(machine_libcloud.extra)
 
         for key in extra.keys():
-            if key not in ['boot_disk', 'disks', 'location',
-                           'machineType', 'os_type', 'zone',
-                           'dns_name', 'creationTimestamp']:
+            if key in ['metadata']:
                 del extra[key]
         return extra
 
