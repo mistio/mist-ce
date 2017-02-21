@@ -40,7 +40,6 @@ def list_machines(request):
       required: true
       type: string
     """
-    import ipdb;ipdb.set_trace()
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     # SEC get filtered resources based on auth_context
@@ -235,6 +234,12 @@ def create_machine(request):
     job_id = params.get('job_id', uuid.uuid4().hex)
 
     auth_context = auth_context_from_request(request)
+
+    try:
+        cloud = Cloud.objects.get(owner=auth_context.owner,
+                                  id=cloud_id, deleted=None)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
 
     # compose schedule as a dict from relative parameters
     if not params.get('schedule_type'):
