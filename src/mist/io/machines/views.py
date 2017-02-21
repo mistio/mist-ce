@@ -40,17 +40,17 @@ def list_machines(request):
       required: true
       type: string
     """
-
+    import ipdb;ipdb.set_trace()
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     # SEC get filtered resources based on auth_context
-    machines = methods.filter_list_machines(auth_context, cloud_id)
-
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner,
                                   id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
+
+    machines = methods.filter_list_machines(auth_context, cloud_id)
 
     if cloud.machine_count != len(machines):
         try:
