@@ -701,6 +701,25 @@ class ListNetworks(UserTask):
         return {'cloud_id': cloud_id, 'networks': networks}
 
 
+class ListZones(UserTask):
+    abstract = False
+    task_key = 'list_zones'
+    result_expires = 60 * 60 * 24
+    result_fresh = 0
+    polling = False
+    soft_time_limit = 60
+
+    def execute(self, owner_id, cloud_id):
+        owner = Owner.objects.get(id=owner_id)
+        log.warn('Running list zones for user %s cloud %s'
+                 % (owner.id, cloud_id))
+        from mist.io.dns.methods import list_zones
+        zones = list_zones(owner, cloud_id)
+        log.warn('Returning list zones for user %s cloud %s'
+                 % (owner.id, cloud_id))
+        return {'cloud_id': cloud_id, 'zones': zones}
+
+
 class ListImages(UserTask):
     abstract = False
     task_key = 'list_images'
