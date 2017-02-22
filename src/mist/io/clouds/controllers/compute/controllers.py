@@ -21,6 +21,7 @@ accessed through a cloud model, using the `ctl` abbreviation, like this:
 
 
 import re
+import copy
 import socket
 import logging
 import tempfile
@@ -430,6 +431,21 @@ class GoogleComputeController(BaseComputeController):
         return get_driver(Provider.GCE)(self.cloud.email,
                                         self.cloud.private_key,
                                         project=self.cloud.project_id)
+
+    def _list_machines__get_machine_extra(self, machine, machine_libcloud):
+        # FIXME: we delete the extra.metadata for now because it can be
+        # > 40kb per machine on GCE clouds with enabled GKE, causing the
+        # websocket to overload and hang and is also a security concern.
+        # We should revisit this and see if there is some use for this
+        # metadata and if there are other fields that should be filtered
+        # as well
+
+        extra = copy.copy(machine_libcloud.extra)
+
+        for key in extra.keys():
+            if key in ['metadata']:
+                del extra[key]
+        return extra
 
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         # iso8601 string
@@ -882,7 +898,7 @@ class LibvirtComputeController(BaseComputeController):
                            machine_libcloud.private_ips[0]
                 command = '$(command -v sudo) shutdown -r now'
                 # todo move it up
-                from mist.core.methods import ssh_command
+                from mist.io.methods import ssh_command
                 ssh_command(self.cloud.owner, self.cloud.id,
                             machine_libcloud.id, hostname, command)
                 return True

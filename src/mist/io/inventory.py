@@ -1,14 +1,16 @@
+from mist.io.users.models import User
+from mist.io.clouds.models import Cloud
+from mist.io.machines.models import Machine, KeyAssociation
+from mist.io.keys.models import SSHKey, SignedSSHKey
+
 try:
-    from mist.io.users.models import User
-    from mist.io.clouds.models import Cloud
-    from mist.io.machines.models import Machine, KeyAssociation
-    from mist.io.keys.models import SSHKey, SignedSSHKey
     from mist.core import config
     from mist.core.vpn.methods import destination_nat as dnat
 except ImportError:
     from mist.io import config, model
 
-import mist.io.methods
+    def dnat(owner, ip_addr, port):
+        return ip_addr, port
 
 
 class MistInventory(object):
@@ -76,7 +78,8 @@ class MistInventory(object):
     def _list_machines(self, cloud_id):
         if cloud_id not in self._cache:
             print 'Actually doing list_machines for %s' % cloud_id
-            machines = mist.io.methods.list_machines(self.owner, cloud_id)
+            from mist.io.machines.methods import list_machines
+            machines = list_machines(self.owner, cloud_id)
             self._cache[cloud_id] = machines
         return self._cache[cloud_id]
 
