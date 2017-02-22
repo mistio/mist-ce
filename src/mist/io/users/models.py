@@ -3,6 +3,7 @@ import logging
 import json
 import uuid
 import re
+import datetime
 import mongoengine as me
 
 from time import time
@@ -234,7 +235,7 @@ class Owner(me.Document):
 
     avatar = me.StringField(default='')
 
-    # set a global alerts email
+    last_active = me.DateTimeField(default=datetime.datetime.now)
 
     # billing related fields
     customerId = me.StringField()
@@ -507,16 +508,20 @@ class Team(me.EmbeddedDocument):
 class Organization(Owner):
     name = me.StringField(required=True)
     members = me.ListField(me.ReferenceField(User), required=True)
+    members_count = me.IntField(default=0)
     teams = me.EmbeddedDocumentListField(
         Team,
         default=lambda: [Team(name='Owners', policy=Policy(operator='ALLOW'))]
     )
+    teams_count = me.IntField(default=0)
     # These are assigned only to organization from now on
     promo_codes = me.ListField()
     selected_plan = me.StringField()
     enterprise_plan = me.DictField()
 
     insights_enabled = me.BooleanField(default=False)
+
+    created = me.DateTimeField(default=datetime.datetime.now)
 
     @property
     def mapper(self):
@@ -655,6 +660,8 @@ class Organization(Owner):
             raise me.ValidationError("Organization with name '%s' "
                                      "already exists." % self.name)
 
+        self.members_count = len(self.members)
+        self.teams_count = len(self.teams)
         super(Organization, self).clean()
 
 
