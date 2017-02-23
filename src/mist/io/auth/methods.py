@@ -254,6 +254,7 @@ def reissue_cookie_session(request, user_id='', su='', org=None, after=0,
     session.ip_address = mist.io.helpers.ip_from_request(request)
     session.user_agent = request.user_agent
     session.org = org
+    session.su = su
     session.save()
     request.environ['session'] = session
     return session
