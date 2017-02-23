@@ -4,10 +4,6 @@ This module contains everything that is need to communicate with machines via
 SSH.
 
 """
-
-from time import sleep
-from StringIO import StringIO
-
 import paramiko
 import websocket
 import socket
@@ -16,19 +12,21 @@ import ssl
 import tempfile
 import mongoengine as me
 
+from time import sleep
+from StringIO import StringIO
+
+from mist.io.clouds.models import Cloud
+from mist.io.machines.models import Machine, KeyAssociation
+from mist.io.keys.models import Key, SignedSSHKey
+
 from mist.io.exceptions import MachineUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import ServiceUnavailableError
 
 from mist.io.helpers import trigger_session_update
-
 from mist.io.helpers import get_story
 
 try:
-    from mist.io.users.models import User
-    from mist.io.clouds.models import Cloud
-    from mist.io.machines.models import Machine, KeyAssociation
-    from mist.io.keys.models import Key, SignedSSHKey
     from mist.core import config
 except ImportError:
     from mist.io import config
