@@ -9,8 +9,7 @@ from mongoengine import ValidationError, NotUniqueError, DoesNotExist
 
 from time import time
 
-from libcloud.compute.base import Node
-from libcloud.compute.types import Provider, NodeState
+from libcloud.compute.types import Provider
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
 from libcloud.dns.types import Provider as DnsProvider
