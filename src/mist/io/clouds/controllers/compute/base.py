@@ -292,10 +292,7 @@ class BaseComputeController(BaseController):
         for machine in self._list_machines__fetch_generic_machines():
             machine.last_seen = now
             machine.missing_since = None
-            if self.check_if_machine_accessible(machine):
-                machine.state = config.STATES[NodeState.RUNNING]
-            else:
-                machine.state = config.STATES[NodeState.UNKNOWN]
+            machine.state = config.STATES[NodeState.UNKNOWN]
             for action in ('start', 'stop', 'reboot', 'destroy', 'rename',
                            'resume', 'suspend', 'undefine'):
                 setattr(machine.actions, action, False)
