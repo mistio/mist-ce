@@ -1079,7 +1079,6 @@ def destroy_machine(user, cloud_id, machine_id):
         log.info("Will try to disable monitoring for machine before "
                  "destroying it (we don't bother to check if it "
                  "actually has monitoring enabled.")
-        
     except ImportError:
         from mist.io.dummy.methods import disable_monitoring
 
