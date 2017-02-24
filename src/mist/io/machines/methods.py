@@ -25,7 +25,7 @@ from mist.io.methods import connect_provider
 from mist.io.networks.methods import list_networks
 from mist.io.tag.methods import resolve_id_and_set_tags
 
-from mist.core import config  # TODO handle this for opes.source
+from mist.io import config
 
 import logging
 

@@ -1,4 +1,5 @@
 import paramiko
+import logging
 import json
 import uuid
 import re
@@ -19,7 +20,7 @@ from amqp.connection import Connection
 
 from paramiko.ssh_exception import SSHException
 
-import ansible.playbook
+import ansible.playbook  # TODO what is these for?
 import ansible.utils.template
 from ansible import callbacks
 from ansible import utils
@@ -34,9 +35,7 @@ from mist.io.machines.models import Machine
 from mist.io.scripts.models import Script
 from mist.io.schedules.models import Schedule
 
-from mist.core import config  # TODO handle this for open.source
-
-celery_cfg = 'mist.core.celery_config'
+celery_cfg = 'mist.core.celery_config'  # TODO what is this for?
 
 from mist.io.helpers import log_event
 from mist.io.helpers import send_email as helper_send_email
@@ -45,7 +44,8 @@ from mist.io.helpers import amqp_owner_listening
 from mist.io.helpers import amqp_log
 from mist.io.helpers import trigger_session_update
 
-import logging
+from mist.io import config
+
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)

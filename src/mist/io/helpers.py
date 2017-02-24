@@ -39,15 +39,13 @@ from amqp.exceptions import NotFound as AmqpNotFound
 
 from distutils.version import LooseVersion
 
+import mist.io.users.models
+from mist.io.auth.models import ApiToken, datetime_to_str
+
 from mist.io.exceptions import MistError, NotFoundError
 from mist.io.exceptions import RequiredParameterMissingError
-import mist.io.users.models
 
-from mist.core import config  # TODO handle for open.source
-# try:
-#
-# except ImportError:
-#     from mist.io import config
+from mist.io import config
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -1152,7 +1150,6 @@ def logging_view_decorator(func):
             log_dict['user_id'] = None
             log_dict['owner_id'] = None
 
-        from mist.io.auth.models import ApiToken, datetime_to_str
         if isinstance(session, ApiToken):
             if not 'dummy' in session.name:
                 log_dict['api_token_id'] = str(session.id)
