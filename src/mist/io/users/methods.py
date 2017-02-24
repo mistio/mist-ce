@@ -19,7 +19,7 @@ from mist.io import config
 try:
     from mist.core.methods import assign_promo
 except ImportError:
-    from mist.io.dummy import assign_promo
+    from mist.io.dummy.methods import assign_promo
 
 log = logging.getLogger(__name__)
 
