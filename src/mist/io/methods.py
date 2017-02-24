@@ -41,8 +41,12 @@ from mist.io.clouds.models import Cloud
 from mist.io.networks.models import NETWORKS, SUBNETS, Network, Subnet
 from mist.io.machines.models import Machine
 
-from mist.core.vpn.methods import super_ping  # TODO handle this for open_sourc
-from mist.core import config
+try:
+    from mist.core.vpn.methods import super_ping
+except ImportError:
+    from mist.io.dummy.methods import super_ping
+
+from mist.io import config
 
 import mist.io.clouds.models as cloud_models
 
