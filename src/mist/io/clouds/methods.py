@@ -7,8 +7,6 @@ from mist.io.helpers import trigger_session_update
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import BadRequestError, NotFoundError
 
-from mist.io.methods import enable_monitoring
-
 from mist.io.tag.methods import get_tags_for_resource
 
 from mist.io import config
@@ -46,12 +44,12 @@ def add_cloud_v_2(owner, title, provider, params):
     if provider == 'bare_metal' and monitoring:
         # Let's overload this a bit more by also combining monitoring.
         machine = Machine.objects.get(cloud=cloud)
-        #  TODO handle this for open.source
+        #  TODO move it up
         try:
-            from mist.core.methods import enable_monitoring as _en_mon
+            from mist.core.methods import enable_monitoring
         except ImportError:
-            _en_mon = enable_monitoring
-        ret['monitoring'] = _en_mon(
+            from mist.io.dummy.methods import enable_monitoring
+        ret['monitoring'] = enable_monitoring(
             owner, cloud.id, machine.machine_id,
             no_ssh=not (machine.os_type == 'unix' and
                         machine.key_associations)
@@ -79,16 +77,15 @@ def delete_cloud(owner, cloud_id):
     """Deletes cloud with given cloud_id."""
 
     log.info("Deleting cloud: %s", cloud_id)
-    # FIXME handle this for open.source
     # if a core/io installation, disable monitoring for machines
+    # TODO move it up
     try:
         from mist.core.methods import disable_monitoring_cloud
-    except ImportError:
-        # this is a standalone io installation, don't bother
-        pass
-    else:
         # this a core/io installation, disable directly using core's function
         log.info("Disabling monitoring before deleting cloud.")
+    except ImportError:
+        from mist.io.dummy.methods import disable_monitoring_cloud
+    else:
         try:
             disable_monitoring_cloud(owner, cloud_id)
         except Exception as exc:
@@ -101,7 +98,7 @@ def delete_cloud(owner, cloud_id):
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
-    log.info("Succesfully deleted cloud '%s'", cloud_id)
+    log.info("Successfully deleted cloud '%s'", cloud_id)
     trigger_session_update(owner, ['clouds'])
 
 
