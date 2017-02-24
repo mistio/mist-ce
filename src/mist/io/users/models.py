@@ -232,6 +232,8 @@ class Owner(me.Document):
     rules = me.MapField(field=me.ReferenceField(Rule))
     alerts_email = me.ListField(me.StringField(), default=[])
 
+    avatar = me.StringField(default='')
+
     # set a global alerts email
 
     # billing related fields
@@ -376,6 +378,14 @@ class User(Owner):
         else:
             name = (self.first_name or '') + ' ' + (self.last_name or '')
             return name.strip() or self.email
+
+
+class Avatar(me.Document):
+    id = me.StringField(primary_key=True,
+                        default=lambda: uuid4().hex)
+    content_type = me.StringField(default="image/png")
+    body = me.BinaryField()
+    owner = me.ReferenceField(Owner, required=True)
 
 
 class Team(me.EmbeddedDocument):

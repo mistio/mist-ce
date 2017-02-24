@@ -12,6 +12,8 @@ import datetime
 import tempfile
 import traceback
 import functools
+import jsonpickle
+
 from time import time, strftime, sleep
 
 from pymongo import MongoClient
@@ -41,7 +43,7 @@ from mist.io.exceptions import MistError, NotFoundError
 from mist.io.exceptions import RequiredParameterMissingError
 import mist.io.users.models
 
-from mist.core import config
+from mist.core import config  # TODO handle for open.source
 # try:
 #
 # except ImportError:
@@ -59,11 +61,11 @@ def get_temp_file(content):
     """Creates a temporary file on disk and saves 'content' in it.
 
     It is meant to be used like this:
-    with get_temp_file(my_string) as filepath:
-        do_stuff(filepath)
+    with get_temp_file(my_string) as file_path:
+        do_stuff(file_path)
 
     Once the with block is exited, the file is always deleted, even if an
-    exception has been rised.
+    exception has been raised.
 
     """
     (tmp_fd, tmp_path) = tempfile.mkstemp()
@@ -1260,8 +1262,8 @@ def logging_view_decorator(func):
         es_dict['exception'] = es_dict.pop('_exc')
         es_dict['type'] = 'exception'
         routing_key = "%s.%s" % (es_dict['owner_id'], es_dict['action'])
-
-        amqp_publish('exceptions', routing_key, es_dict,
+        pickler = jsonpickle.pickler.Pickler()
+        amqp_publish('exceptions', routing_key, pickler.flatten(es_dict),
                      ex_type='topic', ex_declare=True,
                      auto_delete=False)
 

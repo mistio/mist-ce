@@ -2,26 +2,28 @@ import random
 import string
 import urllib
 import logging
-
 from mongoengine import DoesNotExist
+
+from mist.io.users.models import Organization, User
 
 import mist.io.helpers
 
 from mist.io.exceptions import ConflictError
-
 from mist.io.exceptions import RedirectError
 from mist.io.exceptions import UserNotFoundError
 from mist.io.exceptions import UserUnauthorizedError
 from mist.io.exceptions import AdminUnauthorizedError
 from mist.io.exceptions import InternalServerError
 
-from mist.io.users.models import Organization, User
-from mist.core.rbac.methods import AuthContext
+from mist.io.tasks import revoke_token
+
+
+from mist.core.rbac.methods import AuthContext  # TODO handle for open.source
 
 from mist.io.auth.models import ApiToken
 from mist.io.auth.models import SessionToken
 
-
+#  TODO do we need here logging.basicConfig(level=config.PY_LOG_LEVEL,
 log = logging.getLogger(__name__)
 
 
@@ -201,7 +203,6 @@ def reissue_cookie_session(request, user_id='', su='', org=None, after=0,
     if not isinstance(session, SessionToken):
         raise Exception("Can not reissue an API token session.")
     if after:
-        from mist.core.tasks import revoke_token
         revoke_token.apply_async(args=(session.token, ), countdown=after)
     else:
         session.invalidate()
