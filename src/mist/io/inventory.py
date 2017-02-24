@@ -3,13 +3,9 @@ from mist.io.machines.models import Machine, KeyAssociation
 from mist.io.keys.models import SSHKey, SignedSSHKey
 
 try:
-    from mist.core import config
     from mist.core.vpn.methods import destination_nat as dnat
 except ImportError:
-    from mist.io import config, model
-
-    def dnat(owner, ip_addr, port):
-        return ip_addr, port
+    from mist.io.dummy.methods import dnat
 
 
 class MistInventory(object):
