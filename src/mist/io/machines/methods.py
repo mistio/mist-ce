@@ -1073,28 +1073,22 @@ def destroy_machine(user, cloud_id, machine_id):
 
     # if machine has monitoring, disable it. the way we disable depends on
     # whether this is a standalone io installation or not
-    disable_monitoring_function = None
-    try:  # TODO handle this for open.source
-        from mist.core.methods import disable_monitoring as dis_mon_core
-        disable_monitoring_function = dis_mon_core
-    except ImportError:
-        #  TODO handle this for open.source
-        from mist.io.methods import disable_monitoring
-        # this is a standalone io instal/mlation, using io's disable_monitoring
-        # if we have an authentication token for the core service
-        if user.mist_api_token:
-            disable_monitoring_function = disable_monitoring
-    if disable_monitoring_function is not None:
+    try:
+        from mist.core.methods import disable_monitoring
+
         log.info("Will try to disable monitoring for machine before "
                  "destroying it (we don't bother to check if it "
                  "actually has monitoring enabled.")
-        try:
-            # we don't actually bother to undeploy collectd
-            disable_monitoring_function(user, cloud_id, machine_id,
-                                        no_ssh=True)
-        except Exception as exc:
-            log.warning("Didn't manage to disable monitoring, maybe the "
-                        "machine never had monitoring enabled. Error: %r", exc)
+        
+    except ImportError:
+        from mist.io.dummy.methods import disable_monitoring
+
+    try:
+        # we don't actually bother to undeploy collectd
+        disable_monitoring(user, cloud_id, machine_id, no_ssh=True)
+    except Exception as exc:
+        log.warning("Didn't manage to disable monitoring, maybe the "
+                    "machine never had monitoring enabled. Error: %r", exc)
 
     machine.ctl.destroy()
 
