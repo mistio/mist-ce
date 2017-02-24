@@ -69,7 +69,6 @@ class Zone(me.Document):
         """
         if not kwargs['domain']:
             raise RequiredParameterMissingError('domain')
-        #assert isinstance(cloud, Cloud)
         if not cloud or not isinstance(cloud, Cloud):
             raise BadRequestError('cloud')
         if not owner or not isinstance(owner, Organization):
@@ -138,7 +137,7 @@ class Record(me.Document):
         self.ctl = RecordController(self)
 
     @classmethod
-    def add(cls, zone=None, id='', **kwargs):
+    def add(cls, owner=None, zone=None, id='', **kwargs):
         """Add Record
 
         This is a class method, meaning that it is meant to be called on the
@@ -170,9 +169,9 @@ class Record(me.Document):
         # the best matching domain.
         if not zone and kwargs['type'] in ['A', 'AAAA', 'CNAME']:
             assert isinstance(owner, Organization)
-            zone = BaseDNSController.find_best_matching_zone(owner, kwargs)
-        if zone and not isinstance(zone, Zone):
-            raise BadRequestError('zone')
+            zone = BaseDNSController.find_best_matching_zone(owner,
+                                                             kwargs['name'])
+        assert isinstance(zone, Zone)
 
         record = cls(zone=zone)
         if id:

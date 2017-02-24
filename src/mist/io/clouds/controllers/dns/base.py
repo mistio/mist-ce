@@ -390,7 +390,7 @@ class BaseDNSController(BaseController):
         return
 
     @staticmethod
-    def find_best_matching_zone(owner, kwargs):
+    def find_best_matching_zone(owner, name):
         """
         This is a static method that tries to extract a valid domain from
         the name provided, trying to find the best matching DNS zone. This only
@@ -402,7 +402,7 @@ class BaseDNSController(BaseController):
         from mist.io.dns.models import Zone
 
         # Split hostname in dot separated parts.
-        parts = [part for part in kwargs['name'].split('.') if part]
+        parts = [part for part in name.split('.') if part]
         # Find all possible domains for this domain name,
         # longest first
         all_domains = {}
@@ -412,7 +412,7 @@ class BaseDNSController(BaseController):
             all_domains[domain] = subdomain
         if not all_domains:
             raise BadRequestError("Couldn't extract a valid domain from \
-                                the provided '%s'."  % kwargs['name'])
+                                the provided '%s'."  % name)
 
         zones = Zone.objects(owner=owner)
         # We need to iterate over all the cloud DNS zones to find
@@ -423,4 +423,4 @@ class BaseDNSController(BaseController):
                 if zone_candidate.domain == domain:
                     return zone_candidate
         raise BadRequestError("No DNS zone found, can't proceed with "
-                              "creating record '%s'."  % kwargs['name'])
+                              "creating record '%s'."  % name)
