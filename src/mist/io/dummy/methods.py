@@ -50,3 +50,14 @@ def get_load(owner, start='', stop='', step='', tornado_callback=None):
 def check_monitoring(owner):
     return {}
 
+
+def assoc_metric(owner, cloud_id, machine_id, metric_id, name='', unit=''):
+    return None
+
+
+def update_metric(owner, metric_id, name="", unit=""):
+    return
+
+
+def disable_monitoring(owner, cloud_id, machine_id, no_ssh=False, job_id=''):
+    return
