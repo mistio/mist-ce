@@ -1,22 +1,26 @@
+import logging
+from time import time
+
 from mist.io.users.models import User
 from mist.io.users.models import Organization
 
 from mongoengine import ValidationError
 from mongoengine import OperationError
 
-from mist.core.methods import assign_promo
-from mist.core.methods import get_secure_rand_token
+from mist.io.auth.models import get_secure_rand_token
 from mist.io.helpers import log_event
-
-from mist.core import config
 
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import MethodNotAllowedError
 from mist.io.exceptions import OrganizationOperationError
 
-from time import time
+from mist.io import config
 
-import logging
+try:
+    from mist.core.methods import assign_promo
+except ImportError:
+    from mist.io.dummy import assign_promo
+
 log = logging.getLogger(__name__)
 
 
