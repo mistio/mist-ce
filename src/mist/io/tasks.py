@@ -717,11 +717,24 @@ class ListZones(UserTask):
         owner = Owner.objects.get(id=owner_id)
         log.warn('Running list zones for user %s cloud %s'
                  % (owner.id, cloud_id))
-        from mist.io.dns.methods import list_zones
-        zones = list_zones(owner, cloud_id)
+        try:
+            cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+        except Cloud.DoesNotExist:
+            raise CloudNotFoundError
+        if not hasattr(cloud.ctl, 'dns'):
+            return {'cloud_id': cloud_id, 'zones': []}
+        ret = []
+        zones = cloud.ctl.dns.list_zones()
+
+        for zone in zones:
+            zone_dict = zone.as_dict()
+            zone_dict['records'] = [record.as_dict() for
+                                    record in zone.ctl.list_records()]
+            ret.append(zone_dict)
+
         log.warn('Returning list zones for user %s cloud %s'
                  % (owner.id, cloud_id))
-        return {'cloud_id': cloud_id, 'zones': zones}
+        return {'cloud_id': cloud_id, 'zones': ret}
 
 
 class ListImages(UserTask):

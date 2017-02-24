@@ -325,6 +325,7 @@ class MainConnection(MistConnection):
         periodic_tasks.extend([('list_images', tasks.ListImages()),
                                ('list_sizes', tasks.ListSizes()),
                                ('list_networks', tasks.ListNetworks()),
+                               ('list_zones', tasks.ListZones()),
                                ('list_locations', tasks.ListLocations()),
                                ('list_projects', tasks.ListProjects())])
         for key, task in periodic_tasks:
@@ -391,7 +392,7 @@ class MainConnection(MistConnection):
             result = body
         log.info("Got %s", routing_key)
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
-                               'list_networks', 'list_machines',
+                               'list_networks', 'list_machines', 'list_zones',
                                'list_locations', 'list_projects', 'ping']):
             if routing_key == 'list_machines':
                 # probe newly discovered running machines
