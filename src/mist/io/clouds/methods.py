@@ -11,7 +11,7 @@ from mist.io.methods import enable_monitoring
 
 from mist.io.tag.methods import get_tags_for_resource
 
-from mist.core import config  # TODO handle this for open source
+from mist.io import config
 
 import logging
 

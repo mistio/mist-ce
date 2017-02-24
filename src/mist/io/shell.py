@@ -26,12 +26,12 @@ from mist.io.exceptions import ServiceUnavailableError
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import get_story
 
-try:
-    from mist.core import config
-except ImportError:
-    from mist.io import config
+from mist.io import config
 
-from mist.core.vpn.methods import destination_nat as dnat
+try:
+    from mist.core.vpn.methods import destination_nat as dnat
+except ImportError:
+    from mist.io.dummy.methods import dnat
 
 import logging
 
