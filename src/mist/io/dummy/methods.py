@@ -61,3 +61,13 @@ def update_metric(owner, metric_id, name="", unit=""):
 
 def disable_monitoring(owner, cloud_id, machine_id, no_ssh=False, job_id=''):
     return
+
+
+def enable_monitoring(owner, cloud_id, machine_id,name='', dns_name='',
+                      public_ips=None, private_ips=None, no_ssh=False,
+                      dry=False, job_id='', plugins=None, deploy_async=True):
+    return {}
+
+
+def disable_monitoring_cloud(owner, cloud_id, no_ssh=False):
+    return
