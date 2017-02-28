@@ -1223,7 +1223,8 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
                key_id='', username='', password='', port=22, job_id='',
                action_prefix='', su=False, env=""):
     import mist.io.shell
-    from mist.io.methods import list_machines, notify_admin, notify_user
+    from mist.io.methods import notify_admin, notify_user
+    from mist.io.machines.methods import list_machines
 
     if not isinstance(owner, Owner):
         if isinstance(owner, basestring):
