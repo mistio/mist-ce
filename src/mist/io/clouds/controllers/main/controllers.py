@@ -424,9 +424,6 @@ class OtherMainController(BaseMainController):
         # FIXME: Move ssh command to Machine controller once it is migrated.
         from mist.core.methods import ssh_command
 
-        # Sanitize inputs.
-        host = sanitize_host(host)
-        check_host(host)
         try:
             ssh_port = int(ssh_port)
         except (ValueError, TypeError):
@@ -449,6 +446,10 @@ class OtherMainController(BaseMainController):
             rdp_port=rdp_port
         )
         if host:
+            # Sanitize inputs.
+            host = sanitize_host(host)
+            check_host(host)
+
             if is_private_subnet(socket.gethostbyname(host)):
                 machine.private_ips = [host]
             else:
