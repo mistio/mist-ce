@@ -1,4 +1,5 @@
 import json
+import time
 import logging
 import datetime
 
@@ -171,6 +172,9 @@ def log_story(event):
         if event.get(key):
             story_id = event[key]
             story_type = key.split('_')[0]
+
+            # Wait for 1 second to ensure the index has been refreshed.
+            time.sleep(1)
 
             # Search for existing story.
             story = get_simple_story(owner_id=event['owner_id'],
