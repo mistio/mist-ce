@@ -178,22 +178,22 @@ class Record(me.Document):
     def clean(self):
         """Overriding the default clean method to implement param checking"""
         # We need to be checking the rdata based on the type of record
-        if type == 'A':
+        if self.type == 'A':
             try:
                 ip_addr = self.rdata[0].decode('utf-8')
                 ip.ip_address(ip_addr)
             except ValueError:
                 raise me.ValidationError('IPv4 address provided is not valid')
-        if type == 'AAAA':
+        if self.type == 'AAAA':
             try:
                 ip_addr = self.rdata[0].decode('utf-8')
                 ip.ip_address(ip_addr)
             except ValueError:
                 raise me.ValidationError('IPv6 address provided is not valid')
-        if type == "CNAME":
+        if self.type == "CNAME":
             if not self.rdata[0].endswith('.'):
                 self.rdata[0] += '.'
-        if type == "A" or type == "AAAA" or type == "CNAME":
+        if self.type == "A" or self.type == "AAAA" or self.type == "CNAME":
             if not len(self.rdata) == 1:
                 raise me.ValidationError('We cannot have more than one rdata'
                                          'values for this type of record.')

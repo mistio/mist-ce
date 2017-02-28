@@ -177,6 +177,7 @@ class BaseDNSController(BaseController):
             for rec in records:
                 if rec.record_id == record.record_id:
                     records.remove(rec)
+                    break
             records.append(record)
 
         # Then delete any records that are in the DB for this zone but were not
