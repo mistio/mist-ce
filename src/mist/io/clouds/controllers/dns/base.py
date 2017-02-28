@@ -413,8 +413,8 @@ class BaseDNSController(BaseController):
             domain = '.'.join(parts[i:]) + '.'
             all_domains[domain] = subdomain
         if not all_domains:
-            raise BadRequestError("Couldn't extract a valid domain from \
-                                the provided '%s'."  % name)
+            raise BadRequestError("Couldn't extract a valid domain from "
+                                  "the provided '%s'." % name)
 
         zones = Zone.objects(owner=owner)
         # We need to iterate over all the cloud DNS zones to find
@@ -425,4 +425,4 @@ class BaseDNSController(BaseController):
                 if zone_candidate.domain == domain:
                     return zone_candidate
         raise BadRequestError("No DNS zone found, can't proceed with "
-                              "creating record '%s'."  % name)
+                              "creating record '%s'." % name)
