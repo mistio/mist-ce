@@ -174,8 +174,10 @@ class BaseDNSController(BaseController):
             # There's a chance that we have received duplicate records as for
             # example for Route NS records, so skip adding it to the list if we
             # already have it
-            if record not in records:
-                records.append(record)
+            for rec in records:
+                if rec.record_id == record.record_id:
+                    records.remove(rec)
+            records.append(record)
 
         # Then delete any records that are in the DB for this zone but were not
         # returned by the list_records() method meaning the were deleted in the
