@@ -69,7 +69,6 @@ class Zone(me.Document):
         """
         if not kwargs['domain']:
             raise RequiredParameterMissingError('domain')
-        #assert isinstance(cloud, Cloud)
         if not cloud or not isinstance(cloud, Cloud):
             raise BadRequestError('cloud')
         if not owner or not isinstance(owner, Organization):
@@ -138,7 +137,7 @@ class Record(me.Document):
         self.ctl = RecordController(self)
 
     @classmethod
-    def add(cls, zone=None, id='', **kwargs):
+    def add(cls, owner=None, zone=None, id='', **kwargs):
         """Add Record
 
         This is a class method, meaning that it is meant to be called on the
@@ -162,17 +161,13 @@ class Record(me.Document):
             raise RequiredParameterMissingError('data')
         if not kwargs['type']:
             raise RequiredParameterMissingError('type')
-        # Owner is needed when we don't have a domain/zone and we need to
-        # find the best matching one. As such we always need to be popping this
-        # as the libcloud create_record doesn't accept an owner param.
-        owner = kwargs.pop('owner', "")
         # If we were not given a zone then we need the owner to try and find
         # the best matching domain.
         if not zone and kwargs['type'] in ['A', 'AAAA', 'CNAME']:
             assert isinstance(owner, Organization)
-            zone = BaseDNSController.find_best_matching_zone(owner, kwargs)
-        if zone and not isinstance(zone, Zone):
-            raise BadRequestError('zone')
+            zone = BaseDNSController.find_best_matching_zone(owner,
+                                                             kwargs['name'])
+        assert isinstance(zone, Zone)
 
         record = cls(zone=zone)
         if id:
@@ -183,22 +178,22 @@ class Record(me.Document):
     def clean(self):
         """Overriding the default clean method to implement param checking"""
         # We need to be checking the rdata based on the type of record
-        if type == 'A':
+        if self.type == 'A':
             try:
                 ip_addr = self.rdata[0].decode('utf-8')
                 ip.ip_address(ip_addr)
             except ValueError:
                 raise me.ValidationError('IPv4 address provided is not valid')
-        if type == 'AAAA':
+        if self.type == 'AAAA':
             try:
                 ip_addr = self.rdata[0].decode('utf-8')
                 ip.ip_address(ip_addr)
             except ValueError:
                 raise me.ValidationError('IPv6 address provided is not valid')
-        if type == "CNAME":
+        if self.type == "CNAME":
             if not self.rdata[0].endswith('.'):
                 self.rdata[0] += '.'
-        if type == "A" or type == "AAAA" or type == "CNAME":
+        if self.type == "A" or self.type == "AAAA" or self.type == "CNAME":
             if not len(self.rdata) == 1:
                 raise me.ValidationError('We cannot have more than one rdata'
                                          'values for this type of record.')
