@@ -802,7 +802,7 @@ $sudo /opt/mistio-collectd/collectd.sh restart
 
 def get_stats(user, cloud_id, machine_id, start='', stop='', step='', metrics=''):
     raise NotImplementedError()
-    
+
     try:
         resp = requests.get(
             "%s/clouds/%s/machines/%s/stats" % (config.CORE_URI,
