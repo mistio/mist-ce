@@ -38,8 +38,6 @@ from mist.io.schedules.methods import filter_list_schedules
 from mist.io import tasks
 from mist.io.hub.tornado_shell_client import ShellHubClient
 
-from mist.io import config
-
 try:
     from mist.core.methods import get_stats, get_load, check_monitoring
     from mist.core.methods import get_user_data, filter_list_tags
@@ -56,6 +54,9 @@ except ImportError:
     from mist.io.dummy.methods import filter_list_templates
     from mist.io.dummy.methods import filter_list_stacks
     multi_user = False
+
+
+from mist.io import config
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
