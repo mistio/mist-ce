@@ -1,56 +1,105 @@
 """Basic configuration and mappings
-
-Here we define constants needed by mist.io
-
-Also, the configuration from settings.py is exposed through this module.
-
+   Here we define constants needed by mist.io
+   Also, the configuration from settings.py is exposed through this module.
 """
-
 import os
 import logging
-
 
 from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 
-
 # Parse user defined settings from settings.py in the top level project dir
 log = logging.getLogger(__name__)
 
-# If SETTINGS_FILE ebv variable exists, it will point to a mounted
-# file that hosts the configuration option of our Kubernetes
-# configMap.
+# If SETTINGS_FILE env variable exists, it will point to a mounted
+# file that hosts the configuration option of our Kubernetes configMap.
 settings_file = os.getenv('SETTINGS_FILE') or 'settings.py'
 
 settings = {}
 try:
     execfile(settings_file, settings)
 except IOError:
-    log.warning("No settings.py file found.")
+    log.warning("No %s file found." % settings_file)
 except Exception as exc:
     log.error("Error parsing settings py: %r", exc)
-CORE_URI = settings.get("CORE_URI", os.environ.get("CORE_URI", "https://mist.io"))
+    
+###############################################################################
+# The following variables are common for both open.source and mist.core
+###############################################################################
 AMQP_URI = settings.get("AMQP_URI", "localhost:5672")
-MEMCACHED_HOST = settings.get("MEMCACHED_HOST", ["127.0.0.1:11211"])
-BROKER_URL = settings.get("BROKER_URL", "amqp://guest:guest@127.0.0.1/")
 SSL_VERIFY = settings.get("SSL_VERIFY", True)
-JS_BUILD = settings.get("JS_BUILD", False)
-CSS_BUILD = settings.get("CSS_BUILD", False)
-LAST_BUILD = settings.get("LAST_BUILD", '')
-JS_LOG_LEVEL = settings.get("JS_LOG_LEVEL", 3)
+
 PY_LOG_LEVEL = settings.get("PY_LOG_LEVEL", logging.INFO)
 PY_LOG_FORMAT = settings.get("PY_LOG_FORMAT", '%(asctime)s %(levelname)s %(threadName)s %(module)s - %(funcName)s: %(message)s')
 PY_LOG_FORMAT_DATE = settings.get("PY_LOG_FORMAT_DATE", "%Y-%m-%d %H:%M:%S")
-GOOGLE_ANALYTICS_ID = settings.get("GOOGLE_ANALYTICS_ID", "")
-COMMAND_TIMEOUT = settings.get("COMMAND_TIMEOUT", 20)
+LOG_EXCEPTIONS = settings.get("LOG_EXCEPTIONS", True)
+
+JS_BUILD = settings.get("JS_BUILD", False)
+CSS_BUILD = settings.get("CSS_BUILD", False)
+JS_LOG_LEVEL = settings.get("JS_LOG_LEVEL", 3)
+
+MONGO_URI = settings.get("MONGO_URI", os.environ.get("MONGO_URI", "mongodb:27017"))
+MONGO_DB = settings.get("MONGO_DB", os.environ.get("MONGO_DB", "mist2"))
+
+ACTIVATE_POLLER = settings.get("ACTIVATE_POLLER", True)  # TODO depracate it
+
+# number of api tokens user can have
+ACTIVE_APITOKEN_NUM = settings.get('ACTIVE_APITOKEN_NUM', 20)
 ALLOW_CONNECT_LOCALHOST = settings.get('ALLOW_CONNECT_LOCALHOST', True)
 ALLOW_CONNECT_PRIVATE = settings.get('ALLOW_CONNECT_PRIVATE', True)
+SAVE_TAGS_ON_PROVIDER = settings.get('SAVE_TAGS_ON_PROVIDER', True)  # TODO ?
+
 # allow mist.io to connect to KVM hypervisor running on the same server
 ALLOW_LIBVIRT_LOCALHOST = settings.get('ALLOW_LIBVIRT_LOCALHOST', False)
-# mist.io interface to the OpenVPN server
-VPN_SERVER_API_ADDRESS = settings.get('VPN_SERVER_API_ADDRESS', '')
-ALLOWED_PRIVATE_NETWORKS = settings.get('ALLOWED_PRIVATE_NETWORKS', ['192.168.0.0/16', '172.16.0.0/12', '10.0.0.0/8'])
-ALLOW_PUBLIC_VPN = settings.get('ALLOW_PUBLIC_VPN', True)
+
+# Docker related
+DOCKER_IP = settings.get("DOCKER_IP", os.environ.get("DOCKER_IP", "172.17.0.1"))
+DOCKER_PORT = settings.get("DOCKER_PORT", os.environ.get("DOCKER_PORT", "2375"))
+DOCKER_TLS_KEY = settings.get("DOCKER_TLS_KEY", os.environ.get("DOCKER_TLS_KEY"))
+DOCKER_TLS_CERT = settings.get("DOCKER_TLS_CERT", os.environ.get("DOCKER_TLS_CERT"))
+DOCKER_TLS_CA = settings.get("DOCKER_TLS_CA", os.environ.get("DOCKER_TLS_CA"))
+
+MAILER_SETTINGS = settings.get("MAILER_SETTINGS",
+                               {
+                                   'mail.host': "mailmock",
+                                   'mail.port': "8025",
+                                   'mail.tls': False,
+                                   'mail.starttls': False,
+                                   'mail.username': "",
+                                   'mail.password': ""
+                               })
+# PLAN OUT experiments
+NEW_UI_EXPERIMENT_ENABLE = settings.get("NEW_UI_EXPERIMENT_ENABLE", False)
+
+GITHUB_BOT_TOKEN = settings.get("GITHUB_BOT_TOKEN", "")
+
+###############################################################################
+#  Different set in io and core
+###############################################################################
+SECRET = settings.get("SECRET", "")
+
+CORE_URI = settings.get("CORE_URI", os.environ.get("CORE_URI", "https://mist.io"))
+MEMCACHED_HOST = settings.get("MEMCACHED_HOST", ["127.0.0.1:11211"])
+BROKER_URL = settings.get("BROKER_URL", "amqp://guest:guest@127.0.0.1/")
+
+#  TODO COuld we add our email here?
+NOTIFICATION_EMAIL = {
+    'all': settings.get("NOTIFICATION_EMAIL", ""),
+    'dev': settings.get("NOTIFICATION_EMAIL_DEV", ""),
+    'ops': settings.get("NOTIFICATION_EMAIL_OPS", ""),
+    'sales': settings.get("NOTIFICATION_EMAIL_SALES", ""),
+    'demo': settings.get("NOTIFICATION_EMAIL_DEMO", ""),
+    'support':  settings.get("NOTIFICATION_EMAIL_SUPPORT", ""),
+    }
+
+EMAIL_FROM = settings.get("EMAIL_FROM", "")
+
+# Monitoring Related
+COLLECTD_HOST = settings.get("COLLECTD_HOST", "")
+COLLECTD_PORT = settings.get("COLLECTD_PORT", "")
+
+GOOGLE_ANALYTICS_ID = settings.get("GOOGLE_ANALYTICS_ID", "")
+COMMAND_TIMEOUT = settings.get("COMMAND_TIMEOUT", 20)  # TODO ?
 
 # celery settings
 CELERY_SETTINGS = {
@@ -63,7 +112,10 @@ CELERY_SETTINGS = {
 }
 CELERY_SETTINGS.update(settings.get('CELERY_SETTINGS', {}))
 
+
+###############################################################################
 # App constants
+###############################################################################
 
 STATES = {
     NodeState.RUNNING: 'running',
@@ -81,8 +133,6 @@ STATES = {
     NodeState.RECONFIGURING: 'reconfiguring'
 }
 
-
-
 # All EC2 providers, useful for type checking
 EC2_PROVIDERS = (
     Provider.EC2_US_EAST,
@@ -99,12 +149,10 @@ EC2_PROVIDERS = (
 #    Provider.EC2_AP_SOUTH1,
 )
 
-
 EC2_SECURITYGROUP = {
     'name': 'mistio',
     'description': 'Security group created by mist.io'
 }
-
 
 # Linode datacenter ids/names mapping
 LINODE_DATACENTERS = {
@@ -452,7 +500,6 @@ SUPPORTED_PROVIDERS = [
     }
 ]
 
-
 # Base AMIs
 EC2_IMAGES = {
     'eu-west-1': {
@@ -574,7 +621,6 @@ EC2_IMAGES = {
     },
 }
 
-
 EC2_IMAGES[Provider.EC2_EU_WEST] = EC2_IMAGES['eu-west-1']
 EC2_IMAGES[Provider.EC2_SA_EAST] = EC2_IMAGES['sa-east-1']
 EC2_IMAGES[Provider.EC2_AP_NORTHEAST] = EC2_IMAGES['ap-northeast-1']
@@ -622,3 +668,76 @@ GCE_IMAGES = ['debian-cloud',
               'suse-cloud',
               'ubuntu-os-cloud',
               'windows-cloud']
+
+BANNED_EMAIL_PROVIDERS = [
+    'mailinator.com',
+    'bob.info',
+    'veryreallemail.com',
+    'spamherelots.com',
+    'putthisinyourspamdatabase.com',
+    'thisisnotmyrealemail.com',
+    'binkmail.com',
+    'spamhereplease.com',
+    'sendspamhere.com',
+    'chogmail.com',
+    'spamthisplease.com',
+    'frapmail.com',
+    'obobbo.com',
+    'devnullmail.com',
+    'dispostable.com',
+    'yopmail.com',
+    'soodonims.com',
+    'spambog.com',
+    'spambog.de',
+    'discardmail.com',
+    'discardmail.de',
+    'spambog.ru',
+    'cust.in',
+    '0815.ru',
+    's0ny.net',
+    'hochsitze.com',
+    'hulapla.de',
+    'misterpinball.de',
+    'nomail2me.com',
+    'dbunker.com',
+    'bund.us',
+    'teewars.org',
+    'superstachel.de',
+    'brennendesreich.de',
+    'ano-mail.net',
+    '10minutemail.com',
+    'rppkn.com',
+    'trashmail.net',
+    'dacoolest.com',
+    'junk1e.com',
+    'throwawayemailaddress.com',
+    'imgv.de',
+    'spambastion.com',
+    'dreameheap.com',
+    'trollbot.org',
+    'getairmail.com',
+    'anonymizer.com',
+    'dudmail.com',
+    'scatmail.com',
+    'trayna.com',
+    'spamgourmet.com',
+    'incognitomail.org',
+    'mailexpire.com',
+    'mailforspam.com',
+    'sharklasers.com',
+    'guerillamail.com',
+    'guerrillamailblock.com',
+    'guerrillamail.net',
+    'guerrillamail.org',
+    'guerrillamail.biz',
+    'spam4.me',
+    'grr.la',
+    'guerrillamail.de',
+    'trbvm.com',
+    'byom.de'
+]
+
+try:
+    from mist.core.config import *
+except ImportError:
+    pass
