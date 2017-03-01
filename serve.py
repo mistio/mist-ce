@@ -7,13 +7,12 @@ import tornado.ioloop
 
 from tornado_profile import TornadoProfiler
 
-import mist.io.sock
-
-
 try:
     from mist.core.sock import make_router
 except ImportError:
     from mist.io.sock import make_router
+
+import mist.io.sock # this is after try-except on purpose
 
 
 def sig_handler(sig, frame):
