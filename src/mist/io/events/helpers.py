@@ -74,8 +74,7 @@ def get_simple_story(owner_id, story_id, story_type=None, closed=None):
                     }
                 }
             }
-        },
-        'size': 1
+        }
     }
     if closed is True:
         query['query']['bool']['filter']['bool']['must_not'].append(

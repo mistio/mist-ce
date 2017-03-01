@@ -762,7 +762,7 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
             return {'_python_object': str(obj)}
 
         event = {
-            'owner_id': str(owner_id),
+            'owner_id': owner_id or None,
             'type': str(event_type),
             'action': str(action),
             'time': time(),

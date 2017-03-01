@@ -19,6 +19,7 @@ FIELDS = (
 CLOSES_INCIDENT = (
     'update_rule',
     'delete_rule',
+    'delete_cloud',
     'destroy_machine',
     'rule_untriggered',
     'disable_monitoring',

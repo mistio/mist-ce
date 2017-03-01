@@ -155,7 +155,7 @@ def log_story(event):
 
     """
     # Ensure `owner_id` is present, since ES indices are based on it.
-    assert event.get('owner_id') and event.get('owner_id') != 'None', 'OwnerID'
+    assert event.get('owner_id'), 'OwnerID'
 
     etype = event['type']
     eaction = event['action']
@@ -172,9 +172,6 @@ def log_story(event):
         if event.get(key):
             story_id = event[key]
             story_type = key.split('_')[0]
-
-            # Wait for 1 second to ensure the index has been refreshed.
-            time.sleep(1)
 
             # Search for existing story.
             story = get_simple_story(owner_id=event['owner_id'],
@@ -222,11 +219,13 @@ def log_story(event):
 
         # TODO: Start incident and stack stories.
 
-        # Save to Elasticsearch.
+        # Save to Elasticsearch. Refresh the index immediately.
         index = '%s-stories-%s' % (
                 event['owner_id'],
                 datetime.datetime.utcnow().strftime('%Y.%m.%d'))
-        es().index(index=index, doc_type=story['type'], body=story)
+        es().index(
+            index=index, doc_type=story['type'], body=story, refresh='true'
+        )
 
         # Append corresponding stories to the logged event.
         event['_stories'].append((story['story_id'], story['type']))
@@ -481,6 +480,21 @@ def get_story(owner_id, story_id, story_type=None, expand=True):
 
 
 def close_story(story_id):
+    """Close an open story."""
+    story = get_simple_story(owner_id='*', story_id=story_id)  # TODO: owner_id
+    if not story:
+        log.error('Failed to find story %s', story_id)
+    elif story['_source']['finished_at']:
+        log.error('Story %s already closed', story_id)
+    else:
+        doc = story['_source']
+        doc['finished_at'] = time.time()
+        es().index(index=story['_index'], doc_type=story['_type'],
+                   id=story['_id'],
+                   body=doc)
+
+
+def delete_story(story_id):
     """Delete a story."""
     story = get_simple_story(owner_id='*', story_id=story_id)  # TODO: owner_id
     if story:
