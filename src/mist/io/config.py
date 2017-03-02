@@ -22,7 +22,7 @@ except IOError:
     log.warning("No %s file found." % settings_file)
 except Exception as exc:
     log.error("Error parsing settings py: %r", exc)
-    
+
 ###############################################################################
 # The following variables are common for both open.source and mist.core
 ###############################################################################
