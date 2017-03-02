@@ -22,7 +22,7 @@ from mist.io.exceptions import NotFoundError
 try:
     from mist.core.rbac.methods import AuthContext
 except ImportError:
-    from mist.io.dummy.methods import AuthContext
+    from mist.io.dummy.rbac import AuthContext
 
 log = logging.getLogger(__name__)
 
