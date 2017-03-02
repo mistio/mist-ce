@@ -1,13 +1,28 @@
 import json
 import logging
 
+from mist.core.config import ELASTICSEARCH
 from mist.core.helpers import es_client as es
+
+from mist.io.exceptions import NotFoundError
+from mist.io.exceptions import RateLimitError
+from mist.io.exceptions import BadRequestError
+from mist.io.exceptions import ServiceUnavailableError
 
 
 log = logging.getLogger(__name__)
 
+# Additional kwargs passed explicitly to the Tornado-compatible ES client.
+_es_kwargs = {
+    'ca_certs': None,
+    'auth_username': ELASTICSEARCH['elastic_username'],
+    'auth_password': ELASTICSEARCH['elastic_password'],
+    'validate_cert': ELASTICSEARCH['elastic_verify_certs'],
+}
 
-def get_event(owner_id, event_id, event_type=None, fields=None):
+
+def get_event(owner_id, event_id, event_type=None, fields=None,
+              callback=None, tornado_async=False):
     """Fetch a single event.
 
     Returns a complete ES hit including the _source, _type, and _id.
@@ -17,6 +32,8 @@ def get_event(owner_id, event_id, event_type=None, fields=None):
         - event_id: The event's UUID.
         - event_type: The event's type.
         - fields: The fields of the matching document to be returned.
+        - callback: Method to be invoked upon the response.
+        - tornado_async: Denotes where to execute Tornado-safe HTTP requests.
 
     """
     index = '%s-logs-*' % owner_id
@@ -29,8 +46,7 @@ def get_event(owner_id, event_id, event_type=None, fields=None):
                     }
                 }
             }
-        },
-        'size': 1
+        }
     }
     # Return only specific fields, if requested.
     if fields:
@@ -38,12 +54,19 @@ def get_event(owner_id, event_id, event_type=None, fields=None):
             fields = [fields]
         query['_source'] = {'includes': fields}
 
-    result = es().search(index=index, doc_type=event_type, body=query)
-    result = result['hits']['hits']
-    return result[0] if result else None
+    if not tornado_async:
+        result = es().search(index=index, doc_type=event_type, body=query)
+        if callback:
+            return callback(result)
+        return result['hits']['hits'][0] if result['hits']['hits'] else None
+    else:
+        es(tornado_async).search(index=index, doc_type=event_type,
+                                 body=json.dumps(query), callback=callback,
+                                 **_es_kwargs)
 
 
-def get_simple_story(owner_id, story_id, story_type=None, closed=None):
+def get_simple_story(owner_id, story_id, story_type=None, closed=None,
+                     callback=None, tornado_async=False):
     """Fetch a single story.
 
     Returns a complete ES hit including the _source, _type, and _id.
@@ -55,6 +78,8 @@ def get_simple_story(owner_id, story_id, story_type=None, closed=None):
         - story_id: The story's UUID.
         - story_type: The story's type.
         - closed: Denotes whether to fetch open/closed stories.
+        - callback: Method to be invoked upon the response.
+        - tornado_async: Denotes where to execute Tornado-safe HTTP requests.
 
     """
     index = '%s-stories-*' % owner_id
@@ -85,16 +110,20 @@ def get_simple_story(owner_id, story_id, story_type=None, closed=None):
             {'term': {'finished_at': 0}}
         )
 
-    result = es().search(index=index, doc_type=story_type, body=query)
-    result = result['hits']['hits']
+    if not tornado_async:
+        result = es().search(index=index, doc_type=story_type, body=query)
+        if len(result['hits']['hits']) > 1:
+            log.error('Found multiple stories with story_id %s', story_id)
+        if callback:
+            return callback(result)
+        return result['hits']['hits'][0] if result['hits']['hits'] else None
+    else:
+        es(tornado_async).search(index=index, doc_type=story_type,
+                                 body=json.dumps(query), callback=callback,
+                                 **_es_kwargs)
 
-    if len(result) > 1:
-        log.error('Found multiple stories with story_id %s', story_id)
 
-    return result[0] if result else None
-
-
-def get_open_incidents(owner_id, **kwargs):
+def get_open_incidents(owner_id, callback=None, tornado_async=False, **kwargs):
     """Fetch open incidents.
 
     Incidents are stories with story_type='incident'.
@@ -105,6 +134,8 @@ def get_open_incidents(owner_id, **kwargs):
     Arguments:
         - owner_id: The Owner, whose index to search.
         - kwargs: Extra terms to be used for filtering.
+        - callback: Method to be invoked upon the response.
+        - tornado_async: Denotes where to execute Tornado-safe HTTP requests.
 
     """
     index = '%s-stories-*' % owner_id
@@ -131,8 +162,15 @@ def get_open_incidents(owner_id, **kwargs):
                     {'term': {key: kwargs[key]}}
             )
 
-    result = es().search(index=index, doc_type='incident', body=query)
-    return result['hits']['hits']
+    if not tornado_async:
+        result = es().search(index=index, doc_type='incident', body=query)
+        if callback:
+            return callback(result)
+        return result['hits']['hits']
+    else:
+        es(tornado_async).search(index=index, doc_type='incident',
+                                 body=json.dumps(query), callback=callback,
+                                 **_es_kwargs)
 
 
 def start_machine_story(story, event):
@@ -172,3 +210,29 @@ def start_machine_story(story, event):
     # TODO: Add schedule entry, create DNS Record.
     # Add entire summary to the story.
     story['summary'] = summary
+
+
+def _on_response_callback(response, tornado_async=False):
+    """HTTP Response-handling callback.
+
+    This method is meant to return HTTP Response objects generated either in a
+    Tornado or synchronous execution context.
+
+    Arguments:
+        - response: HTTP Response object.
+        - tornado_async: Denotes if a Tornado-safe HTTP request was issued.
+
+    """
+    if tornado_async:
+        if response.code != 200:
+            log.error('Error on Elasticsearch query in tornado_async mode. '
+                      'Got %d status code: %s', response.code, response.body)
+            if response.code == 400:
+                raise BadRequestError()
+            if response.code == 404:
+                raise NotFoundError()
+            if response.code == 429:
+                raise RateLimitError()
+            raise ServiceUnavailableError()
+        response = json.loads(response.body)
+    return response['hits']['hits']

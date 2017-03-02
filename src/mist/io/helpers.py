@@ -751,7 +751,7 @@ def encrypt2(plaintext, key=config.SECRET, key_salt='', no_iv=False):
 
 # TODO: Deprecate. Move to io/events/methods.py once fully switched to ES.
 def log_event(owner_id, event_type, action, error=None, story_id='',
-              user_id=None, _mongo_conn=None, **kwargs):
+              user_id=None, _mongo_conn=None, tornado_async=False, **kwargs):
 
     """Log dict of the keyword arguments passed"""
     conn = _mongo_conn if _mongo_conn else MongoClient(config.MONGO_URI)
@@ -782,8 +782,8 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
             stories = log_story(event, _mongo_conn=conn)
             if config.LOGS_FROM_ELASTIC:
                 from mist.io.events.methods import log_story as log_story_to_elastic
-                event.update({'log_id': uuid.uuid4().hex, '_stories': []})
-                log_story_to_elastic(event)
+                event.update({'log_id': uuid.uuid4().hex})
+                log_story_to_elastic(event, tornado_async=tornado_async)
         except Exception as exc:
             log.error("failed to log story: %s %s %s %s %s Error %r",
                       owner_id, event_type, error, action, kwargs, exc)
