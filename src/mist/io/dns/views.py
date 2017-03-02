@@ -9,6 +9,7 @@ from mist.io.auth.methods import auth_context_from_request
 from mist.io.exceptions import NotFoundError
 from mist.io.exceptions import CloudNotFoundError
 
+from mist.io.helpers import trigger_session_update
 from mist.io.helpers import params_from_request, view_config
 
 OK = Response("OK", 200)
@@ -69,7 +70,12 @@ def create_dns_zone(request):
         raise CloudNotFoundError
 
     params = params_from_request(request)
-    return Zone.add(owner=cloud.owner, cloud=cloud, **params).as_dict()
+    params.pop('cloud', '')
+    new_zone = Zone.add(owner=cloud.owner, cloud=cloud, **params).as_dict()
+
+    # Schedule a UI update
+    trigger_session_update(auth_context.owner, ['clouds'])
+    return new_zone
 
 @view_config(route_name='api_v1_records', request_method='POST', renderer='json')
 def create_dns_record(request):
@@ -94,7 +100,11 @@ def create_dns_record(request):
     # Get the params and create the new record
     params = params_from_request(request)
 
-    return Record.add(owner=auth_context.owner, zone=zone, **params).as_dict()
+    rec = Record.add(owner=auth_context.owner, zone=zone, **params).as_dict()
+
+    # Schedule a UI update
+    trigger_session_update(auth_context.owner, ['clouds'])
+    return rec
 
 @view_config(route_name='api_v1_zone', request_method='DELETE', renderer='json')
 def delete_dns_zone(request):
@@ -116,6 +126,9 @@ def delete_dns_zone(request):
         raise NotFoundError('Zone does not exist')
 
     zone.ctl.delete_zone()
+
+    # Schedule a UI update
+    trigger_session_update(auth_context.owner, ['clouds'])
     return OK
 
 @view_config(route_name='api_v1_record', request_method='DELETE', renderer='json')
@@ -142,4 +155,7 @@ def delete_dns_record(request):
         raise NotFoundError('Record does not exist')
 
     record.ctl.delete_record()
+
+    # Schedule a UI update
+    trigger_session_update(auth_context.owner, ['clouds'])
     return OK
