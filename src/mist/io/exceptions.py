@@ -217,6 +217,14 @@ class SubnetExistsError(ConflictError):
     msg = "Subnet already exists"
 
 
+class ZoneExistsError(ConflictError):
+    msg = "Zone already exists"
+
+
+class RecordExistsError(ConflictError):
+    msg = "Record already exists"
+
+
 #  Rate Limit Error (translated as 429 in views)
 class RateLimitError(MistError):
     msg = "Rate Limit Error"
@@ -266,13 +274,10 @@ class SubnetDeletionError(InternalServerError):
     msg = "Subnet deletion failed"
 
 
-class SSLError(MistError):
-    msg = "SSL certificate verification error"
-
-
 #  BAD GATEWAY (translated as 502 in views)
 class BadGatewayError(MistError):
-    """Used to notify about failures in upstream services according to RFC 2616"""
+    """Used to notify about failures in upstream services
+    according to RFC 2616"""
     msg = "Bad Gateway"
     http_code = 502
 
