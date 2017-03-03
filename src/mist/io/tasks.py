@@ -33,6 +33,7 @@ from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.io.scripts.models import Script
 from mist.io.schedules.models import Schedule
+from mist.io.dns.models import Zone, Record
 
 from mist.core import config  # TODO handle this for open.source
 
@@ -82,7 +83,6 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
 
     from mist.io.methods import connect_provider, probe_ssh_only
     from mist.io.methods import notify_user, notify_admin
-    from mist.io.methods import create_dns_a_record
 
     from mist.core.methods import enable_monitoring  # TODO handle for open.so
 
@@ -152,13 +152,17 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
 
             if hostname:
                 try:
-                    record = create_dns_a_record(owner, hostname, host)
-                    hostname = '.'.join((record.name, record.zone.domain))
-                    log_event(action='create_dns_a_record', hostname=hostname,
+                    kwargs = {}
+                    kwargs['name'] = hostname
+                    kwargs['type'] = 'A'
+                    kwargs['data'] = host
+                    kwargs['ttl'] = 3600
+                    record = Record.add(owner=owner, **kwargs)
+                    log_event(action='Create_A_record', hostname=hostname,
                               **log_dict)
                 except Exception as exc:
-                    log_event(action='create_dns_a_record', error=str(exc),
-                              **log_dict)
+                    log_event(action='Create_A_record', hostname=hostname,
+                              error=str(exc), **log_dict)
 
             error = False
             if script_id:

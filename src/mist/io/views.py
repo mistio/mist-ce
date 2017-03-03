@@ -21,6 +21,7 @@ import pyramid.httpexceptions
 
 from mist.io.scripts.models import CollectdScript
 from mist.io.clouds.models import Cloud
+from mist.io.dns.models import Zone, Record
 from mist.io.machines.models import Machine
 from mist.io.networks.models import Network, Subnet
 from mist.io.users.models import Avatar, Owner
@@ -156,7 +157,7 @@ def list_dns_zones(request):
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
 
-    return cloud.ctl.dns.list_zones()
+    return [zone.as_dict() for zone in cloud.ctl.dns.list_zones()]
 
 
 @view_config(route_name='api_v1_records', request_method='GET', renderer='json')
@@ -172,7 +173,13 @@ def list_dns_records(request):
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
-    return cloud.ctl.dns.list_records(zone_id)
+    try:
+        zone = Zone.objects.get(owner=auth_context.owner, cloud=cloud,
+                                id=zone_id)
+    except Zone.DoesNotExist:
+        raise NotFoundError('Zone does not exist')
+
+    return [record.as_dict() for record in zone.ctl.list_records()]
 
 @view_config(route_name='api_v1_zones', request_method='POST', renderer='json')
 def create_dns_zone(request):
@@ -187,21 +194,9 @@ def create_dns_zone(request):
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
-    # Get the rest of the params
-    # domain is required and must contain a trailing period(.)
-    # type should be master or slave, and defaults to master.
-    # ttl is the time for which the zone should be valid for. Defaults to None.
-    # Should be an integer value.
-    # extra is a dictionary with extra details. Defaults to None.
-    params = params_from_request(request)
-    domain = params.get('domain', '')
-    if not domain:
-        raise RequiredParameterMissingError('domain')
-    type = params.get('type', '')
-    ttl = params.get('ttl', 0)
-    extra = params.get('extra', '')
 
-    return cloud.ctl.dns.create_zone(domain, type, ttl, extra)
+    params = params_from_request(request)
+    return Zone.add(owner=cloud.owner, cloud=cloud, **params).as_dict()
 
 @view_config(route_name='api_v1_records', request_method='POST', renderer='json')
 def create_dns_record(request):
@@ -218,25 +213,15 @@ def create_dns_record(request):
         raise NotFoundError('Cloud does not exist')
 
     zone_id = request.matchdict['zone']
-    # Get the rest of the params
-    # name is required and must contain a trailing period(.)
-    # type should be the type of the record we want to create (A,MX,CNAME etc),
-    # and it is required.
-    # ttl is the time for which the record should be valid for. Defaults to 0.
-    # Should be an integer value.
-    params = params_from_request(request)
-    name = params.get('name', '')
-    if not name:
-        raise RequiredParameterMissingError('name')
-    type = params.get('type', '')
-    if not type:
-        raise RequiredParameterMissingError('type')
-    data = params.get('data', '')
-    if not data:
-        raise RequiredParameterMissingError('data')
-    ttl = params.get('ttl', 0)
+    try:
+        zone = Zone.objects.get(owner=auth_context.owner, id=zone_id)
+    except Zone.DoesNotExist:
+        raise NotFoundError('Zone does not exist')
 
-    return cloud.ctl.dns.create_record(zone_id, name, type, data, ttl)
+    # Get the params and create the new record
+    params = params_from_request(request)
+
+    return Record.add(owner=auth_context.owner, zone=zone, **params).as_dict()
 
 @view_config(route_name='api_v1_zone', request_method='DELETE', renderer='json')
 def delete_dns_zone(request):
@@ -247,12 +232,17 @@ def delete_dns_zone(request):
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     zone_id = request.matchdict['zone']
+    # Do we need the cloud here, now that the models have been created?
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
+    try:
+        zone = Zone.objects.get(owner=auth_context.owner, id=zone_id)
+    except Zone.DoesNotExist:
+        raise NotFoundError('Zone does not exist')
 
-    return cloud.ctl.dns.delete_zone(zone_id)
+    return zone.ctl.delete_zone()
 
 @view_config(route_name='api_v1_record', request_method='DELETE', renderer='json')
 def delete_dns_record(request):
@@ -268,8 +258,16 @@ def delete_dns_record(request):
         cloud = Cloud.objects.get(owner=auth_context.owner, id=cloud_id)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
+    try:
+        zone = Zone.objects.get(owner=auth_context.owner, id=zone_id)
+    except Zone.DoesNotExist:
+        raise NotFoundError('Zone does not exist')
+    try:
+        record = Record.objects.get(zone=zone, id=record_id)
+    except Record.DoesNotExist:
+        raise NotFoundError('Record does not exist')
 
-    return cloud.ctl.dns.delete_record(zone_id, record_id)
+    return record.ctl.delete_record()
 
 
 @view_config(route_name='api_v1_images', request_method='POST', renderer='json')
