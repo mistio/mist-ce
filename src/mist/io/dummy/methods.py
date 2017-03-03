@@ -15,7 +15,7 @@ def to_tunnel(owner, host):
 
 
 def super_ping(owner, tunnel_id='', host='', pkts=10):
-    return None
+    return
 
 
 def filter_list_templates(auth_context):
@@ -27,7 +27,7 @@ def filter_list_stacks(auth_context):
 
 
 def get_user_data(auth_context):
-    return None
+    return
 
 
 def filter_list_tags(auth_context, scripts=None, perm='read'):
@@ -40,7 +40,7 @@ def filter_list_vpn_tunnels(auth_context, perm='read'):
 
 def get_stats(owner, cloud_id, machine_id, start='', stop='', step='',
               metrics=None, callback=None, tornado_async=False):
-    return None
+    return
 
 
 def get_load(owner, start='', stop='', step='', tornado_callback=None):
@@ -52,7 +52,7 @@ def check_monitoring(owner):
 
 
 def assoc_metric(owner, cloud_id, machine_id, metric_id, name='', unit=''):
-    return None
+    return
 
 
 def update_metric(owner, metric_id, name="", unit=""):
