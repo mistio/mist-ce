@@ -25,6 +25,11 @@ from mist.io.methods import connect_provider
 from mist.io.networks.methods import list_networks
 from mist.io.tag.methods import resolve_id_and_set_tags
 
+try:
+    from mist.core.methods import disable_monitoring
+except ImportError:
+    from mist.io.dummy.methods import disable_monitoring
+
 from mist.io import config
 
 import logging
@@ -1073,15 +1078,6 @@ def destroy_machine(user, cloud_id, machine_id):
 
     # if machine has monitoring, disable it. the way we disable depends on
     # whether this is a standalone io installation or not
-    try:
-        from mist.core.methods import disable_monitoring
-
-        log.info("Will try to disable monitoring for machine before "
-                 "destroying it (we don't bother to check if it "
-                 "actually has monitoring enabled.")
-    except ImportError:
-        from mist.io.dummy.methods import disable_monitoring
-
     try:
         # we don't actually bother to undeploy collectd
         disable_monitoring(user, cloud_id, machine_id, no_ssh=True)
