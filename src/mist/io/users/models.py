@@ -235,7 +235,7 @@ class Owner(me.Document):
 
     avatar = me.StringField(default='')
 
-    last_active = me.DateTimeField(default=datetime.datetime.now)
+    last_active = me.DateTimeField()
 
     # billing related fields
     customerId = me.StringField()
