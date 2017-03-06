@@ -7,10 +7,8 @@ import tornado.ioloop
 
 import mist.io.amqp_tornado
 import mist.io.hub.main
-try:
-    from mist.core import config
-except ImportError:
-    from mist.io import config
+
+from mist.io import config
 
 
 log = logging.getLogger(__name__)

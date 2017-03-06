@@ -3,11 +3,12 @@ import requests
 import datetime
 import StringIO
 import mongoengine as me
-from mist.core import config
 from pyramid.response import Response
 from mist.io.exceptions import BadRequestError
 from mist.io.helpers import trigger_session_update
 from mist.io.exceptions import ScriptNameExistsError
+
+from mist.io import config
 
 log = logging.getLogger(__name__)
 
