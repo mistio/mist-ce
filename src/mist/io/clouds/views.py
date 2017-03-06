@@ -130,6 +130,10 @@ def add_cloud(request):
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
 
+    # If insights enabled on org, set poller with half hour period.
+    if auth_context.org.insights_enabled:
+        cloud.ctl.set_polling_interval(1800)
+
     if cloud_tags:
         add_tags_to_resource(owner, cloud, cloud_tags.items())
 
