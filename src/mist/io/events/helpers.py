@@ -12,14 +12,6 @@ from mist.io.exceptions import ServiceUnavailableError
 
 log = logging.getLogger(__name__)
 
-# Additional kwargs passed explicitly to the Tornado-compatible ES client.
-_es_kwargs = {
-    'ca_certs': None,
-    'auth_username': ELASTICSEARCH['elastic_username'],
-    'auth_password': ELASTICSEARCH['elastic_password'],
-    'validate_cert': ELASTICSEARCH['elastic_verify_certs'],
-}
-
 
 def get_event(owner_id, event_id, event_type=None, fields=None,
               callback=None, tornado_async=False):
@@ -61,8 +53,7 @@ def get_event(owner_id, event_id, event_type=None, fields=None,
         return result['hits']['hits'][0] if result['hits']['hits'] else None
     else:
         es(tornado_async).search(index=index, doc_type=event_type,
-                                 body=json.dumps(query), callback=callback,
-                                 **_es_kwargs)
+                                 body=json.dumps(query), callback=callback)
 
 
 def get_simple_story(owner_id, story_id, story_type=None, closed=None,
@@ -119,8 +110,7 @@ def get_simple_story(owner_id, story_id, story_type=None, closed=None,
         return result['hits']['hits'][0] if result['hits']['hits'] else None
     else:
         es(tornado_async).search(index=index, doc_type=story_type,
-                                 body=json.dumps(query), callback=callback,
-                                 **_es_kwargs)
+                                 body=json.dumps(query), callback=callback)
 
 
 def get_open_incidents(owner_id, callback=None, tornado_async=False, **kwargs):
@@ -169,8 +159,7 @@ def get_open_incidents(owner_id, callback=None, tornado_async=False, **kwargs):
         return result['hits']['hits']
     else:
         es(tornado_async).search(index=index, doc_type='incident',
-                                 body=json.dumps(query), callback=callback,
-                                 **_es_kwargs)
+                                 body=json.dumps(query), callback=callback)
 
 
 def start_machine_story(story, event):

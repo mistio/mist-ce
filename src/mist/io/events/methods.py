@@ -13,7 +13,6 @@ from mist.io.events.helpers import get_simple_story
 from mist.io.events.helpers import get_open_incidents
 from mist.io.events.helpers import start_machine_story
 
-from mist.io.events.helpers import _es_kwargs
 from mist.io.events.helpers import _on_response_callback
 
 from mist.io.events.constants import FIELDS, CLOSES_INCIDENT
@@ -252,7 +251,7 @@ def _on_new_story_callback(event, story, tornado_async=False):
     else:
         es(tornado_async).index_doc(index=index, doc_type=story['type'],
                                     body=json.dumps(story),
-                                    params={'refresh': 'true'}, **_es_kwargs)
+                                    params={'refresh': 'true'})
 
 
 def _on_old_story_callback(event, story, tornado_async=False):
@@ -372,7 +371,7 @@ def _on_old_story_callback(event, story, tornado_async=False):
         else:
             es(tornado_async).update_doc(
                 index=story['_index'], doc_type=stype, doc_id=story['_id'],
-                body=json.dumps(script), **_es_kwargs
+                body=json.dumps(script)
             )
 
     # Fetch the event that started the story. Invoke the update callback.
@@ -521,7 +520,7 @@ def get_stories(story_type='', owner_id='', user_id='',
         es(tornado_async).search(index=index,
                                  doc_type=story_type,
                                  body=json.dumps(query),
-                                 callback=_on_stories_callback, **_es_kwargs)
+                                 callback=_on_stories_callback)
 
 
 def get_story(owner_id, story_id, story_type=None, expand=True):
