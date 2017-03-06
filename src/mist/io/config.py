@@ -669,11 +669,6 @@ GCE_IMAGES = [
     'windows-cloud',
 ]
 
-try:
-    from mist.core.config import *
-except ImportError:
-    pass
-
 
 # Get settings from mist.core.
 def dirname(path, num=1):
