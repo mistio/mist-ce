@@ -747,9 +747,9 @@ def encrypt2(plaintext, key=config.SECRET, key_salt='', no_iv=False):
     return ciphertext.encode('hex')
 
 
-# TODO: Deprecate. Move to io/events/methods.py once fully switched to ES.
+# TODO: Deprecate. Move to io/logs/methods.py once fully switched to ES.
 def log_event(owner_id, event_type, action, error=None, story_id='',
-              user_id=None, _mongo_conn=None, **kwargs):
+              user_id=None, _mongo_conn=None, tornado_async=False, **kwargs):
 
     """Log dict of the keyword arguments passed"""
     conn = _mongo_conn if _mongo_conn else MongoClient(config.MONGO_URI)
@@ -760,7 +760,7 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
             return {'_python_object': str(obj)}
 
         event = {
-            'owner_id': str(owner_id),
+            'owner_id': owner_id or None,
             'type': str(event_type),
             'action': str(action),
             'time': time(),
@@ -779,9 +779,9 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
         try:
             stories = log_story(event, _mongo_conn=conn)
             if config.LOGS_FROM_ELASTIC:
-                from mist.io.events.methods import log_story as log_story_to_elastic
-                event.update({'log_id': uuid.uuid4().hex, '_stories': []})
-                log_story_to_elastic(event)
+                from mist.io.logs.methods import log_story as log_story_to_elastic
+                event.update({'log_id': uuid.uuid4().hex})
+                log_story_to_elastic(event, tornado_async=tornado_async)
         except Exception as exc:
             log.error("failed to log story: %s %s %s %s %s Error %r",
                       owner_id, event_type, error, action, kwargs, exc)
@@ -1021,7 +1021,7 @@ def get_stories(story_type='', owner_id='', user_id='',
                 limit=0, **kwargs):
 
     if config.LOGS_FROM_ELASTIC:
-        from mist.io.events.methods import get_stories as get_stories_from_elastic
+        from mist.io.logs.methods import get_stories as get_stories_from_elastic
         return get_stories_from_elastic(
             story_type=story_type, owner_id=owner_id, user_id=user_id,
             cloud_id=cloud_id, machine_id=machine_id, script_id=script_id,
