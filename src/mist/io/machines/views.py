@@ -15,9 +15,12 @@ from mist.io.helpers import view_config, params_from_request
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import BadRequestError, NotFoundError
 
-#  TODO handle this for open.source, it is used from machine_rdp
-from mist.core.vpn.methods import destination_nat
-from mist.core import config
+from mist.io import config
+
+try:
+    from mist.core.vpn.methods import destination_nat as dnat
+except ImportError:
+    from mist.io.dummy.methods import dnat
 
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
@@ -433,7 +436,7 @@ def machine_rdp(request):
     except:
         rdp_port = 3389
 
-    host, rdp_port = destination_nat(auth_context.owner, host, rdp_port)
+    host, rdp_port = dnat(auth_context.owner, host, rdp_port)
 
     rdp_content = 'full address:s:%s:%s\nprompt for credentials:i:1' % \
                   (host, rdp_port)

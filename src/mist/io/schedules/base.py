@@ -10,7 +10,6 @@ import datetime
 import mongoengine as me
 from mist.io.scripts.models import Script
 from mist.io.exceptions import MistError
-from mist.core.rbac.methods import AuthContext
 from mist.io.exceptions import InternalServerError
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import ScriptNotFoundError
@@ -19,6 +18,11 @@ from mist.io.exceptions import ScheduleNameExistsError
 
 from mist.io.machines.models import Machine
 from mist.io.exceptions import NotFoundError
+
+try:
+    from mist.core.rbac.methods import AuthContext
+except ImportError:
+    from mist.io.dummy.rbac import AuthContext
 
 log = logging.getLogger(__name__)
 

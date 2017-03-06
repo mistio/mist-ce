@@ -11,6 +11,11 @@ from yaml.parser import ParserError as YamlParserError
 from yaml.scanner import ScannerError as YamlScannerError
 from mist.io.exceptions import RequiredParameterMissingError
 
+try:
+    from mist.core.methods import assoc_metric, update_metric
+except ImportError:
+    from mist.io.dummy.methods import assoc_metric, update_metric
+
 log = logging.getLogger(__name__)
 
 
@@ -236,8 +241,6 @@ $sudo rm -rf %(tmp_dir)s""" % {'plugin_id': plugin_id, 'tmp_dir': tmp_dir}
         return {'metric_id': metric_id, 'stdout': stdout}
 
     def deploy_and_assoc_python_plugin_from_script(self, machine):
-        from mist.core.methods import assoc_metric, update_metric
-
         # FIXME this works only for inline source_code
         # else we must_download the source from url or github
 

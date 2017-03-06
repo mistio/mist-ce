@@ -9,7 +9,7 @@ from mist.io.tag.methods import get_tags_for_resource
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import transform_key_machine_associations
 
-from mist.core import config  # TODO handle this for opes.source
+from mist.io import config
 
 import logging
 
