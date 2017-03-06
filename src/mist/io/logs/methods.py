@@ -8,14 +8,14 @@ from mist.core.rbac.methods import filter_logs
 
 from mist.io.exceptions import NotFoundError
 
-from mist.io.events.helpers import get_event
-from mist.io.events.helpers import get_simple_story
-from mist.io.events.helpers import get_open_incidents
-from mist.io.events.helpers import start_machine_story
+from mist.io.logs.helpers import get_event
+from mist.io.logs.helpers import get_simple_story
+from mist.io.logs.helpers import get_open_incidents
+from mist.io.logs.helpers import start_machine_story
 
-from mist.io.events.helpers import _on_response_callback
+from mist.io.logs.helpers import _on_response_callback
 
-from mist.io.events.constants import FIELDS, CLOSES_INCIDENT
+from mist.io.logs.constants import FIELDS, CLOSES_INCIDENT
 
 
 log = logging.getLogger(__name__)
