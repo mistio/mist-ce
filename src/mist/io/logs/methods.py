@@ -243,7 +243,7 @@ def _on_new_story_callback(event, story, tornado_async=False):
     # Save to Elasticsearch. Refresh the index immediately.
     index = '%s-stories-%s' % (
             event['owner_id'],
-            datetime.datetime.utcnow().strftime('%Y.%m.%d'))
+            datetime.datetime.utcnow().strftime('%Y.%m'))
     if not tornado_async:
         es().index(
             index=index, doc_type=story['type'], body=story, refresh='true'
