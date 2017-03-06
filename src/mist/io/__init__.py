@@ -1,19 +1,21 @@
 """Routes and wsgi app creation"""
 
 import os
+import logging
 
 from pyramid.config import Configurator
 from pyramid.renderers import JSON
 
-from mist.io.resources import Root
 from mist.io import config
-
-import logging
 
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
-log = logging.getLogger(__name__)
+
+
+class Root(object):
+    def __init__(self, request):
+        self.request = request
 
 
 def main(global_config, **settings):

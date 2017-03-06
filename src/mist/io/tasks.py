@@ -1,4 +1,5 @@
 import paramiko
+import logging
 import json
 import uuid
 import re
@@ -19,7 +20,7 @@ from amqp.connection import Connection
 
 from paramiko.ssh_exception import SSHException
 
-import ansible.playbook
+import ansible.playbook  # TODO what is these for?
 import ansible.utils.template
 from ansible import callbacks
 from ansible import utils
@@ -35,9 +36,7 @@ from mist.io.scripts.models import Script
 from mist.io.schedules.models import Schedule
 from mist.io.dns.models import Zone, Record
 
-from mist.core import config  # TODO handle this for open.source
-
-celery_cfg = 'mist.core.celery_config'
+celery_cfg = 'mist.core.celery_config'  # TODO what is this for?
 
 from mist.io.helpers import log_event
 from mist.io.helpers import send_email as helper_send_email
@@ -46,7 +45,8 @@ from mist.io.helpers import amqp_owner_listening
 from mist.io.helpers import amqp_log
 from mist.io.helpers import trigger_session_update
 
-import logging
+from mist.io import config
+
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
@@ -84,7 +84,10 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
     from mist.io.methods import connect_provider, probe_ssh_only
     from mist.io.methods import notify_user, notify_admin
 
-    from mist.core.methods import enable_monitoring  # TODO handle for open.so
+    try:
+        from mist.core.methods import enable_monitoring
+    except ImportError:
+        from mist.io.dummy.methods import enable_monitoring
 
     job_id = job_id or uuid.uuid4().hex
     if owner.find("@") != -1:
@@ -235,8 +238,13 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             # TODO add schedule_id for adding a machine to an already exist
             if schedule:
                 try:
+                    from mist.core.rbac.methods import AuthContext
+                except ImportError:
+                    from mist.io.dummy.rbac import AuthContext
+
+                try:
                     name = schedule.pop('name') + '_' + machine_id
-                    from mist.core.rbac.methods import AuthContext  # TODO
+
                     auth_context = AuthContext.deserialize(
                         schedule.pop('auth_context'))
                     # TODO add machines

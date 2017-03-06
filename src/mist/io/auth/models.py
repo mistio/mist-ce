@@ -6,7 +6,6 @@ import mongoengine as me
 from functools import partial
 from datetime import datetime, timedelta
 
-from mist.core.config import MONGO_URI
 from mist.io.users.models import User, Organization
 from mist.core.rbac.models import Policy
 from mist.io.exceptions import UserNotFoundError
