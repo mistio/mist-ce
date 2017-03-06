@@ -70,9 +70,7 @@ def create_dns_zone(request):
         raise CloudNotFoundError
 
     params = params_from_request(request)
-    params.pop('cloud', '')
     new_zone = Zone.add(owner=cloud.owner, cloud=cloud, **params).as_dict()
-
     # Schedule a UI update
     trigger_session_update(auth_context.owner, ['clouds'])
     return new_zone

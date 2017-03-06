@@ -13,8 +13,7 @@ class Tag(me.Document):
     resource_type = me.StringField(choices=['cloud', 'clouds', 'keys',
                                             'scripts', 'machine', 'machines',
                                             'template', 'stack', 'image',
-                                            'network', 'tunnel', 'schedules',
-                                            'zone'])
+                                            'network', 'tunnel', 'schedules'])
 
     value = me.StringField()
     resource = me.GenericReferenceField()
