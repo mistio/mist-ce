@@ -11,6 +11,31 @@ from mist.io.exceptions import CloudUnauthorizedError
 log = logging.getLogger(__name__)
 
 
+class ConnectionProxy(object):
+    """Wraps a connection with a destructor to disconnect upon gc"""
+
+    def __init__(self, conn):
+        """Initialize with a libcloud-like connection object"""
+        self.conn = conn
+
+    def disconnect(self):
+        """Close libcloud-like connection to cloud"""
+        if self.conn is None:
+            return
+        log.debug("Closing libcloud-like connection %s.", self.conn)
+        try:
+            self._conn.disconnect()
+        except AttributeError:
+            pass
+        except Exception as exc:
+            log.error("Error disconnecting conn '%s': %r", self.conn, exc)
+        self.conn = None
+
+    def __del__(self):
+        """When garbage collected, make sure to disconnect the connection"""
+        self.disconnect()
+
+
 class BaseController(object):
     """Abstract base class for every cloud/provider controller (except main)
 
@@ -86,8 +111,8 @@ class BaseController(object):
 
         """
         if self._conn is None:
-            self._conn = self.connect()
-        return self._conn
+            self._conn = ConnectionProxy(self.connect())
+        return self._conn.conn
 
     def check_connection(self):
         """Raise exception if we can't connect to cloud provider
@@ -106,35 +131,6 @@ class BaseController(object):
         self.connect()
 
     def disconnect(self):
-        """Close libcloud-like connection to cloud
-
-        If a connection object has been initialized, this method will attempt
-        to call its disconnect method.
-
-        This method is called automatically called by the class's destructor.
-        This may however be unreliable, so users should call `disconnect`
-        manually to be on the safe side.
-
-        For cloud providers whose connection object is dummy in the sense that
-        it doesn't represent an actual underlying connection, this method
-        doesn't really do anything.
-
-        Subclasses SHOULD NOT override this method.
-
-        If a subclass has to perform some special clean up, like deleting
-        temporary files, it SHOULD *extend* this method instead.
-
-        """
         if self._conn is not None:
-            log.debug("Closing libcloud-like connection for %s.", self.cloud)
-            try:
-                self._conn.disconnect()
-            except AttributeError:
-                pass
-            except Exception as exc:
-                log.error("Error disconnecting cloud '%s': %r", self, exc)
+            self._conn.disconnect()
             self._conn = None
-
-    def __del__(self):
-        """Disconnect libcloud-like connection upon garbage collection"""
-        self.disconnect()
