@@ -15,10 +15,10 @@ from passlib.context import CryptContext
 from social.backends.utils import get_backend
 from social.apps.pyramid_app.utils import get_helper
 
-from mist.core import config
-
 from mist.core.rbac.models import Policy
 from mist.core.rbac.mappings import PermissionMapper, RBACMapping
+
+from mist.io import config
 
 
 logging.basicConfig(level=config.PY_LOG_LEVEL,

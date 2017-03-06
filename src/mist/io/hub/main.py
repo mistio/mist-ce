@@ -12,10 +12,7 @@ import gevent
 import gevent.socket
 import gevent.monkey
 
-try:  # Multi-user environment
-    from mist.core import config
-except ImportError:  # Standalone mist.io
-    from mist.io import config
+from mist.io import config
 
 # Exchange to be used by hub. Should be the same for server and clients.
 EXCHANGE = 'hub'

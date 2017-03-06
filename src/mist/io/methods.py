@@ -9,8 +9,7 @@ from mongoengine import ValidationError, NotUniqueError, DoesNotExist
 
 from time import time
 
-from libcloud.compute.base import Node
-from libcloud.compute.types import Provider, NodeState
+from libcloud.compute.types import Provider
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
 from libcloud.dns.types import Provider as DnsProvider
@@ -42,8 +41,12 @@ from mist.io.clouds.models import Cloud
 from mist.io.networks.models import NETWORKS, SUBNETS, Network, Subnet
 from mist.io.machines.models import Machine
 
-from mist.core.vpn.methods import super_ping  # TODO handle this for open_sourc
-from mist.core import config
+try:
+    from mist.core.vpn.methods import super_ping
+except ImportError:
+    from mist.io.dummy.methods import super_ping
+
+from mist.io import config
 
 import mist.io.clouds.models as cloud_models
 
@@ -379,6 +382,8 @@ def delete_subnet(owner, subnet):
 
 
 def check_monitoring(user):
+    raise NotImplementedError()
+
     """Ask the mist.io service if monitoring is enabled for this machine."""
     try:
         ret = requests.get(config.CORE_URI + '/monitoring',
@@ -400,6 +405,7 @@ def check_monitoring(user):
 def enable_monitoring(user, cloud_id, machine_id,
                       name='', dns_name='', public_ips=None,
                       no_ssh=False, dry=False, deploy_async=True, **kwargs):
+    raise NotImplementedError()
     """Enable monitoring for a machine."""
     cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
     payload = {
@@ -451,6 +457,7 @@ def enable_monitoring(user, cloud_id, machine_id,
 
 def disable_monitoring(user, cloud_id, machine_id, no_ssh=False):
     """Disable monitoring for a machine."""
+    raise NotImplementedError()
     payload = {
         'action': 'disable',
         'no_ssh': True
@@ -675,6 +682,8 @@ def notify_user(owner, title, message="", email_notify=True, **kwargs):
 
 
 def find_metrics(user, cloud_id, machine_id):
+    raise NotImplementedError()
+
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
                                                 cloud_id, machine_id)
     headers = {'Authorization': get_auth_header(user)}
@@ -692,6 +701,8 @@ def find_metrics(user, cloud_id, machine_id):
 
 
 def assoc_metric(user, cloud_id, machine_id, metric_id):
+    raise NotImplementedError()
+
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
                                                 cloud_id, machine_id)
     try:
@@ -711,6 +722,8 @@ def assoc_metric(user, cloud_id, machine_id, metric_id):
 
 
 def disassoc_metric(user, cloud_id, machine_id, metric_id):
+    raise NotImplementedError()
+
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
                                                 cloud_id, machine_id)
     try:
@@ -731,6 +744,8 @@ def disassoc_metric(user, cloud_id, machine_id, metric_id):
 
 def update_metric(user, metric_id, name=None, unit=None,
                   cloud_id=None, machine_id=None):
+    raise NotImplementedError()
+
     url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
     headers = {'Authorization': get_auth_header(user)}
     params = {
@@ -786,6 +801,8 @@ $sudo /opt/mistio-collectd/collectd.sh restart
 
 
 def get_stats(user, cloud_id, machine_id, start='', stop='', step='', metrics=''):
+    raise NotImplementedError()
+
     try:
         resp = requests.get(
             "%s/clouds/%s/machines/%s/stats" % (config.CORE_URI,

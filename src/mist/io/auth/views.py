@@ -15,7 +15,7 @@ from mist.io.exceptions import NotFoundError
 from mist.io.exceptions import BadRequestError, UserUnauthorizedError
 from mist.io.exceptions import RequiredParameterMissingError, ForbiddenError
 
-from mist.core import config
+from mist.io import config
 
 OK = Response("OK", 200)
 

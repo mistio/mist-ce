@@ -17,8 +17,10 @@ from mist.io.exceptions import InternalServerError
 
 from mist.io.tasks import revoke_token
 
-
-from mist.core.rbac.methods import AuthContext  # TODO handle for open.source
+try:
+    from mist.core.rbac.methods import AuthContext
+except:
+    from mist.io.dummy.rbac import AuthContext
 
 from mist.io.auth.models import ApiToken
 from mist.io.auth.models import SessionToken
