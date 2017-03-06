@@ -34,7 +34,7 @@ class AuthContext(object):
         return []
 
     def get_allowed_resources(self, action='read', rtype=None):
-        return []
+        return
 
     def _get_matching_tags(self, rtype, action):
         return {}
