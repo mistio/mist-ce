@@ -9,7 +9,6 @@ from tornado_profile import TornadoProfiler
 
 import mist.io.sock
 
-
 try:
     from mist.core.sock import make_router
 except ImportError:

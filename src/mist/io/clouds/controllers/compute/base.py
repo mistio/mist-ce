@@ -33,8 +33,11 @@ from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.io.helpers import get_datetime
 
-from mist.core.vpn.methods import destination_nat as dnat
-from mist.core.vpn.methods import super_ping
+try:
+    from mist.core.vpn.methods import destination_nat as dnat
+    from mist.core.vpn.methods import super_ping
+except ImportError:
+    from mist.io.dummy.methods import dnat, super_ping
 
 from mist.io.clouds.controllers.base import BaseController
 

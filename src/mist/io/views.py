@@ -27,13 +27,6 @@ from mist.io.networks.models import Network, Subnet
 from mist.io.users.models import Avatar, Owner
 from mist.io.auth.models import SessionToken
 
-from mist.core import config
-
-# except ImportError:
-#     from mist.io import config
-#     from mist.io.helpers import user_from_request
-#     from pyramid.view import view_config
-
 from mist.io import methods
 
 from mist.io.exceptions import RequiredParameterMissingError
@@ -50,6 +43,8 @@ from mist.io.helpers import view_config
 
 from mist.io.auth.methods import auth_context_from_request
 from mist.io.auth.methods import user_from_request, session_from_request
+
+from mist.io import config
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -535,7 +530,6 @@ def probe(request):
     machine_id = request.matchdict['machine']
     cloud_id = request.matchdict['cloud']
     params = params_from_request(request)
-    host = params.get('host', None)
     key_id = params.get('key', None)
     ssh_user = params.get('ssh_user', '')
     # FIXME: simply don't pass a key parameter
@@ -549,7 +543,7 @@ def probe(request):
     except me.DoesNotExist:
         machine_uuid = ""
     auth_context.check_perm("machine", "read", machine_uuid)
-
+    host = machine.hostname or None
     ret = methods.probe(auth_context.owner, cloud_id, machine_id, host, key_id,
                         ssh_user)
     amqp_publish_user(auth_context.owner, "probe",

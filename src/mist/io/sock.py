@@ -13,25 +13,15 @@ import json
 import random
 import traceback
 import datetime
-import netaddr
 
 import tornado.gen
 
 from sockjs.tornado import SockJSConnection, SockJSRouter
 from mist.io.sockjs_mux import MultiplexConnection
 
-try:
-    from mist.io import config as ioconfig
-    from mist.core import config
-    from mist.core.methods import get_stats, get_load
-    from mist.io.clouds.models import Cloud
-    from mist.io.machines.models import Machine
-    from mist.io.keys.models import Key
-    multi_user = True
-except ImportError:
-    from mist.io import config
-    from mist.io.methods import get_stats
-    multi_user = False
+from mist.io.clouds.models import Cloud
+from mist.io.machines.models import Machine
+from mist.io.poller.models import ListMachinesPollingSchedule
 
 from mist.io.auth.methods import auth_context_from_session_id
 
@@ -39,21 +29,34 @@ from mist.io.exceptions import BadRequestError, UnauthorizedError, MistError
 from mist.io.exceptions import PolicyUnauthorizedError
 from mist.io.amqp_tornado import Consumer
 
-from mist.io import methods
 from mist.io.clouds.methods import filter_list_clouds
 from mist.io.keys.methods import filter_list_keys
 from mist.io.machines.methods import filter_list_machines
 from mist.io.scripts.methods import filter_list_scripts
 from mist.io.schedules.methods import filter_list_schedules
 
-from mist.core import methods as core_methods
-from mist.core.orchestration import methods as orchestration_methods
-from mist.core.rbac import methods as rbac_methods
-
 from mist.io import tasks
 from mist.io.hub.tornado_shell_client import ShellHubClient
 
-from mist.io.poller.models import ListMachinesPollingSchedule
+try:
+    from mist.core.methods import get_stats, get_load, check_monitoring
+    from mist.core.methods import get_user_data, filter_list_tags
+    from mist.core.methods import filter_list_vpn_tunnels
+    from mist.core.rbac.methods import filter_org
+    from mist.core.orchestration.methods import filter_list_templates
+    from mist.core.orchestration.methods import filter_list_stacks
+    multi_user = True  # TODO what is this for?
+except ImportError:
+    from mist.io.dummy.methods import get_stats, get_load, check_monitoring
+    from mist.io.dummy.methods import get_user_data, filter_list_tags
+    from mist.io.dummy.methods import filter_list_vpn_tunnels
+    from mist.io.dummy.rbac import filter_org
+    from mist.io.dummy.methods import filter_list_templates
+    from mist.io.dummy.methods import filter_list_stacks
+    multi_user = False
+
+
+from mist.io import config
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -263,11 +266,11 @@ class MainConnection(MistConnection):
             ListMachinesPollingSchedule.add(cloud=cloud, interval=10, ttl=120)
 
     def update_user(self):
-        self.send('user', core_methods.get_user_data(self.auth_context))
+        self.send('user', get_user_data(self.auth_context))
 
     def update_org(self):
         try:
-            org = rbac_methods.filter_org(self.auth_context)
+            org = filter_org(self.auth_context)
         except:  # Forbidden
             org = None
 
@@ -275,8 +278,7 @@ class MainConnection(MistConnection):
             self.send('org', org)
 
     def list_tags(self):
-        self.send('list_tags',
-                  core_methods.filter_list_tags(self.auth_context))
+        self.send('list_tags', filter_list_tags(self.auth_context))
 
     def list_keys(self):
         self.send('list_keys', filter_list_keys(self.auth_context))
@@ -288,16 +290,13 @@ class MainConnection(MistConnection):
         self.send('list_schedules', filter_list_schedules(self.auth_context))
 
     def list_templates(self):
-        self.send('list_templates',
-                  orchestration_methods.filter_list_templates(self.auth_context))
+        self.send('list_templates', filter_list_templates(self.auth_context))
 
     def list_stacks(self):
-        self.send('list_stacks',
-                  orchestration_methods.filter_list_stacks(self.auth_context))
+        self.send('list_stacks', filter_list_stacks(self.auth_context))
 
     def list_tunnels(self):
-        self.send('list_tunnels',
-                  core_methods.filter_list_vpn_tunnels(self.auth_context))
+        self.send('list_tunnels', filter_list_vpn_tunnels(self.auth_context))
 
     def list_clouds(self):
         if config.ACTIVATE_POLLER:
@@ -341,11 +340,7 @@ class MainConnection(MistConnection):
                     self.send(key, cached)
 
     def check_monitoring(self):
-        try:
-            from mist.core import methods as core_methods
-            func = core_methods.check_monitoring
-        except ImportError:
-            func = methods.check_monitoring
+        func = check_monitoring
         try:
             self.send('monitoring', func(self.owner))
         except Exception as exc:

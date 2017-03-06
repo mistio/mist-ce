@@ -3,10 +3,11 @@ import json
 import uuid
 import mongoengine as me
 
-from mist.core import config as core_config
 import mist.io.tag.models
 from mist.io.keys.models import Key
 from mist.io.machines.controllers import MachineController
+
+from mist.io import config
 
 
 class KeyAssociation(me.EmbeddedDocument):
@@ -77,7 +78,7 @@ class Monitoring(me.EmbeddedDocument):
         from mist.io.methods import get_deploy_collectd_command_windows
         from mist.io.methods import get_deploy_collectd_command_coreos
         args = (self._instance.id, self.collectd_password,
-                core_config.COLLECTD_HOST, core_config.COLLECTD_PORT)
+                config.COLLECTD_HOST, config.COLLECTD_PORT)
         return {
             'unix': get_deploy_collectd_command_unix(*args),
             'coreos': get_deploy_collectd_command_coreos(*args),
@@ -89,7 +90,7 @@ class Monitoring(me.EmbeddedDocument):
 
         return {
             'hasmonitoring': self.hasmonitoring,
-            'monitor_server': core_config.COLLECTD_HOST,
+            'monitor_server': config.COLLECTD_HOST,
             'collectd_password': self.collectd_password,
             'metrics': self.metrics,
             'installation_status': status.as_dict() if status else '',

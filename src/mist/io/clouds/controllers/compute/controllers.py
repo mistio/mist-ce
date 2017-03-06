@@ -24,20 +24,17 @@ import re
 import copy
 import socket
 import logging
+import netaddr
 import tempfile
 
-from xml.sax.saxutils import escape
-
-import netaddr
-
 import mongoengine as me
+
+from xml.sax.saxutils import escape
 
 from libcloud.pricing import get_size_price
 from libcloud.compute.base import Node, NodeImage
 from libcloud.compute.providers import get_driver
 from libcloud.compute.types import Provider, NodeState
-
-from mist.io import config
 
 from mist.io.exceptions import MistError
 from mist.io.exceptions import InternalServerError
@@ -45,10 +42,16 @@ from mist.io.exceptions import MachineNotFoundError
 
 from mist.io.machines.models import Machine
 
-from mist.core.vpn.methods import destination_nat as dnat
 from mist.io.misc.cloud import CloudImage
 
 from mist.io.clouds.controllers.main.base import BaseComputeController
+
+from mist.io import config
+
+try:
+    from mist.core.vpn.methods import destination_nat as dnat
+except ImportError:
+    from mist.io.dummy.methods import dnat
 
 
 log = logging.getLogger(__name__)
