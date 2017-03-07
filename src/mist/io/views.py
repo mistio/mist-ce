@@ -401,19 +401,21 @@ def probe(request):
     machine_id = request.matchdict['machine']
     cloud_id = request.matchdict['cloud']
     params = params_from_request(request)
-    host = params.get('host', None)
     key_id = params.get('key', None)
     ssh_user = params.get('ssh_user', '')
-    # FIXME: simply don't pass a key parameter
+
     if key_id == 'undefined':
         key_id = ''
     auth_context = auth_context_from_request(request)
     auth_context.check_perm("cloud", "read", cloud_id)
+
     try:
         machine = Machine.objects.get(cloud=cloud_id, machine_id=machine_id)
         machine_uuid = machine.id
+        host = machine.hostname
     except me.DoesNotExist:
         machine_uuid = ""
+        host = None
     auth_context.check_perm("machine", "read", machine_uuid)
 
     ret = methods.probe(auth_context.owner, cloud_id, machine_id, host, key_id,
