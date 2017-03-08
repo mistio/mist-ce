@@ -43,7 +43,6 @@ ACTIVATE_POLLER = True
 ACTIVE_APITOKEN_NUM = 20
 ALLOW_CONNECT_LOCALHOST = True
 ALLOW_CONNECT_PRIVATE = True
-SAVE_TAGS_ON_PROVIDER = True  # TODO ?
 
 # allow mist.io to connect to KVM hypervisor running on the same server
 ALLOW_LIBVIRT_LOCALHOST = False
@@ -94,7 +93,6 @@ COLLECTD_HOST = ""
 COLLECTD_PORT = ""
 
 GOOGLE_ANALYTICS_ID = ""
-COMMAND_TIMEOUT = 20  # TODO ?
 
 # celery settings
 CELERY_SETTINGS = {
