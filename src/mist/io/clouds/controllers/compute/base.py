@@ -813,7 +813,7 @@ class BaseComputeController(BaseController):
                 hostname = machine.private_ips[0]
             command = '$(command -v sudo) shutdown -r now'
             # TODO move it up
-            from mist.core.methods import ssh_command
+            from mist.io.methods import ssh_command
             ssh_command(self.cloud.owner, self.cloud.id,
                         machine.machine_id, hostname, command)
         except MistError as exc:
