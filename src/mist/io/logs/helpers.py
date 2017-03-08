@@ -1,7 +1,6 @@
 import json
 import logging
 
-from mist.core.config import ELASTICSEARCH
 from mist.core.helpers import es_client as es
 
 from mist.io.exceptions import NotFoundError

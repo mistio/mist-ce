@@ -120,7 +120,7 @@ def session_from_request(request):
 
 
 def user_from_request(request, admin=False, redirect=False):
-    """Given request, initiate User instance (mist.core.model.User)
+    """Given request, initiate User instance (mist.io.users.model.User)
 
     First try to check if there is a valid api token header, else check if
     there is a valid cookie session, else raise UserUnauthorizedError.
