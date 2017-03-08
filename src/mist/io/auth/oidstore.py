@@ -1,8 +1,5 @@
 import time
 import mongoengine as me
-from mist.core import config
-
-from mongoengine import DoesNotExist
 
 from openid.store import nonce
 from openid.association import Association
@@ -80,7 +77,7 @@ class OpenIdMistStore(OpenIDStore):
             query.update({'handle': handle.encode('hex')})
         try:
             mist_associations = MistAssociation.objects(**query)
-        except DoesNotExist:
+        except me.DoesNotExist:
             mist_associations = []
 
         filtered_mist_assocs = []
@@ -115,7 +112,7 @@ class OpenIdMistStore(OpenIDStore):
         try:
             mist_associations = MistAssociation.objects(server_url=server_url,
                                                         handle=handle.encode('hex'))
-        except DoesNotExist:
+        except me.DoesNotExist:
             return False
 
         for assoc in mist_associations:
@@ -138,7 +135,7 @@ class OpenIdMistStore(OpenIDStore):
         try:
             mist_nonces = MistNonce.objects(server_url=server_url, salt=salt,
                                             timestamp=timestamp)
-        except DoesNotExist:
+        except me.DoesNotExist:
             mist_nonces = []
 
         if len(mist_nonces) == 0:
@@ -160,7 +157,7 @@ class OpenIdMistStore(OpenIDStore):
         """
         try:
             mist_nonces = MistNonce.objects()
-        except DoesNotExist:
+        except me.DoesNotExist:
             mist_nonces = []
 
         counter = 0
@@ -181,7 +178,7 @@ class OpenIdMistStore(OpenIDStore):
         """
         try:
             mist_associations = MistAssociation.objects()
-        except DoesNotExist:
+        except me.DoesNotExist:
             mist_associations = []
 
         counter = 0

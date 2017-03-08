@@ -1,56 +1,98 @@
 """Basic configuration and mappings
-
-Here we define constants needed by mist.io
-
-Also, the configuration from settings.py is exposed through this module.
-
+   Here we define constants needed by mist.io
+   Also, the configuration from settings.py is exposed through this module.
 """
-
 import os
+import sys
+import ssl
 import logging
 
-
+import libcloud.security
 from libcloud.compute.types import Provider
 from libcloud.compute.types import NodeState
 
 
-# Parse user defined settings from settings.py in the top level project dir
-log = logging.getLogger(__name__)
+libcloud.security.SSL_VERSION = ssl.PROTOCOL_TLSv1_2
 
-# If SETTINGS_FILE ebv variable exists, it will point to a mounted
-# file that hosts the configuration option of our Kubernetes
-# configMap.
-settings_file = os.getenv('SETTINGS_FILE') or 'settings.py'
 
-settings = {}
-try:
-    execfile(settings_file, settings)
-except IOError:
-    log.warning("No settings.py file found.")
-except Exception as exc:
-    log.error("Error parsing settings py: %r", exc)
-CORE_URI = settings.get("CORE_URI", os.environ.get("CORE_URI", "https://mist.io"))
-AMQP_URI = settings.get("AMQP_URI", "localhost:5672")
-MEMCACHED_HOST = settings.get("MEMCACHED_HOST", ["127.0.0.1:11211"])
-BROKER_URL = settings.get("BROKER_URL", "amqp://guest:guest@127.0.0.1/")
-SSL_VERIFY = settings.get("SSL_VERIFY", True)
-JS_BUILD = settings.get("JS_BUILD", False)
-CSS_BUILD = settings.get("CSS_BUILD", False)
-LAST_BUILD = settings.get("LAST_BUILD", '')
-JS_LOG_LEVEL = settings.get("JS_LOG_LEVEL", 3)
-PY_LOG_LEVEL = settings.get("PY_LOG_LEVEL", logging.INFO)
-PY_LOG_FORMAT = settings.get("PY_LOG_FORMAT", '%(asctime)s %(levelname)s %(threadName)s %(module)s - %(funcName)s: %(message)s')
-PY_LOG_FORMAT_DATE = settings.get("PY_LOG_FORMAT_DATE", "%Y-%m-%d %H:%M:%S")
-GOOGLE_ANALYTICS_ID = settings.get("GOOGLE_ANALYTICS_ID", "")
-COMMAND_TIMEOUT = settings.get("COMMAND_TIMEOUT", 20)
-ALLOW_CONNECT_LOCALHOST = settings.get('ALLOW_CONNECT_LOCALHOST', True)
-ALLOW_CONNECT_PRIVATE = settings.get('ALLOW_CONNECT_PRIVATE', True)
+###############################################################################
+# The following variables are common for both open.source and mist.core
+###############################################################################
+
+CORE_URI = "https://mist.io"
+AMQP_URI = "rabbitmq:5672"
+MEMCACHED_HOST = ["memcached:11211"]
+BROKER_URL = "amqp://guest:guest@rabbitmq/"
+SSL_VERIFY = True
+
+PY_LOG_LEVEL = logging.INFO
+PY_LOG_FORMAT = '%(asctime)s %(levelname)s %(threadName)s %(module)s - %(funcName)s: %(message)s'
+PY_LOG_FORMAT_DATE = "%Y-%m-%d %H:%M:%S"
+LOG_EXCEPTIONS = True
+
+JS_BUILD = False
+CSS_BUILD = False
+JS_LOG_LEVEL = 3
+
+MONGO_URI = "mongodb:27017"
+MONGO_DB = "mist2"
+
+ACTIVATE_POLLER = True
+
+# number of api tokens user can have
+ACTIVE_APITOKEN_NUM = 20
+ALLOW_CONNECT_LOCALHOST = True
+ALLOW_CONNECT_PRIVATE = True
+
 # allow mist.io to connect to KVM hypervisor running on the same server
-ALLOW_LIBVIRT_LOCALHOST = settings.get('ALLOW_LIBVIRT_LOCALHOST', False)
-# mist.io interface to the OpenVPN server
-VPN_SERVER_API_ADDRESS = settings.get('VPN_SERVER_API_ADDRESS', '')
-ALLOWED_PRIVATE_NETWORKS = settings.get('ALLOWED_PRIVATE_NETWORKS', ['192.168.0.0/16', '172.16.0.0/12', '10.0.0.0/8'])
-ALLOW_PUBLIC_VPN = settings.get('ALLOW_PUBLIC_VPN', True)
+ALLOW_LIBVIRT_LOCALHOST = False
+
+# Docker related
+DOCKER_IP = "172.17.0.1"
+DOCKER_PORT = "2375"
+DOCKER_TLS_KEY = ""
+DOCKER_TLS_CERT = ""
+DOCKER_TLS_CA = ""
+
+MAILER_SETTINGS = {
+    'mail.host': "mailmock",
+    'mail.port': "8025",
+    'mail.tls': False,
+    'mail.starttls': False,
+    'mail.username': "",
+    'mail.password': "",
+}
+
+# PLAN OUT experiments
+NEW_UI_EXPERIMENT_ENABLE = False
+
+GITHUB_BOT_TOKEN = ""
+
+NO_VERIFY_HOSTS = []
+
+###############################################################################
+#  Different set in io and core
+###############################################################################
+
+SECRET = ""
+
+
+NOTIFICATION_EMAIL = {
+    'all': "",
+    'dev': "",
+    'ops': "",
+    'sales': "",
+    'demo': "",
+    'support': "",
+}
+
+EMAIL_FROM = ""
+
+# Monitoring Related
+COLLECTD_HOST = ""
+COLLECTD_PORT = ""
+
+GOOGLE_ANALYTICS_ID = ""
 
 # celery settings
 CELERY_SETTINGS = {
@@ -58,12 +100,18 @@ CELERY_SETTINGS = {
     'CELERY_TASK_SERIALIZER': 'json',
     'CELERYD_LOG_FORMAT': PY_LOG_FORMAT,
     'CELERYD_TASK_LOG_FORMAT': PY_LOG_FORMAT,
-    'CELERYD_CONCURRENCY': 32,
+    'CELERYD_CONCURRENCY': 4,
     'CELERYD_MAX_TASKS_PER_CHILD': 32,
+    'CELERYD_MAX_MEMORY_PER_CHILD': 204800,  # 20480 KiB - 200 MiB
+    'CELERY_MONGODB_SCHEDULER_DB': 'mist2',
+    'CELERY_MONGODB_SCHEDULER_COLLECTION': 'schedules',
+    'CELERY_MONGODB_SCHEDULER_URL': MONGO_URI,
 }
-CELERY_SETTINGS.update(settings.get('CELERY_SETTINGS', {}))
 
+
+###############################################################################
 # App constants
+###############################################################################
 
 STATES = {
     NodeState.RUNNING: 'running',
@@ -81,8 +129,6 @@ STATES = {
     NodeState.RECONFIGURING: 'reconfiguring'
 }
 
-
-
 # All EC2 providers, useful for type checking
 EC2_PROVIDERS = (
     Provider.EC2_US_EAST,
@@ -96,15 +142,13 @@ EC2_PROVIDERS = (
     Provider.EC2_AP_SOUTHEAST2,
     Provider.EC2_SA_EAST,
     Provider.EC2_US_WEST_OREGON,
-#    Provider.EC2_AP_SOUTH1,
+    # Provider.EC2_AP_SOUTH1,
 )
-
 
 EC2_SECURITYGROUP = {
     'name': 'mistio',
     'description': 'Security group created by mist.io'
 }
-
 
 # Linode datacenter ids/names mapping
 LINODE_DATACENTERS = {
@@ -452,7 +496,6 @@ SUPPORTED_PROVIDERS = [
     }
 ]
 
-
 # Base AMIs
 EC2_IMAGES = {
     'eu-west-1': {
@@ -574,7 +617,6 @@ EC2_IMAGES = {
     },
 }
 
-
 EC2_IMAGES[Provider.EC2_EU_WEST] = EC2_IMAGES['eu-west-1']
 EC2_IMAGES[Provider.EC2_SA_EAST] = EC2_IMAGES['sa-east-1']
 EC2_IMAGES[Provider.EC2_AP_NORTHEAST] = EC2_IMAGES['ap-northeast-1']
@@ -611,14 +653,92 @@ DOCKER_IMAGES = {
     'mist/fedora-20': 'Fedora 20',
 }
 
-GCE_IMAGES = ['debian-cloud',
-              'centos-cloud',
-              'suse-cloud',
-              'rhel-cloud',
-              'coreos-cloud',
-              'gce-nvme',
-              'google-containers',
-              'opensuse-cloud',
-              'suse-cloud',
-              'ubuntu-os-cloud',
-              'windows-cloud']
+GCE_IMAGES = [
+    'debian-cloud',
+    'centos-cloud',
+    'suse-cloud',
+    'rhel-cloud',
+    'coreos-cloud',
+    'gce-nvme',
+    'google-containers',
+    'opensuse-cloud',
+    'suse-cloud',
+    'ubuntu-os-cloud',
+    'windows-cloud',
+]
+
+
+# Get settings from mist.core.
+def dirname(path, num=1):
+    for i in xrange(num):
+        path = os.path.dirname(path)
+    return path
+
+
+CORE_CONFIG_PATH = os.path.join(dirname(__file__, 5),
+                                'mist', 'core', 'config.py')
+if os.path.exists(CORE_CONFIG_PATH):
+    print >> sys.stderr, "Will load core config from %s" % CORE_CONFIG_PATH
+    execfile(CORE_CONFIG_PATH)
+
+
+# Get settings from environmental variables.
+FROM_ENV_STRINGS = [
+    'AMQP_URI', 'BROKER_URL', 'CORE_URI', 'MONGO_URI', 'MONGO_DB', 'DOCKER_IP',
+    'DOCKER_PORT', 'DOCKER_TLS_KEY', 'DOCKER_TLS_CERT', 'DOCKER_TLS_CA',
+]
+FROM_ENV_INTS = [
+]
+FROM_ENV_BOOLS = [
+    'SSL_VERIFY', 'ALLOW_CONNECT_LOCALHOST', 'ALLOW_CONNECT_PRIVATE',
+    'ALLOW_LIBVIRT_LOCALHOST',
+]
+FROM_ENV_ARRAYS = [
+    'MEMCACHED_HOST',
+]
+print >> sys.stderr, "Reading settings from environmental variables."
+for key in FROM_ENV_STRINGS:
+    if os.getenv(key):
+        locals()[key] = os.getenv(key)
+for key in FROM_ENV_INTS:
+    if os.getenv(key):
+        try:
+            locals()[key] = int(os.getenv(key))
+        except (KeyError, ValueError):
+            print >> sys.stderr, "Invalid value for %s: %s" % (key,
+                                                               os.getenv(key))
+for key in FROM_ENV_BOOLS:
+    if os.getenv(key) is not None:
+        locals()[key] = os.getenv(key) in ('1', 'true', 'True')
+for key in FROM_ENV_ARRAYS:
+    if os.getenv(key):
+        locals()[key] = os.getenv(key).split(',')
+
+
+# Get settings from settings file.
+settings_file = os.getenv('SETTINGS_FILE') or 'settings.py'
+if os.path.exists(settings_file):
+    print >> sys.stderr, "Reading local settings from %s" % settings_file
+    conf = {}
+    execfile(settings_file, conf)
+    for key in conf:
+        if isinstance(locals().get(key), dict) and isinstance(conf[key], dict):
+            locals()[key].update(conf[key])
+        else:
+            locals()[key] = conf[key]
+
+
+# Update celery settings.
+CELERY_SETTINGS.update({
+    'BROKER_URL': BROKER_URL,
+    'CELERY_MONGODB_SCHEDULER_URL': MONGO_URI,
+    'CELERYD_LOG_FORMAT': PY_LOG_FORMAT,
+    'CELERYD_TASK_LOG_FORMAT': PY_LOG_FORMAT,
+})
+
+
+# Configure libcloud to not verify certain hosts.
+if NO_VERIFY_HOSTS:
+    if DOCKER_IP:
+        NO_VERIFY_HOSTS.append(DOCKER_IP)
+    libcloud.security.NO_VERIFY_MATCH_HOSTNAMES = NO_VERIFY_HOSTS

@@ -33,8 +33,11 @@ from mist.io.exceptions import CloudUnauthorizedError
 
 from mist.io.helpers import get_datetime
 
-from mist.core.vpn.methods import destination_nat as dnat
-from mist.core.vpn.methods import super_ping
+try:
+    from mist.core.vpn.methods import destination_nat as dnat
+    from mist.core.vpn.methods import super_ping
+except ImportError:
+    from mist.io.dummy.methods import dnat, super_ping
 
 from mist.io.clouds.controllers.base import BaseController
 
@@ -292,10 +295,7 @@ class BaseComputeController(BaseController):
         for machine in self._list_machines__fetch_generic_machines():
             machine.last_seen = now
             machine.missing_since = None
-            if self.check_if_machine_accessible(machine):
-                machine.state = config.STATES[NodeState.RUNNING]
-            else:
-                machine.state = config.STATES[NodeState.UNKNOWN]
+            machine.state = config.STATES[NodeState.UNKNOWN]
             for action in ('start', 'stop', 'reboot', 'destroy', 'rename',
                            'resume', 'suspend', 'undefine'):
                 setattr(machine.actions, action, False)
@@ -813,7 +813,7 @@ class BaseComputeController(BaseController):
                 hostname = machine.private_ips[0]
             command = '$(command -v sudo) shutdown -r now'
             # TODO move it up
-            from mist.core.methods import ssh_command
+            from mist.io.methods import ssh_command
             ssh_command(self.cloud.owner, self.cloud.id,
                         machine.machine_id, hostname, command)
         except MistError as exc:

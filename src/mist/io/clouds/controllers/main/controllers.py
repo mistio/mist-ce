@@ -41,13 +41,18 @@ from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.helpers import sanitize_host, check_host
 
 from mist.io.keys.models import Key
-from mist.core.vpn.methods import to_tunnel
+from mist.io.machines.models import Machine
 
 from mist.io.helpers import rename_kwargs
 from mist.io.clouds.controllers.main.base import BaseMainController
 from mist.io.clouds.controllers.compute import controllers as compute_ctls
 from mist.io.clouds.controllers.network import controllers as network_ctls
 from mist.io.clouds.controllers.dns import controllers as dns_ctls
+
+try:
+    from mist.core.vpn.methods import to_tunnel
+except MistError:
+    from mist.io.dummy.methods import to_tunnel
 
 
 log = logging.getLogger(__name__)
@@ -292,8 +297,6 @@ class LibvirtMainController(BaseMainController):
             fail_on_invalid_params=fail_on_invalid_params,
             add=True, **kwargs
         )
-        # FIXME: Resolve cyclic dependency issues
-        from mist.io.machines.models import Machine
         # FIXME: Don't use self.cloud.host as machine_id, this prevents us from
         # changing the cloud's host.
         # FIXME: Add type field to differentiate between actual vm's and the
@@ -415,18 +418,10 @@ class OtherMainController(BaseMainController):
         """Add machine to this dummy Cloud
 
         This is a special method that exists only on this Cloud subclass.
-
         """
-        # FIXME: Move this to top of the file once Machine model is migrated.
-        # The import statement is currently here to avoid circular import
-        # issues.
-        from mist.io.machines.models import Machine
         # FIXME: Move ssh command to Machine controller once it is migrated.
-        from mist.core.methods import ssh_command
+        from mist.io.methods import ssh_command
 
-        # Sanitize inputs.
-        host = sanitize_host(host)
-        check_host(host)
         try:
             ssh_port = int(ssh_port)
         except (ValueError, TypeError):
@@ -449,6 +444,10 @@ class OtherMainController(BaseMainController):
             rdp_port=rdp_port
         )
         if host:
+            # Sanitize inputs.
+            host = sanitize_host(host)
+            check_host(host)
+
             if is_private_subnet(socket.gethostbyname(host)):
                 machine.private_ips = [host]
             else:

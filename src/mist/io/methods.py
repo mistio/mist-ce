@@ -9,8 +9,7 @@ from mongoengine import ValidationError, NotUniqueError, DoesNotExist
 
 from time import time
 
-from libcloud.compute.base import Node
-from libcloud.compute.types import Provider, NodeState
+from libcloud.compute.types import Provider
 from libcloud.common.types import InvalidCredsError
 from libcloud.utils.networking import is_private_subnet
 from libcloud.dns.types import Provider as DnsProvider
@@ -42,8 +41,12 @@ from mist.io.clouds.models import Cloud
 from mist.io.networks.models import NETWORKS, SUBNETS, Network, Subnet
 from mist.io.machines.models import Machine
 
-from mist.core.vpn.methods import super_ping  # TODO handle this for open_sourc
-from mist.core import config
+try:
+    from mist.core.vpn.methods import super_ping
+except ImportError:
+    from mist.io.dummy.methods import super_ping
+
+from mist.io import config
 
 import mist.io.clouds.models as cloud_models
 
@@ -191,194 +194,9 @@ def delete_subnet(owner, subnet):
     trigger_session_update(owner, ['clouds'])
 
 
-#  TODO we don't use this, do we need it?
-# def set_machine_tags(owner, cloud_id, machine_id, tags):
-#     """Sets metadata for a machine, given the cloud and machine id.
-#
-#     Libcloud handles this differently for each provider. Linode and Rackspace,
-#     at least the old Rackspace providers, don't support metadata adding.
-#
-#     machine_id comes as u'...' but the rest are plain strings so use == when
-#     comparing in ifs. u'f' is 'f' returns false and 'in' is too broad.
-#
-#     Tags is expected to be a list of key-value dicts
-#     """
-#     cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-#
-#     if not isinstance(cloud, (cloud_models.AmazonCloud,
-#                               cloud_models.GoogleCloud,
-#                               cloud_models.RackSpaceCloud,
-#                               cloud_models.OpenStackCloud)):
-#         return False
-#
-#     conn = connect_provider(cloud)
-#
-#     machine = Node(machine_id, name='', state=NodeState.RUNNING,
-#                    public_ips=[], private_ips=[], driver=conn)
-#
-#     tags_dict = {}
-#     if isinstance(tags, list):
-#         for tag in tags:
-#             for tag_key, tag_value in tag.items():
-#                 if not tag_value:
-#                     tag_value = ""
-#                 if type(tag_key) == unicode:
-#                     tag_key = tag_key.encode('utf-8')
-#                 if type(tag_value) == unicode:
-#                     tag_value = tag_value.encode('utf-8')
-#                 tags_dict[tag_key] = tag_value
-#     elif isinstance(tags, dict):
-#         for tag_key in tags:
-#             tag_value = tags[tag_key]
-#             if not tag_value:
-#                 tag_value = ""
-#             if type(tag_key) == unicode:
-#                 tag_key = tag_key.encode('utf-8')
-#             if type(tag_value) == unicode:
-#                 tag_value = tag_value.encode('utf-8')
-#             tags_dict[tag_key] = tag_value
-#
-#     if isinstance(cloud, cloud_models.AmazonCloud):
-#         try:
-#             # first get a list of current tags. Make sure
-#             # the response dict gets utf-8 encoded
-#             # then delete tags and update with the new ones
-#             ec2_tags = conn.ex_describe_tags(machine)
-#             ec2_tags.pop('Name')
-#             encoded_ec2_tags = {}
-#             for ec2_key, ec2_value in ec2_tags.items():
-#                 if type(ec2_key) == unicode:
-#                     ec2_key = ec2_key.encode('utf-8')
-#                 if type(ec2_value) == unicode:
-#                     ec2_value = ec2_value.encode('utf-8')
-#                 encoded_ec2_tags[ec2_key] = ec2_value
-#             conn.ex_delete_tags(machine, encoded_ec2_tags)
-#             # ec2 resource can have up to 10 tags, with one of them being the Name
-#             if len(tags_dict) > 9:
-#                 tags_keys = tags_dict.keys()[:9]
-#                 pop_keys = [key for key in tags_dict.keys() if key not in tags_keys]
-#                 for key in pop_keys:
-#                     tags_dict.pop(key)
-#
-#             conn.ex_create_tags(machine, tags_dict)
-#         except Exception as exc:
-#             raise CloudUnavailableError(cloud_id, exc)
-#     else:
-#         if conn.type == 'gce':
-#             try:
-#                 for node in conn.list_nodes():
-#                     if node.id == machine_id:
-#                         machine = node
-#                         break
-#             except Exception as exc:
-#                 raise CloudUnavailableError(cloud_id, exc)
-#             if not machine:
-#                 raise MachineNotFoundError(machine_id)
-#             try:
-#                 conn.ex_set_node_metadata(machine, tags)
-#             except Exception as exc:
-#                 raise InternalServerError("error setting tags", exc)
-#         else:
-#             try:
-#                 conn.ex_set_metadata(machine, tags_dict)
-#             except Exception as exc:
-#                 raise InternalServerError("error creating tags", exc)
-
-
-#  TODO we don't use this, do we need it?
-# def delete_machine_tag(owner, cloud_id, machine_id, tag):
-#     """Deletes metadata for a machine, given the machine id and the tag to be
-#     deleted.
-#
-#     Libcloud handles this differently for each provider. Linode and Rackspace,
-#     at least the old Rackspace providers, don't support metadata updating. In
-#     EC2 you can delete just the tag you like. In Openstack you can only set a
-#     new list and not delete from the existing.
-#
-#     Mist.io client knows only the value of the tag and not it's key so it
-#     has to loop through the machine list in order to find it.
-#
-#     Don't forget to check string encoding before using them in ifs.
-#     u'f' is 'f' returns false.
-#
-#     """
-#
-#     cloud = Cloud.objects.get(owner=owner, id=cloud_id, deleted=None)
-#
-#     if not tag:
-#         raise RequiredParameterMissingError("tag")
-#     conn = connect_provider(cloud)
-#
-#     if type(tag) == unicode:
-#         tag = tag.encode('utf-8')
-#
-#     if conn.type in [Provider.LINODE, Provider.RACKSPACE_FIRST_GEN]:
-#         raise MethodNotAllowedError("Deleting metadata is not supported in %s"
-#                                     % conn.type)
-#
-#     machine = None
-#     try:
-#         for node in conn.list_nodes():
-#             if node.id == machine_id:
-#                 machine = node
-#                 break
-#     except Exception as exc:
-#         raise CloudUnavailableError(cloud_id, exc)
-#     if not machine:
-#         raise MachineNotFoundError(machine_id)
-#     if isinstance(cloud, cloud_models.AmazonCloud):
-#         tags = machine.extra.get('tags', None)
-#         pair = None
-#         for mkey, mdata in tags.iteritems():
-#             if type(mkey) == unicode:
-#                 mkey = mkey.encode('utf-8')
-#             if type(mdata) == unicode:
-#                 mdata = mdata.encode('utf-8')
-#             if tag == mkey:
-#                 pair = {mkey: mdata}
-#                 break
-#         if not pair:
-#             raise NotFoundError("tag not found")
-#
-#         try:
-#             conn.ex_delete_tags(machine, pair)
-#         except Exception as exc:
-#             raise CloudUnavailableError("Error deleting metadata in EC2", exc)
-#
-#     else:
-#         if conn.type == 'gce':
-#             try:
-#                 metadata = machine.extra['metadata']['items']
-#                 for tag_data in metadata:
-#                     mkey = tag_data.get('key')
-#                     mdata = tag_data.get('value')
-#                     if tag == mkey:
-#                         metadata.remove({u'value': mdata, u'key': mkey})
-#                 conn.ex_set_node_metadata(machine, metadata)
-#             except Exception as exc:
-#                 raise InternalServerError("Error while updating metadata", exc)
-#         else:
-#             tags = machine.extra.get('metadata', None)
-#             key = None
-#             for mkey, mdata in tags.iteritems():
-#                 if type(mkey) == unicode:
-#                     mkey = mkey.encode('utf-8')
-#                 if type(mdata) == unicode:
-#                     mdata = mdata.encode('utf-8')
-#                 if tag == mkey:
-#                     key = mkey
-#             if key:
-#                 tags.pop(key.decode('utf-8'))
-#             else:
-#                 raise NotFoundError("tag not found")
-#
-#             try:
-#                 conn.ex_set_metadata(machine, tags)
-#             except:
-#                 raise CloudUnavailableError("Error while updating metadata")
-
-
 def check_monitoring(user):
+    raise NotImplementedError()
+
     """Ask the mist.io service if monitoring is enabled for this machine."""
     try:
         ret = requests.get(config.CORE_URI + '/monitoring',
@@ -400,6 +218,7 @@ def check_monitoring(user):
 def enable_monitoring(user, cloud_id, machine_id,
                       name='', dns_name='', public_ips=None,
                       no_ssh=False, dry=False, deploy_async=True, **kwargs):
+    raise NotImplementedError()
     """Enable monitoring for a machine."""
     cloud = Cloud.objects.get(owner=user, id=cloud_id, deleted=None)
     payload = {
@@ -451,6 +270,7 @@ def enable_monitoring(user, cloud_id, machine_id,
 
 def disable_monitoring(user, cloud_id, machine_id, no_ssh=False):
     """Disable monitoring for a machine."""
+    raise NotImplementedError()
     payload = {
         'action': 'disable',
         'no_ssh': True
@@ -675,6 +495,8 @@ def notify_user(owner, title, message="", email_notify=True, **kwargs):
 
 
 def find_metrics(user, cloud_id, machine_id):
+    raise NotImplementedError()
+
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
                                                 cloud_id, machine_id)
     headers = {'Authorization': get_auth_header(user)}
@@ -692,6 +514,8 @@ def find_metrics(user, cloud_id, machine_id):
 
 
 def assoc_metric(user, cloud_id, machine_id, metric_id):
+    raise NotImplementedError()
+
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
                                                 cloud_id, machine_id)
     try:
@@ -711,6 +535,8 @@ def assoc_metric(user, cloud_id, machine_id, metric_id):
 
 
 def disassoc_metric(user, cloud_id, machine_id, metric_id):
+    raise NotImplementedError()
+
     url = "%s/clouds/%s/machines/%s/metrics" % (config.CORE_URI,
                                                 cloud_id, machine_id)
     try:
@@ -731,6 +557,8 @@ def disassoc_metric(user, cloud_id, machine_id, metric_id):
 
 def update_metric(user, metric_id, name=None, unit=None,
                   cloud_id=None, machine_id=None):
+    raise NotImplementedError()
+
     url = "%s/metrics/%s" % (config.CORE_URI, metric_id)
     headers = {'Authorization': get_auth_header(user)}
     params = {
@@ -786,6 +614,8 @@ $sudo /opt/mistio-collectd/collectd.sh restart
 
 
 def get_stats(user, cloud_id, machine_id, start='', stop='', step='', metrics=''):
+    raise NotImplementedError()
+
     try:
         resp = requests.get(
             "%s/clouds/%s/machines/%s/stats" % (config.CORE_URI,

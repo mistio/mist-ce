@@ -15,9 +15,12 @@ from mist.io.helpers import view_config, params_from_request
 from mist.io.exceptions import RequiredParameterMissingError
 from mist.io.exceptions import BadRequestError, NotFoundError
 
-#  TODO handle this for open.source, it is used from machine_rdp
-from mist.core.vpn.methods import destination_nat
-from mist.core import config
+from mist.io import config
+
+try:
+    from mist.core.vpn.methods import destination_nat as dnat
+except ImportError:
+    from mist.io.dummy.methods import dnat
 
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
@@ -40,17 +43,16 @@ def list_machines(request):
       required: true
       type: string
     """
-
     auth_context = auth_context_from_request(request)
     cloud_id = request.matchdict['cloud']
     # SEC get filtered resources based on auth_context
-    machines = methods.filter_list_machines(auth_context, cloud_id)
-
     try:
         cloud = Cloud.objects.get(owner=auth_context.owner,
                                   id=cloud_id, deleted=None)
     except Cloud.DoesNotExist:
         raise NotFoundError('Cloud does not exist')
+
+    machines = methods.filter_list_machines(auth_context, cloud_id)
 
     if cloud.machine_count != len(machines):
         try:
@@ -174,8 +176,9 @@ def create_machine(request):
     bare_metal:
       description: ' Needed only by SoftLayer cloud'
       type: string
+    schedule:
+      type: dict
     """
-    # TODO add schedule in docstring
 
     params = params_from_request(request)
     cloud_id = request.matchdict['cloud']
@@ -235,6 +238,12 @@ def create_machine(request):
     job_id = params.get('job_id', uuid.uuid4().hex)
 
     auth_context = auth_context_from_request(request)
+
+    try:
+        Cloud.objects.get(owner=auth_context.owner,
+                          id=cloud_id, deleted=None)
+    except Cloud.DoesNotExist:
+        raise NotFoundError('Cloud does not exist')
 
     # compose schedule as a dict from relative parameters
     if not params.get('schedule_type'):
@@ -428,7 +437,7 @@ def machine_rdp(request):
     except:
         rdp_port = 3389
 
-    host, rdp_port = destination_nat(auth_context.owner, host, rdp_port)
+    host, rdp_port = dnat(auth_context.owner, host, rdp_port)
 
     rdp_content = 'full address:s:%s:%s\nprompt for credentials:i:1' % \
                   (host, rdp_port)

@@ -1,6 +1,5 @@
 import mongoengine as me
 
-from mist.core import config
 from mist.io.users.models import Owner
 
 

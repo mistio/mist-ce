@@ -1,10 +1,11 @@
+import logging
+
 from pyramid.response import Response
 from mist.io.clouds.models import Cloud
 from mist.io.auth.methods import auth_context_from_request
 
 from mist.io.helpers import trigger_session_update
 from mist.io.helpers import view_config, params_from_request
-
 
 from mist.io.exceptions import BadRequestError
 from mist.io.exceptions import RequiredParameterMissingError, NotFoundError
@@ -15,9 +16,7 @@ from mist.io.clouds.methods import delete_cloud as m_delete_cloud
 
 from mist.io.tag.methods import add_tags_to_resource
 
-from mist.core import config
-
-import logging
+from mist.io import config
 
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
@@ -130,6 +129,10 @@ def add_cloud(request):
     monitoring = ret.get('monitoring')
 
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+
+    # If insights enabled on org, set poller with half hour period.
+    if auth_context.org.insights_enabled:
+        cloud.ctl.set_polling_interval(1800)
 
     if cloud_tags:
         add_tags_to_resource(owner, cloud, cloud_tags.items())

@@ -1,4 +1,5 @@
 import paramiko
+import logging
 import json
 import uuid
 import re
@@ -19,11 +20,6 @@ from amqp.connection import Connection
 
 from paramiko.ssh_exception import SSHException
 
-import ansible.playbook
-import ansible.utils.template
-from ansible import callbacks
-from ansible import utils
-
 from mist.io.exceptions import MistError, NotFoundError
 from mist.io.exceptions import ServiceUnavailableError, MachineNotFoundError
 from mist.io.shell import Shell
@@ -33,8 +29,7 @@ from mist.io.clouds.models import Cloud
 from mist.io.machines.models import Machine
 from mist.io.scripts.models import Script
 from mist.io.schedules.models import Schedule
-
-from mist.core import config  # TODO handle this for open.source
+from mist.io.dns.models import Zone, Record
 
 celery_cfg = 'mist.core.celery_config'
 
@@ -45,7 +40,8 @@ from mist.io.helpers import amqp_owner_listening
 from mist.io.helpers import amqp_log
 from mist.io.helpers import trigger_session_update
 
-import logging
+from mist.io import config
+
 logging.basicConfig(level=config.PY_LOG_LEVEL,
                     format=config.PY_LOG_FORMAT,
                     datefmt=config.PY_LOG_FORMAT_DATE)
@@ -82,9 +78,11 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
 
     from mist.io.methods import connect_provider, probe_ssh_only
     from mist.io.methods import notify_user, notify_admin
-    from mist.io.methods import create_dns_a_record
 
-    from mist.core.methods import enable_monitoring  # TODO handle for open.so
+    try:
+        from mist.core.methods import enable_monitoring
+    except ImportError:
+        from mist.io.dummy.methods import enable_monitoring
 
     job_id = job_id or uuid.uuid4().hex
     if owner.find("@") != -1:
@@ -152,13 +150,17 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
 
             if hostname:
                 try:
-                    record = create_dns_a_record(owner, hostname, host)
-                    hostname = '.'.join((record.name, record.zone.domain))
-                    log_event(action='create_dns_a_record', hostname=hostname,
+                    kwargs = {}
+                    kwargs['name'] = hostname
+                    kwargs['type'] = 'A'
+                    kwargs['data'] = host
+                    kwargs['ttl'] = 3600
+                    record = Record.add(owner=owner, **kwargs)
+                    log_event(action='Create_A_record', hostname=hostname,
                               **log_dict)
                 except Exception as exc:
-                    log_event(action='create_dns_a_record', error=str(exc),
-                              **log_dict)
+                    log_event(action='Create_A_record', hostname=hostname,
+                              error=str(exc), **log_dict)
 
             error = False
             if script_id:
@@ -231,8 +233,13 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             # TODO add schedule_id for adding a machine to an already exist
             if schedule:
                 try:
+                    from mist.core.rbac.methods import AuthContext
+                except ImportError:
+                    from mist.io.dummy.rbac import AuthContext
+
+                try:
                     name = schedule.pop('name') + '_' + machine_id
-                    from mist.core.rbac.methods import AuthContext  # TODO
+
                     auth_context = AuthContext.deserialize(
                         schedule.pop('auth_context'))
                     # TODO add machines
@@ -699,6 +706,38 @@ class ListNetworks(UserTask):
         log.warn('Returning list networks for user %s cloud %s'
                  % (owner.id, cloud_id))
         return {'cloud_id': cloud_id, 'networks': networks}
+
+
+class ListZones(UserTask):
+    abstract = False
+    task_key = 'list_zones'
+    result_expires = 60 * 60 * 24
+    result_fresh = 0
+    polling = False
+    soft_time_limit = 60
+
+    def execute(self, owner_id, cloud_id):
+        owner = Owner.objects.get(id=owner_id)
+        log.warn('Running list zones for user %s cloud %s'
+                 % (owner.id, cloud_id))
+        try:
+            cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+        except Cloud.DoesNotExist:
+            raise CloudNotFoundError
+        if not hasattr(cloud.ctl, 'dns'):
+            return {'cloud_id': cloud_id, 'zones': []}
+        ret = []
+        zones = cloud.ctl.dns.list_zones()
+
+        for zone in zones:
+            zone_dict = zone.as_dict()
+            zone_dict['records'] = [record.as_dict() for
+                                    record in zone.ctl.list_records()]
+            ret.append(zone_dict)
+
+        log.warn('Returning list zones for user %s cloud %s'
+                 % (owner.id, cloud_id))
+        return {'cloud_id': cloud_id, 'zones': ret}
 
 
 class ListImages(UserTask):
