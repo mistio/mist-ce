@@ -168,9 +168,6 @@ class BaseMachinesCondition(me.EmbeddedDocument):
 class ListOfMachinesSchedule(BaseMachinesCondition):
     machines = me.ListField(me.ReferenceField(Machine, required=True,),
                             required=True)
-    # TODO
-    # machines_uuids
-    # reverse_delete_rule=me.PULL
 
     @property
     def sched_machines(self):
