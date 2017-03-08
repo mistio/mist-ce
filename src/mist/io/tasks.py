@@ -20,11 +20,6 @@ from amqp.connection import Connection
 
 from paramiko.ssh_exception import SSHException
 
-import ansible.playbook  # TODO what is these for?
-import ansible.utils.template
-from ansible import callbacks
-from ansible import utils
-
 from mist.io.exceptions import MistError, NotFoundError
 from mist.io.exceptions import ServiceUnavailableError, MachineNotFoundError
 from mist.io.shell import Shell
@@ -36,7 +31,7 @@ from mist.io.scripts.models import Script
 from mist.io.schedules.models import Schedule
 from mist.io.dns.models import Zone, Record
 
-celery_cfg = 'mist.core.celery_config'  # TODO what is this for?
+celery_cfg = 'mist.core.celery_config'
 
 from mist.io.helpers import log_event
 from mist.io.helpers import send_email as helper_send_email

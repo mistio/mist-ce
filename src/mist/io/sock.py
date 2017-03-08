@@ -45,7 +45,6 @@ try:
     from mist.core.rbac.methods import filter_org
     from mist.core.orchestration.methods import filter_list_templates
     from mist.core.orchestration.methods import filter_list_stacks
-    multi_user = True  # TODO what is this for?
 except ImportError:
     from mist.io.dummy.methods import get_stats, get_load, check_monitoring
     from mist.io.dummy.methods import get_user_data, filter_list_tags
@@ -53,8 +52,6 @@ except ImportError:
     from mist.io.dummy.rbac import filter_org
     from mist.io.dummy.methods import filter_list_templates
     from mist.io.dummy.methods import filter_list_stacks
-    multi_user = False
-
 
 from mist.io import config
 

@@ -176,8 +176,9 @@ def create_machine(request):
     bare_metal:
       description: ' Needed only by SoftLayer cloud'
       type: string
+    schedule:
+      type: dict
     """
-    # TODO add schedule in docstring
 
     params = params_from_request(request)
     cloud_id = request.matchdict['cloud']
