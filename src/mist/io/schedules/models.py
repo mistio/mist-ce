@@ -205,7 +205,7 @@ class TaggedMachinesSchedule(BaseMachinesCondition):
 
     def validate(self, clean=True):
         if self.tags:
-            regex = re.complile(r'^[a-z0-9_-]+$')
+            regex = re.compile(r'^[a-z0-9_-]+$')
             for key, value in self.tags.iteritems():
                 if not key:
                     raise me.ValidationError('You cannot add a tag '
