@@ -194,12 +194,14 @@ class TaggedMachinesSchedule(BaseMachinesCondition):
         for k, v in self.tags.iteritems():
             machines_from_tags = Tag.objects(owner=self._instance.owner,
                                              resource_type='machines',
-                                             key=k, value=v)
+                                             key=k)  # value=v
             for m in machines_from_tags:
-                if m.resource.state != 'terminated':
-                    machine_id = m.resource.machine_id
-                    cloud_id = m.resource.cloud.id
-                    cloud_machines_pairs.append((cloud_id, machine_id))
+                #  FIXME this is ugly, but we must refactor tags
+                if m.value == v or v is None and m.value == '':
+                    if m.resource.state != 'terminated':
+                        machine_id = m.resource.machine_id
+                        cloud_id = m.resource.cloud.id
+                        cloud_machines_pairs.append((cloud_id, machine_id))
 
         return cloud_machines_pairs
 
