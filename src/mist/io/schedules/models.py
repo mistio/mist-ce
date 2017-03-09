@@ -197,7 +197,7 @@ class TaggedMachinesSchedule(BaseMachinesCondition):
                                              key=k)  # value=v
             for m in machines_from_tags:
                 #  FIXME this is ugly, but we must refactor tags
-                if m.value == v or v is None and m.value == '':
+                if m.value == v or (v is None and m.value == ''):
                     if m.resource.state != 'terminated':
                         machine_id = m.resource.machine_id
                         cloud_id = m.resource.cloud.id
