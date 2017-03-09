@@ -655,6 +655,7 @@ class VCloudComputeController(BaseComputeController):
         host = dnat(self.cloud.owner, self.cloud.host)
         return get_driver(self.provider)(self.cloud.username,
                                          self.cloud.password, host=host,
+                                         port=self.cloud.port,
                                          verify_match_hostname=False)
 
     def _list_machines__machine_actions(self,  machine, machine_libcloud):
