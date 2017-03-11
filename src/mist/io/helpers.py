@@ -41,7 +41,7 @@ from amqp.exceptions import NotFound as AmqpNotFound
 from distutils.version import LooseVersion
 
 import mist.io.users.models
-from mist.io.auth.models import ApiToken, datetime_to_str
+from mist.io.auth.models import ApiToken, SessionToken, datetime_to_str
 
 from mist.io.exceptions import MistError, NotFoundError
 from mist.io.exceptions import RequiredParameterMissingError
@@ -772,9 +772,38 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
             event['email'] = mist.io.users.models.User.objects.get(
                 id=user_id).email
         for key in ('cloud_id', 'machine_id', 'script_id', 'rule_id',
-                    'job_id', 'shell_id', 'session_id', 'incident_id'):
+                    'job_id', 'shell_id', 'session_id', 'incident_id',
+                    'fingerprint', 'experiment', 'choice'):
             if key in kwargs:
                 event[key] = kwargs.pop(key)
+        session_id = event.get('session_id')
+        fingerprint = event.get('fingerprint')
+        experiment = events.get('experiment')
+        choice = events.get('choice')
+
+        # Cross populate session data to facilitate funnel analysis
+        if session_id:
+            session = SessionToken(session_id)
+            if fingerprint: # store fingerprint in session
+                session.fingerprint = fingerprint
+            elif session.fingerprint: # add fingerprint in log entry
+                event['fingerprint'] = session.fingerprint
+            if experiment: # store experiment in session
+                session.experiment = experiment
+            elif session.experiment:
+                event['experiment'] = session.experiment
+            if choice:
+                session.choice = choice
+            elif session.choice:
+                event['choice'] = session.choice
+            # Remove experiment values for disabled experiments
+            if session.experiment not in ENABLED_EXPERIMENTS:
+                event.pop('experiment')
+                event.pop('choice')
+                session.experiment = ''
+                session.choice = ''
+            session.save()
+
         event['_id'] = str(coll.save(event.copy()))
         try:
             stories = log_story(event, _mongo_conn=conn)
