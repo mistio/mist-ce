@@ -3,8 +3,12 @@ import time
 import logging
 import datetime
 
-from mist.core.helpers import es_client as es
-from mist.core.rbac.methods import filter_logs
+from mist.io.helpers import es_client as es
+
+try:
+    from mist.core.rbac.methods import filter_logs
+except ImportError:
+    from mist.io.dummy.rbac import filter_logs
 
 from mist.io.exceptions import NotFoundError
 
