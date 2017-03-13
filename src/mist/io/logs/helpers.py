@@ -1,7 +1,7 @@
 import json
 import logging
 
-from mist.core.helpers import es_client as es
+from mist.io.helpers import es_client as es
 
 from mist.io.exceptions import NotFoundError
 from mist.io.exceptions import RateLimitError
