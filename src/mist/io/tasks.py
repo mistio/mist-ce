@@ -120,6 +120,45 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
             tmp_log('not running state')
             raise self.retry(exc=Exception(), countdown=120, max_retries=30)
 
+        # TODO add schedule_id for adding a machine to an already exist
+        if schedule:
+            log_dict = {
+                'owner_id': owner.id,
+                'event_type': 'job',
+                'cloud_id': cloud_id,
+                'machine_id': machine_id,
+                'job_id': job_id,
+                'host': host,
+                'key_id': key_id,
+            }
+            try:
+                from mist.core.rbac.methods import AuthContext
+            except ImportError:
+                from mist.io.dummy.rbac import AuthContext
+
+            try:
+                name = schedule.pop('name') + '_' + machine_id
+
+                auth_context = AuthContext.deserialize(
+                    schedule.pop('auth_context'))
+                # TODO add machines
+                m = Machine.objects.get(cloud=cloud, machine_id=machine_id)
+                machines_uuids = [m.id]
+                schedule['machines_uuids'] = machines_uuids
+                tmp_log('Add scheduler entry %s', name)
+                schedule_info = Schedule.add(auth_context, name, **schedule)
+                tmp_log("A new scheduler was added")
+                log_event(action='Add scheduler entry',
+                          scheduler=schedule_info.as_dict(), **log_dict)
+            except Exception as e:
+                print repr(e)
+                error = True
+                notify_user(owner, "add scheduler entry failed for "
+                                   "machine %s" % machine_id, repr(e),
+                            error=error)
+                log_event(action='Add scheduler entry failed',
+                          error=error, **log_dict)
+
         try:
             from mist.io.shell import Shell
             shell = Shell(host)
@@ -203,7 +242,8 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
 
             if monitoring:
                 try:
-                    enable_monitoring(owner, cloud_id, node.id,
+                    enable_monitoring(
+                        owner, cloud_id, node.id,
                         name=node.name, dns_name=node.extra.get('dns_name',''),
                         public_ips=ips, no_ssh=False, dry=False, job_id=job_id,
                         plugins=plugins, deploy_async=False,
@@ -228,38 +268,6 @@ def post_deploy_steps(self, owner, cloud_id, machine_id, monitoring,
                 )
                 error = ret['error']
                 tmp_log('executed post_script_id %s', post_script_id)
-
-            # set schedule entry as a post deploy step
-            # TODO add schedule_id for adding a machine to an already exist
-            if schedule:
-                try:
-                    from mist.core.rbac.methods import AuthContext
-                except ImportError:
-                    from mist.io.dummy.rbac import AuthContext
-
-                try:
-                    name = schedule.pop('name') + '_' + machine_id
-
-                    auth_context = AuthContext.deserialize(
-                        schedule.pop('auth_context'))
-                    # TODO add machines
-                    m = Machine.objects.get(cloud=cloud, machine_id=machine_id)
-                    machines_uuids = [m.id]
-                    schedule['machines_uuids'] = machines_uuids
-                    tmp_log('Add scheduler entry %s', name)
-                    schedule_info = Schedule.add(auth_context, name,
-                                                 **schedule)
-                    tmp_log("A new scheduler was added")
-                    log_event(action='add scheduler entry',
-                              scheduler=schedule_info.as_dict(), **log_dict)
-                except Exception as e:
-                    print repr(e)
-                    error = True
-                    notify_user(owner, "add scheduler entry failed for "
-                                       "machine %s" % machine_id, repr(e),
-                                error=error)
-                    log_event(action='Add scheduler entry failed',
-                              error=error, **log_dict)
 
             log_event(action='post_deploy_finished', error=error, **log_dict)
 
@@ -1153,7 +1161,8 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
                 try:
                     machine.ctl.start()
                 except Exception as exc:
-                    log_dict['error'] = str(exc)
+                    log_dict['error'] = str(exc) + \
+                                        ' Machine in %s state' % machine.state
                     log_event(action='Start failed', **log_dict)
                 else:
                     log_event(action='Start succeeded', **log_dict)
@@ -1162,7 +1171,8 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
                 try:
                     machine.ctl.stop()
                 except Exception as exc:
-                    log_dict['error'] = str(exc)
+                    log_dict['error'] = str(exc) + \
+                                        ' Machine in %s state' % machine.state
                     log_event(action='Stop failed', **log_dict)
                 else:
                     log_event(action='Stop succeeded', **log_dict)
@@ -1171,7 +1181,8 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
                 try:
                     machine.ctl.reboot()
                 except Exception as exc:
-                    log_dict['error'] = str(exc)
+                    log_dict['error'] = str(exc) + \
+                                        ' Machine in %s state' % machine.state
                     log_event(action='Reboot failed', **log_dict)
                 else:
                     log_event(action='Reboot succeeded', **log_dict)
@@ -1180,7 +1191,8 @@ def run_machine_action(owner_id, action, name, cloud_id, machine_id):
                 try:
                     destroy_machine(owner, cloud_id, machine_id)
                 except Exception as exc:
-                    log_dict['error'] = str(exc)
+                    log_dict['error'] = str(exc) + \
+                                        ' Machine in %s state' % machine.state
                     log_event(action='Destroy failed', **log_dict)
                 else:
                     log_event(action='Destroy succeeded', **log_dict)
