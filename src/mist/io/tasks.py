@@ -888,8 +888,7 @@ def deploy_collectd(owner, cloud_id, machine_id, extra_vars, job_id='',
     # FIXME
     from mist.io.methods import deploy_collectd
 
-    assert isinstance(owner, Organization)
-
+    owner = Owner.objects.get(id=owner)
     cloud = Cloud.objects.get(owner=owner, id=cloud_id)
     machine = Machine.objects.get(cloud=cloud, machine_id=machine_id)
     machine.monitoring.installation_status.state = 'installing'
@@ -944,11 +943,8 @@ def deploy_collectd(owner, cloud_id, machine_id, extra_vars, job_id='',
 
 @app.task
 def undeploy_collectd(owner, cloud_id, machine_id):
-    if owner.find("@") != -1:
-        owner = User.objects.get(email=owner)
-    else:
-        owner = Owner.objects.get(id=owner)
     import mist.io.methods
+    owner = Owner.objects.get(id=owner)
     mist.io.methods.undeploy_collectd(owner, cloud_id, machine_id)
 
 
@@ -1259,7 +1255,7 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
     from mist.io.methods import notify_admin, notify_user
     from mist.io.machines.methods import list_machines
 
-    assert isinstance(owner, Organization)
+    owner = Owner.objects.get(id=owner)
 
     ret = {
         'owner_id': owner.id,
