@@ -28,25 +28,29 @@ class AuthContext(object):
         pass
 
     def check_perm(self, rtype, action, rid):
-        return None
+        return
 
     def get_security_tags(self):
         return []
 
     def get_allowed_resources(self, action='read', rtype=None):
-        return
+        return {}
 
     def _get_matching_tags(self, rtype, action):
         return {}
 
 
 def validate_rule_rid(rule, owner):
-    pass
+    return
 
 
 def filter_org(auth_context):
-    return None
+    return
 
 
 def rbac_filter(auth_context, query):
-    return None
+    return
+
+
+def filter_logs(auth_context, kwargs):
+    return
