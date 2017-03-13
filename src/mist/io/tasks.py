@@ -20,11 +20,6 @@ from amqp.connection import Connection
 
 from paramiko.ssh_exception import SSHException
 
-import ansible.playbook  # TODO what is these for?
-import ansible.utils.template
-from ansible import callbacks
-from ansible import utils
-
 from mist.io.exceptions import MistError, NotFoundError
 from mist.io.exceptions import ServiceUnavailableError, MachineNotFoundError
 from mist.io.shell import Shell
@@ -36,7 +31,7 @@ from mist.io.scripts.models import Script
 from mist.io.schedules.models import Schedule
 from mist.io.dns.models import Zone, Record
 
-celery_cfg = 'mist.core.celery_config'  # TODO what is this for?
+celery_cfg = 'mist.core.celery_config'
 
 from mist.io.helpers import log_event
 from mist.io.helpers import send_email as helper_send_email
@@ -711,6 +706,38 @@ class ListNetworks(UserTask):
         log.warn('Returning list networks for user %s cloud %s'
                  % (owner.id, cloud_id))
         return {'cloud_id': cloud_id, 'networks': networks}
+
+
+class ListZones(UserTask):
+    abstract = False
+    task_key = 'list_zones'
+    result_expires = 60 * 60 * 24
+    result_fresh = 0
+    polling = False
+    soft_time_limit = 60
+
+    def execute(self, owner_id, cloud_id):
+        owner = Owner.objects.get(id=owner_id)
+        log.warn('Running list zones for user %s cloud %s'
+                 % (owner.id, cloud_id))
+        try:
+            cloud = Cloud.objects.get(owner=owner, id=cloud_id)
+        except Cloud.DoesNotExist:
+            raise CloudNotFoundError
+        if not hasattr(cloud.ctl, 'dns'):
+            return {'cloud_id': cloud_id, 'zones': []}
+        ret = []
+        zones = cloud.ctl.dns.list_zones()
+
+        for zone in zones:
+            zone_dict = zone.as_dict()
+            zone_dict['records'] = [record.as_dict() for
+                                    record in zone.ctl.list_records()]
+            ret.append(zone_dict)
+
+        log.warn('Returning list zones for user %s cloud %s'
+                 % (owner.id, cloud_id))
+        return {'cloud_id': cloud_id, 'zones': ret}
 
 
 class ListImages(UserTask):

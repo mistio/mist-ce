@@ -203,6 +203,7 @@ class VCloudMainController(BaseMainController):
     def _update__preparse_kwargs(self, kwargs):
         username = kwargs.get('username', self.cloud.username) or ''
         organization = kwargs.pop('organization')
+
         if not organization:
             if '@' not in username:
                 raise RequiredParameterMissingError('organization')

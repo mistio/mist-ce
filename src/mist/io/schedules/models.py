@@ -168,9 +168,6 @@ class BaseMachinesCondition(me.EmbeddedDocument):
 class ListOfMachinesSchedule(BaseMachinesCondition):
     machines = me.ListField(me.ReferenceField(Machine, required=True,),
                             required=True)
-    # TODO
-    # machines_uuids
-    # reverse_delete_rule=me.PULL
 
     @property
     def sched_machines(self):
@@ -197,18 +194,20 @@ class TaggedMachinesSchedule(BaseMachinesCondition):
         for k, v in self.tags.iteritems():
             machines_from_tags = Tag.objects(owner=self._instance.owner,
                                              resource_type='machines',
-                                             key=k, value=v)
+                                             key=k)  # value=v
             for m in machines_from_tags:
-                if m.resource.state != 'terminated':
-                    machine_id = m.resource.machine_id
-                    cloud_id = m.resource.cloud.id
-                    cloud_machines_pairs.append((cloud_id, machine_id))
+                #  FIXME this is ugly, but we must refactor tags
+                if m.value == v or (v is None and m.value == ''):
+                    if m.resource.state != 'terminated':
+                        machine_id = m.resource.machine_id
+                        cloud_id = m.resource.cloud.id
+                        cloud_machines_pairs.append((cloud_id, machine_id))
 
         return cloud_machines_pairs
 
     def validate(self, clean=True):
         if self.tags:
-            regex = re.complile(r'^[a-z0-9_-]+$')
+            regex = re.compile(r'^[a-z0-9_-]+$')
             for key, value in self.tags.iteritems():
                 if not key:
                     raise me.ValidationError('You cannot add a tag '

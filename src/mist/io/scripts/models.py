@@ -61,7 +61,7 @@ class GithubLocation(Location):
 
 class UrlLocation(Location):
     type = 'url'
-    url = me.StringField(required=True)  # TODO maybe URLField
+    url = me.StringField(required=True)
     entrypoint = me.StringField()
 
     def clean(self):
@@ -191,20 +191,13 @@ class Script(me.Document):
         return script
 
     @property
-    def script(self):  # TODO only for as_dict_old, replace with location.type
+    def script(self):
         if self.location.type == 'inline':
             return self.location.source_code
         elif self.location.type == 'github':
             return self.location.repo
         elif self.location.type == 'url':
             return self.location.url
-
-    # def get_jobs(self):
-    #     """Get jobs related to script."""
-    #     conn = MongoClient(config.MONGO_URI)
-    #     db = conn['mist']
-    #     cursor = db.ansible_jobs.find({'script_id': self.id})
-    #     # FIXME what is this?
 
     def delete(self):
         super(Script, self).delete()

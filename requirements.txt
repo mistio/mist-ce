@@ -29,3 +29,4 @@ websocket-client==0.29.0
 iso8601
 tornado-profile
 jsonpickler
+dnspython

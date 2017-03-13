@@ -1,7 +1,6 @@
 import random
 import string
 import urllib
-import logging
 from mongoengine import DoesNotExist
 
 from mist.io.users.models import Organization, User
@@ -24,9 +23,6 @@ except:
 
 from mist.io.auth.models import ApiToken
 from mist.io.auth.models import SessionToken
-
-#  TODO do we need here logging.basicConfig(level=config.PY_LOG_LEVEL,
-log = logging.getLogger(__name__)
 
 
 def migrate_old_api_token(request):
@@ -124,7 +120,7 @@ def session_from_request(request):
 
 
 def user_from_request(request, admin=False, redirect=False):
-    """Given request, initiate User instance (mist.core.model.User)
+    """Given request, initiate User instance (mist.io.users.model.User)
 
     First try to check if there is a valid api token header, else check if
     there is a valid cookie session, else raise UserUnauthorizedError.
@@ -174,9 +170,6 @@ def auth_context_from_auth_token(token):
     user = token.get_user()
     if user is None:
         raise UserUnauthorizedError()
-    # TODO: Currently we only allow one organization and in that case only
-    # organizational context. We must allow user to switch between multiple
-    # organizational and a personal context.
     return AuthContext(user, token)
 
 
@@ -256,6 +249,7 @@ def reissue_cookie_session(request, user_id='', su='', org=None, after=0,
     session.ip_address = mist.io.helpers.ip_from_request(request)
     session.user_agent = request.user_agent
     session.org = org
+    session.su = su
     session.save()
     request.environ['session'] = session
     return session

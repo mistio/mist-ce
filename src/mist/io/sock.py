@@ -45,7 +45,6 @@ try:
     from mist.core.rbac.methods import filter_org
     from mist.core.orchestration.methods import filter_list_templates
     from mist.core.orchestration.methods import filter_list_stacks
-    multi_user = True  # TODO what is this for?
 except ImportError:
     from mist.io.dummy.methods import get_stats, get_load, check_monitoring
     from mist.io.dummy.methods import get_user_data, filter_list_tags
@@ -53,8 +52,6 @@ except ImportError:
     from mist.io.dummy.rbac import filter_org
     from mist.io.dummy.methods import filter_list_templates
     from mist.io.dummy.methods import filter_list_stacks
-    multi_user = False
-
 
 from mist.io import config
 
@@ -324,6 +321,7 @@ class MainConnection(MistConnection):
         periodic_tasks.extend([('list_images', tasks.ListImages()),
                                ('list_sizes', tasks.ListSizes()),
                                ('list_networks', tasks.ListNetworks()),
+                               ('list_zones', tasks.ListZones()),
                                ('list_locations', tasks.ListLocations()),
                                ('list_projects', tasks.ListProjects())])
         for key, task in periodic_tasks:
@@ -386,7 +384,7 @@ class MainConnection(MistConnection):
             result = body
         log.info("Got %s", routing_key)
         if routing_key in set(['notify', 'probe', 'list_sizes', 'list_images',
-                               'list_networks', 'list_machines',
+                               'list_networks', 'list_machines', 'list_zones',
                                'list_locations', 'list_projects', 'ping']):
             if routing_key == 'list_machines':
                 # probe newly discovered running machines

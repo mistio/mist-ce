@@ -210,17 +210,26 @@ class CloudPollingSchedule(PollingSchedule):
 
     @property
     def enabled(self):
-        return (super(CloudPollingSchedule, self).enabled
-                and self.cloud.enabled
-                and not self.cloud.deleted)
+        try:
+            return (super(CloudPollingSchedule, self).enabled
+                    and self.cloud.enabled
+                    and not self.cloud.deleted)
+        except me.DoesNotExist:
+            log.error('Cannot get cloud for polling schedule.')
+            return False
 
     @property
     def interval(self):
-        if self.default_interval.every != self.cloud.polling_interval:
-            log.warning("Schedule has different interval from cloud, fixing")
-            self.default_interval.every = self.cloud.polling_interval
-            self.save()
-        return super(CloudPollingSchedule, self).interval
+        try:
+            if self.default_interval.every != self.cloud.polling_interval:
+                log.warning("Schedule has different interval from cloud, "
+                            "fixing")
+                self.default_interval.every = self.cloud.polling_interval
+                self.save()
+            return super(CloudPollingSchedule, self).interval
+        except me.DoesNotExist:
+            log.error('Cannot get interval. Cloud is missing')
+            return PollingInterval(every=0)
 
 
 class ListMachinesPollingSchedule(CloudPollingSchedule):
