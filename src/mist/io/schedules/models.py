@@ -413,6 +413,9 @@ class Schedule(me.Document):
 
     def as_dict(self):
         # Return a dict as it will be returned to the API
+
+        last_run = '' if self.total_run_count == 0 else str(self.last_run_at)
+
         sdict = {
             'id': self.id,
             'name': self.name,
@@ -426,8 +429,7 @@ class Schedule(me.Document):
             'task_enabled': self.task_enabled,
             'active': self.enabled,
             'run_immediately': self.run_immediately or '',
-            'last_run_at': '' if self.total_run_count == 0 else str(
-                                                            self.last_run_at),
+            'last_run_at': last_run,
             'total_run_count': self.total_run_count,
             'max_run_count': self.max_run_count,
         }
