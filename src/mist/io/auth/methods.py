@@ -197,6 +197,7 @@ def reissue_cookie_session(request, user_id='', su='', org=None, after=0,
     session = session_from_request(request)
     if not isinstance(session, SessionToken):
         raise Exception("Can not reissue an API token session.")
+
     if after:
         revoke_token.apply_async(args=(session.token, ), countdown=after)
     else:
@@ -204,8 +205,17 @@ def reissue_cookie_session(request, user_id='', su='', org=None, after=0,
         session.save()
 
     # And then issue the new session
-    session = SessionToken()
+    new_session = SessionToken()
 
+    # Pass on fingerprint & experiment choice to new session
+    if session.fingerprint:
+        new_session.fingerprint = session.fingerprint
+    if session.experiment:
+        new_session.experiment = session.experiment
+    if session.choice:
+        new_session.choice = session.choice
+
+    session = new_session
     if user_id or su:
         # A user will be set to the session
         user_for_session = su if su else user_id

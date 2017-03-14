@@ -781,12 +781,12 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
                 event[key] = kwargs.pop(key)
         session_id = event.get('session_id')
         fingerprint = event.get('fingerprint')
-        experiment = events.get('experiment')
-        choice = events.get('choice')
+        experiment = event.get('experiment')
+        choice = event.get('choice')
 
         # Cross populate session data to facilitate funnel analysis
         if session_id:
-            session = SessionToken(session_id)
+            session = SessionToken.objects.get(id=session_id)
             if fingerprint: # store fingerprint in session
                 session.fingerprint = fingerprint
             elif session.fingerprint: # add fingerprint in log entry
@@ -800,9 +800,11 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
             elif session.choice:
                 event['choice'] = session.choice
             # Remove experiment values for disabled experiments
-            if session.experiment not in ENABLED_EXPERIMENTS:
-                event.pop('experiment')
-                event.pop('choice')
+            if session.experiment not in config.ENABLED_EXPERIMENTS:
+                if 'experiment' in event:
+                    event.pop('experiment')
+                if 'choice' in event:
+                    event.pop('choice')
                 session.experiment = ''
                 session.choice = ''
             session.save()
@@ -1161,7 +1163,6 @@ def logging_view_decorator(func):
                                         'enable_insights', 'register'):
             # don't log these views no matter what
             return response
-
         # log request #
         log_dict = {
             'event_type': 'request',
@@ -1186,10 +1187,19 @@ def logging_view_decorator(func):
             log_dict['_exc_type'] = type(context)
             log_dict['_traceback'] = traceback.format_exc()
 
-        # log user
+        # log session
         session = request.environ['session']
+        if session:
+            log_dict['session_id'] = str(session.id)
+            if session.fingerprint:
+                log_dict['fingerprint'] = session.fingerprint
+            if session.experiment:
+                log_dict['experiment'] = session.experiment
+            if session.choice:
+                log_dict['choice'] = session.choice
+
+        # log user
         user = session.get_user(effective=False)
-        #    swagIt(request,response,func)
         if user is not None:
             log_dict['user_id'] = user.id
             sudoer = session.get_user()
