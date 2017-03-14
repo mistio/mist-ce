@@ -40,6 +40,9 @@ from amqp.exceptions import NotFound as AmqpNotFound
 
 from distutils.version import LooseVersion
 
+from elasticsearch import Elasticsearch
+from elasticsearch_tornado import EsClient
+
 import mist.io.users.models
 from mist.io.auth.models import ApiToken, SessionToken, datetime_to_str
 
@@ -1355,3 +1358,36 @@ def view_config(*args, **kwargs):
 
     return pyramid_view_config(*args, decorator=logging_view_decorator,
                                **kwargs)
+
+
+class AsyncElasticsearch(EsClient):
+    """Tornado-compatible Elasticsearch client."""
+
+    def mk_req(self, url, **kwargs):
+        """Update kwargs with authentication credentials."""
+        kwargs.update({
+            'auth_username': config.ELASTICSEARCH['elastic_username'],
+            'auth_password': config.ELASTICSEARCH['elastic_password'],
+            'validate_cert': config.ELASTICSEARCH['elastic_verify_certs'],
+            'ca_certs': None
+        })
+        return super(AsyncElasticsearch, self).mk_req(url, **kwargs)
+
+
+def es_client(async=False):
+    """Returns an initialized Elasticsearch client."""
+    if not async:
+        return Elasticsearch(
+            config.ELASTICSEARCH['elastic_host'],
+            port=config.ELASTICSEARCH['elastic_port'],
+            http_auth=(config.ELASTICSEARCH['elastic_username'],
+                       config.ELASTICSEARCH['elastic_password']),
+            use_ssl=config.ELASTICSEARCH['elastic_use_ssl'],
+            verify_certs=config.ELASTICSEARCH['elastic_verify_certs'],
+        )
+    else:
+        method = 'https' if config.ELASTICSEARCH['elastic_use_ssl'] else 'http'
+        return AsyncElasticsearch(
+            config.ELASTICSEARCH['elastic_host'],
+            port=config.ELASTICSEARCH['elastic_port'], method=method,
+        )
