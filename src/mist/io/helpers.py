@@ -1191,12 +1191,15 @@ def logging_view_decorator(func):
         session = request.environ['session']
         if session:
             log_dict['session_id'] = str(session.id)
-            if session.fingerprint:
-                log_dict['fingerprint'] = session.fingerprint
-            if session.experiment:
-                log_dict['experiment'] = session.experiment
-            if session.choice:
-                log_dict['choice'] = session.choice
+            try:
+                if session.fingerprint:
+                    log_dict['fingerprint'] = session.fingerprint
+                if session.experiment:
+                    log_dict['experiment'] = session.experiment
+                if session.choice:
+                    log_dict['choice'] = session.choice
+            except AttributeError: # in case of ApiToken
+                pass
 
         # log user
         user = session.get_user(effective=False)
