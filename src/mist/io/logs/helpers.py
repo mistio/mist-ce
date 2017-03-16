@@ -27,13 +27,16 @@ def get_event(owner_id, event_id, event_type=None, fields=None,
         - tornado_async: Denotes where to execute Tornado-safe HTTP requests.
 
     """
-    index = '%s-logs-*' % owner_id
+    index = 'app-logs-*'
     query = {
         'query': {
             'bool': {
                 'filter': {
-                    'term': {
-                        'log_id': event_id
+                    'bool': {
+                        'must': [
+                            {'term': {'owner_id': owner_id}},
+                            {'term': {'log_id': event_id}}
+                        ]
                     }
                 }
             }
@@ -72,7 +75,7 @@ def get_simple_story(owner_id, story_id, story_type=None, closed=None,
         - tornado_async: Denotes where to execute Tornado-safe HTTP requests.
 
     """
-    index = '%s-stories-*' % owner_id
+    index = 'stories-*'
     query = {
         'query': {
             'bool': {
@@ -91,6 +94,10 @@ def get_simple_story(owner_id, story_id, story_type=None, closed=None,
             }
         }
     }
+    if owner_id:
+        query['query']['bool']['filter']['bool']['must'].append(
+            {'term': {'owner_id': owner_id}}
+        )
     if closed is True:
         query['query']['bool']['filter']['bool']['must_not'].append(
             {'term': {'finished_at': 0}}
@@ -127,18 +134,15 @@ def get_open_incidents(owner_id, callback=None, tornado_async=False, **kwargs):
         - tornado_async: Denotes where to execute Tornado-safe HTTP requests.
 
     """
-    index = '%s-stories-*' % owner_id
+    index = 'stories-*'
     query = {
         'query': {
             'bool': {
                 'filter': {
                     'bool': {
                         'must': [
-                            {
-                                'term': {
-                                    'finished_at': 0
-                                }
-                            }
+                            {'term': {'owner_id': owner_id}},
+                            {'term': {'finished_at': 0}}
                         ]
                     }
                 }
