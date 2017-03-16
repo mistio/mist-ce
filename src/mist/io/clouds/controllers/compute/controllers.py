@@ -928,6 +928,8 @@ class LibvirtComputeController(BaseComputeController):
 class OnAppComputeController(BaseComputeController):
 
     def _connect(self):
+        import libcloud.security
+        libcloud.security.VERIFY_SSL_CERT=False
         return get_driver(Provider.ONAPP)(key=self.cloud.username,
                                           secret=self.cloud.apikey,
                                           host=self.cloud.host)
