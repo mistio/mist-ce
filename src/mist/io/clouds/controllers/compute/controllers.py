@@ -939,6 +939,10 @@ class OnAppComputeController(BaseComputeController):
 
     def _list_machines__postparse_machine(self, machine, machine_libcloud):
         machine.os_type = machine_libcloud.extra.get('operating_system', 'linux')
+        # on a VM this has been freebsd and it caused list_machines to raise
+        # exception due to validation of machine model
+        if machine.os_type not in ('unix', 'linux', 'windows', 'coreos'):
+            machine.os_type = 'linux'
 
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
         # TODO: investigate how price_per_hour and price_per_hour_powered_off
