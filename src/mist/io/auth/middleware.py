@@ -29,7 +29,10 @@ class AuthMiddleware(object):
                     cookie = 'session.id=%s; Path=/;' % session.token
                     headers.append(('Set-Cookie', cookie))
 
-            first_entry_cookie = 'first_entry=true; Path=/;'
+            cookie_val = "landing"
+            if session.get_user():
+                cookie_val = "app"
+            first_entry_cookie = 'first_entry=%s; Path=/; Max-Age=99999999' % cookie_val
             headers.append(('Set-Cookie', first_entry_cookie))
 
             # ApiTokens with 'dummy' in name are handed out by session from
