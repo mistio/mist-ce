@@ -1205,6 +1205,7 @@ def logging_view_decorator(func):
                       'rackspace': 'api_key',
                       'nephoscale': 'password',
                       'softlayer': 'api_key',
+                      'onapp': 'api_key',
                       'digitalocean': 'token',
                       'gce': 'private_key',
                       'azure': 'certificate',

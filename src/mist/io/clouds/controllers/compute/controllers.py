@@ -925,6 +925,35 @@ class LibvirtComputeController(BaseComputeController):
         self.connection.ex_undefine_node(machine_libcloud)
 
 
+class OnAppComputeController(BaseComputeController):
+
+    def _connect(self):
+        return get_driver(Provider.ONAPP)(key=self.cloud.username,
+                                          secret=self.cloud.apikey,
+                                          host=self.cloud.host)
+
+    def _list_machines__machine_creation_date(self, machine, machine_libcloud):
+        return machine_libcloud.extra.get('created_at')
+
+    def _list_machines__postparse_machine(self, machine, machine_libcloud):
+        machine.os_type = machine_libcloud.extra.get('operating_system', 'linux')
+
+    def _list_machines__cost_machine(self,  machine, machine_libcloud):
+        # TODO: investigate how price_per_hour and price_per_hour_powered_off
+        # differ
+        # also what happens if VM is stopped
+        return machine_libcloud.extra.get('price_per_hour', 0), 0
+
+    def _reboot_machine(self, machine, machine_libcloud):
+        self.connection.reboot_node(machine_libcloud)
+
+    def _start_machine(self,  machine, machine_libcloud):
+        self.connection.ex_start_node(machine_libcloud)
+
+    def _stop_machine(self,  machine, machine_libcloud):
+        self.connection.ex_stop_node(machine_libcloud)
+
+
 class OtherComputeController(BaseComputeController):
 
     def _connect(self):
