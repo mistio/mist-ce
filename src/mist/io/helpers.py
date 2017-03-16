@@ -810,16 +810,19 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
             session.save()
 
         event['_id'] = str(coll.save(event.copy()))
-        try:
-            stories = log_story(event, _mongo_conn=conn)
-            if config.LOGS_FROM_ELASTIC:
-                from mist.io.logs.methods import log_story as log_story_to_elastic
-                event.update({'log_id': uuid.uuid4().hex})
-                log_story_to_elastic(event, tornado_async=tornado_async)
-        except Exception as exc:
-            log.error("failed to log story: %s %s %s %s %s Error %r",
-                      owner_id, event_type, error, action, kwargs, exc)
-            stories = []
+        if event['type'] == 'ui':
+            stories = [] # ui logs have no stories
+        else:
+            try:
+                stories = log_story(event, _mongo_conn=conn)
+                if config.LOGS_FROM_ELASTIC:
+                    from mist.io.logs.methods import log_story as log_story_to_elastic
+                    event.update({'log_id': uuid.uuid4().hex})
+                    log_story_to_elastic(event, tornado_async=tornado_async)
+            except Exception as exc:
+                log.error("failed to log story: %s %s %s %s %s Error %r",
+                        owner_id, event_type, error, action, kwargs, exc)
+                stories = []
     except Exception as exc:
         log.error("failed to log event: %s %s %s %s %s Error %r",
                   owner_id, event_type, error, action, kwargs, exc)
