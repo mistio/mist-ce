@@ -201,6 +201,7 @@ class TaggedMachinesSchedule(BaseMachinesCondition):
                     if m.resource.state != 'terminated':
                         machine_id = m.resource.machine_id
                         cloud_id = m.resource.cloud.id
+                        #  this
                         cloud_machines_pairs.append((cloud_id, machine_id))
 
         return cloud_machines_pairs
@@ -412,6 +413,9 @@ class Schedule(me.Document):
 
     def as_dict(self):
         # Return a dict as it will be returned to the API
+
+        last_run = '' if self.total_run_count == 0 else str(self.last_run_at)
+
         sdict = {
             'id': self.id,
             'name': self.name,
@@ -425,9 +429,9 @@ class Schedule(me.Document):
             'task_enabled': self.task_enabled,
             'active': self.enabled,
             'run_immediately': self.run_immediately or '',
-            'last_run_at': str(self.last_run_at or ''),
-            'total_run_count': self.total_run_count or 0,
-            'max_run_count': self.max_run_count or 0,
+            'last_run_at': last_run,
+            'total_run_count': self.total_run_count,
+            'max_run_count': self.max_run_count,
         }
 
         if isinstance(self.machines_condition, ListOfMachinesSchedule):

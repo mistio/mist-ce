@@ -258,7 +258,7 @@ def create_machine(request):
             raise RequiredParameterMissingError('schedule_entry')
 
         schedule = {
-            'name': 'scheduler_' + params.get('name'),
+            'name': params.get('name'),
             'description': params.get('description', ''),
             'action': params.get('action', ''),
             'script_id': params.get('schedule_script_id', ''),
