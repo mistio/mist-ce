@@ -28,6 +28,13 @@ class AuthMiddleware(object):
                 if not session.last_accessed_at:
                     cookie = 'session.id=%s; Path=/;' % session.token
                     headers.append(('Set-Cookie', cookie))
+
+            cookie_val = "landing"
+            if session.get_user():
+                cookie_val = "app"
+            first_entry_cookie = 'first_entry=%s; Path=/; Max-Age=99999999' % cookie_val
+            headers.append(('Set-Cookie', first_entry_cookie))
+
             # ApiTokens with 'dummy' in name are handed out by session from
             # request function when the api token is not correct, to prevent
             # csrf checks by the CsrfMiddleware but allow calls to function
