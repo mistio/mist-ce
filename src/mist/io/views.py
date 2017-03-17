@@ -14,6 +14,8 @@ import json
 import traceback
 import mongoengine as me
 
+from datetime import date, datetime, timedelta
+
 from pyramid.response import Response
 from pyramid.renderers import render_to_response
 import pyramid.httpexceptions
@@ -36,13 +38,15 @@ from mist.io.exceptions import KeyParameterMissingError, MistError
 from mist.io.exceptions import PolicyUnauthorizedError, UnauthorizedError
 from mist.io.exceptions import CloudNotFoundError, ScheduleTaskNotFound
 from mist.io.exceptions import NetworkNotFoundError, SubnetNotFoundError
+from mist.io.exceptions import UserUnauthorizedError, RedirectError
 
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, amqp_publish_user
-from mist.io.helpers import view_config
+from mist.io.helpers import view_config, log_event, ip_from_request
 
 from mist.io.auth.methods import auth_context_from_request
 from mist.io.auth.methods import user_from_request, session_from_request
+from mist.io.auth.methods import get_csrf_token
 
 from mist.io import config
 
@@ -91,49 +95,64 @@ def exception_handler_mist(exc, request):
     return Response(str(exc), exc.http_code)
 
 
-#@view_config(context='pyramid.httpexceptions.HTTPNotFound',
-#             renderer='templates/404.pt')
-#def not_found(self, request):
-#    return pyramid.httpexceptions.HTTPFound(request.host_url+"/#"+request.path)
-
-
 @view_config(route_name='home', request_method='GET')
-@view_config(route_name='clouds', request_method='GET')
-@view_config(route_name='cloud', request_method='GET')
-@view_config(route_name='machines', request_method='GET')
-@view_config(route_name='machine', request_method='GET')
-@view_config(route_name='images', request_method='GET')
-@view_config(route_name='image', request_method='GET')
-@view_config(route_name='keys', request_method='GET')
-@view_config(route_name='key', request_method='GET')
-@view_config(route_name='networks', request_method='GET')
-@view_config(route_name='network', request_method='GET')
+@view_config(route_name='ui_routes', request_method='GET')
 def home(request):
-    """Home page view"""
+    """
+    User visits home page.
+    Redirect to mist app if logged in, landing page otherwise.
+    """
     params = params_from_request(request)
-    user = user_from_request(request)
-    if params.get('ember'):
-        template = 'home.pt'
-    else:
-        template = 'poly.pt'
-    return render_to_response('templates/%s' % template,
-        {
-        'project': 'mist.io',
-        'email': json.dumps(user.email),
-        'first_name': json.dumps(""),
-        'last_name': json.dumps(""),
-        'supported_providers': json.dumps(config.SUPPORTED_PROVIDERS_V_2),
-        'core_uri': json.dumps(config.CORE_URI),
-        'auth': json.dumps(bool(user.mist_api_token)),
-        'js_build': json.dumps(config.JS_BUILD),
-        'css_build': config.CSS_BUILD,
-        'js_log_level': json.dumps(config.JS_LOG_LEVEL),
+
+    build_path = ''
+    if config.BUILD_TAG and not params.get('debug'):
+        build_path = 'build/%s/bundled/' % config.BUILD_TAG
+
+    template_inputs = {
+        'build_path': build_path,
+        'csrf_token': json.dumps(get_csrf_token(request)),
         'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
-        'is_core': json.dumps(False),
-        'csrf_token': json.dumps(""),
-        'beta_features': json.dumps(False),
-        'last_build': config.LAST_BUILD
-        }, request=request)
+        'mixpanel_id': config.MIXPANEL_ID,
+        'fb_id': config.FB_ID,
+        'olark_id': config.OLARK_ID,
+    }
+
+    try:
+        user = user_from_request(request)
+    except UserUnauthorizedError:
+        external_auth = config.USE_EXTERNAL_AUTHENTICATION
+        if external_auth:
+            url = request.route_url(route_name='social.auth.login',
+                                    backend=external_auth)
+            raise RedirectError(url)
+
+        #check for first entry in landing cookie, if not add first entry ui log
+        if "first_entry" not in request.cookies:
+            log_event(owner_id="", user_id="",
+                               event_type='ui',
+                               action='first entry at home',
+                               ip=ip_from_request(request))
+
+        return render_to_response('templates/landing.pt', template_inputs)
+
+    if not user.last_active or datetime.now() - user.last_active > timedelta(0, 300):
+        user.last_active = datetime.now()
+        user.save()
+
+    #check for first entry in app cookie, if not add first entry ui log
+    if "first_entry" not in request.cookies or request.cookies['first_entry'] != "app":
+        log_event(owner_id="", user_id="",
+                           event_type='ui',
+                           action='first entry at app',
+                           ip=ip_from_request(request))
+
+    auth_context = auth_context_from_request(request)
+    if not auth_context.owner.last_active or \
+       datetime.now() - auth_context.owner.last_active > timedelta(0, 300):
+        auth_context.owner.last_active = datetime.now()
+        auth_context.owner.save()
+
+    return render_to_response('templates/ui.pt', template_inputs)
 
 
 @view_config(route_name='api_v1_images', request_method='POST', renderer='json')
