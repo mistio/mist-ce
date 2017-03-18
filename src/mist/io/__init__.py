@@ -68,6 +68,16 @@ def add_routes(configurator):
 
     configurator.add_route('ui_routes', '/{section}*fizzle', custom_predicates=[valid_ui_section])
     configurator.add_route('home', '/')
+    configurator.add_route('switch_context', '/switch_context')
+    configurator.add_route('switch_context_org', '/switch_context/{org_id}')
+    configurator.add_route('login', '/login')
+    configurator.add_route('login_service', 'login/{service}')
+    configurator.add_route('logout', '/logout')
+    configurator.add_route('register', '/register')
+    configurator.add_route('confirm', '/confirm')
+    configurator.add_route('set_password', '/set-password')
+    configurator.add_route('forgot_password', '/forgot')
+    configurator.add_route('reset_password', '/reset-password')
 
     configurator.add_route('api_v1_avatars', '/api/v1/avatars')
     configurator.add_route('api_v1_avatar', '/api/v1/avatars/{avatar}')
