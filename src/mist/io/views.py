@@ -21,6 +21,7 @@ from pyramid.response import Response
 from pyramid.renderers import render_to_response
 from pyramid.httpexceptions import HTTPFound
 
+
 from mist.io.scripts.models import CollectdScript
 from mist.io.clouds.models import Cloud
 from mist.io.dns.models import Zone, Record
@@ -43,6 +44,7 @@ from mist.io.exceptions import NetworkNotFoundError, SubnetNotFoundError
 from mist.io.exceptions import UserUnauthorizedError, RedirectError
 from mist.io.exceptions import UserNotFoundError, ConflictError
 
+from mist.io.helpers import encrypt, decrypt
 from mist.io.helpers import get_auth_header, params_from_request
 from mist.io.helpers import trigger_session_update, amqp_publish_user
 from mist.io.helpers import view_config, log_event, ip_from_request

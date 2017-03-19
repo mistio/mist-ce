@@ -17,6 +17,8 @@ from social.apps.pyramid_app.utils import get_helper
 from mist.core.rbac.models import Policy
 from mist.core.rbac.mappings import PermissionMapper, RBACMapping
 
+import mist.io.helpers
+
 from mist.io import config
 
 
@@ -266,8 +268,7 @@ class Owner(me.Document):
         return self.id
 
     def get_external_id(self, service):
-        import mist.io.helpers
-        return mist.io.helpers.encrypt2(self.id, key_salt=service, no_iv=True)
+        return mist.io.helpers.encrypt(self.id, key_salt=service, no_iv=True)
 
     def as_dict(self):
         # FIXME: Now, this is just silly

@@ -722,7 +722,7 @@ def ts_to_str(timestamp):
         return None
 
 
-def encrypt2(plaintext, key=config.SECRET, key_salt='', no_iv=False):
+def encrypt(plaintext, key=config.SECRET, key_salt='', no_iv=False):
     """Encrypt shit the right way"""
 
     # sanitize inputs
@@ -748,6 +748,41 @@ def encrypt2(plaintext, key=config.SECRET, key_salt='', no_iv=False):
 
     # return ciphertext in hex encoding
     return ciphertext.encode('hex')
+
+
+def decrypt(ciphertext, key=config.SECRET, key_salt='', no_iv=False):
+    """Decrypt shit the right way"""
+
+    # sanitize inputs
+    key = SHA256.new(key + key_salt).digest()
+    if len(key) not in AES.key_size:
+        raise Exception()
+    if len(ciphertext) % AES.block_size:
+        raise Exception()
+    try:
+        ciphertext = ciphertext.decode('hex')
+    except TypeError:
+        log.warning("Ciphertext wasn't given as a hexadecimal string.")
+
+    # split initialization vector and ciphertext
+    if no_iv:
+        iv = '\0' * AES.block_size
+    else:
+        iv = ciphertext[:AES.block_size]
+        ciphertext = ciphertext[AES.block_size:]
+
+    # decrypt ciphertext using AES in CFB mode
+    plaintext = AES.new(key, AES.MODE_CFB, iv).decrypt(ciphertext)
+
+    # validate padding using PKCS7 padding scheme
+    padlen = ord(plaintext[-1])
+    if padlen < 1 or padlen > AES.block_size:
+        raise Exception()
+    if plaintext[-padlen:] != chr(padlen) * padlen:
+        raise Exception()
+    plaintext = plaintext[:-padlen]
+
+    return plaintext
 
 
 # TODO: Deprecate. Move to io/logs/methods.py once fully switched to ES.
