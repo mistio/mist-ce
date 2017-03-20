@@ -120,8 +120,7 @@ def home(request):
 
     template_inputs = config.HOMEPAGE_INPUTS
     template_inputs['build_path'] = build_path
-    template_inputs['csrf_token'] = json.dumps(get_csrf_token(request)
-
+    template_inputs['csrf_token'] = json.dumps(get_csrf_token(request))
 
     try:
         user = user_from_request(request)
