@@ -8,7 +8,6 @@ import mongoengine as me
 
 from time import time
 from uuid import uuid4
-from datetime import date
 
 from passlib.context import CryptContext
 
@@ -53,6 +52,7 @@ class HtmlSafeStrField(me.StringField):
         return value
 
 
+# TODO remove these, but first delete feedback field from user
 class Feedback(me.EmbeddedDocument):
     company_name = me.StringField()
     country = me.StringField()
@@ -238,6 +238,7 @@ class Owner(me.Document):
     last_active = me.DateTimeField()
 
     # billing related fields
+    # TODO remove this after merge core_billing
     customerId = me.StringField()
     card = me.StringField()
 
@@ -387,58 +388,6 @@ class Avatar(me.Document):
     content_type = me.StringField(default="image/png")
     body = me.BinaryField()
     owner = me.ReferenceField(Owner, required=True)
-
-
-class Promo(me.Document):
-    code = me.StringField()
-    url_token = me.StringField()
-    plans = me.ListField()
-    # these must be renamed, eventually to orgs
-    users = me.ListField()
-    max_users = me.IntField()
-    discount = me.IntField()
-    duration = me.IntField()
-    expiration = me.FloatField()
-    stripe_coupon_id = me.StringField()
-    send_to_purchase = me.BooleanField()
-
-    def describe(self):
-        """Automatically creates a human readable description for promo."""
-        discount = self.discount
-        days = self.duration
-        duration = "%d days" % days
-        if days >= 30:
-            months = round(float(days) / 30)
-            duration = "%d month" % months
-            if months > 1:
-                duration += 's'
-            if not months % 12:
-                years = months / 12
-                duration = "%d year" % years
-                if years > 1:
-                    duration += 's'
-        return "%d%% off for %s" % (discount, duration)
-
-    def __str__(self):
-        return self.describe()
-
-    def as_dict(self):
-        return json.loads(self.to_json())
-
-    def api_view(self):
-        return {
-            'plans': self.plans,
-            'title': self.code,
-            'users': self.users,
-            'maxUsers': self.max_users,
-            'discount': self.discount,
-            'duration': self.duration,
-            'expiration': date.fromtimestamp(self.expiration).isoformat(),
-            'urlToken': self.url_token,
-            'description': self.describe(),
-            'stripeCouponId': self.stripe_coupon_id,
-            'sendToPurchase': self.send_to_purchase
-        }
 
 
 class Team(me.EmbeddedDocument):

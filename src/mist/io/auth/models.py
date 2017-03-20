@@ -164,3 +164,6 @@ class SessionToken(AuthToken):
     csrf_token = me.StringField(min_length=64, max_length=64,
                                 default=partial(get_secure_rand_token,
                                                 num_of_chars=64))
+    fingerprint = me.StringField(default='')
+    experiment = me.StringField(default='')
+    choice = me.StringField(default='')
