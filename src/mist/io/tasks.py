@@ -1260,15 +1260,14 @@ def group_run_script(owner_id, script_id, name, cloud_machines_pairs):
 
 
 @app.task(soft_time_limit=3600, time_limit=3630)
-def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
+def run_script(owner_id, script_id, cloud_id, machine_id, params='', host='',
                key_id='', username='', password='', port=22, job_id='',
                action_prefix='', su=False, env=""):
     import mist.io.shell
     from mist.io.methods import notify_admin, notify_user
     from mist.io.machines.methods import list_machines
 
-    if not isinstance(owner, Owner):
-        owner = Owner.objects.get(id=owner)
+    owner = Owner.objects.get(id=owner_id)
 
     ret = {
         'owner_id': owner.id,
