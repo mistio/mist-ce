@@ -160,6 +160,37 @@ def home(request):
     return render_to_response('templates/ui.pt', template_inputs)
 
 
+@view_config(context='pyramid.httpexceptions.HTTPNotFound')
+def not_found(self, request):
+    request.response.status = 404
+    params = params_from_request(request)
+
+    build_path = ''
+    if config.BUILD_TAG and not params.get('debug'):
+        build_path = '/build/%s/bundled/' % config.BUILD_TAG
+
+    template_inputs = config.HOMEPAGE_INPUTS
+    template_inputs['build_path'] = build_path
+    template_inputs['csrf_token'] = json.dumps(get_csrf_token(request))
+
+    try:
+        user = user_from_request(request)
+    except UserUnauthorizedError:
+        external_auth = config.USE_EXTERNAL_AUTHENTICATION
+        if external_auth:
+            url = request.route_url(route_name='social.auth.login',
+                                    backend=external_auth)
+            raise RedirectError(url)
+
+        return render_to_response('templates/landing.pt', template_inputs,
+                                  request=request)
+
+    current_org = show_user_organization(request)
+
+    return render_to_response('templates/ui.pt', template_inputs,
+                              request=request)
+
+
 # SEC
 @view_config(route_name='login', request_method='POST', renderer='json')
 @view_config(route_name='login_service', request_method='POST',
@@ -1710,4 +1741,3 @@ def delete_avatar(request):
     avatar.delete()
     trigger_session_update(auth_context.owner, ["org"])
     return OK
-
