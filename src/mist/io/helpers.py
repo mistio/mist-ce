@@ -304,10 +304,11 @@ def amqp_subscribe(exchange, callback, queue='',
 def _amqp_owner_exchange(owner):
     # The exchange/queue name consists of a non-empty sequence of these
     # characters: letters, digits, hyphen, underscore, period, or colon.
-    try:
-        owner = mist.io.users.models.Owner.objects.get(id=owner)
-    except Exception as exc:
-        raise Exception('%r %r' % (exc, owner))
+    if not isinstance(owner, mist.io.users.models.Owner):
+        try:
+            owner = mist.io.users.models.Owner.objects.get(id=owner)
+        except Exception as exc:
+            raise Exception('%r %r' % (exc, owner))
     return "owner_%s" % owner.id
 
 
