@@ -1267,7 +1267,8 @@ def run_script(owner, script_id, cloud_id, machine_id, params='', host='',
     from mist.io.methods import notify_admin, notify_user
     from mist.io.machines.methods import list_machines
 
-    owner = Owner.objects.get(id=owner)
+    if not isinstance(owner, Owner):
+        owner = Owner.objects.get(id=owner)
 
     ret = {
         'owner_id': owner.id,
