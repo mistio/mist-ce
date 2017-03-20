@@ -118,14 +118,10 @@ def home(request):
     if config.BUILD_TAG and not params.get('debug'):
         build_path = 'build/%s/bundled/' % config.BUILD_TAG
 
-    template_inputs = {
-        'build_path': build_path,
-        'csrf_token': json.dumps(get_csrf_token(request)),
-        'google_analytics_id': config.GOOGLE_ANALYTICS_ID,
-        'mixpanel_id': config.MIXPANEL_ID,
-        'fb_id': config.FB_ID,
-        'olark_id': config.OLARK_ID,
-    }
+    template_inputs = config.HOMEPAGE_INPUTS
+    template_inputs['build_path'] = build_path
+    template_inputs['csrf_token'] = json.dumps(get_csrf_token(request)
+
 
     try:
         user = user_from_request(request)

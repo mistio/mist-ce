@@ -739,3 +739,11 @@ if NO_VERIFY_HOSTS:
     if DOCKER_IP:
         NO_VERIFY_HOSTS.append(DOCKER_IP)
     libcloud.security.NO_VERIFY_MATCH_HOSTNAMES = NO_VERIFY_HOSTS
+
+
+HOMEPAGE_INPUTS = {
+    'google_analytics_id': GOOGLE_ANALYTICS_ID,
+    'mixpanel_id': MIXPANEL_ID,
+    'fb_id': FB_ID,
+    'olark_id': OLARK_ID,
+}
