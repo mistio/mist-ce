@@ -934,6 +934,14 @@ class OnAppComputeController(BaseComputeController):
                                           secret=self.cloud.apikey,
                                           host=self.cloud.host)
 
+    def _list_machines__machine_actions(self,  machine, machine_libcloud):
+        super(OnAppComputeController, self)._list_machines__machine_actions(
+               machine, machine_libcloud)
+        if machine_libcloud.state is NodeState.RUNNING:
+            machine.actions.suspend = True
+        if machine_libcloud.state is NodeState.SUSPENDED:
+            machine.actions.resume = True
+
     def _list_machines__machine_creation_date(self, machine, machine_libcloud):
         return machine_libcloud.extra.get('created_at')
 
@@ -950,14 +958,11 @@ class OnAppComputeController(BaseComputeController):
         # also what happens if VM is stopped
         return machine_libcloud.extra.get('price_per_hour', 0), 0
 
-    def _reboot_machine(self, machine, machine_libcloud):
-        self.connection.reboot_node(machine_libcloud)
+    def _resume_machine(self, machine, machine_libcloud):
+        self.connection.ex_resume_node(machine_libcloud)
 
-    def _start_machine(self,  machine, machine_libcloud):
-        self.connection.ex_start_node(machine_libcloud)
-
-    def _stop_machine(self,  machine, machine_libcloud):
-        self.connection.ex_stop_node(machine_libcloud)
+    def _suspend_machine(self, machine, machine_libcloud):
+        self.connection.ex_suspend_node(machine_libcloud)
 
 
 class OtherComputeController(BaseComputeController):
