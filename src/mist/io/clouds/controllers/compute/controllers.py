@@ -952,6 +952,10 @@ class OnAppComputeController(BaseComputeController):
         if machine.os_type not in ('unix', 'linux', 'windows', 'coreos'):
             machine.os_type = 'linux'
 
+        machine.extra['image_id'] = machine.extra.get('template_label') or machine.extra.get('operating_system_distro')
+        machine.extra.pop('template_label', None)
+        machine.extra['size'] = "%scpu, %sM ram" % (machine.extra.get('cpus'), machine.extra.get('memory'))
+
     def _list_machines__cost_machine(self,  machine, machine_libcloud):
         # TODO: investigate how price_per_hour and price_per_hour_powered_off
         # differ
