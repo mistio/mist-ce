@@ -779,12 +779,12 @@ def confirm_invitation(request):
         key = params.get('key')
         if not key:
             key = user.activation_key
-        uri = 'confirm?' + urllib.urlencode({'key': key, 'invitoken': invitoken})
+        uri = '/confirm?' + urllib.urlencode({'key': key, 'invitoken': invitoken})
         raise RedirectError(uri)
 
     # if user is confirmed but not logged in then redirect to log in page
     if not auth_context:
-        uri = 'login?' + urllib.urlencode({'invitoken': invitoken})
+        uri = '/login?' + urllib.urlencode({'invitoken': invitoken})
         raise RedirectError(uri)
 
     # if user is logged in then make sure it's his invitation that he is
