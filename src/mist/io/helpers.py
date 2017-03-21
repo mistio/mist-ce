@@ -51,11 +51,6 @@ from mist.io.exceptions import RequiredParameterMissingError
 
 from mist.io import config
 
-try:
-    from mist.core.experiments.helpers import cross_populate_session_data
-except ImportError:
-    from mist.io.dummy.methods import cross_populate_session_data
-
 
 import logging
 logging.basicConfig(level=config.PY_LOG_LEVEL,
@@ -820,6 +815,10 @@ def log_event(owner_id, event_type, action, error=None, story_id='',
             if key in kwargs:
                 event[key] = kwargs.pop(key)
 
+        try:
+            from mist.core.experiments.helpers import cross_populate_session_data
+        except ImportError:
+            from mist.io.dummy.methods import cross_populate_session_data
         event = cross_populate_session_data(event, kwargs)
 
         event['_id'] = str(coll.save(event.copy()))
