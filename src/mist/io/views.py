@@ -73,8 +73,8 @@ OK = Response("OK", 200)
 
 @view_config(context=Exception)
 def exception_handler_mist(exc, request):
-    """Here we catch exceptions and transform them to proper http responses
-
+    """
+    Here we catch exceptions and transform them to proper http responses
     This is a special pyramid view that gets triggered whenever an exception
     is raised from any other view. It catches all exceptions exc where
     isinstance(exc, context) is True.
@@ -102,8 +102,11 @@ def exception_handler_mist(exc, request):
     # mist exceptions are ok.
     log.info("MistError: %r", exc)
 
+    # if it is a RedirectError, then send an HTTP Redirect
+    if isinstance(exc, RedirectError):
+        return HTTPFound(exc.url or '')
 
-    # translate it to HTTP response based on http_code attribute
+    # else translate it to HTTP response based on http_code attribute
     return Response(str(exc), exc.http_code)
 
 
